@@ -1,0 +1,7 @@
+# CMake generation dependency list for this directory.
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/cmake/Modules/ExtendPath.cmake
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/cmake/Modules/FindPrefixFromConfig.cmake
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/cmake/modules/CMakeLists.txt
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/cmake/modules/LLVMConfig.cmake.in
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/cmake/modules/LLVMConfigVersion.cmake.in
+C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/cmake/modules/LLVMDistributionSupport.cmake

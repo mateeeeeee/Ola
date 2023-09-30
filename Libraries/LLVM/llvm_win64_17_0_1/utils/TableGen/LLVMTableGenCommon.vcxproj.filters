@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\Attributes.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\CodeGenIntrinsics.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\DirectiveEmitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\IntrinsicEmitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\RISCVTargetDefEmitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\SDNodeProperties.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\obj.LLVMTableGenCommon.dir\$(Configuration)\VTEmitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{E0ED2ED2-1558-3ADD-8937-0DDCF5889563}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

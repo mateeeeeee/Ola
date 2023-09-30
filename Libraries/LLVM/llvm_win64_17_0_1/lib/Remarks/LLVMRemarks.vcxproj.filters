@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\BitstreamRemarkParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\BitstreamRemarkSerializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\Remark.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkLinker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkSerializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkStreamer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\RemarkStringTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\YAMLRemarkParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\YAMLRemarkSerializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\BitstreamRemarkParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\YAMLRemarkParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\BitstreamRemarkContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\BitstreamRemarkParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\BitstreamRemarkSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\HotnessThresholdParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\Remark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkLinker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkStreamer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\RemarkStringTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Remarks\YAMLRemarkSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\Remarks\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CD922F21-FB8F-3E95-AE48-993BE1C9A99B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75C1D2B9-8EE6-3ABC-97E2-62AE4BFF662F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

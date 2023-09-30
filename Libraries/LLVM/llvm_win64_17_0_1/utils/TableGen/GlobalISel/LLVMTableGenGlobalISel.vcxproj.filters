@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\CodeExpander.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagEdge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagInstr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagOperands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagPredicate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagPredicateDependencyEdge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\CodeExpander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\CodeExpansions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\CombinerUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagInstr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagOperands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagPredicate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchDagPredicateDependencyEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\GIMatchTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\utils\TableGen\GlobalISel\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CD922F21-FB8F-3E95-AE48-993BE1C9A99B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75C1D2B9-8EE6-3ABC-97E2-62AE4BFF662F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

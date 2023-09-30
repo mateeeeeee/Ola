@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\Architecture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\ArchitectureSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\InterfaceFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\TextStubV5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\PackedVersion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\Platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\Symbol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\SymbolSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\Target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\TextStub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\TextStubCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\TextAPIContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\TextStubCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\Architecture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\ArchitectureSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\InterfaceFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\PackedVersion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\Symbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\SymbolSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\Target.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\TextAPIReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\TextAPI\TextAPIWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\TextAPI\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CD922F21-FB8F-3E95-AE48-993BE1C9A99B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75C1D2B9-8EE6-3ABC-97E2-62AE4BFF662F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\12a9faee166d5240e82b0a08844345c2\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A35FBA69-A6F5-331E-AB82-302D67FE159C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

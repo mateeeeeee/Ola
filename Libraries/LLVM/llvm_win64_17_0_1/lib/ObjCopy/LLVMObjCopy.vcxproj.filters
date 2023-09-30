@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\Archive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\CommonConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\ObjCopy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\ConfigManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFObjcopy.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFObject.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFReader.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFWriter.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\ELF\ELFObjcopy.cpp">
+      <Filter>Source Files\ELF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\ELF\ELFObject.cpp">
+      <Filter>Source Files\ELF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOObjcopy.cpp">
+      <Filter>Source Files\MachO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOReader.cpp">
+      <Filter>Source Files\MachO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOWriter.cpp">
+      <Filter>Source Files\MachO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOLayoutBuilder.cpp">
+      <Filter>Source Files\MachO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOObject.cpp">
+      <Filter>Source Files\MachO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmObject.cpp">
+      <Filter>Source Files\wasm</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmReader.cpp">
+      <Filter>Source Files\wasm</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmWriter.cpp">
+      <Filter>Source Files\wasm</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmObjcopy.cpp">
+      <Filter>Source Files\wasm</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFObjcopy.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFReader.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFWriter.cpp">
+      <Filter>Source Files\COFF</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\Archive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\CommonConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\ConfigManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\MultiFormatConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\ObjCopy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\COFF\COFFConfig.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\COFF\COFFObjcopy.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\ELF\ELFConfig.h">
+      <Filter>Header Files\ELF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\ELF\ELFObjcopy.h">
+      <Filter>Header Files\ELF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\MachO\MachOConfig.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\MachO\MachOObjcopy.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\wasm\WasmConfig.h">
+      <Filter>Header Files\wasm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\wasm\WasmObjcopy.h">
+      <Filter>Header Files\wasm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\XCOFF\XCOFFConfig.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\ObjCopy\XCOFF\XCOFFObjcopy.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFObject.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFReader.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\COFF\COFFWriter.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\ELF\ELFObject.h">
+      <Filter>Header Files\ELF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOLayoutBuilder.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOObject.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOReader.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\MachO\MachOWriter.h">
+      <Filter>Header Files\MachO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmObject.h">
+      <Filter>Header Files\wasm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmReader.h">
+      <Filter>Header Files\wasm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\wasm\WasmWriter.h">
+      <Filter>Header Files\wasm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFObject.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFReader.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\XCOFF\XCOFFWriter.h">
+      <Filter>Header Files\COFF</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\lib\ObjCopy\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CD922F21-FB8F-3E95-AE48-993BE1C9A99B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\COFF">
+      <UniqueIdentifier>{5DB06CDF-A772-3111-94A2-385C1A3D81E8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ELF">
+      <UniqueIdentifier>{191C9C4E-341E-3AD4-A954-AF3D07C63422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MachO">
+      <UniqueIdentifier>{F79EB402-2B3E-3D31-8B21-ECA69C8F3FAF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wasm">
+      <UniqueIdentifier>{CD1924C8-E435-35C8-9A79-5639C6EC734B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75C1D2B9-8EE6-3ABC-97E2-62AE4BFF662F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COFF">
+      <UniqueIdentifier>{00E8F2F7-8360-311A-A158-9CE66DECCE76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ELF">
+      <UniqueIdentifier>{5C32E0EA-BA68-3C32-9B7B-1F4655AD5173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MachO">
+      <UniqueIdentifier>{E596098F-D4D2-3996-9154-A08747FBD38C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wasm">
+      <UniqueIdentifier>{BF6B3CB6-EFF6-35A3-8D7F-28AED426781E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\89d0d899371900c9407b0abe45304894\ACC.h.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\89d0d899371900c9407b0abe45304894\ACC.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\e59a3d44713b5e61ef2843666495c102\acc_gen.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Frontend\OpenACC\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include\llvm\Frontend\OpenACC\CMakeFiles\acc_gen" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A35FBA69-A6F5-331E-AB82-302D67FE159C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1082 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FC6F7EE6-F7CD-3CFB-88AC-EB9D06CFBBA3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.27\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-ASM.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.27\Modules\FindBacktrace.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindLibXml2.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython\Support.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython3.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindZLIB.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\SelectLibraryConfigurations.cmake;C:\Program Files\CMake\share\cmake-3.27\Templates\CPackConfig.cmake.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\CMakePolicy.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\GNUInstallPackageDir.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\config-ix.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddLLVM.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckAtomic.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckCompilerVersion.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckProblematicConfigurations.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\ChooseMSVCCRT.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CoverageReport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\DetermineGCCCompatible.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindLibpfm.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\Findzstd.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetErrcMessages.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetHostTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMOptions.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMStdlib.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVM-Config.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMCheckLinkerFlag.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMDistributionSupport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMProcessSources.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\SetTargetTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\TableGen.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\VersionFromVCS.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmParsers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmPrinters.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Disassemblers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetExegesis.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetMCAs.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Targets.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\abi-breaking.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\llvm-config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\llvm.spec.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeASMCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCXXCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeRCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeSystem.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.27\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-ASM.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.27\Modules\FindBacktrace.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindLibXml2.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython\Support.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython3.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindZLIB.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\SelectLibraryConfigurations.cmake;C:\Program Files\CMake\share\cmake-3.27\Templates\CPackConfig.cmake.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\CMakePolicy.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\GNUInstallPackageDir.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\config-ix.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddLLVM.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckAtomic.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckCompilerVersion.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckProblematicConfigurations.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\ChooseMSVCCRT.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CoverageReport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\DetermineGCCCompatible.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindLibpfm.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\Findzstd.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetErrcMessages.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetHostTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMOptions.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMStdlib.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVM-Config.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMCheckLinkerFlag.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMDistributionSupport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMProcessSources.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\SetTargetTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\TableGen.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\VersionFromVCS.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmParsers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmPrinters.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Disassemblers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetExegesis.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetMCAs.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Targets.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\abi-breaking.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\llvm-config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\llvm.spec.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeASMCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCXXCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeRCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeSystem.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.27\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-ASM.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.27\Modules\FindBacktrace.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindLibXml2.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython\Support.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython3.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindZLIB.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\SelectLibraryConfigurations.cmake;C:\Program Files\CMake\share\cmake-3.27\Templates\CPackConfig.cmake.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\CMakePolicy.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\GNUInstallPackageDir.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\config-ix.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddLLVM.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckAtomic.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckCompilerVersion.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckProblematicConfigurations.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\ChooseMSVCCRT.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CoverageReport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\DetermineGCCCompatible.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindLibpfm.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\Findzstd.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetErrcMessages.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetHostTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMOptions.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMStdlib.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVM-Config.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMCheckLinkerFlag.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMDistributionSupport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMProcessSources.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\SetTargetTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\TableGen.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\VersionFromVCS.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmParsers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmPrinters.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Disassemblers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetExegesis.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetMCAs.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Targets.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\abi-breaking.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\llvm-config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\llvm.spec.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeASMCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCXXCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeRCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeSystem.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.27\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompileFeatures.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestASMCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckCXXSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-ASM.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-3.27\Modules\FindBacktrace.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindLibXml2.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython\Support.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindPython3.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\FindZLIB.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.27\Modules\SelectLibraryConfigurations.cmake;C:\Program Files\CMake\share\cmake-3.27\Templates\CPackConfig.cmake.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\CMakePolicy.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\cmake\Modules\GNUInstallPackageDir.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\config-ix.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddLLVM.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\AddOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckAtomic.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckCompilerVersion.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CheckProblematicConfigurations.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\ChooseMSVCCRT.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\CoverageReport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\DetermineGCCCompatible.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindLibpfm.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\FindOCaml.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\Findzstd.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetErrcMessages.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\GetHostTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMOptions.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\HandleLLVMStdlib.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVM-Config.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMCheckLinkerFlag.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMDistributionSupport.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\LLVMProcessSources.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\SetTargetTriple.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\TableGen.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\cmake\modules\VersionFromVCS.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmParsers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\AsmPrinters.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Disassemblers.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetExegesis.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\TargetMCAs.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\Targets.def.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\abi-breaking.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include\llvm\Config\llvm-config.h.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\llvm.spec.in;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeASMCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeCXXCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeRCCompiler.cmake;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\3.27.4\CMakeSystem.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\ZERO_CHECK.vcxproj">
+      <Project>{377EDFC3-8D67-3442-AADB-F3EF0C9DF2FD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\DynamicLibrary\DynamicLibraryLib.vcxproj">
+      <Project>{C850E178-3416-3C43-91A0-BCFC414B7163}</Project>
+      <Name>DynamicLibraryLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\FileCheck\FileCheck.vcxproj">
+      <Project>{FB5B78D7-DC2B-389B-84A7-F120C9E35C59}</Project>
+      <Name>FileCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\KillTheDoctor\KillTheDoctor.vcxproj">
+      <Project>{37900A15-0D0F-340F-A7B2-0C6803EA9438}</Project>
+      <Name>KillTheDoctor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-shlib\LLVM-C.vcxproj">
+      <Project>{13CFE79E-8903-3B2B-9161-022B8C7CC869}</Project>
+      <Name>LLVM-C</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\AsmParser\LLVMAArch64AsmParser.vcxproj">
+      <Project>{38AEBDF4-2D41-3ECD-B4FE-40F59894782F}</Project>
+      <Name>LLVMAArch64AsmParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\LLVMAArch64CodeGen.vcxproj">
+      <Project>{AEBF6EED-C15C-3C06-9142-88B29E3F7E46}</Project>
+      <Name>LLVMAArch64CodeGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\MCTargetDesc\LLVMAArch64Desc.vcxproj">
+      <Project>{24190748-69B6-350A-B402-61150BBFC793}</Project>
+      <Name>LLVMAArch64Desc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\Disassembler\LLVMAArch64Disassembler.vcxproj">
+      <Project>{EDC4BEEF-7172-3989-BFAB-668BF9AD3737}</Project>
+      <Name>LLVMAArch64Disassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\TargetInfo\LLVMAArch64Info.vcxproj">
+      <Project>{8196C2EE-8C44-3806-ABAE-EA3599B60ED2}</Project>
+      <Name>LLVMAArch64Info</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\AArch64\Utils\LLVMAArch64Utils.vcxproj">
+      <Project>{BFDAB590-398D-30DD-9CA4-FD876AF0E13B}</Project>
+      <Name>LLVMAArch64Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\AsmParser\LLVMARMAsmParser.vcxproj">
+      <Project>{137EF47A-47F5-3022-8BCB-68A11FDAF2FE}</Project>
+      <Name>LLVMARMAsmParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\LLVMARMCodeGen.vcxproj">
+      <Project>{3B1D1FA6-64E5-3D8C-9189-F30349975935}</Project>
+      <Name>LLVMARMCodeGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\MCTargetDesc\LLVMARMDesc.vcxproj">
+      <Project>{50FFC33E-1F7B-3624-AFCB-C6A807B2C8CE}</Project>
+      <Name>LLVMARMDesc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\Disassembler\LLVMARMDisassembler.vcxproj">
+      <Project>{12926959-12A0-3C54-B366-1498DDE0569A}</Project>
+      <Name>LLVMARMDisassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\TargetInfo\LLVMARMInfo.vcxproj">
+      <Project>{18B38D2F-A265-31B3-8C8A-271D2FC1037E}</Project>
+      <Name>LLVMARMInfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\ARM\Utils\LLVMARMUtils.vcxproj">
+      <Project>{A9BA3C25-674E-3FBE-8AF5-C507626FDB94}</Project>
+      <Name>LLVMARMUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\AggressiveInstCombine\LLVMAggressiveInstCombine.vcxproj">
+      <Project>{73B3153D-C61F-391C-B2D5-ED5FBC9BA2BF}</Project>
+      <Name>LLVMAggressiveInstCombine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Analysis\LLVMAnalysis.vcxproj">
+      <Project>{B5F6F729-93E6-34D3-86A3-1C9013152D91}</Project>
+      <Name>LLVMAnalysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\AsmParser\LLVMAsmParser.vcxproj">
+      <Project>{4CC5C342-03BB-3141-BBB0-417D68743DE3}</Project>
+      <Name>LLVMAsmParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\AsmPrinter\LLVMAsmPrinter.vcxproj">
+      <Project>{1C6AC656-DDE9-34E2-9824-1BE4F87B0930}</Project>
+      <Name>LLVMAsmPrinter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\BinaryFormat\LLVMBinaryFormat.vcxproj">
+      <Project>{0C56DEEA-60AE-389F-8A1E-5C796A05AC1B}</Project>
+      <Name>LLVMBinaryFormat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Bitcode\Reader\LLVMBitReader.vcxproj">
+      <Project>{551555C7-130A-36ED-B573-6480DAF8BDC3}</Project>
+      <Name>LLVMBitReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Bitcode\Writer\LLVMBitWriter.vcxproj">
+      <Project>{901C1BD1-A776-31C7-BBA0-5459272099C7}</Project>
+      <Name>LLVMBitWriter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Bitstream\Reader\LLVMBitstreamReader.vcxproj">
+      <Project>{A0550E36-93E3-3815-9AAA-E9FD37F01665}</Project>
+      <Name>LLVMBitstreamReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\CFGuard\LLVMCFGuard.vcxproj">
+      <Project>{2BE1B9BE-77FA-39D3-A596-FBB942ACA923}</Project>
+      <Name>LLVMCFGuard</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cfi-verify\lib\LLVMCFIVerify.vcxproj">
+      <Project>{4A55E33D-2810-3DD5-8E90-FEE683A7A029}</Project>
+      <Name>LLVMCFIVerify</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\LLVMCodeGen.vcxproj">
+      <Project>{B0D89CA6-BA79-338C-8EDD-0FB2CEEA50C9}</Project>
+      <Name>LLVMCodeGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\LLVMCodeGenTypes.vcxproj">
+      <Project>{62F6B601-B7E4-3703-A1D9-95366E4B4A40}</Project>
+      <Name>LLVMCodeGenTypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\IR\LLVMCore.vcxproj">
+      <Project>{A99EAFF5-8011-3A86-A04F-D23E88B4F8CC}</Project>
+      <Name>LLVMCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\Coroutines\LLVMCoroutines.vcxproj">
+      <Project>{25F84F05-E8BF-3517-AA23-4B9EAE7CFBB7}</Project>
+      <Name>LLVMCoroutines</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ProfileData\Coverage\LLVMCoverage.vcxproj">
+      <Project>{E6803D6D-ED9D-3752-9D30-0144ED6BACF2}</Project>
+      <Name>LLVMCoverage</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DWARFLinker\LLVMDWARFLinker.vcxproj">
+      <Project>{95FD782A-C377-3BAD-B986-D8B2B43C2AA4}</Project>
+      <Name>LLVMDWARFLinker</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DWARFLinkerParallel\LLVMDWARFLinkerParallel.vcxproj">
+      <Project>{BEBBAC80-7EE4-3AA7-A3A1-5C32BEE52132}</Project>
+      <Name>LLVMDWARFLinkerParallel</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DWP\LLVMDWP.vcxproj">
+      <Project>{9AA8A479-A8AA-3CF3-93B3-1D7AC12B8CD6}</Project>
+      <Name>LLVMDWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\BTF\LLVMDebugInfoBTF.vcxproj">
+      <Project>{AA0A5699-3241-3C9D-BDF5-DD769113DCBA}</Project>
+      <Name>LLVMDebugInfoBTF</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\CodeView\LLVMDebugInfoCodeView.vcxproj">
+      <Project>{025809D1-7A6F-342A-BFDE-4544A13B44F2}</Project>
+      <Name>LLVMDebugInfoCodeView</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\DWARF\LLVMDebugInfoDWARF.vcxproj">
+      <Project>{10095FC8-1363-3508-B123-950DAB35E23C}</Project>
+      <Name>LLVMDebugInfoDWARF</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\GSYM\LLVMDebugInfoGSYM.vcxproj">
+      <Project>{2DCA6663-EECF-374D-BFDC-E204C602C241}</Project>
+      <Name>LLVMDebugInfoGSYM</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\LogicalView\LLVMDebugInfoLogicalView.vcxproj">
+      <Project>{D9DE9B5B-3F4C-383A-A3A7-19E3C40EC46E}</Project>
+      <Name>LLVMDebugInfoLogicalView</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\MSF\LLVMDebugInfoMSF.vcxproj">
+      <Project>{2CA5795B-022D-3D76-BF34-B334B0297760}</Project>
+      <Name>LLVMDebugInfoMSF</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\PDB\LLVMDebugInfoPDB.vcxproj">
+      <Project>{E60CE4CD-A638-31EA-AF22-E96198057886}</Project>
+      <Name>LLVMDebugInfoPDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Debuginfod\LLVMDebuginfod.vcxproj">
+      <Project>{469EAA5F-E325-3E8A-AD96-5825F88BF2A1}</Project>
+      <Name>LLVMDebuginfod</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Demangle\LLVMDemangle.vcxproj">
+      <Project>{7490709F-3D39-3300-941C-B420C525FD7F}</Project>
+      <Name>LLVMDemangle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-diff\lib\LLVMDiff.vcxproj">
+      <Project>{39E8A7E7-FF81-3CFC-AB8D-EA1BECE78841}</Project>
+      <Name>LLVMDiff</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ToolDrivers\llvm-dlltool\LLVMDlltoolDriver.vcxproj">
+      <Project>{A5D581A9-080A-3680-AFB4-46EB16621830}</Project>
+      <Name>LLVMDlltoolDriver</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\LLVMExecutionEngine.vcxproj">
+      <Project>{DBEAB7CC-E304-3932-828B-02E380048F04}</Project>
+      <Name>LLVMExecutionEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-exegesis\lib\LLVMExegesis.vcxproj">
+      <Project>{1AED8558-FF71-3285-A115-8180FCBE7829}</Project>
+      <Name>LLVMExegesis</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-exegesis\lib\AArch64\LLVMExegesisAArch64.vcxproj">
+      <Project>{75C77C40-6A6E-337A-8916-238BFDA93B8E}</Project>
+      <Name>LLVMExegesisAArch64</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-exegesis\lib\X86\LLVMExegesisX86.vcxproj">
+      <Project>{762E5939-1D71-358F-B5F7-525A5577215A}</Project>
+      <Name>LLVMExegesisX86</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Extensions\LLVMExtensions.vcxproj">
+      <Project>{F15D1B61-A84A-399B-889C-CDBE390E1CEE}</Project>
+      <Name>LLVMExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\FileCheck\LLVMFileCheck.vcxproj">
+      <Project>{F46E2FC0-1F28-31EF-AAF0-464E91DEC4AC}</Project>
+      <Name>LLVMFileCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Frontend\HLSL\LLVMFrontendHLSL.vcxproj">
+      <Project>{2DCF3F3A-62C4-3B79-9323-941B2040CB43}</Project>
+      <Name>LLVMFrontendHLSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Frontend\OpenACC\LLVMFrontendOpenACC.vcxproj">
+      <Project>{FDDB36C6-7B09-33E3-A108-5BD162E2D21C}</Project>
+      <Name>LLVMFrontendOpenACC</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Frontend\OpenMP\LLVMFrontendOpenMP.vcxproj">
+      <Project>{D72DE962-70B3-38B5-A38F-B57F82B6639F}</Project>
+      <Name>LLVMFrontendOpenMP</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\FuzzMutate\LLVMFuzzMutate.vcxproj">
+      <Project>{E614057F-2838-3310-9583-9F5E181EADEE}</Project>
+      <Name>LLVMFuzzMutate</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\FuzzMutate\LLVMFuzzerCLI.vcxproj">
+      <Project>{5BD02F2E-B1CF-35CE-8C9C-430CD1C6638C}</Project>
+      <Name>LLVMFuzzerCLI</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\GlobalISel\LLVMGlobalISel.vcxproj">
+      <Project>{785BED49-C59D-3284-BFE8-D33311CB11C0}</Project>
+      <Name>LLVMGlobalISel</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\IRPrinter\LLVMIRPrinter.vcxproj">
+      <Project>{01F66938-DD41-3A07-AB8D-4266F72714AB}</Project>
+      <Name>LLVMIRPrinter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\IRReader\LLVMIRReader.vcxproj">
+      <Project>{9640037F-C454-387D-85A8-28A605EF553E}</Project>
+      <Name>LLVMIRReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\InstCombine\LLVMInstCombine.vcxproj">
+      <Project>{CFC2ABB1-FB7A-36BC-98BE-FC84A7E7A2D2}</Project>
+      <Name>LLVMInstCombine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\Instrumentation\LLVMInstrumentation.vcxproj">
+      <Project>{794AC396-2B14-3394-A90D-1747AC14156A}</Project>
+      <Name>LLVMInstrumentation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\InterfaceStub\LLVMInterfaceStub.vcxproj">
+      <Project>{1060EF81-7DB5-3599-9B7A-37C8D5BF4B82}</Project>
+      <Name>LLVMInterfaceStub</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\Interpreter\LLVMInterpreter.vcxproj">
+      <Project>{B84D3D41-D4E0-3804-8008-D454B295D4FF}</Project>
+      <Name>LLVMInterpreter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\JITLink\LLVMJITLink.vcxproj">
+      <Project>{0DC5E7E4-3E01-3919-AA51-78A4813F5792}</Project>
+      <Name>LLVMJITLink</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\LTO\LLVMLTO.vcxproj">
+      <Project>{F5E2A3C8-2A42-30C1-9665-25C5F41F2B84}</Project>
+      <Name>LLVMLTO</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ToolDrivers\llvm-lib\LLVMLibDriver.vcxproj">
+      <Project>{DACC8AD6-C7D0-3E64-B499-14877E5B2A0C}</Project>
+      <Name>LLVMLibDriver</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\LineEditor\LLVMLineEditor.vcxproj">
+      <Project>{F75257CC-35C7-34A9-8951-15C5B7021B0D}</Project>
+      <Name>LLVMLineEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Linker\LLVMLinker.vcxproj">
+      <Project>{12F7FE89-9D1E-3B15-95BB-26D0FA22686E}</Project>
+      <Name>LLVMLinker</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\MC\LLVMMC.vcxproj">
+      <Project>{B4A0F277-7B01-364B-9F98-35DC5DF7133B}</Project>
+      <Name>LLVMMC</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\MCA\LLVMMCA.vcxproj">
+      <Project>{397D84E2-0486-3AF5-9B94-F319CCE84638}</Project>
+      <Name>LLVMMCA</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\MC\MCDisassembler\LLVMMCDisassembler.vcxproj">
+      <Project>{2BBB8AA7-11D5-3699-B5B7-C2320F7E14A8}</Project>
+      <Name>LLVMMCDisassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\MCJIT\LLVMMCJIT.vcxproj">
+      <Project>{A54CF4A7-6B93-3531-B60E-77425B4EC702}</Project>
+      <Name>LLVMMCJIT</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\MC\MCParser\LLVMMCParser.vcxproj">
+      <Project>{711E1BA3-1E89-3414-9D6B-95236CA68DFA}</Project>
+      <Name>LLVMMCParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\MIRParser\LLVMMIRParser.vcxproj">
+      <Project>{053CB001-954E-36DB-AE82-46A5E8C488BF}</Project>
+      <Name>LLVMMIRParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\ObjCARC\LLVMObjCARCOpts.vcxproj">
+      <Project>{9AB3CF2B-348D-357D-8694-296E5FE75792}</Project>
+      <Name>LLVMObjCARCOpts</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ObjCopy\LLVMObjCopy.vcxproj">
+      <Project>{8102151D-0196-374E-B16B-07EC416F8EE4}</Project>
+      <Name>LLVMObjCopy</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Object\LLVMObject.vcxproj">
+      <Project>{FDD432EF-C25D-3878-8607-676186B2368B}</Project>
+      <Name>LLVMObject</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ObjectYAML\LLVMObjectYAML.vcxproj">
+      <Project>{58ADA5B6-2444-3437-A6AF-02B98C797AA8}</Project>
+      <Name>LLVMObjectYAML</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Option\LLVMOption.vcxproj">
+      <Project>{935E4EDC-2E35-3516-8A5A-A72399FD3F5C}</Project>
+      <Name>LLVMOption</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\Orc\LLVMOrcJIT.vcxproj">
+      <Project>{1D3D82FC-22C2-33ED-9502-46BE46AB8E7D}</Project>
+      <Name>LLVMOrcJIT</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\Orc\Shared\LLVMOrcShared.vcxproj">
+      <Project>{17DF51C5-40AD-3D33-BFE2-EE4B9BB15CB0}</Project>
+      <Name>LLVMOrcShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\Orc\TargetProcess\LLVMOrcTargetProcess.vcxproj">
+      <Project>{754545DD-EE60-39CE-8316-6376AEA96E0F}</Project>
+      <Name>LLVMOrcTargetProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Passes\LLVMPasses.vcxproj">
+      <Project>{70215E68-FD53-3BD2-95E1-5DFDCBBAC3EE}</Project>
+      <Name>LLVMPasses</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ProfileData\LLVMProfileData.vcxproj">
+      <Project>{56A8BCED-0649-3523-9328-656FE94C95A4}</Project>
+      <Name>LLVMProfileData</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Remarks\LLVMRemarks.vcxproj">
+      <Project>{2412C53D-5CEB-38E7-BEA0-1F14237C7BBD}</Project>
+      <Name>LLVMRemarks</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\ExecutionEngine\RuntimeDyld\LLVMRuntimeDyld.vcxproj">
+      <Project>{BD4FACAA-D318-371C-9BAD-13DFABB31BC3}</Project>
+      <Name>LLVMRuntimeDyld</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\Scalar\LLVMScalarOpts.vcxproj">
+      <Project>{44C8C34D-EA4C-3F9D-B6E8-4A63137BE61F}</Project>
+      <Name>LLVMScalarOpts</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\CodeGen\SelectionDAG\LLVMSelectionDAG.vcxproj">
+      <Project>{DEF97F52-F82E-38D0-8F9B-FB38F01C50E8}</Project>
+      <Name>LLVMSelectionDAG</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Support\LLVMSupport.vcxproj">
+      <Project>{9A93AE2A-C945-322C-8360-228F3B14EB8D}</Project>
+      <Name>LLVMSupport</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\DebugInfo\Symbolize\LLVMSymbolize.vcxproj">
+      <Project>{C82D7ED8-D373-3946-9E19-8FE0F1861DEA}</Project>
+      <Name>LLVMSymbolize</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\TableGen\LLVMTableGen.vcxproj">
+      <Project>{72F289DC-ED26-376C-B846-2B4388BA7A61}</Project>
+      <Name>LLVMTableGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\LLVMTableGenCommon.vcxproj">
+      <Project>{AA867CE7-56B0-391A-A15F-2A1AD9B5550D}</Project>
+      <Name>LLVMTableGenCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\GlobalISel\LLVMTableGenGlobalISel.vcxproj">
+      <Project>{4BE22610-E8D0-39D3-ABBC-900BC42EA57F}</Project>
+      <Name>LLVMTableGenGlobalISel</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\LLVMTarget.vcxproj">
+      <Project>{6CF903AE-4402-3923-BA1C-8A55A16A94EB}</Project>
+      <Name>LLVMTarget</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\TargetParser\LLVMTargetParser.vcxproj">
+      <Project>{02620A6D-CC84-3A1D-8663-B98D7EBE2EA4}</Project>
+      <Name>LLVMTargetParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\TextAPI\LLVMTextAPI.vcxproj">
+      <Project>{F3592D06-7B92-3D7A-B3B7-B1BB52CCBA3F}</Project>
+      <Name>LLVMTextAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\Utils\LLVMTransformUtils.vcxproj">
+      <Project>{30095524-4C7C-38DC-8CDF-FB98A2FD75B5}</Project>
+      <Name>LLVMTransformUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\Vectorize\LLVMVectorize.vcxproj">
+      <Project>{2BEBC095-7FAD-3BCD-9DF9-2A5FEC60BDBB}</Project>
+      <Name>LLVMVectorize</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\AsmParser\LLVMWebAssemblyAsmParser.vcxproj">
+      <Project>{9F213782-1A24-3707-850F-8F0E63118EE1}</Project>
+      <Name>LLVMWebAssemblyAsmParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\LLVMWebAssemblyCodeGen.vcxproj">
+      <Project>{AEFB8C09-574C-397E-B854-ADD275224692}</Project>
+      <Name>LLVMWebAssemblyCodeGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\MCTargetDesc\LLVMWebAssemblyDesc.vcxproj">
+      <Project>{C7BB1C6E-7222-3C37-83A3-6DC0588730BA}</Project>
+      <Name>LLVMWebAssemblyDesc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\Disassembler\LLVMWebAssemblyDisassembler.vcxproj">
+      <Project>{82D3D289-4560-3C3B-9D69-4B6773348C2B}</Project>
+      <Name>LLVMWebAssemblyDisassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\TargetInfo\LLVMWebAssemblyInfo.vcxproj">
+      <Project>{6E2FF1BD-DBA0-37A2-B5A2-F9B2733C58D2}</Project>
+      <Name>LLVMWebAssemblyInfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\WebAssembly\Utils\LLVMWebAssemblyUtils.vcxproj">
+      <Project>{B379255F-7501-3918-866E-4F762424C869}</Project>
+      <Name>LLVMWebAssemblyUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\WindowsDriver\LLVMWindowsDriver.vcxproj">
+      <Project>{60F3DA4E-C233-3F61-AEB1-C29B63D9E4F3}</Project>
+      <Name>LLVMWindowsDriver</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\WindowsManifest\LLVMWindowsManifest.vcxproj">
+      <Project>{FB79F994-17AC-3512-8285-7B3400CAF93B}</Project>
+      <Name>LLVMWindowsManifest</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\AsmParser\LLVMX86AsmParser.vcxproj">
+      <Project>{72A75DDB-630C-3737-9948-FA5ACD1D5F03}</Project>
+      <Name>LLVMX86AsmParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\LLVMX86CodeGen.vcxproj">
+      <Project>{DA8AE434-B0C0-3F19-8DFB-4B363148C2D9}</Project>
+      <Name>LLVMX86CodeGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\MCTargetDesc\LLVMX86Desc.vcxproj">
+      <Project>{1C219D54-69D9-3FD1-9FE2-0C49DE6E77C8}</Project>
+      <Name>LLVMX86Desc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\Disassembler\LLVMX86Disassembler.vcxproj">
+      <Project>{95675FD0-ACC5-3CBB-8146-15241856AD02}</Project>
+      <Name>LLVMX86Disassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\TargetInfo\LLVMX86Info.vcxproj">
+      <Project>{3279A2F0-E655-38E9-8439-BADCF561E248}</Project>
+      <Name>LLVMX86Info</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Target\X86\MCA\LLVMX86TargetMCA.vcxproj">
+      <Project>{AE24AE5C-D3CB-3C7A-B168-1BF734F0C9D0}</Project>
+      <Name>LLVMX86TargetMCA</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\XRay\LLVMXRay.vcxproj">
+      <Project>{9F0AA49B-49F8-3062-8AD8-C133CBD8ECAF}</Project>
+      <Name>LLVMXRay</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\lib\Transforms\IPO\LLVMipo.vcxproj">
+      <Project>{8EAFA50E-70D5-319F-8A55-8ADDAB7AD6BD}</Project>
+      <Name>LLVMipo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\lto\LTO.vcxproj">
+      <Project>{5FCAB4B3-6D68-3AF1-BC1D-306B55D390DE}</Project>
+      <Name>LTO</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\DynamicLibrary\PipSqueak.vcxproj">
+      <Project>{576AE9DE-D181-3914-B14C-4B6CDF8A3FAC}</Project>
+      <Name>PipSqueak</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\remarks-shlib\Remarks.vcxproj">
+      <Project>{5C190CDC-EE1E-3A89-8D21-D5835378D359}</Project>
+      <Name>Remarks</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\DynamicLibrary\SecondLib.vcxproj">
+      <Project>{7991AD46-87EE-33A7-AD43-1452CBC48E2C}</Project>
+      <Name>SecondLib</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\UnicodeData\UnicodeNameMappingGenerator.vcxproj">
+      <Project>{E81B72CC-5E34-3895-B30B-780899DA1307}</Project>
+      <Name>UnicodeNameMappingGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\third-party\benchmark\src\benchmark.vcxproj">
+      <Project>{70A9D7D9-35D5-3A72-8C22-C2C59660C6AC}</Project>
+      <Name>benchmark</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\third-party\benchmark\src\benchmark_main.vcxproj">
+      <Project>{AEA533FE-E761-35D2-9442-87793C1F3717}</Project>
+      <Name>benchmark_main</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\bugpoint\bugpoint.vcxproj">
+      <Project>{DB260230-2628-3ED9-A848-EEA438B23D5D}</Project>
+      <Name>bugpoint</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\count\count.vcxproj">
+      <Project>{80622708-D32E-3CF3-9B94-ED5E4BBA1DD5}</Project>
+      <Name>count</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\dsymutil\dsymutil.vcxproj">
+      <Project>{2791D7E5-C106-3D88-A797-C5D69513D34D}</Project>
+      <Name>dsymutil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llc\llc.vcxproj">
+      <Project>{88971E03-77AB-3A7A-AA18-140BF217B4F8}</Project>
+      <Name>llc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\lli\lli.vcxproj">
+      <Project>{68644475-6D78-36F2-930B-20B17D508BE9}</Project>
+      <Name>lli</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\lli\ChildTarget\lli-child-target.vcxproj">
+      <Project>{EA9F53DD-7A17-309F-AA0F-C564EEACA180}</Project>
+      <Name>lli-child-target</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\PerfectShuffle\llvm-PerfectShuffle.vcxproj">
+      <Project>{3BA1E9D1-2FAA-3E0E-8F45-A59D1227DB0C}</Project>
+      <Name>llvm-PerfectShuffle</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-symbolizer\llvm-addr2line.vcxproj">
+      <Project>{F5A96752-4347-3CBB-AEC0-00A9F4AF2BB6}</Project>
+      <Name>llvm-addr2line</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ar\llvm-ar.vcxproj">
+      <Project>{C1B0EA33-EFF7-3A79-8015-F620BF062486}</Project>
+      <Name>llvm-ar</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-as\llvm-as.vcxproj">
+      <Project>{7345DCB5-BF19-33DB-93E9-4B05008FB3C7}</Project>
+      <Name>llvm-as</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-bcanalyzer\llvm-bcanalyzer.vcxproj">
+      <Project>{B4E7A4F6-C035-3DA1-A3B2-C4F14C63B61E}</Project>
+      <Name>llvm-bcanalyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objcopy\llvm-bitcode-strip.vcxproj">
+      <Project>{B35183C0-13AB-38CC-8774-6325F59EEBF6}</Project>
+      <Name>llvm-bitcode-strip</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-c-test\llvm-c-test.vcxproj">
+      <Project>{19B8A74B-B6BA-3792-8784-D563119240AE}</Project>
+      <Name>llvm-c-test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cat\llvm-cat.vcxproj">
+      <Project>{D55FE27E-E162-3E9C-AFDB-64735C1949CC}</Project>
+      <Name>llvm-cat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cfi-verify\llvm-cfi-verify.vcxproj">
+      <Project>{0EC8401F-BD45-32B5-9BD5-03CEBD5E5219}</Project>
+      <Name>llvm-cfi-verify</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-config\llvm-config.vcxproj">
+      <Project>{4411BD81-83D1-3DBA-AD55-2747CEB7B65C}</Project>
+      <Name>llvm-config</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cov\llvm-cov.vcxproj">
+      <Project>{C4596160-FFEA-345F-9CA4-8C5B4098DF44}</Project>
+      <Name>llvm-cov</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cvtres\llvm-cvtres.vcxproj">
+      <Project>{524F5135-BBDD-3DC3-A63D-06194A214520}</Project>
+      <Name>llvm-cvtres</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cxxdump\llvm-cxxdump.vcxproj">
+      <Project>{75F5C5F1-B58F-3AA8-AA88-999294E8FB92}</Project>
+      <Name>llvm-cxxdump</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cxxfilt\llvm-cxxfilt.vcxproj">
+      <Project>{D5E5A0DB-0888-32F5-925E-D7AC0C1AAF7A}</Project>
+      <Name>llvm-cxxfilt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-cxxmap\llvm-cxxmap.vcxproj">
+      <Project>{3F6902D2-49F7-3F0F-8313-25BB74654D30}</Project>
+      <Name>llvm-cxxmap</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-debuginfo-analyzer\llvm-debuginfo-analyzer.vcxproj">
+      <Project>{AB47DC88-A88F-3504-AC35-E5FE99D0EAEB}</Project>
+      <Name>llvm-debuginfo-analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-debuginfod\llvm-debuginfod.vcxproj">
+      <Project>{E916DCDD-2A97-3A5D-9284-70E8A3634E86}</Project>
+      <Name>llvm-debuginfod</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-debuginfod-find\llvm-debuginfod-find.vcxproj">
+      <Project>{482EA9C3-6E31-3FDB-8F88-54086FE7A49D}</Project>
+      <Name>llvm-debuginfod-find</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-diff\llvm-diff.vcxproj">
+      <Project>{AB49D411-F9A0-3776-96C3-6DB828649262}</Project>
+      <Name>llvm-diff</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-dis\llvm-dis.vcxproj">
+      <Project>{384CA511-28C0-3F6A-A22E-2AF7DD1B56AC}</Project>
+      <Name>llvm-dis</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-dlang-demangle-fuzzer\llvm-dlang-demangle-fuzzer.vcxproj">
+      <Project>{8011597A-3B34-35C3-A995-5BFD3E098200}</Project>
+      <Name>llvm-dlang-demangle-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ar\llvm-dlltool.vcxproj">
+      <Project>{8CDA59AE-FE04-3664-BE0F-41B505886FB6}</Project>
+      <Name>llvm-dlltool</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-dwarfdump\llvm-dwarfdump.vcxproj">
+      <Project>{E2D5613A-8A30-3A64-8B96-075839E4F1E0}</Project>
+      <Name>llvm-dwarfdump</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-dwarfutil\llvm-dwarfutil.vcxproj">
+      <Project>{B039E191-03EB-3BD8-A81F-FA5B14BC5B3C}</Project>
+      <Name>llvm-dwarfutil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-dwp\llvm-dwp.vcxproj">
+      <Project>{A7945251-6F41-3A47-9A05-C5CAF7287F4A}</Project>
+      <Name>llvm-dwp</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-exegesis\llvm-exegesis.vcxproj">
+      <Project>{49D741B5-736D-314C-B317-2F2A4D3795A5}</Project>
+      <Name>llvm-exegesis</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-extract\llvm-extract.vcxproj">
+      <Project>{FFE1FED4-09CD-3A78-ACC8-E527EAC5210A}</Project>
+      <Name>llvm-extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-gsymutil\llvm-gsymutil.vcxproj">
+      <Project>{D7573C26-FA84-3A17-A933-869C73FB2DD8}</Project>
+      <Name>llvm-gsymutil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ifs\llvm-ifs.vcxproj">
+      <Project>{6EAF4245-6322-3618-B714-6F875FBF2F65}</Project>
+      <Name>llvm-ifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objcopy\llvm-install-name-tool.vcxproj">
+      <Project>{DB098B8E-1BA3-3AB6-9E4D-94A38FA0CC49}</Project>
+      <Name>llvm-install-name-tool</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-isel-fuzzer\llvm-isel-fuzzer.vcxproj">
+      <Project>{0D77C177-B3C8-3213-8F48-696BC24BE3D5}</Project>
+      <Name>llvm-isel-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-itanium-demangle-fuzzer\llvm-itanium-demangle-fuzzer.vcxproj">
+      <Project>{1EC0F84B-8CF6-3723-88B1-2C7BB6876BA9}</Project>
+      <Name>llvm-itanium-demangle-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-jitlink\llvm-jitlink.vcxproj">
+      <Project>{08AFCC5F-D289-3B2F-8977-BCA7BF003EEF}</Project>
+      <Name>llvm-jitlink</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-jitlink\llvm-jitlink-executor\llvm-jitlink-executor.vcxproj">
+      <Project>{F2FD5358-BA7C-330C-AC3E-8C1297853AA4}</Project>
+      <Name>llvm-jitlink-executor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ar\llvm-lib.vcxproj">
+      <Project>{7F310BB7-B2BD-3C4F-B032-137F535133D5}</Project>
+      <Name>llvm-lib</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-libtool-darwin\llvm-libtool-darwin.vcxproj">
+      <Project>{77A503C1-1B64-376A-8032-1AC5D6279D64}</Project>
+      <Name>llvm-libtool-darwin</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-link\llvm-link.vcxproj">
+      <Project>{F8D37956-EA60-3CD4-BCC3-8F81C4A86035}</Project>
+      <Name>llvm-link</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-lipo\llvm-lipo.vcxproj">
+      <Project>{00F6E979-91EF-3211-BA86-1B1A72953505}</Project>
+      <Name>llvm-lipo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\llvm-locstats\llvm-locstats.vcxproj">
+      <Project>{30812743-7A3C-343F-8836-0E48DDFA9D7A}</Project>
+      <Name>llvm-locstats</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-lto\llvm-lto.vcxproj">
+      <Project>{E2DD7D47-D783-3B98-8EE0-B62C6E549AB8}</Project>
+      <Name>llvm-lto</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-lto2\llvm-lto2.vcxproj">
+      <Project>{91954076-BACA-317B-B638-A6AE1E34E40D}</Project>
+      <Name>llvm-lto2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-mc\llvm-mc.vcxproj">
+      <Project>{E2978F48-1F1E-3582-99D7-93CA36649182}</Project>
+      <Name>llvm-mc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-mca\llvm-mca.vcxproj">
+      <Project>{34CBF2C5-AC81-3116-B76C-3B99DA774E2B}</Project>
+      <Name>llvm-mca</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-microsoft-demangle-fuzzer\llvm-microsoft-demangle-fuzzer.vcxproj">
+      <Project>{7C359FE6-3C82-39AD-89FE-5A152674CAB5}</Project>
+      <Name>llvm-microsoft-demangle-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ml\llvm-ml.vcxproj">
+      <Project>{D92698BF-E82F-35F4-9139-74034C453AF3}</Project>
+      <Name>llvm-ml</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-modextract\llvm-modextract.vcxproj">
+      <Project>{0278FA4A-0A79-30E1-A8B6-98F14BB847A7}</Project>
+      <Name>llvm-modextract</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-mt\llvm-mt.vcxproj">
+      <Project>{FFA7BD36-2DBC-3E6F-8469-81CB0C9B59E2}</Project>
+      <Name>llvm-mt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-nm\llvm-nm.vcxproj">
+      <Project>{9648BB5C-44DD-3029-ADD5-13F91741258D}</Project>
+      <Name>llvm-nm</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objcopy\llvm-objcopy.vcxproj">
+      <Project>{C823201B-7F18-33E5-9034-BD6C49BAA85F}</Project>
+      <Name>llvm-objcopy</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objdump\llvm-objdump.vcxproj">
+      <Project>{BD811516-CFF5-375F-8C8E-8CAF7A9D8950}</Project>
+      <Name>llvm-objdump</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-opt-fuzzer\llvm-opt-fuzzer.vcxproj">
+      <Project>{A10A6391-147E-389C-BEDE-1B48DEF4C4C5}</Project>
+      <Name>llvm-opt-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-opt-report\llvm-opt-report.vcxproj">
+      <Project>{23D8046A-92CE-38A2-B24C-440F9720A768}</Project>
+      <Name>llvm-opt-report</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objdump\llvm-otool.vcxproj">
+      <Project>{5DB05161-133C-39EC-92C0-378A1CA3ECE5}</Project>
+      <Name>llvm-otool</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-pdbutil\llvm-pdbutil.vcxproj">
+      <Project>{1E181CAC-CC01-3D22-90A1-5C40965DF604}</Project>
+      <Name>llvm-pdbutil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-profdata\llvm-profdata.vcxproj">
+      <Project>{C65129FF-0736-3FF7-BD40-6CCCA40FCB99}</Project>
+      <Name>llvm-profdata</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-profgen\llvm-profgen.vcxproj">
+      <Project>{9EE2C09B-8814-3590-9106-C95936764423}</Project>
+      <Name>llvm-profgen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-ar\llvm-ranlib.vcxproj">
+      <Project>{756B1F71-9C15-3D27-92FF-150891067BD5}</Project>
+      <Name>llvm-ranlib</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-rc\llvm-rc.vcxproj">
+      <Project>{34225B5E-3D24-324B-AE52-4B900EB6D235}</Project>
+      <Name>llvm-rc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-readobj\llvm-readelf.vcxproj">
+      <Project>{918986C5-6415-3895-8AA8-371056A421CD}</Project>
+      <Name>llvm-readelf</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-readobj\llvm-readobj.vcxproj">
+      <Project>{2DBBE26F-6CAC-31AF-ABD1-B196023A35CD}</Project>
+      <Name>llvm-readobj</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-reduce\llvm-reduce.vcxproj">
+      <Project>{90F6AF01-FEEC-33F3-9104-31208534E103}</Project>
+      <Name>llvm-reduce</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-remark-size-diff\llvm-remark-size-diff.vcxproj">
+      <Project>{25C2E51F-196A-3320-821B-898A983B5781}</Project>
+      <Name>llvm-remark-size-diff</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-remarkutil\llvm-remarkutil.vcxproj">
+      <Project>{ABB0D1A8-6628-3760-8792-9CCB7CE6048A}</Project>
+      <Name>llvm-remarkutil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-rtdyld\llvm-rtdyld.vcxproj">
+      <Project>{D391AAE9-271B-33A2-854C-C64D4B895A70}</Project>
+      <Name>llvm-rtdyld</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-rust-demangle-fuzzer\llvm-rust-demangle-fuzzer.vcxproj">
+      <Project>{39EE4AC5-5227-3F64-8B1D-1302ADA21C27}</Project>
+      <Name>llvm-rust-demangle-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-sim\llvm-sim.vcxproj">
+      <Project>{D18EC447-EFEC-319B-B826-FA1966DBC0DA}</Project>
+      <Name>llvm-sim</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-size\llvm-size.vcxproj">
+      <Project>{7A37C26C-70A6-3A9B-9E56-3DA96FC7F0F2}</Project>
+      <Name>llvm-size</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-special-case-list-fuzzer\llvm-special-case-list-fuzzer.vcxproj">
+      <Project>{A91996C5-B2C4-38F5-9AD0-E7B43B35F2A1}</Project>
+      <Name>llvm-special-case-list-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-split\llvm-split.vcxproj">
+      <Project>{675AEA77-0165-3E92-86FE-92B854954092}</Project>
+      <Name>llvm-split</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-stress\llvm-stress.vcxproj">
+      <Project>{FCD569CD-DA19-3B4C-A725-C8AA00437EA7}</Project>
+      <Name>llvm-stress</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-strings\llvm-strings.vcxproj">
+      <Project>{FFB243AC-F4E5-32B7-83B6-FF3AD1A39021}</Project>
+      <Name>llvm-strings</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-objcopy\llvm-strip.vcxproj">
+      <Project>{3D4EAC41-7344-38A6-8F60-C55535EAC8F8}</Project>
+      <Name>llvm-strip</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-symbolizer\llvm-symbolizer.vcxproj">
+      <Project>{CF8E29B0-23FF-3B49-B745-674E932FDF20}</Project>
+      <Name>llvm-symbolizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-tapi-diff\llvm-tapi-diff.vcxproj">
+      <Project>{FE8C3849-8FEC-35F7-BFA6-F8C3751B9DCB}</Project>
+      <Name>llvm-tapi-diff</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\TableGen\llvm-tblgen.vcxproj">
+      <Project>{3D46561C-63EE-36C7-8279-89DF927620BB}</Project>
+      <Name>llvm-tblgen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-tli-checker\llvm-tli-checker.vcxproj">
+      <Project>{C0E4CDFC-0C98-3DFC-8622-FF96932090C0}</Project>
+      <Name>llvm-tli-checker</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-undname\llvm-undname.vcxproj">
+      <Project>{1D498F2A-D7A6-34F2-B08B-51887A77B91E}</Project>
+      <Name>llvm-undname</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-rc\llvm-windres.vcxproj">
+      <Project>{14150E39-9D2C-3B6D-9970-1BD4825C4318}</Project>
+      <Name>llvm-windres</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-xray\llvm-xray.vcxproj">
+      <Project>{34D833CD-A3DC-3B9E-B714-DBEC8C0938A7}</Project>
+      <Name>llvm-xray</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-yaml-numeric-parser-fuzzer\llvm-yaml-numeric-parser-fuzzer.vcxproj">
+      <Project>{ACAB6E41-2C07-3FD1-9B43-77370AE8D028}</Project>
+      <Name>llvm-yaml-numeric-parser-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\llvm-yaml-parser-fuzzer\llvm-yaml-parser-fuzzer.vcxproj">
+      <Project>{FDA9F342-6210-3C4A-B017-1ED24EA9FEC6}</Project>
+      <Name>llvm-yaml-parser-fuzzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include\llvm\Support\llvm_vcsrevision_h.vcxproj">
+      <Project>{99A81252-13CB-3DD5-B0F1-1BEB94B9A41E}</Project>
+      <Name>llvm_vcsrevision_h</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\not\not.vcxproj">
+      <Project>{714C44C5-AB36-3105-9461-2FAF3A98ECA4}</Project>
+      <Name>not</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\obj2yaml\obj2yaml.vcxproj">
+      <Project>{002683E9-7521-36FA-A847-7AC6893E9932}</Project>
+      <Name>obj2yaml</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\opt\opt.vcxproj">
+      <Project>{6EB7D7CC-36C5-344B-BFFA-7B47C4341B9C}</Project>
+      <Name>opt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\sancov\sancov.vcxproj">
+      <Project>{91D7D504-EC18-301E-A8D3-5FC2B382FC38}</Project>
+      <Name>sancov</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\sanstats\sanstats.vcxproj">
+      <Project>{DDB5CD0B-AE56-31D4-AA01-5BFD29E01F5B}</Project>
+      <Name>sanstats</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\split-file\split-file.vcxproj">
+      <Project>{9218172B-C8F1-3AFF-AEC3-9453F6B06BD3}</Project>
+      <Name>split-file</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\verify-uselistorder\verify-uselistorder.vcxproj">
+      <Project>{060A208E-36D0-37A5-B615-C1DE3C05EB9F}</Project>
+      <Name>verify-uselistorder</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\utils\yaml-bench\yaml-bench.vcxproj">
+      <Project>{43A57BC3-689C-3516-A1B9-54EFF0D0E46C}</Project>
+      <Name>yaml-bench</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\tools\yaml2obj\yaml2obj.vcxproj">
+      <Project>{C83A0DF1-CE30-32C7-B098-FB052F8FB82E}</Project>
+      <Name>yaml2obj</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

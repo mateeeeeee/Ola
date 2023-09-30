@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B5772A4B-06E4-3AA4-A173-FB139F3357CD}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>UnitTests</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\unittests;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\include;C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm-project_17_0_1\llvm\unittests\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/unittests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/unittests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/unittests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/unittests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/unittests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/unittests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm/unittests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm-project_17_0_1/llvm -BC:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1 --check-stamp-file C:/Users/mateb/OneDrive/Desktop/Projekti/LLVM/llvm_win64_17_0_1/unittests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\ZERO_CHECK.vcxproj">
+      <Project>{377EDFC3-8D67-3442-AADB-F3EF0C9DF2FD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Target\AArch64\AArch64Tests.vcxproj">
+      <Project>{8CB070DE-2A6C-3904-A621-EF132F463E98}</Project>
+      <Name>AArch64Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ADT\ADTTests.vcxproj">
+      <Project>{250B4B19-A5BB-32FF-A559-25EBA796C928}</Project>
+      <Name>ADTTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Target\ARM\ARMTests.vcxproj">
+      <Project>{5DB8BA04-DABF-33F2-A9BF-86690ABE5AB5}</Project>
+      <Name>ARMTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Analysis\AnalysisTests.vcxproj">
+      <Project>{EF80CC40-4C22-37BE-BC2F-E15912AAD71D}</Project>
+      <Name>AnalysisTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\AsmParser\AsmParserTests.vcxproj">
+      <Project>{0479C0AC-030F-3916-8E10-EE80E6343ACA}</Project>
+      <Name>AsmParserTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\BinaryFormat\BinaryFormatTests.vcxproj">
+      <Project>{61FF7AC8-CA5B-3164-9707-17B5F9C2D707}</Project>
+      <Name>BinaryFormatTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Bitcode\BitcodeTests.vcxproj">
+      <Project>{EB3BBCD3-BCD7-358D-B4F3-F90DE43A2F7E}</Project>
+      <Name>BitcodeTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Bitstream\BitstreamTests.vcxproj">
+      <Project>{1D617EF1-D859-3B8C-A527-C9D7504A592A}</Project>
+      <Name>BitstreamTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\tools\llvm-cfi-verify\CFIVerifyTests.vcxproj">
+      <Project>{0302B5E2-44C0-3638-A548-6D9476AFB9D7}</Project>
+      <Name>CFIVerifyTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CodeGen\CodeGenTests.vcxproj">
+      <Project>{E3D1D18A-DE23-373F-AE82-3AAA43C52CB4}</Project>
+      <Name>CodeGenTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\CommandLineInit\CommandLineInitTests.vcxproj">
+      <Project>{D958E00D-2DEA-3621-986F-801EE9DE41BA}</Project>
+      <Name>CommandLineInitTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Transforms\Coroutines\CoroTests.vcxproj">
+      <Project>{13102EDA-3E8F-3437-A1F3-A6CD52077E7E}</Project>
+      <Name>CoroTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DWARFLinkerParallel\DWARFLinkerParallelTests.vcxproj">
+      <Project>{6E328342-558B-36CA-91F1-6429477DBEE4}</Project>
+      <Name>DWARFLinkerParallelTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\BTF\DebugInfoBTFTests.vcxproj">
+      <Project>{6B3D94E6-FE99-39C8-A2FA-DCD73720CD0C}</Project>
+      <Name>DebugInfoBTFTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\CodeView\DebugInfoCodeViewTests.vcxproj">
+      <Project>{936EB3AD-2396-334B-BD96-0C3F0D054CF5}</Project>
+      <Name>DebugInfoCodeViewTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\DWARF\DebugInfoDWARFTests.vcxproj">
+      <Project>{EB29230D-3A58-38C9-925A-508BAF826D85}</Project>
+      <Name>DebugInfoDWARFTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\GSYM\DebugInfoGSYMTests.vcxproj">
+      <Project>{1B35D3EB-A5F3-3C30-8B7B-CE0ADD5C7E2D}</Project>
+      <Name>DebugInfoGSYMTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\LogicalView\DebugInfoLogicalViewTests.vcxproj">
+      <Project>{F3DCC511-DD39-38CC-90E6-DBD2CD2CBF4A}</Project>
+      <Name>DebugInfoLogicalViewTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\MSF\DebugInfoMSFTests.vcxproj">
+      <Project>{2DCF749B-5E46-3EF0-BCCA-1BAF83E49981}</Project>
+      <Name>DebugInfoMSFTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\PDB\DebugInfoPDBTests.vcxproj">
+      <Project>{0702AAF9-5922-36F9-804E-A0B767D5D165}</Project>
+      <Name>DebugInfoPDBTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\DebugInfo\Symbolizer\DebugInfoSymbolizerTests.vcxproj">
+      <Project>{06C3B04F-850B-3B1B-B1B4-47CF237B18E6}</Project>
+      <Name>DebugInfoSymbolizerTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Debuginfod\DebuginfodTests.vcxproj">
+      <Project>{BF7869B7-8557-3FFB-9247-E1D947112D9B}</Project>
+      <Name>DebuginfodTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Demangle\DemangleTests.vcxproj">
+      <Project>{2BA41E62-D931-37B3-AC8F-098F557E6EAF}</Project>
+      <Name>DemangleTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\DynamicLibrary\DynamicLibraryTests.vcxproj">
+      <Project>{E4B3BB7F-4483-3C46-83A5-9994D1FB735C}</Project>
+      <Name>DynamicLibraryTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ExecutionEngine\ExecutionEngineTests.vcxproj">
+      <Project>{E8B775E2-B9FA-3A4A-97ED-4E00FE9DD9A4}</Project>
+      <Name>ExecutionEngineTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\FileCheck\FileCheckTests.vcxproj">
+      <Project>{5BF69FC7-015B-399C-8EE8-C637D9A6DF64}</Project>
+      <Name>FileCheckTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\FuzzMutate\FuzzMutateTests.vcxproj">
+      <Project>{65C8516D-2410-3727-9495-47CC56CC8A05}</Project>
+      <Name>FuzzMutateTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\CodeGen\GlobalISel\GlobalISelTests.vcxproj">
+      <Project>{FAB7948F-D86B-3F51-87A4-713C11B47AA3}</Project>
+      <Name>GlobalISelTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Transforms\IPO\IPOTests.vcxproj">
+      <Project>{27BB1F95-462F-3162-9E2E-296347FC64D8}</Project>
+      <Name>IPOTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\IR\IRTests.vcxproj">
+      <Project>{8337391B-7A83-3A97-86C6-1980F0BEED1C}</Project>
+      <Name>IRTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\InterfaceStub\InterfaceStubTests.vcxproj">
+      <Project>{12DE780A-61F5-3EB7-888E-8235CBDD514A}</Project>
+      <Name>InterfaceStubTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ExecutionEngine\JITLink\JITLinkTests.vcxproj">
+      <Project>{90634689-08A6-35BC-A7F0-608AD86E4FFB}</Project>
+      <Name>JITLinkTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\tools\llvm-exegesis\LLVMExegesisTests.vcxproj">
+      <Project>{55110786-914F-3AC2-8704-F843DFC8B277}</Project>
+      <Name>LLVMExegesisTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Frontend\LLVMFrontendTests.vcxproj">
+      <Project>{87CEE609-E4E1-33F9-AB93-FACBD9A304EB}</Project>
+      <Name>LLVMFrontendTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\tools\llvm-mca\LLVMMCATests.vcxproj">
+      <Project>{1B325390-FA63-3BB1-88E3-8BBDC6C10128}</Project>
+      <Name>LLVMMCATests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\tools\llvm-profdata\LLVMProfdataTests.vcxproj">
+      <Project>{93D464AB-D1BC-3BAE-B04D-7470D47C6D38}</Project>
+      <Name>LLVMProfdataTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\tools\llvm-profgen\LLVMProfgenTests.vcxproj">
+      <Project>{EE092040-B21A-3F18-8696-DE01A68E2589}</Project>
+      <Name>LLVMProfgenTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\LineEditor\LineEditorTests.vcxproj">
+      <Project>{4F670A84-6694-31B2-B2B0-4614AAEB8DA4}</Project>
+      <Name>LineEditorTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Linker\LinkerTests.vcxproj">
+      <Project>{C8B95DAF-FAE7-392B-8FF6-DE43BD0B8279}</Project>
+      <Name>LinkerTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ExecutionEngine\MCJIT\MCJITTests.vcxproj">
+      <Project>{23103076-C3D5-3A6B-BF68-18A8074E69FB}</Project>
+      <Name>MCJITTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\MC\MCTests.vcxproj">
+      <Project>{19029A55-1642-3A79-A2B0-34D7559DC03E}</Project>
+      <Name>MCTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\MIR\MIRTests.vcxproj">
+      <Project>{A0934B48-44A3-3514-8353-975C51CDDEEC}</Project>
+      <Name>MIRTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\MI\MITests.vcxproj">
+      <Project>{D96B4C41-EE5D-3318-B53D-48DA32FED9E8}</Project>
+      <Name>MITests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ObjCopy\ObjCopyTests.vcxproj">
+      <Project>{491A6BD3-E997-3D7A-9BFF-7F03F20A581B}</Project>
+      <Name>ObjCopyTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Object\ObjectTests.vcxproj">
+      <Project>{55021AFD-5EF2-3A9C-BEF3-7D3FA9E0AB82}</Project>
+      <Name>ObjectTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ObjectYAML\ObjectYAMLTests.vcxproj">
+      <Project>{6F669965-981F-3C4A-911A-315D4675520D}</Project>
+      <Name>ObjectYAMLTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Option\OptionTests.vcxproj">
+      <Project>{6E9AF483-0685-3E11-B9B1-FD129889EA9D}</Project>
+      <Name>OptionTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ExecutionEngine\Orc\OrcJITTests.vcxproj">
+      <Project>{339AAF45-6E91-323C-AB30-A371CF48A12D}</Project>
+      <Name>OrcJITTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Passes\PassBuilderBindings\PassesBindingsTests.vcxproj">
+      <Project>{06F7FE31-6BAF-3401-90B9-FC9D8461B6DA}</Project>
+      <Name>PassesBindingsTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\ProfileData\ProfileDataTests.vcxproj">
+      <Project>{1562A924-1AAD-38B1-A7E6-C141D2ED4F34}</Project>
+      <Name>ProfileDataTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Remarks\RemarksTests.vcxproj">
+      <Project>{B6B8B0DD-CE16-3912-ADCE-327767FE20DC}</Project>
+      <Name>RemarksTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Transforms\Scalar\ScalarTests.vcxproj">
+      <Project>{E4CE4A70-4C66-397B-A5EE-FD97EFBA44E3}</Project>
+      <Name>ScalarTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Support\SupportTests.vcxproj">
+      <Project>{642F4F8D-63F1-33A4-8627-3B125EFAAD86}</Project>
+      <Name>SupportTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\TableGen\TableGenTests.vcxproj">
+      <Project>{A32A950A-2370-3880-AFE9-BE3EE74E57EF}</Project>
+      <Name>TableGenTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\TargetParser\TargetParserTests.vcxproj">
+      <Project>{6B9A7D39-C971-3321-989A-EE6646E017CA}</Project>
+      <Name>TargetParserTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Testing\ADT\TestingADTTests.vcxproj">
+      <Project>{A6FED728-2B9F-357C-B5F4-96B753DFEF66}</Project>
+      <Name>TestingADTTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Testing\Annotations\TestingAnnotationTests.vcxproj">
+      <Project>{90922648-AA97-3383-9648-72FBB3DAFE4E}</Project>
+      <Name>TestingAnnotationTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Testing\Support\TestingSupportTests.vcxproj">
+      <Project>{D7407195-EBA2-3E6B-ADAA-0B83B2E8397C}</Project>
+      <Name>TestingSupportTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\TextAPI\TextAPITests.vcxproj">
+      <Project>{1EE532EE-DB10-3EF3-B738-DDBE349B0F53}</Project>
+      <Name>TextAPITests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Transforms\Utils\UtilsTests.vcxproj">
+      <Project>{8A5A954C-B088-3408-9661-EC391F01A094}</Project>
+      <Name>UtilsTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Transforms\Vectorize\VectorizeTests.vcxproj">
+      <Project>{E75DCB56-1356-31B8-B193-D426F4C5021E}</Project>
+      <Name>VectorizeTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Target\WebAssembly\WebAssemblyTests.vcxproj">
+      <Project>{F170CED1-84F4-361D-90FD-DF3ACE3154FA}</Project>
+      <Name>WebAssemblyTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\MC\X86\X86MCTests.vcxproj">
+      <Project>{1FFF1FF2-7A5F-3703-8F9F-9DB8CCC4B18B}</Project>
+      <Name>X86MCTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\Target\X86\X86Tests.vcxproj">
+      <Project>{C1F66C3A-72A9-3CF9-8BC6-34487C4E6E51}</Project>
+      <Name>X86Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\mateb\OneDrive\Desktop\Projekti\LLVM\llvm_win64_17_0_1\unittests\XRay\XRayTests.vcxproj">
+      <Project>{ED34EF87-E597-3510-AC73-704F349DC5C1}</Project>
+      <Name>XRayTests</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>
