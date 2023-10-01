@@ -2,6 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Frontend\SourceBuffer.cpp">
+      <Filter>Frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\TokenTypes.cpp">
+      <Filter>Frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="Compiler\Compiler.cpp">
+      <Filter>Compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -27,8 +36,32 @@
     <ClInclude Include="Core\Defines.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Enums.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\SourceLocation.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\SourceBuffer.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\TokenTypes.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Token.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Lexer.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Compiler\Compiler.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="Frontend\Tokens.def">
+      <Filter>Frontend</Filter>
+    </None>
   </ItemGroup>
 </Project>
