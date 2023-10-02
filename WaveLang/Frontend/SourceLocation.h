@@ -19,7 +19,6 @@ namespace wave
 			.column = loc.column + i
 		};
 	}
-
 	inline void NewChar(SourceLocation& loc)
 	{
 		++loc.column;

@@ -9,7 +9,7 @@ namespace wave
 
 	int32 Compile(CompilerInput const&)
 	{
-
+		return 0;
 	}
 
 }
