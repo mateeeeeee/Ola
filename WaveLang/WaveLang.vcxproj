@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Compiler\Compiler.cpp" />
+    <ClCompile Include="Frontend\Diagnostics.cpp" />
     <ClCompile Include="Frontend\Lexer.cpp" />
     <ClCompile Include="Frontend\SourceBuffer.cpp" />
     <ClCompile Include="Frontend\TokenTypes.cpp" />
@@ -155,15 +156,18 @@
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />
+    <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\SourceBuffer.h" />
     <ClInclude Include="Frontend\SourceLocation.h" />
     <ClInclude Include="Frontend\Token.h" />
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Utility\Enums.h" />
+    <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="Frontend\Diagnostics.def" />
     <None Include="Frontend\Tokens.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

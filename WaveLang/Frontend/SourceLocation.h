@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 
 namespace wave
 {
@@ -8,28 +7,29 @@ namespace wave
 		std::string filename = "";
 		uint32 line = 1;
 		uint32 column = 1;
-	};
 
-	inline SourceLocation operator+(SourceLocation const& loc, int32 i)
-	{
-		return SourceLocation
+		SourceLocation operator+(int32 i)
 		{
-			.filename = loc.filename,
-			.line = loc.line,
-			.column = loc.column + i
-		};
-	}
-	inline void NewChar(SourceLocation& loc)
-	{
-		++loc.column;
-	}
-	inline void NewChars(SourceLocation& loc, int32 i)
-	{
-		loc.column += i;
-	}
-	inline void NewLine(SourceLocation& loc)
-	{
-		++loc.line;
-		loc.column = 1;
-	}
+			return SourceLocation
+			{
+				.filename = filename,
+				.line = line,
+				.column = column + i
+			};
+		}
+
+		void NewChar()
+		{
+			++column;
+		}
+		void NewChars(int32 i)
+		{
+			column += i;
+		}
+		void NewLine()
+		{
+			++line;
+			column = 1;
+		}
+	};
 }

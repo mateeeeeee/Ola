@@ -1,12 +1,15 @@
 #include "Lexer.h"
 #include "SourceBuffer.h"
+#include "Diagnostics.h"
 
 
 namespace wave
 {
+
 	Lexer::Lexer(SourceBuffer const& source) : buf_ptr(source.GetBufferStart()), cur_ptr(buf_ptr),
-		loc{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size()) }
-	{}
+											   loc{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size())}
+	{
+	}
 
 	void Lexer::Lex()
 	{
@@ -25,6 +28,15 @@ namespace wave
 			{
 				auto const& prev_token = tokens.back();
 				if (prev_token.Is(TokenKind::newline)) current_token.SetFlag(TokenFlag_BeginningOfLine);
+				if (prev_token.Is(TokenKind::hash) && prev_token.HasFlag(TokenFlag_BeginningOfLine))
+				{
+					std::string_view identifier = current_token.GetIdentifier();
+					if (IsPreprocessorKeyword(identifier))
+					{
+						current_token.SetKind(GetPreprocessorKeywordType(identifier));
+						tokens.pop_back();
+					}
+				}
 			}
 			else current_token.SetFlag(TokenFlag_BeginningOfLine);
 
@@ -51,14 +63,14 @@ namespace wave
 		case '\n':
 		{
 			bool ret = LexNewLine(token);
-			NewLine(loc);
+			loc.NewLine();
 			buf_ptr = cur_ptr;
 			token.ClearFlag(TokenFlag_LeadingSpace);
 			return ret;
 		}
 		case '/':
 		{
-			if (*cur_ptr == '/')
+			if (*cur_ptr == '/') 
 			{
 				++cur_ptr;
 				return LexComment(token);
@@ -353,7 +365,7 @@ namespace wave
 				t.SetKind(TokenKind::ellipsis);
 				cur_ptr += 2;
 			}
-			else
+			else 
 			{
 				t.SetKind(TokenKind::period);
 			}

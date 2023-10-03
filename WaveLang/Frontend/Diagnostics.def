@@ -1,0 +1,7 @@
+#ifndef DIAG
+#define DIAG(diag_code, diag_level, diag_msg)
+#endif
+
+
+
+#undef DIAG

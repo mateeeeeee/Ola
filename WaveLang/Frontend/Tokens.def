@@ -1,4 +1,3 @@
-
 #ifndef TOKEN
 #define TOKEN(X)
 #endif
@@ -9,6 +8,9 @@
 #define KEYWORD(X) TOKEN(KW_##X)
 #endif
 
+#ifndef PP_KEYWORD
+#define PP_KEYWORD(X) TOKEN(PP_##X)
+#endif
 
 TOKEN(unknown)
 TOKEN(eof)
@@ -80,29 +82,49 @@ KEYWORD(do)
 KEYWORD(if)
 KEYWORD(else)
 KEYWORD(return)
-
+KEYWORD(inline)
 KEYWORD(enum)
-KEYWORD(class)
-
+KEYWORD(struct)
+KEYWORD(union)
 KEYWORD(const)
-KEYWORD(using)
-
+KEYWORD(volatile)
+KEYWORD(typedef)
 KEYWORD(static)
 KEYWORD(extern)
-
+KEYWORD(auto)
+KEYWORD(register)
+KEYWORD(restrict)
 KEYWORD(bool)
+KEYWORD(char)
+KEYWORD(short)
 KEYWORD(int)
+KEYWORD(long)
 KEYWORD(float)
+KEYWORD(double)
+KEYWORD(signed)
+KEYWORD(unsigned)
 KEYWORD(void)
-
 KEYWORD(sizeof)
-KEYWORD(alignas)
-KEYWORD(alignof)
-KEYWORD(atomic)
+KEYWORD(_Alignas)
+KEYWORD(_Alignof)
+KEYWORD(_Atomic)
+KEYWORD(_Thread_local)
 
+PP_KEYWORD(if)
+PP_KEYWORD(else)
+PP_KEYWORD(elif)
+PP_KEYWORD(ifdef)
+PP_KEYWORD(ifndef)
+PP_KEYWORD(elifdef)
+PP_KEYWORD(elifndef)
+PP_KEYWORD(endif)
+PP_KEYWORD(defined)
+PP_KEYWORD(include)
+PP_KEYWORD(define)
+PP_KEYWORD(undef)
+
+#undef PP_KEYWORD
 #undef KEYWORD
 #undef PUNCTUATOR
 #undef TOKEN
-
-
 

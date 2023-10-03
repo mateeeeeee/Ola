@@ -2,17 +2,20 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Frontend\SourceBuffer.cpp">
-      <Filter>Frontend</Filter>
-    </ClCompile>
-    <ClCompile Include="Frontend\TokenTypes.cpp">
-      <Filter>Frontend</Filter>
-    </ClCompile>
     <ClCompile Include="Compiler\Compiler.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="Frontend\Diagnostics.cpp">
+      <Filter>Frontend\Diagnostics</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\SourceBuffer.cpp">
+      <Filter>Frontend\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\TokenTypes.cpp">
+      <Filter>Frontend\Lexer</Filter>
+    </ClCompile>
     <ClCompile Include="Frontend\Lexer.cpp">
-      <Filter>Frontend</Filter>
+      <Filter>Frontend\Lexer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +34,15 @@
     <Filter Include="Compiler">
       <UniqueIdentifier>{5a9e5edd-9a6e-4bed-938a-29a116919b9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Frontend\Diagnostics">
+      <UniqueIdentifier>{678164f4-4a70-47a1-871d-c5a20ffedd77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frontend\Lexer">
+      <UniqueIdentifier>{64f50d84-7450-46f5-b0b8-0c1eb5a5ff42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frontend\Parser">
+      <UniqueIdentifier>{e5a9bd14-d512-4ead-9d1d-b77b278fa8c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CoreTypes.h">
@@ -42,29 +54,38 @@
     <ClInclude Include="Utility\Enums.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Frontend\SourceLocation.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\SourceBuffer.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\TokenTypes.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\Token.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\Lexer.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
     <ClInclude Include="Compiler\Compiler.h">
       <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Singleton.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Diagnostics.h">
+      <Filter>Frontend\Diagnostics</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\SourceBuffer.h">
+      <Filter>Frontend\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\SourceLocation.h">
+      <Filter>Frontend\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Token.h">
+      <Filter>Frontend\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\TokenTypes.h">
+      <Filter>Frontend\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Lexer.h">
+      <Filter>Frontend\Lexer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="Frontend\Diagnostics.def">
+      <Filter>Frontend\Diagnostics</Filter>
+    </None>
     <None Include="Frontend\Tokens.def">
-      <Filter>Frontend</Filter>
+      <Filter>Frontend\Lexer</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -15,6 +15,8 @@ namespace wave
 
 	class Lexer
 	{
+		friend class Preprocessor;
+
 	public:
 		explicit Lexer(SourceBuffer const& source);
 		Lexer(Lexer const&) = delete;
@@ -23,6 +25,7 @@ namespace wave
 		void Lex();
 
 		std::vector<Token> const& GetTokens() const { return tokens; }
+
 	private:
 		char const* buf_ptr;
 		char const* cur_ptr;
@@ -42,7 +45,7 @@ namespace wave
 
 		void UpdatePointersAndLocation()
 		{
-			NewChars(loc, static_cast<int32>(cur_ptr - buf_ptr));
+			loc.NewChars(static_cast<int32>(cur_ptr - buf_ptr));
 			buf_ptr = cur_ptr;
 		}
 
