@@ -11,9 +11,7 @@ namespace wave
 	{
 		TokenFlag_None = 0x0,
 		TokenFlag_LeadingSpace = 0x1,
-		TokenFlag_BeginningOfLine = 0x2,
-		TokenFlag_PartOfPPDirective = 0x4,
-		TokenFlag_SkipedByPP = 0x8
+		TokenFlag_BeginningOfLine = 0x2
 	};
 	DEFINE_ENUM_BIT_OPERATORS(TokenFlag);
 	using TokenFlags = uint32;
@@ -43,53 +41,30 @@ namespace wave
 			else return Is(t1) || IsOneOf(ts...);
 		}
 
-		bool IsPPKeyword() const
-		{
-			return IsOneOf(TokenKind::PP_define,  TokenKind::PP_defined,  TokenKind::PP_elif,
-						   TokenKind::PP_elifdef, TokenKind::PP_elifndef, TokenKind::PP_else,
-						   TokenKind::PP_endif,   TokenKind::PP_if,       TokenKind::PP_ifdef, 
-						   TokenKind::PP_ifndef,  TokenKind::PP_include,  TokenKind::PP_undef);
-		}
 		bool IsDeclSpec() const
 		{
 			return IsOneOf(
-				TokenKind::KW_inline,
 				TokenKind::KW_enum,
-				TokenKind::KW_struct,
-				TokenKind::KW_union,
+				TokenKind::KW_class,
 				TokenKind::KW_const,
-				TokenKind::KW_volatile,
-				TokenKind::KW_typedef,
 				TokenKind::KW_static,
 				TokenKind::KW_extern,
 				TokenKind::KW_auto,
-				TokenKind::KW_register,
-				TokenKind::KW_restrict,
 				TokenKind::KW_bool,
 				TokenKind::KW_char,
-				TokenKind::KW_short,
 				TokenKind::KW_int,
-				TokenKind::KW_signed,
-				TokenKind::KW_unsigned,
-				TokenKind::KW_long,
 				TokenKind::KW_float,
-				TokenKind::KW_double,
 				TokenKind::KW_void,
-				TokenKind::KW__Alignas,
-				TokenKind::KW__Atomic,
-				TokenKind::KW__Thread_local);
+				TokenKind::KW_auto,
+				TokenKind::KW_alignas,
+				TokenKind::KW_atomic);
 		}
 		bool IsStorageSpecifier() const
 		{
 			return IsOneOf(
-				TokenKind::KW_inline,
-				TokenKind::KW_typedef,
 				TokenKind::KW_static,
 				TokenKind::KW_extern,
-				TokenKind::KW_auto,
-				TokenKind::KW_register,
-				TokenKind::KW__Atomic,
-				TokenKind::KW__Thread_local);
+				TokenKind::KW_atomic);
 		}
 
 		void SetFlag(TokenFlag flag)

@@ -12,8 +12,4 @@ namespace wave
 
 	bool IsKeyword(std::string_view identifer);
 	TokenKind GetKeywordType(std::string_view identifer);
-
-	bool IsPreprocessorKeyword(std::string_view identifer);
-	TokenKind GetPreprocessorKeywordType(std::string_view identifer);
-
 }

@@ -28,15 +28,6 @@ namespace wave
 			{
 				auto const& prev_token = tokens.back();
 				if (prev_token.Is(TokenKind::newline)) current_token.SetFlag(TokenFlag_BeginningOfLine);
-				if (prev_token.Is(TokenKind::hash) && prev_token.HasFlag(TokenFlag_BeginningOfLine))
-				{
-					std::string_view identifier = current_token.GetIdentifier();
-					if (IsPreprocessorKeyword(identifier))
-					{
-						current_token.SetKind(GetPreprocessorKeywordType(identifier));
-						tokens.pop_back();
-					}
-				}
 			}
 			else current_token.SetFlag(TokenFlag_BeginningOfLine);
 
@@ -157,7 +148,7 @@ namespace wave
 	bool Lexer::LexString(Token& t)
 	{
 		FillToken(t, TokenKind::string_literal, [](char c) -> bool { return c != '"'; });
-		++cur_ptr; 
+		++cur_ptr;
 		UpdatePointersAndLocation();
 		return true;
 	}

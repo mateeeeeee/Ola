@@ -4,7 +4,8 @@
 
 namespace wave
 {
-	#define DEFINE_ENUM_BIT_OPERATORS(ENUMTYPE) \
+
+#define DEFINE_ENUM_BIT_OPERATORS(ENUMTYPE) \
 	static_assert(std::is_enum_v<ENUMTYPE>); \
 	using ENUMTYPE##UnderlyingType = std::underlying_type_t<ENUMTYPE>; \
 	inline ENUMTYPE  operator|(ENUMTYPE a, ENUMTYPE b) { return ENUMTYPE(((ENUMTYPE##UnderlyingType)a) | ((ENUMTYPE##UnderlyingType)b)); } \

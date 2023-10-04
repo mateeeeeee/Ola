@@ -1,5 +1,5 @@
 #ifndef DIAG
-#define DIAG(diag_code, diag_level, diag_msg)
+#define DIAG(diag_code, diag_kind, diag_msg)
 #endif
 
 

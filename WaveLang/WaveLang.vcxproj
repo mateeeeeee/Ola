@@ -117,7 +117,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\LLVM\llvm_win64_17_0_1\Release\lib;$(SolutionDir)Libraries\spdlog\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>spdlogd.lib;LLVMAnalysis.lib;LLVMCore.lib;LLVMExecutionEngine.lib;LLVMInstCombine.lib;LLVMObject.lib;LLVMOrcJIT.lib;LLVMRuntimeDyld.lib;LLVMScalarOpts.lib;LLVMSupport.lib;LLVMX86CodeGen.lib;LLVMX86AsmParser.lib;LLVMX86Desc.lib;LLVMX86Disassembler.lib;LLVMX86Info.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMFrontendOpenMP.lib;LLVMLinker.lib;LLVMIRPrinter.lib;LLVMVectorize.lib;LLVMJITLink.lib;LLVMOrcTargetProcess.lib;LLVMOrcShared.lib;LLVMWindowsDriver.lib;LLVMOption.lib;LLVMAsmPrinter.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMInstrumentation.lib;LLVMSelectionDAG.lib;LLVMCodeGen.lib;LLVMAggressiveInstCombine.lib;LLVMTarget.lib;LLVMBitWriter.lib;LLVMObjCARCOpts.lib;LLVMTransformUtils.lib;LLVMProfileData.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoMSF.lib;LLVMDebugInfoBTF.lib;LLVMDebugInfoDWARF.lib;LLVMIRReader.lib;LLVMBitReader.lib;LLVMAsmParser.lib;LLVMTextAPI.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMCodeGenTypes.lib;LLVMMCParser.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMBinaryFormat.lib;LLVMTargetParser.lib;LLVMDebugInfoCodeView.lib;LLVMDemangle.lib;psapi.lib;shell32.lib;ole32.lib;uuid.lib;advapi32.lib;delayimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;oleaut32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>Tokens.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,7 +142,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\LLVM\llvm_win64_17_0_1\Release\lib;$(SolutionDir)Libraries\spdlog\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>spdlog.lib;LLVMAnalysis.lib;LLVMCore.lib;LLVMExecutionEngine.lib;LLVMInstCombine.lib;LLVMObject.lib;LLVMOrcJIT.lib;LLVMRuntimeDyld.lib;LLVMScalarOpts.lib;LLVMSupport.lib;LLVMX86CodeGen.lib;LLVMX86AsmParser.lib;LLVMX86Desc.lib;LLVMX86Disassembler.lib;LLVMX86Info.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMFrontendOpenMP.lib;LLVMLinker.lib;LLVMIRPrinter.lib;LLVMVectorize.lib;LLVMJITLink.lib;LLVMOrcTargetProcess.lib;LLVMOrcShared.lib;LLVMWindowsDriver.lib;LLVMOption.lib;LLVMAsmPrinter.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMInstrumentation.lib;LLVMSelectionDAG.lib;LLVMCodeGen.lib;LLVMAggressiveInstCombine.lib;LLVMTarget.lib;LLVMBitWriter.lib;LLVMObjCARCOpts.lib;LLVMTransformUtils.lib;LLVMProfileData.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoMSF.lib;LLVMDebugInfoBTF.lib;LLVMDebugInfoDWARF.lib;LLVMIRReader.lib;LLVMBitReader.lib;LLVMAsmParser.lib;LLVMTextAPI.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMCodeGenTypes.lib;LLVMMCParser.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMBinaryFormat.lib;LLVMTargetParser.lib;LLVMDebugInfoCodeView.lib;LLVMDemangle.lib;psapi.lib;shell32.lib;ole32.lib;uuid.lib;advapi32.lib;delayimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;oleaut32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>Tokens.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,8 +169,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="Frontend\Diagnostics.def" />
-    <None Include="Frontend\Tokens.def" />
+    <None Include="Frontend\Diagnostics.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Frontend\Tokens.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
