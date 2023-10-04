@@ -2,6 +2,10 @@
 #define DIAG(diag_code, diag_kind, diag_msg)
 #endif
 
+DIAG(invalid_number_literal, error, "[Lexer] Invalid number literal")
+DIAG(unknown_character, error, "[Lexer] Unknown character")
 
+DIAG(unexpected_token, error, "[Parser] Unexpected token")
+DIAG(empty_statement, warning, "[Parser] Empty statement")
 
 #undef DIAG

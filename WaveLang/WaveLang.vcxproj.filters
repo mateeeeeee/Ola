@@ -17,6 +17,9 @@
     <ClCompile Include="Frontend\Lexer.cpp">
       <Filter>Frontend\Lexer</Filter>
     </ClCompile>
+    <ClCompile Include="Frontend\Parser.cpp">
+      <Filter>Frontend\Parser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -78,6 +81,18 @@
     <ClInclude Include="Frontend\Lexer.h">
       <Filter>Frontend\Lexer</Filter>
     </ClInclude>
+    <ClInclude Include="Frontend\Parser.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Type.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\AST.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Symbol.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
@@ -87,5 +102,8 @@
     <None Include="Frontend\Tokens.def">
       <Filter>Frontend\Lexer</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="wave_grammar.txt" />
   </ItemGroup>
 </Project>

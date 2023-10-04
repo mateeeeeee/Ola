@@ -1,0 +1,34 @@
+<translation-unit> ::= { <function_definition> | <function_declaration> }*
+
+<function_declaration> ::= extern <identifier>( <parameter-type-list> ) {-> <abstract-declarator>}?;
+ <function_definition> ::= <identifier>( <parameter-type-list> ) {-> <abstract-declarator>}? <compound_statement>
+
+<parameter-type-list> ::= <parameter-list>
+                        | <parameter-list> , ...
+
+<parameter-list> ::= <parameter-declaration>
+                   | <parameter-list> , <parameter-declaration>
+
+<parameter-declaration> ::= {<declaration-specifier>}+ <declarator>
+                          | {<declaration-specifier>}+ <abstract-declarator>
+                          | {<declaration-specifier>}+
+
+<declarator> ::= <identifier>
+               | ( <declarator> )
+               | <declarator> [ {<constant-expression>}? ]
+
+<abstract-declarator> ::= {<abstract-declarator>}? [ {<constant-expression>}? ]
+                        | {<abstract-declarator>}? ( {<parameter-type-list>}? )
+
+
+<declaration-specifier> ::= <type-specifier>
+                          | <type-qualifier>
+
+<type-qualifier> ::= const
+<type-specifier> ::= void
+                   | bool
+                   | char
+                   | int
+                   | float
+                   | <enum-specifier>
+                   | <class-specifier>

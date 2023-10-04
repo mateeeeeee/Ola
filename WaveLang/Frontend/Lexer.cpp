@@ -113,7 +113,7 @@ namespace wave
 			return LexPunctuator(token);
 		}
 		}
-		//Report(diag::lexing_failed, loc);
+		Report(diag::unknown_character, loc);
 		return false;
 	}
 
@@ -125,7 +125,7 @@ namespace wave
 		else if (std::isalpha(*tmp_ptr))
 		{
 			UpdatePointersAndLocation();
-			//Report(diag::invalid_number_literal, loc);
+			Report(diag::invalid_number_literal, loc);
 			return false;
 		}
 		FillToken(t, TokenKind::number, tmp_ptr);
