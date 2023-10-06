@@ -6,7 +6,11 @@
 
 namespace wave
 {
-
+	struct Symbol
+	{
+		std::string name;
+		std::unique_ptr<Type> type;
+	};
 
 	template<typename SymType>
 	class ScopeTable
@@ -15,16 +19,19 @@ namespace wave
 		explicit ScopeTable(uint32 scope_id) : scope_id(scope_id) {}
 		uint32 GetScope() const { return scope_id; }
 
-		bool Insert(SymType const& symbol)
+		bool Insert(SymType&& symbol)
 		{
 			if (scope_sym_table.contains(symbol.name)) return false;
-			scope_sym_table[symbol.name] = symbol;
+			scope_sym_table.insert(std::make_pair(symbol.name, std::move(symbol)));
 			return true;
 		}
 
 		SymType* LookUp(std::string const& sym_name)
 		{
-			if (scope_sym_table.contains(sym_name)) return &scope_sym_table[sym_name];
+			if (auto it = scope_sym_table.find(sym_name); it != scope_sym_table.end())
+			{
+				return &it->second;
+			}
 			else return nullptr;
 		}
 
@@ -53,9 +60,9 @@ namespace wave
 			--scope_id;
 		}
 
-		bool Insert(SymType const& symbol)
+		bool Insert(SymType&& symbol)
 		{
-			return scopes.back().Insert(symbol);
+			return scopes.back().Insert(std::move(symbol));
 		}
 
 		SymType* LookUp(std::string const& sym_name)
@@ -68,11 +75,11 @@ namespace wave
 		}
 		SymType* LookUp(std::string_view sym_name)
 		{
-			return LookUp(std::string(sym_name));
+			return LookUp(sym_name);
 		}
 		SymType* LookUpCurrentScope(std::string_view sym_name)
 		{
-			if (SymType* sym = scopes.back().LookUp(std::string(sym_name))) return sym;
+			if (SymType* sym = scopes.back().LookUp(sym_name)) return sym;
 			return nullptr;
 		}
 

@@ -41,30 +41,15 @@ namespace wave
 			else return Is(t1) || IsOneOf(ts...);
 		}
 
-		bool IsDeclSpec() const
+		bool IsType() const
 		{
 			return IsOneOf(
 				TokenKind::KW_enum,
-				TokenKind::KW_class,
-				TokenKind::KW_const,
-				TokenKind::KW_static,
-				TokenKind::KW_extern,
-				TokenKind::KW_auto,
 				TokenKind::KW_bool,
 				TokenKind::KW_char,
 				TokenKind::KW_int,
 				TokenKind::KW_float,
-				TokenKind::KW_void,
-				TokenKind::KW_auto,
-				TokenKind::KW_alignas,
-				TokenKind::KW_atomic);
-		}
-		bool IsStorageSpecifier() const
-		{
-			return IsOneOf(
-				TokenKind::KW_static,
-				TokenKind::KW_extern,
-				TokenKind::KW_atomic);
+				TokenKind::KW_void);
 		}
 
 		void SetFlag(TokenFlag flag)

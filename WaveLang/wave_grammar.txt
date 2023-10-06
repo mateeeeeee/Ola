@@ -1,7 +1,7 @@
 <translation-unit> ::= { <function_definition> | <function_declaration> }*
 
-<function_declaration> ::= extern <identifier>( <parameter-type-list> ) {-> <abstract-declarator>}?;
- <function_definition> ::= <identifier>( <parameter-type-list> ) {-> <abstract-declarator>}? <compound_statement>
+<function_declaration> ::= extern fn <identifier>( <parameter-type-list> ) -> <type-specifier>;
+<function_definition> ::= fn <identifier>( <parameter-type-list> ) {-> <type-specifier>}? <compound_statement>
 
 <parameter-type-list> ::= <parameter-list>
                         | <parameter-list> , ...
@@ -9,23 +9,16 @@
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list> , <parameter-declaration>
 
-<parameter-declaration> ::= <declaration-specifier> <declarator>
-                          | <declaration-specifier> <abstract-declarator>
+<parameter-declaration> ::= <type-qualifier> <declarator> : <type-specifier>
 
 <declarator> ::= <identifier>
-               | <declarator> [ {<constant-expression>}? ]
 
-<abstract-declarator> ::= {<abstract-declarator>}? [ {<constant-expression>}? ]
-                       
-<declaration-specifier> ::= <type-specifier>
-                          | <type-qualifier>
-
-<type-qualifier> ::= const
+<type-qualifier> ::= {const}?
 <type-specifier> ::= void
-                   | bool
-                   | char
-                   | int
-                   | float
+                   | bool  | bool[ {<constant-expression>}? ]
+                   | char  | char[ {<constant-expression>}? ]
+                   | int   | int[ {<constant-expression>}? ]
+                   | float | float[ {<constant-expression>}? ]
                    | <enum-specifier>
                    | <class-specifier>
 				   
@@ -137,11 +130,8 @@
                    | ~
                    | !
 
-<declaration> ::=  {<declaration-specifier>}+ {<init-declarator>}* ;
-
-<init-declarator> ::= <declarator>
-                    | <declarator> = <initializer>
-					
+<declaration> ::=  let {<type-qualifier>}? <declarator> {: <type-specifier>}?  { = <initializer>}? ;
+	
 <initializer> ::= <assignment-expression>
 
 <compound-statement> ::= { {<declaration>}* {<statement>}* }

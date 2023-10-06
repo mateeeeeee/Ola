@@ -18,6 +18,7 @@ namespace wave
 	class VariableDeclAST;
 
 	class StmtAST;
+	class CompoundStmtAST;
 
 	class ExprAST;
 
@@ -90,21 +91,27 @@ namespace wave
 	class FunctionDeclAST : public DeclAST
 	{
 	public:
-		FunctionDeclAST(DeclKind decl_kind, std::string_view name, SourceLocation const& loc)
-			: DeclAST(decl_kind, name, loc) {}
+		FunctionDeclAST(std::string_view name, SourceLocation const& loc)
+			: DeclAST(DeclKind::Function, name, loc) {}
 
 		void AddParamDeclaration(std::unique_ptr<VariableDeclAST>&& param)
 		{
 			param_declarations.push_back(std::move(param));
 		}
-		void SetDefinition()
+		void SetDefinition(std::unique_ptr<CompoundStmtAST>&& _definition)
 		{
+			definition = std::move(_definition);
+		}
 
+		bool IsExtern() const
+		{
+			return definition == nullptr;
 		}
 
 
 	private:
 		std::vector<std::unique_ptr<VariableDeclAST>> param_declarations;
+		std::unique_ptr<CompoundStmtAST> definition;
 	};
 	class VariableDeclAST : public DeclAST
 	{
@@ -141,6 +148,19 @@ namespace wave
 
 	protected:
 		explicit StmtAST(StmtKind kind) : kind(kind) {}
+	};
+	class CompoundStmtAST : public StmtAST
+	{
+	public:
+		CompoundStmtAST() : StmtAST(StmtKind::Compound) {}
+
+		void AddStatement(std::unique_ptr<StmtAST>&& stmt)
+		{
+			statements.push_back(std::move(stmt));
+		}
+
+	private:
+		std::vector<std::unique_ptr<StmtAST>> statements;
 	};
 
 	enum class ExprKind : uint8
@@ -182,16 +202,16 @@ namespace wave
 		virtual int64 EvaluateConstexpr() const { return 0; }
 
 		SourceLocation const& GetLocation() const { return loc; }
-		Type const& GetType() const { return type; }
+		Type const& GetType() const { return *type; }
 		ExprKind GetExprKind() const { return kind; }
 
 	protected:
 		ExprKind kind;
 		SourceLocation loc;
-		Type type;
+		std::unique_ptr<Type> type;
 
 	protected:
-		ExprAST(ExprKind kind, SourceLocation const& loc, Type const& type = builtin_types::Int) : kind(kind), loc(loc), type(type) {}
+		ExprAST(ExprKind kind, SourceLocation const& loc, std::unique_ptr<Type>&& type) : kind(kind), loc(loc), type(std::move(type)) {}
 	};
 
 	struct AST

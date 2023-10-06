@@ -2,12 +2,14 @@
 #include <concepts>
 #include <string>
 #include <vector>
+#include <memory>
 #include <span>
 
 namespace wave
 {
 	enum class TypeKind : uint8
 	{
+		Invalid,
 		Void,
 		Bool,
 		Char,
@@ -21,6 +23,9 @@ namespace wave
 	class Type
 	{
 	public:
+		constexpr Type() {}
+		WAVE_NONCOPYABLE(Type);
+		WAVE_DEFAULT_MOVABLE(Type);
 
 		constexpr bool IsConst() const { return is_const; }
 		constexpr uint32 GetSize() const { return size; }
@@ -52,10 +57,10 @@ namespace wave
 		T* TryAs();
 
 	private:
-		TypeKind kind;
-		uint32 size;
-		uint32 align;
-		bool is_const;
+		TypeKind kind = TypeKind::Invalid;
+		uint32 size = 0;
+		uint32 align = 0;
+		bool is_const = false;
 
 	protected:
 		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0)
@@ -115,50 +120,56 @@ namespace wave
 	class ArrayType : public Type
 	{
 	public:
-		explicit ArrayType(Type const& type) : Type{ TypeKind::Array, 0, type.GetAlign() } {}
+		explicit ArrayType(std::unique_ptr<Type>&& type) : Type{ TypeKind::Array, 0, type->GetAlign() }, type(std::move(type)) {}
+		ArrayType(std::unique_ptr<Type>&& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
+		type(std::move(type)), array_size(array_size) {}
+		WAVE_NONCOPYABLE(ArrayType);
+		WAVE_DEFAULT_MOVABLE(ArrayType);
+
 		virtual bool IsCompatible(Type const& other) const override
 		{
 			if (other.IsNot(TypeKind::Array)) return false;
 			ArrayType const& other_array_type = other.As<ArrayType>();
 
-			bool is_underlying_type_array = type.Is(TypeKind::Array);
-			bool is_other_underlying_type_array = other_array_type.type.Is(TypeKind::Array);
+			bool is_underlying_type_array = type->Is(TypeKind::Array);
+			bool is_other_underlying_type_array = other_array_type.type->Is(TypeKind::Array);
 			if (!is_underlying_type_array && !is_other_underlying_type_array)
 			{
-				return type.GetKind() == other_array_type.type.GetKind();
+				return type->GetKind() == other_array_type.type->GetKind();
 			}
 			else if (is_underlying_type_array && is_other_underlying_type_array)
 			{
-				return type.IsCompatible(other_array_type.type);
+				return type->IsCompatible(*other_array_type.type);
 			}
 			else return false;
 		}
 
 	private:
-		Type type;
+		std::unique_ptr<Type> type;
+		uint32 array_size = 0;
 	};
 
 	struct FunctionParameter
 	{
 		std::string name = "";
-		Type type;
+		std::unique_ptr<Type> type;
 	};
 	class FunctionType : public Type
 	{
 	public:
-		explicit FunctionType(Type const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
-		return_type(return_type), params(params){}
+		explicit FunctionType(std::unique_ptr<Type>&& return_type, std::vector<FunctionParameter>&& params = {}) : Type{ TypeKind::Function, 8, 8 },
+		return_type(std::move(return_type)), params(std::move(params)){}
 
 		virtual bool IsCompatible(Type const& other) const override
 		{
 			return false;
 		}
 
-		Type const& GetReturnType() const { return return_type; }
+		Type const& GetReturnType() const { return *return_type; }
 		std::span<const FunctionParameter> GetParameters() const { return params; }
 
 	private:
-		Type return_type;
+		std::unique_ptr<Type> return_type;
 		std::vector<FunctionParameter> params;
 	};
 

@@ -2,11 +2,16 @@
 #include <vector>
 #include <memory>
 #include "Token.h"
+#include "Symbol.h"
+#include "Diagnostics.h"
 
 namespace wave
 {
+	class Parser;
 	struct AST;
 	class ExprAST;
+	class DeclAST;
+	class FunctionDeclAST;
 
 	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
 	class Parser
@@ -15,7 +20,7 @@ namespace wave
 
 		struct Context
 		{
-
+			std::unique_ptr<SymbolTable<Symbol>> sym_table;
 		};
 	public:
 
@@ -29,7 +34,7 @@ namespace wave
 		std::vector<Token> tokens;
 		TokenPtr current_token;
 		std::unique_ptr<AST> ast;
-		Context context;
+		Context ctx;
 
 	private:
 		bool Consume(TokenKind k)
@@ -63,6 +68,11 @@ namespace wave
 		void Report(diag::DiagCode);
 
 		void ParseTranslationUnit();
-		[[nodiscard]] std::vector<std::unique_ptr<DeclAST>> ParseDeclaration();
+		[[nodiscard]] std::vector<std::unique_ptr<DeclAST>> ParseGlobalDeclaration();
+		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDeclaration();
+		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDefinition();
+
+		std::unique_ptr<Type> ParseTypeSpecifier();
 	};
+
 }
