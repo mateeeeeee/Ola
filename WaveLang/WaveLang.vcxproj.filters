@@ -20,6 +20,9 @@
     <ClCompile Include="Frontend\Parser.cpp">
       <Filter>Frontend\Parser</Filter>
     </ClCompile>
+    <ClCompile Include="Frontend\AST.cpp">
+      <Filter>Frontend\Parser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">

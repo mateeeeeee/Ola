@@ -45,6 +45,8 @@ namespace wave
 		while (Consume(TokenKind::semicolon)) Report(diag::empty_statement);
 		std::vector<std::unique_ptr<DeclAST>> declarations;
 
+
+
 		return declarations;
 	}
 

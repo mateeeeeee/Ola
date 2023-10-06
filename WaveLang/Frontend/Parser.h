@@ -6,7 +6,9 @@
 namespace wave
 {
 	struct AST;
+	class ExprAST;
 
+	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
 	class Parser
 	{
 		using TokenPtr = std::vector<Token>::iterator;
