@@ -19,6 +19,11 @@ namespace wave
 
 	class StmtAST;
 	class CompoundStmtAST;
+	class ExprStmtAST;
+	class DeclStmtAST;
+	class NullStmtAST;
+	class IfStmtAST;
+	class ReturnStmtAST;
 
 	class ExprAST;
 
@@ -53,7 +58,6 @@ namespace wave
 		TranslationUnitAST() = default;
 		
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override {}
-		virtual Value* Codegen(Context& context) const { return nullptr; }
 
 		void AddDeclaration(std::unique_ptr<DeclAST>&& declaration)
 		{
@@ -172,6 +176,61 @@ namespace wave
 
 	private:
 		std::vector<std::unique_ptr<StmtAST>> statements;
+	};
+	class ExprStmtAST : public StmtAST
+	{
+	public:
+		ExprStmtAST(std::unique_ptr<ExprAST>&& expr) : StmtAST(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr)) {}
+		ExprAST* GetExpr() const { return expr.get(); }
+
+	private:
+		std::unique_ptr<ExprAST> expr;
+	};
+	class DeclStmtAST : public StmtAST
+	{
+	public:
+		DeclStmtAST(std::unique_ptr<DeclAST>&& decl) : StmtAST(StmtKind::Decl), declaration(std::move(decl)) {}
+		DeclAST* GetDeclarations() const { return declaration.get(); }
+
+	private:
+		std::unique_ptr<DeclAST> declaration;
+	};
+	class NullStmtAST final : public ExprStmtAST
+	{
+	public:
+		NullStmtAST() : ExprStmtAST(nullptr) {}
+	};
+	class IfStmtAST final : public StmtAST
+	{
+	public:
+		IfStmtAST() : StmtAST(StmtKind::If) {}
+
+		void SetCondition(std::unique_ptr<ExprAST>&& _condition)
+		{
+			condition = std::move(_condition);
+		}
+		void SetThenStatement(std::unique_ptr<StmtAST>&& _then_stmt)
+		{
+			then_stmt = std::move(_then_stmt);
+		}
+		void SetElseStatement(std::unique_ptr<StmtAST>&& _else_stmt)
+		{
+			else_stmt = std::move(_else_stmt);
+		}
+
+	private:
+		std::unique_ptr<ExprAST> condition;
+		std::unique_ptr<StmtAST> then_stmt;
+		std::unique_ptr<StmtAST> else_stmt;
+	};
+	class ReturnStmtAST final : public StmtAST
+	{
+	public:
+		explicit ReturnStmtAST(std::unique_ptr<ExprStmtAST>&& ret_expr)
+			: StmtAST(StmtKind::Return), ret_expr(std::move(ret_expr)) {}
+
+	private:
+		std::unique_ptr <ExprStmtAST> ret_expr;
 	};
 
 	enum class ExprKind : uint8

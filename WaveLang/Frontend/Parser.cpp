@@ -64,7 +64,7 @@ namespace wave
 	//<function_declaration> ::= extern fn <identifier>( <parameter-list> ) -> <type-specifier>};
 	//<parameter-list> ::= <parameter-declaration>
 	//                   | <parameter-list>, <parameter-declaration>
-	//<parameter-declaration> ::= <type-qualifier> <declarator> : <type-specifier>
+	//<parameter-declaration> ::= {<type-qualifier>}? <declarator> : <type-specifier>
 	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDeclaration()
 	{
 		WAVE_ASSERT(ctx.sym_table->IsGlobal());
@@ -95,18 +95,18 @@ namespace wave
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Report(diag::function_params_missing_coma);
 
+				QualifiedType param_type{};
+				ParseTypeQualifier(param_type);
+
 				if (current_token->IsNot(TokenKind::identifier)) Report(diag::expected_identifier);
 				std::string_view identifier = current_token->GetIdentifier(); ++current_token;
 
 				Expect(TokenKind::colon);
-
-				QualifiedType param_type{};
-				ParseTypeQualifier(param_type);
 				ParseTypeSpecifier(param_type);
-
+				if (!param_type.HasRawType()) Report(diag::missing_type_specifier);
 				if (param_type->Is(TypeKind::Void)) Report(diag::void_invalid_context);
 
-				std::unique_ptr<VariableDeclAST> param_decl = std::make_unique<VariableDeclAST>(identifier, current_token->GetLocation());
+				std::unique_ptr<VariableDeclAST> param_decl = ParseVariableDeclaration(true);
 				param_decl->SetType(param_type);
 				function_decl->AddParamDeclaration(std::move(param_decl));
 
@@ -138,10 +138,69 @@ namespace wave
 	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDefinition()
 	{
 		std::unique_ptr<FunctionDeclAST> function_decl = ParseFunctionDeclaration();
-
-		//#todo parse compound statement
-
+		std::unique_ptr<CompoundStmtAST> function_body = ParseCompoundStatement();
+		function_decl->SetDefinition(std::move(function_body));
 		return function_decl;
+	}
+
+	//let a = 5;
+	//let const a = 5;
+	//let a : int = 5;
+	//a : int
+	//const a : int
+	std::unique_ptr<VariableDeclAST> Parser::ParseVariableDeclaration(bool function_param_decl)
+	{
+		QualifiedType param_type{};
+		ParseTypeQualifier(param_type);
+		if (current_token->IsNot(TokenKind::identifier)) Report(diag::expected_identifier);
+		std::string_view identifier = current_token->GetIdentifier(); ++current_token;
+
+		if (function_param_decl)
+		{
+			Expect(TokenKind::colon);
+			ParseTypeSpecifier(param_type);
+			if (!param_type.HasRawType()) Report(diag::missing_type_specifier);
+			if (param_type->Is(TypeKind::Void)) Report(diag::void_invalid_context);
+		}
+		else
+		{
+			if (Consume(TokenKind::colon)) ParseTypeSpecifier(param_type);
+			
+		}
+		std::unique_ptr<VariableDeclAST> variable_decl = std::make_unique<VariableDeclAST>(identifier, current_token->GetLocation());
+		variable_decl->SetType(param_type);
+		
+
+
+		return variable_decl;
+	}
+
+	std::unique_ptr<StmtAST> Parser::ParseStatement()
+	{
+		return nullptr;
+	}
+
+	std::unique_ptr<CompoundStmtAST> Parser::ParseCompoundStatement()
+	{
+		Expect(TokenKind::left_brace);
+		SCOPED_SYMBOL_TABLE(ctx.sym_table);
+		std::unique_ptr<CompoundStmtAST> compound_stmt = std::make_unique<CompoundStmtAST>();
+		while (current_token->IsNot(TokenKind::right_brace))
+		{
+			if (current_token->Is(TokenKind::KW_let))
+			{
+				std::unique_ptr<VariableDeclAST> decl = ParseVariableDeclaration(false);
+
+				compound_stmt->AddStatement(std::make_unique<DeclStmtAST>(std::move(decl)));
+			}
+			else
+			{
+				std::unique_ptr<StmtAST> stmt = ParseStatement();
+				compound_stmt->AddStatement(std::move(stmt));
+			}
+		}
+		Expect(TokenKind::right_brace);
+		return compound_stmt;
 	}
 
 	//<type-qualifier> ::= {const}?
@@ -164,16 +223,17 @@ namespace wave
 	{
 		switch (current_token->GetKind())
 		{
-		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void);
-		case TokenKind::KW_bool:  type.SetRawType(builtin_types::Bool);
-		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);
-		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int);
-		case TokenKind::KW_float: type.SetRawType(builtin_types::Float);
+		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void); break;
+		case TokenKind::KW_bool:  type.SetRawType(builtin_types::Bool);	break;
+		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);	break;
+		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int); break;
+		case TokenKind::KW_float: type.SetRawType(builtin_types::Float); break;
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetIdentifier();
 			WAVE_ASSERT(false); //#todo : check if it's enum or class
 		}
+		break;
 		default:
 			Report(diag::invalid_type_specifier);
 			return;

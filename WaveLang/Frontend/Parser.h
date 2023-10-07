@@ -11,7 +11,10 @@ namespace wave
 	struct AST;
 	class ExprAST;
 	class DeclAST;
+	class StmtAST;
 	class FunctionDeclAST;
+	class VariableDeclAST;
+	class CompoundStmtAST;
 
 	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
 	class Parser
@@ -71,6 +74,10 @@ namespace wave
 		[[nodiscard]] std::vector<std::unique_ptr<DeclAST>> ParseGlobalDeclaration();
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDeclaration();
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDefinition();
+		[[nodiscard]] std::unique_ptr<VariableDeclAST> ParseVariableDeclaration(bool function_param_decl);
+
+		[[nodiscard]] std::unique_ptr<StmtAST> ParseStatement();
+		[[nodiscard]] std::unique_ptr<CompoundStmtAST> ParseCompoundStatement();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);

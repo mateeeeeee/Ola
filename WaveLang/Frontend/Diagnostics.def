@@ -12,4 +12,5 @@ DIAG(expected_identifier, error, "[Parser] Expected identifier")
 DIAG(invalid_type_specifier, error, "[Parser] Invalid type specifier")
 DIAG(function_params_missing_coma, error, "Missing coma in function parameters declaration")
 DIAG(void_invalid_context, error, "Void is only allowed when specifying function return value")
+DIAG(missing_type_specifier, error, "Missing type specifier")
 #undef DIAG
