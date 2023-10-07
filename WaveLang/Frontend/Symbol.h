@@ -9,28 +9,29 @@ namespace wave
 	struct Symbol
 	{
 		std::string name;
-		std::unique_ptr<Type> type;
+		QualifiedType type;
 	};
 
-	template<typename SymType>
+	template<typename _Ty>
 	class ScopeTable
 	{
+		using SymType = _Ty;
 	public:
 		explicit ScopeTable(uint32 scope_id) : scope_id(scope_id) {}
 		uint32 GetScope() const { return scope_id; }
 
-		bool Insert(SymType&& symbol)
+		bool Insert(SymType const& symbol)
 		{
 			if (scope_sym_table.contains(symbol.name)) return false;
-			scope_sym_table.insert(std::make_pair(symbol.name, std::move(symbol)));
+			scope_sym_table[symbol.name] = symbol;
 			return true;
 		}
 
 		SymType* LookUp(std::string const& sym_name)
 		{
-			if (auto it = scope_sym_table.find(sym_name); it != scope_sym_table.end())
+			if (scope_sym_table.contains(sym_name))
 			{
-				return &it->second;
+				return &scope_sym_table[sym_name];
 			}
 			else return nullptr;
 		}
@@ -41,9 +42,11 @@ namespace wave
 		std::unordered_map<std::string, SymType> scope_sym_table;
 	};
 
-	template<typename SymType>
+	template<typename _Ty>
 	class SymbolTable
 	{
+	public:
+		using SymType = _Ty;
 	public:
 		SymbolTable()
 		{
@@ -60,7 +63,7 @@ namespace wave
 			--scope_id;
 		}
 
-		bool Insert(SymType&& symbol)
+		bool Insert(SymType const& symbol)
 		{
 			return scopes.back().Insert(std::move(symbol));
 		}
@@ -89,4 +92,19 @@ namespace wave
 		std::vector<ScopeTable<SymType>> scopes;
 		uint32 scope_id = 0;
 	};
+
+	template<typename T>
+	struct ScopedSymbolTable
+	{
+		ScopedSymbolTable(SymbolTable<T>& sym_table) : sym_table(sym_table)
+		{
+			sym_table.EnterScope();
+		}
+		~ScopedSymbolTable()
+		{
+			sym_table.ExitScope();
+		}
+		SymbolTable<T>& sym_table;
+	};
+	#define SCOPED_SYMBOL_TABLE(sym_table) ScopedSymbolTable<std::remove_reference_t<decltype(*sym_table)>::SymType> WAVE_CONCAT(_scoped_sym_table,__COUNTER__)(*sym_table)
 }

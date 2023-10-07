@@ -41,7 +41,7 @@ namespace wave
 	public:
 		virtual ~NodeAST() = default;
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {};
-		virtual Value* Codegen(Context& context) const {}
+		virtual Value* Codegen(Context& context) const { return nullptr; }
 
 	protected:
 		NodeAST() = default;
@@ -53,7 +53,7 @@ namespace wave
 		TranslationUnitAST() = default;
 		
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override {}
-		virtual Value* Codegen(Context& context) const {}
+		virtual Value* Codegen(Context& context) const { return nullptr; }
 
 		void AddDeclaration(std::unique_ptr<DeclAST>&& declaration)
 		{
@@ -73,20 +73,38 @@ namespace wave
 	{
 	public:
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {}
-		virtual Value* Codegen(Context& context) const {}
+		virtual Value* Codegen(Context& context) const { return nullptr; }
 
 		DeclKind GetDeclKind() const { return decl_kind; }
 		SourceLocation GetLocation() const { return source_loc; }
 		std::string_view GetName() const { return name; }
 
+		void SetType(QualifiedType const& _type) { type = _type; }
+		QualifiedType const& GetType() const { return type; }
+
 	private:
 		DeclKind decl_kind;
 		std::string name;
 		SourceLocation source_loc;
+		QualifiedType type;
 
 	protected:
 		DeclAST(DeclKind decl_kind, std::string_view name, SourceLocation const& loc)
 			: decl_kind(decl_kind), name(name), source_loc(loc) {}
+	};
+	class VariableDeclAST : public DeclAST
+	{
+	public:
+		VariableDeclAST(std::string_view name, SourceLocation const& loc)
+			: DeclAST(DeclKind::Variable, name, loc) {}
+
+		void SetInitExpression(std::unique_ptr<ExprAST>&& expr)
+		{
+			init_expr = std::move(expr);
+		}
+
+	private:
+		std::unique_ptr<ExprAST> init_expr;
 	};
 	class FunctionDeclAST : public DeclAST
 	{
@@ -108,16 +126,9 @@ namespace wave
 			return definition == nullptr;
 		}
 
-
 	private:
 		std::vector<std::unique_ptr<VariableDeclAST>> param_declarations;
 		std::unique_ptr<CompoundStmtAST> definition;
-	};
-	class VariableDeclAST : public DeclAST
-	{
-	public:
-
-	private:
 	};
 
 	enum class StmtKind : uint8

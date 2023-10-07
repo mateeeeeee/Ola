@@ -72,7 +72,8 @@ namespace wave
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDeclaration();
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDefinition();
 
-		std::unique_ptr<Type> ParseTypeSpecifier();
+		void ParseTypeQualifier(QualifiedType& type);
+		void ParseTypeSpecifier(QualifiedType& type);
 	};
 
 }

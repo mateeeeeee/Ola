@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <span>
+#include "Utility/Enums.h"
 
 namespace wave
 {
@@ -24,13 +25,9 @@ namespace wave
 	{
 	public:
 		constexpr Type() {}
-		WAVE_NONCOPYABLE(Type);
-		WAVE_DEFAULT_MOVABLE(Type);
 
-		constexpr bool IsConst() const { return is_const; }
 		constexpr uint32 GetSize() const { return size; }
 		constexpr uint32 GetAlign() const { return align; }
-		constexpr void SetConst(bool _const) { is_const = _const; }
 		constexpr void SetAlign(uint32 _align) { align = _align; }
 		constexpr void SetSize(uint32 _size) { size = _size; }
 
@@ -60,11 +57,54 @@ namespace wave
 		TypeKind kind = TypeKind::Invalid;
 		uint32 size = 0;
 		uint32 align = 0;
-		bool is_const = false;
 
 	protected:
 		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0)
-			: kind(kind), size(size), align(align), is_const(false) {}
+			: kind(kind), size(size), align(align) {}
+	};
+
+
+	enum QualifierFlag : uint8
+	{
+		Qualifier_None = 0x0,
+		Qualifier_Const = 0x1
+	};
+	DEFINE_ENUM_BIT_OPERATORS(QualifierFlag);
+	using Qualifiers = uint8;
+
+	class QualifiedType
+	{
+		friend class Type;
+	public:
+		explicit QualifiedType(Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers) {}
+		template<typename _Ty> requires std::derived_from<_Ty, Type>
+		QualifiedType(_Ty const& _type, Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers)
+		{
+			type = std::make_shared<_Ty>(_type);
+		}
+
+		bool IsConst() const { return qualifiers & Qualifier_Const; }
+		void AddConst() { qualifiers |= Qualifier_Const; }
+		void RemoveConst() { qualifiers &= ~Qualifier_Const; }
+
+		bool HasRawType() const { return type != nullptr; }
+		template<typename _Ty> requires std::derived_from<_Ty, Type>
+		void SetRawType(_Ty const& _type)
+		{
+			type = std::make_shared<_Ty>(_type);
+		}
+		void ResetRawType() { type = nullptr; }
+		Type const& RawType() const { return *type; }
+		Type& RawType() { return *type; }
+
+		Type const* operator->() const { return type.get(); }
+		Type* operator->() { return type.get(); }
+		Type const& operator*() const { return RawType(); }
+		operator Type const& () const { return RawType(); }
+
+	private:
+		std::shared_ptr<Type> type = nullptr;
+		Qualifiers qualifiers = Qualifier_None;
 	};
 
 	class VoidType : public Type
@@ -120,56 +160,54 @@ namespace wave
 	class ArrayType : public Type
 	{
 	public:
-		explicit ArrayType(std::unique_ptr<Type>&& type) : Type{ TypeKind::Array, 0, type->GetAlign() }, type(std::move(type)) {}
-		ArrayType(std::unique_ptr<Type>&& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
-		type(std::move(type)), array_size(array_size) {}
-		WAVE_NONCOPYABLE(ArrayType);
-		WAVE_DEFAULT_MOVABLE(ArrayType);
+		explicit ArrayType(QualifiedType const& type) : Type{ TypeKind::Array, 0, type->GetAlign() }, base_type(type) {}
+		ArrayType(QualifiedType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
+			base_type(type), array_size(array_size) {}
 
 		virtual bool IsCompatible(Type const& other) const override
 		{
 			if (other.IsNot(TypeKind::Array)) return false;
 			ArrayType const& other_array_type = other.As<ArrayType>();
 
-			bool is_underlying_type_array = type->Is(TypeKind::Array);
-			bool is_other_underlying_type_array = other_array_type.type->Is(TypeKind::Array);
+			bool is_underlying_type_array = base_type->Is(TypeKind::Array);
+			bool is_other_underlying_type_array = other_array_type.base_type->Is(TypeKind::Array);
 			if (!is_underlying_type_array && !is_other_underlying_type_array)
 			{
-				return type->GetKind() == other_array_type.type->GetKind();
+				return base_type->GetKind() == other_array_type.base_type->GetKind();
 			}
 			else if (is_underlying_type_array && is_other_underlying_type_array)
 			{
-				return type->IsCompatible(*other_array_type.type);
+				return base_type->IsCompatible(*other_array_type.base_type);
 			}
 			else return false;
 		}
 
 	private:
-		std::unique_ptr<Type> type;
+		QualifiedType base_type;
 		uint32 array_size = 0;
 	};
 
 	struct FunctionParameter
 	{
 		std::string name = "";
-		std::unique_ptr<Type> type;
+		QualifiedType type;
 	};
 	class FunctionType : public Type
 	{
 	public:
-		explicit FunctionType(std::unique_ptr<Type>&& return_type, std::vector<FunctionParameter>&& params = {}) : Type{ TypeKind::Function, 8, 8 },
-		return_type(std::move(return_type)), params(std::move(params)){}
+		explicit FunctionType(QualifiedType const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
+		return_type(return_type), params(params){}
 
 		virtual bool IsCompatible(Type const& other) const override
 		{
 			return false;
 		}
 
-		Type const& GetReturnType() const { return *return_type; }
+		QualifiedType const& GetReturnType() const { return return_type; }
 		std::span<const FunctionParameter> GetParameters() const { return params; }
 
 	private:
-		std::unique_ptr<Type> return_type;
+		QualifiedType return_type;
 		std::vector<FunctionParameter> params;
 	};
 
