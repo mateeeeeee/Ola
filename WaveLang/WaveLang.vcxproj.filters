@@ -26,6 +26,9 @@
     <ClCompile Include="Frontend\Sema.cpp">
       <Filter>Frontend\Parser</Filter>
     </ClCompile>
+    <ClCompile Include="Utility\Debug.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -99,6 +102,12 @@
     <ClInclude Include="Frontend\Sema.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Debug.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Logger.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Frontend\Diagnostics.def">
@@ -107,6 +116,7 @@
     <None Include="Frontend\Tokens.def">
       <Filter>Frontend\Lexer</Filter>
     </None>
+    <None Include="test.wv" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />

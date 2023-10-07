@@ -6,6 +6,7 @@
 #include "Frontend/Lexer.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
+#include "Utility/Debug.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -45,7 +46,7 @@ namespace wave
 			Parser parser(lex.GetTokens());
 			parser.Parse();
 			AST* ast = parser.GetAST();
-			if (ast_dump) {}
+			if (ast_dump) DebugNodeVisitorAST debug_ast(ast);
 
 			Sema sema(ast);
 

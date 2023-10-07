@@ -58,13 +58,13 @@ namespace wave::diag
 		switch (diag_kind)
 		{
 		case DiagKind::info:
-			LU_INFO(output);
+			WAVE_INFO(output);
 			break;
 		case DiagKind::warning:
-			LU_WARN(output);
+			WAVE_WARN(output);
 			break;
 		case DiagKind::error:
-			LU_ERROR(output);
+			WAVE_ERROR(output);
 			break;
 		}
 		if (exit_on_error && diag_kind == DiagKind::error) std::exit(EXIT_CODE_COMPILATION_FAILED);

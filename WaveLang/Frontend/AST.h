@@ -50,6 +50,7 @@ namespace wave
 		virtual void Visit(DeclStmtAST const& node, uint32 depth) {}
 		virtual void Visit(NullStmtAST const& node, uint32 depth) {}
 		virtual void Visit(ReturnStmtAST const& node, uint32 depth) {}
+		virtual void Visit(IfStmtAST const& node, uint32 depth) {}
 
 		virtual void Visit(ExprAST const& node, uint32 depth) {}
 		virtual void Visit(UnaryExprAST const& node, uint32 depth) {}
@@ -185,7 +186,7 @@ namespace wave
 	protected:
 		explicit StmtAST(StmtKind kind) : kind(kind) {}
 	};
-	class CompoundStmtAST : public StmtAST
+	class CompoundStmtAST final : public StmtAST
 	{
 	public:
 		CompoundStmtAST() : StmtAST(StmtKind::Compound) {}
@@ -219,7 +220,7 @@ namespace wave
 
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 	};
-	class DeclStmtAST : public StmtAST
+	class DeclStmtAST final : public StmtAST
 	{
 	public:
 		DeclStmtAST(std::unique_ptr<DeclAST>&& decl) : StmtAST(StmtKind::Decl), declaration(std::move(decl)) {}

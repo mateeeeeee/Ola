@@ -156,11 +156,13 @@
     <ClCompile Include="Frontend\SourceBuffer.cpp" />
     <ClCompile Include="Frontend\TokenTypes.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Utility\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />
+    <ClInclude Include="Core\Logger.h" />
     <ClInclude Include="Frontend\AST.h" />
     <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\Lexer.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="Frontend\Token.h" />
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Frontend\Type.h" />
+    <ClInclude Include="Utility\Debug.h" />
     <ClInclude Include="Utility\Enums.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +184,7 @@
     <None Include="Frontend\Tokens.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="test.wv" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />
