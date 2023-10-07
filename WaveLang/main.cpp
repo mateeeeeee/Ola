@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 	cli_parser.add_option("-o", output_file, "Output file")->default_val("wave");
 
 	CLI11_PARSE(cli_parser, argc, argv);
-	wave::CompilerFlags flags = wave::CompilerFlag_None;
+	wave::CompilerFlags flags = wave::CompilerFlag_None | wave::CompilerFlag_DumpAST;
 
 	wave::CompilerInput compiler_input{};
 	compiler_input.flags = flags;

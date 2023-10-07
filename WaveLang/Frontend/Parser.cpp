@@ -18,16 +18,16 @@ namespace wave
 	{
 		if (!Consume(k))
 		{
-			Report(diag::unexpected_token);
+			Diag(diag::unexpected_token);
 			return false;
 		}
 		return true;
 	}
 
-	void Parser::Report(diag::DiagCode code)
+	void Parser::Diag(diag::DiagCode code)
 	{
 		--current_token;
-		diag::Report(code, current_token->GetLocation());
+		diag::Diag(code, current_token->GetLocation());
 		++current_token;
 	}
 
@@ -36,29 +36,24 @@ namespace wave
 	{
 		while (current_token->IsNot(TokenKind::eof))
 		{
-			std::vector<std::unique_ptr<DeclAST>> declarations = ParseGlobalDeclaration();
-			for (auto&& declaration : declarations) ast->translation_unit->AddDeclaration(std::move(declaration));
+			ast->translation_unit->AddDeclaration(ParseGlobalDeclaration());
 		}
 	}
 
-	std::vector<std::unique_ptr<DeclAST>> Parser::ParseGlobalDeclaration()
+	std::unique_ptr<DeclAST> Parser::ParseGlobalDeclaration()
 	{
-		while (Consume(TokenKind::semicolon)) Report(diag::empty_statement);
-		std::vector<std::unique_ptr<DeclAST>> declarations;
+		while (Consume(TokenKind::semicolon)) Diag(diag::empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			if (!Consume(TokenKind::KW_fn)) Report(diag::missing_fn);
-			declarations.push_back(ParseFunctionDeclaration());
+			if (!Consume(TokenKind::KW_fn)) Diag(diag::missing_fn);
+			return ParseFunctionDeclaration();
 		}
 		else if (Consume(TokenKind::KW_fn))
 		{
-			declarations.push_back(ParseFunctionDefinition());
+			return ParseFunctionDefinition();
 		}
-		else
-		{
-			Report(diag::missing_fn);
-		}
-		return declarations;
+		else Diag(diag::missing_fn);
+		return nullptr;
 	}
 
 	//<function_declaration> ::= extern fn <identifier>( <parameter-list> ) -> <type-specifier>};
@@ -67,10 +62,7 @@ namespace wave
 	//<parameter-declaration> ::= {<type-qualifier>}? <declarator> : <type-specifier>
 	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDeclaration()
 	{
-		WAVE_ASSERT(ctx.sym_table->IsGlobal());
-		SCOPED_SYMBOL_TABLE(ctx.sym_table);
-
-		if (current_token->IsNot(TokenKind::identifier)) Report(diag::expected_identifier);
+		if (current_token->IsNot(TokenKind::identifier)) Diag(diag::expected_identifier);
 		std::string_view identifier = current_token->GetIdentifier(); ++current_token;
 
 		Expect(TokenKind::left_round);
@@ -93,25 +85,24 @@ namespace wave
 			std::vector<FunctionParameter> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Report(diag::function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(diag::function_params_missing_coma);
 
 				QualifiedType param_type{};
 				ParseTypeQualifier(param_type);
 
-				if (current_token->IsNot(TokenKind::identifier)) Report(diag::expected_identifier);
+				if (current_token->IsNot(TokenKind::identifier)) Diag(diag::expected_identifier);
 				std::string_view identifier = current_token->GetIdentifier(); ++current_token;
 
 				Expect(TokenKind::colon);
 				ParseTypeSpecifier(param_type);
-				if (!param_type.HasRawType()) Report(diag::missing_type_specifier);
-				if (param_type->Is(TypeKind::Void)) Report(diag::void_invalid_context);
+				if (!param_type.HasRawType()) Diag(diag::missing_type_specifier);
+				if (param_type->Is(TypeKind::Void)) Diag(diag::void_invalid_context);
 
 				std::unique_ptr<VariableDeclAST> param_decl = ParseVariableDeclaration(true);
 				param_decl->SetType(param_type);
 				function_decl->AddParamDeclaration(std::move(param_decl));
 
 				param_types.emplace_back(std::string(identifier), param_type);
-				ctx.sym_table->Insert(Symbol{ .name = std::string(identifier), .type = param_type });
 			}
 
 			QualifiedType return_type{};
@@ -126,7 +117,6 @@ namespace wave
 		}
 
 		function_decl->SetType(function_type);
-		ctx.sym_table->Insert(Symbol{ .name = std::string(identifier), .type = function_type });
 
 		return function_decl;
 	}
@@ -150,47 +140,68 @@ namespace wave
 	//const a : int
 	std::unique_ptr<VariableDeclAST> Parser::ParseVariableDeclaration(bool function_param_decl)
 	{
+		while (Consume(TokenKind::semicolon)) Diag(diag::empty_statement);
+
 		QualifiedType param_type{};
 		ParseTypeQualifier(param_type);
-		if (current_token->IsNot(TokenKind::identifier)) Report(diag::expected_identifier);
+		if (current_token->IsNot(TokenKind::identifier)) Diag(diag::expected_identifier);
 		std::string_view identifier = current_token->GetIdentifier(); ++current_token;
 
 		if (function_param_decl)
 		{
 			Expect(TokenKind::colon);
 			ParseTypeSpecifier(param_type);
-			if (!param_type.HasRawType()) Report(diag::missing_type_specifier);
-			if (param_type->Is(TypeKind::Void)) Report(diag::void_invalid_context);
+			if (!param_type.HasRawType()) Diag(diag::missing_type_specifier);
+			if (param_type->Is(TypeKind::Void)) Diag(diag::void_invalid_context);
 		}
 		else
 		{
 			if (Consume(TokenKind::colon)) ParseTypeSpecifier(param_type);
-			
+
+			if (Consume(TokenKind::equal))
+			{
+				std::unique_ptr<ExprAST> init_expr = ParseExpression();
+
+			}
 		}
 		std::unique_ptr<VariableDeclAST> variable_decl = std::make_unique<VariableDeclAST>(identifier, current_token->GetLocation());
 		variable_decl->SetType(param_type);
-		
-
-
 		return variable_decl;
 	}
 
 	std::unique_ptr<StmtAST> Parser::ParseStatement()
 	{
+		switch (current_token->GetKind())
+		{
+		case TokenKind::left_brace: return ParseCompoundStatement();
+		case TokenKind::KW_return: return ParseReturnStatement();
+		//case TokenKind::KW_if: return ParseIfStatement();
+		//case TokenKind::KW_while: return ParseWhileStatement();
+		//case TokenKind::KW_for: return ParseForStatement();
+		//case TokenKind::KW_do: return ParseDoWhileStatement();
+		//case TokenKind::KW_continue: return ParseContinueStatement();
+		//case TokenKind::KW_break: return ParseBreakStatement();
+		//case TokenKind::KW_goto: return ParseGotoStatement();
+		//case TokenKind::KW_switch: return ParseSwitchStatement();
+		//case TokenKind::KW_case:
+		//case TokenKind::KW_default: return ParseCaseStatement();
+		//case TokenKind::identifier:
+		//	if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
+		default:
+			return ParseExpressionStatement();
+		}
 		return nullptr;
 	}
 
 	std::unique_ptr<CompoundStmtAST> Parser::ParseCompoundStatement()
 	{
 		Expect(TokenKind::left_brace);
-		SCOPED_SYMBOL_TABLE(ctx.sym_table);
 		std::unique_ptr<CompoundStmtAST> compound_stmt = std::make_unique<CompoundStmtAST>();
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
 			if (current_token->Is(TokenKind::KW_let))
 			{
 				std::unique_ptr<VariableDeclAST> decl = ParseVariableDeclaration(false);
-
 				compound_stmt->AddStatement(std::make_unique<DeclStmtAST>(std::move(decl)));
 			}
 			else
@@ -201,6 +212,26 @@ namespace wave
 		}
 		Expect(TokenKind::right_brace);
 		return compound_stmt;
+	}
+
+	std::unique_ptr<ExprStmtAST> Parser::ParseExpressionStatement()
+	{
+		if (Consume(TokenKind::semicolon)) return std::make_unique<NullStmtAST>();
+		std::unique_ptr<ExprAST> expression = ParseExpression();
+		Expect(TokenKind::semicolon);
+		return std::make_unique<ExprStmtAST>(std::move(expression));
+	}
+
+	std::unique_ptr<ReturnStmtAST> Parser::ParseReturnStatement()
+	{
+		Expect(TokenKind::KW_return);
+		std::unique_ptr<ExprStmtAST> ret_expr_stmt = ParseExpressionStatement();
+		return std::make_unique<ReturnStmtAST>(std::move(ret_expr_stmt));
+	}
+
+	std::unique_ptr<ExprAST> Parser::ParseExpression()
+	{
+		return nullptr;
 	}
 
 	//<type-qualifier> ::= {const}?
@@ -235,7 +266,7 @@ namespace wave
 		}
 		break;
 		default:
-			Report(diag::invalid_type_specifier);
+			Diag(diag::invalid_type_specifier);
 			return;
 		}
 
@@ -243,7 +274,7 @@ namespace wave
 		{
 			if (type->Is(TypeKind::Void))
 			{
-				Report(diag::invalid_type_specifier);
+				Diag(diag::invalid_type_specifier);
 				return;
 			}
 

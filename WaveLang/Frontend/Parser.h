@@ -15,16 +15,13 @@ namespace wave
 	class FunctionDeclAST;
 	class VariableDeclAST;
 	class CompoundStmtAST;
+	class ExprStmtAST;
+	class ReturnStmtAST;
 
 	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
 	class Parser
 	{
 		using TokenPtr = std::vector<Token>::iterator;
-
-		struct Context
-		{
-			std::unique_ptr<SymbolTable<Symbol>> sym_table;
-		};
 	public:
 
 		explicit Parser(std::vector<Token> const& tokens);
@@ -37,7 +34,6 @@ namespace wave
 		std::vector<Token> tokens;
 		TokenPtr current_token;
 		std::unique_ptr<AST> ast;
-		Context ctx;
 
 	private:
 		bool Consume(TokenKind k)
@@ -63,21 +59,25 @@ namespace wave
 		{
 			if (!Consume(k, ts...))
 			{
-				Report(diag::unexpected_token);
+				Diag(diag::unexpected_token);
 				return false;
 			}
 			return true;
 		}
-		void Report(diag::DiagCode);
+		void Diag(diag::DiagCode);
 
 		void ParseTranslationUnit();
-		[[nodiscard]] std::vector<std::unique_ptr<DeclAST>> ParseGlobalDeclaration();
+		[[nodiscard]] std::unique_ptr<DeclAST> ParseGlobalDeclaration();
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDeclaration();
 		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDefinition();
 		[[nodiscard]] std::unique_ptr<VariableDeclAST> ParseVariableDeclaration(bool function_param_decl);
 
 		[[nodiscard]] std::unique_ptr<StmtAST> ParseStatement();
 		[[nodiscard]] std::unique_ptr<CompoundStmtAST> ParseCompoundStatement();
+		[[nodiscard]] std::unique_ptr<ExprStmtAST> ParseExpressionStatement();
+		[[nodiscard]] std::unique_ptr<ReturnStmtAST> ParseReturnStatement();
+
+		[[nodiscard]] std::unique_ptr<ExprAST> ParseExpression();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);

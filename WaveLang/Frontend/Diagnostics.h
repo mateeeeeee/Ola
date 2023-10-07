@@ -17,7 +17,7 @@ namespace wave::diag
 
 	void Initialize(bool warnings_as_errors = false, bool exit_on_error = true);
 
-	void Report(DiagCode code, SourceLocation const& loc);
-	void Report(DiagCode code);
+	void Diag(DiagCode code, SourceLocation const& loc);
+	void Diag(DiagCode code);
 	void SetLocation(SourceLocation const& loc);
 }

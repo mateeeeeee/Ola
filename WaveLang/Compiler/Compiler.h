@@ -5,15 +5,13 @@
 
 namespace wave
 {
-	enum CompilerFlag : uint32
+	enum CompilerFlags : uint32
 	{
 		CompilerFlag_None = 0x0,
-		CompilerFlag_DumpIR = 0x1,
-		CompilerFlag_DumpAST = 0x2,
-		CompilerFlag_NoLLVM = 0x4,
+		CompilerFlag_DumpAST = 0x1,
+		CompilerFlag_NoLLVM = 0x2,
 	};
-	DEFINE_ENUM_BIT_OPERATORS(CompilerFlag);
-	using CompilerFlags = uint32;
+	DEFINE_ENUM_BIT_OPERATORS(CompilerFlags);
 
 	enum class CompilerOutput
 	{

@@ -49,7 +49,7 @@ namespace wave::diag
 		exit_on_error = _exit_on_error;
 	}
 
-	void Report(DiagCode code, SourceLocation const& loc)
+	void Diag(DiagCode code, SourceLocation const& loc)
 	{
 		DiagKind diag_kind = diag_kinds[code];
 		std::string output = std::format("[Diagnostics][{}]: {} in file {} at line: {}, col: {}\n",
@@ -70,9 +70,9 @@ namespace wave::diag
 		if (exit_on_error && diag_kind == DiagKind::error) std::exit(EXIT_CODE_COMPILATION_FAILED);
 	}
 
-	void Report(DiagCode code)
+	void Diag(DiagCode code)
 	{
-		Report(code, loc);
+		Diag(code, loc);
 	}
 
 	void SetLocation(SourceLocation const& _loc)

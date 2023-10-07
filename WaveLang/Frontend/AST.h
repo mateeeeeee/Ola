@@ -26,6 +26,12 @@ namespace wave
 	class ReturnStmtAST;
 
 	class ExprAST;
+	class UnaryExprAST;
+	class BinaryExprAST;
+	class TernaryExprAST;
+	class IntLiteralAST;
+	class StringLiteralAST;
+	class IdentifierAST;
 
 	class INodeVisitorAST
 	{
@@ -39,6 +45,19 @@ namespace wave
 		virtual void Visit(VariableDeclAST const& node, uint32 depth) {}
 
 		virtual void Visit(StmtAST const& node, uint32 depth) {}
+		virtual void Visit(CompoundStmtAST const& node, uint32 depth) {}
+		virtual void Visit(ExprStmtAST const& node, uint32 depth) {}
+		virtual void Visit(DeclStmtAST const& node, uint32 depth) {}
+		virtual void Visit(NullStmtAST const& node, uint32 depth) {}
+		virtual void Visit(ReturnStmtAST const& node, uint32 depth) {}
+
+		virtual void Visit(ExprAST const& node, uint32 depth) {}
+		virtual void Visit(UnaryExprAST const& node, uint32 depth) {}
+		virtual void Visit(BinaryExprAST const& node, uint32 depth) {}
+		virtual void Visit(TernaryExprAST const& node, uint32 depth) {}
+		virtual void Visit(IntLiteralAST const& node, uint32 depth) {}
+		virtual void Visit(StringLiteralAST const& node, uint32 depth) {}
+		virtual void Visit(IdentifierAST const& node, uint32 depth) {}
 	};
 
 	class NodeAST
@@ -51,18 +70,17 @@ namespace wave
 	protected:
 		NodeAST() = default;
 	};
-
 	class TranslationUnitAST : public NodeAST
 	{
 	public:
 		TranslationUnitAST() = default;
-		
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override {}
 
 		void AddDeclaration(std::unique_ptr<DeclAST>&& declaration)
 		{
 			declarations.push_back(std::move(declaration));
 		}
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
 
 	private:
 		std::vector<std::unique_ptr<DeclAST>> declarations;
@@ -76,8 +94,7 @@ namespace wave
 	class DeclAST
 	{
 	public:
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {}
-		virtual Value* Codegen(Context& context) const { return nullptr; }
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 		DeclKind GetDeclKind() const { return decl_kind; }
 		SourceLocation GetLocation() const { return source_loc; }
@@ -99,8 +116,9 @@ namespace wave
 	class VariableDeclAST : public DeclAST
 	{
 	public:
-		VariableDeclAST(std::string_view name, SourceLocation const& loc)
-			: DeclAST(DeclKind::Variable, name, loc) {}
+		VariableDeclAST(std::string_view name, SourceLocation const& loc) : DeclAST(DeclKind::Variable, name, loc) {}
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 		void SetInitExpression(std::unique_ptr<ExprAST>&& expr)
 		{
@@ -113,8 +131,9 @@ namespace wave
 	class FunctionDeclAST : public DeclAST
 	{
 	public:
-		FunctionDeclAST(std::string_view name, SourceLocation const& loc)
-			: DeclAST(DeclKind::Function, name, loc) {}
+		FunctionDeclAST(std::string_view name, SourceLocation const& loc) : DeclAST(DeclKind::Function, name, loc) {}
+		
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 		void AddParamDeclaration(std::unique_ptr<VariableDeclAST>&& param)
 		{
@@ -158,6 +177,8 @@ namespace wave
 	public:
 		StmtKind GetStmtKind() const { return kind; }
 
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+
 	protected:
 		StmtKind kind;
 
@@ -174,6 +195,8 @@ namespace wave
 			statements.push_back(std::move(stmt));
 		}
 
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+
 	private:
 		std::vector<std::unique_ptr<StmtAST>> statements;
 	};
@@ -181,24 +204,43 @@ namespace wave
 	{
 	public:
 		ExprStmtAST(std::unique_ptr<ExprAST>&& expr) : StmtAST(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr)) {}
+
 		ExprAST* GetExpr() const { return expr.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 	private:
 		std::unique_ptr<ExprAST> expr;
-	};
-	class DeclStmtAST : public StmtAST
-	{
-	public:
-		DeclStmtAST(std::unique_ptr<DeclAST>&& decl) : StmtAST(StmtKind::Decl), declaration(std::move(decl)) {}
-		DeclAST* GetDeclarations() const { return declaration.get(); }
-
-	private:
-		std::unique_ptr<DeclAST> declaration;
 	};
 	class NullStmtAST final : public ExprStmtAST
 	{
 	public:
 		NullStmtAST() : ExprStmtAST(nullptr) {}
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+	};
+	class DeclStmtAST : public StmtAST
+	{
+	public:
+		DeclStmtAST(std::unique_ptr<DeclAST>&& decl) : StmtAST(StmtKind::Decl), declaration(std::move(decl)) {}
+
+		DeclAST* GetDeclarations() const { return declaration.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+
+	private:
+		std::unique_ptr<DeclAST> declaration;
+	};
+	class ReturnStmtAST final : public StmtAST
+	{
+	public:
+		explicit ReturnStmtAST(std::unique_ptr<ExprStmtAST>&& ret_expr)
+			: StmtAST(StmtKind::Return), ret_expr(std::move(ret_expr)) {}
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+
+	private:
+		std::unique_ptr <ExprStmtAST> ret_expr;
 	};
 	class IfStmtAST final : public StmtAST
 	{
@@ -218,19 +260,12 @@ namespace wave
 			else_stmt = std::move(_else_stmt);
 		}
 
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+
 	private:
 		std::unique_ptr<ExprAST> condition;
 		std::unique_ptr<StmtAST> then_stmt;
 		std::unique_ptr<StmtAST> else_stmt;
-	};
-	class ReturnStmtAST final : public StmtAST
-	{
-	public:
-		explicit ReturnStmtAST(std::unique_ptr<ExprStmtAST>&& ret_expr)
-			: StmtAST(StmtKind::Return), ret_expr(std::move(ret_expr)) {}
-
-	private:
-		std::unique_ptr <ExprStmtAST> ret_expr;
 	};
 
 	enum class ExprKind : uint8
@@ -265,24 +300,134 @@ namespace wave
 		LessEqual, GreaterEqual,
 		Invalid
 	};
+	enum class ExprValueCategory : bool
+	{
+		LValue,
+		RValue
+	};
 	class ExprAST : public NodeAST
 	{
 	public:
+		SourceLocation const& GetLocation() const { return loc; }
+		ExprKind GetExprKind() const { return kind; }
+		bool IsLValue() const { return value_category == ExprValueCategory::LValue; }
+
+		void SetType(QualifiedType const& _type) { type = _type; }
+		QualifiedType const& GetType() const { return type; }
+
 		virtual bool IsConstexpr() const { return false; }
 		virtual int64 EvaluateConstexpr() const { return 0; }
 
-		SourceLocation const& GetLocation() const { return loc; }
-		Type const& GetType() const { return *type; }
-		ExprKind GetExprKind() const { return kind; }
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 	protected:
 		ExprKind kind;
 		SourceLocation loc;
-		std::unique_ptr<Type> type;
+		QualifiedType type;
+		ExprValueCategory value_category = ExprValueCategory::RValue;
 
 	protected:
-		ExprAST(ExprKind kind, SourceLocation const& loc, std::unique_ptr<Type>&& type) : kind(kind), loc(loc), type(std::move(type)) {}
+		ExprAST(ExprKind kind, SourceLocation const& loc) : kind(kind), loc(loc) {}
+		void SetValueCategory(ExprValueCategory _value_category) { value_category = _value_category; }
 	};
+	class UnaryExprAST : public ExprAST
+	{
+	public:
+		UnaryExprAST(UnaryExprKind op, SourceLocation const& loc) : ExprAST(ExprKind::Unary, loc), op(op), operand(nullptr) {}
+		void SetOperand(std::unique_ptr<ExprAST>&& _operand)
+		{
+			operand = std::move(_operand);
+		}
+		UnaryExprKind GetUnaryKind() const { return op; }
+		ExprAST* GetOperand() const { return operand.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		UnaryExprKind op;
+		std::unique_ptr<ExprAST> operand;
+	};
+	class BinaryExprAST : public ExprAST
+	{
+	public:
+		BinaryExprAST(BinaryExprKind op, SourceLocation const& loc) : ExprAST(ExprKind::Binary, loc), op(op) {}
+		void SetLHS(std::unique_ptr<ExprAST>&& _lhs) { lhs = std::move(_lhs); }
+		void SetRHS(std::unique_ptr<ExprAST>&& _rhs) { rhs = std::move(_rhs); }
+
+		BinaryExprKind GetBinaryKind() const { return op; }
+		ExprAST* GetLHS() const { return lhs.get(); }
+		ExprAST* GetRHS() const { return rhs.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		std::unique_ptr<ExprAST> lhs, rhs;
+		BinaryExprKind op;
+	};
+	class TernaryExprAST : public ExprAST
+	{
+	public:
+		explicit TernaryExprAST(SourceLocation const& loc) : ExprAST(ExprKind::Ternary, loc),
+			cond_expr(std::move(cond_expr)),
+			true_expr(std::move(true_expr)),
+			false_expr(std::move(false_expr))
+		{}
+
+		void SetCondition(std::unique_ptr<ExprAST>&& expr) { cond_expr = std::move(expr); }
+		void SetTrueExpr(std::unique_ptr<ExprAST>&& expr) { true_expr = std::move(expr); }
+		void SetFalseExpr(std::unique_ptr<ExprAST>&& expr) { false_expr = std::move(expr); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		std::unique_ptr<ExprAST> cond_expr;
+		std::unique_ptr<ExprAST> true_expr;
+		std::unique_ptr<ExprAST> false_expr;
+	};
+	class IntLiteralAST final : public ExprAST
+	{
+	public:
+		IntLiteralAST(int64 value, SourceLocation const& loc) : ExprAST(ExprKind::IntLiteral, loc), value(value) 
+		{
+			SetType(builtin_types::Int);
+		}
+		int64 GetValue() const { return value; }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		int64 value;
+	};
+	class StringLiteralAST final : public ExprAST
+	{
+	public:
+		StringLiteralAST(std::string_view str, SourceLocation const& loc) : ExprAST(ExprKind::StringLiteral, loc), str(str) 
+		{
+			SetType(ArrayType(builtin_types::Char, (uint32)str.size()));
+		}
+		std::string_view GetString() const { return str; }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		std::string str;
+	};
+	class IdentifierAST : public ExprAST
+	{
+	public:
+		std::string_view GetName() const { return name; }
+
+	protected:
+		explicit IdentifierAST(std::string_view name, SourceLocation const& loc) : ExprAST(ExprKind::DeclRef, loc), name(name)
+		{
+			SetValueCategory(ExprValueCategory::LValue);
+		}
+
+	private:
+		std::string name;
+	};
+
+	//DeclRefAST, FunctionCallAST, CastExprAST
 
 	struct AST
 	{

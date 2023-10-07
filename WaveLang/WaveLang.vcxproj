@@ -152,6 +152,7 @@
     <ClCompile Include="Frontend\Diagnostics.cpp" />
     <ClCompile Include="Frontend\Lexer.cpp" />
     <ClCompile Include="Frontend\Parser.cpp" />
+    <ClCompile Include="Frontend\Sema.cpp" />
     <ClCompile Include="Frontend\SourceBuffer.cpp" />
     <ClCompile Include="Frontend\TokenTypes.cpp" />
     <ClCompile Include="main.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\Parser.h" />
+    <ClInclude Include="Frontend\Sema.h" />
     <ClInclude Include="Frontend\SourceBuffer.h" />
     <ClInclude Include="Frontend\SourceLocation.h" />
     <ClInclude Include="Frontend\Symbol.h" />
@@ -171,10 +173,8 @@
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Frontend\Type.h" />
     <ClInclude Include="Utility\Enums.h" />
-    <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.gitignore" />
     <None Include="Frontend\Diagnostics.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
