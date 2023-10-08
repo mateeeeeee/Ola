@@ -1,12 +1,15 @@
-<translation-unit> ::= { <function_definition> | <function_declaration> }*
 
-<function_declaration> ::= extern fn <identifier>( <parameter-list> ) -> <type-specifier>;
+
+<translation-unit> ::= {import-declaration}*{ <function_definition> | <function_declaration> }*
+
+<import-declaration> ::= import <identifier>;
+<function_declaration> ::= extern fn <identifier>( <parameter-list> ) {-> <type-specifier>}?;
 <function_definition> ::= fn <identifier>( <parameter-list> ) {-> <type-specifier>}? <compound_statement>
 
 <parameter-list> ::= <parameter-declaration>
-                   | <parameter-list> , <parameter-declaration>
+                   | <parameter-list>, <parameter-declaration>
 
-<parameter-declaration> ::= {<type-qualifier>}* <declarator> : <type-specifier>
+<parameter-declaration> ::= {<type-qualifier>}? <declarator> : <type-specifier>
 
 <declarator> ::= <identifier>
 
@@ -76,19 +79,19 @@
 							  
 
 <cast-expression> ::= <unary-expression>
-                    | ( <type-name> ) <cast-expression>
+                    | ( <type-specifier> ) <cast-expression>
 
 <unary-expression> ::= <postfix-expression>
                      | ++ <unary-expression>
                      | -- <unary-expression>
                      | <unary-operator> <cast-expression>
-                     | sizeof <unary-expression>
-                     | sizeof <type-name>
+                     | sizeof (<unary-expression>)
+                     | sizeof (<type-specifier>)
+                     | typeof (<expression>)
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
                        | <postfix-expression> ( {<assignment-expression>}* )
-                       | <postfix-expression> . <identifier>
                        | <postfix-expression> ++
                        | <postfix-expression> --
 

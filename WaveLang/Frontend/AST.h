@@ -71,7 +71,7 @@ namespace wave
 	protected:
 		NodeAST() = default;
 	};
-	class TranslationUnitAST : public NodeAST
+	class TranslationUnitAST final : public NodeAST
 	{
 	public:
 		TranslationUnitAST() = default;
@@ -427,8 +427,44 @@ namespace wave
 	private:
 		std::string name;
 	};
+	class CastExprAST : public ExprAST
+	{
+	public:
+		CastExprAST(SourceLocation const& loc, QualifiedType const& qtype)
+			: ExprAST(ExprKind::Cast, loc), operand(nullptr)
+		{
+			SetType(qtype);
+			SetValueCategory(ExprValueCategory::RValue);
+		}
+		void SetOperand(std::unique_ptr<ExprAST>&& _operand)
+		{
+			operand = std::move(_operand);
+		}
 
-	//DeclRefAST, FunctionCallAST, CastExprAST
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		std::unique_ptr<ExprAST> operand;
+	};
+	class FunctionCallExprAST final : public ExprAST
+	{
+	public:
+		FunctionCallExprAST(std::unique_ptr<ExprAST>&& func, SourceLocation const& loc)
+			: ExprAST(ExprKind::FunctionCall, loc), func_expr(std::move(func)) {}
+
+		void AddArgument(std::unique_ptr<ExprAST>&& arg)
+		{
+			func_args.push_back(std::move(arg));
+		}
+
+		ExprAST* GetFunction() const { return func_expr.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+
+	private:
+		std::unique_ptr<ExprAST> func_expr;
+		std::vector<std::unique_ptr<ExprAST>> func_args;
+	};
 
 	struct AST
 	{

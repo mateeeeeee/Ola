@@ -1,2 +1,16 @@
-[2023-10-07 20:18:52.891] [lucc logger] [error] [Diagnostics][Error]: [Parser] Unexpected token in file test.wv at line: 1, col: 9
+[2023-10-08 03:20:11.787] [lucc logger] [debug] AST Traversal:
+
+[2023-10-08 03:20:11.790] [lucc logger] [debug] TranslationUnitAST 
+
+[2023-10-08 03:20:11.791] [lucc logger] [debug] `->FunctionDeclAST 
+
+[2023-10-08 03:20:11.791] [lucc logger] [debug]    `->CompoundStmtAST 
+
+[2023-10-08 03:20:11.792] [lucc logger] [debug]       `->DeclStmtAST 
+
+[2023-10-08 03:20:11.792] [lucc logger] [debug]          `->VariableDeclAST 
+
+[2023-10-08 03:20:11.793] [lucc logger] [debug]       `->ReturnStmtAST 
+
+[2023-10-08 03:20:11.793] [lucc logger] [debug]          `->NullStmtAST 
 
