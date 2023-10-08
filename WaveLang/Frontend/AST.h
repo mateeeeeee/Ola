@@ -7,8 +7,9 @@
 
 namespace wave
 {
-	class Context;
-	class Value;
+	class Sema;
+	class ContextLLVM;
+	class ValueLLVM;
 
 	class NodeAST;
 	class TranslationUnitAST;
@@ -66,8 +67,7 @@ namespace wave
 	public:
 		virtual ~NodeAST() = default;
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {};
-		virtual Value* Codegen(Context& context) const { return nullptr; }
-
+		virtual void Sema(Sema&) {}
 	protected:
 		NodeAST() = default;
 	};
@@ -225,7 +225,7 @@ namespace wave
 	public:
 		DeclStmtAST(std::unique_ptr<DeclAST>&& decl) : StmtAST(StmtKind::Decl), declaration(std::move(decl)) {}
 
-		DeclAST* GetDeclarations() const { return declaration.get(); }
+		DeclAST* GetDeclaration() const { return declaration.get(); }
 
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
@@ -416,13 +416,13 @@ namespace wave
 	class IdentifierAST : public ExprAST
 	{
 	public:
-		std::string_view GetName() const { return name; }
-
-	protected:
 		explicit IdentifierAST(std::string_view name, SourceLocation const& loc) : ExprAST(ExprKind::DeclRef, loc), name(name)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
+		std::string_view GetName() const { return name; }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
 
 	private:
 		std::string name;

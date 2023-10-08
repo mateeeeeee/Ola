@@ -128,6 +128,10 @@ namespace wave
 		func_expr->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
+	void IdentifierAST::Accept(INodeVisitorAST& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 }
 

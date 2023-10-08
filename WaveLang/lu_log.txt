@@ -1,16 +1,22 @@
-[2023-10-08 03:20:11.787] [lucc logger] [debug] AST Traversal:
+[2023-10-08 15:12:49.369] [lucc logger] [debug] AST Traversal:
 
-[2023-10-08 03:20:11.790] [lucc logger] [debug] TranslationUnitAST 
+[2023-10-08 15:12:49.371] [lucc logger] [debug] TranslationUnitAST 
 
-[2023-10-08 03:20:11.791] [lucc logger] [debug] `->FunctionDeclAST 
+[2023-10-08 15:12:49.371] [lucc logger] [debug] `->FunctionDeclAST 
 
-[2023-10-08 03:20:11.791] [lucc logger] [debug]    `->CompoundStmtAST 
+[2023-10-08 15:12:49.371] [lucc logger] [debug]    `->CompoundStmtAST 
 
-[2023-10-08 03:20:11.792] [lucc logger] [debug]       `->DeclStmtAST 
+[2023-10-08 15:12:49.372] [lucc logger] [debug]       `->DeclStmtAST 
 
-[2023-10-08 03:20:11.792] [lucc logger] [debug]          `->VariableDeclAST 
+[2023-10-08 15:12:49.372] [lucc logger] [debug]          `->VariableDeclAST 
 
-[2023-10-08 03:20:11.793] [lucc logger] [debug]       `->ReturnStmtAST 
+[2023-10-08 15:12:49.372] [lucc logger] [debug]             `->BinaryExprAST 
 
-[2023-10-08 03:20:11.793] [lucc logger] [debug]          `->NullStmtAST 
+[2023-10-08 15:12:49.373] [lucc logger] [debug]                `->IdentifierAST 
+
+[2023-10-08 15:12:49.373] [lucc logger] [debug]                `->IntLiteralAST 
+
+[2023-10-08 15:12:49.373] [lucc logger] [debug]       `->ReturnStmtAST 
+
+[2023-10-08 15:12:49.374] [lucc logger] [debug]          `->NullStmtAST 
 

@@ -128,6 +128,7 @@ namespace wave
 
 	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDefinition()
 	{
+		SCOPED_SYMBOL_TABLE(sema.ctx.sym_table);
 		std::unique_ptr<FunctionDeclAST> function_decl = ParseFunctionDeclaration(false);
 		std::unique_ptr<CompoundStmtAST> function_body = ParseCompoundStatement();
 		function_decl->SetDefinition(std::move(function_body));
@@ -191,6 +192,7 @@ namespace wave
 
 	std::unique_ptr<CompoundStmtAST> Parser::ParseCompoundStatement()
 	{
+		SCOPED_SYMBOL_TABLE(sema.ctx.sym_table);
 		Expect(TokenKind::left_brace);
 		std::unique_ptr<CompoundStmtAST> compound_stmt = std::make_unique<CompoundStmtAST>();
 		while (current_token->IsNot(TokenKind::right_brace))
@@ -240,7 +242,6 @@ namespace wave
 		}
 		return lhs;
 	}
-
 
 	std::unique_ptr<ExprAST> Parser::ParseExpression()
 	{
@@ -588,22 +589,45 @@ namespace wave
 
 	std::unique_ptr<ExprAST> Parser::ParsePrimaryExpression()
 	{
+		switch (current_token->GetKind())
+		{
+		case TokenKind::left_round: return ParseParenthesizedExpression();
+		case TokenKind::identifier: return ParseIdentifier(); break;
+		case TokenKind::number: return ParseIntegerLiteral();
+		case TokenKind::string_literal: return ParseStringLiteral(); break;
+		default:
+			Diag(diag::unexpected_token);
+		}
+		WAVE_ASSERT(false);
 		return nullptr;
 	}
 
 	std::unique_ptr<IntLiteralAST> Parser::ParseIntegerLiteral()
 	{
-		return nullptr;
+		WAVE_ASSERT(current_token->Is(TokenKind::number));
+		std::string_view string_number = current_token->GetIdentifier();
+		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return std::make_unique<IntLiteralAST>(value, loc);
 	}
 
 	std::unique_ptr<StringLiteralAST> Parser::ParseStringLiteral()
 	{
-		return nullptr;
+		WAVE_ASSERT(current_token->Is(TokenKind::string_literal));
+		std::string_view str = current_token->GetIdentifier();
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return std::make_unique<StringLiteralAST>(str, loc);
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseIdentifier()
+	std::unique_ptr<IdentifierAST> Parser::ParseIdentifier()
 	{
-		return nullptr;
+		WAVE_ASSERT(current_token->Is(TokenKind::identifier));
+		std::string_view name = current_token->GetIdentifier();
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return std::make_unique<IdentifierAST>(name, loc);
 	}
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)

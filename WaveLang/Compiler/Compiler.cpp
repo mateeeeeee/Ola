@@ -48,8 +48,6 @@ namespace wave
 			AST* ast = parser.GetAST();
 			if (ast_dump) DebugNodeVisitorAST debug_ast(ast);
 
-			Sema sema(ast);
-
 			//llvmCodegen llvm(ast);
 			//write llvm
 		}

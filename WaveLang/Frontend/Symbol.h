@@ -106,5 +106,5 @@ namespace wave
 		}
 		SymbolTable<T>& sym_table;
 	};
-	#define SCOPED_SYMBOL_TABLE(sym_table) ScopedSymbolTable<std::remove_reference_t<decltype(*sym_table)>::SymType> WAVE_CONCAT(_scoped_sym_table,__COUNTER__)(*sym_table)
+	#define SCOPED_SYMBOL_TABLE(sym_table) ScopedSymbolTable<std::remove_reference_t<decltype(sym_table)>::SymType> WAVE_CONCAT(_scoped_sym_table,__COUNTER__)(sym_table)
 }

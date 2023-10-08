@@ -2,24 +2,11 @@
 #include <vector>
 #include <memory>
 #include "Token.h"
-#include "Symbol.h"
+#include "Sema.h"
 #include "Diagnostics.h"
 
 namespace wave
 {
-	class Parser;
-	struct AST;
-	class ExprAST;
-	class DeclAST;
-	class StmtAST;
-	class FunctionDeclAST;
-	class VariableDeclAST;
-	class CompoundStmtAST;
-	class ExprStmtAST;
-	class ReturnStmtAST;
-	class IntLiteralAST;
-	class StringLiteralAST;
-
 	enum class BinaryExprKind : uint8;
 
 	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
@@ -35,6 +22,7 @@ namespace wave
 		AST* GetAST() const { return ast.get(); }
 
 	private:
+		Sema sema;
 		std::vector<Token> tokens;
 		TokenPtr current_token;
 		std::unique_ptr<AST> ast;
@@ -107,7 +95,7 @@ namespace wave
 		[[nodiscard]] std::unique_ptr<ExprAST> ParsePrimaryExpression();
 		[[nodiscard]] std::unique_ptr<IntLiteralAST> ParseIntegerLiteral();
 		[[nodiscard]] std::unique_ptr<StringLiteralAST> ParseStringLiteral();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseIdentifier();
+		[[nodiscard]] std::unique_ptr<IdentifierAST> ParseIdentifier();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);
