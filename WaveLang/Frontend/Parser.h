@@ -2,14 +2,19 @@
 #include <vector>
 #include <memory>
 #include "Token.h"
-#include "Sema.h"
 #include "Diagnostics.h"
+#include "ForwardAST.h"
 
 namespace wave
 {
+	struct AST;
+	class QualifiedType;
+	class Sema;
+	class Parser;
+	
 	enum class BinaryExprKind : uint8;
-
 	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
+
 	class Parser
 	{
 		using TokenPtr = std::vector<Token>::iterator;
@@ -22,9 +27,10 @@ namespace wave
 		AST* GetAST() const { return ast.get(); }
 
 	private:
-		Sema sema;
 		std::vector<Token> tokens;
 		TokenPtr current_token;
+
+		std::unique_ptr<Sema> sema;
 		std::unique_ptr<AST> ast;
 
 	private:

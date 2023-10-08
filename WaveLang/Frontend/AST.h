@@ -2,37 +2,14 @@
 #include <vector>
 #include <memory>
 #include <string_view>
+#include "ForwardAST.h"
 #include "SourceLocation.h"
 #include "Type.h"
 
 namespace wave
 {
-	class Sema;
 	class ContextLLVM;
 	class ValueLLVM;
-
-	class NodeAST;
-	class TranslationUnitAST;
-
-	class DeclAST;
-	class FunctionDeclAST;
-	class VariableDeclAST;
-
-	class StmtAST;
-	class CompoundStmtAST;
-	class ExprStmtAST;
-	class DeclStmtAST;
-	class NullStmtAST;
-	class IfStmtAST;
-	class ReturnStmtAST;
-
-	class ExprAST;
-	class UnaryExprAST;
-	class BinaryExprAST;
-	class TernaryExprAST;
-	class IntLiteralAST;
-	class StringLiteralAST;
-	class IdentifierAST;
 
 	class INodeVisitorAST
 	{
@@ -67,7 +44,7 @@ namespace wave
 	public:
 		virtual ~NodeAST() = default;
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {};
-		virtual void Sema(Sema&) {}
+
 	protected:
 		NodeAST() = default;
 	};
@@ -119,12 +96,13 @@ namespace wave
 	public:
 		VariableDeclAST(std::string_view name, SourceLocation const& loc) : DeclAST(DeclKind::Variable, name, loc) {}
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
-
-		void SetInitExpression(std::unique_ptr<ExprAST>&& expr)
+		void SetInitExpr(std::unique_ptr<ExprAST>&& expr)
 		{
 			init_expr = std::move(expr);
 		}
+		ExprAST const* GetInitExpr() const { return init_expr.get(); }
+
+		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 	private:
 		std::unique_ptr<ExprAST> init_expr;
@@ -237,6 +215,8 @@ namespace wave
 	public:
 		explicit ReturnStmtAST(std::unique_ptr<ExprStmtAST>&& ret_expr)
 			: StmtAST(StmtKind::Return), ret_expr(std::move(ret_expr)) {}
+
+		ExprStmtAST const* GetExprStmt() const { return ret_expr.get(); }
 
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
@@ -436,10 +416,12 @@ namespace wave
 			SetType(qtype);
 			SetValueCategory(ExprValueCategory::RValue);
 		}
+
 		void SetOperand(std::unique_ptr<ExprAST>&& _operand)
 		{
 			operand = std::move(_operand);
 		}
+		ExprAST const* GetOperand() const { return operand.get(); }
 
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
 
@@ -456,7 +438,6 @@ namespace wave
 		{
 			func_args.push_back(std::move(arg));
 		}
-
 		ExprAST* GetFunction() const { return func_expr.get(); }
 
 		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
@@ -471,4 +452,25 @@ namespace wave
 		AST() { translation_unit = std::make_unique<TranslationUnitAST>(); }
 		std::unique_ptr<TranslationUnitAST> translation_unit;
 	};
+
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	inline To* dynamic_ast_cast(From* from)
+	{
+		return dynamic_cast<To*>(from);
+	}
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	inline To const* dynamic_ast_cast(From const* from)
+	{
+		return dynamic_cast<To const*>(from);
+	}
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	inline To* ast_cast(From* from)
+	{
+		return static_cast<To*>(from);
+	}
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	inline To const* ast_cast(From const* from)
+	{
+		return static_cast<To const*>(from);
+	}
 }

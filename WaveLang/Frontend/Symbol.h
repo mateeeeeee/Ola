@@ -27,11 +27,12 @@ namespace wave
 			return true;
 		}
 
-		SymType* LookUp(std::string const& sym_name)
+		SymType* LookUp(std::string_view sym_name)
 		{
-			if (scope_sym_table.contains(sym_name))
+			std::string name(sym_name);
+			if (scope_sym_table.contains(name))
 			{
-				return &scope_sym_table[sym_name];
+				return &scope_sym_table[name];
 			}
 			else return nullptr;
 		}
@@ -70,15 +71,15 @@ namespace wave
 
 		SymType* LookUp(std::string const& sym_name)
 		{
+			return LookUp(sym_name);
+		}
+		SymType* LookUp(std::string_view sym_name)
+		{
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
 				if (SymType* sym = scope->LookUp(sym_name)) return sym;
 			}
 			return nullptr;
-		}
-		SymType* LookUp(std::string_view sym_name)
-		{
-			return LookUp(sym_name);
 		}
 		SymType* LookUpCurrentScope(std::string_view sym_name)
 		{

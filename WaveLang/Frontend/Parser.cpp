@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "Diagnostics.h"
 #include "AST.h"
+#include "Sema.h"
 
 namespace wave
 {
@@ -10,6 +11,7 @@ namespace wave
 
 	void Parser::Parse()
 	{
+		sema = std::make_unique<Sema>();
 		ast = std::make_unique<AST>();
 		PreprocessTokens();
 		ParseTranslationUnit();
@@ -39,7 +41,7 @@ namespace wave
 		{
 			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline)) preprocessed_tokens.push_back(token);
 		}
-		//resolve import *.wvi 
+		//#todo resolve import *.wvi 
 		std::swap(preprocessed_tokens, tokens);
 		current_token = tokens.begin();
 	}
@@ -128,9 +130,11 @@ namespace wave
 
 	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDefinition()
 	{
-		SCOPED_SYMBOL_TABLE(sema.ctx.sym_table);
+		SCOPED_SYMBOL_TABLE(sema->ctx.sym_table);
 		std::unique_ptr<FunctionDeclAST> function_decl = ParseFunctionDeclaration(false);
+		sema->ctx.current_func = &function_decl->GetType();
 		std::unique_ptr<CompoundStmtAST> function_body = ParseCompoundStatement();
+		sema->ctx.current_func = nullptr;
 		function_decl->SetDefinition(std::move(function_body));
 		return function_decl;
 	}
@@ -158,11 +162,12 @@ namespace wave
 			if (Consume(TokenKind::equal))
 			{
 				std::unique_ptr<ExprAST> init_expr = ParseExpression();
-				variable_decl->SetInitExpression(std::move(init_expr));
+				variable_decl->SetInitExpr(std::move(init_expr));
 			}
 			Expect(TokenKind::semicolon);
 		}
 		variable_decl->SetType(param_type);
+		sema->ActOnVariableDecl(variable_decl.get());
 		return variable_decl;
 	}
 
@@ -192,7 +197,7 @@ namespace wave
 
 	std::unique_ptr<CompoundStmtAST> Parser::ParseCompoundStatement()
 	{
-		SCOPED_SYMBOL_TABLE(sema.ctx.sym_table);
+		SCOPED_SYMBOL_TABLE(sema->ctx.sym_table);
 		Expect(TokenKind::left_brace);
 		std::unique_ptr<CompoundStmtAST> compound_stmt = std::make_unique<CompoundStmtAST>();
 		while (current_token->IsNot(TokenKind::right_brace))
@@ -224,7 +229,9 @@ namespace wave
 	{
 		Expect(TokenKind::KW_return);
 		std::unique_ptr<ExprStmtAST> ret_expr_stmt = ParseExpressionStatement();
-		return std::make_unique<ReturnStmtAST>(std::move(ret_expr_stmt));
+		std::unique_ptr<ReturnStmtAST> return_stmt = std::make_unique<ReturnStmtAST>(std::move(ret_expr_stmt));
+		sema->ActOnReturnStmt(return_stmt.get());
+		return return_stmt;
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
@@ -240,6 +247,7 @@ namespace wave
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
+		sema->ActOnExpr(lhs.get());
 		return lhs;
 	}
 
@@ -282,7 +290,6 @@ namespace wave
 		std::unique_ptr<ExprAST> rhs = ParseAssignmentExpression();
 		if (arith_op_kind != BinaryExprKind::Assign)
 		{
-			//#todo: remove this hack, add clone to ast nodes
 			TokenPtr current_token_copy2 = current_token;
 			current_token = current_token_copy;
 			std::unique_ptr<ExprAST> lhs_copy = ParseConditionalExpression();
@@ -627,7 +634,9 @@ namespace wave
 		std::string_view name = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return std::make_unique<IdentifierAST>(name, loc);
+		std::unique_ptr<IdentifierAST> identifier = std::make_unique<IdentifierAST>(name, loc);
+		sema->ActOnIdentifier(identifier.get());
+		return identifier;
 	}
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)
@@ -637,6 +646,7 @@ namespace wave
 			type.AddConst();
 		}
 	}
+
 	void Parser::ParseTypeSpecifier(QualifiedType& type)
 	{
 		switch (current_token->GetKind())

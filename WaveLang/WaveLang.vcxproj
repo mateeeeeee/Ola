@@ -165,6 +165,7 @@
     <ClInclude Include="Core\Logger.h" />
     <ClInclude Include="Frontend\AST.h" />
     <ClInclude Include="Frontend\Diagnostics.h" />
+    <ClInclude Include="Frontend\ForwardAST.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\Parser.h" />
     <ClInclude Include="Frontend\Sema.h" />

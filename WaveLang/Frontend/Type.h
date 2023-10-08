@@ -236,23 +236,23 @@ namespace wave
 	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
 
 	template<typename T> requires std::derived_from<T, Type>
-	inline T& TypeCast(Type& t)
+	inline T& type_cast(Type& t)
 	{
 		return static_cast<T&>(t);
 	}
 	template<typename T> requires std::derived_from<T, Type>
-	inline T const& TypeCast(Type const& t)
+	inline T const& type_cast(Type const& t)
 	{
 		return static_cast<T const&>(t);
 	}
 
 	template<typename T> requires std::derived_from<T, Type>
-	inline T* DynamicTypeCast(Type& t)
+	inline T* dynamic_type_cast(Type& t)
 	{
 		return dynamic_cast<T*>(&t);
 	}
 	template<typename T> requires std::derived_from<T, Type>
-	inline T const* DynamicTypeCast(Type const& t)
+	inline T const* dynamic_type_cast(Type const& t)
 	{
 		return dynamic_cast<T const*>(&t);
 	}
@@ -260,21 +260,21 @@ namespace wave
 	template<typename T>
 	T const& Type::As() const
 	{
-		return TypeCast<T>(*this);
+		return type_cast<T>(*this);
 	}
 	template<typename T>
 	T& Type::As()
 	{
-		return TypeCast<T>(*this);
+		return type_cast<T>(*this);
 	}
 	template<typename T>
 	T const* Type::TryAs() const
 	{
-		return DynamicTypeCast<T>(*this);
+		return dynamic_type_cast<T>(*this);
 	}
 	template<typename T>
 	T* Type::TryAs()
 	{
-		return DynamicTypeCast<T>(*this);
+		return dynamic_type_cast<T>(*this);
 	}
 }

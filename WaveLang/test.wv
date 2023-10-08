@@ -1,5 +1,7 @@
+
 fn main() -> int
 {
+	let B = 5;
 	let a : int = B + 3;
-	return;
+	return 0;
 }

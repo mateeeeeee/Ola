@@ -108,6 +108,9 @@
     <ClInclude Include="Core\Logger.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Frontend\ForwardAST.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Frontend\Diagnostics.def">

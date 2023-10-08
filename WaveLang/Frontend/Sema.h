@@ -1,23 +1,16 @@
 #pragma once
 #include "Symbol.h"
+#include "ForwardAST.h"
 
 namespace wave
 {
-	class Parser;
-	struct AST;
-	class ExprAST;
-	class DeclAST;
-	class StmtAST;
-	class FunctionDeclAST;
-	class VariableDeclAST;
-	class CompoundStmtAST;
-	class ExprStmtAST;
-	class ReturnStmtAST;
-	class IntLiteralAST;
-	class StringLiteralAST;
-	class IdentifierAST;
+	namespace diag
+	{
+		enum DiagCode : uint32;
+	}
 
-	class FunctionType;
+	class Parser;
+	struct SourceLocation;
 
 	class Sema 
 	{
@@ -25,19 +18,32 @@ namespace wave
 		struct Context
 		{
 			SymbolTable<Symbol> sym_table;
-			FunctionType const* current_func = nullptr;
+			class QualifiedType const* current_func = nullptr;
+			bool return_stmt_encountered = false;
 		};
 
 	public:
-		Sema() = default;
+		Sema();
+		~Sema();
+
+	private:
 		WAVE_NONCOPYABLE(Sema);
 		WAVE_DEFAULT_MOVABLE(Sema);
-		~Sema() = default;
 
-		void ActOnVariableDecl(std::unique_ptr<VariableDeclAST>& var_decl);
-		void ActOnFunctionDecl(std::unique_ptr<FunctionDeclAST>& func_decl);
+		void ActOnVariableDecl(VariableDeclAST* var_decl);
+		void ActOnFunctionDecl(FunctionDeclAST* function_decl);
+		void ActOnReturnStmt(ReturnStmtAST* return_stmt);
+		void ActOnExpr(ExprAST* expr);
+		void ActOnIdentifier(IdentifierAST* identifier);
 
 	private:
 		Context ctx;
+
+	private:
+		void Diag(diag::DiagCode, SourceLocation const&);
+
+		void ActOnUnaryExpr(UnaryExprAST* unary_expr);
+		void ActOnBinaryExpr(BinaryExprAST* binary_expr);
+		void ActOnCastExpr(CastExprAST* cast_expr);
 	};
 }
