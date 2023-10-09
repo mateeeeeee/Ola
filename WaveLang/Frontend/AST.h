@@ -2,40 +2,12 @@
 #include <vector>
 #include <memory>
 #include <string_view>
-#include "ForwardAST.h"
+#include "IVisitorAST.h"
 #include "SourceLocation.h"
 #include "Type.h"
 
 namespace wave
 {
-	class IVisitorAST
-	{
-	public:
-		virtual ~IVisitorAST() = default;
-		virtual void Visit(NodeAST const& node, uint32 depth) {}
-		virtual void Visit(TranslationUnitAST const& node, uint32 depth) {}
-
-		virtual void Visit(DeclAST const& node, uint32 depth) {}
-		virtual void Visit(FunctionDeclAST const& node, uint32 depth) {}
-		virtual void Visit(VariableDeclAST const& node, uint32 depth) {}
-
-		virtual void Visit(StmtAST const& node, uint32 depth) {}
-		virtual void Visit(CompoundStmtAST const& node, uint32 depth) {}
-		virtual void Visit(ExprStmtAST const& node, uint32 depth) {}
-		virtual void Visit(DeclStmtAST const& node, uint32 depth) {}
-		virtual void Visit(NullStmtAST const& node, uint32 depth) {}
-		virtual void Visit(ReturnStmtAST const& node, uint32 depth) {}
-		virtual void Visit(IfStmtAST const& node, uint32 depth) {}
-
-		virtual void Visit(ExprAST const& node, uint32 depth) {}
-		virtual void Visit(UnaryExprAST const& node, uint32 depth) {}
-		virtual void Visit(BinaryExprAST const& node, uint32 depth) {}
-		virtual void Visit(TernaryExprAST const& node, uint32 depth) {}
-		virtual void Visit(IntLiteralAST const& node, uint32 depth) {}
-		virtual void Visit(StringLiteralAST const& node, uint32 depth) {}
-		virtual void Visit(IdentifierAST const& node, uint32 depth) {}
-	};
-
 	class NodeAST
 	{
 	public:
@@ -82,7 +54,7 @@ namespace wave
 		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
-		DeclKind decl_kind;
+		DeclKind const decl_kind;
 		std::string name;
 		SourceLocation source_loc;
 		QualifiedType type;
@@ -161,7 +133,7 @@ namespace wave
 		virtual void Accept(IVisitorAST& visitor) const override;
 
 	protected:
-		StmtKind kind;
+		StmtKind const kind;
 
 	protected:
 		explicit StmtAST(StmtKind kind) : kind(kind) {}
@@ -312,7 +284,7 @@ namespace wave
 		virtual void Accept(IVisitorAST& visitor) const override;
 
 	protected:
-		ExprKind kind;
+		ExprKind const kind;
 		SourceLocation loc;
 		QualifiedType type;
 		ExprValueCategory value_category = ExprValueCategory::RValue;

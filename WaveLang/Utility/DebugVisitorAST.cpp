@@ -1,4 +1,5 @@
-#include "Debug.h"
+#include "DebugVisitorAST.h"
+#include "Frontend/AST.h"
 #include "Core/Logger.h"
 
 namespace wave
@@ -95,103 +96,103 @@ namespace wave
 		}
 	}
 
-	DebugNodeVisitorAST::DebugNodeVisitorAST(AST* ast)
+	DebugVisitorAST::DebugVisitorAST(AST const* ast)
 	{
 		WAVE_DEBUG("AST Traversal:\n");
 		ast->translation_unit->Accept(*this, 0);
 	}
 
-	void DebugNodeVisitorAST::Visit(NodeAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(NodeAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}NodeAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(IdentifierAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(IdentifierAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}IdentifierAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(StringLiteralAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(StringLiteralAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}StringLiteralAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(IntLiteralAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(IntLiteralAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}IntLiteralAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(TernaryExprAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(TernaryExprAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}TernaryExprAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(BinaryExprAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(BinaryExprAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}BinaryExprAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(UnaryExprAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(UnaryExprAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}UnaryExprAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(ExprAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(ExprAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}ExprAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(IfStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(IfStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}IfStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(ReturnStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(ReturnStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}ReturnStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(NullStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(NullStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}NullStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(DeclStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(DeclStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}DeclStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(ExprStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(ExprStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}ExprStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(CompoundStmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(CompoundStmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}CompoundStmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(StmtAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(StmtAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}StmtAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(VariableDeclAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(VariableDeclAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}VariableDeclAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(FunctionDeclAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(FunctionDeclAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}FunctionDeclAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(DeclAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(DeclAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}DeclAST \n", GetIndentation(depth));
 	}
 
-	void DebugNodeVisitorAST::Visit(TranslationUnitAST const& node, uint32 depth)
+	void DebugVisitorAST::Visit(TranslationUnitAST const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}TranslationUnitAST \n", GetIndentation(depth));
 	}

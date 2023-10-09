@@ -1,13 +1,12 @@
 #pragma once
-#include "Frontend/AST.h"
+#include "Frontend/IVisitorAST.h"
 
 namespace wave
 {
-	class DebugNodeVisitorAST : public IVisitorAST
+	class DebugVisitorAST : public IVisitorAST
 	{
 	public:
-
-		explicit DebugNodeVisitorAST(AST* ast);
+		explicit DebugVisitorAST(AST const* ast);
 
 		virtual void Visit(NodeAST const& node, uint32 depth) override;
 		virtual void Visit(TranslationUnitAST const& node, uint32 depth) override;

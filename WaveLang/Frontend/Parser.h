@@ -7,7 +7,6 @@
 
 namespace wave
 {
-	struct AST;
 	class QualifiedType;
 	class Sema;
 	class Parser;
@@ -20,13 +19,14 @@ namespace wave
 		using TokenPtr = std::vector<Token>::iterator;
 	public:
 
-		explicit Parser(std::vector<Token> const& tokens);
+		explicit Parser(Diagnostics& diagnostics, std::vector<Token> const& tokens);
 		~Parser();
 
 		void Parse();
-		AST* GetAST() const { return ast.get(); }
+		AST const* GetAST() const { return ast.get(); }
 
 	private:
+		Diagnostics& diagnostics;
 		std::vector<Token> tokens;
 		TokenPtr current_token;
 
@@ -57,12 +57,17 @@ namespace wave
 		{
 			if (!Consume(k, ts...))
 			{
-				Diag(diag::unexpected_token);
+				Diag(unexpected_token);
 				return false;
 			}
 			return true;
 		}
-		void Diag(diag::DiagCode);
+		void Diag(DiagCode);
+		template<typename... Ts>
+		void Diag(DiagCode code, Ts&&... args)
+		{
+			diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
+		}
 
 		void PreprocessTokens();
 		void ParseTranslationUnit();

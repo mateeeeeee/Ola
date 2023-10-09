@@ -1,30 +1,30 @@
-[2023-10-09 19:58:24.798] [lucc logger] [debug] AST Traversal:
+[2023-10-10 01:27:01.289] [lucc logger] [debug] AST Traversal:
 
-[2023-10-09 19:58:24.802] [lucc logger] [debug] TranslationUnitAST 
+[2023-10-10 01:27:01.292] [lucc logger] [debug] TranslationUnitAST 
 
-[2023-10-09 19:58:24.802] [lucc logger] [debug] `->FunctionDeclAST 
+[2023-10-10 01:27:01.293] [lucc logger] [debug] `->FunctionDeclAST 
 
-[2023-10-09 19:58:24.803] [lucc logger] [debug]    `->CompoundStmtAST 
+[2023-10-10 01:27:01.293] [lucc logger] [debug]    `->CompoundStmtAST 
 
-[2023-10-09 19:58:24.803] [lucc logger] [debug]       `->DeclStmtAST 
+[2023-10-10 01:27:01.293] [lucc logger] [debug]       `->DeclStmtAST 
 
-[2023-10-09 19:58:24.803] [lucc logger] [debug]          `->VariableDeclAST 
+[2023-10-10 01:27:01.293] [lucc logger] [debug]          `->VariableDeclAST 
 
-[2023-10-09 19:58:24.804] [lucc logger] [debug]             `->IntLiteralAST 
+[2023-10-10 01:27:01.293] [lucc logger] [debug]             `->IntLiteralAST 
 
-[2023-10-09 19:58:24.804] [lucc logger] [debug]       `->DeclStmtAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]       `->DeclStmtAST 
 
-[2023-10-09 19:58:24.804] [lucc logger] [debug]          `->VariableDeclAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]          `->VariableDeclAST 
 
-[2023-10-09 19:58:24.804] [lucc logger] [debug]             `->BinaryExprAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]             `->BinaryExprAST 
 
-[2023-10-09 19:58:24.805] [lucc logger] [debug]                `->IdentifierAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]                `->IdentifierAST 
 
-[2023-10-09 19:58:24.805] [lucc logger] [debug]                `->IntLiteralAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]                `->IntLiteralAST 
 
-[2023-10-09 19:58:24.805] [lucc logger] [debug]       `->ReturnStmtAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]       `->ReturnStmtAST 
 
-[2023-10-09 19:58:24.805] [lucc logger] [debug]          `->ExprStmtAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]          `->ExprStmtAST 
 
-[2023-10-09 19:58:24.806] [lucc logger] [debug]             `->IntLiteralAST 
+[2023-10-10 01:27:01.294] [lucc logger] [debug]             `->IntLiteralAST 
 

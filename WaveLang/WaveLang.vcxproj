@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Backend\LLVMCodegen.cpp" />
+    <ClCompile Include="Backend\LLVMVisitorAST.cpp" />
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Frontend\AST.cpp" />
     <ClCompile Include="Frontend\Diagnostics.cpp" />
@@ -157,11 +158,11 @@
     <ClCompile Include="Frontend\SourceBuffer.cpp" />
     <ClCompile Include="Frontend\TokenTypes.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Utility\Debug.cpp" />
+    <ClCompile Include="Utility\DebugVisitorAST.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Backend\ICodegen.h" />
     <ClInclude Include="Backend\LLVMCodegen.h" />
+    <ClInclude Include="Backend\LLVMVisitorAST.h" />
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Frontend\AST.h" />
     <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\ForwardAST.h" />
+    <ClInclude Include="Frontend\IVisitorAST.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\Parser.h" />
     <ClInclude Include="Frontend\Sema.h" />
@@ -178,7 +180,7 @@
     <ClInclude Include="Frontend\Token.h" />
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Frontend\Type.h" />
-    <ClInclude Include="Utility\Debug.h" />
+    <ClInclude Include="Utility\DebugVisitorAST.h" />
     <ClInclude Include="Utility\Enums.h" />
   </ItemGroup>
   <ItemGroup>

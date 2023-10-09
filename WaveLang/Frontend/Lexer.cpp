@@ -6,8 +6,9 @@
 namespace wave
 {
 
-	Lexer::Lexer(SourceBuffer const& source) : buf_ptr(source.GetBufferStart()), cur_ptr(buf_ptr),
-											   loc{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size())}
+	Lexer::Lexer(Diagnostics& diagnostics, SourceBuffer const& source)
+		: diagnostics(diagnostics), buf_ptr(source.GetBufferStart()), cur_ptr(buf_ptr),
+		  loc{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size())}
 	{
 	}
 
@@ -113,7 +114,7 @@ namespace wave
 			return LexPunctuator(token);
 		}
 		}
-		Diag(diag::unknown_character, loc);
+		diagnostics.Report(loc, unknown_character);
 		return false;
 	}
 
@@ -125,7 +126,7 @@ namespace wave
 		else if (std::isalpha(*tmp_ptr))
 		{
 			UpdatePointersAndLocation();
-			Diag(diag::invalid_number_literal, loc);
+			diagnostics.Report(loc, invalid_number_literal);
 			return false;
 		}
 		FillToken(t, TokenKind::number, tmp_ptr);

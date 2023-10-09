@@ -26,10 +26,13 @@
     <ClCompile Include="Frontend\Sema.cpp">
       <Filter>Frontend\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Debug.cpp">
+    <ClCompile Include="Utility\DebugVisitorAST.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Backend\LLVMCodegen.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\LLVMVisitorAST.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
   </ItemGroup>
@@ -105,7 +108,7 @@
     <ClInclude Include="Frontend\Sema.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Debug.h">
+    <ClInclude Include="Utility\DebugVisitorAST.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Core\Logger.h">
@@ -117,7 +120,10 @@
     <ClInclude Include="Backend\LLVMCodegen.h">
       <Filter>Backend</Filter>
     </ClInclude>
-    <ClInclude Include="Backend\ICodegen.h">
+    <ClInclude Include="Frontend\IVisitorAST.h">
+      <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\LLVMVisitorAST.h">
       <Filter>Backend</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,7 +6,8 @@
 #include "Frontend/Lexer.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
-#include "Utility/Debug.h"
+#include "Backend/LLVMCodegen.h"
+#include "Utility/DebugVisitorAST.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -38,25 +39,25 @@ namespace wave
 
 		void CompileTranslationUnit(std::string_view source_filename, bool ast_dump)
 		{
+			Diagnostics diagnostics{};
 			SourceBuffer src(source_filename);
 			AddBuiltins(src);
-			Lexer lex(src);
+			Lexer lex(diagnostics, src);
 			lex.Lex();
 
-			Parser parser(lex.GetTokens());
+			Parser parser(diagnostics, lex.GetTokens());
 			parser.Parse();
-			AST* ast = parser.GetAST();
-			if (ast_dump) DebugNodeVisitorAST debug_ast(ast);
+			AST const* ast = parser.GetAST();
+			if (ast_dump) DebugVisitorAST debug_ast(ast);
 
-			//llvmCodegen llvm(ast);
-			//write llvm
+			LLVMCodegen llvm_codegen(source_filename);
+			llvm_codegen.Generate(ast);
 		}
 	}
 
 	int32 Compile(CompilerInput const& input)
 	{
 		InitLogger();
-		diag::Initialize();
 
 		bool const ast_dump = input.flags & CompilerFlag_DumpAST;
 		bool const use_llvm = !(input.flags & CompilerFlag_NoLLVM);

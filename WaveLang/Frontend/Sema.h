@@ -10,6 +10,7 @@ namespace wave
 	}
 
 	class Parser;
+	class Diagnostics;
 	struct SourceLocation;
 
 	class Sema 
@@ -23,7 +24,7 @@ namespace wave
 		};
 
 	public:
-		Sema();
+		explicit Sema(Diagnostics& diagnostics);
 		~Sema();
 
 	private:
@@ -37,10 +38,10 @@ namespace wave
 		void ActOnIdentifier(IdentifierAST* identifier);
 
 	private:
+		Diagnostics& diagnostics;
 		Context ctx;
 
 	private:
-		void Diag(diag::DiagCode, SourceLocation const&);
 
 		void ActOnUnaryExpr(UnaryExprAST* unary_expr);
 		void ActOnBinaryExpr(BinaryExprAST* binary_expr);

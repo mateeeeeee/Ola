@@ -25,4 +25,6 @@ namespace wave
 	class StringLiteralAST;
 	class IdentifierAST;
 	class CastExprAST;
+
+	struct AST;
 }

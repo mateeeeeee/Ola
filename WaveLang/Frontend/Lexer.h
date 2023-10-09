@@ -6,6 +6,7 @@
 namespace wave
 {
 	class SourceBuffer;
+	class Diagnostics;
 
 	template<typename P>
 	concept CharPredicate = requires(P p, char a)
@@ -15,10 +16,8 @@ namespace wave
 
 	class Lexer
 	{
-		friend class Preprocessor;
-
 	public:
-		explicit Lexer(SourceBuffer const& source);
+		Lexer(Diagnostics& diagnostics, SourceBuffer const& source);
 		Lexer(Lexer const&) = delete;
 		Lexer& operator=(Lexer const&) = delete;
 
@@ -27,6 +26,7 @@ namespace wave
 		std::vector<Token> const& GetTokens() const { return tokens; }
 
 	private:
+		Diagnostics& diagnostics;
 		char const* buf_ptr;
 		char const* cur_ptr;
 

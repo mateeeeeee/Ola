@@ -7,7 +7,7 @@
 namespace wave
 {
 
-	Sema::Sema() = default;
+	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
 	void Sema::ActOnVariableDecl(VariableDeclAST* var_decl)
@@ -24,7 +24,7 @@ namespace wave
 			{
 				if (!type->IsCompatible(init_expr->GetType()))
 				{
-					Diag(diag::incompatible_initializer, var_decl->GetLocation());
+					diagnostics.Report(var_decl->GetLocation(), incompatible_initializer);
 				}
 			}
 			else
@@ -38,13 +38,13 @@ namespace wave
 		{
 			if (!has_init)
 			{
-				Diag(diag::missing_type_specifier_or_init_expr, var_decl->GetLocation());
+				diagnostics.Report(var_decl->GetLocation(), missing_type_specifier_or_init_expr);
 			}
 		}
 		
 		if (ctx.sym_table.LookUpCurrentScope(var_decl->GetName()))
 		{
-			Diag(diag::redefinition_of_identifier, var_decl->GetLocation());
+			diagnostics.Report(var_decl->GetLocation(), redefinition_of_identifier);
 		}
 		bool result = ctx.sym_table.Insert(Symbol{ std::string(var_decl->GetName()), var_decl->GetType()});
 		WAVE_ASSERT(result);
@@ -54,7 +54,7 @@ namespace wave
 	{
 		if (ctx.sym_table.LookUpCurrentScope(function_decl->GetName()))
 		{
-			Diag(diag::redefinition_of_identifier, function_decl->GetLocation());
+			diagnostics.Report(function_decl->GetLocation(), redefinition_of_identifier);
 		}
 		bool result = ctx.sym_table.Insert(Symbol{ std::string(function_decl->GetName()), function_decl->GetType() });
 		WAVE_ASSERT(result);
@@ -71,7 +71,7 @@ namespace wave
 		QualifiedType const& ret_expr_type = ret_expr ? ret_expr->GetType() : builtin_types::Void;
 		if (!ret_expr_type->IsCompatible(return_type))
 		{
-			Diag(diag::incompatible_return_stmt_type, ret_expr ? ret_expr->GetLocation() : SourceLocation{});
+			diagnostics.Report(ret_expr ? ret_expr->GetLocation() : SourceLocation{}, incompatible_return_stmt_type);
 		}
 	}
 
@@ -95,11 +95,6 @@ namespace wave
 			return ActOnCastExpr(cast_expr);
 		}
 		}
-}
-
-	void Sema::Diag(diag::DiagCode code, SourceLocation const& loc)
-	{
-		diag::Diag(code, loc);
 	}
 
 	void Sema::ActOnUnaryExpr(UnaryExprAST* unary_expr)
@@ -125,9 +120,9 @@ namespace wave
 		QualifiedType const& cast_type = cast_expr->GetType();
 		QualifiedType const& operand_type = cast_expr->GetOperand()->GetType();
 
-		if (IsArrayType(cast_type) || IsArrayType(operand_type)) Diag(diag::invalid_cast, cast_expr->GetLocation());
-		if(IsVoidType(cast_type)) Diag(diag::invalid_cast, cast_expr->GetLocation());
-		if(cast_type->IsCompatible(operand_type))  Diag(diag::invalid_cast, cast_expr->GetLocation());
+		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
+		if(IsVoidType(cast_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
+		if(cast_type->IsCompatible(operand_type))  diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
 
 		cast_expr->SetType(operand_type);
 	}
@@ -140,7 +135,7 @@ namespace wave
 		}
 		else 
 		{
-			Diag(diag::undeclared_identifier, identifier->GetLocation());
+			diagnostics.Report(identifier->GetLocation(), undeclared_identifier);
 		}
 	}
 
