@@ -29,6 +29,9 @@
     <ClCompile Include="Utility\Debug.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Backend\LLVMCodegen.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -110,6 +113,12 @@
     </ClInclude>
     <ClInclude Include="Frontend\ForwardAST.h">
       <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\LLVMCodegen.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ICodegen.h">
+      <Filter>Backend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

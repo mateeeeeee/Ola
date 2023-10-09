@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Backend\LLVMCodegen.cpp" />
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Frontend\AST.cpp" />
     <ClCompile Include="Frontend\Diagnostics.cpp" />
@@ -159,6 +160,8 @@
     <ClCompile Include="Utility\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Backend\ICodegen.h" />
+    <ClInclude Include="Backend\LLVMCodegen.h" />
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />

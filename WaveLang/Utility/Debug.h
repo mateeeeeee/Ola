@@ -3,7 +3,7 @@
 
 namespace wave
 {
-	class DebugNodeVisitorAST : public INodeVisitorAST
+	class DebugNodeVisitorAST : public IVisitorAST
 	{
 	public:
 

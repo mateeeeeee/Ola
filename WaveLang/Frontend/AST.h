@@ -8,13 +8,10 @@
 
 namespace wave
 {
-	class ContextLLVM;
-	class ValueLLVM;
-
-	class INodeVisitorAST
+	class IVisitorAST
 	{
 	public:
-		virtual ~INodeVisitorAST() = default;
+		virtual ~IVisitorAST() = default;
 		virtual void Visit(NodeAST const& node, uint32 depth) {}
 		virtual void Visit(TranslationUnitAST const& node, uint32 depth) {}
 
@@ -43,11 +40,12 @@ namespace wave
 	{
 	public:
 		virtual ~NodeAST() = default;
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const {};
-
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const {};
+		virtual void Accept(IVisitorAST& visitor) const {}
 	protected:
 		NodeAST() = default;
 	};
+
 	class TranslationUnitAST final : public NodeAST
 	{
 	public:
@@ -58,7 +56,8 @@ namespace wave
 			declarations.push_back(std::move(declaration));
 		}
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::vector<std::unique_ptr<DeclAST>> declarations;
@@ -69,17 +68,18 @@ namespace wave
 		Variable,
 		Function
 	};
-	class DeclAST
+	class DeclAST : public NodeAST
 	{
 	public:
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
-
 		DeclKind GetDeclKind() const { return decl_kind; }
 		SourceLocation GetLocation() const { return source_loc; }
 		std::string_view GetName() const { return name; }
 
 		void SetType(QualifiedType const& _type) { type = _type; }
 		QualifiedType const& GetType() const { return type; }
+
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		DeclKind decl_kind;
@@ -102,7 +102,8 @@ namespace wave
 		}
 		ExprAST const* GetInitExpr() const { return init_expr.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> init_expr;
@@ -111,8 +112,6 @@ namespace wave
 	{
 	public:
 		FunctionDeclAST(std::string_view name, SourceLocation const& loc) : DeclAST(DeclKind::Function, name, loc) {}
-		
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
 
 		void AddParamDeclaration(std::unique_ptr<VariableDeclAST>&& param)
 		{
@@ -122,11 +121,13 @@ namespace wave
 		{
 			definition = std::move(_definition);
 		}
-
 		bool IsExtern() const
 		{
 			return definition == nullptr;
 		}
+
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::vector<std::unique_ptr<VariableDeclAST>> param_declarations;
@@ -156,7 +157,8 @@ namespace wave
 	public:
 		StmtKind GetStmtKind() const { return kind; }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	protected:
 		StmtKind kind;
@@ -174,7 +176,8 @@ namespace wave
 			statements.push_back(std::move(stmt));
 		}
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::vector<std::unique_ptr<StmtAST>> statements;
@@ -186,7 +189,8 @@ namespace wave
 
 		ExprAST* GetExpr() const { return expr.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> expr;
@@ -196,7 +200,9 @@ namespace wave
 	public:
 		NullStmtAST() : ExprStmtAST(nullptr) {}
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
+
 	};
 	class DeclStmtAST final : public StmtAST
 	{
@@ -205,7 +211,8 @@ namespace wave
 
 		DeclAST* GetDeclaration() const { return declaration.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<DeclAST> declaration;
@@ -218,7 +225,8 @@ namespace wave
 
 		ExprStmtAST const* GetExprStmt() const { return ret_expr.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr <ExprStmtAST> ret_expr;
@@ -241,7 +249,8 @@ namespace wave
 			else_stmt = std::move(_else_stmt);
 		}
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> condition;
@@ -299,7 +308,8 @@ namespace wave
 		virtual bool IsConstexpr() const { return false; }
 		virtual int64 EvaluateConstexpr() const { return 0; }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	protected:
 		ExprKind kind;
@@ -322,7 +332,8 @@ namespace wave
 		UnaryExprKind GetUnaryKind() const { return op; }
 		ExprAST* GetOperand() const { return operand.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		UnaryExprKind op;
@@ -339,7 +350,8 @@ namespace wave
 		ExprAST* GetLHS() const { return lhs.get(); }
 		ExprAST* GetRHS() const { return rhs.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> lhs, rhs;
@@ -358,7 +370,8 @@ namespace wave
 		void SetTrueExpr(std::unique_ptr<ExprAST>&& expr) { true_expr = std::move(expr); }
 		void SetFalseExpr(std::unique_ptr<ExprAST>&& expr) { false_expr = std::move(expr); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> cond_expr;
@@ -374,7 +387,8 @@ namespace wave
 		}
 		int64 GetValue() const { return value; }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		int64 value;
@@ -388,7 +402,8 @@ namespace wave
 		}
 		std::string_view GetString() const { return str; }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::string str;
@@ -402,7 +417,8 @@ namespace wave
 		}
 		std::string_view GetName() const { return name; }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::string name;
@@ -423,7 +439,8 @@ namespace wave
 		}
 		ExprAST const* GetOperand() const { return operand.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> operand;
@@ -440,7 +457,8 @@ namespace wave
 		}
 		ExprAST* GetFunction() const { return func_expr.get(); }
 
-		virtual void Accept(INodeVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor, uint32 depth) const override;
+		virtual void Accept(IVisitorAST& visitor) const override;
 
 	private:
 		std::unique_ptr<ExprAST> func_expr;
