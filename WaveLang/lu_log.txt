@@ -1,30 +1,3 @@
-[2023-10-10 20:19:44.274] [lucc logger] [debug] AST Traversal:
+[2023-10-10 21:39:27.552] [lucc logger] [error] [Diagnostics][Error]: [Sema] Undeclared identifier C in file test.wv at line: 5, col: 16
 
-[2023-10-10 20:19:44.276] [lucc logger] [debug] TranslationUnitAST 
-
-[2023-10-10 20:19:44.277] [lucc logger] [debug] `->FunctionDeclAST 
-
-[2023-10-10 20:19:44.277] [lucc logger] [debug]    `->CompoundStmtAST 
-
-[2023-10-10 20:19:44.277] [lucc logger] [debug]       `->DeclStmtAST 
-
-[2023-10-10 20:19:44.278] [lucc logger] [debug]          `->VariableDeclAST 
-
-[2023-10-10 20:19:44.278] [lucc logger] [debug]             `->IntLiteralAST 
-
-[2023-10-10 20:19:44.279] [lucc logger] [debug]       `->DeclStmtAST 
-
-[2023-10-10 20:19:44.279] [lucc logger] [debug]          `->VariableDeclAST 
-
-[2023-10-10 20:19:44.280] [lucc logger] [debug]             `->BinaryExprAST 
-
-[2023-10-10 20:19:44.280] [lucc logger] [debug]                `->IdentifierAST 
-
-[2023-10-10 20:19:44.280] [lucc logger] [debug]                `->IntLiteralAST 
-
-[2023-10-10 20:19:44.280] [lucc logger] [debug]       `->ReturnStmtAST 
-
-[2023-10-10 20:19:44.281] [lucc logger] [debug]          `->ExprStmtAST 
-
-[2023-10-10 20:19:44.281] [lucc logger] [debug]             `->IntLiteralAST 
 

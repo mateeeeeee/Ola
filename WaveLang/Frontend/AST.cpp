@@ -106,7 +106,11 @@ namespace wave
 		func_expr->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
-	void Identifier::Accept(ASTVisitor& visitor, uint32 depth) const
+	void IdentifierExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(false);
+	}
+	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -195,7 +199,12 @@ namespace wave
 		WAVE_ASSERT(func_expr);
 		visitor.Visit(*this, 0);
 	}
-	void Identifier::Accept(ASTVisitor& visitor) const
+	void IdentifierExpr::Accept(ASTVisitor& visitor) const
+	{
+		WAVE_ASSERT(false);
+	}
+
+	void DeclRefExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

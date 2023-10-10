@@ -37,13 +37,13 @@ namespace wave
 		void Report(SourceLocation const& loc, DiagCode code, Args&&... args)
 		{
 			DiagKind diag_kind = diag_kinds[code];
-			std::string fmt = diag_msgs[code];
+			std::string_view fmt = diag_msgs[code];
 			std::string diag_msg = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
 			std::string output = std::format("[Diagnostics][{}]: {} in file {} at line: {}, col: {}\n",
-				ToString(diag_kind), diag_msg, loc.filename, loc.line, loc.column);
+											  ToString(diag_kind), diag_msg, loc.filename, loc.line, loc.column);
 			output += "\n";
 
-			PrintMessage(output);
+			PrintMessage(diag_kind, output);
 			if (exit_on_error && diag_kind == DiagKind::error) std::exit(EXIT_CODE_COMPILATION_FAILED);
 		}
 

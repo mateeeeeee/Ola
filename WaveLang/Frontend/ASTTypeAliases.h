@@ -31,7 +31,8 @@ namespace wave
 	using UniqueTernaryExprPtr		= UniquePtr<TernaryExpr>;
 	using UniqueIntLiteralPtr		= UniquePtr<IntLiteral>;
 	using UniqueStringLiteralPtr	= UniquePtr<StringLiteral>;
-	using UniqueIdentifierPtr		= UniquePtr<Identifier>;
+	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
+	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;
 	using UniqueCastExprPtr			= UniquePtr<CastExpr>;
 	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
 
@@ -39,9 +40,9 @@ namespace wave
 	using UniqueDeclPtrList			= std::vector<UniqueDeclPtr>;
 	using UniqueStmtPtrList			= std::vector<UniqueStmtPtr>;
 	using UniqueExprPtrList			= std::vector<UniqueExprPtr>;
-	using ExprPtrList				= std::vector<Expr const*>;
-	using DeclPtrList				= std::vector<Decl const*>;
-	using StmtPtrList				= std::vector<Stmt const*>;
-	using VariableDeclPtrList		= std::vector<VariableDecl const*>;
+	using ExprPtrList				= std::vector<Expr*>;
+	using DeclPtrList				= std::vector<Decl*>;
+	using StmtPtrList				= std::vector<Stmt*>;
+	using VariableDeclPtrList		= std::vector<VariableDecl*>;
 
 }

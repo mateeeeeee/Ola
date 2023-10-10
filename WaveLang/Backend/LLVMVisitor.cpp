@@ -99,7 +99,7 @@ namespace wave
 
 	}
 
-	void LLVMVisitor::Visit(Identifier const& node, uint32 depth)
+	void LLVMVisitor::Visit(IdentifierExpr const& node, uint32 depth)
 	{
 
 	}

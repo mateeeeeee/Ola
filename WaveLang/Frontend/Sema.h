@@ -30,10 +30,11 @@ namespace wave
 		~Sema();
 
 	private:
-		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueExprPtr&& init_expr);
-		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueVariableDeclPtrList&& param_decls);
+		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr);
+		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls);
 		void ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition);
 
+		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;

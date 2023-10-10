@@ -378,21 +378,6 @@ namespace wave
 	private:
 		std::string str;
 	};
-	class Identifier : public Expr
-	{
-	public:
-		explicit Identifier(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::DeclRef, loc), name(name)
-		{
-			SetValueCategory(ExprValueCategory::LValue);
-		}
-		std::string_view GetName() const { return name; }
-
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
-
-	private:
-		std::string name;
-	};
 	class CastExpr : public Expr
 	{
 	public:
@@ -433,6 +418,37 @@ namespace wave
 	private:
 		UniqueExprPtr func_expr;
 		UniqueExprPtrList func_args;
+	};
+	class IdentifierExpr : public Expr
+	{
+	protected:
+		explicit IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::DeclRef, loc), name(name)
+		{
+			SetValueCategory(ExprValueCategory::LValue);
+		}
+		std::string_view GetName() const { return name; }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		std::string name;
+	};
+	class DeclRefExpr : public IdentifierExpr
+	{
+	public:
+		DeclRefExpr(Decl* decl, SourceLocation const& loc) 
+			: IdentifierExpr(decl->GetName(), loc), decl(decl)
+		{
+
+		}
+
+		Decl const* GetDeclaration() const { return decl; }
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		Decl* decl;
 	};
 
 	struct AST

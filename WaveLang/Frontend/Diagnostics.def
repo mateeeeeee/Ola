@@ -2,23 +2,23 @@
 #define DIAG(diag_code, diag_kind, diag_msg)
 #endif
 
-DIAG(invalid_number_literal, error, "[Lexer] Invalid number literal")
-DIAG(unknown_character, error, "[Lexer] Unknown character")
+DIAG(invalid_number_literal, error, "Invalid number literal")
+DIAG(unknown_character, error, "Unknown character")
 
-DIAG(unexpected_token, error, "[Parser] Unexpected token")
-DIAG(empty_statement, warning, "[Parser] Empty statement")
-DIAG(missing_fn, error, "[Parser] Missing keyword fn")
-DIAG(expected_identifier, error, "[Parser] Expected identifier")
-DIAG(invalid_type_specifier, error, "[Parser] Invalid type specifier")
-DIAG(function_params_missing_coma, error, "[Parser] Missing coma in function parameters declaration")
-DIAG(missing_type_specifier, error, "[Parser] Missing type specifier")
+DIAG(unexpected_token, error, "Unexpected token")
+DIAG(empty_statement, warning, "Empty statement")
+DIAG(missing_fn, error, "Missing keyword fn")
+DIAG(expected_identifier, error, "Expected identifier")
+DIAG(invalid_type_specifier, error, "Invalid type specifier")
+DIAG(function_params_missing_coma, error, "Missing coma in function parameters declaration")
+DIAG(missing_type_specifier, error, "Missing type specifier")
 
 DIAG(void_invalid_context, error, "Void is only allowed when specifying function return value")
 
-DIAG(redefinition_of_identifier, error, "[Sema] Redefinition of an identifier")
-DIAG(incompatible_initializer, error, "[Sema] Incompatible initializer")
-DIAG(incompatible_return_stmt_type, error, "[Sema] Incompatible return statement type")
-DIAG(invalid_cast, error, "[Sema] Invalid cast")
-DIAG(undeclared_identifier, error, "[Sema] Undeclared identifier")
-DIAG(missing_type_specifier_or_init_expr, error, "[Sema] Variable declaration has to have atleast one of init expression and type specifier")
+DIAG(redefinition_of_identifier, error, "Redefinition of an identifier")
+DIAG(incompatible_initializer, error, "Incompatible initializer")
+DIAG(incompatible_return_stmt_type, error, "Incompatible return statement type")
+DIAG(invalid_cast, error, "Invalid cast")
+DIAG(undeclared_identifier, error, "Undeclared identifier {}")
+DIAG(missing_type_specifier_or_init_expr, error, "Variable declaration has to have atleast one of init expression and type specifier")
 #undef DIAG

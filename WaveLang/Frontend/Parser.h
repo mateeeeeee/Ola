@@ -106,7 +106,7 @@ namespace wave
 		[[nodiscard]] UniqueExprPtr ParsePrimaryExpression();
 		[[nodiscard]] UniqueIntLiteralPtr ParseIntegerLiteral();
 		[[nodiscard]] UniqueStringLiteralPtr ParseStringLiteral();
-		[[nodiscard]] UniqueIdentifierPtr ParseIdentifier();
+		[[nodiscard]] UniqueIdentifierExprPtr ParseIdentifier();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);

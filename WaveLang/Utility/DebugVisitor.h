@@ -29,6 +29,7 @@ namespace wave
 		virtual void Visit(TernaryExpr const& node, uint32 depth) override;
 		virtual void Visit(IntLiteral const& node, uint32 depth) override;
 		virtual void Visit(StringLiteral const& node, uint32 depth) override;
-		virtual void Visit(Identifier const& node, uint32 depth) override;
+		virtual void Visit(IdentifierExpr const& node, uint32 depth) override;
+		virtual void Visit(DeclRefExpr const& node, uint32 depth) override;
 	};
 }

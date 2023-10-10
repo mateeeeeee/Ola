@@ -107,7 +107,7 @@ namespace wave
 		WAVE_DEBUG("{}NodeAST \n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(Identifier const& node, uint32 depth)
+	void DebugVisitor::Visit(IdentifierExpr const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}IdentifierAST \n", GetIndentation(depth));
 	}
@@ -195,6 +195,11 @@ namespace wave
 	void DebugVisitor::Visit(TranslationUnit const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}TranslationUnitAST \n", GetIndentation(depth));
+	}
+
+	void DebugVisitor::Visit(DeclRefExpr const& node, uint32 depth)
+	{
+		WAVE_DEBUG("{}DeclRefExpr \n", GetIndentation(depth));
 	}
 
 }

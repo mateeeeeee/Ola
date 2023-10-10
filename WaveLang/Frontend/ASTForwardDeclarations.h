@@ -23,9 +23,10 @@ namespace wave
 	class TernaryExpr;
 	class IntLiteral;
 	class StringLiteral;
-	class Identifier;
+	class IdentifierExpr;
 	class CastExpr;
 	class FunctionCallExpr;
+	class DeclRefExpr;
 
 	struct AST;
 }

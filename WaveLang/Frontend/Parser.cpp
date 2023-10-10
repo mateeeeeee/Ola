@@ -122,7 +122,7 @@ namespace wave
 			function_type.SetRawType(FunctionType(return_type, param_types));
 		}
 		if (expect_semicolon) Expect(TokenKind::semicolon);
-		return sema->ActOnFunctionDecl(name, function_type, loc, std::move(param_decls));
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
@@ -159,7 +159,7 @@ namespace wave
 			if (Consume(TokenKind::equal)) init_expr = ParseExpression();
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnVariableDecl(name, variable_type, loc, std::move(init_expr));
+		return sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr));
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()
@@ -617,14 +617,13 @@ namespace wave
 		return MakeUnique<StringLiteral>(str, loc);
 	}
 
-	UniqueIdentifierPtr Parser::ParseIdentifier()
+	UniqueIdentifierExprPtr Parser::ParseIdentifier()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::identifier));
 		std::string_view name = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		UniqueIdentifierPtr identifier = MakeUnique<Identifier>(name, loc);
-		return identifier;
+		return sema->ActOnIdentifier(name, loc);
 	}
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)

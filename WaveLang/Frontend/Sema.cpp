@@ -8,7 +8,7 @@ namespace wave
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
-	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueExprPtr&& init_expr)
+	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr)
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
@@ -31,7 +31,7 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier);
 		}
 
-		std::unique_ptr<VariableDecl> var_decl = std::make_unique<VariableDecl>(name, loc);
+		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetInitExpr(std::move(init_expr));
 		if (has_init && !has_type_specifier)
 		{
@@ -48,7 +48,7 @@ namespace wave
 		return var_decl;
 	}
 
-	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueVariableDeclPtrList&& param_decls)
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls)
 	{
 		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
 		{
@@ -65,6 +65,20 @@ namespace wave
 	void Sema::ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition)
 	{
 		function_decl->SetDefinition(std::move(definition));
+	}
+
+	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
+	{
+		if (Decl* decl = ctx.decl_scope_stack.LookUpCurrentScope(name))
+		{
+			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
+			return decl_ref;
+		}
+		else
+		{
+			diagnostics.Report(loc, undeclared_identifier, name);
+			return nullptr;
+		}
 	}
 
 	/*
@@ -112,18 +126,6 @@ namespace wave
 		if(cast_type->IsCompatible(operand_type))  diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
 
 		cast_expr->SetType(operand_type);
-	}
-
-	void Sema::ActOnIdentifier(IdentifierAST* identifier)
-	{
-		if (DeclAST* decl = ctx.decl_scope_stack.LookUp(identifier->GetName()))
-		{
-			identifier->SetType(decl->GetType());
-		}
-		else 
-		{
-			diagnostics.Report(identifier->GetLocation(), undeclared_identifier);
-		}
 	}
 	*/
 }
