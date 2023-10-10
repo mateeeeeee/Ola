@@ -12,8 +12,8 @@ namespace wave
 
 	void Parser::Parse()
 	{
-		sema = std::make_unique<Sema>(diagnostics);
-		ast = std::make_unique<AST>();
+		sema = MakeUnique<Sema>(diagnostics);
+		ast = MakeUnique<AST>();
 		PreprocessTokens();
 		ParseTranslationUnit();
 	}
@@ -55,7 +55,7 @@ namespace wave
 		}
 	}
 
-	std::unique_ptr<DeclAST> Parser::ParseGlobalDeclaration()
+	UniqueDeclPtr Parser::ParseGlobalDeclaration()
 	{
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
@@ -71,15 +71,14 @@ namespace wave
 		return nullptr;
 	}
 
-	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDeclaration(bool expect_semicolon)
+	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration(bool expect_semicolon)
 	{
 		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-		std::string_view identifier = current_token->GetIdentifier(); ++current_token;
-
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = current_token->GetIdentifier(); ++current_token;
 		Expect(TokenKind::left_round);
-		std::unique_ptr<FunctionDeclAST> function_decl = std::make_unique<FunctionDeclAST>(identifier, current_token->GetLocation());
 		QualifiedType function_type{};
-
+		UniqueVariableDeclPtrList param_decls;
 		if (Consume(TokenKind::right_round))
 		{
 			if (Consume(TokenKind::arrow))
@@ -108,10 +107,9 @@ namespace wave
 				if (!param_type.HasRawType()) Diag(missing_type_specifier);
 				if (param_type->Is(TypeKind::Void)) Diag(void_invalid_context);
 
-				std::unique_ptr<VariableDeclAST> param_decl = ParseVariableDeclaration(true);
+				UniqueVariableDeclPtr param_decl = ParseVariableDeclaration(true);
 				param_decl->SetType(param_type);
-				function_decl->AddParamDeclaration(std::move(param_decl));
-
+				param_decls.push_back(std::move(param_decl));
 				param_types.emplace_back(std::string(identifier), param_type);
 			}
 
@@ -124,55 +122,47 @@ namespace wave
 			function_type.SetRawType(FunctionType(return_type, param_types));
 		}
 		if (expect_semicolon) Expect(TokenKind::semicolon);
-		function_decl->SetType(function_type);
-
-		return function_decl;
+		return sema->ActOnFunctionDecl(name, function_type, loc, std::move(param_decls));
 	}
 
-	std::unique_ptr<FunctionDeclAST> Parser::ParseFunctionDefinition()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
 	{
-		SCOPED_SYMBOL_TABLE(sema->ctx.sym_table);
-		std::unique_ptr<FunctionDeclAST> function_decl = ParseFunctionDeclaration(false);
+		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+		UniqueFunctionDeclPtr function_decl = ParseFunctionDeclaration(false);
 		sema->ctx.current_func = &function_decl->GetType();
-		std::unique_ptr<CompoundStmtAST> function_body = ParseCompoundStatement();
+		UniqueCompoundStmtPtr function_body = ParseCompoundStatement();
 		sema->ctx.current_func = nullptr;
-		function_decl->SetDefinition(std::move(function_body));
+		sema->ActOnFunctionDecl(function_decl, std::move(function_body));
 		return function_decl;
 	}
 
-	std::unique_ptr<VariableDeclAST> Parser::ParseVariableDeclaration(bool function_param_decl)
+	UniqueVariableDeclPtr Parser::ParseVariableDeclaration(bool function_param_decl)
 	{
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 
-		QualifiedType param_type{};
-		ParseTypeQualifier(param_type);
+		QualifiedType variable_type{};
+		ParseTypeQualifier(variable_type);
 		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-		std::string_view identifier = current_token->GetIdentifier(); ++current_token;
-
-		std::unique_ptr<VariableDeclAST> variable_decl = std::make_unique<VariableDeclAST>(identifier, current_token->GetLocation());
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = current_token->GetIdentifier(); ++current_token;
+		UniqueExprPtr init_expr = nullptr;
 		if (function_param_decl)
 		{
 			Expect(TokenKind::colon);
-			ParseTypeSpecifier(param_type);
-			if (!param_type.HasRawType()) Diag(missing_type_specifier);
-			if (param_type->Is(TypeKind::Void)) Diag(void_invalid_context);
+			ParseTypeSpecifier(variable_type);
+			if (!variable_type.HasRawType()) Diag(missing_type_specifier);
+			if (variable_type->Is(TypeKind::Void)) Diag(void_invalid_context);
 		}
 		else
 		{
-			if (Consume(TokenKind::colon)) ParseTypeSpecifier(param_type);
-			if (Consume(TokenKind::equal))
-			{
-				std::unique_ptr<ExprAST> init_expr = ParseExpression();
-				variable_decl->SetInitExpr(std::move(init_expr));
-			}
+			if (Consume(TokenKind::colon)) ParseTypeSpecifier(variable_type);
+			if (Consume(TokenKind::equal)) init_expr = ParseExpression();
 			Expect(TokenKind::semicolon);
 		}
-		variable_decl->SetType(param_type);
-		sema->ActOnVariableDecl(variable_decl.get());
-		return variable_decl;
+		return sema->ActOnVariableDecl(name, variable_type, loc, std::move(init_expr));
 	}
 
-	std::unique_ptr<StmtAST> Parser::ParseStatement()
+	UniqueStmtPtr Parser::ParseStatement()
 	{
 		switch (current_token->GetKind())
 		{
@@ -196,21 +186,21 @@ namespace wave
 		return nullptr;
 	}
 
-	std::unique_ptr<CompoundStmtAST> Parser::ParseCompoundStatement()
+	UniqueCompoundStmtPtr Parser::ParseCompoundStatement()
 	{
-		SCOPED_SYMBOL_TABLE(sema->ctx.sym_table);
+		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
 		Expect(TokenKind::left_brace);
-		std::unique_ptr<CompoundStmtAST> compound_stmt = std::make_unique<CompoundStmtAST>();
+		UniqueCompoundStmtPtr compound_stmt = MakeUnique<CompoundStmtAST>();
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
 			if (Consume(TokenKind::KW_let))
 			{
-				std::unique_ptr<VariableDeclAST> decl = ParseVariableDeclaration(false);
-				compound_stmt->AddStatement(std::make_unique<DeclStmtAST>(std::move(decl)));
+				UniqueVariableDeclPtr decl = ParseVariableDeclaration(false);
+				compound_stmt->AddStatement(MakeUnique<DeclStmtAST>(std::move(decl)));
 			}
 			else
 			{
-				std::unique_ptr<StmtAST> stmt = ParseStatement();
+				UniqueStmtPtr stmt = ParseStatement();
 				compound_stmt->AddStatement(std::move(stmt));
 			}
 		}
@@ -218,57 +208,55 @@ namespace wave
 		return compound_stmt;
 	}
 
-	std::unique_ptr<ExprStmtAST> Parser::ParseExpressionStatement()
+	UniqueExprStmtPtr Parser::ParseExpressionStatement()
 	{
-		if (Consume(TokenKind::semicolon)) return std::make_unique<NullStmtAST>();
-		std::unique_ptr<ExprAST> expression = ParseExpression();
+		if (Consume(TokenKind::semicolon)) return MakeUnique<NullStmtAST>();
+		UniqueExprPtr expression = ParseExpression();
 		Expect(TokenKind::semicolon);
-		return std::make_unique<ExprStmtAST>(std::move(expression));
+		return MakeUnique<ExprStmtAST>(std::move(expression));
 	}
 
-	std::unique_ptr<ReturnStmtAST> Parser::ParseReturnStatement()
+	UniqueReturnStmtPtr Parser::ParseReturnStatement()
 	{
 		Expect(TokenKind::KW_return);
-		std::unique_ptr<ExprStmtAST> ret_expr_stmt = ParseExpressionStatement();
-		std::unique_ptr<ReturnStmtAST> return_stmt = std::make_unique<ReturnStmtAST>(std::move(ret_expr_stmt));
-		sema->ActOnReturnStmt(return_stmt.get());
+		UniqueExprStmtPtr ret_expr_stmt = ParseExpressionStatement();
+		UniqueReturnStmtPtr return_stmt = MakeUnique<ReturnStmtAST>(std::move(ret_expr_stmt));
 		return return_stmt;
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
-	std::unique_ptr<ExprAST> Parser::ParseBinaryExpression()
+	UniqueExprPtr Parser::ParseBinaryExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = (this->*ParseFn)();
+		UniqueExprPtr lhs = (this->*ParseFn)();
 		while (Consume(token_kind))
 		{
 			SourceLocation loc = current_token->GetLocation();
-			std::unique_ptr<ExprAST> rhs = (this->*ParseFn)();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = (this->*ParseFn)();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
-		sema->ActOnExpr(lhs.get());
 		return lhs;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseExpression()
+	UniqueExprPtr Parser::ParseExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseAssignmentExpression, TokenKind::comma, BinaryExprKind::Comma>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseParenthesizedExpression()
+	UniqueExprPtr Parser::ParseParenthesizedExpression()
 	{
 		Expect(TokenKind::left_round);
-		std::unique_ptr<ExprAST> expr = ParseExpression();
+		UniqueExprPtr expr = ParseExpression();
 		Expect(TokenKind::right_round);
 		return expr;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseAssignmentExpression()
+	UniqueExprPtr Parser::ParseAssignmentExpression()
 	{
 		TokenPtr current_token_copy = current_token;
-		std::unique_ptr<ExprAST> lhs = ParseConditionalExpression();
+		UniqueExprPtr lhs = ParseConditionalExpression();
 		BinaryExprKind arith_op_kind = BinaryExprKind::Assign;
 		SourceLocation loc = current_token->GetLocation();
 		switch (current_token->GetKind())
@@ -288,39 +276,39 @@ namespace wave
 			return lhs;
 		}
 		++current_token;
-		std::unique_ptr<ExprAST> rhs = ParseAssignmentExpression();
+		UniqueExprPtr rhs = ParseAssignmentExpression();
 		if (arith_op_kind != BinaryExprKind::Assign)
 		{
 			TokenPtr current_token_copy2 = current_token;
 			current_token = current_token_copy;
-			std::unique_ptr<ExprAST> lhs_copy = ParseConditionalExpression();
+			UniqueExprPtr lhs_copy = ParseConditionalExpression();
 			current_token = current_token_copy2;
 
-			std::unique_ptr<BinaryExprAST> tmp = std::make_unique<BinaryExprAST>(arith_op_kind, loc);
+			UniqueBinaryExprPtr tmp = MakeUnique<BinaryExprAST>(arith_op_kind, loc);
 			tmp->SetLHS(std::move(lhs_copy));
 			tmp->SetRHS(std::move(rhs));
 
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(BinaryExprKind::Assign, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(BinaryExprKind::Assign, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(tmp));
 			return parent;
 		}
 		else
 		{
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(arith_op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(arith_op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			return parent;
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseConditionalExpression()
+	UniqueExprPtr Parser::ParseConditionalExpression()
 	{
 		SourceLocation loc = current_token->GetLocation();
-		std::unique_ptr<ExprAST> cond = ParseLogicalOrExpression();
+		UniqueExprPtr cond = ParseLogicalOrExpression();
 		if (Consume(TokenKind::question))
 		{
-			std::unique_ptr<TernaryExprAST> ternary_expr = std::make_unique<TernaryExprAST>(loc);
+			UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExprAST>(loc);
 			ternary_expr->SetCondition(std::move(cond));
 			ternary_expr->SetTrueExpr(ParseExpression());
 			Expect(TokenKind::colon);
@@ -330,34 +318,34 @@ namespace wave
 		return cond;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseLogicalOrExpression()
+	UniqueExprPtr Parser::ParseLogicalOrExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseLogicalAndExpression, TokenKind::pipe_pipe, BinaryExprKind::LogicalOr>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseLogicalAndExpression()
+	UniqueExprPtr Parser::ParseLogicalAndExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseInclusiveOrExpression, TokenKind::amp_amp, BinaryExprKind::LogicalAnd>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseInclusiveOrExpression()
+	UniqueExprPtr Parser::ParseInclusiveOrExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseExclusiveOrExpression, TokenKind::pipe, BinaryExprKind::BitOr>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseExclusiveOrExpression()
+	UniqueExprPtr Parser::ParseExclusiveOrExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseAndExpression, TokenKind::caret, BinaryExprKind::BitXor>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseAndExpression()
+	UniqueExprPtr Parser::ParseAndExpression()
 	{
 		return ParseBinaryExpression<&Parser::ParseEqualityExpression, TokenKind::amp, BinaryExprKind::BitAnd>();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseEqualityExpression()
+	UniqueExprPtr Parser::ParseEqualityExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = ParseRelationalExpression();
+		UniqueExprPtr lhs = ParseRelationalExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -370,17 +358,17 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			std::unique_ptr<ExprAST> rhs = ParseRelationalExpression();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = ParseRelationalExpression();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseRelationalExpression()
+	UniqueExprPtr Parser::ParseRelationalExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = ParseShiftExpression();
+		UniqueExprPtr lhs = ParseShiftExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -395,17 +383,17 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			std::unique_ptr<ExprAST> rhs = ParseShiftExpression();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = ParseShiftExpression();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseShiftExpression()
+	UniqueExprPtr Parser::ParseShiftExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = ParseAdditiveExpression();
+		UniqueExprPtr lhs = ParseAdditiveExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -418,17 +406,17 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			std::unique_ptr<ExprAST> rhs = ParseAdditiveExpression();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = ParseAdditiveExpression();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseAdditiveExpression()
+	UniqueExprPtr Parser::ParseAdditiveExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = ParseMultiplicativeExpression();
+		UniqueExprPtr lhs = ParseMultiplicativeExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -441,17 +429,17 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			std::unique_ptr<ExprAST> rhs = ParseMultiplicativeExpression();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = ParseMultiplicativeExpression();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseMultiplicativeExpression()
+	UniqueExprPtr Parser::ParseMultiplicativeExpression()
 	{
-		std::unique_ptr<ExprAST> lhs = ParseCastExpression();
+		UniqueExprPtr lhs = ParseCastExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -465,15 +453,15 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			std::unique_ptr<ExprAST> rhs = ParseCastExpression();
-			std::unique_ptr<BinaryExprAST> parent = std::make_unique<BinaryExprAST>(op_kind, loc);
+			UniqueExprPtr rhs = ParseCastExpression();
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
 		}
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseCastExpression()
+	UniqueExprPtr Parser::ParseCastExpression()
 	{
 		if (current_token->Is(TokenKind::left_round) && (current_token + 1)->IsType())
 		{
@@ -483,36 +471,36 @@ namespace wave
 			Expect(TokenKind::right_round);
 
 			SourceLocation loc = current_token->GetLocation();
-			std::unique_ptr<CastExprAST> cast_expr = std::make_unique<CastExprAST>(loc, cast_type);
+			UniqueCastExprPtr cast_expr = MakeUnique<CastExprAST>(loc, cast_type);
 			cast_expr->SetOperand(ParseCastExpression());
 			return cast_expr;
 		}
 		else return ParseUnaryExpression();
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseUnaryExpression()
+	UniqueExprPtr Parser::ParseUnaryExpression()
 	{
-		std::unique_ptr<UnaryExprAST> unary_expr;
+		UniqueUnaryExprPtr unary_expr;
 		SourceLocation loc = current_token->GetLocation();
 		switch (current_token->GetKind())
 		{
 		case TokenKind::plus_plus:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::PreIncrement, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PreIncrement, loc);
 			break;
 		case TokenKind::minus_minus:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::PreDecrement, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PreDecrement, loc);
 			break;
 		case TokenKind::plus:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::Plus, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Plus, loc);
 			break;
 		case TokenKind::minus:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::Minus, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Minus, loc);
 			break;
 		case TokenKind::tilde:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::BitNot, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::BitNot, loc);
 			break;
 		case TokenKind::exclaim:
-			unary_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::LogicalNot, loc);
+			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::LogicalNot, loc);
 			break;
 		case TokenKind::KW_sizeof: return ParseSizeofExpression();
 		case TokenKind::KW_alignof: return ParseAlignofExpression();
@@ -525,23 +513,23 @@ namespace wave
 		return unary_expr;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParsePostFixExpression()
+	UniqueExprPtr Parser::ParsePostFixExpression()
 	{
-		std::unique_ptr<ExprAST> expr = ParsePrimaryExpression();
+		UniqueExprPtr expr = ParsePrimaryExpression();
 
 		SourceLocation loc = current_token->GetLocation();
 		switch (current_token->GetKind())
 		{
 		case TokenKind::left_round:
 		{
-			std::unique_ptr<FunctionCallExprAST> func_call_expr = std::make_unique<FunctionCallExprAST>(std::move(expr), current_token->GetLocation());
+			UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExprAST>(std::move(expr), current_token->GetLocation());
 			++current_token;
 
 			if (!Consume(TokenKind::right_round))
 			{
 				while (true)
 				{
-					std::unique_ptr<ExprAST> arg_expr = ParseAssignmentExpression();
+					UniqueExprPtr arg_expr = ParseAssignmentExpression();
 					func_call_expr->AddArgument(std::move(arg_expr));
 					if (Consume(TokenKind::right_round)) break;
 					Expect(TokenKind::comma);
@@ -552,25 +540,25 @@ namespace wave
 		case TokenKind::plus_plus:
 		{
 			++current_token;
-			std::unique_ptr<UnaryExprAST> post_inc_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::PostIncrement, loc);
+			UniqueUnaryExprPtr post_inc_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PostIncrement, loc);
 			post_inc_expr->SetOperand(std::move(expr));
 			return post_inc_expr;
 		}
 		case TokenKind::minus_minus:
 		{
 			++current_token;
-			std::unique_ptr<UnaryExprAST> post_dec_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::PostDecrement, loc);
+			UniqueUnaryExprPtr post_dec_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PostDecrement, loc);
 			post_dec_expr->SetOperand(std::move(expr));
 			return post_dec_expr;
 		}
 		case TokenKind::left_square:
 		{
 			++current_token;
-			std::unique_ptr<ExprAST> bracket_expr = ParseExpression();
+			UniqueExprPtr bracket_expr = ParseExpression();
 			Expect(TokenKind::right_square);
 
-			std::unique_ptr<UnaryExprAST> dereference_expr = std::make_unique<UnaryExprAST>(UnaryExprKind::Dereference, loc);
-			std::unique_ptr<BinaryExprAST> add_expr = std::make_unique<BinaryExprAST>(BinaryExprKind::Add, loc);
+			UniqueUnaryExprPtr dereference_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Dereference, loc);
+			UniqueBinaryExprPtr add_expr = MakeUnique<BinaryExprAST>(BinaryExprKind::Add, loc);
 			add_expr->SetLHS(std::move(expr));
 			add_expr->SetRHS(std::move(bracket_expr));
 			dereference_expr->SetOperand(std::move(add_expr));
@@ -580,22 +568,22 @@ namespace wave
 		return expr;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParseSizeofExpression()
+	UniqueExprPtr Parser::ParseSizeofExpression()
 	{
 		return nullptr;
 	}
 
-	std::unique_ptr<IntLiteralAST> Parser::ParseAlignofExpression()
+	UniqueIntLiteralPtr Parser::ParseAlignofExpression()
 	{
 		return nullptr;
 	}
 
-	std::unique_ptr<IntLiteralAST> Parser::ParseAlignasExpression()
+	UniqueIntLiteralPtr Parser::ParseAlignasExpression()
 	{
 		return nullptr;
 	}
 
-	std::unique_ptr<ExprAST> Parser::ParsePrimaryExpression()
+	UniqueExprPtr Parser::ParsePrimaryExpression()
 	{
 		switch (current_token->GetKind())
 		{
@@ -610,33 +598,32 @@ namespace wave
 		return nullptr;
 	}
 
-	std::unique_ptr<IntLiteralAST> Parser::ParseIntegerLiteral()
+	UniqueIntLiteralPtr Parser::ParseIntegerLiteral()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::number));
 		std::string_view string_number = current_token->GetIdentifier();
 		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return std::make_unique<IntLiteralAST>(value, loc);
+		return MakeUnique<IntLiteralAST>(value, loc);
 	}
 
-	std::unique_ptr<StringLiteralAST> Parser::ParseStringLiteral()
+	UniqueStringLiteralPtr Parser::ParseStringLiteral()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::string_literal));
 		std::string_view str = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return std::make_unique<StringLiteralAST>(str, loc);
+		return MakeUnique<StringLiteralAST>(str, loc);
 	}
 
-	std::unique_ptr<IdentifierAST> Parser::ParseIdentifier()
+	UniqueIdentifierPtr Parser::ParseIdentifier()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::identifier));
 		std::string_view name = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		std::unique_ptr<IdentifierAST> identifier = std::make_unique<IdentifierAST>(name, loc);
-		sema->ActOnIdentifier(identifier.get());
+		UniqueIdentifierPtr identifier = MakeUnique<IdentifierAST>(name, loc);
 		return identifier;
 	}
 

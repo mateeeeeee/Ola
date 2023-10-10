@@ -167,6 +167,7 @@
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />
     <ClInclude Include="Core\Logger.h" />
+    <ClInclude Include="Frontend\AliasAST.h" />
     <ClInclude Include="Frontend\AST.h" />
     <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\ForwardAST.h" />
@@ -176,7 +177,7 @@
     <ClInclude Include="Frontend\Sema.h" />
     <ClInclude Include="Frontend\SourceBuffer.h" />
     <ClInclude Include="Frontend\SourceLocation.h" />
-    <ClInclude Include="Frontend\Symbol.h" />
+    <ClInclude Include="Frontend\Scope.h" />
     <ClInclude Include="Frontend\Token.h" />
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Frontend\Type.h" />

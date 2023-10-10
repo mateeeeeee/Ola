@@ -1,6 +1,6 @@
 #pragma once
-#include "Symbol.h"
-#include "ForwardAST.h"
+#include "Scope.h"
+#include "AST.h"
 
 namespace wave
 {
@@ -18,33 +18,24 @@ namespace wave
 		friend class Parser;
 		struct Context
 		{
-			SymbolTable<Symbol> sym_table;
+			ScopeStack<DeclAST> decl_scope_stack;
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 		};
 
 	public:
 		explicit Sema(Diagnostics& diagnostics);
+		WAVE_NONCOPYABLE(Sema);
+		WAVE_DEFAULT_MOVABLE(Sema);
 		~Sema();
 
 	private:
-		WAVE_NONCOPYABLE(Sema);
-		WAVE_DEFAULT_MOVABLE(Sema);
-
-		void ActOnVariableDecl(VariableDeclAST* var_decl);
-		void ActOnFunctionDecl(FunctionDeclAST* function_decl);
-		void ActOnReturnStmt(ReturnStmtAST* return_stmt);
-		void ActOnExpr(ExprAST* expr);
-		void ActOnIdentifier(IdentifierAST* identifier);
+		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueExprPtr&& init_expr);
+		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, QualifiedType const& type, SourceLocation const& loc, UniqueVariableDeclPtrList&& param_decls);
+		void ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition);
 
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;
-
-	private:
-
-		void ActOnUnaryExpr(UnaryExprAST* unary_expr);
-		void ActOnBinaryExpr(BinaryExprAST* binary_expr);
-		void ActOnCastExpr(CastExprAST* cast_expr);
 	};
 }

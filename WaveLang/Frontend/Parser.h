@@ -3,7 +3,7 @@
 #include <memory>
 #include "Token.h"
 #include "Diagnostics.h"
-#include "ForwardAST.h"
+#include "AliasAST.h"
 
 namespace wave
 {
@@ -12,7 +12,7 @@ namespace wave
 	class Parser;
 	
 	enum class BinaryExprKind : uint8;
-	using ExprParseFn = std::unique_ptr<ExprAST>(Parser::*)();
+	using ExprParseFn = UniqueExprPtr(Parser::*)();
 
 	class Parser
 	{
@@ -71,42 +71,42 @@ namespace wave
 
 		void PreprocessTokens();
 		void ParseTranslationUnit();
-		[[nodiscard]] std::unique_ptr<DeclAST> ParseGlobalDeclaration();
-		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDeclaration(bool expect_semicolon = true);
-		[[nodiscard]] std::unique_ptr<FunctionDeclAST> ParseFunctionDefinition();
-		[[nodiscard]] std::unique_ptr<VariableDeclAST> ParseVariableDeclaration(bool function_param_decl);
+		[[nodiscard]] UniqueDeclPtr ParseGlobalDeclaration();
+		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDeclaration(bool expect_semicolon = true);
+		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDefinition();
+		[[nodiscard]] UniqueVariableDeclPtr ParseVariableDeclaration(bool function_param_decl);
 
-		[[nodiscard]] std::unique_ptr<StmtAST> ParseStatement();
-		[[nodiscard]] std::unique_ptr<CompoundStmtAST> ParseCompoundStatement();
-		[[nodiscard]] std::unique_ptr<ExprStmtAST> ParseExpressionStatement();
-		[[nodiscard]] std::unique_ptr<ReturnStmtAST> ParseReturnStatement();
+		[[nodiscard]] UniqueStmtPtr ParseStatement();
+		[[nodiscard]] UniqueCompoundStmtPtr ParseCompoundStatement();
+		[[nodiscard]] UniqueExprStmtPtr ParseExpressionStatement();
+		[[nodiscard]] UniqueReturnStmtPtr ParseReturnStatement();
 
 		template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseBinaryExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseParenthesizedExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseAssignmentExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseConditionalExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseLogicalOrExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseLogicalAndExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseInclusiveOrExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseExclusiveOrExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseAndExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseEqualityExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseRelationalExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseShiftExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseAdditiveExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseMultiplicativeExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseCastExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseUnaryExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParsePostFixExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParseSizeofExpression();
-		[[nodiscard]] std::unique_ptr<IntLiteralAST> ParseAlignofExpression();
-		[[nodiscard]] std::unique_ptr<IntLiteralAST> ParseAlignasExpression();
-		[[nodiscard]] std::unique_ptr<ExprAST> ParsePrimaryExpression();
-		[[nodiscard]] std::unique_ptr<IntLiteralAST> ParseIntegerLiteral();
-		[[nodiscard]] std::unique_ptr<StringLiteralAST> ParseStringLiteral();
-		[[nodiscard]] std::unique_ptr<IdentifierAST> ParseIdentifier();
+		[[nodiscard]] UniqueExprPtr ParseBinaryExpression();
+		[[nodiscard]] UniqueExprPtr ParseExpression();
+		[[nodiscard]] UniqueExprPtr ParseParenthesizedExpression();
+		[[nodiscard]] UniqueExprPtr ParseAssignmentExpression();
+		[[nodiscard]] UniqueExprPtr ParseConditionalExpression();
+		[[nodiscard]] UniqueExprPtr ParseLogicalOrExpression();
+		[[nodiscard]] UniqueExprPtr ParseLogicalAndExpression();
+		[[nodiscard]] UniqueExprPtr ParseInclusiveOrExpression();
+		[[nodiscard]] UniqueExprPtr ParseExclusiveOrExpression();
+		[[nodiscard]] UniqueExprPtr ParseAndExpression();
+		[[nodiscard]] UniqueExprPtr ParseEqualityExpression();
+		[[nodiscard]] UniqueExprPtr ParseRelationalExpression();
+		[[nodiscard]] UniqueExprPtr ParseShiftExpression();
+		[[nodiscard]] UniqueExprPtr ParseAdditiveExpression();
+		[[nodiscard]] UniqueExprPtr ParseMultiplicativeExpression();
+		[[nodiscard]] UniqueExprPtr ParseCastExpression();
+		[[nodiscard]] UniqueExprPtr ParseUnaryExpression();
+		[[nodiscard]] UniqueExprPtr ParsePostFixExpression();
+		[[nodiscard]] UniqueExprPtr ParseSizeofExpression();
+		[[nodiscard]] UniqueIntLiteralPtr ParseAlignofExpression();
+		[[nodiscard]] UniqueIntLiteralPtr ParseAlignasExpression();
+		[[nodiscard]] UniqueExprPtr ParsePrimaryExpression();
+		[[nodiscard]] UniqueIntLiteralPtr ParseIntegerLiteral();
+		[[nodiscard]] UniqueStringLiteralPtr ParseStringLiteral();
+		[[nodiscard]] UniqueIdentifierPtr ParseIdentifier();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);
