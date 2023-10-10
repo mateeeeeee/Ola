@@ -1,5 +1,5 @@
 #include "LLVMCodegen.h"
-#include "LLVMVisitorAST.h"
+#include "LLVMVisitor.h"
 
 namespace wave
 {
@@ -15,7 +15,7 @@ namespace wave
 
 	void LLVMCodegen::Generate(AST const* ast)
 	{
-		LLVMVisitorAST llvm_visitor(ast);
+		LLVMVisitor llvm_visitor(ast);
 	}
 
 }

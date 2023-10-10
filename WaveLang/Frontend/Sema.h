@@ -18,7 +18,7 @@ namespace wave
 		friend class Parser;
 		struct Context
 		{
-			ScopeStack<DeclAST> decl_scope_stack;
+			ScopeStack<Decl> decl_scope_stack;
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 		};

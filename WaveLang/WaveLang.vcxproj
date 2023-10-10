@@ -148,7 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Backend\LLVMCodegen.cpp" />
-    <ClCompile Include="Backend\LLVMVisitorAST.cpp" />
+    <ClCompile Include="Backend\LLVMVisitor.cpp" />
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Frontend\AST.cpp" />
     <ClCompile Include="Frontend\Diagnostics.cpp" />
@@ -162,16 +162,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Backend\LLVMCodegen.h" />
-    <ClInclude Include="Backend\LLVMVisitorAST.h" />
+    <ClInclude Include="Backend\LLVMVisitor.h" />
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />
     <ClInclude Include="Core\Defines.h" />
     <ClInclude Include="Core\Logger.h" />
-    <ClInclude Include="Frontend\AliasAST.h" />
+    <ClInclude Include="Frontend\ASTTypeAliases.h" />
     <ClInclude Include="Frontend\AST.h" />
     <ClInclude Include="Frontend\Diagnostics.h" />
-    <ClInclude Include="Frontend\ForwardAST.h" />
-    <ClInclude Include="Frontend\IVisitorAST.h" />
+    <ClInclude Include="Frontend\ASTForwardDeclarations.h" />
+    <ClInclude Include="Frontend\ASTVisitor.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\Parser.h" />
     <ClInclude Include="Frontend\Sema.h" />

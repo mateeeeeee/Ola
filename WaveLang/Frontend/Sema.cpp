@@ -31,7 +31,7 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier);
 		}
 
-		std::unique_ptr<VariableDeclAST> var_decl = std::make_unique<VariableDeclAST>(name, loc);
+		std::unique_ptr<VariableDecl> var_decl = std::make_unique<VariableDecl>(name, loc);
 		var_decl->SetInitExpr(std::move(init_expr));
 		if (has_init && !has_type_specifier)
 		{
@@ -54,7 +54,7 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier);
 		}
-		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDeclAST>(name, loc);
+		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetParamDeclarations(std::move(param_decls));
 		bool result = ctx.decl_scope_stack.Insert(function_decl.get());

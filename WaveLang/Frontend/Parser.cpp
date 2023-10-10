@@ -190,13 +190,13 @@ namespace wave
 	{
 		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
 		Expect(TokenKind::left_brace);
-		UniqueCompoundStmtPtr compound_stmt = MakeUnique<CompoundStmtAST>();
+		UniqueCompoundStmtPtr compound_stmt = MakeUnique<CompoundStmt>();
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
 			if (Consume(TokenKind::KW_let))
 			{
 				UniqueVariableDeclPtr decl = ParseVariableDeclaration(false);
-				compound_stmt->AddStatement(MakeUnique<DeclStmtAST>(std::move(decl)));
+				compound_stmt->AddStatement(MakeUnique<DeclStmt>(std::move(decl)));
 			}
 			else
 			{
@@ -210,17 +210,17 @@ namespace wave
 
 	UniqueExprStmtPtr Parser::ParseExpressionStatement()
 	{
-		if (Consume(TokenKind::semicolon)) return MakeUnique<NullStmtAST>();
+		if (Consume(TokenKind::semicolon)) return MakeUnique<NullStmt>();
 		UniqueExprPtr expression = ParseExpression();
 		Expect(TokenKind::semicolon);
-		return MakeUnique<ExprStmtAST>(std::move(expression));
+		return MakeUnique<ExprStmt>(std::move(expression));
 	}
 
 	UniqueReturnStmtPtr Parser::ParseReturnStatement()
 	{
 		Expect(TokenKind::KW_return);
 		UniqueExprStmtPtr ret_expr_stmt = ParseExpressionStatement();
-		UniqueReturnStmtPtr return_stmt = MakeUnique<ReturnStmtAST>(std::move(ret_expr_stmt));
+		UniqueReturnStmtPtr return_stmt = MakeUnique<ReturnStmt>(std::move(ret_expr_stmt));
 		return return_stmt;
 	}
 
@@ -232,7 +232,7 @@ namespace wave
 		{
 			SourceLocation loc = current_token->GetLocation();
 			UniqueExprPtr rhs = (this->*ParseFn)();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -284,18 +284,18 @@ namespace wave
 			UniqueExprPtr lhs_copy = ParseConditionalExpression();
 			current_token = current_token_copy2;
 
-			UniqueBinaryExprPtr tmp = MakeUnique<BinaryExprAST>(arith_op_kind, loc);
+			UniqueBinaryExprPtr tmp = MakeUnique<BinaryExpr>(arith_op_kind, loc);
 			tmp->SetLHS(std::move(lhs_copy));
 			tmp->SetRHS(std::move(rhs));
 
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(BinaryExprKind::Assign, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(BinaryExprKind::Assign, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(tmp));
 			return parent;
 		}
 		else
 		{
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(arith_op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(arith_op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			return parent;
@@ -308,7 +308,7 @@ namespace wave
 		UniqueExprPtr cond = ParseLogicalOrExpression();
 		if (Consume(TokenKind::question))
 		{
-			UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExprAST>(loc);
+			UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
 			ternary_expr->SetCondition(std::move(cond));
 			ternary_expr->SetTrueExpr(ParseExpression());
 			Expect(TokenKind::colon);
@@ -359,7 +359,7 @@ namespace wave
 			}
 			++current_token;
 			UniqueExprPtr rhs = ParseRelationalExpression();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -384,7 +384,7 @@ namespace wave
 			}
 			++current_token;
 			UniqueExprPtr rhs = ParseShiftExpression();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -407,7 +407,7 @@ namespace wave
 			}
 			++current_token;
 			UniqueExprPtr rhs = ParseAdditiveExpression();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -430,7 +430,7 @@ namespace wave
 			}
 			++current_token;
 			UniqueExprPtr rhs = ParseMultiplicativeExpression();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -454,7 +454,7 @@ namespace wave
 			}
 			++current_token;
 			UniqueExprPtr rhs = ParseCastExpression();
-			UniqueBinaryExprPtr parent = MakeUnique<BinaryExprAST>(op_kind, loc);
+			UniqueBinaryExprPtr parent = MakeUnique<BinaryExpr>(op_kind, loc);
 			parent->SetLHS(std::move(lhs));
 			parent->SetRHS(std::move(rhs));
 			lhs = std::move(parent);
@@ -471,7 +471,7 @@ namespace wave
 			Expect(TokenKind::right_round);
 
 			SourceLocation loc = current_token->GetLocation();
-			UniqueCastExprPtr cast_expr = MakeUnique<CastExprAST>(loc, cast_type);
+			UniqueCastExprPtr cast_expr = MakeUnique<CastExpr>(loc, cast_type);
 			cast_expr->SetOperand(ParseCastExpression());
 			return cast_expr;
 		}
@@ -485,22 +485,22 @@ namespace wave
 		switch (current_token->GetKind())
 		{
 		case TokenKind::plus_plus:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PreIncrement, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::PreIncrement, loc);
 			break;
 		case TokenKind::minus_minus:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PreDecrement, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::PreDecrement, loc);
 			break;
 		case TokenKind::plus:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Plus, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::Plus, loc);
 			break;
 		case TokenKind::minus:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Minus, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::Minus, loc);
 			break;
 		case TokenKind::tilde:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::BitNot, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::BitNot, loc);
 			break;
 		case TokenKind::exclaim:
-			unary_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::LogicalNot, loc);
+			unary_expr = MakeUnique<UnaryExpr>(UnaryExprKind::LogicalNot, loc);
 			break;
 		case TokenKind::KW_sizeof: return ParseSizeofExpression();
 		case TokenKind::KW_alignof: return ParseAlignofExpression();
@@ -522,7 +522,7 @@ namespace wave
 		{
 		case TokenKind::left_round:
 		{
-			UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExprAST>(std::move(expr), current_token->GetLocation());
+			UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(std::move(expr), current_token->GetLocation());
 			++current_token;
 
 			if (!Consume(TokenKind::right_round))
@@ -540,14 +540,14 @@ namespace wave
 		case TokenKind::plus_plus:
 		{
 			++current_token;
-			UniqueUnaryExprPtr post_inc_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PostIncrement, loc);
+			UniqueUnaryExprPtr post_inc_expr = MakeUnique<UnaryExpr>(UnaryExprKind::PostIncrement, loc);
 			post_inc_expr->SetOperand(std::move(expr));
 			return post_inc_expr;
 		}
 		case TokenKind::minus_minus:
 		{
 			++current_token;
-			UniqueUnaryExprPtr post_dec_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::PostDecrement, loc);
+			UniqueUnaryExprPtr post_dec_expr = MakeUnique<UnaryExpr>(UnaryExprKind::PostDecrement, loc);
 			post_dec_expr->SetOperand(std::move(expr));
 			return post_dec_expr;
 		}
@@ -557,8 +557,8 @@ namespace wave
 			UniqueExprPtr bracket_expr = ParseExpression();
 			Expect(TokenKind::right_square);
 
-			UniqueUnaryExprPtr dereference_expr = MakeUnique<UnaryExprAST>(UnaryExprKind::Dereference, loc);
-			UniqueBinaryExprPtr add_expr = MakeUnique<BinaryExprAST>(BinaryExprKind::Add, loc);
+			UniqueUnaryExprPtr dereference_expr = MakeUnique<UnaryExpr>(UnaryExprKind::Dereference, loc);
+			UniqueBinaryExprPtr add_expr = MakeUnique<BinaryExpr>(BinaryExprKind::Add, loc);
 			add_expr->SetLHS(std::move(expr));
 			add_expr->SetRHS(std::move(bracket_expr));
 			dereference_expr->SetOperand(std::move(add_expr));
@@ -605,7 +605,7 @@ namespace wave
 		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return MakeUnique<IntLiteralAST>(value, loc);
+		return MakeUnique<IntLiteral>(value, loc);
 	}
 
 	UniqueStringLiteralPtr Parser::ParseStringLiteral()
@@ -614,7 +614,7 @@ namespace wave
 		std::string_view str = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return MakeUnique<StringLiteralAST>(str, loc);
+		return MakeUnique<StringLiteral>(str, loc);
 	}
 
 	UniqueIdentifierPtr Parser::ParseIdentifier()
@@ -623,7 +623,7 @@ namespace wave
 		std::string_view name = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		UniqueIdentifierPtr identifier = MakeUnique<IdentifierAST>(name, loc);
+		UniqueIdentifierPtr identifier = MakeUnique<Identifier>(name, loc);
 		return identifier;
 	}
 

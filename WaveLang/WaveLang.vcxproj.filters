@@ -32,7 +32,7 @@
     <ClCompile Include="Backend\LLVMCodegen.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
-    <ClCompile Include="Backend\LLVMVisitorAST.cpp">
+    <ClCompile Include="Backend\LLVMVisitor.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
   </ItemGroup>
@@ -114,19 +114,19 @@
     <ClInclude Include="Core\Logger.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Frontend\ForwardAST.h">
+    <ClInclude Include="Frontend\ASTForwardDeclarations.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
     <ClInclude Include="Backend\LLVMCodegen.h">
       <Filter>Backend</Filter>
     </ClInclude>
-    <ClInclude Include="Frontend\IVisitorAST.h">
+    <ClInclude Include="Frontend\ASTVisitor.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="Backend\LLVMVisitorAST.h">
+    <ClInclude Include="Backend\LLVMVisitor.h">
       <Filter>Backend</Filter>
     </ClInclude>
-    <ClInclude Include="Frontend\AliasAST.h">
+    <ClInclude Include="Frontend\ASTTypeAliases.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
   </ItemGroup>
