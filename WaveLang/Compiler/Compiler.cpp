@@ -6,7 +6,7 @@
 #include "Frontend/Lexer.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
-#include "Backend/LLVMCodegen.h"
+#include "Backend/LLVMIRGenerator.h"
 #include "Utility/DebugVisitor.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -37,10 +37,10 @@ namespace wave
 			src.Prepend("");
 		}
 
-		void CompileTranslationUnit(std::string_view source_filename, bool ast_dump)
+		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, bool ast_dump)
 		{
 			Diagnostics diagnostics{};
-			SourceBuffer src(source_filename);
+			SourceBuffer src(source_file);
 			AddBuiltins(src);
 			Lexer lex(diagnostics, src);
 			lex.Lex();
@@ -50,8 +50,8 @@ namespace wave
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
-			LLVMCodegen llvm_codegen(source_filename);
-			llvm_codegen.Generate(ast);
+			LLVMIRGenerator llvm_ir_generator(ir_file);
+			llvm_ir_generator.Generate(ast);
 		}
 	}
 
@@ -69,11 +69,12 @@ namespace wave
 		{
 			fs::path file_name = fs::path(input.sources[i]).stem();
 			fs::path file_ext = fs::path(input.sources[i]).extension();
-			fs::path assembly_file = directory_path / file_name;  assembly_file += ".asm";
+			fs::path assembly_file = directory_path / file_name;  assembly_file += ".s";
 			fs::path object_file = directory_path / file_name; object_file += ".obj";
+			fs::path ir_file = directory_path / file_name; ir_file += ".ll";
 			fs::path source_file = directory_path / input.sources[i];
 
-			CompileTranslationUnit(source_file.string(), ast_dump);
+			CompileTranslationUnit(source_file.string(), ir_file.string(), ast_dump);
 			object_files[i] = object_file;
 		}
 		return 0;

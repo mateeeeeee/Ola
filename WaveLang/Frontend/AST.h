@@ -25,6 +25,7 @@ namespace wave
 		{
 			declarations.push_back(std::move(declaration));
 		}
+		UniqueDeclPtrList const& GetDeclarations() const { return declarations; }
 
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
 		virtual void Accept(ASTVisitor& visitor) const override;
@@ -95,6 +96,9 @@ namespace wave
 		{
 			return definition == nullptr;
 		}
+
+		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
+		CompoundStmt const* GetBody() const { return definition.get(); }
 
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
 		virtual void Accept(ASTVisitor& visitor) const override;

@@ -1,19 +1,19 @@
-#include "LLVMCodegen.h"
+#include "LLVMIRGenerator.h"
 #include "LLVMVisitor.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FileSystem.h"
 
 namespace wave
 {
-	LLVMCodegen::LLVMCodegen(std::string_view output_file)
+	LLVMIRGenerator::LLVMIRGenerator(std::string_view output_file) : output_file(output_file)
 	{
 	}
 
-	LLVMCodegen::~LLVMCodegen()
+	LLVMIRGenerator::~LLVMIRGenerator()
 	{
 	}
 
-	void LLVMCodegen::Generate(AST const* ast)
+	void LLVMIRGenerator::Generate(AST const* ast)
 	{
 		LLVMVisitor llvm_visitor(ast);
 		std::error_code error;

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
 #include "Frontend/ASTVisitor.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
@@ -7,13 +8,26 @@
 namespace llvm
 {
 	class Module;
+	class Value;
+	class Type;
 }
 
 namespace wave
 {
+	class QualifiedType;
+
 	class LLVMVisitor : public ASTVisitor
 	{
-		friend class LLVMCodegen;
+		friend class LLVMIRGenerator;
+
+		struct VoidPointerHash
+		{
+			size_t operator()(void const* ptr) const
+			{
+				return reinterpret_cast<size_t>(ptr);
+			}
+		};
+		using LLVMValueMap = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
 
 	private:
 		explicit LLVMVisitor(AST const* ast);
@@ -46,6 +60,9 @@ namespace wave
 		llvm::LLVMContext context;
 		llvm::IRBuilder<> builder;
 		std::unique_ptr<llvm::Module> module;
+		LLVMValueMap llvm_value_map;
 
+	private:
+		llvm::Type* ConvertToLLVMType(QualifiedType const& type);
 	};
 }

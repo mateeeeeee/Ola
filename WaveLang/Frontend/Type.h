@@ -182,6 +182,9 @@ namespace wave
 			else return false;
 		}
 
+		QualifiedType const& GetBaseType() const { return base_type; }
+		uint32 GetArraySize() const { return array_size; }
+
 	private:
 		QualifiedType base_type;
 		uint32 array_size = 0;
@@ -204,7 +207,7 @@ namespace wave
 		}
 
 		QualifiedType const& GetReturnType() const { return return_type; }
-		std::span<const FunctionParameter> GetParameters() const { return params; }
+		std::span<FunctionParameter const> GetParameters() const { return params; }
 
 	private:
 		QualifiedType return_type;

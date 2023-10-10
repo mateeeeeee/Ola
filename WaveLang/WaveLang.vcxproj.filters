@@ -29,7 +29,7 @@
     <ClCompile Include="Utility\DebugVisitor.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Backend\LLVMCodegen.cpp">
+    <ClCompile Include="Backend\LLVMIRGenerator.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
     <ClCompile Include="Backend\LLVMVisitor.cpp">
@@ -117,7 +117,7 @@
     <ClInclude Include="Frontend\ASTForwardDeclarations.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="Backend\LLVMCodegen.h">
+    <ClInclude Include="Backend\LLVMIRGenerator.h">
       <Filter>Backend</Filter>
     </ClInclude>
     <ClInclude Include="Frontend\ASTVisitor.h">

@@ -5,11 +5,11 @@ namespace wave
 {
 	struct AST;
 
-	class LLVMCodegen
+	class LLVMIRGenerator
 	{
 	public:
-		explicit LLVMCodegen(std::string_view output_file);
-		~LLVMCodegen();
+		explicit LLVMIRGenerator(std::string_view output_file);
+		~LLVMIRGenerator();
 
 		void Generate(AST const* ast);
 
