@@ -36,11 +36,12 @@ namespace wave
 	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
 
 	using UniqueVariableDeclPtrList = std::vector<UniqueVariableDeclPtr>;
-	using VariableDeclPtrList		= std::vector<VariableDecl*>;
 	using UniqueDeclPtrList			= std::vector<UniqueDeclPtr>;
-	using DeclPtrList				= std::vector<Decl*>;
 	using UniqueStmtPtrList			= std::vector<UniqueStmtPtr>;
-	using StmtPtrList				= std::vector<Stmt*>;
 	using UniqueExprPtrList			= std::vector<UniqueExprPtr>;
-	using ExprPtrList				= std::vector<Expr*>;
+	using ExprPtrList				= std::vector<Expr const*>;
+	using DeclPtrList				= std::vector<Decl const*>;
+	using StmtPtrList				= std::vector<Stmt const*>;
+	using VariableDeclPtrList		= std::vector<VariableDecl const*>;
+
 }
