@@ -138,6 +138,15 @@ namespace wave
 		case BinaryExprKind::Add:
 			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
 			break;
+		case BinaryExprKind::Subtract:
+			result = builder.CreateSub(lhs_value, rhs_value, "subtmp");
+			break;
+		case BinaryExprKind::Multiply:
+			result = builder.CreateMul(lhs_value, rhs_value, "multmp");
+			break;
+		case BinaryExprKind::Divide:
+			result = builder.CreateSDiv(lhs_value, rhs_value, "sdivtmp");
+			break;
 		}
 		WAVE_ASSERT(result);
 		llvm_value_map[&binary_expr] = result;
