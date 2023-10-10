@@ -85,7 +85,7 @@ namespace wave
 		true_expr->Accept(visitor, depth + 1);
 		false_expr->Accept(visitor, depth + 1);
 	}
-	void IntLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ConstantInt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -181,7 +181,7 @@ namespace wave
 		WAVE_ASSERT(cond_expr && true_expr && false_expr);
 		visitor.Visit(*this, 0);
 	}
-	void IntLiteral::Accept(ASTVisitor& visitor) const
+	void ConstantInt::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

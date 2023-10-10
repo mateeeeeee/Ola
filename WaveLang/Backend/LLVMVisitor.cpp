@@ -25,7 +25,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(TranslationUnit const& translation_unit, uint32 depth)
 	{
-		for (auto&& decl : translation_unit.GetDeclarations()) decl->Accept(*this);
+		for (auto&& decl : translation_unit.GetDecls()) decl->Accept(*this);
 	}
 
 	void LLVMVisitor::Visit(Decl const& decl, uint32 depth)
@@ -59,39 +59,54 @@ namespace wave
 		llvm_value_map[&function_decl] = llvm_function;
 	}
 
-	void LLVMVisitor::Visit(VariableDecl const& node, uint32 depth)
+	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32 depth)
 	{
+		llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
+		llvm::AllocaInst* alloca_inst = builder.CreateAlloca(llvm_type, nullptr, var_decl.GetName());
 
+		if (var_decl.GetInitExpr()) 
+		{
+			var_decl.GetInitExpr()->Accept(*this);
+			llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
+			builder.CreateStore(init_value, alloca_inst);
+		}
+		llvm_value_map[&var_decl] = alloca_inst;
 	}
 
-	void LLVMVisitor::Visit(Stmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(Stmt const& stmt, uint32 depth)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(CompoundStmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(CompoundStmt const& compound_stmt, uint32 depth)
 	{
-
+		for (auto const& statement : compound_stmt.GetStmts()) statement->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(ExprStmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32 depth)
 	{
-
+		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(DeclStmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32 depth)
 	{
-
+		if (decl_stmt.GetDecl()) decl_stmt.GetDecl()->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(NullStmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(NullStmt const& null_stmt, uint32 depth) {}
+
+	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32 depth)
 	{
-
-	}
-
-	void LLVMVisitor::Visit(ReturnStmt const& node, uint32 depth)
-	{
-
+		if (return_stmt.GetExprStmt()) 
+		{
+			return_stmt.GetExprStmt()->Accept(*this);
+			llvm::Value* return_value = llvm_value_map[return_stmt.GetExprStmt()];
+			builder.CreateRet(return_value);
+		}
+		else 
+		{
+			builder.CreateRetVoid();
+		}
 	}
 
 	void LLVMVisitor::Visit(IfStmt const& node, uint32 depth)
@@ -109,9 +124,23 @@ namespace wave
 
 	}
 
-	void LLVMVisitor::Visit(BinaryExpr const& node, uint32 depth)
+	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32 depth)
 	{
-		
+		binary_expr.GetLHS()->Accept(*this);
+		llvm::Value* lhs_value = llvm_value_map[binary_expr.GetLHS()];  
+		binary_expr.GetRHS()->Accept(*this);
+		llvm::Value* rhs_value = llvm_value_map[binary_expr.GetRHS()];
+		WAVE_ASSERT(lhs_value && rhs_value);
+
+		llvm::Value* result = nullptr;
+		switch (binary_expr.GetBinaryKind()) 
+		{
+		case BinaryExprKind::Add:
+			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
+			break;
+		}
+		WAVE_ASSERT(result);
+		llvm_value_map[&binary_expr] = result;
 	}
 
 	void LLVMVisitor::Visit(TernaryExpr const& node, uint32 depth)
@@ -119,9 +148,10 @@ namespace wave
 
 	}
 
-	void LLVMVisitor::Visit(IntLiteral const& node, uint32 depth)
+	void LLVMVisitor::Visit(ConstantInt const& int_literal, uint32 depth)
 	{
-
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), int_literal.GetValue());
+		llvm_value_map[&int_literal] = constant;
 	}
 
 	void LLVMVisitor::Visit(StringLiteral const& node, uint32 depth)
@@ -131,7 +161,14 @@ namespace wave
 
 	void LLVMVisitor::Visit(IdentifierExpr const& node, uint32 depth)
 	{
+		WAVE_ASSERT(false);
+	}
 
+	void LLVMVisitor::Visit(DeclRefExpr const& decl_ref, uint32 depth)
+	{
+		llvm::Value* value = llvm_value_map[decl_ref.GetDecl()];
+		WAVE_ASSERT(value);
+		llvm_value_map[&decl_ref] = value;
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)

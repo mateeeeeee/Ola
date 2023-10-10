@@ -138,6 +138,7 @@
       <Filter>Frontend\Lexer</Filter>
     </None>
     <None Include="test.wv" />
+    <None Include="test.ll" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />

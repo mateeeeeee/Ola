@@ -199,6 +199,7 @@
     <None Include="Frontend\Tokens.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="test.ll" />
     <None Include="test.wv" />
   </ItemGroup>
   <ItemGroup>

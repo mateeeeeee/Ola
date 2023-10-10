@@ -21,7 +21,7 @@ namespace wave
 	class UnaryExpr;
 	class BinaryExpr;
 	class TernaryExpr;
-	class IntLiteral;
+	class ConstantInt;
 	class StringLiteral;
 	class IdentifierExpr;
 	class CastExpr;

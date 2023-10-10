@@ -51,7 +51,7 @@ namespace wave
 	{
 		while (current_token->IsNot(TokenKind::eof))
 		{
-			ast->translation_unit->AddDeclaration(ParseGlobalDeclaration());
+			ast->translation_unit->AddDecl(ParseGlobalDeclaration());
 		}
 	}
 
@@ -196,12 +196,12 @@ namespace wave
 			if (Consume(TokenKind::KW_let))
 			{
 				UniqueVariableDeclPtr decl = ParseVariableDeclaration(false);
-				compound_stmt->AddStatement(MakeUnique<DeclStmt>(std::move(decl)));
+				compound_stmt->AddStmt(MakeUnique<DeclStmt>(std::move(decl)));
 			}
 			else
 			{
 				UniqueStmtPtr stmt = ParseStatement();
-				compound_stmt->AddStatement(std::move(stmt));
+				compound_stmt->AddStmt(std::move(stmt));
 			}
 		}
 		Expect(TokenKind::right_brace);
@@ -530,7 +530,7 @@ namespace wave
 				while (true)
 				{
 					UniqueExprPtr arg_expr = ParseAssignmentExpression();
-					func_call_expr->AddArgument(std::move(arg_expr));
+					func_call_expr->AddArg(std::move(arg_expr));
 					if (Consume(TokenKind::right_round)) break;
 					Expect(TokenKind::comma);
 				}
@@ -605,7 +605,7 @@ namespace wave
 		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return MakeUnique<IntLiteral>(value, loc);
+		return MakeUnique<ConstantInt>(value, loc);
 	}
 
 	UniqueStringLiteralPtr Parser::ParseStringLiteral()

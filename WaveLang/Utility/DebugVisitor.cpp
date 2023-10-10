@@ -117,7 +117,7 @@ namespace wave
 		WAVE_DEBUG("{}StringLiteralAST \n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(IntLiteral const& node, uint32 depth)
+	void DebugVisitor::Visit(ConstantInt const& node, uint32 depth)
 	{
 		WAVE_DEBUG("{}IntLiteralAST \n", GetIndentation(depth));
 	}

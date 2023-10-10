@@ -29,7 +29,7 @@ namespace wave
 	using UniqueUnaryExprPtr		= UniquePtr<UnaryExpr>;
 	using UniqueBinaryExprPtr		= UniquePtr<BinaryExpr>;
 	using UniqueTernaryExprPtr		= UniquePtr<TernaryExpr>;
-	using UniqueIntLiteralPtr		= UniquePtr<IntLiteral>;
+	using UniqueIntLiteralPtr		= UniquePtr<ConstantInt>;
 	using UniqueStringLiteralPtr	= UniquePtr<StringLiteral>;
 	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
 	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;

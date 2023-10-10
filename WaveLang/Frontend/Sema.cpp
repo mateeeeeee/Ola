@@ -56,7 +56,7 @@ namespace wave
 		}
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
-		function_decl->SetParamDeclarations(std::move(param_decls));
+		function_decl->SetParamDecls(std::move(param_decls));
 		bool result = ctx.decl_scope_stack.Insert(function_decl.get());
 		WAVE_ASSERT(result);
 		return function_decl;
@@ -64,7 +64,7 @@ namespace wave
 
 	void Sema::ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition)
 	{
-		function_decl->SetDefinition(std::move(definition));
+		function_decl->SetBody(std::move(definition));
 	}
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)

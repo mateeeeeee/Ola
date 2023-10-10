@@ -52,9 +52,10 @@ namespace wave
 		virtual void Visit(UnaryExpr const& node, uint32 depth);
 		virtual void Visit(BinaryExpr const& node, uint32 depth);
 		virtual void Visit(TernaryExpr const& node, uint32 depth);
-		virtual void Visit(IntLiteral const& node, uint32 depth);
+		virtual void Visit(ConstantInt const& node, uint32 depth);
 		virtual void Visit(StringLiteral const& node, uint32 depth);
 		virtual void Visit(IdentifierExpr const& node, uint32 depth);
+		virtual void Visit(DeclRefExpr const& node, uint32 depth);
 
 	private:
 		llvm::LLVMContext context;
