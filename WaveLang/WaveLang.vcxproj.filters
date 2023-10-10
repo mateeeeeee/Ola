@@ -26,7 +26,7 @@
     <ClCompile Include="Frontend\Sema.cpp">
       <Filter>Frontend\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\DebugVisitorAST.cpp">
+    <ClCompile Include="Utility\DebugVisitor.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Backend\LLVMCodegen.cpp">
@@ -108,7 +108,7 @@
     <ClInclude Include="Frontend\Sema.h">
       <Filter>Frontend\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\DebugVisitorAST.h">
+    <ClInclude Include="Utility\DebugVisitor.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Core\Logger.h">

@@ -3,10 +3,10 @@
 
 namespace wave
 {
-	class DebugVisitorAST : public ASTVisitor
+	class DebugVisitor : public ASTVisitor
 	{
 	public:
-		explicit DebugVisitorAST(AST const* ast);
+		explicit DebugVisitor(AST const* ast);
 
 		virtual void Visit(NodeAST const& node, uint32 depth) override;
 		virtual void Visit(TranslationUnit const& node, uint32 depth) override;

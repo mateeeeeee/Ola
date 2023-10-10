@@ -7,7 +7,7 @@
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 #include "Backend/LLVMCodegen.h"
-#include "Utility/DebugVisitorAST.h"
+#include "Utility/DebugVisitor.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -48,7 +48,7 @@ namespace wave
 			Parser parser(diagnostics, lex.GetTokens());
 			parser.Parse();
 			AST const* ast = parser.GetAST();
-			if (ast_dump) DebugVisitorAST debug_ast(ast);
+			if (ast_dump) DebugVisitor debug_ast(ast);
 
 			LLVMCodegen llvm_codegen(source_filename);
 			llvm_codegen.Generate(ast);

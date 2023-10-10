@@ -158,7 +158,7 @@
     <ClCompile Include="Frontend\SourceBuffer.cpp" />
     <ClCompile Include="Frontend\TokenTypes.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Utility\DebugVisitorAST.cpp" />
+    <ClCompile Include="Utility\DebugVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Backend\LLVMCodegen.h" />
@@ -181,7 +181,7 @@
     <ClInclude Include="Frontend\Token.h" />
     <ClInclude Include="Frontend\TokenTypes.h" />
     <ClInclude Include="Frontend\Type.h" />
-    <ClInclude Include="Utility\DebugVisitorAST.h" />
+    <ClInclude Include="Utility\DebugVisitor.h" />
     <ClInclude Include="Utility\Enums.h" />
   </ItemGroup>
   <ItemGroup>
