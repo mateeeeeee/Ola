@@ -229,6 +229,10 @@ namespace wave
 			else_stmt = std::move(_else_stmt);
 		}
 
+		Expr const* GetCondition() const { return condition.get(); }
+		Stmt const* GetThenStatement() const { return then_stmt.get(); }
+		Stmt const* GetElseStatement() const { return else_stmt.get(); }
+
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
 		virtual void Accept(ASTVisitor& visitor) const override;
 

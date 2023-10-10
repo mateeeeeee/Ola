@@ -109,9 +109,19 @@ namespace wave
 		}
 	}
 
-	void LLVMVisitor::Visit(IfStmt const& node, uint32 depth)
+	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32 depth)
 	{
+		if_stmt.GetCondition()->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[if_stmt.GetCondition()];
+		WAVE_ASSERT(condition_value);
 
+		// Create basic blocks for the "if" and "else" branches
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* if_block = llvm::BasicBlock::Create(context, "if", function);
+		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "else");
+		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "merge");
+
+		builder.CreateCondBr(condition_value, if_block, else_block);
 	}
 
 	void LLVMVisitor::Visit(Expr const& node, uint32 depth)
