@@ -1,13 +1,24 @@
 #pragma once
+#include <memory>
 #include "Frontend/ASTVisitor.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+
+namespace llvm
+{
+	class Module;
+}
 
 namespace wave
 {
 	class LLVMVisitor : public ASTVisitor
 	{
 		friend class LLVMCodegen;
+
 	private:
 		explicit LLVMVisitor(AST const* ast);
+
+
 		virtual void Visit(NodeAST const& node, uint32 depth);
 		virtual void Visit(TranslationUnit const& node, uint32 depth);
 
@@ -32,7 +43,9 @@ namespace wave
 		virtual void Visit(IdentifierExpr const& node, uint32 depth);
 
 	private:
+		llvm::LLVMContext context;
+		llvm::IRBuilder<> builder;
+		std::unique_ptr<llvm::Module> module;
 
-	private:
 	};
 }

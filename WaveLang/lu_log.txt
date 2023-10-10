@@ -1,3 +1,0 @@
-[2023-10-10 21:39:27.552] [lucc logger] [error] [Diagnostics][Error]: [Sema] Undeclared identifier C in file test.wv at line: 5, col: 16
-
-

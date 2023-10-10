@@ -1,11 +1,20 @@
 #include "LLVMVisitor.h"
 #include "Frontend/AST.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/TargetSelect.h"
 
 namespace wave
 {
 
-	LLVMVisitor::LLVMVisitor(AST const* ast)
+	LLVMVisitor::LLVMVisitor(AST const* ast) : builder(context)
 	{
+		llvm::InitializeAllTargets();
+		llvm::InitializeAllTargetMCs();
+		llvm::InitializeAllAsmPrinters();
+		llvm::InitializeAllAsmParsers();
+
+		module = std::make_unique<llvm::Module>("WaveModule", context);
+
 		ast->translation_unit->Accept(*this);
 	}
 
@@ -81,7 +90,24 @@ namespace wave
 
 	void LLVMVisitor::Visit(BinaryExpr const& node, uint32 depth)
 	{
+		node.GetLHS()->Accept(*this);
+		node.GetLHS()->Accept(*this);
+		llvm::Value* right = RHS->codegen();
 
+		if (!left || !right)
+			return nullptr;
+
+		if (Op == '+') {
+			// Create an LLVM IR builder
+			llvm::IRBuilder<> builder(llvm::getGlobalContext());
+
+			// Add the left and right values
+			return builder.CreateAdd(left, right, "addtmp");
+		}
+		else {
+			// Handle other binary operators similarly
+			return nullptr;
+		}
 	}
 
 	void LLVMVisitor::Visit(TernaryExpr const& node, uint32 depth)

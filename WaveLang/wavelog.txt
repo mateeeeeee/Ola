@@ -1,0 +1,30 @@
+[2023-10-10 22:46:13.037] [wave logger] [debug] AST Traversal:
+
+[2023-10-10 22:46:13.038] [wave logger] [debug] TranslationUnitAST 
+
+[2023-10-10 22:46:13.038] [wave logger] [debug] `->FunctionDeclAST 
+
+[2023-10-10 22:46:13.038] [wave logger] [debug]    `->CompoundStmtAST 
+
+[2023-10-10 22:46:13.039] [wave logger] [debug]       `->DeclStmtAST 
+
+[2023-10-10 22:46:13.039] [wave logger] [debug]          `->VariableDeclAST 
+
+[2023-10-10 22:46:13.039] [wave logger] [debug]             `->IntLiteralAST 
+
+[2023-10-10 22:46:13.039] [wave logger] [debug]       `->DeclStmtAST 
+
+[2023-10-10 22:46:13.039] [wave logger] [debug]          `->VariableDeclAST 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]             `->BinaryExprAST 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]                `->DeclRefExpr 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]                `->IntLiteralAST 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]       `->ReturnStmtAST 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]          `->ExprStmtAST 
+
+[2023-10-10 22:46:13.040] [wave logger] [debug]             `->IntLiteralAST 
+

@@ -35,6 +35,7 @@ namespace wave
 		void ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition);
 
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
+
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;
