@@ -31,9 +31,20 @@ namespace wave
 
 	private:
 		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr);
-		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls);
-		void ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition);
+		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr);
 
+		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
+		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
+		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtr&& decl);
+		UniqueReturnStmtPtr ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt);
+
+		UniqueUnaryExprPtr ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand);
+		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);
+		UniqueTernaryExprPtr ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr);
+		UniqueCastExprPtr ActOnCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr);
+		UniqueFunctionCallExprPtr ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
+		UniqueConstantIntPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
+		UniqueStringLiteralPtr ActOnStringLiteral(std::string_view str, SourceLocation const& loc);
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 
 	private:

@@ -15,10 +15,13 @@ DIAG(missing_type_specifier, error, "Missing type specifier")
 
 DIAG(void_invalid_context, error, "Void is only allowed when specifying function return value")
 
-DIAG(redefinition_of_identifier, error, "Redefinition of an identifier")
+DIAG(redefinition_of_identifier, error, "Redefinition of an identifier {}")
+DIAG(undeclared_identifier, error, "Undeclared identifier {}")
+DIAG(invalid_main_function_declaration, error, "Invalid main function declaration")
+DIAG(main_cannot_be_extern, error, "Invalid main function declaration")
 DIAG(incompatible_initializer, error, "Incompatible initializer")
 DIAG(incompatible_return_stmt_type, error, "Incompatible return statement type")
 DIAG(invalid_cast, error, "Invalid cast")
-DIAG(undeclared_identifier, error, "Undeclared identifier {}")
+
 DIAG(missing_type_specifier_or_init_expr, error, "Variable declaration has to have atleast one of init expression and type specifier")
 #undef DIAG

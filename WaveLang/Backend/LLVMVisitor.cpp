@@ -52,7 +52,7 @@ namespace wave
 			++param_it;
 		}
 
-		if (!function_decl.IsExtern())
+		if (!function_decl.IsDefinition())
 		{
 			function_decl.GetBodyStmt()->Accept(*this);
 		}

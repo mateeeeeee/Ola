@@ -95,7 +95,7 @@ namespace wave
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return definition.get(); }
 
-		bool IsExtern() const
+		bool IsDefinition() const
 		{
 			return definition == nullptr;
 		}
@@ -143,17 +143,7 @@ namespace wave
 	class CompoundStmt final : public Stmt
 	{
 	public:
-		CompoundStmt() : Stmt(StmtKind::Compound) {}
-
-		void AddStmt(UniqueStmtPtr&& stmt)
-		{
-			statements.push_back(std::move(stmt));
-		}
-
-		void SetStmts(UniqueStmtPtrList&& stmts)
-		{
-			statements = std::move(stmts);
-		}
+		CompoundStmt(UniqueStmtPtrList&& stmts) : Stmt(StmtKind::Compound), statements(std::move(stmts)) {}
 		UniqueStmtPtrList const& GetStmts() const { return statements; }
 
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
@@ -421,12 +411,12 @@ namespace wave
 	class FunctionCallExpr final : public Expr
 	{
 	public:
-		FunctionCallExpr(UniqueExprPtr&& func, SourceLocation const& loc)
+		FunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func)
 			: Expr(ExprKind::FunctionCall, loc), func_expr(std::move(func)) {}
 
-		void AddArg(UniqueExprPtr&& arg)
+		void SetArgs(UniqueExprPtrList&& args)
 		{
-			func_args.push_back(std::move(arg));
+			func_args = std::move(args);
 		}
 		Expr const* GetFunction() const { return func_expr.get(); }
 
@@ -457,7 +447,9 @@ namespace wave
 	public:
 		DeclRefExpr(Decl* decl, SourceLocation const& loc) 
 			: IdentifierExpr(decl->GetName(), loc), decl(decl)
-		{}
+		{
+			SetType(decl->GetType());
+		}
 
 		Decl const* GetDecl() const { return decl; }
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;

@@ -72,8 +72,7 @@ namespace wave
 		void PreprocessTokens();
 		void ParseTranslationUnit();
 		[[nodiscard]] UniqueDeclPtr ParseGlobalDeclaration();
-		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDeclaration(bool expect_semicolon = true);
-		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDefinition();
+		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDeclaration(bool is_function_def = false);
 		[[nodiscard]] UniqueVariableDeclPtr ParseVariableDeclaration(bool function_param_decl);
 
 		[[nodiscard]] UniqueStmtPtr ParseStatement();
@@ -101,10 +100,10 @@ namespace wave
 		[[nodiscard]] UniqueExprPtr ParseUnaryExpression();
 		[[nodiscard]] UniqueExprPtr ParsePostFixExpression();
 		[[nodiscard]] UniqueExprPtr ParseSizeofExpression();
-		[[nodiscard]] UniqueIntLiteralPtr ParseAlignofExpression();
-		[[nodiscard]] UniqueIntLiteralPtr ParseAlignasExpression();
+		[[nodiscard]] UniqueConstantIntPtr ParseAlignofExpression();
+		[[nodiscard]] UniqueConstantIntPtr ParseAlignasExpression();
 		[[nodiscard]] UniqueExprPtr ParsePrimaryExpression();
-		[[nodiscard]] UniqueIntLiteralPtr ParseIntegerLiteral();
+		[[nodiscard]] UniqueConstantIntPtr ParseConstantInt();
 		[[nodiscard]] UniqueStringLiteralPtr ParseStringLiteral();
 		[[nodiscard]] UniqueIdentifierExprPtr ParseIdentifier();
 

@@ -13,6 +13,11 @@ namespace wave
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
 
+		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+
 		if (has_init && has_type_specifier)
 		{
 			//#todo
@@ -28,7 +33,7 @@ namespace wave
 
 		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
 		{
-			diagnostics.Report(loc, redefinition_of_identifier);
+			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
@@ -48,23 +53,133 @@ namespace wave
 		return var_decl;
 	}
 
-	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls)
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt)
 	{
 		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
 		{
-			diagnostics.Report(loc, redefinition_of_identifier);
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+
+		if (name == "main")
+		{
+			FunctionType const* func_type = type->TryAs<FunctionType>();
+			WAVE_ASSERT(func_type);
+			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParameters().empty())
+			{
+				diagnostics.Report(loc, invalid_main_function_declaration);
+			}
 		}
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetParamDecls(std::move(param_decls));
+		if(body_stmt) function_decl->SetBodyStmt(std::move(body_stmt));
+
 		bool result = ctx.decl_scope_stack.Insert(function_decl.get());
 		WAVE_ASSERT(result);
 		return function_decl;
 	}
 
-	void Sema::ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition)
+	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
-		function_decl->SetBodyStmt(std::move(definition));
+		return MakeUnique<CompoundStmt>(std::move(stmts));
+	}
+
+	UniqueExprStmtPtr Sema::ActOnExprStmt(UniqueExprPtr&& expr)
+	{
+		return MakeUnique<ExprStmt>(std::move(expr));
+	}
+
+	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueDeclPtr&& decl)
+	{
+		return MakeUnique<DeclStmt>(std::move(decl));
+	}
+
+	UniqueReturnStmtPtr Sema::ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt)
+	{
+		WAVE_ASSERT(ctx.current_func);
+		ctx.return_stmt_encountered = true;
+		FunctionType const& func_type = type_cast<FunctionType>(*ctx.current_func);
+		QualifiedType const& return_type = func_type.GetReturnType();
+
+		Expr const* ret_expr = expr_stmt->GetExpr();
+		QualifiedType const& ret_expr_type = ret_expr ? ret_expr->GetType() : builtin_types::Void;
+		if (!ret_expr_type->IsCompatible(return_type))
+		{
+			diagnostics.Report(ret_expr ? ret_expr->GetLocation() : SourceLocation{}, incompatible_return_stmt_type);
+		}
+		return MakeUnique<ReturnStmt>(std::move(expr_stmt));
+	}
+
+	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
+	{
+		//#todo semantic analysis
+
+		UniqueUnaryExprPtr unary_expr = MakeUnique<UnaryExpr>(op, loc);
+		unary_expr->SetType(operand->GetType());
+		unary_expr->SetOperand(std::move(operand));
+
+		return unary_expr;
+	}
+
+	UniqueBinaryExprPtr Sema::ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs)
+	{
+		//#todo semantic analysis
+
+		UniqueBinaryExprPtr binary_expr = MakeUnique<BinaryExpr>(op, loc);
+		binary_expr->SetType(lhs->GetType());
+		binary_expr->SetLHS(std::move(lhs));
+		binary_expr->SetRHS(std::move(rhs));
+		return binary_expr;
+	}
+
+	UniqueTernaryExprPtr Sema::ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr)
+	{
+		//#todo semantic analysis
+		UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
+		ternary_expr->SetType(true_expr->GetType());
+		ternary_expr->SetConditionExpr(std::move(cond_expr));
+		ternary_expr->SetTrueExpr(std::move(true_expr));
+		ternary_expr->SetFalseExpr(std::move(false_expr));
+		return ternary_expr;
+	}
+
+	UniqueCastExprPtr Sema::ActOnCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)
+	{
+		//#todo semantic analysis
+		/*
+		QualifiedType const& cast_type = cast_expr->GetType();
+		QualifiedType const& operand_type = cast_expr->GetOperand()->GetType();
+
+		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
+		if(IsVoidType(cast_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
+		if(cast_type->IsCompatible(operand_type))  diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
+		*/
+		UniqueCastExprPtr cast_expr = MakeUnique<CastExpr>(loc, type);
+		cast_expr->SetOperand(std::move(expr));
+		return cast_expr;
+	}
+
+	UniqueFunctionCallExprPtr Sema::ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
+	{
+		//#todo semantic analysis
+		QualifiedType const& func_expr_type = func_expr->GetType();
+		WAVE_ASSERT(IsFunctionType(func_expr_type));
+		FunctionType func_type = type_cast<FunctionType>(func_expr_type);
+
+		UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(loc, std::move(func_expr));
+		func_call_expr->SetType(func_type.GetReturnType());
+		func_call_expr->SetArgs(std::move(args));
+		return func_call_expr;
+	}
+
+	UniqueConstantIntPtr Sema::ActOnConstantInt(int64 value, SourceLocation const& loc)
+	{
+		return MakeUnique<ConstantInt>(value, loc);
+	}
+
+	UniqueStringLiteralPtr Sema::ActOnStringLiteral(std::string_view str, SourceLocation const& loc)
+	{
+		return MakeUnique<StringLiteral>(str, loc);
 	}
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
@@ -80,53 +195,5 @@ namespace wave
 			return nullptr;
 		}
 	}
-
-	/*
-
-	void Sema::ActOnReturnStmt(ReturnStmtAST* return_stmt)
-	{
-		WAVE_ASSERT(ctx.current_func);
-		ctx.return_stmt_encountered = true;
-		FunctionType const& func_type = type_cast<FunctionType>(*ctx.current_func);
-		QualifiedType const& return_type = func_type.GetReturnType();
-		
-		ExprAST const* ret_expr = return_stmt->GetExprStmt()->GetExpr();
-		QualifiedType const& ret_expr_type = ret_expr ? ret_expr->GetType() : builtin_types::Void;
-		if (!ret_expr_type->IsCompatible(return_type))
-		{
-			diagnostics.Report(ret_expr ? ret_expr->GetLocation() : SourceLocation{}, incompatible_return_stmt_type);
-		}
-	}
-
-	void Sema::ActOnUnaryExpr(UnaryExprAST* unary_expr)
-	{
-		QualifiedType const& operand_type = unary_expr->GetOperand()->GetType();
-		unary_expr->SetType(operand_type);
-	}
-
-	void Sema::ActOnBinaryExpr(BinaryExprAST* binary_expr)
-	{
-		QualifiedType const& lhs_type = binary_expr->GetLHS()->GetType();
-		QualifiedType const& rhs_type = binary_expr->GetRHS()->GetType();
-
-		if (lhs_type->GetKind() == rhs_type->GetKind())
-		{
-			binary_expr->SetType(lhs_type);
-			return;
-		}
-	}
-
-	void Sema::ActOnCastExpr(CastExprAST* cast_expr)
-	{
-		QualifiedType const& cast_type = cast_expr->GetType();
-		QualifiedType const& operand_type = cast_expr->GetOperand()->GetType();
-
-		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-		if(IsVoidType(cast_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-		if(cast_type->IsCompatible(operand_type))  diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-
-		cast_expr->SetType(operand_type);
-	}
-	*/
 }
 
