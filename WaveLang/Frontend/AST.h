@@ -88,12 +88,12 @@ namespace wave
 		{
 			param_declarations = std::move(param_decls);
 		}
-		void SetBody(UniqueCompoundStmtPtr&& _definition)
+		void SetBodyStmt(UniqueCompoundStmtPtr&& _definition)
 		{
 			definition = std::move(_definition);
 		}
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
-		CompoundStmt const* GetBody() const { return definition.get(); }
+		CompoundStmt const* GetBodyStmt() const { return definition.get(); }
 
 		bool IsExtern() const
 		{
@@ -216,22 +216,22 @@ namespace wave
 	public:
 		IfStmt() : Stmt(StmtKind::If) {}
 
-		void SetCondition(UniqueExprPtr&& _condition)
+		void SetConditionExpr(UniqueExprPtr&& _condition)
 		{
 			condition = std::move(_condition);
 		}
-		void SetThenStatement(UniqueStmtPtr&& _then_stmt)
+		void SetThenStmt(UniqueStmtPtr&& _then_stmt)
 		{
 			then_stmt = std::move(_then_stmt);
 		}
-		void SetElseStatement(UniqueStmtPtr&& _else_stmt)
+		void SetElseStmt(UniqueStmtPtr&& _else_stmt)
 		{
 			else_stmt = std::move(_else_stmt);
 		}
 
-		Expr const* GetCondition() const { return condition.get(); }
-		Stmt const* GetThenStatement() const { return then_stmt.get(); }
-		Stmt const* GetElseStatement() const { return else_stmt.get(); }
+		Expr const* GetConditionExpr() const { return condition.get(); }
+		Stmt const* GetThenStmt() const { return then_stmt.get(); }
+		Stmt const* GetElseStmt() const { return else_stmt.get(); }
 
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
 		virtual void Accept(ASTVisitor& visitor) const override;
@@ -350,11 +350,11 @@ namespace wave
 			false_expr(std::move(false_expr))
 		{}
 
-		void SetCondition(UniqueExprPtr&& expr) { cond_expr = std::move(expr); }
+		void SetConditionExpr(UniqueExprPtr&& expr) { cond_expr = std::move(expr); }
 		void SetTrueExpr(UniqueExprPtr&& expr) { true_expr = std::move(expr); }
 		void SetFalseExpr(UniqueExprPtr&& expr) { false_expr = std::move(expr); }
 
-		Expr const* GetCondition() const { return cond_expr.get(); }
+		Expr const* GetConditionExpr() const { return cond_expr.get(); }
 		Expr const* GetTrueExpr() const { return true_expr.get(); }
 		Expr const* GetFalseExpr() const { return false_expr.get(); }
 

@@ -54,7 +54,7 @@ namespace wave
 
 		if (!function_decl.IsExtern())
 		{
-			function_decl.GetBody()->Accept(*this);
+			function_decl.GetBodyStmt()->Accept(*this);
 		}
 		llvm_value_map[&function_decl] = llvm_function;
 	}
@@ -111,11 +111,10 @@ namespace wave
 
 	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32 depth)
 	{
-		if_stmt.GetCondition()->Accept(*this);
-		llvm::Value* condition_value = llvm_value_map[if_stmt.GetCondition()];
+		if_stmt.GetConditionExpr()->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[if_stmt.GetConditionExpr()];
 		WAVE_ASSERT(condition_value);
 
-		// Create basic blocks for the "if" and "else" branches
 		llvm::Function* function = builder.GetInsertBlock()->getParent();
 		llvm::BasicBlock* if_block = llvm::BasicBlock::Create(context, "if", function);
 		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "else");

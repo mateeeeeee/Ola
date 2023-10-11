@@ -64,7 +64,7 @@ namespace wave
 
 	void Sema::ActOnFunctionDecl(UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& definition)
 	{
-		function_decl->SetBody(std::move(definition));
+		function_decl->SetBodyStmt(std::move(definition));
 	}
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)

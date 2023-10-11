@@ -309,7 +309,7 @@ namespace wave
 		if (Consume(TokenKind::question))
 		{
 			UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
-			ternary_expr->SetCondition(std::move(cond));
+			ternary_expr->SetConditionExpr(std::move(cond));
 			ternary_expr->SetTrueExpr(ParseExpression());
 			Expect(TokenKind::colon);
 			ternary_expr->SetFalseExpr(ParseConditionalExpression());
