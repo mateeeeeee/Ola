@@ -9,7 +9,8 @@ namespace wave
 	{
 		CompilerFlag_None = 0x0,
 		CompilerFlag_DumpAST = 0x1,
-		CompilerFlag_NoLLVM = 0x2,
+		CompilerFlag_OutputAssembly = 0x2,
+		CompilerFlag_NoLLVM = 0x4,
 	};
 	DEFINE_ENUM_BIT_OPERATORS(CompilerFlags);
 

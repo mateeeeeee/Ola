@@ -60,23 +60,54 @@ namespace wave
 		InitLogger();
 
 		bool const ast_dump = input.flags & CompilerFlag_DumpAST;
+		bool const output_assembly = input.flags & CompilerFlag_OutputAssembly;
 		bool const use_llvm = !(input.flags & CompilerFlag_NoLLVM);
 		WAVE_ASSERT_MSG(use_llvm, "Only LLVM is supported for code generation");
 
 		fs::path directory_path = input.input_directory;
+		std::vector<fs::path> assembly_files(input.sources.size());
 		std::vector<fs::path> object_files(input.sources.size());
+		fs::path output_file(input.output_file);
+		output_file += ".exe";
+		int64 res;
 		for (uint64 i = 0; i < input.sources.size(); ++i)
 		{
 			fs::path file_name = fs::path(input.sources[i]).stem();
 			fs::path file_ext = fs::path(input.sources[i]).extension();
-			fs::path assembly_file = directory_path / file_name;  assembly_file += ".s";
-			fs::path object_file = directory_path / file_name; object_file += ".obj";
+
 			fs::path ir_file = directory_path / file_name; ir_file += ".ll";
 			fs::path source_file = directory_path / input.sources[i];
 
 			CompileTranslationUnit(source_file.string(), ir_file.string(), ast_dump);
+
+			fs::path assembly_file = directory_path / file_name;  assembly_file += ".s";
+			fs::path object_file = directory_path / file_name; object_file += ".obj";
+
 			object_files[i] = object_file;
+			assembly_files[i] = assembly_file;
+
+			//llc input.ll -o output.s
+			std::string cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
+			system(cmd.c_str());
+
+			//clang input.s - o my_program
+			std::string cmd2 = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
+			system(cmd2.c_str());
+
+			res = system(output_file.string().c_str());
+			
+			if (output_assembly)
+			{
+				//llvm-ir -> assembly 
+				//assembly -> object file
+			}
+			else
+			{
+				//llvm-ir -> object file
+			}
 		}
-		return 0;
+		//link all object files produced
+		//call exe
+		return res;
 	}
 }

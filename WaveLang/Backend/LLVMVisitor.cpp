@@ -100,7 +100,7 @@ namespace wave
 		if (return_stmt.GetExprStmt()) 
 		{
 			return_stmt.GetExprStmt()->Accept(*this);
-			llvm::Value* return_value = llvm_value_map[return_stmt.GetExprStmt()];
+			llvm::Value* return_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
 			builder.CreateRet(return_value);
 		}
 		else 
@@ -186,7 +186,8 @@ namespace wave
 	{
 		llvm::Value* value = llvm_value_map[decl_ref.GetDecl()];
 		WAVE_ASSERT(value);
-		llvm_value_map[&decl_ref] = value;
+		llvm::LoadInst* load = builder.CreateLoad(ConvertToLLVMType(decl_ref.GetType()), value, decl_ref.GetDecl()->GetName());
+		llvm_value_map[&decl_ref] = load;
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)
