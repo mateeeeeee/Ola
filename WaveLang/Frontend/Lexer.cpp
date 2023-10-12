@@ -122,15 +122,27 @@ namespace wave
 	{
 		char const* tmp_ptr = cur_ptr;
 		Consume(tmp_ptr, [](char c) -> bool { return std::isdigit(c); });
-		if (*tmp_ptr == 'f' || *tmp_ptr == 'F') ++tmp_ptr;
+		if (*tmp_ptr == '.')
+		{
+			tmp_ptr++;
+			Consume(tmp_ptr, [](char c) -> bool { return std::isdigit(c); });
+			if (std::isalpha(*tmp_ptr)) return false;
+			FillToken(t, TokenKind::float_number, tmp_ptr);
+			UpdatePointersAndLocation();
+			return true;
+		}
 		else if (std::isalpha(*tmp_ptr))
 		{
 			UpdatePointersAndLocation();
 			diagnostics.Report(loc, invalid_number_literal);
 			return false;
 		}
-		FillToken(t, TokenKind::number, tmp_ptr);
-		UpdatePointersAndLocation();
+		else
+		{
+			FillToken(t, TokenKind::int_number, tmp_ptr);
+			UpdatePointersAndLocation();
+			return true;
+		}
 		return true;
 	}
 

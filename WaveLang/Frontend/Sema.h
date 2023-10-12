@@ -46,6 +46,7 @@ namespace wave
 		UniqueConstantIntPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
+		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 
 	private:

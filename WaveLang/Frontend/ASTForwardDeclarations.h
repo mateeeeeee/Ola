@@ -21,11 +21,12 @@ namespace wave
 	class UnaryExpr;
 	class BinaryExpr;
 	class TernaryExpr;
+	class IdentifierExpr;
+	class DeclRefExpr;
 	class ConstantInt;
 	class ConstantString;
 	class ConstantBool;
-	class IdentifierExpr;
-	class DeclRefExpr;
+	class ConstantFloat;
 	class CastExpr;
 	class FunctionCallExpr;
 

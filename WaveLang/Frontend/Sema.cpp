@@ -206,6 +206,11 @@ namespace wave
 		return MakeUnique<ConstantBool>(value, loc);
 	}
 
+	UniqueConstantFloatPtr Sema::ActOnConstantFloat(double value, SourceLocation const& loc)
+	{
+		return MakeUnique<ConstantFloat>(value, loc);
+	}
+
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
 	{
 		if (Decl* decl = ctx.decl_scope_stack.LookUpCurrentScope(name))

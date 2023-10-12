@@ -454,6 +454,22 @@ namespace wave
 		bool value;
 	};
 
+	class ConstantFloat final : public Expr 
+	{
+	public:
+		ConstantFloat(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value)
+		{
+			SetType(builtin_types::Float);
+		}
+		double GetValue() const { return value; }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		double value;
+	};
+
 	class CastExpr : public Expr
 	{
 	public:

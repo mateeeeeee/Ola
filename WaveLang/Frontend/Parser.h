@@ -106,6 +106,7 @@ namespace wave
 		[[nodiscard]] UniqueConstantIntPtr ParseConstantInt();
 		[[nodiscard]] UniqueConstantStringPtr ParseConstantString();
 		[[nodiscard]] UniqueConstantBoolPtr ParseConstantBool();
+		[[nodiscard]] UniqueConstantFloatPtr ParseConstantFloat();
 		[[nodiscard]] UniqueIdentifierExprPtr ParseIdentifier();
 
 		void ParseTypeQualifier(QualifiedType& type);

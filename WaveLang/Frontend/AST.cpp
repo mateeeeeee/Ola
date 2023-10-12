@@ -94,15 +94,19 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-	}
 	void ConstantInt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
 	void ConstantString::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void ConstantFloat::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -203,6 +207,10 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 	void ConstantBool::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void ConstantFloat::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

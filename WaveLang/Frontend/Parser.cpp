@@ -553,7 +553,8 @@ namespace wave
 		{
 		case TokenKind::left_round: return ParseParenthesizedExpression();
 		case TokenKind::identifier: return ParseIdentifier(); 
-		case TokenKind::number: return ParseConstantInt();
+		case TokenKind::int_number: return ParseConstantInt();
+		case TokenKind::float_number: return ParseConstantFloat();
 		case TokenKind::string_literal: return ParseConstantString(); 
 		case TokenKind::KW_true:
 		case TokenKind::KW_false:  return ParseConstantBool();
@@ -567,7 +568,7 @@ namespace wave
 
 	UniqueConstantIntPtr Parser::ParseConstantInt()
 	{
-		WAVE_ASSERT(current_token->Is(TokenKind::number));
+		WAVE_ASSERT(current_token->Is(TokenKind::int_number));
 		std::string_view string_number = current_token->GetIdentifier();
 		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
@@ -593,6 +594,16 @@ namespace wave
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnConstantBool(value, loc);
+	}
+
+	UniqueConstantFloatPtr Parser::ParseConstantFloat()
+	{
+		WAVE_ASSERT(current_token->Is(TokenKind::float_number));
+		std::string_view string_number = current_token->GetIdentifier();
+		double value = std::stod(current_token->GetIdentifier().data(), nullptr);
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnConstantFloat(value, loc);
 	}
 
 	UniqueIdentifierExprPtr Parser::ParseIdentifier()
