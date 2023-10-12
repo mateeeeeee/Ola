@@ -14,15 +14,22 @@
 #define WAVE_WARNINGS_OFF			pragma(warning(push, 0))
 #define WAVE_WARNINGS_ON			pragma(warning(pop))
 #define WAVE_DEBUGBREAK()			__debugbreak()
-#define WAVE_UNREACHABLE()			__assume(false)
 #define WAVE_FORCEINLINE			__forceinline
 #define WAVE_INLINE				    inline
 #define WAVE_NODISCARD				[[nodiscard]]
 #define WAVE_NORETURN				[[noreturn]]
 #define WAVE_DEPRECATED			    [[deprecated]]
 #define WAVE_DEPRECATED_MSG(msg)	[[deprecated(#msg)]]
-#define WAVE_ALIGN(align)           alignas(align) 
+#define WAVE_ALIGNAS(align)         alignas(align) 
 
+#ifdef __GNUC__ 
+#define WAVE_UNREACHABLE()			___builtin_unreachable();
+#elifdef _MSC_VER 
+#define WAVE_UNREACHABLE()			___assume(false);
+#else
+#define WAVE_UNREACHABLE()	
+#endif
+		
 
 
 #define WAVE_NONCOPYABLE(ClassName)                 \

@@ -25,9 +25,9 @@ namespace wave
 	class ConstantString;
 	class ConstantBool;
 	class IdentifierExpr;
+	class DeclRefExpr;
 	class CastExpr;
 	class FunctionCallExpr;
-	class DeclRefExpr;
 
 	struct AST;
 }

@@ -83,14 +83,14 @@ namespace wave
 		for (auto const& statement : compound_stmt.GetStmts()) statement->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32 depth)
-	{
-		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
-	}
-
 	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32 depth)
 	{
 		if (decl_stmt.GetDecl()) decl_stmt.GetDecl()->Accept(*this);
+	}
+
+	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32 depth)
+	{
+		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
 	}
 
 	void LLVMVisitor::Visit(NullStmt const& null_stmt, uint32 depth) {}
@@ -182,18 +182,6 @@ namespace wave
 
 	}
 
-	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32 depth)
-	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), constant_int.GetValue());
-		llvm_value_map[&constant_int] = constant;
-	}
-
-	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32 depth)
-	{
-		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
-		llvm_value_map[&string_constant] = constant;
-	}
-
 	void LLVMVisitor::Visit(IdentifierExpr const& node, uint32 depth)
 	{
 		WAVE_ASSERT(false);
@@ -205,6 +193,18 @@ namespace wave
 		WAVE_ASSERT(value);
 		llvm::LoadInst* load = builder.CreateLoad(ConvertToLLVMType(decl_ref.GetType()), value, decl_ref.GetDecl()->GetName());
 		llvm_value_map[&decl_ref] = load;
+	}
+
+	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32 depth)
+	{
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), constant_int.GetValue());
+		llvm_value_map[&constant_int] = constant;
+	}
+
+	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32 depth)
+	{
+		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
+		llvm_value_map[&string_constant] = constant;
 	}
 
 	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32 depth)
@@ -247,6 +247,7 @@ namespace wave
 		}
 		case TypeKind::Class:
 			WAVE_ASSERT_MSG(false, "Not supported yet");
+			break;
 		default:
 			WAVE_UNREACHABLE();
 		}

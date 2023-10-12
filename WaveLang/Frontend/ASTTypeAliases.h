@@ -15,9 +15,11 @@ namespace wave
 	}
 
 	using UniqueTranslationUnitPtr	= UniquePtr<TranslationUnit>;
+
 	using UniqueDeclPtr				= UniquePtr<Decl>;
 	using UniqueFunctionDeclPtr		= UniquePtr<FunctionDecl>;
 	using UniqueVariableDeclPtr		= UniquePtr<VariableDecl>;
+
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;
 	using UniqueExprStmtPtr			= UniquePtr<ExprStmt>;
@@ -25,15 +27,16 @@ namespace wave
 	using UniqueNullStmtPtr			= UniquePtr<NullStmt>;
 	using UniqueIfStmtPtr			= UniquePtr<IfStmt>;
 	using UniqueReturnStmtPtr		= UniquePtr<ReturnStmt>;
+
 	using UniqueExprPtr				= UniquePtr<Expr>;
 	using UniqueUnaryExprPtr		= UniquePtr<UnaryExpr>;
 	using UniqueBinaryExprPtr		= UniquePtr<BinaryExpr>;
 	using UniqueTernaryExprPtr		= UniquePtr<TernaryExpr>;
+	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
+	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;
 	using UniqueConstantIntPtr		= UniquePtr<ConstantInt>;
 	using UniqueConstantStringPtr	= UniquePtr<ConstantString>;
 	using UniqueConstantBoolPtr		= UniquePtr<ConstantBool>;
-	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
-	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;
 	using UniqueCastExprPtr			= UniquePtr<CastExpr>;
 	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
 

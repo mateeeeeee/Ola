@@ -16,6 +16,7 @@ namespace wave
 		NodeAST() = default;
 	};
 
+
 	class TranslationUnit final : public NodeAST
 	{
 	public:
@@ -33,6 +34,7 @@ namespace wave
 	private:
 		UniqueDeclPtrList declarations;
 	};
+
 
 	enum class DeclKind : bool
 	{
@@ -62,6 +64,7 @@ namespace wave
 		Decl(DeclKind decl_kind, std::string_view name, SourceLocation const& loc)
 			: decl_kind(decl_kind), name(name), source_loc(loc) {}
 	};
+
 	class VariableDecl : public Decl
 	{
 	public:
@@ -79,6 +82,7 @@ namespace wave
 	private:
 		UniqueExprPtr init_expr;
 	};
+
 	class FunctionDecl : public Decl
 	{
 	public:
@@ -107,6 +111,7 @@ namespace wave
 		UniqueVariableDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr definition;
 	};
+
 
 	enum class StmtKind : uint8
 	{
@@ -140,6 +145,7 @@ namespace wave
 	protected:
 		explicit Stmt(StmtKind kind) : kind(kind) {}
 	};
+
 	class CompoundStmt final : public Stmt
 	{
 	public:
@@ -152,28 +158,7 @@ namespace wave
 	private:
 		UniqueStmtPtrList statements;
 	};
-	class ExprStmt : public Stmt
-	{
-	public:
-		ExprStmt(UniqueExprPtr&& expr) : Stmt(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr)) {}
-
-		Expr const* GetExpr() const { return expr.get(); }
-
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
-
-	private:
-		UniqueExprPtr expr;
-	};
-	class NullStmt final : public ExprStmt
-	{
-	public:
-		NullStmt() : ExprStmt(nullptr) {}
-
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
-
-	};
+	
 	class DeclStmt final : public Stmt
 	{
 	public:
@@ -187,6 +172,31 @@ namespace wave
 	private:
 		UniqueDeclPtr declaration;
 	};
+
+	class ExprStmt : public Stmt
+	{
+	public:
+		ExprStmt(UniqueExprPtr&& expr) : Stmt(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr)) {}
+
+		Expr const* GetExpr() const { return expr.get(); }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		UniqueExprPtr expr;
+	};
+
+	class NullStmt final : public ExprStmt
+	{
+	public:
+		NullStmt() : ExprStmt(nullptr) {}
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	};
+
 	class ReturnStmt final : public Stmt
 	{
 	public:
@@ -201,6 +211,7 @@ namespace wave
 	private:
 		UniqueExprStmtPtr ret_expr;
 	};
+
 	class IfStmt final : public Stmt
 	{
 	public:
@@ -231,6 +242,7 @@ namespace wave
 		UniqueStmtPtr then_stmt;
 		UniqueStmtPtr else_stmt;
 	};
+
 
 	enum class ExprKind : uint8
 	{
@@ -296,6 +308,7 @@ namespace wave
 		Expr(ExprKind kind, SourceLocation const& loc) : kind(kind), loc(loc) {}
 		void SetValueCategory(ExprValueCategory _value_category) { value_category = _value_category; }
 	};
+
 	class UnaryExpr : public Expr
 	{
 	public:
@@ -314,6 +327,7 @@ namespace wave
 		UnaryExprKind op;
 		UniqueExprPtr operand;
 	};
+
 	class BinaryExpr : public Expr
 	{
 	public:
@@ -332,6 +346,7 @@ namespace wave
 		UniqueExprPtr lhs, rhs;
 		BinaryExprKind op;
 	};
+
 	class TernaryExpr : public Expr
 	{
 	public:
@@ -357,6 +372,40 @@ namespace wave
 		UniqueExprPtr true_expr;
 		UniqueExprPtr false_expr;
 	};
+
+	class IdentifierExpr : public Expr
+	{
+	protected:
+		explicit IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::DeclRef, loc), name(name)
+		{
+			SetValueCategory(ExprValueCategory::LValue);
+		}
+		std::string_view GetName() const { return name; }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		std::string name;
+	};
+
+	class DeclRefExpr : public IdentifierExpr
+	{
+	public:
+		DeclRefExpr(Decl* decl, SourceLocation const& loc)
+			: IdentifierExpr(decl->GetName(), loc), decl(decl)
+		{
+			SetType(decl->GetType());
+		}
+
+		Decl const* GetDecl() const { return decl; }
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		Decl* decl;
+	};
+
 	class ConstantInt final : public Expr
 	{
 	public:
@@ -372,6 +421,7 @@ namespace wave
 	private:
 		int64 value;
 	};
+
 	class ConstantString final : public Expr
 	{
 	public:
@@ -387,6 +437,7 @@ namespace wave
 	private:
 		std::string str;
 	};
+
 	class ConstantBool final : public Expr
 	{
 	public:
@@ -425,6 +476,7 @@ namespace wave
 	private:
 		UniqueExprPtr operand;
 	};
+
 	class FunctionCallExpr final : public Expr
 	{
 	public:
@@ -443,37 +495,6 @@ namespace wave
 	private:
 		UniqueExprPtr func_expr;
 		UniqueExprPtrList func_args;
-	};
-	class IdentifierExpr : public Expr
-	{
-	protected:
-		explicit IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::DeclRef, loc), name(name)
-		{
-			SetValueCategory(ExprValueCategory::LValue);
-		}
-		std::string_view GetName() const { return name; }
-
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
-
-	private:
-		std::string name;
-	};
-	class DeclRefExpr : public IdentifierExpr
-	{
-	public:
-		DeclRefExpr(Decl* decl, SourceLocation const& loc) 
-			: IdentifierExpr(decl->GetName(), loc), decl(decl)
-		{
-			SetType(decl->GetType());
-		}
-
-		Decl const* GetDecl() const { return decl; }
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
-
-	private:
-		Decl* decl;
 	};
 
 	struct AST

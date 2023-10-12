@@ -7,6 +7,7 @@ namespace wave
 		visitor.Visit(*this, depth);
 		for (auto&& decl : declarations) decl->Accept(visitor, depth + 1);
 	}
+
 	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		WAVE_ASSERT(false);
@@ -85,6 +86,18 @@ namespace wave
 		true_expr->Accept(visitor, depth + 1);
 		false_expr->Accept(visitor, depth + 1);
 	}
+	void IdentifierExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(false);
+	}
+	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 	void ConstantInt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -105,18 +118,6 @@ namespace wave
 		visitor.Visit(*this, depth);
 		func_expr->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
-	}
-	void IdentifierExpr::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		WAVE_ASSERT(false);
-	}
-	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-	}
-	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
 	}
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
@@ -185,11 +186,23 @@ namespace wave
 		WAVE_ASSERT(cond_expr && true_expr && false_expr);
 		visitor.Visit(*this, 0);
 	}
+	void IdentifierExpr::Accept(ASTVisitor& visitor) const
+	{
+		WAVE_ASSERT(false);
+	}
+	void DeclRefExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 	void ConstantInt::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
 	void ConstantString::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void ConstantBool::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
@@ -203,20 +216,5 @@ namespace wave
 		WAVE_ASSERT(func_expr);
 		visitor.Visit(*this, 0);
 	}
-	void IdentifierExpr::Accept(ASTVisitor& visitor) const
-	{
-		WAVE_ASSERT(false);
-	}
-
-	void DeclRefExpr::Accept(ASTVisitor& visitor) const
-	{
-		visitor.Visit(*this, 0);
-	}
-
-	void ConstantBool::Accept(ASTVisitor& visitor) const
-	{
-		visitor.Visit(*this, 0);
-	}
-
 }
 
