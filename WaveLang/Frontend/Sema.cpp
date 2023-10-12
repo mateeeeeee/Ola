@@ -134,6 +134,15 @@ namespace wave
 			else diagnostics.Report(loc, invalid_assignment_to_rvalue);
 		}
 		break;
+		case BinaryExprKind::Add:
+		break;
+		case BinaryExprKind::Subtract:
+		break;
+		case BinaryExprKind::Multiply:
+		break;
+		case BinaryExprKind::Divide:
+		break;
+		break;
 		}
 
 		UniqueBinaryExprPtr binary_expr = MakeUnique<BinaryExpr>(op, loc);
@@ -157,14 +166,13 @@ namespace wave
 	UniqueCastExprPtr Sema::ActOnCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)
 	{
 		//#todo semantic analysis
-		/*
-		QualifiedType const& cast_type = cast_expr->GetType();
-		QualifiedType const& operand_type = cast_expr->GetOperand()->GetType();
+		QualifiedType const& cast_type = type;
+		QualifiedType const& operand_type = expr->GetType();
 
-		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-		if(IsVoidType(cast_type)) diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-		if(cast_type->IsCompatible(operand_type))  diagnostics.Report(cast_expr->GetLocation(), invalid_cast);
-		*/
+		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(loc, invalid_cast);
+		if(IsVoidType(cast_type)) diagnostics.Report(loc, invalid_cast);
+		if(operand_type->IsCompatible(cast_type)) diagnostics.Report(loc, invalid_cast);
+		
 		UniqueCastExprPtr cast_expr = MakeUnique<CastExpr>(loc, type);
 		cast_expr->SetOperand(std::move(expr));
 		return cast_expr;
@@ -188,9 +196,14 @@ namespace wave
 		return MakeUnique<ConstantInt>(value, loc);
 	}
 
-	UniqueStringLiteralPtr Sema::ActOnStringLiteral(std::string_view str, SourceLocation const& loc)
+	UniqueConstantStringPtr Sema::ActOnConstantString(std::string_view str, SourceLocation const& loc)
 	{
-		return MakeUnique<StringLiteral>(str, loc);
+		return MakeUnique<ConstantString>(str, loc);
+	}
+
+	UniqueConstantBoolPtr Sema::ActOnConstantBool(bool value, SourceLocation const& loc)
+	{
+		return MakeUnique<ConstantBool>(value, loc);
 	}
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)

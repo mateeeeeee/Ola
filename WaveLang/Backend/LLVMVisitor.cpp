@@ -146,18 +146,6 @@ namespace wave
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
 		{
-		case BinaryExprKind::Add:
-			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
-			break;
-		case BinaryExprKind::Subtract:
-			result = builder.CreateSub(lhs_value, rhs_value, "subtmp");
-			break;
-		case BinaryExprKind::Multiply:
-			result = builder.CreateMul(lhs_value, rhs_value, "multmp");
-			break;
-		case BinaryExprKind::Divide:
-			result = builder.CreateSDiv(lhs_value, rhs_value, "sdivtmp");
-			break;
 		case BinaryExprKind::Assign:
 		{
 			if (DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(lhs))
@@ -172,6 +160,18 @@ namespace wave
 			}
 		}
 		break;
+		case BinaryExprKind::Add:
+			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
+			break;
+		case BinaryExprKind::Subtract:
+			result = builder.CreateSub(lhs_value, rhs_value, "subtmp");
+			break;
+		case BinaryExprKind::Multiply:
+			result = builder.CreateMul(lhs_value, rhs_value, "multmp");
+			break;
+		case BinaryExprKind::Divide:
+			result = builder.CreateSDiv(lhs_value, rhs_value, "sdivtmp");
+			break;
 		}
 		WAVE_ASSERT(result);
 		llvm_value_map[&binary_expr] = result;
@@ -182,15 +182,16 @@ namespace wave
 
 	}
 
-	void LLVMVisitor::Visit(ConstantInt const& int_literal, uint32 depth)
+	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32 depth)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), int_literal.GetValue());
-		llvm_value_map[&int_literal] = constant;
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), constant_int.GetValue());
+		llvm_value_map[&constant_int] = constant;
 	}
 
-	void LLVMVisitor::Visit(StringLiteral const& node, uint32 depth)
+	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32 depth)
 	{
-
+		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
+		llvm_value_map[&string_constant] = constant;
 	}
 
 	void LLVMVisitor::Visit(IdentifierExpr const& node, uint32 depth)
@@ -204,6 +205,12 @@ namespace wave
 		WAVE_ASSERT(value);
 		llvm::LoadInst* load = builder.CreateLoad(ConvertToLLVMType(decl_ref.GetType()), value, decl_ref.GetDecl()->GetName());
 		llvm_value_map[&decl_ref] = load;
+	}
+
+	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32 depth)
+	{
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), bool_constant.GetValue());
+		llvm_value_map[&bool_constant] = constant;
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)

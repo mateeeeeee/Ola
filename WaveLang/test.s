@@ -15,20 +15,13 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$16, %rsp
-	.seh_stackalloc 16
+	pushq	%rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	movq	$5, 8(%rsp)
-	movq	8(%rsp), %rax
-	addq	$5, %rax
-	addq	$10, %rax
-	movq	%rax, (%rsp)
-	movq	(%rsp), %rax
-	addq	$10, %rax
-	movq	%rax, (%rsp)
-	movq	(%rsp), %rax
-	addq	$12, %rax
-	addq	$16, %rsp
+	movb	$0, 7(%rsp)
+	xorl	%eax, %eax
+                                        # kill: def $rax killed $eax
+	popq	%rcx
 	retq
 	.seh_endproc
                                         # -- End function

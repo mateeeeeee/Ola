@@ -241,6 +241,7 @@ namespace wave
 		IntLiteral,
 		FloatLiteral,
 		StringLiteral,
+		BoolLiteral,
 		DeclRef,
 		Cast
 	};
@@ -371,10 +372,10 @@ namespace wave
 	private:
 		int64 value;
 	};
-	class StringLiteral final : public Expr
+	class ConstantString final : public Expr
 	{
 	public:
-		StringLiteral(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str) 
+		ConstantString(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str) 
 		{
 			SetType(ArrayType(builtin_types::Char, (uint32)str.size()));
 		}
@@ -386,6 +387,22 @@ namespace wave
 	private:
 		std::string str;
 	};
+	class ConstantBool final : public Expr
+	{
+	public:
+		ConstantBool(bool value, SourceLocation const& loc) : Expr(ExprKind::BoolLiteral, loc), value(value)
+		{
+			SetType(builtin_types::Bool);
+		}
+		bool GetValue() const { return value; }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		bool value;
+	};
+
 	class CastExpr : public Expr
 	{
 	public:

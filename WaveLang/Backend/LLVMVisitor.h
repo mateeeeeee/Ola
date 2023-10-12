@@ -53,7 +53,8 @@ namespace wave
 		virtual void Visit(BinaryExpr const& node, uint32 depth);
 		virtual void Visit(TernaryExpr const& node, uint32 depth);
 		virtual void Visit(ConstantInt const& node, uint32 depth);
-		virtual void Visit(StringLiteral const& node, uint32 depth);
+		virtual void Visit(ConstantString const& node, uint32 depth);
+		virtual void Visit(ConstantBool const& node, uint32 depth);
 		virtual void Visit(IdentifierExpr const& node, uint32 depth);
 		virtual void Visit(DeclRefExpr const& node, uint32 depth);
 

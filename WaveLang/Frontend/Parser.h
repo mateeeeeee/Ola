@@ -104,7 +104,8 @@ namespace wave
 		[[nodiscard]] UniqueConstantIntPtr ParseAlignasExpression();
 		[[nodiscard]] UniqueExprPtr ParsePrimaryExpression();
 		[[nodiscard]] UniqueConstantIntPtr ParseConstantInt();
-		[[nodiscard]] UniqueStringLiteralPtr ParseStringLiteral();
+		[[nodiscard]] UniqueConstantStringPtr ParseConstantString();
+		[[nodiscard]] UniqueConstantBoolPtr ParseConstantBool();
 		[[nodiscard]] UniqueIdentifierExprPtr ParseIdentifier();
 
 		void ParseTypeQualifier(QualifiedType& type);

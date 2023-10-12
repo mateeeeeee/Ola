@@ -153,7 +153,7 @@ namespace wave
 		constexpr FloatType() : Type{ TypeKind::Float, 8, 8 } {}
 		virtual bool IsCompatible(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Float);
+			return other.IsOneOf(TypeKind::Float, TypeKind::Int);
 		}
 	};
 

@@ -552,9 +552,12 @@ namespace wave
 		switch (current_token->GetKind())
 		{
 		case TokenKind::left_round: return ParseParenthesizedExpression();
-		case TokenKind::identifier: return ParseIdentifier(); break;
+		case TokenKind::identifier: return ParseIdentifier(); 
 		case TokenKind::number: return ParseConstantInt();
-		case TokenKind::string_literal: return ParseStringLiteral(); break;
+		case TokenKind::string_literal: return ParseConstantString(); 
+		case TokenKind::KW_true:
+		case TokenKind::KW_false:  return ParseConstantBool();
+
 		default:
 			Diag(unexpected_token);
 		}
@@ -572,13 +575,24 @@ namespace wave
 		return sema->ActOnConstantInt(value, loc);
 	}
 
-	UniqueStringLiteralPtr Parser::ParseStringLiteral()
+	UniqueConstantStringPtr Parser::ParseConstantString()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::string_literal));
 		std::string_view str = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnStringLiteral(str, loc);
+		return sema->ActOnConstantString(str, loc);
+	}
+
+	UniqueConstantBoolPtr Parser::ParseConstantBool()
+	{
+		WAVE_ASSERT(current_token->IsOneOf(TokenKind::KW_true, TokenKind::KW_false));
+		bool value = false;
+		if (current_token->Is(TokenKind::KW_false)) value = false;
+		else if (current_token->Is(TokenKind::KW_true)) value = true;
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnConstantBool(value, loc);
 	}
 
 	UniqueIdentifierExprPtr Parser::ParseIdentifier()

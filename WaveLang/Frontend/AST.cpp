@@ -89,7 +89,7 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
-	void StringLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ConstantString::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -111,6 +111,10 @@ namespace wave
 		WAVE_ASSERT(false);
 	}
 	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -185,7 +189,7 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
-	void StringLiteral::Accept(ASTVisitor& visitor) const
+	void ConstantString::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
@@ -205,6 +209,11 @@ namespace wave
 	}
 
 	void DeclRefExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+
+	void ConstantBool::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
