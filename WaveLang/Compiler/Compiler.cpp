@@ -94,7 +94,7 @@ namespace wave
 			std::string cmd2 = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
 			system(cmd2.c_str());
 
-			res = system(output_file.string().c_str());
+			//res = system(output_file.string().c_str());
 			
 			if (output_assembly)
 			{
