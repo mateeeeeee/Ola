@@ -135,14 +135,16 @@ namespace wave
 
 	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32 depth)
 	{
-		binary_expr.GetLHS()->Accept(*this);
-		llvm::Value* lhs_value = llvm_value_map[binary_expr.GetLHS()];  
-		binary_expr.GetRHS()->Accept(*this);
-		llvm::Value* rhs_value = llvm_value_map[binary_expr.GetRHS()];
+		Expr const* lhs = binary_expr.GetLHS();
+		lhs->Accept(*this);
+		llvm::Value* lhs_value = llvm_value_map[lhs];
+		Expr const* rhs = binary_expr.GetRHS();
+		rhs->Accept(*this);
+		llvm::Value* rhs_value = llvm_value_map[rhs];
 		WAVE_ASSERT(lhs_value && rhs_value);
 
 		llvm::Value* result = nullptr;
-		switch (binary_expr.GetBinaryKind()) 
+		switch (binary_expr.GetBinaryKind())
 		{
 		case BinaryExprKind::Add:
 			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
@@ -156,6 +158,20 @@ namespace wave
 		case BinaryExprKind::Divide:
 			result = builder.CreateSDiv(lhs_value, rhs_value, "sdivtmp");
 			break;
+		case BinaryExprKind::Assign:
+		{
+			if (DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(lhs))
+			{
+				Decl const* decl = decl_ref->GetDecl();
+				llvm::Value* decl_value = llvm_value_map[decl];
+				result = builder.CreateStore(rhs_value, decl_value);
+			}
+			else
+			{
+				WAVE_ASSERT(false);
+			}
+		}
+		break;
 		}
 		WAVE_ASSERT(result);
 		llvm_value_map[&binary_expr] = result;

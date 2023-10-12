@@ -21,8 +21,13 @@ main:                                   # @main
 	movq	$5, 8(%rsp)
 	movq	8(%rsp), %rax
 	addq	$5, %rax
+	addq	$10, %rax
 	movq	%rax, (%rsp)
 	movq	(%rsp), %rax
+	addq	$10, %rax
+	movq	%rax, (%rsp)
+	movq	(%rsp), %rax
+	addq	$12, %rax
 	addq	$16, %rsp
 	retq
 	.seh_endproc

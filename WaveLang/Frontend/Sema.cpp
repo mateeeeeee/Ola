@@ -20,11 +20,10 @@ namespace wave
 
 		if (has_init && has_type_specifier)
 		{
-			//#todo
-			//if (!type->IsCompatible(init_expr->GetType()))
-			//{
-			//	diagnostics.Report(loc, incompatible_initializer);
-			//}
+			if (!type->IsCompatible(init_expr->GetType()))
+			{
+				diagnostics.Report(loc, incompatible_initializer);
+			}
 		}
 		else if(!has_init && !has_type_specifier)
 		{
@@ -124,6 +123,18 @@ namespace wave
 	UniqueBinaryExprPtr Sema::ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs)
 	{
 		//#todo semantic analysis
+		switch (op)
+		{
+		case BinaryExprKind::Assign:
+		{
+			if (lhs->IsLValue())
+			{
+				if (lhs->GetType().IsConst()) diagnostics.Report(loc, invalid_assignment_to_const);
+			}
+			else diagnostics.Report(loc, invalid_assignment_to_rvalue);
+		}
+		break;
+		}
 
 		UniqueBinaryExprPtr binary_expr = MakeUnique<BinaryExpr>(op, loc);
 		binary_expr->SetType(lhs->GetType());

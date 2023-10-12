@@ -22,6 +22,8 @@ DIAG(main_cannot_be_extern, error, "Invalid main function declaration")
 DIAG(incompatible_initializer, error, "Incompatible initializer")
 DIAG(incompatible_return_stmt_type, error, "Incompatible return statement type")
 DIAG(invalid_cast, error, "Invalid cast")
+DIAG(invalid_assignment_to_const, error, "Assignment to const variable")
+DIAG(invalid_assignment_to_rvalue, error, "Assignment to rvalue variable")
 
 DIAG(missing_type_specifier_or_init_expr, error, "Variable declaration has to have atleast one of init expression and type specifier")
 #undef DIAG

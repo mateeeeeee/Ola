@@ -123,7 +123,7 @@ namespace wave
 		constexpr BoolType() : Type{ TypeKind::Bool, 1, 1 } {}
 		virtual bool IsCompatible(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Char, TypeKind::Int);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Int);
 		}
 	};
 
@@ -133,7 +133,7 @@ namespace wave
 		constexpr CharType() : Type{ TypeKind::Char, 1, 1 } {}
 		virtual bool IsCompatible(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Char, TypeKind::Int);
+			return other.Is(TypeKind::Char);
 		}
 	};
 
@@ -143,7 +143,7 @@ namespace wave
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
 		virtual bool IsCompatible(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Char, TypeKind::Int);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Int);
 		}
 	};
 

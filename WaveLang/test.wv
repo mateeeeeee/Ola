@@ -2,6 +2,7 @@
 fn main() -> int
 {
 	let B = 5;
-	let a : int = B + 5;
-	return a;
+	let a : int = B + 5 + 10;
+	a = a + 10;
+	return a + 12;
 }
