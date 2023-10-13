@@ -19,8 +19,7 @@ main:                                   # @main
 	.seh_stackalloc 8
 	.seh_endprologue
 	movb	$0, 7(%rsp)
-	xorl	%eax, %eax
-                                        # kill: def $rax killed $eax
+	movl	$25, %eax
 	popq	%rcx
 	retq
 	.seh_endproc

@@ -69,7 +69,6 @@ namespace wave
 		std::vector<fs::path> object_files(input.sources.size());
 		fs::path output_file(input.output_file);
 		output_file += ".exe";
-		int64 res;
 		for (uint64 i = 0; i < input.sources.size(); ++i)
 		{
 			fs::path file_name = fs::path(input.sources[i]).stem();
@@ -87,17 +86,18 @@ namespace wave
 			assembly_files[i] = assembly_file;
 
 			//llc input.ll -o output.s
-			std::string cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
-			system(cmd.c_str());
+			
 
 			//clang input.s - o my_program
 			std::string cmd2 = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
 			system(cmd2.c_str());
 
-			res = system(output_file.string().c_str());
-			
 			if (output_assembly)
 			{
+				std::string asm_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
+				system(asm_cmd.c_str());
+
+
 				//llvm-ir -> assembly 
 				//assembly -> object file
 			}
@@ -106,6 +106,9 @@ namespace wave
 				//llvm-ir -> object file
 			}
 		}
+
+		int64 res = system(output_file.string().c_str());;
+
 		//link all object files produced
 		//call exe
 		return res;
