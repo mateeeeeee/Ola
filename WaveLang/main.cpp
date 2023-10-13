@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
 	wave::CompilerInput compiler_input{};
 	compiler_input.flags = flags;
-	compiler_input.input_directory = "";
+	compiler_input.input_directory = "Test";
 	compiler_input.sources = input_files;
 	compiler_input.output_file = output_file;
 	compiler_input.output_type = wave::CompilerOutput::Exe;

@@ -157,7 +157,7 @@ namespace wave
 		else
 		{
 			if (Consume(TokenKind::colon)) ParseTypeSpecifier(variable_type);
-			if (Consume(TokenKind::equal)) init_expr = ParseExpression();
+			if (Consume(TokenKind::equal)) init_expr = ParseAssignmentExpression();
 			Expect(TokenKind::semicolon);
 		}
 		return sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr));

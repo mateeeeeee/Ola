@@ -61,6 +61,9 @@
     <Filter Include="Frontend\Parser">
       <UniqueIdentifier>{e5a9bd14-d512-4ead-9d1d-b77b278fa8c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{3d11edb5-5e2e-42b7-b29b-588aabbcc632}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CoreTypes.h">
@@ -137,8 +140,15 @@
     <None Include="Frontend\Tokens.def">
       <Filter>Frontend\Lexer</Filter>
     </None>
-    <None Include="test.wv" />
-    <None Include="test.ll" />
+    <None Include="Test\test.ll">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="Test\test.s">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="Test\test.wv">
+      <Filter>Test</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />
