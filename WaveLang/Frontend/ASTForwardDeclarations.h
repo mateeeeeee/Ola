@@ -14,8 +14,8 @@ namespace wave
 	class ExprStmt;
 	class DeclStmt;
 	class NullStmt;
-	class IfStmt;
 	class ReturnStmt;
+	class IfStmt;
 
 	class Expr;
 	class UnaryExpr;

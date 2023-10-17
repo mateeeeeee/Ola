@@ -169,7 +169,7 @@ namespace wave
 		{
 		case TokenKind::left_brace: return ParseCompoundStatement();
 		case TokenKind::KW_return: return ParseReturnStatement();
-		//case TokenKind::KW_if: return ParseIfStatement();
+		case TokenKind::KW_if: return ParseIfStatement();
 		//case TokenKind::KW_while: return ParseWhileStatement();
 		//case TokenKind::KW_for: return ParseForStatement();
 		//case TokenKind::KW_do: return ParseDoWhileStatement();
@@ -222,6 +222,17 @@ namespace wave
 		Expect(TokenKind::KW_return);
 		UniqueExprStmtPtr ret_expr_stmt = ParseExpressionStatement();
 		return sema->ActOnReturnStmt(std::move(ret_expr_stmt));
+	}
+
+	UniqueIfStmtPtr Parser::ParseIfStatement()
+	{
+		Expect(TokenKind::KW_if);
+		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
+		UniqueStmtPtr then_stmt = ParseStatement();
+		UniqueStmtPtr else_stmt = nullptr;
+		if (Consume(TokenKind::KW_else)) else_stmt = ParseStatement();
+		
+		return sema->ActOnIfStmt(std::move(cond_expr), std::move(then_stmt), std::move(else_stmt));
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>

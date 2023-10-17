@@ -101,26 +101,47 @@ namespace wave
 		{
 			return_stmt.GetExprStmt()->Accept(*this);
 			llvm::Value* return_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
-			builder.CreateRet(return_value);
+			llvm::ReturnInst* return_inst = builder.CreateRet(return_value);
+			llvm_value_map[&return_stmt] = return_inst;
 		}
 		else 
 		{
-			builder.CreateRetVoid();
+			llvm::ReturnInst* return_inst = builder.CreateRetVoid();
+			llvm_value_map[&return_stmt] = return_inst;
 		}
 	}
 
 	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32 depth)
 	{
-		if_stmt.GetConditionExpr()->Accept(*this);
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* then_block  = llvm::BasicBlock::Create(context, "if.then", function);
+		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "if.else", function);
+		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function);
+
+		Expr const* cond_expr = if_stmt.GetConditionExpr();
+		Stmt const* then_stmt = if_stmt.GetThenStmt();
+		Stmt const* else_stmt = if_stmt.GetElseStmt();
+
+		WAVE_ASSERT(cond_expr);
+		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[if_stmt.GetConditionExpr()];
 		WAVE_ASSERT(condition_value);
+		llvm::Value* boolean_cond = builder.CreateICmpNE(condition_value, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
+		builder.CreateCondBr(boolean_cond, then_block, else_block);
+		
+		builder.SetInsertPoint(then_block);
+		then_stmt->Accept(*this);
+		llvm::Value* then_value = llvm_value_map[then_stmt];
+		WAVE_ASSERT(then_value);
+		builder.CreateBr(merge_block);
 
-		llvm::Function* function = builder.GetInsertBlock()->getParent();
-		llvm::BasicBlock* if_block = llvm::BasicBlock::Create(context, "if", function);
-		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "else");
-		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "merge");
-
-		builder.CreateCondBr(condition_value, if_block, else_block);
+		builder.SetInsertPoint(else_block);
+		if (else_stmt)
+		{
+			else_stmt->Accept(*this);
+			builder.CreateBr(merge_block);
+		}
+		builder.SetInsertPoint(merge_block);
 	}
 
 	void LLVMVisitor::Visit(Expr const& node, uint32 depth)

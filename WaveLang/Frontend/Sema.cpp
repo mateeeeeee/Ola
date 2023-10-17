@@ -109,6 +109,15 @@ namespace wave
 		return MakeUnique<ReturnStmt>(std::move(expr_stmt));
 	}
 
+	UniqueIfStmtPtr Sema::ActOnIfStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& then_stmt, UniqueStmtPtr&& else_stmt)
+	{
+		UniqueIfStmtPtr if_stmt = MakeUnique<IfStmt>();
+		if_stmt->SetConditionExpr(std::move(cond_expr));
+		if_stmt->SetThenStmt(std::move(then_stmt));
+		if_stmt->SetElseStmt(std::move(else_stmt));
+		return if_stmt;
+	}
+
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
 	{
 		//#todo semantic analysis

@@ -1,6 +1,9 @@
 
 fn main() -> int
 {
-	let f : bool = false;
-	return 25;
+	let b = 10;
+	let a = b - 10;
+	if(a) return a + b;
+	else return a - b;
+	return 0;
 }
