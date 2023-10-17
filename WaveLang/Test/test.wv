@@ -3,7 +3,15 @@ fn main() -> int
 {
 	let b = 10;
 	let a = b - 10;
-	if(a) return a + b;
-	else return a - b;
+	if(a + 1)
+	{	
+		a = a + 5;
+		return a * a;
+	}
+	else
+	{
+		b = b + 5;
+		return b * b;
+	}
 	return 0;
 }

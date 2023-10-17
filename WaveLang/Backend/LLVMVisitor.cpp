@@ -131,8 +131,6 @@ namespace wave
 		
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
-		llvm::Value* then_value = llvm_value_map[then_stmt];
-		WAVE_ASSERT(then_value);
 		builder.CreateBr(merge_block);
 
 		builder.SetInsertPoint(else_block);

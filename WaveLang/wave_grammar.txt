@@ -1,6 +1,6 @@
 //TODO: 
 1. add public modifier for function to determine is linkage external or no
-2. add Wave Std Lib
+2. add Wave Std Lib : io, math
 
 <translation-unit> ::= {import-declaration}*{ <function_definition> | <function_declaration> }*
 

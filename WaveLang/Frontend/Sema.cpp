@@ -222,7 +222,7 @@ namespace wave
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
 	{
-		if (Decl* decl = ctx.decl_scope_stack.LookUpCurrentScope(name))
+		if (Decl* decl = ctx.decl_scope_stack.LookUp(name))
 		{
 			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 			return decl_ref;

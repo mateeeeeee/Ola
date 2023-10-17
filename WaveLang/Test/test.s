@@ -22,16 +22,24 @@ main:                                   # @main
 	movq	8(%rsp), %rax
 	subq	$10, %rax
 	movq	%rax, (%rsp)
-	cmpq	$0, (%rsp)
+	movq	(%rsp), %rax
+	addq	$1, %rax
+	cmpq	$0, %rax
 	je	.LBB0_2
 # %bb.1:                                # %if.then
 	movq	(%rsp), %rax
-	addq	8(%rsp), %rax
+	addq	$5, %rax
+	movq	%rax, (%rsp)
+	movq	(%rsp), %rax
+	imulq	(%rsp), %rax
 	addq	$16, %rsp
 	retq
 .LBB0_2:                                # %if.else
-	movq	(%rsp), %rax
-	subq	8(%rsp), %rax
+	movq	8(%rsp), %rax
+	addq	$5, %rax
+	movq	%rax, 8(%rsp)
+	movq	8(%rsp), %rax
+	imulq	8(%rsp), %rax
 	addq	$16, %rsp
 	retq
 	.seh_endproc
