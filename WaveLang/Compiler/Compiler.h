@@ -31,4 +31,5 @@ namespace wave
 	};
 
 	int32 Compile(CompilerInput const&);
+	int32 CompileTest(std::string_view input, bool debug);
 }

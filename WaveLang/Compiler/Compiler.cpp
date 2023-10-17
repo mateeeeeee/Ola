@@ -100,4 +100,47 @@ namespace wave
 		res = system(exe_cmd.c_str());
 		return res;
 	}
+
+	int32 CompileTest(std::string_view input, bool debug)
+	{
+		InitLogger();
+		std::string code(input);
+
+		fs::path tmp_directory = std::filesystem::current_path() / "Tmp";
+		fs::create_directory(tmp_directory);
+
+		fs::path file_name = "tmp";
+		fs::path ir_file = tmp_directory / file_name; ir_file += ".ll";
+		fs::path assembly_file	= tmp_directory / file_name; assembly_file += ".s";
+		fs::path output_file	= tmp_directory / file_name; output_file += ".exe";
+
+		//compilation
+		{
+			Diagnostics diagnostics{};
+			SourceBuffer src(code.data(), code.size());
+			AddBuiltins(src);
+			Lexer lex(diagnostics, src);
+			lex.Lex();
+
+			Parser parser(diagnostics, lex.GetTokens());
+			parser.Parse();
+
+			AST const* ast = parser.GetAST();
+			if (debug) DebugVisitor debug_ast(ast);
+
+			LLVMIRGenerator llvm_ir_generator(ir_file.string());
+			llvm_ir_generator.Generate(ast);
+		}
+		std::string compile_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
+		system(compile_cmd.c_str());
+
+		std::string assembly_cmd = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
+		system(assembly_cmd.c_str());
+
+		std::string exe_cmd = std::format("{}", output_file.string());
+		int32 exitcode = system(exe_cmd.c_str());
+		fs::remove_all(tmp_directory);
+		return exitcode;
+	}
+
 }
