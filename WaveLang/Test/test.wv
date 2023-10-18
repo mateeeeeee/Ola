@@ -2,9 +2,19 @@
 fn main() -> int
 {
 	let a = 0;
-	if(a++)
+	let b = 0;
+	let c = 10;
+	if(a)
 	{
 		return a;
 	}
-	return a * 2;
+	else if(b)
+	{
+		return b;
+	}
+	else if(c)
+	{
+		return c;
+	}
+	else return 15;
 }

@@ -15,28 +15,34 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$24, %rsp
-	.seh_stackalloc 24
+	pushq	%rbp
+	.seh_pushreg %rbp
+	subq	$32, %rsp
+	.seh_stackalloc 32
+	leaq	32(%rsp), %rbp
+	.seh_setframe %rbp, 32
 	.seh_endprologue
-	movq	$0, 8(%rsp)
-	movq	8(%rsp), %rax
-	movq	8(%rsp), %rcx
-	movq	%rcx, (%rsp)
-	addq	$1, %rax
-	movq	%rax, 8(%rsp)
-	cmpq	$0, (%rsp)
+	movq	$0, -16(%rbp)
+	movq	$0, -24(%rbp)
+	movq	$10, -32(%rbp)
+	cmpq	$0, -16(%rbp)
 	je	.LBB0_2
 # %bb.1:                                # %if.then
-	movq	8(%rsp), %rax
-	movq	%rax, 16(%rsp)
-	jmp	.LBB0_3
-.LBB0_2:                                # %if.end
-	movq	8(%rsp), %rax
-	shlq	%rax
-	movq	%rax, 16(%rsp)
-.LBB0_3:                                # %exit
-	movq	16(%rsp), %rax
-	addq	$24, %rsp
+	movq	-16(%rbp), %rax
+	movq	%rax, -8(%rbp)
+	jmp	.LBB0_5
+.LBB0_2:                                # %if.else
+	cmpq	$0, -24(%rbp)
+	jne	.LBB0_4
+# %bb.3:                                # %if.end
+	jmp	.LBB0_5
+.LBB0_4:                                # %if.then1
+	movq	-24(%rbp), %rax
+	movq	%rax, -8(%rbp)
+.LBB0_5:                                # %exit
+	movq	-8(%rbp), %rax
+	movq	%rbp, %rsp
+	popq	%rbp
 	retq
 	.seh_endproc
                                         # -- End function

@@ -57,17 +57,32 @@ namespace wave
 		{
 			return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
 			exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
+
 			function_decl.GetBodyStmt()->Accept(*this);
+
 			builder.SetInsertPoint(exit_block);
 			if (return_alloc) builder.CreateRet(Load(function_type->getReturnType(), return_alloc));
 			else builder.CreateRetVoid();
+
+			std::vector<llvm::BasicBlock*> unreachable_blocks{};
+			for (auto&& block : *llvm_function)
+				if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
+			for (auto unreachable_block : unreachable_blocks)
+				unreachable_block->removeFromParent();
+
+			std::vector<llvm::BasicBlock*> empty_blocks{};
+			for (auto&& block : *llvm_function)
+				if (block.empty()) empty_blocks.push_back(&block);
+			for (auto empty_block : empty_blocks)
+			{
+				builder.SetInsertPoint(empty_block);
+				builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
+				builder.CreateBr(exit_block);
+			}
+
 			exit_block = nullptr;
 			return_alloc = nullptr;
 		}
-
-		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *llvm_function) if (block.empty() || block.hasNPredecessors(0)) empty_blocks.push_back(&block);
-		for (auto empty_block : empty_blocks) if(empty_block != entry_block) empty_block->removeFromParent();
 
 		llvm_value_map[&function_decl] = llvm_function;
 	}
@@ -141,9 +156,8 @@ namespace wave
 		if(else_stmt) else_block = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
 		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
 
-		WAVE_ASSERT(cond_expr);
 		cond_expr->Accept(*this);
-		llvm::Value* condition_value = llvm_value_map[if_stmt.GetConditionExpr()];
+		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
 		llvm::Value* condition_load = Load(cond_expr->GetType(), condition_value);
 
@@ -156,7 +170,51 @@ namespace wave
 
 		if (else_stmt)
 		{
+			/*
+			if(a)
+			{
+				return a;
+			}
+			else if(b)
+			{
+				return b;
+			}
+			else if(c)
+			{
+				return c;
+			}
+			else return 10;
+			*/
 			builder.SetInsertPoint(else_block);
+
+			while (IfStmt const* if_stmt_next = dynamic_ast_cast<IfStmt>(else_stmt))
+			{
+				Expr const* cond_expr_next = if_stmt_next->GetConditionExpr();
+				Stmt const* then_stmt_next = if_stmt_next->GetThenStmt();
+				Stmt const* else_stmt_next = if_stmt_next->GetElseStmt();
+
+				llvm::BasicBlock* then_block_next = llvm::BasicBlock::Create(context, "if.then", function, exit_block);
+
+				cond_expr_next->Accept(*this);
+				llvm::Value* condition_value_next = llvm_value_map[cond_expr_next];
+				WAVE_ASSERT(condition_value_next);
+				llvm::Value* condition_load_next = Load(cond_expr_next->GetType(), condition_value_next);
+
+				llvm::Value* boolean_cond_next = builder.CreateICmpNE(condition_load_next, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
+				builder.CreateCondBr(boolean_cond_next, then_block_next, merge_block);
+
+				builder.SetInsertPoint(then_block_next);
+				then_stmt_next->Accept(*this);
+				builder.CreateBr(merge_block);
+
+				if (else_stmt_next)
+				{
+					llvm::BasicBlock* else_block_next = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
+					builder.SetInsertPoint(else_block_next);
+				}
+
+				else_stmt = if_stmt_next->GetElseStmt();
+			}
 			else_stmt->Accept(*this);
 			builder.CreateBr(merge_block);
 		}
