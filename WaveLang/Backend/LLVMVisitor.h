@@ -10,6 +10,7 @@ namespace llvm
 	class Module;
 	class Value;
 	class Type;
+	class AllocaInst;
 }
 
 namespace wave
@@ -63,8 +64,12 @@ namespace wave
 		llvm::IRBuilder<> builder;
 		std::unique_ptr<llvm::Module> module;
 		LLVMValueMap llvm_value_map;
-
+		llvm::AllocaInst* return_alloc;
+		llvm::BasicBlock* exit_block;
 	private:
-		llvm::Type* ConvertToLLVMType(QualifiedType const& type);
+		llvm::Type* ConvertToLLVMType(QualifiedType const&);
+		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
+		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
+		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 	};
 }

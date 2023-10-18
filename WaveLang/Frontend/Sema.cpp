@@ -61,7 +61,7 @@ namespace wave
 
 		if (name == "main")
 		{
-			FunctionType const* func_type = type->TryAs<FunctionType>();
+			FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
 			WAVE_ASSERT(func_type);
 			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParameters().empty())
 			{

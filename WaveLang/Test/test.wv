@@ -10,8 +10,8 @@ fn main() -> int
 	}
 	else
 	{
-		b = b + 5;
-		return b * b;
+		b = a - 3;
+		return b * 2;
 	}
 	return 0;
 	//return -10 + 20;

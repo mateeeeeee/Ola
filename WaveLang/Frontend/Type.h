@@ -43,16 +43,6 @@ namespace wave
 			else return Is(t1) || IsOneOf(ts...);
 		}
 
-		template<typename T>
-		T const& As() const;
-		template<typename T>
-		T& As();
-
-		template<typename T>
-		T const* TryAs() const;
-		template<typename T>
-		T* TryAs();
-
 	private:
 		TypeKind kind = TypeKind::Invalid;
 		uint32 size = 0;
@@ -62,6 +52,35 @@ namespace wave
 		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0)
 			: kind(kind), size(size), align(align) {}
 	};
+
+
+	template<typename T> requires std::derived_from<T, Type>
+	inline bool isa(Type const& t)
+	{
+		return t.GetKind() == std::declval<T>().GetKind();
+	}
+
+	template<typename T> requires std::derived_from<T, Type>
+	inline T& type_cast(Type& t)
+	{
+		return static_cast<T&>(t);
+	}
+	template<typename T> requires std::derived_from<T, Type>
+	inline T const& type_cast(Type const& t)
+	{
+		return static_cast<T const&>(t);
+	}
+
+	template<typename T> requires std::derived_from<T, Type>
+	inline T* dynamic_type_cast(Type& t)
+	{
+		return dynamic_cast<T*>(&t);
+	}
+	template<typename T> requires std::derived_from<T, Type>
+	inline T const* dynamic_type_cast(Type const& t)
+	{
+		return dynamic_cast<T const*>(&t);
+	}
 
 
 	enum QualifierFlag : uint8
@@ -167,7 +186,7 @@ namespace wave
 		virtual bool IsCompatible(Type const& other) const override
 		{
 			if (other.IsNot(TypeKind::Array)) return false;
-			ArrayType const& other_array_type = other.As<ArrayType>();
+			ArrayType const& other_array_type = type_cast<ArrayType>(other);
 
 			bool is_underlying_type_array = base_type->Is(TypeKind::Array);
 			bool is_other_underlying_type_array = other_array_type.base_type->Is(TypeKind::Array);
@@ -228,7 +247,6 @@ namespace wave
 	{
 		return type.Is(K);
 	}
-
 	inline bool (*IsVoidType)(Type const& type) = IsType<TypeKind::Void>;
 	inline bool (*IsArrayType)(Type const& type) = IsType<TypeKind::Array>;
 	inline bool (*IsIntegerType)(Type const& type) = IsType<TypeKind::Int>;
@@ -237,47 +255,4 @@ namespace wave
 	inline bool (*IsFloatType)(Type const& type) = IsType<TypeKind::Float>;
 	inline bool (*IsFunctionType)(Type const& type) = IsType<TypeKind::Function>;
 	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
-
-	template<typename T> requires std::derived_from<T, Type>
-	inline T& type_cast(Type& t)
-	{
-		return static_cast<T&>(t);
-	}
-	template<typename T> requires std::derived_from<T, Type>
-	inline T const& type_cast(Type const& t)
-	{
-		return static_cast<T const&>(t);
-	}
-
-	template<typename T> requires std::derived_from<T, Type>
-	inline T* dynamic_type_cast(Type& t)
-	{
-		return dynamic_cast<T*>(&t);
-	}
-	template<typename T> requires std::derived_from<T, Type>
-	inline T const* dynamic_type_cast(Type const& t)
-	{
-		return dynamic_cast<T const*>(&t);
-	}
-
-	template<typename T>
-	T const& Type::As() const
-	{
-		return type_cast<T>(*this);
-	}
-	template<typename T>
-	T& Type::As()
-	{
-		return type_cast<T>(*this);
-	}
-	template<typename T>
-	T const* Type::TryAs() const
-	{
-		return dynamic_type_cast<T>(*this);
-	}
-	template<typename T>
-	T* Type::TryAs()
-	{
-		return dynamic_type_cast<T>(*this);
-	}
 }

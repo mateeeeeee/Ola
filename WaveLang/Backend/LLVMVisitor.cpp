@@ -2,6 +2,7 @@
 #include "Frontend/AST.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/Casting.h"
 
 namespace wave
 {
@@ -18,22 +19,22 @@ namespace wave
 		ast->translation_unit->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(NodeAST const& node, uint32 depth)
+	void LLVMVisitor::Visit(NodeAST const&, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(TranslationUnit const& translation_unit, uint32 depth)
+	void LLVMVisitor::Visit(TranslationUnit const& translation_unit, uint32)
 	{
 		for (auto&& decl : translation_unit.GetDecls()) decl->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(Decl const& decl, uint32 depth)
+	void LLVMVisitor::Visit(Decl const&, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32 depth)
+	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
@@ -54,105 +55,130 @@ namespace wave
 
 		if (!function_decl.IsDefinition())
 		{
+			return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
+			exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
 			function_decl.GetBodyStmt()->Accept(*this);
+			builder.SetInsertPoint(exit_block);
+			if (return_alloc) builder.CreateRet(Load(function_type->getReturnType(), return_alloc));
+			else builder.CreateRetVoid();
+			exit_block = nullptr;
+			return_alloc = nullptr;
 		}
+
+		std::vector<llvm::BasicBlock*> empty_blocks{};
+		for (auto&& block : *llvm_function) if (block.empty()) empty_blocks.push_back(&block);
+		for (auto empty_block : empty_blocks) empty_block->removeFromParent();
+
 		llvm_value_map[&function_decl] = llvm_function;
 	}
 
-	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32 depth)
+	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
 		llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
-		llvm::AllocaInst* alloca_inst = builder.CreateAlloca(llvm_type, nullptr, var_decl.GetName());
+		llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
 
 		if (var_decl.GetInitExpr()) 
 		{
 			var_decl.GetInitExpr()->Accept(*this);
 			llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-			builder.CreateStore(init_value, alloca_inst);
+			Store(init_value, alloca);
 		}
-		llvm_value_map[&var_decl] = alloca_inst;
+		llvm_value_map[&var_decl] = alloca;
 	}
 
-	void LLVMVisitor::Visit(Stmt const& stmt, uint32 depth)
+	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(CompoundStmt const& compound_stmt, uint32 depth)
+	void LLVMVisitor::Visit(CompoundStmt const& compound_stmt, uint32)
 	{
 		for (auto const& statement : compound_stmt.GetStmts()) statement->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32 depth)
+	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32)
 	{
 		if (decl_stmt.GetDecl()) decl_stmt.GetDecl()->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32 depth)
+	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32)
 	{
 		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(NullStmt const& null_stmt, uint32 depth) {}
+	void LLVMVisitor::Visit(NullStmt const& null_stmt, uint32) {}
 
-	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32 depth)
+	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
 		if (return_stmt.GetExprStmt()) 
 		{
 			return_stmt.GetExprStmt()->Accept(*this);
-			llvm::Value* return_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
-			llvm::ReturnInst* return_inst = builder.CreateRet(return_value);
-			llvm_value_map[&return_stmt] = return_inst;
+			llvm::Value* return_expr_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
+			llvm::Value* return_value = Load(return_stmt.GetExprStmt()->GetExpr()->GetType(), return_expr_value);
+			llvm_value_map[&return_stmt] = Store(return_value, return_alloc);
 		}
 		else 
 		{
-			llvm::ReturnInst* return_inst = builder.CreateRetVoid();
-			llvm_value_map[&return_stmt] = return_inst;
+			llvm_value_map[&return_stmt] = nullptr;
 		}
+		builder.CreateBr(exit_block);
+
+		llvm::BasicBlock* currentBlock = builder.GetInsertBlock();
+		llvm::Function* currentFunction = currentBlock->getParent();
+		llvm::BasicBlock* returnBlock = llvm::BasicBlock::Create(context, "return", currentFunction, currentBlock->getNextNode());
+		builder.SetInsertPoint(returnBlock);
 	}
 
-	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32 depth)
+	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32)
 	{
-		llvm::Function* function = builder.GetInsertBlock()->getParent();
-		llvm::BasicBlock* then_block  = llvm::BasicBlock::Create(context, "if.then", function);
-		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "if.else", function);
-		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function);
-
 		Expr const* cond_expr = if_stmt.GetConditionExpr();
 		Stmt const* then_stmt = if_stmt.GetThenStmt();
 		Stmt const* else_stmt = if_stmt.GetElseStmt();
+
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* then_block = llvm::BasicBlock::Create(context, "if.then", function, exit_block);
+		llvm::BasicBlock* else_block = nullptr;
+		if(else_stmt) else_block = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
+		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
+
+		//% 6 = load i32, ptr % 3, align 4
+		//% 7 = add nsw i32 % 6, 1
+		//% 8 = icmp ne i32 % 7, 0
+		//br i1 % 8, label % 9, label % 15
 
 		WAVE_ASSERT(cond_expr);
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[if_stmt.GetConditionExpr()];
 		WAVE_ASSERT(condition_value);
-		llvm::Value* boolean_cond = builder.CreateICmpNE(condition_value, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
-		builder.CreateCondBr(boolean_cond, then_block, else_block);
+		llvm::Value* condition_load = Load(cond_expr->GetType(), condition_value);
+
+		llvm::Value* boolean_cond = builder.CreateICmpNE(condition_load, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
+		builder.CreateCondBr(boolean_cond, then_block, else_block ? else_block : merge_block);
 		
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
 		builder.CreateBr(merge_block);
 
-		builder.SetInsertPoint(else_block);
 		if (else_stmt)
 		{
+			builder.SetInsertPoint(else_block);
 			else_stmt->Accept(*this);
 			builder.CreateBr(merge_block);
 		}
 		builder.SetInsertPoint(merge_block);
 	}
 
-	void LLVMVisitor::Visit(Expr const& node, uint32 depth)
+	void LLVMVisitor::Visit(Expr const& node, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(UnaryExpr const& node, uint32 depth)
+	void LLVMVisitor::Visit(UnaryExpr const& node, uint32)
 	{
 
 	}
 
-	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32 depth)
+	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32)
 	{
 		Expr const* lhs = binary_expr.GetLHS();
 		lhs->Accept(*this);
@@ -162,71 +188,64 @@ namespace wave
 		llvm::Value* rhs_value = llvm_value_map[rhs];
 		WAVE_ASSERT(lhs_value && rhs_value);
 
+		llvm::Value* lhs_load = Load(lhs->GetType(), lhs_value);
+		llvm::Value* rhs_load = Load(rhs->GetType(), rhs_value);
+
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
 		{
 		case BinaryExprKind::Assign:
 		{
-			if (DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(lhs))
-			{
-				Decl const* decl = decl_ref->GetDecl();
-				llvm::Value* decl_value = llvm_value_map[decl];
-				result = builder.CreateStore(rhs_value, decl_value);
-			}
-			else
-			{
-				WAVE_ASSERT(false);
-			}
+			result = Store(rhs_value, lhs_value);
 		}
 		break;
 		case BinaryExprKind::Add:
-			result = builder.CreateAdd(lhs_value, rhs_value, "addtmp");
+			result = builder.CreateAdd(lhs_load, rhs_load);
 			break;
 		case BinaryExprKind::Subtract:
-			result = builder.CreateSub(lhs_value, rhs_value, "subtmp");
+			result = builder.CreateSub(lhs_load, rhs_load);
 			break;
 		case BinaryExprKind::Multiply:
-			result = builder.CreateMul(lhs_value, rhs_value, "multmp");
+			result = builder.CreateMul(lhs_load, rhs_load);
 			break;
 		case BinaryExprKind::Divide:
-			result = builder.CreateSDiv(lhs_value, rhs_value, "sdivtmp");
+			result = builder.CreateSDiv(lhs_load, rhs_load);
 			break;
 		}
 		WAVE_ASSERT(result);
 		llvm_value_map[&binary_expr] = result;
 	}
 
-	void LLVMVisitor::Visit(TernaryExpr const& node, uint32 depth)
+	void LLVMVisitor::Visit(TernaryExpr const&, uint32)
 	{
 
 	}
 
-	void LLVMVisitor::Visit(IdentifierExpr const& node, uint32 depth)
+	void LLVMVisitor::Visit(IdentifierExpr const&, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(DeclRefExpr const& decl_ref, uint32 depth)
+	void LLVMVisitor::Visit(DeclRefExpr const& decl_ref, uint32)
 	{
 		llvm::Value* value = llvm_value_map[decl_ref.GetDecl()];
 		WAVE_ASSERT(value);
-		llvm::LoadInst* load = builder.CreateLoad(ConvertToLLVMType(decl_ref.GetType()), value, decl_ref.GetDecl()->GetName());
-		llvm_value_map[&decl_ref] = load;
+		llvm_value_map[&decl_ref] = value;
 	}
 
-	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32 depth)
+	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), constant_int.GetValue());
 		llvm_value_map[&constant_int] = constant;
 	}
 
-	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32 depth)
+	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
 		llvm_value_map[&string_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32 depth)
+	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), bool_constant.GetValue());
 		llvm_value_map[&bool_constant] = constant;
@@ -248,12 +267,12 @@ namespace wave
 			return llvm::Type::getDoubleTy(context);
 		case TypeKind::Array:
 		{
-			ArrayType const& array_type = type->As<ArrayType>();
+			ArrayType const& array_type = type_cast<ArrayType>(type);
 			return llvm::ArrayType::get(ConvertToLLVMType(array_type.GetBaseType()), array_type.GetArraySize());
 		}
 		case TypeKind::Function:
 		{
-			FunctionType const& function_type = type->As<FunctionType>();
+			FunctionType const& function_type = type_cast<FunctionType>(type);
 			std::span<FunctionParameter const> function_params = function_type.GetParameters();
 
 			llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
@@ -271,6 +290,28 @@ namespace wave
 			WAVE_UNREACHABLE();
 		}
 		return nullptr;
+	}
+
+	llvm::Value* LLVMVisitor::Load(QualifiedType const& type, llvm::Value* ptr)
+	{
+		llvm::Type* llvm_type = ConvertToLLVMType(type);
+		return Load(llvm_type, ptr);
+	}
+
+	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
+	{
+		if (isa<llvm::ConstantData, llvm::BinaryOperator>(ptr)) return ptr;
+
+		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
+		return load_inst;
+	}
+
+	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
+	{
+		if (isa<llvm::ConstantData, llvm::BinaryOperator>(value)) 
+			return builder.CreateStore(value, ptr);
+		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
+		return builder.CreateStore(load, ptr);
 	}
 
 }
