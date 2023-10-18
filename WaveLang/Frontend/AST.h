@@ -262,8 +262,7 @@ namespace wave
 		PreIncrement, PreDecrement,
 		PostIncrement, PostDecrement,
 		Plus, Minus, BitNot,
-		LogicalNot,
-		Dereference, AddressOf
+		LogicalNot
 	};
 	enum class BinaryExprKind : uint8
 	{

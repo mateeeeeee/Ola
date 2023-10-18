@@ -66,8 +66,8 @@ namespace wave
 		}
 
 		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *llvm_function) if (block.empty()) empty_blocks.push_back(&block);
-		for (auto empty_block : empty_blocks) empty_block->removeFromParent();
+		for (auto&& block : *llvm_function) if (block.empty() || block.hasNPredecessors(0)) empty_blocks.push_back(&block);
+		for (auto empty_block : empty_blocks) if(empty_block != entry_block) empty_block->removeFromParent();
 
 		llvm_value_map[&function_decl] = llvm_function;
 	}
@@ -112,10 +112,10 @@ namespace wave
 	{
 		if (return_stmt.GetExprStmt()) 
 		{
-			return_stmt.GetExprStmt()->Accept(*this);
+			return_stmt.GetExprStmt()->GetExpr()->Accept(*this);
 			llvm::Value* return_expr_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
-			llvm::Value* return_value = Load(return_stmt.GetExprStmt()->GetExpr()->GetType(), return_expr_value);
-			llvm_value_map[&return_stmt] = Store(return_value, return_alloc);
+			//llvm::Value* return_value = Load(return_stmt.GetExprStmt()->GetExpr()->GetType(), return_expr_value);
+			llvm_value_map[&return_stmt] = Store(return_expr_value, return_alloc);
 		}
 		else 
 		{
@@ -140,11 +140,6 @@ namespace wave
 		llvm::BasicBlock* else_block = nullptr;
 		if(else_stmt) else_block = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
 		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
-
-		//% 6 = load i32, ptr % 3, align 4
-		//% 7 = add nsw i32 % 6, 1
-		//% 8 = icmp ne i32 % 7, 0
-		//br i1 % 8, label % 9, label % 15
 
 		WAVE_ASSERT(cond_expr);
 		cond_expr->Accept(*this);
@@ -173,9 +168,72 @@ namespace wave
 		WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(UnaryExpr const& node, uint32)
+	void LLVMVisitor::Visit(UnaryExpr const& unary_expr, uint32)
 	{
+		Expr const* operand = unary_expr.GetOperand();
+		operand->Accept(*this);
+		llvm::Value* operand_value = llvm_value_map[operand];
+		WAVE_ASSERT(operand_value);
+		llvm::Value* operand_load = Load(operand->GetType(), operand_value);
 
+		llvm::Value* result = nullptr;
+		switch (unary_expr.GetUnaryKind())
+		{
+		case UnaryExprKind::PreIncrement:
+		{
+			llvm::Value* incremented_value = builder.CreateAdd(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			Store(incremented_value, operand_value);
+			result = incremented_value;
+		}
+		break;
+		case UnaryExprKind::PreDecrement:
+		{
+			llvm::Value* decremented_value = builder.CreateSub(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			Store(decremented_value, operand_value);
+			result = decremented_value;
+		}
+		break;
+		case UnaryExprKind::PostIncrement:
+		{
+			result = builder.CreateAlloca(operand_value->getType());
+			Store(operand_value, result);
+			llvm::Value* incremented_value = builder.CreateAdd(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			Store(incremented_value, operand_value);
+		}
+		break;
+		case UnaryExprKind::PostDecrement:
+		{
+			result = builder.CreateAlloca(operand_value->getType());
+			Store(operand_value, result);
+			llvm::Value* decremented_value = builder.CreateSub(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			Store(decremented_value, operand_value);
+		}
+		break;
+		case UnaryExprKind::Plus:
+		{
+			result = operand_value;
+		}
+		break;
+		case UnaryExprKind::Minus:
+		{
+			result = builder.CreateNeg(operand_load);
+		}
+		break;
+		case UnaryExprKind::BitNot:
+		{
+			result = builder.CreateNot(operand_load);
+		}
+		break;
+		case UnaryExprKind::LogicalNot:
+		{
+			result = builder.CreateICmpEQ(operand_load, llvm::ConstantInt::get(operand_value->getType(), 0));
+		}
+		break;
+		default:
+			WAVE_ASSERT(false);
+		}
+		WAVE_ASSERT(result);
+		llvm_value_map[&unary_expr] = result;
 	}
 
 	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32)
@@ -300,7 +358,7 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
-		if (isa<llvm::ConstantData, llvm::BinaryOperator>(ptr)) return ptr;
+		if (isa<llvm::ConstantData, llvm::UnaryOperator, llvm::BinaryOperator>(ptr)) return ptr;
 
 		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
 		return load_inst;
@@ -308,8 +366,7 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
-		if (isa<llvm::ConstantData, llvm::BinaryOperator>(value)) 
-			return builder.CreateStore(value, ptr);
+		if (isa<llvm::ConstantData, llvm::UnaryOperator, llvm::BinaryOperator>(value)) return builder.CreateStore(value, ptr);
 		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}

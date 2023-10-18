@@ -1,18 +1,10 @@
 
 fn main() -> int
 {
-	let b = 10;
-	let a = b - 10;
-	if(a + 1)
-	{	
-		a = a + 5;
-		return a * a;
-	}
-	else
+	let a = 0;
+	if(a++)
 	{
-		b = a - 3;
-		return b * 2;
+		return a;
 	}
-	return 0;
-	//return -10 + 20;
+	return a * 2;
 }

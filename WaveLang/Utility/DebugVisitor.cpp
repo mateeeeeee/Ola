@@ -86,10 +86,6 @@ namespace wave
 				return "~";
 			case UnaryExprKind::LogicalNot:
 				return "!";
-			case UnaryExprKind::Dereference:
-				return "*";
-			case UnaryExprKind::AddressOf:
-				return "&";
 			default:
 				return "invalid";
 			}

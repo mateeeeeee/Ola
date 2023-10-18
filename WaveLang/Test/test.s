@@ -18,26 +18,19 @@ main:                                   # @main
 	subq	$24, %rsp
 	.seh_stackalloc 24
 	.seh_endprologue
-	movq	$10, 8(%rsp)
+	movq	$0, 8(%rsp)
 	movq	8(%rsp), %rax
-	subq	$10, %rax
-	movq	%rax, (%rsp)
-	movq	(%rsp), %rax
+	movq	8(%rsp), %rcx
+	movq	%rcx, (%rsp)
 	addq	$1, %rax
-	cmpq	$0, %rax
+	movq	%rax, 8(%rsp)
+	cmpq	$0, (%rsp)
 	je	.LBB0_2
 # %bb.1:                                # %if.then
-	movq	(%rsp), %rax
-	addq	$5, %rax
-	movq	%rax, (%rsp)
-	movq	(%rsp), %rax
-	imulq	(%rsp), %rax
+	movq	8(%rsp), %rax
 	movq	%rax, 16(%rsp)
 	jmp	.LBB0_3
-.LBB0_2:                                # %if.else
-	movq	(%rsp), %rax
-	subq	$3, %rax
-	movq	%rax, 8(%rsp)
+.LBB0_2:                                # %if.end
 	movq	8(%rsp), %rax
 	shlq	%rax
 	movq	%rax, 16(%rsp)

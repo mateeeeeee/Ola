@@ -66,6 +66,7 @@ namespace wave
 		LLVMValueMap llvm_value_map;
 		llvm::AllocaInst* return_alloc;
 		llvm::BasicBlock* exit_block;
+
 	private:
 		llvm::Type* ConvertToLLVMType(QualifiedType const&);
 		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
