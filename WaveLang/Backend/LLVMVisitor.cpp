@@ -159,11 +159,18 @@ namespace wave
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
-		llvm::Value* condition_load = Load(cond_expr->GetType(), condition_value);
 
-		llvm::Value* boolean_cond = builder.CreateICmpNE(condition_load, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
-		builder.CreateCondBr(boolean_cond, then_block, else_block ? else_block : merge_block);
-		
+		if (IsBoolean(condition_value->getType()))
+		{
+			builder.CreateCondBr(condition_value, then_block, else_block ? else_block : merge_block);
+		}
+		else
+		{
+			llvm::Value* condition = Load(cond_expr->GetType(), condition_value);
+			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "ifcond");
+			builder.CreateCondBr(boolean_cond, then_block, else_block ? else_block : merge_block);
+		}
+
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
 		builder.CreateBr(merge_block);
@@ -184,25 +191,25 @@ namespace wave
 
 	void LLVMVisitor::Visit(UnaryExpr const& unary_expr, uint32)
 	{
-		Expr const* operand = unary_expr.GetOperand();
-		operand->Accept(*this);
-		llvm::Value* operand_value = llvm_value_map[operand];
+		Expr const* operand_expr = unary_expr.GetOperand();
+		operand_expr->Accept(*this);
+		llvm::Value* operand_value = llvm_value_map[operand_expr];
 		WAVE_ASSERT(operand_value);
-		llvm::Value* operand_load = Load(operand->GetType(), operand_value);
+		llvm::Value* operand = Load(operand_expr->GetType(), operand_value);
 
 		llvm::Value* result = nullptr;
 		switch (unary_expr.GetUnaryKind())
 		{
 		case UnaryExprKind::PreIncrement:
 		{
-			llvm::Value* incremented_value = builder.CreateAdd(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			llvm::Value* incremented_value = builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(incremented_value, operand_value);
 			result = incremented_value;
 		}
 		break;
 		case UnaryExprKind::PreDecrement:
 		{
-			llvm::Value* decremented_value = builder.CreateSub(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			llvm::Value* decremented_value = builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(decremented_value, operand_value);
 			result = decremented_value;
 		}
@@ -211,7 +218,7 @@ namespace wave
 		{
 			result = builder.CreateAlloca(operand_value->getType());
 			Store(operand_value, result);
-			llvm::Value* incremented_value = builder.CreateAdd(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			llvm::Value* incremented_value = builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(incremented_value, operand_value);
 		}
 		break;
@@ -219,7 +226,7 @@ namespace wave
 		{
 			result = builder.CreateAlloca(operand_value->getType());
 			Store(operand_value, result);
-			llvm::Value* decremented_value = builder.CreateSub(operand_load, llvm::ConstantInt::get(operand_load->getType(), 1));
+			llvm::Value* decremented_value = builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(decremented_value, operand_value);
 		}
 		break;
@@ -230,17 +237,17 @@ namespace wave
 		break;
 		case UnaryExprKind::Minus:
 		{
-			result = builder.CreateNeg(operand_load);
+			result = builder.CreateNeg(operand);
 		}
 		break;
 		case UnaryExprKind::BitNot:
 		{
-			result = builder.CreateNot(operand_load);
+			result = builder.CreateNot(operand);
 		}
 		break;
 		case UnaryExprKind::LogicalNot:
 		{
-			result = builder.CreateICmpEQ(operand_load, llvm::ConstantInt::get(operand_value->getType(), 0));
+			result = builder.CreateICmpEQ(operand, llvm::ConstantInt::get(operand_value->getType(), 0));
 		}
 		break;
 		default:
@@ -252,16 +259,16 @@ namespace wave
 
 	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32)
 	{
-		Expr const* lhs = binary_expr.GetLHS();
-		lhs->Accept(*this);
-		llvm::Value* lhs_value = llvm_value_map[lhs];
-		Expr const* rhs = binary_expr.GetRHS();
-		rhs->Accept(*this);
-		llvm::Value* rhs_value = llvm_value_map[rhs];
+		Expr const* lhs_expr = binary_expr.GetLHS();
+		lhs_expr->Accept(*this);
+		llvm::Value* lhs_value = llvm_value_map[lhs_expr];
+		Expr const* rhs_expr = binary_expr.GetRHS();
+		rhs_expr->Accept(*this);
+		llvm::Value* rhs_value = llvm_value_map[rhs_expr];
 		WAVE_ASSERT(lhs_value && rhs_value);
 
-		llvm::Value* lhs_load = Load(lhs->GetType(), lhs_value);
-		llvm::Value* rhs_load = Load(rhs->GetType(), rhs_value);
+		llvm::Value* lhs = Load(lhs_expr->GetType(), lhs_value);
+		llvm::Value* rhs = Load(rhs_expr->GetType(), rhs_value);
 
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
@@ -272,17 +279,79 @@ namespace wave
 		}
 		break;
 		case BinaryExprKind::Add:
-			result = builder.CreateAdd(lhs_load, rhs_load);
-			break;
+		{
+			result = builder.CreateAdd(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::Subtract:
-			result = builder.CreateSub(lhs_load, rhs_load);
-			break;
+		{
+			result = builder.CreateSub(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::Multiply:
-			result = builder.CreateMul(lhs_load, rhs_load);
-			break;
+		{
+			result = builder.CreateMul(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::Divide:
-			result = builder.CreateSDiv(lhs_load, rhs_load);
+		{
+			result = builder.CreateSDiv(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Modulo:
+		{
+			result = builder.CreateSRem(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::ShiftLeft:
 			break;
+		case BinaryExprKind::ShiftRight:
+			break;
+		case BinaryExprKind::BitAnd:
+			break;
+		case BinaryExprKind::BitOr:
+			break;
+		case BinaryExprKind::BitXor:
+			break;
+		case BinaryExprKind::Comma:
+			break;
+		case BinaryExprKind::LogicalAnd:
+			break;
+		case BinaryExprKind::LogicalOr:
+			break;
+		case BinaryExprKind::Equal:
+		{
+			result = builder.CreateICmpEQ(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::NotEqual:
+		{
+			result = builder.CreateICmpNE(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Less:
+		{
+			result = builder.CreateICmpSLT(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Greater:
+		{
+			result = builder.CreateICmpSGT(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::LessEqual:
+		{
+			result = builder.CreateICmpSLE(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::GreaterEqual:
+		{
+			result = builder.CreateICmpSGE(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Invalid:
+		default:
+			WAVE_ASSERT(false);
 		}
 		WAVE_ASSERT(result);
 		llvm_value_map[&binary_expr] = result;
@@ -321,6 +390,11 @@ namespace wave
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), bool_constant.GetValue());
 		llvm_value_map[&bool_constant] = constant;
+	}
+
+	bool LLVMVisitor::IsBoolean(llvm::Type* type)
+	{
+		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)

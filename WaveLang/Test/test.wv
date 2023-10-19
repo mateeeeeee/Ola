@@ -2,11 +2,11 @@
 fn main() -> int
 {
 	let a = 0;
-	let b = 0;
-	let c = 0;
-	if(a++)
+	a += 5;
+	let b = 5;
+	if(a != b)
 	{
-		return a;
+		++a;
 	}
-	return a*2;
+	return a;
 }

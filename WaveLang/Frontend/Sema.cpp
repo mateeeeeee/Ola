@@ -131,7 +131,7 @@ namespace wave
 
 	UniqueBinaryExprPtr Sema::ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs)
 	{
-		//#todo semantic analysis
+		QualifiedType type{};
 		switch (op)
 		{
 		case BinaryExprKind::Assign:
@@ -144,18 +144,51 @@ namespace wave
 		}
 		break;
 		case BinaryExprKind::Add:
-		break;
 		case BinaryExprKind::Subtract:
-		break;
 		case BinaryExprKind::Multiply:
-		break;
 		case BinaryExprKind::Divide:
+		case BinaryExprKind::Modulo:
+		{
+			type = lhs->GetType();
+		}
 		break;
+		case BinaryExprKind::ShiftLeft:
+		case BinaryExprKind::ShiftRight:
+		{
+		}
 		break;
+		case BinaryExprKind::BitAnd:
+		case BinaryExprKind::BitOr:
+		case BinaryExprKind::BitXor:
+		{
+		}
+		break;
+		case BinaryExprKind::LogicalAnd:
+		case BinaryExprKind::LogicalOr:
+		{
+		}
+		break;
+		case BinaryExprKind::Equal:
+		case BinaryExprKind::NotEqual:
+		case BinaryExprKind::Less:
+		case BinaryExprKind::Greater:
+		case BinaryExprKind::LessEqual:
+		case BinaryExprKind::GreaterEqual:
+		{
+			type = builtin_types::Bool;
+		}
+		break;
+		case BinaryExprKind::Comma:
+		{
+		}
+		break;
+		case BinaryExprKind::Invalid:
+		default:
+			WAVE_ASSERT(false);
 		}
 
 		UniqueBinaryExprPtr binary_expr = MakeUnique<BinaryExpr>(op, loc);
-		binary_expr->SetType(lhs->GetType());
+		binary_expr->SetType(type);
 		binary_expr->SetLHS(std::move(lhs));
 		binary_expr->SetRHS(std::move(rhs));
 		return binary_expr;

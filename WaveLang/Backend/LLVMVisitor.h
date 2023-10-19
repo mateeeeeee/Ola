@@ -68,6 +68,7 @@ namespace wave
 		llvm::BasicBlock* exit_block;
 
 	private:
+		bool IsBoolean(llvm::Type*);
 		llvm::Type* ConvertToLLVMType(QualifiedType const&);
 		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);

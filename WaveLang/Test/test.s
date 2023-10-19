@@ -15,30 +15,27 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$40, %rsp
-	.seh_stackalloc 40
+	subq	$24, %rsp
+	.seh_stackalloc 24
 	.seh_endprologue
-	movq	$0, 24(%rsp)
-	movq	$0, 16(%rsp)
 	movq	$0, 8(%rsp)
-	movq	24(%rsp), %rax
-	movq	24(%rsp), %rcx
-	movq	%rcx, (%rsp)
-	addq	$1, %rax
-	movq	%rax, 24(%rsp)
-	cmpq	$0, (%rsp)
+	movq	8(%rsp), %rax
+	addq	$5, %rax
+	movq	%rax, 8(%rsp)
+	movq	$5, (%rsp)
+	movq	8(%rsp), %rax
+	cmpq	(%rsp), %rax
 	je	.LBB0_2
 # %bb.1:                                # %if.then
-	movq	24(%rsp), %rax
-	movq	%rax, 32(%rsp)
-	jmp	.LBB0_3
+	movq	8(%rsp), %rax
+	addq	$1, %rax
+	movq	%rax, 8(%rsp)
 .LBB0_2:                                # %if.end
-	movq	24(%rsp), %rax
-	shlq	%rax
-	movq	%rax, 32(%rsp)
-.LBB0_3:                                # %exit
-	movq	32(%rsp), %rax
-	addq	$40, %rsp
+	movq	8(%rsp), %rax
+	movq	%rax, 16(%rsp)
+# %bb.3:                                # %exit
+	movq	16(%rsp), %rax
+	addq	$24, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
