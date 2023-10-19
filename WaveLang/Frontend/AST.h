@@ -178,7 +178,15 @@ namespace wave
 	public:
 		ExprStmt(UniqueExprPtr&& expr) : Stmt(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr)) {}
 
-		Expr const* GetExpr() const { return expr.get(); }
+		Expr const* GetExpr() const 
+		{
+			return expr.get(); 
+		}
+
+		Expr* ReleaseExpr()
+		{
+			return expr.release();
+		}
 
 		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
 		virtual void Accept(ASTVisitor& visitor) const override;
@@ -243,7 +251,6 @@ namespace wave
 		UniqueStmtPtr else_stmt;
 	};
 
-
 	enum class ExprKind : uint8
 	{
 		Unary,
@@ -255,7 +262,7 @@ namespace wave
 		StringLiteral,
 		BoolLiteral,
 		DeclRef,
-		Cast
+		ImplicitCast
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -276,6 +283,7 @@ namespace wave
 		LessEqual, GreaterEqual,
 		Invalid
 	};
+
 	enum class ExprValueCategory : bool
 	{
 		LValue,
@@ -375,7 +383,7 @@ namespace wave
 	class IdentifierExpr : public Expr
 	{
 	protected:
-		explicit IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::DeclRef, loc), name(name)
+		explicit IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
@@ -391,8 +399,7 @@ namespace wave
 	class DeclRefExpr : public IdentifierExpr
 	{
 	public:
-		DeclRefExpr(Decl* decl, SourceLocation const& loc)
-			: IdentifierExpr(decl->GetName(), loc), decl(decl)
+		DeclRefExpr(Decl* decl, SourceLocation const& loc) : IdentifierExpr(ExprKind::DeclRef, decl->GetName(), loc), decl(decl)
 		{
 			SetType(decl->GetType());
 		}
@@ -469,11 +476,10 @@ namespace wave
 		double value;
 	};
 
-	class CastExpr : public Expr
+	class ImplicitCastExpr : public Expr
 	{
 	public:
-		CastExpr(SourceLocation const& loc, QualifiedType const& qtype)
-			: Expr(ExprKind::Cast, loc), operand(nullptr)
+		ImplicitCastExpr(SourceLocation const& loc, QualifiedType const& qtype) : Expr(ExprKind::ImplicitCast, loc), operand(nullptr)
 		{
 			SetType(qtype);
 			SetValueCategory(ExprValueCategory::RValue);

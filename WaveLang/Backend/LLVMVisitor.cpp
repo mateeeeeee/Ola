@@ -13,7 +13,6 @@ namespace wave
 		llvm::InitializeAllTargetMCs();
 		llvm::InitializeAllAsmPrinters();
 		llvm::InitializeAllAsmParsers();
-
 		module = std::make_unique<llvm::Module>("WaveModule", context);
 
 		ast->translation_unit->Accept(*this);
@@ -125,11 +124,11 @@ namespace wave
 
 	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
-		if (return_stmt.GetExprStmt()) 
+		if (ExprStmt const* expr_stmt = return_stmt.GetExprStmt()) 
 		{
-			return_stmt.GetExprStmt()->GetExpr()->Accept(*this);
-			llvm::Value* return_expr_value = llvm_value_map[return_stmt.GetExprStmt()->GetExpr()];
-			//llvm::Value* return_value = Load(return_stmt.GetExprStmt()->GetExpr()->GetType(), return_expr_value);
+			expr_stmt->GetExpr()->Accept(*this);
+			llvm::Value* return_expr_value = llvm_value_map[expr_stmt->GetExpr()];
+			WAVE_ASSERT(return_expr_value);
 			llvm_value_map[&return_stmt] = Store(return_expr_value, return_alloc);
 		}
 		else 
@@ -392,9 +391,32 @@ namespace wave
 		llvm_value_map[&bool_constant] = constant;
 	}
 
-	bool LLVMVisitor::IsBoolean(llvm::Type* type)
+	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32 depth)
 	{
-		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
+		llvm::Type* cast_type = ConvertToLLVMType(cast_expr.GetType());
+		Expr const* cast_operand_expr = cast_expr.GetOperand();
+		llvm::Type* cast_operand_type = ConvertToLLVMType(cast_operand_expr->GetType());
+		cast_operand_expr->Accept(*this);
+		llvm::Value* cast_operand_value = llvm_value_map[cast_operand_expr];
+		WAVE_ASSERT(cast_operand_value);
+		
+		if (cast_expr.GetType()->Is(TypeKind::Int))
+		{
+			if (cast_operand_expr->GetType()->Is(TypeKind::Bool))
+			{
+				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
+				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, llvm::Type::getInt64Ty(context));
+			}
+		}
+		else if (cast_expr.GetType()->Is(TypeKind::Bool))
+		{
+			if (cast_operand_expr->GetType()->Is(TypeKind::Int))
+			{
+				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
+				llvm_value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+			}
+		}
+		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)
@@ -446,7 +468,7 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
-		if (isa<llvm::ConstantData, llvm::UnaryOperator, llvm::BinaryOperator>(ptr)) return ptr;
+		if (!isa<llvm::AllocaInst>(ptr)) return ptr;
 
 		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
 		return load_inst;
@@ -454,9 +476,14 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
-		if (isa<llvm::ConstantData, llvm::UnaryOperator, llvm::BinaryOperator>(value)) return builder.CreateStore(value, ptr);
+		if (!isa<llvm::AllocaInst>(value)) return builder.CreateStore(value, ptr);
 		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
 		return builder.CreateStore(load, ptr);
+	}
+
+	bool LLVMVisitor::IsBoolean(llvm::Type* type)
+	{
+		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
 	}
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
+#include <functional>
 #include "Frontend/ASTVisitor.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
@@ -56,22 +57,26 @@ namespace wave
 		virtual void Visit(ConstantInt const&, uint32 depth) override;
 		virtual void Visit(ConstantString const&, uint32 depth) override;
 		virtual void Visit(ConstantBool const&, uint32 depth) override;
-		virtual void Visit(CastExpr const&, uint32 depth) override {}
+		virtual void Visit(ImplicitCastExpr const&, uint32 depth) override;
 		virtual void Visit(FunctionCallExpr const&, uint32 depth) override {}
 
 	private:
 		llvm::LLVMContext context;
 		llvm::IRBuilder<> builder;
+
 		std::unique_ptr<llvm::Module> module;
 		LLVMValueMap llvm_value_map;
+
 		llvm::AllocaInst* return_alloc;
 		llvm::BasicBlock* exit_block;
 
 	private:
-		bool IsBoolean(llvm::Type*);
-		llvm::Type* ConvertToLLVMType(QualifiedType const&);
+
 		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
+		llvm::Type* ConvertToLLVMType(QualifiedType const&);
+
+		static bool IsBoolean(llvm::Type*);
 	};
 }

@@ -18,22 +18,17 @@ main:                                   # @main
 	subq	$24, %rsp
 	.seh_stackalloc 24
 	.seh_endprologue
-	movq	$0, 8(%rsp)
-	movq	8(%rsp), %rax
-	addq	$5, %rax
-	movq	%rax, 8(%rsp)
-	movq	$5, (%rsp)
-	movq	8(%rsp), %rax
-	cmpq	(%rsp), %rax
-	je	.LBB0_2
-# %bb.1:                                # %if.then
-	movq	8(%rsp), %rax
-	addq	$1, %rax
-	movq	%rax, 8(%rsp)
-.LBB0_2:                                # %if.end
-	movq	8(%rsp), %rax
+	movq	$100, 8(%rsp)
+	cmpq	$0, 8(%rsp)
+	setne	%al
+	andb	$1, %al
+	movb	%al, 7(%rsp)
+	movb	7(%rsp), %al
+	andb	$1, %al
+	movzbl	%al, %eax
+                                        # kill: def $rax killed $eax
 	movq	%rax, 16(%rsp)
-# %bb.3:                                # %exit
+# %bb.1:                                # %exit
 	movq	16(%rsp), %rax
 	addq	$24, %rsp
 	retq

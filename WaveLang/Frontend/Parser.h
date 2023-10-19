@@ -97,7 +97,6 @@ namespace wave
 		[[nodiscard]] UniqueExprPtr ParseShiftExpression();
 		[[nodiscard]] UniqueExprPtr ParseAdditiveExpression();
 		[[nodiscard]] UniqueExprPtr ParseMultiplicativeExpression();
-		[[nodiscard]] UniqueExprPtr ParseCastExpression();
 		[[nodiscard]] UniqueExprPtr ParseUnaryExpression();
 		[[nodiscard]] UniqueExprPtr ParsePostFixExpression();
 		[[nodiscard]] UniqueExprPtr ParseSizeofExpression();

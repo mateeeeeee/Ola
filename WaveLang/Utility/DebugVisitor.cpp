@@ -208,7 +208,7 @@ namespace wave
 		WAVE_DEBUG("{}ConstantFloat\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(CastExpr const&, uint32 depth)
+	void DebugVisitor::Visit(ImplicitCastExpr const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}CastExpr\n", GetIndentation(depth));
 	}

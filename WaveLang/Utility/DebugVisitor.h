@@ -33,7 +33,7 @@ namespace wave
 		virtual void Visit(ConstantString const&, uint32 depth) override;
 		virtual void Visit(ConstantBool const&, uint32 depth) override;
 		virtual void Visit(ConstantFloat const&, uint32 depth) override;
-		virtual void Visit(CastExpr const&, uint32 depth) override;
+		virtual void Visit(ImplicitCastExpr const&, uint32 depth) override;
 		virtual void Visit(FunctionCallExpr const&, uint32 depth) override;
 	};
 }

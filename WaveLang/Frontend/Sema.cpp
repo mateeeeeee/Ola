@@ -20,9 +20,13 @@ namespace wave
 
 		if (has_init && has_type_specifier)
 		{
-			if (!type->IsCompatible(init_expr->GetType()))
+			if (!type->IsAssignableFrom(init_expr->GetType()))
 			{
 				diagnostics.Report(loc, incompatible_initializer);
+			}
+			else if (!type->IsSameAs(init_expr->GetType()))
+			{
+				init_expr = ActOnImplicitCastExpr(loc, type, std::move(init_expr));
 			}
 		}
 		else if(!has_init && !has_type_specifier)
@@ -101,10 +105,18 @@ namespace wave
 		QualifiedType const& return_type = func_type.GetReturnType();
 
 		Expr const* ret_expr = expr_stmt->GetExpr();
+		SourceLocation loc = ret_expr ? ret_expr->GetLocation() : SourceLocation{};
+
 		QualifiedType const& ret_expr_type = ret_expr ? ret_expr->GetType() : builtin_types::Void;
-		if (!ret_expr_type->IsCompatible(return_type))
+		if (!return_type->IsAssignableFrom(ret_expr_type))
 		{
-			diagnostics.Report(ret_expr ? ret_expr->GetLocation() : SourceLocation{}, incompatible_return_stmt_type);
+			diagnostics.Report(loc, incompatible_return_stmt_type);
+		}
+		else if (!return_type->IsSameAs(ret_expr_type))
+		{
+			UniqueExprPtr casted_ret_expr(expr_stmt->ReleaseExpr());
+			casted_ret_expr = ActOnImplicitCastExpr(loc, return_type, std::move(casted_ret_expr));
+			expr_stmt.reset(new ExprStmt(std::move(casted_ret_expr)));
 		}
 		return MakeUnique<ReturnStmt>(std::move(expr_stmt));
 	}
@@ -132,15 +144,27 @@ namespace wave
 	UniqueBinaryExprPtr Sema::ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs)
 	{
 		QualifiedType type{};
+		QualifiedType const& lhs_type = lhs->GetType();
+		QualifiedType const& rhs_type = rhs->GetType();
 		switch (op)
 		{
 		case BinaryExprKind::Assign:
 		{
 			if (lhs->IsLValue())
 			{
-				if (lhs->GetType().IsConst()) diagnostics.Report(loc, invalid_assignment_to_const);
+				if (lhs_type.IsConst()) diagnostics.Report(loc, invalid_assignment_to_const);
 			}
 			else diagnostics.Report(loc, invalid_assignment_to_rvalue);
+
+			if (!lhs_type->IsAssignableFrom(rhs->GetType()))
+			{
+				diagnostics.Report(loc, incompatible_initializer);
+			}
+			else if (!lhs_type->IsSameAs(rhs_type))
+			{
+				rhs = ActOnImplicitCastExpr(loc, lhs_type, std::move(rhs));
+			}
+			type = lhs_type;
 		}
 		break;
 		case BinaryExprKind::Add:
@@ -149,7 +173,7 @@ namespace wave
 		case BinaryExprKind::Divide:
 		case BinaryExprKind::Modulo:
 		{
-			type = lhs->GetType();
+			type = lhs_type;
 		}
 		break;
 		case BinaryExprKind::ShiftLeft:
@@ -205,21 +229,6 @@ namespace wave
 		return ternary_expr;
 	}
 
-	UniqueCastExprPtr Sema::ActOnCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)
-	{
-		//#todo semantic analysis
-		QualifiedType const& cast_type = type;
-		QualifiedType const& operand_type = expr->GetType();
-
-		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(loc, invalid_cast);
-		if(IsVoidType(cast_type)) diagnostics.Report(loc, invalid_cast);
-		if(operand_type->IsCompatible(cast_type)) diagnostics.Report(loc, invalid_cast);
-		
-		UniqueCastExprPtr cast_expr = MakeUnique<CastExpr>(loc, type);
-		cast_expr->SetOperand(std::move(expr));
-		return cast_expr;
-	}
-
 	UniqueFunctionCallExprPtr Sema::ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
 		//#todo semantic analysis
@@ -266,5 +275,20 @@ namespace wave
 			return nullptr;
 		}
 	}
+
+	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)
+	{
+		QualifiedType const& cast_type = type;
+		QualifiedType const& operand_type = expr->GetType();
+
+		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(loc, invalid_cast);
+		if (IsVoidType(cast_type)) diagnostics.Report(loc, invalid_cast);
+		if (!cast_type->IsAssignableFrom(operand_type)) diagnostics.Report(loc, invalid_cast);
+
+		UniqueImplicitCastExprPtr cast_expr = MakeUnique<ImplicitCastExpr>(loc, type);
+		cast_expr->SetOperand(std::move(expr));
+		return cast_expr;
+	}
+
 }
 

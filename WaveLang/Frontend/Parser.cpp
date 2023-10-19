@@ -431,7 +431,7 @@ namespace wave
 
 	UniqueExprPtr Parser::ParseMultiplicativeExpression()
 	{
-		UniqueExprPtr lhs = ParseCastExpression();
+		UniqueExprPtr lhs = ParseUnaryExpression();
 		while (true)
 		{
 			BinaryExprKind op_kind = BinaryExprKind::Invalid;
@@ -445,26 +445,10 @@ namespace wave
 				return lhs;
 			}
 			++current_token;
-			UniqueExprPtr rhs = ParseCastExpression();
+			UniqueExprPtr rhs = ParseUnaryExpression();
 			UniqueBinaryExprPtr parent = sema->ActOnBinaryExpr(op_kind, loc, std::move(lhs), std::move(rhs));
 			lhs = std::move(parent);
 		}
-	}
-
-	UniqueExprPtr Parser::ParseCastExpression()
-	{
-		if (current_token->Is(TokenKind::left_round) && (current_token + 1)->IsType())
-		{
-			Expect(TokenKind::left_round);
-			QualifiedType cast_type{};
-			ParseTypeSpecifier(cast_type);
-			Expect(TokenKind::right_round);
-			WAVE_ASSERT(cast_type.HasRawType());
-			SourceLocation loc = current_token->GetLocation();
-			UniqueExprPtr expr = ParseCastExpression();
-			return sema->ActOnCastExpr(loc, cast_type, std::move(expr));
-		}
-		else return ParseUnaryExpression();
 	}
 
 	UniqueExprPtr Parser::ParseUnaryExpression()

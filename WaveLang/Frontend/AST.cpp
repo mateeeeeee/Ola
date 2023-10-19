@@ -110,7 +110,7 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
-	void CastExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ImplicitCastExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		WAVE_ASSERT(operand);
 		visitor.Visit(*this, depth);
@@ -214,7 +214,7 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
-	void CastExpr::Accept(ASTVisitor& visitor) const
+	void ImplicitCastExpr::Accept(ASTVisitor& visitor) const
 	{
 		WAVE_ASSERT(operand);
 		visitor.Visit(*this, 0);

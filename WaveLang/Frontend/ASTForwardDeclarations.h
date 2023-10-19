@@ -27,7 +27,7 @@ namespace wave
 	class ConstantString;
 	class ConstantBool;
 	class ConstantFloat;
-	class CastExpr;
+	class ImplicitCastExpr;
 	class FunctionCallExpr;
 
 	struct AST;

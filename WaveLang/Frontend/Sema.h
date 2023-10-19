@@ -42,7 +42,6 @@ namespace wave
 		UniqueUnaryExprPtr ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand);
 		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);
 		UniqueTernaryExprPtr ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr);
-		UniqueCastExprPtr ActOnCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr);
 		UniqueFunctionCallExprPtr ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
 		UniqueConstantIntPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
@@ -53,5 +52,8 @@ namespace wave
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;
+
+	private:
+		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr);
 	};
 }

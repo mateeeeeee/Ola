@@ -31,7 +31,11 @@ namespace wave
 		constexpr void SetAlign(uint32 _align) { align = _align; }
 		constexpr void SetSize(uint32 _size) { size = _size; }
 
-		virtual bool IsCompatible(Type const& other) const { return true; }
+		bool IsSameAs(Type const& t) const
+		{
+			return kind == t.kind;
+		}
+		virtual bool IsAssignableFrom(Type const&) const { return true; }
 
 		TypeKind GetKind() const { return kind; }
 		bool Is(TypeKind t) const { return kind == t; }
@@ -52,7 +56,6 @@ namespace wave
 		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0)
 			: kind(kind), size(size), align(align) {}
 	};
-
 
 	template<typename T> requires std::derived_from<T, Type>
 	inline bool isa(Type const& t)
@@ -130,7 +133,7 @@ namespace wave
 	{
 	public:
 		constexpr VoidType() : Type{ TypeKind::Void } {}
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
 			return other.Is(TypeKind::Void);
 		}
@@ -140,9 +143,9 @@ namespace wave
 	{
 	public:
 		constexpr BoolType() : Type{ TypeKind::Bool, 1, 1 } {}
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Int);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
 		}
 	};
 
@@ -150,7 +153,7 @@ namespace wave
 	{
 	public:
 		constexpr CharType() : Type{ TypeKind::Char, 1, 1 } {}
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
 			return other.Is(TypeKind::Char);
 		}
@@ -160,9 +163,9 @@ namespace wave
 	{
 	public:
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Int);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
 		}
 	};
 
@@ -170,9 +173,9 @@ namespace wave
 	{
 	public:
 		constexpr FloatType() : Type{ TypeKind::Float, 8, 8 } {}
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Float, TypeKind::Int);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Float, TypeKind::Int);
 		}
 	};
 
@@ -183,7 +186,7 @@ namespace wave
 		ArrayType(QualifiedType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
 			base_type(type), array_size(array_size) {}
 
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
 			if (other.IsNot(TypeKind::Array)) return false;
 			ArrayType const& other_array_type = type_cast<ArrayType>(other);
@@ -196,7 +199,7 @@ namespace wave
 			}
 			else if (is_underlying_type_array && is_other_underlying_type_array)
 			{
-				return base_type->IsCompatible(*other_array_type.base_type);
+				return base_type->IsAssignableFrom(*other_array_type.base_type);
 			}
 			else return false;
 		}
@@ -220,7 +223,7 @@ namespace wave
 		explicit FunctionType(QualifiedType const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
 		return_type(return_type), params(params){}
 
-		virtual bool IsCompatible(Type const& other) const override
+		virtual bool IsAssignableFrom(Type const& other) const override
 		{
 			return false;
 		}
