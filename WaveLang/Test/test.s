@@ -18,17 +18,31 @@ main:                                   # @main
 	subq	$24, %rsp
 	.seh_stackalloc 24
 	.seh_endprologue
-	movq	$100, 8(%rsp)
-	cmpq	$0, 8(%rsp)
-	setne	%al
-	andb	$1, %al
-	movb	%al, 7(%rsp)
-	movb	7(%rsp), %al
-	andb	$1, %al
-	movzbl	%al, %eax
-                                        # kill: def $rax killed $eax
+	movq	$0, 8(%rsp)
+	movq	$0, (%rsp)
+	jmp	.LBB0_3
+.LBB0_1:                                # %for.body
+                                        #   in Loop: Header=BB0_3 Depth=1
+	movq	8(%rsp), %rax
+	addq	$2, %rax
+	movq	%rax, 8(%rsp)
+	movq	(%rsp), %rax
+	addq	$1, %rax
+	movq	%rax, (%rsp)
+	jmp	.LBB0_4
+.LBB0_2:                                # %for.end
+	movq	8(%rsp), %rax
 	movq	%rax, 16(%rsp)
-# %bb.1:                                # %exit
+	jmp	.LBB0_5
+.LBB0_3:                                # %for.cond
+                                        # =>This Inner Loop Header: Depth=1
+	cmpq	$10, (%rsp)
+	jl	.LBB0_1
+	jmp	.LBB0_2
+.LBB0_4:                                # %for.iter
+                                        #   in Loop: Header=BB0_3 Depth=1
+	jmp	.LBB0_3
+.LBB0_5:                                # %exit
 	movq	16(%rsp), %rax
 	addq	$24, %rsp
 	retq

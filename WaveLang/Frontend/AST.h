@@ -251,6 +251,43 @@ namespace wave
 		UniqueStmtPtr else_stmt;
 	};
 
+	class ForStmt final : public Stmt
+	{
+	public:
+		ForStmt() : Stmt(StmtKind::For) {}
+
+		void SetInitStmt(UniqueStmtPtr&& _init_stmt)
+		{
+			init_stmt = std::move(_init_stmt);
+		}
+		void SetCondExpr(UniqueExprPtr&& _cond_expr)
+		{
+			cond_expr = std::move(_cond_expr);
+		}
+		void SetIterExpr(UniqueExprPtr&& _iter_expr)
+		{
+			iter_expr = std::move(_iter_expr);
+		}
+		void SetBodyStmt(UniqueStmtPtr&& _body_stmt)
+		{
+			body_stmt = std::move(_body_stmt);
+		}
+
+		Stmt const* GetInitStmt() const { return init_stmt.get(); }
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
+		Expr const* GetIterExpr() const { return iter_expr.get(); }
+		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		UniqueStmtPtr init_stmt;
+		UniqueExprPtr cond_expr;
+		UniqueExprPtr iter_expr;
+		UniqueStmtPtr body_stmt;
+	};
+
 	enum class ExprKind : uint8
 	{
 		Unary,
@@ -363,11 +400,11 @@ namespace wave
 			false_expr(std::move(false_expr))
 		{}
 
-		void SetConditionExpr(UniqueExprPtr&& expr) { cond_expr = std::move(expr); }
+		void SetCondExpr(UniqueExprPtr&& expr) { cond_expr = std::move(expr); }
 		void SetTrueExpr(UniqueExprPtr&& expr) { true_expr = std::move(expr); }
 		void SetFalseExpr(UniqueExprPtr&& expr) { false_expr = std::move(expr); }
 
-		Expr const* GetConditionExpr() const { return cond_expr.get(); }
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Expr const* GetTrueExpr() const { return true_expr.get(); }
 		Expr const* GetFalseExpr() const { return false_expr.get(); }
 

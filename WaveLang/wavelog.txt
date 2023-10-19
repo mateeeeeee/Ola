@@ -1,0 +1,56 @@
+[2023-10-19 23:47:44.796] [wave logger] [debug] AST Traversal:
+
+[2023-10-19 23:47:44.798] [wave logger] [debug] TranslationUnit
+
+[2023-10-19 23:47:44.798] [wave logger] [debug] `->FunctionDecl
+
+[2023-10-19 23:47:44.799] [wave logger] [debug]    `->CompoundStmt
+
+[2023-10-19 23:47:44.799] [wave logger] [debug]       `->DeclStmt
+
+[2023-10-19 23:47:44.799] [wave logger] [debug]          `->VariableDecl
+
+[2023-10-19 23:47:44.799] [wave logger] [debug]             `->ConstantInt
+
+[2023-10-19 23:47:44.800] [wave logger] [debug]       `->DeclStmt
+
+[2023-10-19 23:47:44.800] [wave logger] [debug]          `->VariableDecl
+
+[2023-10-19 23:47:44.800] [wave logger] [debug]             `->ConstantInt
+
+[2023-10-19 23:47:44.800] [wave logger] [debug]       `->ForStmt
+
+[2023-10-19 23:47:44.800] [wave logger] [debug]          `->NullStmt
+
+[2023-10-19 23:47:44.801] [wave logger] [debug]          `->BinaryExpr
+
+[2023-10-19 23:47:44.801] [wave logger] [debug]             `->DeclRefExpr
+
+[2023-10-19 23:47:44.801] [wave logger] [debug]             `->ConstantInt
+
+[2023-10-19 23:47:44.801] [wave logger] [debug]          `->CompoundStmt
+
+[2023-10-19 23:47:44.802] [wave logger] [debug]             `->ExprStmt
+
+[2023-10-19 23:47:44.802] [wave logger] [debug]                `->BinaryExpr
+
+[2023-10-19 23:47:44.802] [wave logger] [debug]                   `->DeclRefExpr
+
+[2023-10-19 23:47:44.803] [wave logger] [debug]                   `->BinaryExpr
+
+[2023-10-19 23:47:44.803] [wave logger] [debug]                      `->DeclRefExpr
+
+[2023-10-19 23:47:44.803] [wave logger] [debug]                      `->ConstantInt
+
+[2023-10-19 23:47:44.804] [wave logger] [debug]             `->ExprStmt
+
+[2023-10-19 23:47:44.804] [wave logger] [debug]                `->UnaryExpr
+
+[2023-10-19 23:47:44.804] [wave logger] [debug]                   `->DeclRefExpr
+
+[2023-10-19 23:47:44.805] [wave logger] [debug]       `->ReturnStmt
+
+[2023-10-19 23:47:44.806] [wave logger] [debug]          `->ExprStmt
+
+[2023-10-19 23:47:44.807] [wave logger] [debug]             `->DeclRefExpr
+

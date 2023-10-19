@@ -22,6 +22,7 @@ namespace wave
 		virtual void Visit(NullStmt const&, uint32 depth) {}
 		virtual void Visit(ReturnStmt const&, uint32 depth) {}
 		virtual void Visit(IfStmt const&, uint32 depth) {}
+		virtual void Visit(ForStmt const&, uint32 depth) {}
 
 		virtual void Visit(Expr const&, uint32 depth) {}
 		virtual void Visit(UnaryExpr const&, uint32 depth) {}

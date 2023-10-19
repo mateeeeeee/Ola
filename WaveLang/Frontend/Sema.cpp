@@ -130,6 +130,16 @@ namespace wave
 		return if_stmt;
 	}
 
+	UniqueForStmtPtr Sema::ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt)
+	{
+		UniqueForStmtPtr for_stmt = MakeUnique<ForStmt>();
+		for_stmt->SetInitStmt(std::move(init_stmt));
+		for_stmt->SetCondExpr(std::move(cond_expr));
+		for_stmt->SetIterExpr(std::move(iter_expr));
+		for_stmt->SetBodyStmt(std::move(body_stmt));
+		return for_stmt;
+	}
+
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
 	{
 		//#todo semantic analysis
@@ -223,7 +233,7 @@ namespace wave
 		//#todo semantic analysis
 		UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
 		ternary_expr->SetType(true_expr->GetType());
-		ternary_expr->SetConditionExpr(std::move(cond_expr));
+		ternary_expr->SetCondExpr(std::move(cond_expr));
 		ternary_expr->SetTrueExpr(std::move(true_expr));
 		ternary_expr->SetFalseExpr(std::move(false_expr));
 		return ternary_expr;

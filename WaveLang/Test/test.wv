@@ -1,7 +1,12 @@
 
 fn main() -> int
 {
-	let a = 100;
-    let b : bool = a;
-    return b;
+	let b = 0;
+	let a = 0;
+	for(;a < 10;)
+	{
+		b += 2;
+		++a;
+	}
+	return b;
 }

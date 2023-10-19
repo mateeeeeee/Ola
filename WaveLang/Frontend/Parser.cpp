@@ -170,8 +170,8 @@ namespace wave
 		case TokenKind::left_brace: return ParseCompoundStatement();
 		case TokenKind::KW_return: return ParseReturnStatement();
 		case TokenKind::KW_if: return ParseIfStatement();
+		case TokenKind::KW_for: return ParseForStatement();
 		//case TokenKind::KW_while: return ParseWhileStatement();
-		//case TokenKind::KW_for: return ParseForStatement();
 		//case TokenKind::KW_do: return ParseDoWhileStatement();
 		//case TokenKind::KW_continue: return ParseContinueStatement();
 		//case TokenKind::KW_break: return ParseBreakStatement();
@@ -233,6 +233,37 @@ namespace wave
 		if (Consume(TokenKind::KW_else)) else_stmt = ParseStatement();
 		
 		return sema->ActOnIfStmt(std::move(cond_expr), std::move(then_stmt), std::move(else_stmt));
+	}
+
+	UniqueForStmtPtr Parser::ParseForStatement()
+	{
+		Expect(TokenKind::KW_for);
+		Expect(TokenKind::left_round);
+
+		UniqueStmtPtr init_stmt = nullptr;
+		if (Consume(TokenKind::KW_let))
+		{
+			UniqueDeclPtr decl = ParseVariableDeclaration(false);
+			init_stmt = MakeUnique<DeclStmt>(std::move(decl));
+		}
+		else init_stmt = ParseExpressionStatement();
+
+		UniqueExprPtr cond_expr = nullptr;
+		if (!Consume(TokenKind::semicolon))
+		{
+			cond_expr = ParseExpression();
+			Expect(TokenKind::semicolon);
+		}
+
+		UniqueExprPtr iter_expr = nullptr;
+		if (!Consume(TokenKind::right_round))
+		{
+			iter_expr = ParseExpression();
+			Expect(TokenKind::right_round);
+		}
+
+		UniqueStmtPtr body_stmt = ParseStatement();
+		return sema->ActOnForStmt(std::move(init_stmt), std::move(cond_expr), std::move(iter_expr), std::move(body_stmt));
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>

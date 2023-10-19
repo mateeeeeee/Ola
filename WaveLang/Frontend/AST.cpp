@@ -61,6 +61,17 @@ namespace wave
 		if (else_stmt) else_stmt->Accept(visitor, depth + 1);
 	}
 
+	void ForStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(body_stmt);
+		visitor.Visit(*this, depth);
+		if (init_stmt) init_stmt->Accept(visitor, depth + 1);
+		if (cond_expr) cond_expr->Accept(visitor, depth + 1);
+		if (iter_expr) iter_expr->Accept(visitor, depth + 1);
+		body_stmt->Accept(visitor, depth + 1);
+	}
+
+
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		WAVE_ASSERT(false);
@@ -168,6 +179,12 @@ namespace wave
 	void IfStmt::Accept(ASTVisitor& visitor) const
 	{
 		WAVE_ASSERT(condition && then_stmt);
+		visitor.Visit(*this, 0);
+	}
+
+	void ForStmt::Accept(ASTVisitor& visitor) const
+	{
+		WAVE_ASSERT(body_stmt);
 		visitor.Visit(*this, 0);
 	}
 

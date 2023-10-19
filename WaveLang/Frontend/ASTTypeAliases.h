@@ -27,6 +27,7 @@ namespace wave
 	using UniqueNullStmtPtr			= UniquePtr<NullStmt>;
 	using UniqueReturnStmtPtr		= UniquePtr<ReturnStmt>;
 	using UniqueIfStmtPtr			= UniquePtr<IfStmt>;
+	using UniqueForStmtPtr			= UniquePtr<ForStmt>;
 
 	using UniqueExprPtr				= UniquePtr<Expr>;
 	using UniqueUnaryExprPtr		= UniquePtr<UnaryExpr>;
