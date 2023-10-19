@@ -3,18 +3,10 @@ fn main() -> int
 {
 	let a = 0;
 	let b = 0;
-	let c = 10;
-	if(a)
+	let c = 0;
+	if(a++)
 	{
 		return a;
 	}
-	else if(b)
-	{
-		return b;
-	}
-	else if(c)
-	{
-		return c;
-	}
-	else return 15;
+	return a*2;
 }
