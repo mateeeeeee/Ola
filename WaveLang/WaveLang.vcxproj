@@ -219,6 +219,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\todo.txt" />
     <Text Include="wave_grammar.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

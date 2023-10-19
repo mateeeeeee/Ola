@@ -393,24 +393,24 @@ namespace wave
 
 	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32 depth)
 	{
-		llvm::Type* cast_type = ConvertToLLVMType(cast_expr.GetType());
 		Expr const* cast_operand_expr = cast_expr.GetOperand();
-		llvm::Type* cast_operand_type = ConvertToLLVMType(cast_operand_expr->GetType());
 		cast_operand_expr->Accept(*this);
 		llvm::Value* cast_operand_value = llvm_value_map[cast_operand_expr];
 		WAVE_ASSERT(cast_operand_value);
-		
-		if (cast_expr.GetType()->Is(TypeKind::Int))
+
+		llvm::Type* cast_type = ConvertToLLVMType(cast_expr.GetType());
+		llvm::Type* cast_operand_type = ConvertToLLVMType(cast_operand_expr->GetType());
+		if (IsInteger(cast_type))
 		{
-			if (cast_operand_expr->GetType()->Is(TypeKind::Bool))
+			if (IsBoolean(cast_operand_type))
 			{
 				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, llvm::Type::getInt64Ty(context));
 			}
 		}
-		else if (cast_expr.GetType()->Is(TypeKind::Bool))
+		else if (IsBoolean(cast_type))
 		{
-			if (cast_operand_expr->GetType()->Is(TypeKind::Int))
+			if (IsInteger(cast_operand_type))
 			{
 				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
@@ -484,6 +484,16 @@ namespace wave
 	bool LLVMVisitor::IsBoolean(llvm::Type* type)
 	{
 		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
+	}
+
+	bool LLVMVisitor::IsInteger(llvm::Type* type)
+	{
+		return type->isIntegerTy() && type->getIntegerBitWidth() == 64;
+	}
+
+	bool LLVMVisitor::IsFloat(llvm::Type* type)
+	{
+		return type->isDoubleTy();
 	}
 
 }

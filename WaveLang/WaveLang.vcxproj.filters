@@ -152,5 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />
+    <Text Include="..\todo.txt" />
   </ItemGroup>
 </Project>
