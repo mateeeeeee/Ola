@@ -380,27 +380,24 @@ namespace wave
 	public:
 		SwitchStmt() : Stmt(StmtKind::Switch) {}
 
-		void SetCondExpr(UniqueExprPtr&& _condition)
+		void SetCondExpr(UniqueExprPtr&& _cond_expr)
 		{
-			condition = std::move(_condition);
+			cond_expr = std::move(_cond_expr);
 		}
 		void SetBodyStmt(UniqueStmtPtr&& _body_stmt)
 		{
 			body_stmt = std::move(_body_stmt);
 		}
 
-		bool HasDefaultCase() const
-		{
-			return has_default;
-		}
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
+		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueExprPtr condition;
+		UniqueExprPtr cond_expr;
 		UniqueStmtPtr body_stmt;
-		bool has_default = false;
 	};
 
 	enum class ExprKind : uint8
@@ -575,6 +572,9 @@ namespace wave
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
+		virtual bool IsConstexpr() const { return true; }
+		virtual int64 EvaluateConstexpr() const { return value; }
 
 	private:
 		int64 value;

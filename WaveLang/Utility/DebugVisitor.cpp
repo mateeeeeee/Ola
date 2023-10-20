@@ -183,6 +183,16 @@ namespace wave
 		WAVE_DEBUG("{}DoWhileStmt\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(CaseStmt const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}CaseStmt\n", GetIndentation(depth));
+	}
+
+	void DebugVisitor::Visit(SwitchStmt const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}SwitchStmt\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(Expr const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}Expr\n", GetIndentation(depth));

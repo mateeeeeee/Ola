@@ -52,6 +52,8 @@ namespace wave
 		virtual void Visit(ForStmt const&, uint32) override;
 		virtual void Visit(WhileStmt const&, uint32) override;
 		virtual void Visit(DoWhileStmt const&, uint32) override;
+		virtual void Visit(CaseStmt const&, uint32) override {}
+		virtual void Visit(SwitchStmt const&, uint32) override {}
 
 		virtual void Visit(Expr const&, uint32) override;
 		virtual void Visit(UnaryExpr const&, uint32) override;

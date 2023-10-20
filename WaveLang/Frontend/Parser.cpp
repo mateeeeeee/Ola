@@ -175,10 +175,10 @@ namespace wave
 		case TokenKind::KW_for: return ParseForStatement();
 		case TokenKind::KW_while: return ParseWhileStatement();
 		case TokenKind::KW_do: return ParseDoWhileStatement();
+		case TokenKind::KW_switch: return ParseSwitchStatement();
+		case TokenKind::KW_case:
+		case TokenKind::KW_default: return ParseCaseStatement();
 		//case TokenKind::KW_goto: return ParseGotoStatement();
-		//case TokenKind::KW_switch: return ParseSwitchStatement();
-		//case TokenKind::KW_case:
-		//case TokenKind::KW_default: return ParseCaseStatement();
 		//case TokenKind::identifier:
 		//	if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
 		default:
@@ -311,6 +311,29 @@ namespace wave
 		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
 		Expect(TokenKind::semicolon);
 		return sema->ActOnDoWhileStmt(std::move(cond_expr), std::move(body_stmt));
+	}
+
+	UniqueCaseStmtPtr Parser::ParseCaseStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		UniqueExprPtr case_value = nullptr;
+		if (Consume(TokenKind::KW_case)) case_value = ParseExpression();
+		else Expect(TokenKind::KW_default);
+		return sema->ActOnCaseStmt(loc, std::move(case_value));
+	}
+
+	UniqueSwitchStmtPtr Parser::ParseSwitchStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		Expect(TokenKind::KW_switch);
+		UniqueExprPtr case_expr = ParseParenthesizedExpression();
+		CaseStmtPtrList case_stmts{};
+		sema->ctx.case_callback_stack.push_back([&](CaseStmt* case_stmt) {case_stmts.push_back(case_stmt); });
+		sema->ctx.stmts_using_break_count++;
+		UniqueStmtPtr body_stmt = ParseStatement();
+		sema->ctx.stmts_using_break_count--;
+		sema->ctx.case_callback_stack.pop_back();
+		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), std::move(case_stmts));
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>

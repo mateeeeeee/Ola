@@ -18,6 +18,7 @@ namespace wave
 	{
 		friend class Parser;
 
+		using CaseStmtCallback = std::function<void(CaseStmt*)>;
 		struct Context
 		{
 			ScopeStack<Decl> decl_scope_stack;
@@ -25,8 +26,9 @@ namespace wave
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 
-			uint32 stmts_using_break_count; 
-			uint32 stmts_using_continue_count;
+			uint32 stmts_using_break_count = 0; 
+			uint32 stmts_using_continue_count = 0;
+			std::vector<CaseStmtCallback> case_callback_stack;
 		};
 
 	public:
@@ -49,6 +51,8 @@ namespace wave
 		UniqueForStmtPtr ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt);
 		UniqueWhileStmtPtr ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueDoWhileStmtPtr ActOnDoWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
+		UniqueCaseStmtPtr ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr = nullptr);
+		UniqueSwitchStmtPtr ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, CaseStmtPtrList&& case_stmts);
 
 		UniqueUnaryExprPtr ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand);
 		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);

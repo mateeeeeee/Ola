@@ -172,6 +172,50 @@ namespace wave
 		return do_while_stmt;
 	}
 
+	UniqueCaseStmtPtr Sema::ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr)
+	{
+		if (ctx.case_callback_stack.empty()) diagnostics.Report(loc, case_stmt_outside_switch);
+
+		UniqueCaseStmtPtr case_stmt = nullptr;
+		if (!case_expr)
+		{
+			case_stmt = MakeUnique<CaseStmt>();
+		}
+		else
+		{
+			if (!case_expr->IsConstexpr()) diagnostics.Report(case_value_not_constexpr);
+			case_stmt = MakeUnique<CaseStmt>(case_expr->EvaluateConstexpr());
+		}
+		ctx.case_callback_stack.back()(case_stmt.get());
+		return case_stmt;
+	}
+
+	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, CaseStmtPtrList&& case_stmts)
+	{
+		bool default_found = false;
+		std::unordered_map<int64, bool> case_value_found;
+		for (CaseStmt* case_stmt : case_stmts)
+		{
+			if (case_stmt->IsDefault())
+			{
+				if (default_found) diagnostics.Report(loc, duplicate_default_case);
+				else default_found = true;
+			}
+			else
+			{
+				int64 case_value = case_stmt->GetValue();
+				if (case_value_found[case_value]) diagnostics.Report(loc, duplicate_case_value, case_value);
+				else case_value_found[case_value] = true;
+			}
+		}
+
+		UniqueSwitchStmtPtr switch_stmt = MakeUnique<SwitchStmt>();
+		switch_stmt->SetCondExpr(std::move(cond_expr));
+		switch_stmt->SetBodyStmt(std::move(body_stmt));
+
+		return switch_stmt;
+	}
+
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
 	{
 		//#todo semantic analysis

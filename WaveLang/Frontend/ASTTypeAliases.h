@@ -58,4 +58,5 @@ namespace wave
 	using VariableDeclPtrList		= std::vector<VariableDecl*>;
 	using BreakStmtPtrList			= std::vector<BreakStmt*>;
 	using ContinueStmtPtrList		= std::vector<ContinueStmt*>;
+	using CaseStmtPtrList			= std::vector<CaseStmt*>;
 }
