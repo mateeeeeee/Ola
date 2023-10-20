@@ -3,10 +3,9 @@ fn main() -> int
 {
 	let b = 0;
 	let a = 0;
-	for(;a < 10;)
+	for(;a < 10; ++a)
 	{
-		++a;
-		if(a == 5) continue;
+		if(a % 2) continue;
 		b += 2;
 	}
 	return b;

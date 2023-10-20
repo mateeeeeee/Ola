@@ -325,6 +325,14 @@ namespace wave
 			}
 			else t.SetKind(TokenKind::slash);
 			break;
+		case '%':
+			if (*cur_ptr == '=')
+			{
+				++cur_ptr;
+				t.SetKind(TokenKind::modulo_equal);
+			}
+			else t.SetKind(TokenKind::modulo);
+			break;
 		case '?':
 			t.SetKind(TokenKind::question);
 			break;

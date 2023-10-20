@@ -24,10 +24,11 @@ main:                                   # @main
 .LBB0_1:                                # %for.body
                                         #   in Loop: Header=BB0_3 Depth=1
 	movq	(%rsp), %rax
-	addq	$1, %rax
-	movq	%rax, (%rsp)
-	cmpq	$5, (%rsp)
-	je	.LBB0_5
+	movl	$2, %ecx
+	cqto
+	idivq	%rcx
+	cmpq	$0, %rdx
+	jne	.LBB0_5
 	jmp	.LBB0_6
 .LBB0_2:                                # %for.end
 	movq	8(%rsp), %rax
@@ -40,6 +41,9 @@ main:                                   # @main
 	jmp	.LBB0_2
 .LBB0_4:                                # %for.iter
                                         #   in Loop: Header=BB0_3 Depth=1
+	movq	(%rsp), %rax
+	addq	$1, %rax
+	movq	%rax, (%rsp)
 	jmp	.LBB0_3
 .LBB0_5:                                # %if.then
                                         #   in Loop: Header=BB0_3 Depth=1
