@@ -78,9 +78,10 @@ namespace wave
 		llvm::AllocaInst* return_alloc;
 		llvm::BasicBlock* exit_block;
 
+		std::vector<llvm::SwitchInst*> switch_instructions;
 		std::vector<llvm::BasicBlock*> continue_blocks;
 		std::vector<llvm::BasicBlock*> break_blocks;
-		std::vector<llvm::SwitchInst*> switch_instructions;
+
 	private:
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);

@@ -2,37 +2,13 @@
 fn main() -> int
 {
 
+	let b = 0;
 	let a = 0;
-	if(a > 0)
+	switch(b)
 	{
-		a += 4;
-		let b = a - 1;
-		b *= 5;
-		return b;
+	case 0: a = 10; break;
+	default: a = 5;
 	}
-	else 
-	{
-		for(let i = 0; i < 10; ++i)
-		{
-			a++;
-		}
-		return a;
-	}
-
-	 return 100;
-	//let b = 0;
-	//let a = 0;
-	//switch(b)
-	//{
-	//case 0:
-	//	a = 2;
-	//	break;
-	//case 1:
-	//	a = 3;
-	//	break;
-	//case 2:
-	//	a = 4;
-	//}
-	//
-	//return a;
+	
+	return a;
 }

@@ -332,7 +332,7 @@ namespace wave
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
-		llvm::Value* condition = Load(condition_value->getType(), condition_value);
+		llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
 		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block, 4);
 
 		switch_instructions.push_back(switch_inst);
@@ -341,8 +341,7 @@ namespace wave
 		break_blocks.pop_back();
 		switch_instructions.pop_back();
 
-		builder.CreateBr(end_block);
-		builder.SetInsertPoint(end_block);
+		builder.SetInsertPoint(default_block);
 	}
 
 	void LLVMVisitor::Visit(Expr const&, uint32)

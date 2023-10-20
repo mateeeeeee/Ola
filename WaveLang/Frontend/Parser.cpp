@@ -334,7 +334,7 @@ namespace wave
 		UniqueStmtPtr body_stmt = ParseStatement();
 		sema->ctx.stmts_using_break_count--;
 		sema->ctx.case_callback_stack.pop_back();
-		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), std::move(case_stmts));
+		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), {});
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
