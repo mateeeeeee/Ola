@@ -19,6 +19,8 @@ namespace wave
 	class BreakStmt;
 	class ContinueStmt;
 	class ForStmt;
+	class WhileStmt;
+	class DoWhileStmt;
 
 	class Expr;
 	class UnaryExpr;
@@ -38,8 +40,8 @@ namespace wave
 
 /*
 //todo list for adding new ast node
+0. Add forward declaration, type alias, add to visitor interface and implement it in all visitors (debug,llvm)
 1. add a class and member definitions
 2. Add in Parser::Parse*
 3. Add in Sema::ActOn*
-4. Add forward declaration, add type alias, add it in visitor and implement it in all visitors
 */

@@ -1,19 +1,19 @@
+0. Refactor var and func declarations 
+
 1. Finish adding statements
-	class WhileStmt;
-	class DoWhileStmt;
 	class SwitchStmt;
 	class CaseStmt;
 	class GotoStmt;
 	class LabelStmt;
-	class BreakStmt;
-	class ContinueStmt;
 
 2. Add FunctionCallExpr
 
-3. Work on arrays and floats
+3. Check llvm optimization passes
 
-4. figure out what to do with import statement and how it should work
+4. Work on arrays and floats, enums
 
-5. figure out how to add std lib support
+5. figure out what to do with import statement and how it should work
 
-6. work on classes 
+6. figure out how to add std lib support
+
+7. work on classes 

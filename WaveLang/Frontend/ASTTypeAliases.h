@@ -30,6 +30,8 @@ namespace wave
 	using UniqueBreakStmtPtr		= UniquePtr<BreakStmt>;
 	using UniqueContinueStmtPtr		= UniquePtr<ContinueStmt>;
 	using UniqueForStmtPtr			= UniquePtr<ForStmt>;
+	using UniqueWhileStmtPtr		= UniquePtr<WhileStmt>;
+	using UniqueDoWhileStmtPtr		= UniquePtr<DoWhileStmt>;
 
 	using UniqueExprPtr				= UniquePtr<Expr>;
 	using UniqueUnaryExprPtr		= UniquePtr<UnaryExpr>;

@@ -77,6 +77,20 @@ namespace wave
 		if (iter_expr) iter_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
 	}
+	void WhileStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(cond_expr && body_stmt);
+		visitor.Visit(*this, depth);
+		cond_expr->Accept(visitor, depth + 1);
+		body_stmt->Accept(visitor, depth + 1);
+	}
+	void DoWhileStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(cond_expr && body_stmt);
+		visitor.Visit(*this, depth);
+		cond_expr->Accept(visitor, depth + 1);
+		body_stmt->Accept(visitor, depth + 1);
+	}
 
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -198,6 +212,16 @@ namespace wave
 	void ForStmt::Accept(ASTVisitor& visitor) const
 	{
 		WAVE_ASSERT(body_stmt);
+		visitor.Visit(*this, 0);
+	}
+	void WhileStmt::Accept(ASTVisitor& visitor) const
+	{
+		WAVE_ASSERT(cond_expr && body_stmt);
+		visitor.Visit(*this, 0);
+	}
+	void DoWhileStmt::Accept(ASTVisitor& visitor) const
+	{
+		WAVE_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, 0);
 	}
 

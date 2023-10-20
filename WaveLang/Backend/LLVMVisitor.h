@@ -50,6 +50,8 @@ namespace wave
 		virtual void Visit(BreakStmt const&, uint32) override;
 		virtual void Visit(ContinueStmt const&, uint32) override;
 		virtual void Visit(ForStmt const&, uint32) override;
+		virtual void Visit(WhileStmt const&, uint32) override;
+		virtual void Visit(DoWhileStmt const&, uint32) override;
 
 		virtual void Visit(Expr const&, uint32) override;
 		virtual void Visit(UnaryExpr const&, uint32) override;
@@ -73,15 +75,17 @@ namespace wave
 		llvm::AllocaInst* return_alloc;
 		llvm::BasicBlock* exit_block;
 
-		std::vector<llvm::BasicBlock*> loop_iter_blocks;
-		std::vector<llvm::BasicBlock*> loop_exit_blocks;
+		std::vector<llvm::BasicBlock*> continue_blocks;
+		std::vector<llvm::BasicBlock*> break_blocks;
 
 	private:
+
+		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
+		llvm::Type* ConvertToLLVMType(QualifiedType const&);
 
 		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
-		llvm::Type* ConvertToLLVMType(QualifiedType const&);
 
 		static bool IsBoolean(llvm::Type*);
 		static bool IsInteger(llvm::Type*);

@@ -157,17 +157,7 @@ namespace wave
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
-
-		if (IsBoolean(condition_value->getType()))
-		{
-			builder.CreateCondBr(condition_value, then_block, else_stmt ? else_block : merge_block);
-		}
-		else
-		{
-			llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
-			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "if.cond");
-			builder.CreateCondBr(boolean_cond, then_block, else_stmt ? else_block : merge_block);
-		}
+		ConditionalBranch(condition_value, then_block, else_stmt ? else_block : merge_block);
 
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
@@ -184,16 +174,16 @@ namespace wave
 
 	void LLVMVisitor::Visit(BreakStmt const&, uint32)
 	{
-		WAVE_ASSERT(!loop_exit_blocks.empty());
-		builder.CreateBr(loop_exit_blocks.back());
+		WAVE_ASSERT(!break_blocks.empty());
+		builder.CreateBr(break_blocks.back());
 		llvm::BasicBlock* break_block = llvm::BasicBlock::Create(context, "break", builder.GetInsertBlock()->getParent(), exit_block);
 		builder.SetInsertPoint(break_block);
 	}
 
 	void LLVMVisitor::Visit(ContinueStmt const&, uint32)
 	{
-		WAVE_ASSERT(!loop_iter_blocks.empty());
-		builder.CreateBr(loop_iter_blocks.back());
+		WAVE_ASSERT(!continue_blocks.empty());
+		builder.CreateBr(continue_blocks.back());
 		llvm::BasicBlock* continue_block = llvm::BasicBlock::Create(context, "continue", builder.GetInsertBlock()->getParent(), exit_block);
 		builder.SetInsertPoint(continue_block);
 	}
@@ -207,43 +197,100 @@ namespace wave
 
 		llvm::Function* function = builder.GetInsertBlock()->getParent();
 		llvm::BasicBlock* body_block = llvm::BasicBlock::Create(context, "for.body", function, exit_block);
-		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "for.end", function, exit_block);
-
 		llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(context, "for.cond", function, exit_block);
 		llvm::BasicBlock* iter_block = llvm::BasicBlock::Create(context, "for.iter", function, exit_block);
+		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "for.end", function, exit_block);
+
 
 		if (init_stmt) init_stmt->Accept(*this);
 		builder.CreateBr(cond_block);
 
+		builder.SetInsertPoint(cond_block);
 		if (cond_expr)
 		{
-			builder.SetInsertPoint(cond_block);
 			cond_expr->Accept(*this);
 			llvm::Value* condition_value = llvm_value_map[cond_expr];
-
-			if (IsBoolean(condition_value->getType()))
-			{
-				builder.CreateCondBr(condition_value, body_block, end_block);
-			}
-			else
-			{
-				llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
-				llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)), "for.cond");
-				builder.CreateCondBr(boolean_cond, body_block, end_block);
-			}
+			WAVE_ASSERT(condition_value);
+			ConditionalBranch(condition_value, body_block, end_block);
+		}
+		else
+		{
+			builder.CreateBr(body_block);
 		}
 
-		loop_iter_blocks.push_back(iter_block);
-		loop_exit_blocks.push_back(end_block);
 		builder.SetInsertPoint(body_block);
+
+		continue_blocks.push_back(iter_block);
+		break_blocks.push_back(end_block);
 		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+
 		builder.CreateBr(iter_block);
-		loop_exit_blocks.pop_back();
-		loop_iter_blocks.pop_back();
 
 		builder.SetInsertPoint(iter_block);
 		if (iter_expr) iter_expr->Accept(*this);
 		builder.CreateBr(cond_block);
+
+		builder.SetInsertPoint(end_block);
+	}
+
+	void LLVMVisitor::Visit(WhileStmt const& while_stmt, uint32)
+	{
+		Expr const* cond_expr = while_stmt.GetCondExpr();
+		Stmt const* body_stmt = while_stmt.GetBodyStmt();
+
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(context, "while.cond", function, exit_block);
+		llvm::BasicBlock* body_block = llvm::BasicBlock::Create(context, "while.body", function, exit_block);
+		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "while.end",  function, exit_block);
+
+		builder.CreateBr(cond_block);
+		builder.SetInsertPoint(cond_block);
+		cond_expr->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[cond_expr];
+		WAVE_ASSERT(condition_value);
+		ConditionalBranch(condition_value, body_block, end_block);
+
+		builder.SetInsertPoint(body_block);
+
+		continue_blocks.push_back(cond_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+
+		builder.CreateBr(cond_block);
+
+		builder.SetInsertPoint(end_block);
+	}
+
+	void LLVMVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
+	{
+		Expr const* cond_expr = do_while_stmt.GetCondExpr();
+		Stmt const* body_stmt = do_while_stmt.GetBodyStmt();
+
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* body_block = llvm::BasicBlock::Create(context, "dowhile.body", function, exit_block);
+		llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(context, "dowhile.cond", function, exit_block);
+		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "dowhile.end", function, exit_block);
+
+		builder.CreateBr(body_block);
+		builder.SetInsertPoint(body_block);
+
+		continue_blocks.push_back(cond_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+
+		builder.CreateBr(cond_block);
+
+		builder.SetInsertPoint(cond_block);
+		cond_expr->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[cond_expr];
+		WAVE_ASSERT(condition_value);
+		ConditionalBranch(condition_value, body_block, end_block);
 
 		builder.SetInsertPoint(end_block);
 	}
@@ -456,7 +503,7 @@ namespace wave
 		llvm_value_map[&bool_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32 depth)
+	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
 	{
 		Expr const* cast_operand_expr = cast_expr.GetOperand();
 		cast_operand_expr->Accept(*this);
@@ -482,6 +529,20 @@ namespace wave
 			}
 		}
 		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
+	}
+
+	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
+	{
+		if (IsBoolean(condition_value->getType()))
+		{
+			builder.CreateCondBr(condition_value, true_block, false_block);
+		}
+		else
+		{
+			llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
+			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+			builder.CreateCondBr(boolean_cond, true_block, false_block);
+		}
 	}
 
 	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)

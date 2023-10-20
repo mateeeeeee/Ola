@@ -308,6 +308,56 @@ namespace wave
 		UniqueStmtPtr body_stmt;
 	};
 
+	class WhileStmt final : public Stmt
+	{
+	public:
+		WhileStmt() : Stmt(StmtKind::While) {}
+
+		void SetCondExpr(UniqueExprPtr&& _cond_expr)
+		{
+			cond_expr = std::move(_cond_expr);
+		}
+		void SetBodyStmt(UniqueStmtPtr&& _body_stmt)
+		{
+			body_stmt = std::move(_body_stmt);
+		}
+
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
+		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		UniqueExprPtr cond_expr;
+		UniqueStmtPtr body_stmt;
+	};
+
+	class DoWhileStmt final : public Stmt
+	{
+	public:
+		DoWhileStmt() : Stmt(StmtKind::DoWhile) {}
+
+		void SetCondExpr(UniqueExprPtr&& _cond_expr)
+		{
+			cond_expr = std::move(_cond_expr);
+		}
+		void SetBodyStmt(UniqueStmtPtr&& _body_stmt)
+		{
+			body_stmt = std::move(_body_stmt);
+		}
+
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
+		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+
+	private:
+		UniqueExprPtr cond_expr;
+		UniqueStmtPtr body_stmt;
+	};
+
 	enum class ExprKind : uint8
 	{
 		Unary,

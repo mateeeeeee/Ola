@@ -173,8 +173,8 @@ namespace wave
 		case TokenKind::KW_continue: return ParseContinueStatement();
 		case TokenKind::KW_break: return ParseBreakStatement();
 		case TokenKind::KW_for: return ParseForStatement();
-		//case TokenKind::KW_while: return ParseWhileStatement();
-		//case TokenKind::KW_do: return ParseDoWhileStatement();
+		case TokenKind::KW_while: return ParseWhileStatement();
+		case TokenKind::KW_do: return ParseDoWhileStatement();
 		//case TokenKind::KW_goto: return ParseGotoStatement();
 		//case TokenKind::KW_switch: return ParseSwitchStatement();
 		//case TokenKind::KW_case:
@@ -281,10 +281,36 @@ namespace wave
 		sema->ctx.stmts_using_break_count++;
 		sema->ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_break_count--;
 		sema->ctx.stmts_using_continue_count--;
-		
+		sema->ctx.stmts_using_break_count--;
+
 		return sema->ActOnForStmt(std::move(init_stmt), std::move(cond_expr), std::move(iter_expr), std::move(body_stmt));
+	}
+
+	UniqueWhileStmtPtr Parser::ParseWhileStatement()
+	{
+		Expect(TokenKind::KW_while);
+		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
+		sema->ctx.stmts_using_break_count++;
+		sema->ctx.stmts_using_continue_count++;
+		UniqueStmtPtr body_stmt = ParseStatement();
+		sema->ctx.stmts_using_continue_count--;
+		sema->ctx.stmts_using_break_count--;
+		return sema->ActOnWhileStmt(std::move(cond_expr), std::move(body_stmt));
+	}
+
+	UniqueDoWhileStmtPtr Parser::ParseDoWhileStatement()
+	{
+		Expect(TokenKind::KW_do);
+		sema->ctx.stmts_using_break_count++;
+		sema->ctx.stmts_using_continue_count++;
+		UniqueStmtPtr body_stmt = ParseStatement();
+		sema->ctx.stmts_using_continue_count--;
+		sema->ctx.stmts_using_break_count--;
+		Expect(TokenKind::KW_while);
+		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
+		Expect(TokenKind::semicolon);
+		return sema->ActOnDoWhileStmt(std::move(cond_expr), std::move(body_stmt));
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>

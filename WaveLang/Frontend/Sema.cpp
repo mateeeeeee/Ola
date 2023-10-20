@@ -156,6 +156,22 @@ namespace wave
 		return for_stmt;
 	}
 
+	UniqueWhileStmtPtr Sema::ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt)
+	{
+		UniqueWhileStmtPtr while_stmt = MakeUnique<WhileStmt>();
+		while_stmt->SetCondExpr(std::move(cond_expr));
+		while_stmt->SetBodyStmt(std::move(body_stmt));
+		return while_stmt;
+	}
+
+	UniqueDoWhileStmtPtr Sema::ActOnDoWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt)
+	{
+		UniqueDoWhileStmtPtr do_while_stmt = MakeUnique<DoWhileStmt>();
+		do_while_stmt->SetCondExpr(std::move(cond_expr));
+		do_while_stmt->SetBodyStmt(std::move(body_stmt));
+		return do_while_stmt;
+	}
+
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
 	{
 		//#todo semantic analysis
