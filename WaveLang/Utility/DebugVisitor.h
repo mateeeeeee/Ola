@@ -22,6 +22,8 @@ namespace wave
 		virtual void Visit(NullStmt const&, uint32 depth) override;
 		virtual void Visit(ReturnStmt const&, uint32 depth) override;
 		virtual void Visit(IfStmt const&, uint32 depth) override;
+		virtual void Visit(BreakStmt const&, uint32 depth) override;
+		virtual void Visit(ContinueStmt const&, uint32 depth) override;
 		virtual void Visit(ForStmt const&, uint32 depth) override;
 
 		virtual void Visit(Expr const&, uint32 depth) override;

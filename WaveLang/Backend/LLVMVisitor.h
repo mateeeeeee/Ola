@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 #include "Frontend/ASTVisitor.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
@@ -47,6 +47,8 @@ namespace wave
 		virtual void Visit(NullStmt const&, uint32) override;
 		virtual void Visit(ReturnStmt const&, uint32) override;
 		virtual void Visit(IfStmt const&, uint32) override;
+		virtual void Visit(BreakStmt const&, uint32) override;
+		virtual void Visit(ContinueStmt const&, uint32) override;
 		virtual void Visit(ForStmt const&, uint32) override;
 
 		virtual void Visit(Expr const&, uint32) override;
@@ -70,6 +72,9 @@ namespace wave
 
 		llvm::AllocaInst* return_alloc;
 		llvm::BasicBlock* exit_block;
+
+		std::vector<llvm::BasicBlock*> loop_iter_blocks;
+		std::vector<llvm::BasicBlock*> loop_exit_blocks;
 
 	private:
 

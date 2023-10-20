@@ -27,6 +27,8 @@ namespace wave
 	using UniqueNullStmtPtr			= UniquePtr<NullStmt>;
 	using UniqueReturnStmtPtr		= UniquePtr<ReturnStmt>;
 	using UniqueIfStmtPtr			= UniquePtr<IfStmt>;
+	using UniqueBreakStmtPtr		= UniquePtr<BreakStmt>;
+	using UniqueContinueStmtPtr		= UniquePtr<ContinueStmt>;
 	using UniqueForStmtPtr			= UniquePtr<ForStmt>;
 
 	using UniqueExprPtr				= UniquePtr<Expr>;
@@ -50,5 +52,6 @@ namespace wave
 	using DeclPtrList				= std::vector<Decl*>;
 	using StmtPtrList				= std::vector<Stmt*>;
 	using VariableDeclPtrList		= std::vector<VariableDecl*>;
-
+	using BreakStmtPtrList			= std::vector<BreakStmt*>;
+	using ContinueStmtPtrList		= std::vector<ContinueStmt*>;
 }

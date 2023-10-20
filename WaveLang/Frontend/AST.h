@@ -41,6 +41,7 @@ namespace wave
 		Variable,
 		Function
 	};
+
 	class Decl : public NodeAST
 	{
 	public:
@@ -131,6 +132,7 @@ namespace wave
 		Break,
 		Continue
 	};
+
 	class Stmt : public NodeAST
 	{
 	public:
@@ -251,6 +253,24 @@ namespace wave
 		UniqueStmtPtr else_stmt;
 	};
 
+	class BreakStmt final : public Stmt
+	{
+	public:
+		BreakStmt() : Stmt(StmtKind::Break) {}
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+	};
+
+	class ContinueStmt final : public Stmt
+	{
+	public:
+		ContinueStmt() : Stmt(StmtKind::Continue) {}
+
+		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
+		virtual void Accept(ASTVisitor& visitor) const override;
+	};
+
 	class ForStmt final : public Stmt
 	{
 	public:
@@ -320,12 +340,12 @@ namespace wave
 		LessEqual, GreaterEqual,
 		Invalid
 	};
-
 	enum class ExprValueCategory : bool
 	{
 		LValue,
 		RValue
 	};
+
 	class Expr : public NodeAST
 	{
 	public:

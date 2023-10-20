@@ -182,6 +182,22 @@ namespace wave
 		builder.SetInsertPoint(merge_block);
 	}
 
+	void LLVMVisitor::Visit(BreakStmt const&, uint32)
+	{
+		WAVE_ASSERT(!loop_exit_blocks.empty());
+		builder.CreateBr(loop_exit_blocks.back());
+		llvm::BasicBlock* break_block = llvm::BasicBlock::Create(context, "break", builder.GetInsertBlock()->getParent(), exit_block);
+		builder.SetInsertPoint(break_block);
+	}
+
+	void LLVMVisitor::Visit(ContinueStmt const&, uint32)
+	{
+		WAVE_ASSERT(!loop_iter_blocks.empty());
+		builder.CreateBr(loop_iter_blocks.back());
+		llvm::BasicBlock* continue_block = llvm::BasicBlock::Create(context, "continue", builder.GetInsertBlock()->getParent(), exit_block);
+		builder.SetInsertPoint(continue_block);
+	}
+
 	void LLVMVisitor::Visit(ForStmt const& for_stmt, uint32)
 	{
 		Stmt const* init_stmt = for_stmt.GetInitStmt();
@@ -217,9 +233,13 @@ namespace wave
 			}
 		}
 
+		loop_iter_blocks.push_back(iter_block);
+		loop_exit_blocks.push_back(end_block);
 		builder.SetInsertPoint(body_block);
 		body_stmt->Accept(*this);
 		builder.CreateBr(iter_block);
+		loop_exit_blocks.pop_back();
+		loop_iter_blocks.pop_back();
 
 		builder.SetInsertPoint(iter_block);
 		if (iter_expr) iter_expr->Accept(*this);
@@ -228,7 +248,7 @@ namespace wave
 		builder.SetInsertPoint(end_block);
 	}
 
-	void LLVMVisitor::Visit(Expr const& node, uint32)
+	void LLVMVisitor::Visit(Expr const&, uint32)
 	{
 		WAVE_ASSERT(false);
 	}

@@ -170,11 +170,11 @@ namespace wave
 		case TokenKind::left_brace: return ParseCompoundStatement();
 		case TokenKind::KW_return: return ParseReturnStatement();
 		case TokenKind::KW_if: return ParseIfStatement();
+		case TokenKind::KW_continue: return ParseContinueStatement();
+		case TokenKind::KW_break: return ParseBreakStatement();
 		case TokenKind::KW_for: return ParseForStatement();
 		//case TokenKind::KW_while: return ParseWhileStatement();
 		//case TokenKind::KW_do: return ParseDoWhileStatement();
-		//case TokenKind::KW_continue: return ParseContinueStatement();
-		//case TokenKind::KW_break: return ParseBreakStatement();
 		//case TokenKind::KW_goto: return ParseGotoStatement();
 		//case TokenKind::KW_switch: return ParseSwitchStatement();
 		//case TokenKind::KW_case:
@@ -235,6 +235,22 @@ namespace wave
 		return sema->ActOnIfStmt(std::move(cond_expr), std::move(then_stmt), std::move(else_stmt));
 	}
 
+	UniqueBreakStmtPtr Parser::ParseBreakStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		Expect(TokenKind::KW_break);
+		Expect(TokenKind::semicolon);
+		return sema->ActOnBreakStmt(loc);
+	}
+
+	UniqueContinueStmtPtr Parser::ParseContinueStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		Expect(TokenKind::KW_continue);
+		Expect(TokenKind::semicolon);
+		return sema->ActOnContinueStmt(loc);
+	}
+
 	UniqueForStmtPtr Parser::ParseForStatement()
 	{
 		Expect(TokenKind::KW_for);
@@ -262,7 +278,12 @@ namespace wave
 			Expect(TokenKind::right_round);
 		}
 
+		sema->ctx.stmts_using_break_count++;
+		sema->ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
+		sema->ctx.stmts_using_break_count--;
+		sema->ctx.stmts_using_continue_count--;
+		
 		return sema->ActOnForStmt(std::move(init_stmt), std::move(cond_expr), std::move(iter_expr), std::move(body_stmt));
 	}
 

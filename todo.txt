@@ -1,7 +1,6 @@
 1. Finish adding statements
 	class WhileStmt;
 	class DoWhileStmt;
-	class ForStmt;
 	class SwitchStmt;
 	class CaseStmt;
 	class GotoStmt;

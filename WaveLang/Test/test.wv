@@ -5,8 +5,9 @@ fn main() -> int
 	let a = 0;
 	for(;a < 10;)
 	{
-		b += 2;
 		++a;
+		if(a == 5) continue;
+		b += 2;
 	}
 	return b;
 }

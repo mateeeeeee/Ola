@@ -158,6 +158,16 @@ namespace wave
 		WAVE_DEBUG("{}IfStmt\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(BreakStmt const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}BreakStmt\n", GetIndentation(depth));
+	}
+
+	void DebugVisitor::Visit(ContinueStmt const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}ContinueStmt\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(ForStmt const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}ForStmt\n", GetIndentation(depth));
@@ -222,4 +232,5 @@ namespace wave
 	{
 		WAVE_DEBUG("{}FunctionCallExpr\n", GetIndentation(depth));
 	}
+
 }

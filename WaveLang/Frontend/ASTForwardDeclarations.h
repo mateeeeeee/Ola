@@ -16,6 +16,8 @@ namespace wave
 	class NullStmt;
 	class ReturnStmt;
 	class IfStmt;
+	class BreakStmt;
+	class ContinueStmt;
 	class ForStmt;
 
 	class Expr;

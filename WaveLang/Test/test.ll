@@ -11,29 +11,37 @@ entry:
   br label %for.cond
 
 for.body:                                         ; preds = %for.cond
-  %3 = load i64, ptr %1, align 4
-  %4 = add i64 %3, 2
-  %5 = load i64, ptr %1, align 4
-  store i64 %4, ptr %1, align 4
-  %6 = load i64, ptr %2, align 4
-  %7 = add i64 %6, 1
-  store i64 %7, ptr %2, align 4
-  br label %for.iter
+  %3 = load i64, ptr %2, align 4
+  %4 = add i64 %3, 1
+  store i64 %4, ptr %2, align 4
+  %5 = load i64, ptr %2, align 4
+  %6 = icmp eq i64 %5, 5
+  br i1 %6, label %if.then, label %if.end
 
 for.end:                                          ; preds = %for.cond
-  %8 = load ptr, ptr %1, align 8
-  store ptr %8, ptr %0, align 8
+  %7 = load ptr, ptr %1, align 8
+  store ptr %7, ptr %0, align 8
   br label %exit
 
 for.cond:                                         ; preds = %for.iter, %entry
-  %9 = load i64, ptr %2, align 4
-  %10 = icmp slt i64 %9, 10
-  br i1 %10, label %for.body, label %for.end
+  %8 = load i64, ptr %2, align 4
+  %9 = icmp slt i64 %8, 10
+  br i1 %9, label %for.body, label %for.end
 
-for.iter:                                         ; preds = %for.body
+for.iter:                                         ; preds = %if.end, %if.then
   br label %for.cond
 
+if.then:                                          ; preds = %for.body
+  br label %for.iter
+
+if.end:                                           ; preds = %continue, %for.body
+  %10 = load i64, ptr %1, align 4
+  %11 = add i64 %10, 2
+  %12 = load i64, ptr %1, align 4
+  store i64 %11, ptr %1, align 4
+  br label %for.iter
+
 exit:                                             ; preds = %for.end
-  %11 = load i64, ptr %0, align 4
-  ret i64 %11
+  %13 = load i64, ptr %0, align 4
+  ret i64 %13
 }

@@ -23,17 +23,16 @@ main:                                   # @main
 	jmp	.LBB0_3
 .LBB0_1:                                # %for.body
                                         #   in Loop: Header=BB0_3 Depth=1
-	movq	8(%rsp), %rax
-	addq	$2, %rax
-	movq	%rax, 8(%rsp)
 	movq	(%rsp), %rax
 	addq	$1, %rax
 	movq	%rax, (%rsp)
-	jmp	.LBB0_4
+	cmpq	$5, (%rsp)
+	je	.LBB0_5
+	jmp	.LBB0_6
 .LBB0_2:                                # %for.end
 	movq	8(%rsp), %rax
 	movq	%rax, 16(%rsp)
-	jmp	.LBB0_5
+	jmp	.LBB0_7
 .LBB0_3:                                # %for.cond
                                         # =>This Inner Loop Header: Depth=1
 	cmpq	$10, (%rsp)
@@ -42,7 +41,16 @@ main:                                   # @main
 .LBB0_4:                                # %for.iter
                                         #   in Loop: Header=BB0_3 Depth=1
 	jmp	.LBB0_3
-.LBB0_5:                                # %exit
+.LBB0_5:                                # %if.then
+                                        #   in Loop: Header=BB0_3 Depth=1
+	jmp	.LBB0_4
+.LBB0_6:                                # %if.end
+                                        #   in Loop: Header=BB0_3 Depth=1
+	movq	8(%rsp), %rax
+	addq	$2, %rax
+	movq	%rax, 8(%rsp)
+	jmp	.LBB0_4
+.LBB0_7:                                # %exit
 	movq	16(%rsp), %rax
 	addq	$24, %rsp
 	retq

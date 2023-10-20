@@ -130,6 +130,22 @@ namespace wave
 		return if_stmt;
 	}
 
+	UniqueBreakStmtPtr Sema::ActOnBreakStmt(SourceLocation const& loc)
+	{	
+		if (ctx.stmts_using_break_count == 0) diagnostics.Report(loc, stray_break);
+		
+		UniqueBreakStmtPtr break_stmt = MakeUnique<BreakStmt>();
+		return break_stmt;
+	}
+
+	UniqueContinueStmtPtr Sema::ActOnContinueStmt(SourceLocation const& loc)
+	{
+		if (ctx.stmts_using_continue_count == 0) diagnostics.Report(loc, stray_continue);
+
+		UniqueContinueStmtPtr continue_stmt = MakeUnique<ContinueStmt>();
+		return continue_stmt;
+	}
+
 	UniqueForStmtPtr Sema::ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt)
 	{
 		UniqueForStmtPtr for_stmt = MakeUnique<ForStmt>();

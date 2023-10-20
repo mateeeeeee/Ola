@@ -12,9 +12,7 @@ DIAG(expected_identifier, error, "Expected identifier")
 DIAG(invalid_type_specifier, error, "Invalid type specifier")
 DIAG(function_params_missing_coma, error, "Missing coma in function parameters declaration")
 DIAG(missing_type_specifier, error, "Missing type specifier")
-
 DIAG(void_invalid_context, error, "Void is only allowed when specifying function return value")
-
 DIAG(redefinition_of_identifier, error, "Redefinition of an identifier {}")
 DIAG(undeclared_identifier, error, "Undeclared identifier {}")
 DIAG(invalid_main_function_declaration, error, "Invalid main function declaration")
@@ -24,6 +22,7 @@ DIAG(incompatible_return_stmt_type, error, "Incompatible return statement type")
 DIAG(invalid_cast, error, "Invalid cast")
 DIAG(invalid_assignment_to_const, error, "Assignment to const variable")
 DIAG(invalid_assignment_to_rvalue, error, "Assignment to rvalue variable")
-
+DIAG(stray_break, error, "break statement not in loop or switch statement")
+DIAG(stray_continue, error, "continue statement not in loop statement")
 DIAG(missing_type_specifier_or_init_expr, error, "Variable declaration has to have atleast one of init expression and type specifier")
 #undef DIAG

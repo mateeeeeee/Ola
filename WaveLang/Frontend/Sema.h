@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "Scope.h"
 #include "AST.h"
 
@@ -16,11 +17,16 @@ namespace wave
 	class Sema 
 	{
 		friend class Parser;
+
 		struct Context
 		{
 			ScopeStack<Decl> decl_scope_stack;
+
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
+
+			uint32 stmts_using_break_count; 
+			uint32 stmts_using_continue_count;
 		};
 
 	public:
@@ -38,6 +44,8 @@ namespace wave
 		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtr&& decl);
 		UniqueReturnStmtPtr ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt);
 		UniqueIfStmtPtr ActOnIfStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& then_stmt, UniqueStmtPtr&& else_stmt);
+		UniqueBreakStmtPtr ActOnBreakStmt(SourceLocation const& loc);
+		UniqueContinueStmtPtr ActOnContinueStmt(SourceLocation const& loc);
 		UniqueForStmtPtr ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt);
 
 		UniqueUnaryExprPtr ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand);
