@@ -319,6 +319,7 @@ namespace wave
 		UniqueExprPtr case_value = nullptr;
 		if (Consume(TokenKind::KW_case)) case_value = ParseExpression();
 		else Expect(TokenKind::KW_default);
+		Expect(TokenKind::colon);
 		return sema->ActOnCaseStmt(loc, std::move(case_value));
 	}
 

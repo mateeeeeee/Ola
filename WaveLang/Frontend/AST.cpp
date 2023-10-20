@@ -97,7 +97,10 @@ namespace wave
 	}
 	void SwitchStmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
+		WAVE_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, depth);
+		cond_expr->Accept(visitor, depth + 1);
+		body_stmt->Accept(visitor, depth + 1);
 	}
 
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
@@ -236,6 +239,7 @@ namespace wave
 	}
 	void SwitchStmt::Accept(ASTVisitor& visitor) const
 	{
+		WAVE_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, 0);
 	}
 

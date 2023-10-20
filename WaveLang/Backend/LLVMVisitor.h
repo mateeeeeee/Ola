@@ -12,6 +12,7 @@ namespace llvm
 	class Value;
 	class Type;
 	class AllocaInst;
+	class SwitchInst;
 }
 
 namespace wave
@@ -52,8 +53,8 @@ namespace wave
 		virtual void Visit(ForStmt const&, uint32) override;
 		virtual void Visit(WhileStmt const&, uint32) override;
 		virtual void Visit(DoWhileStmt const&, uint32) override;
-		virtual void Visit(CaseStmt const&, uint32) override {}
-		virtual void Visit(SwitchStmt const&, uint32) override {}
+		virtual void Visit(CaseStmt const&, uint32) override;
+		virtual void Visit(SwitchStmt const&, uint32) override;
 
 		virtual void Visit(Expr const&, uint32) override;
 		virtual void Visit(UnaryExpr const&, uint32) override;
@@ -79,7 +80,7 @@ namespace wave
 
 		std::vector<llvm::BasicBlock*> continue_blocks;
 		std::vector<llvm::BasicBlock*> break_blocks;
-
+		std::vector<llvm::SwitchInst*> switch_instructions;
 	private:
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);

@@ -15,35 +15,74 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$24, %rsp
-	.seh_stackalloc 24
+	pushq	%rbp
+	.seh_pushreg %rbp
+	subq	$32, %rsp
+	.seh_stackalloc 32
+	leaq	32(%rsp), %rbp
+	.seh_setframe %rbp, 32
 	.seh_endprologue
-	movq	$0, 8(%rsp)
-	movq	$0, (%rsp)
-	jmp	.LBB0_2
-.LBB0_1:                                # %for.body
-                                        #   in Loop: Header=BB0_2 Depth=1
-	jmp	.LBB0_3
-.LBB0_2:                                # %for.cond
-                                        # =>This Inner Loop Header: Depth=1
-	cmpq	$10, (%rsp)
-	jl	.LBB0_1
+	movq	$0, -16(%rbp)
+	cmpq	$0, -16(%rbp)
+	jle	.LBB0_2
+# %bb.1:                                # %if.then
+	movq	-16(%rbp), %rax
+	addq	$4, %rax
+	movq	%rax, -16(%rbp)
+	movl	$16, %eax
+	callq	__chkstk
+	subq	%rax, %rsp
+	movq	%rsp, %rax
+	movq	-16(%rbp), %rcx
+	subq	$1, %rcx
+	movq	%rcx, (%rax)
+	imulq	$5, (%rax), %rcx
+	movq	%rcx, (%rax)
+	movq	(%rax), %rax
+	movq	%rax, -8(%rbp)
+	jmp	.LBB0_7
+.LBB0_2:                                # %if.else
+	movl	$16, %eax
+	callq	__chkstk
+	subq	%rax, %rsp
+	movq	%rsp, %rax
+	movq	%rax, -24(%rbp)                 # 8-byte Spill
+	movq	$0, (%rax)
 	jmp	.LBB0_4
-.LBB0_3:                                # %for.iter
-                                        #   in Loop: Header=BB0_2 Depth=1
-	movq	(%rsp), %rax
+.LBB0_3:                                # %for.body
+                                        #   in Loop: Header=BB0_4 Depth=1
+	movq	-16(%rbp), %rax
+	movq	%rax, -32(%rbp)                 # 8-byte Spill
+	movl	$16, %eax
+	callq	__chkstk
+	subq	%rax, %rsp
+	movq	-32(%rbp), %rax                 # 8-byte Reload
+	movq	%rsp, %rcx
+	movq	-16(%rbp), %rdx
+	movq	%rdx, (%rcx)
 	addq	$1, %rax
-	movq	%rax, (%rsp)
-	movq	8(%rsp), %rax
-	addq	$2, %rax
-	movq	%rax, 8(%rsp)
-	jmp	.LBB0_2
-.LBB0_4:                                # %for.end
-	movq	8(%rsp), %rax
-	movq	%rax, 16(%rsp)
-# %bb.5:                                # %exit
-	movq	16(%rsp), %rax
-	addq	$24, %rsp
+	movq	%rax, -16(%rbp)
+	jmp	.LBB0_5
+.LBB0_4:                                # %for.cond
+                                        # =>This Inner Loop Header: Depth=1
+	movq	-24(%rbp), %rax                 # 8-byte Reload
+	cmpq	$10, (%rax)
+	jl	.LBB0_3
+	jmp	.LBB0_6
+.LBB0_5:                                # %for.iter
+                                        #   in Loop: Header=BB0_4 Depth=1
+	movq	-24(%rbp), %rax                 # 8-byte Reload
+	movq	(%rax), %rcx
+	addq	$1, %rcx
+	movq	%rcx, (%rax)
+	jmp	.LBB0_4
+.LBB0_6:                                # %for.end
+	movq	-16(%rbp), %rax
+	movq	%rax, -8(%rbp)
+.LBB0_7:                                # %exit
+	movq	-8(%rbp), %rax
+	movq	%rbp, %rsp
+	popq	%rbp
 	retq
 	.seh_endproc
                                         # -- End function

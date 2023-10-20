@@ -240,7 +240,7 @@ namespace wave
 		Expr const* cond_expr = while_stmt.GetCondExpr();
 		Stmt const* body_stmt = while_stmt.GetBodyStmt();
 
-		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::Function* function	 = builder.GetInsertBlock()->getParent();
 		llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(context, "while.cond", function, exit_block);
 		llvm::BasicBlock* body_block = llvm::BasicBlock::Create(context, "while.body", function, exit_block);
 		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "while.end",  function, exit_block);
@@ -292,6 +292,56 @@ namespace wave
 		WAVE_ASSERT(condition_value);
 		ConditionalBranch(condition_value, body_block, end_block);
 
+		builder.SetInsertPoint(end_block);
+	}
+
+	void LLVMVisitor::Visit(CaseStmt const& case_stmt, uint32)
+	{
+		WAVE_ASSERT(!switch_instructions.empty());
+
+		if (case_stmt.IsDefault())
+		{
+			builder.SetInsertPoint(switch_instructions.back()->getDefaultDest());
+		}
+		else
+		{
+			int64 case_value = case_stmt.GetValue();
+			llvm::ConstantInt* llvm_case_value = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), case_value);
+
+			llvm::Function* function = builder.GetInsertBlock()->getParent();
+			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
+			llvm::BasicBlock* case_block = llvm::BasicBlock::Create(context, block_name, function, exit_block);
+			switch_instructions.back()->addCase(llvm_case_value, case_block);
+			builder.SetInsertPoint(case_block);
+		}
+	}
+
+	void LLVMVisitor::Visit(SwitchStmt const& switch_stmt, uint32)
+	{
+		Expr const* cond_expr = switch_stmt.GetCondExpr();
+		Stmt const* body_stmt = switch_stmt.GetBodyStmt();
+
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* header_block = llvm::BasicBlock::Create(context, "switch.header", function, exit_block);
+		llvm::BasicBlock* default_block = llvm::BasicBlock::Create(context, "switch.default", function, exit_block);
+		llvm::BasicBlock* end_block = llvm::BasicBlock::Create(context, "switch.end", function, exit_block);
+
+		builder.CreateBr(header_block);
+		builder.SetInsertPoint(header_block);
+
+		cond_expr->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[cond_expr];
+		WAVE_ASSERT(condition_value);
+		llvm::Value* condition = Load(condition_value->getType(), condition_value);
+		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block, 4);
+
+		switch_instructions.push_back(switch_inst);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		switch_instructions.pop_back();
+
+		builder.CreateBr(end_block);
 		builder.SetInsertPoint(end_block);
 	}
 
