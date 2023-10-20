@@ -24,5 +24,6 @@ DIAG(invalid_assignment_to_const, error, "Assignment to const variable")
 DIAG(invalid_assignment_to_rvalue, error, "Assignment to rvalue variable")
 DIAG(stray_break, error, "break statement not in loop or switch statement")
 DIAG(stray_continue, error, "continue statement not in loop statement")
+DIAG(invalid_function_call, error, "Invalid function call")
 DIAG(missing_type_specifier_or_init_expr, error, "Variable declaration has to have atleast one of init expression and type specifier")
 #undef DIAG

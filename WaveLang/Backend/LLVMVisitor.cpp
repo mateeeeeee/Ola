@@ -424,8 +424,6 @@ namespace wave
 			break;
 		case BinaryExprKind::BitXor:
 			break;
-		case BinaryExprKind::Comma:
-			break;
 		case BinaryExprKind::LogicalAnd:
 			break;
 		case BinaryExprKind::LogicalOr:
@@ -458,6 +456,11 @@ namespace wave
 		case BinaryExprKind::GreaterEqual:
 		{
 			result = builder.CreateICmpSGE(lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Comma:
+		{
+			result = rhs;
 		}
 		break;
 		case BinaryExprKind::Invalid:

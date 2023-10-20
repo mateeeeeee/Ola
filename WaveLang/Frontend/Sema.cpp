@@ -273,12 +273,26 @@ namespace wave
 
 	UniqueFunctionCallExprPtr Sema::ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
-		//#todo semantic analysis
-		QualifiedType const& func_expr_type = func_expr->GetType();
-		WAVE_ASSERT(IsFunctionType(func_expr_type));
-		FunctionType func_type = type_cast<FunctionType>(func_expr_type);
+		if (func_expr->GetExprKind() != ExprKind::DeclRef)
+		{
+			diagnostics.Report(loc, invalid_function_call);
+			return nullptr;
+		}
 
-		UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(loc, std::move(func_expr));
+		DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
+		Decl const* decl = decl_ref->GetDecl();
+		if (decl->GetDeclKind() != DeclKind::Function)
+		{
+			diagnostics.Report(loc, invalid_function_call);
+			return nullptr;
+		}
+
+		QualifiedType const& func_expr_type = decl->GetType();
+		WAVE_ASSERT(IsFunctionType(func_expr_type));
+		FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
+
+		std::string_view func_name = decl->GetName();
+		UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(loc, func_name);
 		func_call_expr->SetType(func_type.GetReturnType());
 		func_call_expr->SetArgs(std::move(args));
 		return func_call_expr;

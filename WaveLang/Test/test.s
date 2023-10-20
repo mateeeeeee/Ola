@@ -20,22 +20,28 @@ main:                                   # @main
 	.seh_endprologue
 	movq	$0, 8(%rsp)
 	movq	$0, (%rsp)
-.LBB0_1:                                # %dowhile.body
+	jmp	.LBB0_2
+.LBB0_1:                                # %for.body
+                                        #   in Loop: Header=BB0_2 Depth=1
+	jmp	.LBB0_3
+.LBB0_2:                                # %for.cond
                                         # =>This Inner Loop Header: Depth=1
+	cmpq	$10, (%rsp)
+	jl	.LBB0_1
+	jmp	.LBB0_4
+.LBB0_3:                                # %for.iter
+                                        #   in Loop: Header=BB0_2 Depth=1
+	movq	(%rsp), %rax
+	addq	$1, %rax
+	movq	%rax, (%rsp)
 	movq	8(%rsp), %rax
 	addq	$2, %rax
 	movq	%rax, 8(%rsp)
-# %bb.2:                                # %dowhile.cond
-                                        #   in Loop: Header=BB0_1 Depth=1
-	xorl	%eax, %eax
-                                        # kill: def $al killed $al killed $eax
-	testb	$1, %al
-	jne	.LBB0_1
-	jmp	.LBB0_3
-.LBB0_3:                                # %dowhile.end
+	jmp	.LBB0_2
+.LBB0_4:                                # %for.end
 	movq	8(%rsp), %rax
 	movq	%rax, 16(%rsp)
-# %bb.4:                                # %exit
+# %bb.5:                                # %exit
 	movq	16(%rsp), %rax
 	addq	$24, %rsp
 	retq

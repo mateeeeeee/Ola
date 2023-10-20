@@ -28,8 +28,8 @@ namespace wave
 		}
 		UniqueDeclPtrList const& GetDecls() const { return declarations; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueDeclPtrList declarations;
@@ -52,8 +52,8 @@ namespace wave
 		void SetType(QualifiedType const& _type) { type = _type; }
 		QualifiedType const& GetType() const { return type; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		DeclKind const decl_kind;
@@ -77,8 +77,8 @@ namespace wave
 		}
 		Expr const* GetInitExpr() const { return init_expr.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr init_expr;
@@ -105,8 +105,8 @@ namespace wave
 			return definition == nullptr;
 		}
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueVariableDeclPtrList param_declarations;
@@ -138,8 +138,8 @@ namespace wave
 	public:
 		StmtKind GetStmtKind() const { return kind; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	protected:
 		StmtKind const kind;
@@ -154,8 +154,8 @@ namespace wave
 		CompoundStmt(UniqueStmtPtrList&& stmts) : Stmt(StmtKind::Compound), statements(std::move(stmts)) {}
 		UniqueStmtPtrList const& GetStmts() const { return statements; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueStmtPtrList statements;
@@ -168,8 +168,8 @@ namespace wave
 
 		Decl const* GetDecl() const { return declaration.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueDeclPtr declaration;
@@ -190,8 +190,8 @@ namespace wave
 			return expr.release();
 		}
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr expr;
@@ -202,8 +202,8 @@ namespace wave
 	public:
 		NullStmt() : ExprStmt(nullptr) {}
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	};
 
@@ -215,8 +215,8 @@ namespace wave
 
 		ExprStmt const* GetExprStmt() const { return ret_expr.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprStmtPtr ret_expr;
@@ -244,8 +244,8 @@ namespace wave
 		Stmt const* GetThenStmt() const { return then_stmt.get(); }
 		Stmt const* GetElseStmt() const { return else_stmt.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr condition;
@@ -258,8 +258,8 @@ namespace wave
 	public:
 		BreakStmt() : Stmt(StmtKind::Break) {}
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 	};
 
 	class ContinueStmt final : public Stmt
@@ -267,8 +267,8 @@ namespace wave
 	public:
 		ContinueStmt() : Stmt(StmtKind::Continue) {}
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 	};
 
 	class ForStmt final : public Stmt
@@ -298,8 +298,8 @@ namespace wave
 		Expr const* GetIterExpr() const { return iter_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueStmtPtr init_stmt;
@@ -325,8 +325,8 @@ namespace wave
 		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr cond_expr;
@@ -350,12 +350,57 @@ namespace wave
 		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr cond_expr;
 		UniqueStmtPtr body_stmt;
+	};
+
+	class CaseStmt final : public Stmt
+	{
+	public:
+		CaseStmt() : Stmt(StmtKind::Case), is_default(true), value(0) {}
+		explicit CaseStmt(int64 value) : Stmt(StmtKind::Case), is_default(false), value(value) {}
+
+		bool IsDefault() const { return is_default; }
+		int64 GetValue() const { return value; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		int64 value;
+		bool is_default;
+	};
+
+	class SwitchStmt final : public Stmt
+	{
+	public:
+		SwitchStmt() : Stmt(StmtKind::Switch) {}
+
+		void SetCondExpr(UniqueExprPtr&& _condition)
+		{
+			condition = std::move(_condition);
+		}
+		void SetBodyStmt(UniqueStmtPtr&& _body_stmt)
+		{
+			body_stmt = std::move(_body_stmt);
+		}
+
+		bool HasDefaultCase() const
+		{
+			return has_default;
+		}
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueExprPtr condition;
+		UniqueStmtPtr body_stmt;
+		bool has_default = false;
 	};
 
 	enum class ExprKind : uint8
@@ -409,8 +454,8 @@ namespace wave
 		virtual bool IsConstexpr() const { return false; }
 		virtual int64 EvaluateConstexpr() const { return 0; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	protected:
 		ExprKind const kind;
@@ -434,8 +479,8 @@ namespace wave
 		UnaryExprKind GetUnaryKind() const { return op; }
 		Expr const* GetOperand() const { return operand.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UnaryExprKind op;
@@ -453,8 +498,8 @@ namespace wave
 		Expr const* GetLHS() const { return lhs.get(); }
 		Expr const* GetRHS() const { return rhs.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr lhs, rhs;
@@ -478,8 +523,8 @@ namespace wave
 		Expr const* GetTrueExpr() const { return true_expr.get(); }
 		Expr const* GetFalseExpr() const { return false_expr.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr cond_expr;
@@ -496,8 +541,8 @@ namespace wave
 		}
 		std::string_view GetName() const { return name; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		std::string name;
@@ -512,8 +557,8 @@ namespace wave
 		}
 
 		Decl const* GetDecl() const { return decl; }
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		Decl* decl;
@@ -528,8 +573,8 @@ namespace wave
 		}
 		int64 GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		int64 value;
@@ -544,8 +589,8 @@ namespace wave
 		}
 		std::string_view GetString() const { return str; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		std::string str;
@@ -560,8 +605,8 @@ namespace wave
 		}
 		bool GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		bool value;
@@ -576,8 +621,8 @@ namespace wave
 		}
 		double GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		double value;
@@ -598,8 +643,8 @@ namespace wave
 		}
 		Expr const* GetOperand() const { return operand.get(); }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr operand;
@@ -608,20 +653,21 @@ namespace wave
 	class FunctionCallExpr final : public Expr
 	{
 	public:
-		FunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func)
-			: Expr(ExprKind::FunctionCall, loc), func_expr(std::move(func)) {}
+		FunctionCallExpr(SourceLocation const& loc, std::string_view function_name)
+			: Expr(ExprKind::FunctionCall, loc), function_name(function_name) {}
 
 		void SetArgs(UniqueExprPtrList&& args)
 		{
 			func_args = std::move(args);
 		}
-		Expr const* GetFunction() const { return func_expr.get(); }
+		std::string_view GetFunctionName() const { return function_name; }
+		UniqueExprPtrList const& GetArgs() const { return func_args; }
 
-		virtual void Accept(ASTVisitor& visitor, uint32 depth) const override;
-		virtual void Accept(ASTVisitor& visitor) const override;
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueExprPtr func_expr;
+		std::string function_name;
 		UniqueExprPtrList func_args;
 	};
 

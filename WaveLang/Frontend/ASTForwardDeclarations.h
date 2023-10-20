@@ -21,6 +21,8 @@ namespace wave
 	class ForStmt;
 	class WhileStmt;
 	class DoWhileStmt;
+	class CaseStmt;
+	class SwitchStmt;
 
 	class Expr;
 	class UnaryExpr;
