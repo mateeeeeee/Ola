@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <unordered_set>
 #include "Scope.h"
 #include "AST.h"
 
@@ -29,6 +30,9 @@ namespace wave
 			uint32 stmts_using_break_count = 0; 
 			uint32 stmts_using_continue_count = 0;
 			std::vector<CaseStmtCallback> case_callback_stack;
+
+			std::unordered_set<std::string> labels;
+			std::vector<std::string> gotos;
 		};
 
 	public:
@@ -53,6 +57,8 @@ namespace wave
 		UniqueDoWhileStmtPtr ActOnDoWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueCaseStmtPtr ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr = nullptr);
 		UniqueSwitchStmtPtr ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, CaseStmtPtrList&& case_stmts);
+		UniqueGotoStmtPtr ActOnGotoStmt(SourceLocation const& loc, std::string_view label_name);
+		UniqueLabelStmtPtr ActOnLabelStmt(SourceLocation const& loc, std::string_view label_name);
 
 		UniqueUnaryExprPtr ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand);
 		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);

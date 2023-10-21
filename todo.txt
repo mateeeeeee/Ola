@@ -1,17 +1,13 @@
-0. Refactor var and func declarations 
+0. Refactor declarations 
 
-1. Finish adding statements
-	class GotoStmt;
-	class LabelStmt;
+1. Add LLVMOptimizer
 
-2. Add FunctionCallExpr
+2. Add function calls
 
-3. Check llvm optimization passes
+4. Start working on floats, enums, arrays
 
-4. Work on arrays and floats, enums
+5. Start working on import declaration
 
-5. figure out what to do with import statement and how it should work
+6. Start working on std lib implementation
 
-6. figure out how to add std lib support
-
-7. work on classes 
+7. Start working on classes and other oop features

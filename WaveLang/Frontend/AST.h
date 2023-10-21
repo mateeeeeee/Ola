@@ -86,6 +86,7 @@ namespace wave
 
 	class FunctionDecl : public Decl
 	{
+		friend class LabelVisitor;
 	public:
 		FunctionDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Function, name, loc) {}
 
@@ -93,24 +94,27 @@ namespace wave
 		{
 			param_declarations = std::move(param_decls);
 		}
-		void SetBodyStmt(UniqueCompoundStmtPtr&& _definition)
+		void SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt)
 		{
-			definition = std::move(_definition);
+			body_stmt = std::move(_body_stmt);
 		}
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
-		CompoundStmt const* GetBodyStmt() const { return definition.get(); }
+		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		bool IsDefinition() const
+		bool HasDefinition() const
 		{
-			return definition == nullptr;
+			return body_stmt != nullptr;
 		}
+
+		ConstLabelStmtPtrList GetLabels() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueVariableDeclPtrList param_declarations;
-		UniqueCompoundStmtPtr definition;
+		UniqueCompoundStmtPtr body_stmt;
+		mutable ConstLabelStmtPtrList labels;
 	};
 
 
@@ -398,6 +402,32 @@ namespace wave
 	private:
 		UniqueExprPtr cond_expr;
 		UniqueStmtPtr body_stmt;
+	};
+
+	class LabelStmt final : public Stmt
+	{
+	public:
+		LabelStmt(std::string_view label) : Stmt(StmtKind::Label), label_name(label) {}
+		std::string_view GetName() const { return label_name; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		std::string label_name;
+	};
+
+	class GotoStmt final : public Stmt
+	{
+	public:
+		explicit GotoStmt(std::string_view label) : Stmt(StmtKind::Label), label_name(label) {}
+		std::string_view GetLabelName() const { return label_name; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		std::string label_name;
 	};
 
 	enum class ExprKind : uint8

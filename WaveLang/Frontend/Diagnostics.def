@@ -30,4 +30,6 @@ DIAG(case_value_not_constexpr, error, "Case value is not a constant expression")
 DIAG(case_stmt_outside_switch, error, "Case statement not in switch statement")
 DIAG(duplicate_default_case, error, "Duplicate default case")
 DIAG(duplicate_case_value, error, "Duplicate case value {}")
+DIAG(undeclared_label, error, "Undeclared label {}")
+DIAG(redefinition_of_label, error, "Redefinition of label {}")
 #undef DIAG

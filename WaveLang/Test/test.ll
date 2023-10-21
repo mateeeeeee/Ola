@@ -8,36 +8,25 @@ entry:
   store i64 0, ptr %1, align 4
   %2 = alloca i64, align 8
   store i64 0, ptr %2, align 4
-  br label %switch.header
-
-switch.header:                                    ; preds = %entry
-  %3 = load i64, ptr %1, align 4
-  switch i64 %3, label %switch.default [
-    i64 0, label %switch.case0
-    i64 1, label %switch.case1
-  ]
-
-switch.default:                                   ; preds = %switch.case1, %switch.header
-  %4 = load i64, ptr %2, align 4
-  store i64 5, ptr %2, align 4
-  br label %switch.end
-
-switch.end:                                       ; preds = %switch.default
+  %3 = load i64, ptr %2, align 4
+  %4 = alloca ptr, align 8
   %5 = load ptr, ptr %2, align 8
-  store ptr %5, ptr %0, align 8
+  store ptr %5, ptr %4, align 8
+  %6 = add i64 %3, 1
+  store i64 %6, ptr %2, align 4
+  %7 = load i64, ptr %2, align 4
+  %8 = icmp slt i64 %7, 5
+  br i1 %8, label %if.then, label %if.else
+
+if.then:                                          ; preds = %entry
+  store i64 0, ptr %0, align 4
   br label %exit
 
-switch.case0:                                     ; preds = %switch.header
-  %6 = load i64, ptr %2, align 4
-  store i64 10, ptr %2, align 4
-  br label %switch.case1
+if.else:                                          ; preds = %entry
+  store i64 5, ptr %0, align 4
+  br label %exit
 
-switch.case1:                                     ; preds = %switch.case0, %switch.header
-  %7 = load i64, ptr %2, align 4
-  store i64 15, ptr %2, align 4
-  br label %switch.default
-
-exit:                                             ; preds = %switch.end
-  %8 = load i64, ptr %0, align 4
-  ret i64 %8
+exit:                                             ; preds = %if.end, %if.else, %if.then
+  %9 = load i64, ptr %0, align 4
+  ret i64 %9
 }

@@ -2,6 +2,31 @@
 
 namespace wave
 {
+	class LabelVisitor : public ASTVisitor
+	{
+	public:
+		explicit LabelVisitor(ConstLabelStmtPtrList& labels) : labels(labels) {}
+		virtual void Visit(LabelStmt const& label, uint32) override
+		{
+			labels.push_back(&label);
+		}
+
+	private:
+		ConstLabelStmtPtrList& labels;
+	};
+
+	ConstLabelStmtPtrList FunctionDecl::GetLabels() const
+	{
+		WAVE_ASSERT(body_stmt);
+		if (!labels.empty()) return labels;
+
+		LabelVisitor label_visitor(labels);
+		body_stmt->Accept(label_visitor, 0);
+		return labels;
+	}
+
+
+
 	void TranslationUnit::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -21,7 +46,7 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
-		if (definition) definition->Accept(visitor, depth + 1);
+		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
 
 	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
@@ -101,6 +126,14 @@ namespace wave
 		visitor.Visit(*this, depth);
 		cond_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
+	}
+	void LabelStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void GotoStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
 	}
 
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
@@ -240,6 +273,14 @@ namespace wave
 	void SwitchStmt::Accept(ASTVisitor& visitor) const
 	{
 		WAVE_ASSERT(cond_expr && body_stmt);
+		visitor.Visit(*this, 0);
+	}
+	void LabelStmt::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void GotoStmt::Accept(ASTVisitor& visitor) const
+	{
 		visitor.Visit(*this, 0);
 	}
 

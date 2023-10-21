@@ -75,7 +75,16 @@ namespace wave
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetParamDecls(std::move(param_decls));
-		if(body_stmt) function_decl->SetBodyStmt(std::move(body_stmt));
+		if (body_stmt)
+		{
+			function_decl->SetBodyStmt(std::move(body_stmt));
+			for (std::string const& goto_label : ctx.gotos)
+			{
+				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
+			}
+			ctx.gotos.clear();
+			ctx.labels.clear();
+		}
 
 		bool result = ctx.decl_scope_stack.Insert(function_decl.get());
 		WAVE_ASSERT(result);
@@ -214,6 +223,20 @@ namespace wave
 		switch_stmt->SetBodyStmt(std::move(body_stmt));
 
 		return switch_stmt;
+	}
+
+	UniqueGotoStmtPtr Sema::ActOnGotoStmt(SourceLocation const& loc, std::string_view label_name)
+	{
+		ctx.gotos.push_back(std::string(label_name));
+		return MakeUnique<GotoStmt>(label_name);
+	}
+
+	UniqueLabelStmtPtr Sema::ActOnLabelStmt(SourceLocation const& loc, std::string_view label_name)
+	{
+		std::string label(label_name);
+		if (ctx.labels.contains(label)) diagnostics.Report(loc, redefinition_of_label, label_name);
+		ctx.labels.insert(label);
+		return MakeUnique<LabelStmt>(label_name);
 	}
 
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)

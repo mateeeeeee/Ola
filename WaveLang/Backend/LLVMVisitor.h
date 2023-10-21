@@ -55,6 +55,8 @@ namespace wave
 		virtual void Visit(DoWhileStmt const&, uint32) override;
 		virtual void Visit(CaseStmt const&, uint32) override;
 		virtual void Visit(SwitchStmt const&, uint32) override;
+		virtual void Visit(GotoStmt const&, uint32) override;
+		virtual void Visit(LabelStmt const&, uint32) override;
 
 		virtual void Visit(Expr const&, uint32) override;
 		virtual void Visit(UnaryExpr const&, uint32) override;
@@ -81,6 +83,7 @@ namespace wave
 		std::vector<llvm::SwitchInst*> switch_instructions;
 		std::vector<llvm::BasicBlock*> continue_blocks;
 		std::vector<llvm::BasicBlock*> break_blocks;
+		std::unordered_map<std::string, llvm::BasicBlock*> label_blocks;
 
 	private:
 

@@ -87,6 +87,8 @@ namespace wave
 		[[nodiscard]] UniqueDoWhileStmtPtr ParseDoWhileStatement();
 		[[nodiscard]] UniqueCaseStmtPtr ParseCaseStatement();
 		[[nodiscard]] UniqueSwitchStmtPtr ParseSwitchStatement();
+		[[nodiscard]] UniqueGotoStmtPtr ParseGotoStatement();
+		[[nodiscard]] UniqueLabelStmtPtr ParseLabelStatement();
 
 		template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
 		[[nodiscard]] UniqueExprPtr ParseBinaryExpression();

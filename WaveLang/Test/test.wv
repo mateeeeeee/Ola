@@ -1,15 +1,13 @@
  
 fn main() -> int
 {
-
 	let b = 0;
 	let a = 0;
-	switch(b)
-	{
-	case 0: a = 10; 
-	case 1: a = 15; 
-	default: a = 5;
-	}
 	
-	return a;
+    a++;
+    if(a < 5) return 0;
+	else return 5;
+	a +=3;
+	
+    return a;
 }

@@ -34,6 +34,8 @@ namespace wave
 	using UniqueDoWhileStmtPtr		= UniquePtr<DoWhileStmt>;
 	using UniqueCaseStmtPtr			= UniquePtr<CaseStmt>;
 	using UniqueSwitchStmtPtr		= UniquePtr<SwitchStmt>;
+	using UniqueGotoStmtPtr			= UniquePtr<GotoStmt>;
+	using UniqueLabelStmtPtr		= UniquePtr<LabelStmt>;
 
 	using UniqueExprPtr				= UniquePtr<Expr>;
 	using UniqueUnaryExprPtr		= UniquePtr<UnaryExpr>;
@@ -59,4 +61,6 @@ namespace wave
 	using BreakStmtPtrList			= std::vector<BreakStmt*>;
 	using ContinueStmtPtrList		= std::vector<ContinueStmt*>;
 	using CaseStmtPtrList			= std::vector<CaseStmt*>;
+	using LabelStmtPtrList			= std::vector<LabelStmt*>;
+	using ConstLabelStmtPtrList		= std::vector<LabelStmt const*>;
 }

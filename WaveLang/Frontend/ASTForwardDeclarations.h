@@ -23,6 +23,8 @@ namespace wave
 	class DoWhileStmt;
 	class CaseStmt;
 	class SwitchStmt;
+	class GotoStmt;
+	class LabelStmt;
 
 	class Expr;
 	class UnaryExpr;

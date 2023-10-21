@@ -178,10 +178,9 @@ namespace wave
 		case TokenKind::KW_switch: return ParseSwitchStatement();
 		case TokenKind::KW_case:
 		case TokenKind::KW_default: return ParseCaseStatement();
-		//case TokenKind::KW_goto: return ParseGotoStatement();
-		//case TokenKind::identifier:
-		//	if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
-		default:
+		case TokenKind::KW_goto: return ParseGotoStatement();
+		case TokenKind::identifier:
+			if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
 			return ParseExpressionStatement();
 		}
 		return nullptr;
@@ -335,6 +334,25 @@ namespace wave
 		sema->ctx.stmts_using_break_count--;
 		sema->ctx.case_callback_stack.pop_back();
 		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), {});
+	}
+
+	UniqueGotoStmtPtr Parser::ParseGotoStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		Expect(TokenKind::KW_goto);
+		std::string_view label_name = current_token->GetIdentifier();
+		Expect(TokenKind::identifier);
+		Expect(TokenKind::semicolon);
+		return sema->ActOnGotoStmt(loc, label_name);
+	}
+
+	UniqueLabelStmtPtr Parser::ParseLabelStatement()
+	{
+		SourceLocation loc = current_token->GetLocation();
+		std::string_view label_name = current_token->GetIdentifier();
+		Expect(TokenKind::identifier);
+		Expect(TokenKind::colon);
+		return sema->ActOnLabelStmt(loc, label_name);
 	}
 
 	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>

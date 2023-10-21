@@ -52,10 +52,18 @@ namespace wave
 			++param_it;
 		}
 
-		if (!function_decl.IsDefinition())
+		if (function_decl.HasDefinition())
 		{
 			return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
 			exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
+
+			ConstLabelStmtPtrList labels;// = function_decl.GetLabels();
+			for (LabelStmt const* label : labels)
+			{
+				std::string block_name = "label."; block_name += label->GetName();
+				llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, llvm_function, exit_block);
+				label_blocks[block_name] = label_block;
+			}
 
 			function_decl.GetBodyStmt()->Accept(*this);
 
@@ -79,6 +87,7 @@ namespace wave
 				builder.CreateBr(exit_block);
 			}
 
+			//label_blocks.clear();
 			exit_block = nullptr;
 			return_alloc = nullptr;
 		}
@@ -161,13 +170,13 @@ namespace wave
 
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
-		builder.CreateBr(merge_block);
+		if(!then_block->getTerminator()) builder.CreateBr(merge_block);
 
 		if (else_stmt)
 		{
 			builder.SetInsertPoint(else_block);
 			else_stmt->Accept(*this);
-			builder.CreateBr(merge_block);
+			if (!else_block->getTerminator()) builder.CreateBr(merge_block);
 		}
 		builder.SetInsertPoint(merge_block);
 	}
@@ -357,6 +366,20 @@ namespace wave
 		builder.SetInsertPoint(default_block);
 		builder.CreateBr(end_block);
 		builder.SetInsertPoint(end_block);
+	}
+
+	void LLVMVisitor::Visit(GotoStmt const& goto_stmt, uint32)
+	{
+		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
+		builder.CreateBr(label_blocks[label_name]);
+	}
+
+	void LLVMVisitor::Visit(LabelStmt const& label_stmt, uint32)
+	{
+		std::string block_name = "label."; block_name += label_stmt.GetName();
+		llvm::BasicBlock* label_block = label_blocks[block_name];
+		builder.CreateBr(label_block);
+		builder.SetInsertPoint(label_block);
 	}
 
 	void LLVMVisitor::Visit(Expr const&, uint32)
