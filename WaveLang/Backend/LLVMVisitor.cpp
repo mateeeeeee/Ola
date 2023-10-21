@@ -298,10 +298,10 @@ namespace wave
 	void LLVMVisitor::Visit(CaseStmt const& case_stmt, uint32)
 	{
 		WAVE_ASSERT(!switch_instructions.empty());
-
+		llvm::SwitchInst* switch_inst = switch_instructions.back();
 		if (case_stmt.IsDefault())
 		{
-			builder.SetInsertPoint(switch_instructions.back()->getDefaultDest());
+			builder.SetInsertPoint(switch_inst->getDefaultDest());
 		}
 		else
 		{
@@ -311,7 +311,7 @@ namespace wave
 			llvm::Function* function = builder.GetInsertBlock()->getParent();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
 			llvm::BasicBlock* case_block = llvm::BasicBlock::Create(context, block_name, function, exit_block);
-			switch_instructions.back()->addCase(llvm_case_value, case_block);
+			switch_inst->addCase(llvm_case_value, case_block);
 			builder.SetInsertPoint(case_block);
 		}
 	}
@@ -333,7 +333,7 @@ namespace wave
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
 		llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
-		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block, 4);
+		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block);
 
 		switch_instructions.push_back(switch_inst);
 		break_blocks.push_back(end_block);
@@ -341,7 +341,22 @@ namespace wave
 		break_blocks.pop_back();
 		switch_instructions.pop_back();
 
+		std::vector<llvm::BasicBlock*> case_blocks;
+		for (auto& case_stmt : switch_inst->cases()) case_blocks.push_back(case_stmt.getCaseSuccessor());
+		for (uint32 i = 0; i < case_blocks.size(); ++i)
+		{
+			llvm::BasicBlock* case_block = case_blocks[i];
+			if (!case_block->getTerminator())
+			{
+				llvm::BasicBlock* dest_block = i < case_blocks.size() - 1 ? case_blocks[i + 1] : default_block;
+				builder.SetInsertPoint(case_block);
+				builder.CreateBr(dest_block);
+			}
+		}
+
 		builder.SetInsertPoint(default_block);
+		builder.CreateBr(end_block);
+		builder.SetInsertPoint(end_block);
 	}
 
 	void LLVMVisitor::Visit(Expr const&, uint32)

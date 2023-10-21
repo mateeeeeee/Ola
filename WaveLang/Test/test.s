@@ -15,34 +15,36 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	pushq	%rbp
-	.seh_pushreg %rbp
 	subq	$32, %rsp
 	.seh_stackalloc 32
-	leaq	32(%rsp), %rbp
-	.seh_setframe %rbp, 32
 	.seh_endprologue
-	movq	$0, -16(%rbp)
-	movq	$0, -24(%rbp)
+	movq	$0, 16(%rsp)
+	movq	$0, 8(%rsp)
 # %bb.1:                                # %switch.header
-	movq	-16(%rbp), %rax
+	movq	16(%rsp), %rax
+	movq	%rax, (%rsp)                    # 8-byte Spill
 	testq	%rax, %rax
 	je	.LBB0_4
+	jmp	.LBB0_7
+.LBB0_7:                                # %switch.header
+	movq	(%rsp), %rax                    # 8-byte Reload
+	subq	$1, %rax
+	je	.LBB0_5
 	jmp	.LBB0_2
 .LBB0_2:                                # %switch.default
-	movq	$5, -24(%rbp)
-	movq	-24(%rbp), %rax
-	movq	%rax, -8(%rbp)
-	jmp	.LBB0_5
-.LBB0_3:                                # %switch.end
-	jmp	.LBB0_5
+	movq	$5, 8(%rsp)
+# %bb.3:                                # %switch.end
+	movq	8(%rsp), %rax
+	movq	%rax, 24(%rsp)
+	jmp	.LBB0_6
 .LBB0_4:                                # %switch.case0
-	movq	$10, -24(%rbp)
-	jmp	.LBB0_3
-.LBB0_5:                                # %exit
-	movq	-8(%rbp), %rax
-	movq	%rbp, %rsp
-	popq	%rbp
+	movq	$10, 8(%rsp)
+.LBB0_5:                                # %switch.case1
+	movq	$15, 8(%rsp)
+	jmp	.LBB0_2
+.LBB0_6:                                # %exit
+	movq	24(%rsp), %rax
+	addq	$32, %rsp
 	retq
 	.seh_endproc
                                         # -- End function

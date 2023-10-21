@@ -1,8 +1,6 @@
 0. Refactor var and func declarations 
 
 1. Finish adding statements
-	class SwitchStmt;
-	class CaseStmt;
 	class GotoStmt;
 	class LabelStmt;
 

@@ -6,7 +6,8 @@ fn main() -> int
 	let a = 0;
 	switch(b)
 	{
-	case 0: a = 10; break;
+	case 0: a = 10; 
+	case 1: a = 15; 
 	default: a = 5;
 	}
 	

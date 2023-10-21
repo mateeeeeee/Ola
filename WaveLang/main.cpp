@@ -1,7 +1,6 @@
-#include "Compiler/Compiler.h"
 #include "CLI/CLI.hpp"
 #include "Core/Logger.h"
-
+#include "Compiler/Compiler.h"
 
 int main(int argc, char** argv)
 {
@@ -54,3 +53,5 @@ int main(int argc, char** argv)
 	wave::int32 exit_code = wave::Compile(compiler_input);
 	return exit_code;
 }
+
+#undef _DEBUG

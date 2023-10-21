@@ -109,7 +109,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions);_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -122,7 +122,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libraries\LLVM\llvm_win64_17_0_1\Release\lib;$(SolutionDir)Libraries\spdlog\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libraries\LLVM\llvm_win64_17_0_1\Debug\lib;$(SolutionDir)Libraries\spdlog\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>spdlogd.lib;LLVMAnalysis.lib;LLVMCore.lib;LLVMExecutionEngine.lib;LLVMInstCombine.lib;LLVMObject.lib;LLVMOrcJIT.lib;LLVMRuntimeDyld.lib;LLVMScalarOpts.lib;LLVMSupport.lib;LLVMX86CodeGen.lib;LLVMX86AsmParser.lib;LLVMX86Desc.lib;LLVMX86Disassembler.lib;LLVMX86Info.lib;LLVMAArch64AsmParser.lib;LLVMAArch64CodeGen.lib;LLVMAArch64Desc.lib;LLVMAArch64Disassembler.lib;LLVMAArch64Info.lib;LLVMAArch64Utils.lib;LLVMARMAsmParser.lib;LLVMARMCodeGen.lib;LLVMARMDesc.lib;LLVMARMDisassembler.lib;LLVMARMInfo.lib;LLVMARMUtils.lib;LLVMWebAssemblyAsmParser.lib;LLVMWebAssemblyCodeGen.lib;LLVMWebAssemblyDesc.lib;LLVMWebAssemblyDisassembler.lib;LLVMWebAssemblyInfo.lib;LLVMWebAssemblyUtils.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMFrontendOpenMP.lib;LLVMLinker.lib;LLVMIRPrinter.lib;LLVMVectorize.lib;LLVMJITLink.lib;LLVMOrcTargetProcess.lib;LLVMOrcShared.lib;LLVMWindowsDriver.lib;LLVMOption.lib;LLVMAsmPrinter.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMInstrumentation.lib;LLVMSelectionDAG.lib;LLVMCodeGen.lib;LLVMAggressiveInstCombine.lib;LLVMTarget.lib;LLVMBitWriter.lib;LLVMObjCARCOpts.lib;LLVMTransformUtils.lib;LLVMProfileData.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoMSF.lib;LLVMDebugInfoBTF.lib;LLVMDebugInfoDWARF.lib;LLVMIRReader.lib;LLVMBitReader.lib;LLVMAsmParser.lib;LLVMTextAPI.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMCodeGenTypes.lib;LLVMMCParser.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMBinaryFormat.lib;LLVMTargetParser.lib;LLVMDebugInfoCodeView.lib;LLVMDemangle.lib;psapi.lib;shell32.lib;ole32.lib;uuid.lib;advapi32.lib;delayimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;oleaut32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -136,14 +136,14 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libraries\LLVM\llvm-project_17_0_1\llvm\include;$(SolutionDir)Libraries\LLVM\llvm_win64_17_0_1\include;$(SolutionDir)Libraries\spdlog\include;$(SolutionDir)Libraries\CLI11\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Core/CoreTypes.h;Core/Defines.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4351;4456;4457;4458;4459;4503;4624;4722;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4577;4091;4592;4319;4709;5105;4324</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -155,6 +155,7 @@
       <AdditionalDependencies>spdlog.lib;LLVMAnalysis.lib;LLVMCore.lib;LLVMExecutionEngine.lib;LLVMInstCombine.lib;LLVMObject.lib;LLVMOrcJIT.lib;LLVMRuntimeDyld.lib;LLVMScalarOpts.lib;LLVMSupport.lib;LLVMX86CodeGen.lib;LLVMX86AsmParser.lib;LLVMX86Desc.lib;LLVMX86Disassembler.lib;LLVMX86Info.lib;LLVMAArch64AsmParser.lib;LLVMAArch64CodeGen.lib;LLVMAArch64Desc.lib;LLVMAArch64Disassembler.lib;LLVMAArch64Info.lib;LLVMAArch64Utils.lib;LLVMARMAsmParser.lib;LLVMARMCodeGen.lib;LLVMARMDesc.lib;LLVMARMDisassembler.lib;LLVMARMInfo.lib;LLVMARMUtils.lib;LLVMWebAssemblyAsmParser.lib;LLVMWebAssemblyCodeGen.lib;LLVMWebAssemblyDesc.lib;LLVMWebAssemblyDisassembler.lib;LLVMWebAssemblyInfo.lib;LLVMWebAssemblyUtils.lib;LLVMPasses.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMFrontendOpenMP.lib;LLVMLinker.lib;LLVMIRPrinter.lib;LLVMVectorize.lib;LLVMJITLink.lib;LLVMOrcTargetProcess.lib;LLVMOrcShared.lib;LLVMWindowsDriver.lib;LLVMOption.lib;LLVMAsmPrinter.lib;LLVMCFGuard.lib;LLVMGlobalISel.lib;LLVMInstrumentation.lib;LLVMSelectionDAG.lib;LLVMCodeGen.lib;LLVMAggressiveInstCombine.lib;LLVMTarget.lib;LLVMBitWriter.lib;LLVMObjCARCOpts.lib;LLVMTransformUtils.lib;LLVMProfileData.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoMSF.lib;LLVMDebugInfoBTF.lib;LLVMDebugInfoDWARF.lib;LLVMIRReader.lib;LLVMBitReader.lib;LLVMAsmParser.lib;LLVMTextAPI.lib;LLVMRemarks.lib;LLVMBitstreamReader.lib;LLVMCodeGenTypes.lib;LLVMMCParser.lib;LLVMMCDisassembler.lib;LLVMMC.lib;LLVMBinaryFormat.lib;LLVMTargetParser.lib;LLVMDebugInfoCodeView.lib;LLVMDemangle.lib;psapi.lib;shell32.lib;ole32.lib;uuid.lib;advapi32.lib;delayimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;oleaut32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetDir)$(TargetName).exe" "$(SolutionDir)WaveTests\$(TargetName).exe"</Command>
