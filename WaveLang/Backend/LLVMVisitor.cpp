@@ -57,7 +57,7 @@ namespace wave
 			return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
 			exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
 
-			ConstLabelStmtPtrList labels;// = function_decl.GetLabels();
+			ConstLabelStmtPtrList labels = function_decl.GetLabels();
 			for (LabelStmt const* label : labels)
 			{
 				std::string block_name = "label."; block_name += label->GetName();
@@ -74,8 +74,8 @@ namespace wave
 			std::vector<llvm::BasicBlock*> unreachable_blocks{};
 			for (auto&& block : *llvm_function)
 				if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-			for (auto unreachable_block : unreachable_blocks)
-				unreachable_block->removeFromParent();
+			//for (auto unreachable_block : unreachable_blocks)
+			//	unreachable_block->removeFromParent();
 
 			std::vector<llvm::BasicBlock*> empty_blocks{};
 			for (auto&& block : *llvm_function)
@@ -87,7 +87,7 @@ namespace wave
 				builder.CreateBr(exit_block);
 			}
 
-			//label_blocks.clear();
+			label_blocks.clear();
 			exit_block = nullptr;
 			return_alloc = nullptr;
 		}

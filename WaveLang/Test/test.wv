@@ -3,11 +3,11 @@ fn main() -> int
 {
 	let b = 0;
 	let a = 0;
-	
-    a++;
-    if(a < 5) return 0;
-	else return 5;
-	a +=3;
-	
+	label:
+	a++;
+	if(a < 5) goto label;
+	else goto end;
+	a+=3;
+	end:
     return a;
 }

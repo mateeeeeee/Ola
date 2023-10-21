@@ -8,6 +8,9 @@ entry:
   store i64 0, ptr %1, align 4
   %2 = alloca i64, align 8
   store i64 0, ptr %2, align 4
+  br label %label.label
+
+label.label:                                      ; preds = %if.then, %entry
   %3 = load i64, ptr %2, align 4
   %4 = alloca ptr, align 8
   %5 = load ptr, ptr %2, align 8
@@ -18,15 +21,29 @@ entry:
   %8 = icmp slt i64 %7, 5
   br i1 %8, label %if.then, label %if.else
 
-if.then:                                          ; preds = %entry
-  store i64 0, ptr %0, align 4
+label.end:                                        ; preds = %if.end, %if.else
+  %9 = load ptr, ptr %2, align 8
+  store ptr %9, ptr %0, align 8
   br label %exit
 
-if.else:                                          ; preds = %entry
-  store i64 5, ptr %0, align 4
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
   br label %exit
 
-exit:                                             ; preds = %if.end, %if.else, %if.then
-  %9 = load i64, ptr %0, align 4
-  ret i64 %9
+if.then:                                          ; preds = %label.label
+  br label %label.label
+
+if.else:                                          ; preds = %label.label
+  br label %label.end
+
+if.end:                                           ; No predecessors!
+  %10 = load i64, ptr %2, align 4
+  %11 = add i64 %10, 3
+  %12 = load i64, ptr %2, align 4
+  store i64 %11, ptr %2, align 4
+  br label %label.end
+
+exit:                                             ; preds = %return, %label.end
+  %13 = load i64, ptr %0, align 4
+  ret i64 %13
 }
