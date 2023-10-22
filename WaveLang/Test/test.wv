@@ -1,13 +1,9 @@
  
 fn main() -> int
 {
-	let b = 0;
 	let a = 0;
-	label:
-	a++;
-	if(a < 5) goto label;
-	else goto end;
-	a+=3;
-	end:
-    return a;
+	let b = 1;
+	if(b) a = 5;
+	else a = 3;
+	return a;
 }

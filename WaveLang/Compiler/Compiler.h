@@ -7,10 +7,13 @@ namespace wave
 {
 	enum CompilerFlags : uint32
 	{
-		CompilerFlag_None = 0x0,
-		CompilerFlag_DumpAST = 0x1,
-		CompilerFlag_OutputAssembly = 0x2,
-		CompilerFlag_NoLLVM = 0x4,
+		CompilerFlag_None    = 0x00,
+		CompilerFlag_DumpAST = 0x01,
+		CompilerFlag_O0		 = 0x02,
+		CompilerFlag_O1		 = 0x04,
+		CompilerFlag_O2		 = 0x08,
+		CompilerFlag_O3		 = 0x10,
+		CompilerFlag_NoLLVM  = 0x1000,
 	};
 	DEFINE_ENUM_BIT_OPERATORS(CompilerFlags);
 

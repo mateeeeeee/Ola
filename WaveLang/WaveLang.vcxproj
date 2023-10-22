@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Backend\LLVMIRGenerator.cpp" />
+    <ClCompile Include="Backend\LLVMOptimizer.cpp" />
     <ClCompile Include="Backend\LLVMVisitor.cpp" />
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Frontend\AST.cpp" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Backend\LLVMIRGenerator.h" />
+    <ClInclude Include="Backend\LLVMOptimizer.h" />
     <ClInclude Include="Backend\LLVMVisitor.h" />
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Core\CoreTypes.h" />

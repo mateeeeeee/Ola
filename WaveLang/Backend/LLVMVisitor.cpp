@@ -1,20 +1,15 @@
 #include "LLVMVisitor.h"
 #include "Frontend/AST.h"
 #include "llvm/IR/Module.h"
-#include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/Casting.h"
 
 namespace wave
 {
+	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module) : context(context), module(module), builder(context)
+	{}
 
-	LLVMVisitor::LLVMVisitor(AST const* ast) : builder(context)
+	void LLVMVisitor::VisitAST(AST const* ast)
 	{
-		llvm::InitializeAllTargets();
-		llvm::InitializeAllTargetMCs();
-		llvm::InitializeAllAsmPrinters();
-		llvm::InitializeAllAsmParsers();
-		module = std::make_unique<llvm::Module>("WaveModule", context);
-
 		ast->translation_unit->Accept(*this);
 	}
 
@@ -38,7 +33,7 @@ namespace wave
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
-		llvm::Function* llvm_function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, function_decl.GetName(), *module);
+		llvm::Function* llvm_function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, function_decl.GetName(), module);
 
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
 		builder.SetInsertPoint(entry_block);

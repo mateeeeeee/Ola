@@ -37,7 +37,16 @@ namespace wave
 			src.Prepend("");
 		}
 
-		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, bool ast_dump)
+		OptimizationLevel GetOptimizationLevelFromFlags(CompilerFlags flags)
+		{
+			if (flags & CompilerFlag_O0) return OptimizationLevel::O0;
+			if (flags & CompilerFlag_O1) return OptimizationLevel::O1;
+			if (flags & CompilerFlag_O2) return OptimizationLevel::O2;
+			if (flags & CompilerFlag_O3) return OptimizationLevel::O3;
+			return OptimizationLevel::O0;
+		}
+
+		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, bool ast_dump, OptimizationLevel opt_level)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -50,18 +59,19 @@ namespace wave
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator(ir_file);
+			LLVMIRGenerator llvm_ir_generator{};
 			llvm_ir_generator.Generate(ast);
+			llvm_ir_generator.Optimize(opt_level);
+			llvm_ir_generator.PrintIR(ir_file);
 		}
 	}
 
 	int32 Compile(CompilerInput const& input)
 	{
 		InitLogger();
-
 		bool const ast_dump = input.flags & CompilerFlag_DumpAST;
-		bool const output_assembly = input.flags & CompilerFlag_OutputAssembly;
 		bool const use_llvm = !(input.flags & CompilerFlag_NoLLVM);
+		OptimizationLevel opt_level = GetOptimizationLevelFromFlags(input.flags);
 		WAVE_ASSERT_MSG(use_llvm, "Only LLVM is supported for code generation");
 
 		fs::path directory_path = input.input_directory;
@@ -77,7 +87,7 @@ namespace wave
 			fs::path ir_file = directory_path / file_name; ir_file += ".ll";
 			fs::path source_file = directory_path / input.sources[i];
 
-			CompileTranslationUnit(source_file.string(), ir_file.string(), ast_dump);
+			CompileTranslationUnit(source_file.string(), ir_file.string(), ast_dump, opt_level);
 
 			fs::path assembly_file = directory_path / file_name;  assembly_file += ".s";
 			fs::path object_file = directory_path / file_name; object_file += ".obj";
@@ -128,8 +138,9 @@ namespace wave
 			AST const* ast = parser.GetAST();
 			if (debug) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator(ir_file.string());
+			LLVMIRGenerator llvm_ir_generator{};
 			llvm_ir_generator.Generate(ast);
+			llvm_ir_generator.PrintIR(ir_file.string());
 		}
 		std::string compile_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
 		system(compile_cmd.c_str());

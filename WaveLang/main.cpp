@@ -8,6 +8,11 @@ int main(int argc, char** argv)
 	CLI::Option* ast_dump = cli_parser.add_flag("--astdump", "Dump AST to output/log");
 	CLI::Option* debug = cli_parser.add_flag("--debug", "Print debug information during compilation process");
 	CLI::Option* test = cli_parser.add_flag("--test", "used for running g-tests");
+	CLI::Option* Od = cli_parser.add_flag("--Od", "No optimizations");
+	CLI::Option* O0 = cli_parser.add_flag("--O0", "No optimizations");
+	CLI::Option* O1 = cli_parser.add_flag("--O1", "Optimize");
+	CLI::Option* O2 = cli_parser.add_flag("--O2", "Optimize more");
+	CLI::Option* O3 = cli_parser.add_flag("--O3", "Optimize even more");
 
 	std::vector<std::string> input_files;
 	cli_parser.add_option("-i", input_files, "Input files");
@@ -39,12 +44,19 @@ int main(int argc, char** argv)
 	if (output_file.empty()) output_file = "out";
 	if (directory.empty()) directory = "Test";
 
+	wave::CompilerFlags compiler_flags = wave::CompilerFlag_None;
+	if(*ast_dump) compiler_flags |= wave::CompilerFlag_DumpAST;
 
-	wave::CompilerFlags flags = wave::CompilerFlag_None;
-	if(*ast_dump) flags |= wave::CompilerFlag_DumpAST;
+	wave::CompilerFlags optimization_flag = wave::CompilerFlag_None;
+	if (O0 || O1) optimization_flag = wave::CompilerFlag_O0;
+	if (O1) optimization_flag = wave::CompilerFlag_O1;
+	if (O2) optimization_flag = wave::CompilerFlag_O2;
+	if (O3) optimization_flag = wave::CompilerFlag_O3;
+
+	compiler_flags |= optimization_flag;
 
 	wave::CompilerInput compiler_input{};
-	compiler_input.flags = flags;
+	compiler_input.flags = compiler_flags;
 	compiler_input.input_directory = directory;
 	compiler_input.sources = input_files;
 	compiler_input.output_file = output_file;

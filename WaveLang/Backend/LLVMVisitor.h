@@ -3,11 +3,11 @@
 #include <unordered_map>
 #include <vector>
 #include "Frontend/ASTVisitor.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
 
 namespace llvm
 {
+	class Context;
 	class Module;
 	class Value;
 	class Type;
@@ -19,6 +19,7 @@ namespace wave
 {
 	class QualifiedType;
 
+	//add types as members
 	class LLVMVisitor : public ASTVisitor
 	{
 		friend class LLVMIRGenerator;
@@ -33,7 +34,9 @@ namespace wave
 		using LLVMValueMap = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
 
 	private:
-		explicit LLVMVisitor(AST const* ast);
+		LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module);
+
+		void VisitAST(AST const* ast);
 		virtual void Visit(NodeAST const&, uint32) override;
 		virtual void Visit(TranslationUnit const&, uint32) override;
 
@@ -71,10 +74,10 @@ namespace wave
 		virtual void Visit(FunctionCallExpr const&, uint32) override {}
 
 	private:
-		llvm::LLVMContext context;
+		llvm::LLVMContext& context;
+		llvm::Module& module;
 		llvm::IRBuilder<> builder;
 
-		std::unique_ptr<llvm::Module> module;
 		LLVMValueMap llvm_value_map;
 
 		llvm::AllocaInst* return_alloc;

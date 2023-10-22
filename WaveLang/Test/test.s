@@ -15,44 +15,25 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	pushq	%rbp
-	.seh_pushreg %rbp
-	subq	$32, %rsp
-	.seh_stackalloc 32
-	leaq	32(%rsp), %rbp
-	.seh_setframe %rbp, 32
+	subq	$16, %rsp
+	.seh_stackalloc 16
 	.seh_endprologue
-	movq	$0, -16(%rbp)
-	movq	$0, -24(%rbp)
-.LBB0_1:                                # %label.label
-                                        # =>This Inner Loop Header: Depth=1
-	movq	-24(%rbp), %rax
-	movq	%rax, -32(%rbp)                 # 8-byte Spill
-	movl	$16, %eax
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-32(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	-24(%rbp), %rdx
-	movq	%rdx, (%rcx)
-	addq	$1, %rax
-	movq	%rax, -24(%rbp)
-	cmpq	$5, -24(%rbp)
-	jl	.LBB0_3
-	jmp	.LBB0_4
-.LBB0_2:                                # %label.end
-	movq	-24(%rbp), %rax
-	movq	%rax, -8(%rbp)
-	jmp	.LBB0_5
-.LBB0_3:                                # %if.then
-                                        #   in Loop: Header=BB0_1 Depth=1
-	jmp	.LBB0_1
-.LBB0_4:                                # %if.else
+	movq	$0, (%rsp)
+	movb	$1, %al
+	testb	$1, %al
+	jne	.LBB0_1
 	jmp	.LBB0_2
-.LBB0_5:                                # %exit
-	movq	-8(%rbp), %rax
-	movq	%rbp, %rsp
-	popq	%rbp
+.LBB0_1:                                # %if.then
+	movq	$5, (%rsp)
+	jmp	.LBB0_3
+.LBB0_2:                                # %if.else
+	jmp	.LBB0_3
+.LBB0_3:                                # %if.end
+	movq	(%rsp), %rax
+	movq	%rax, 8(%rsp)
+# %bb.4:                                # %exit
+	movq	8(%rsp), %rax
+	addq	$16, %rsp
 	retq
 	.seh_endproc
                                         # -- End function

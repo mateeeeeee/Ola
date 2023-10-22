@@ -35,6 +35,9 @@
     <ClCompile Include="Backend\LLVMVisitor.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
+    <ClCompile Include="Backend\LLVMOptimizer.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="Frontend\ASTTypeAliases.h">
       <Filter>Frontend\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\LLVMOptimizer.h">
+      <Filter>Backend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
