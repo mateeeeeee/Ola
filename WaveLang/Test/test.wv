@@ -1,9 +1,11 @@
  
-fn main() -> int
+int main()
 {
-	let a = 0;
-	let b = 1;
-	if(b) a = 5;
-	else a = 3;
+	int a = 0;
+	const int b = 1;
+	if (b) 
+		a = 5;
+	else 
+		a = 3;
 	return a;
 }

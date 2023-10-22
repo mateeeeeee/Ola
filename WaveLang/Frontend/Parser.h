@@ -72,7 +72,7 @@ namespace wave
 		void PreprocessTokens();
 		void ParseTranslationUnit();
 		[[nodiscard]] UniqueDeclPtr ParseGlobalDeclaration();
-		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDeclaration(bool is_function_def = false);
+		[[nodiscard]] UniqueFunctionDeclPtr ParseFunctionDeclaration(bool is_function_def);
 		[[nodiscard]] UniqueVariableDeclPtr ParseVariableDeclaration(bool function_param_decl);
 
 		[[nodiscard]] UniqueStmtPtr ParseStatement();

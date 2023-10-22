@@ -83,7 +83,6 @@ KEYWORD(return)
 KEYWORD(enum)
 KEYWORD(class)
 KEYWORD(const)
-KEYWORD(extern)
 
 KEYWORD(bool)
 KEYWORD(char)
@@ -94,17 +93,15 @@ KEYWORD(void)
 KEYWORD(true)
 KEYWORD(false)
 
+KEYWORD(extern)
 KEYWORD(public)
 KEYWORD(private)
 
 KEYWORD(sizeof)
 KEYWORD(alignas)
 KEYWORD(alignof)
-KEYWORD(atomic)
 
-KEYWORD(let)
-KEYWORD(fn)
-KEYWORD(typeof)
+KEYWORD(var)
 KEYWORD(import)
 
 #undef KEYWORD

@@ -60,68 +60,48 @@ namespace wave
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			if (!Consume(TokenKind::KW_fn)) Diag(missing_fn);
 			return ParseFunctionDeclaration(false);
 		}
-		else if (Consume(TokenKind::KW_fn))
+		else 
 		{
 			return ParseFunctionDeclaration(true);
 		}
-		else Diag(missing_fn);
 		return nullptr;
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration(bool is_function_def)
 	{
 		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+
+		bool is_public = false;
+		if (is_function_def)
+		{
+			if (Consume(TokenKind::KW_public)) is_public = true;
+			else if (Consume(TokenKind::KW_private)) is_public = false;
+		}
+
+		QualifiedType function_type{};
+
+		QualifiedType return_type{};
+		ParseTypeSpecifier(return_type);
 		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = current_token->GetIdentifier(); ++current_token;
 		Expect(TokenKind::left_round);
-		QualifiedType function_type{};
+
 		UniqueVariableDeclPtrList param_decls;
-		if (Consume(TokenKind::right_round))
+		std::vector<FunctionParameter> param_types{};
+		while (!Consume(TokenKind::right_round))
 		{
-			if (Consume(TokenKind::arrow))
-			{
-				QualifiedType return_type{};
-				ParseTypeSpecifier(return_type);
-				function_type.SetRawType(FunctionType(return_type));
-			}
-			else function_type.SetRawType(FunctionType(builtin_types::Void));
+			if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+			UniqueVariableDeclPtr param_decl = ParseVariableDeclaration(true);
+			param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+			param_decls.push_back(std::move(param_decl));
 		}
-		else
-		{
-			std::vector<FunctionParameter> param_types{};
-			while (!Consume(TokenKind::right_round))
-			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+		function_type.SetRawType(FunctionType(return_type, param_types));
 
-				QualifiedType param_type{};
-				ParseTypeQualifier(param_type);
-
-				if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-				std::string_view identifier = current_token->GetIdentifier(); ++current_token;
-
-				Expect(TokenKind::colon);
-				ParseTypeSpecifier(param_type);
-				if (!param_type.HasRawType()) Diag(missing_type_specifier);
-				if (param_type->Is(TypeKind::Void)) Diag(void_invalid_context);
-
-				UniqueVariableDeclPtr param_decl = ParseVariableDeclaration(true);
-				param_decl->SetType(param_type);
-				param_decls.push_back(std::move(param_decl));
-				param_types.emplace_back(std::string(identifier), param_type);
-			}
-
-			QualifiedType return_type{};
-			if (Consume(TokenKind::arrow))
-			{
-				ParseTypeSpecifier(return_type);
-			}
-			else return_type = builtin_types::Void;
-			function_type.SetRawType(FunctionType(return_type, param_types));
-		}
 		if (!is_function_def)
 		{
 			Expect(TokenKind::semicolon);
@@ -134,29 +114,26 @@ namespace wave
 			sema->ctx.current_func = nullptr;
 			return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body));
 		}
-
 	}
 
 	UniqueVariableDeclPtr Parser::ParseVariableDeclaration(bool function_param_decl)
 	{
-		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
-
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
+		ParseTypeSpecifier(variable_type);
+
 		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = current_token->GetIdentifier(); ++current_token;
+
 		UniqueExprPtr init_expr = nullptr;
 		if (function_param_decl)
 		{
-			Expect(TokenKind::colon);
-			ParseTypeSpecifier(variable_type);
 			if (!variable_type.HasRawType()) Diag(missing_type_specifier);
 			if (variable_type->Is(TypeKind::Void)) Diag(void_invalid_context);
 		}
 		else
 		{
-			if (Consume(TokenKind::colon)) ParseTypeSpecifier(variable_type);
 			if (Consume(TokenKind::equal)) init_expr = ParseAssignmentExpression();
 			Expect(TokenKind::semicolon);
 		}
@@ -193,7 +170,7 @@ namespace wave
 		UniqueStmtPtrList stmts;
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
-			if (Consume(TokenKind::KW_let))
+			if (current_token->IsType())
 			{
 				UniqueVariableDeclPtr decl = ParseVariableDeclaration(false);
 				stmts.push_back(sema->ActOnDeclStmt(std::move(decl)));
@@ -256,7 +233,7 @@ namespace wave
 		Expect(TokenKind::left_round);
 
 		UniqueStmtPtr init_stmt = nullptr;
-		if (Consume(TokenKind::KW_let))
+		if (current_token->IsType())
 		{
 			UniqueDeclPtr decl = ParseVariableDeclaration(false);
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl));
