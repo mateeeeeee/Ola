@@ -7,6 +7,6 @@ int add(int a, int b)
 
 int main()
 {
-    int c = add(5, 4);
-    return c;
+    int c = add(5, 4), b = 1;
+    return c + b;
 }

@@ -60,85 +60,127 @@ namespace wave
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			return ParseFunctionDeclaration(false);
+			return ParseFunctionDeclaration();
 		}
 		else 
 		{
-			return ParseFunctionDeclaration(true);
+			return ParseFunctionDefinition();
 		}
 		return nullptr;
 	}
 
-	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration(bool is_function_def)
+	WAVE_NODISCARD UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
 	{
-		sema->ctx.decl_scope_stack.EnterScope();
-		bool is_public = false;
-		if (is_function_def)
-		{
-			if (Consume(TokenKind::KW_public)) is_public = true;
-			else if (Consume(TokenKind::KW_private)) is_public = false;
-		}
-
-		QualifiedType function_type{};
-
-		QualifiedType return_type{};
-		ParseTypeSpecifier(return_type);
-		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-
 		SourceLocation const& loc = current_token->GetLocation();
-		std::string_view name = current_token->GetIdentifier(); ++current_token;
-		Expect(TokenKind::left_round);
-
+		std::string_view name = "";
+		QualifiedType function_type{};
 		UniqueVariableDeclPtrList param_decls;
-		std::vector<FunctionParameter> param_types{};
-		while (!Consume(TokenKind::right_round))
 		{
-			if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+			SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+			QualifiedType return_type{};
+			ParseTypeSpecifier(return_type);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
-			UniqueVariableDeclPtr param_decl = ParseVariableDeclaration(true);
-			param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
-			param_decls.push_back(std::move(param_decl));
-		}
-		function_type.SetRawType(FunctionType(return_type, param_types));
+			name = current_token->GetIdentifier(); ++current_token;
+			Expect(TokenKind::left_round);
 
-		if (!is_function_def)
-		{
+			std::vector<FunctionParameter> param_types{};
+			while (!Consume(TokenKind::right_round))
+			{
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+				UniqueVariableDeclPtr param_decl = ParseParamDeclaration();
+				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_decls.push_back(std::move(param_decl));
+			}
+			function_type.SetRawType(FunctionType(return_type, param_types));
 			Expect(TokenKind::semicolon);
-			sema->ctx.decl_scope_stack.ExitScope();
-			return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
 		}
-		else
-		{
-			sema->ctx.current_func = &function_type;
-			UniqueCompoundStmtPtr function_body = ParseCompoundStatement();
-			sema->ctx.current_func = nullptr;
-			sema->ctx.decl_scope_stack.ExitScope();
-			return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body));
-		}
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
 	}
 
-	UniqueVariableDeclPtr Parser::ParseVariableDeclaration(bool function_param_decl)
+	WAVE_NODISCARD UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
+	{
+		bool is_public = false;
+		if (Consume(TokenKind::KW_public)) is_public = true;
+		else if (Consume(TokenKind::KW_private)) is_public = false;
+
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = "";
+		QualifiedType function_type{};
+		UniqueVariableDeclPtrList param_decls;
+		UniqueCompoundStmtPtr function_body;
+		{
+			SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+			QualifiedType return_type{};
+			ParseTypeSpecifier(return_type);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+
+			SourceLocation const& loc = current_token->GetLocation();
+			name = current_token->GetIdentifier(); ++current_token;
+			Expect(TokenKind::left_round);
+
+			std::vector<FunctionParameter> param_types{};
+			while (!Consume(TokenKind::right_round))
+			{
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+				UniqueVariableDeclPtr param_decl = ParseParamDeclaration();
+				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_decls.push_back(std::move(param_decl));
+			}
+			function_type.SetRawType(FunctionType(return_type, param_types));
+
+			sema->ctx.current_func = &function_type;
+			function_body = ParseCompoundStatement();
+			sema->ctx.current_func = nullptr;
+		}
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body));
+	}
+
+	WAVE_NODISCARD UniqueVariableDeclPtr Parser::ParseParamDeclaration()
 	{
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
 
-		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 		SourceLocation const& loc = current_token->GetLocation();
-		std::string_view name = current_token->GetIdentifier(); ++current_token;
+		std::string_view name = "";
+		if (current_token->Is(TokenKind::identifier))
+		{
+			name = current_token->GetIdentifier(); 
+			++current_token;
+		}
 
-		UniqueExprPtr init_expr = nullptr;
-		if (function_param_decl)
+		if (!variable_type.HasRawType()) Diag(missing_type_specifier);
+		if (variable_type->Is(TypeKind::Void)) Diag(void_invalid_context);
+
+		return sema->ActOnVariableDecl(name, loc, variable_type, nullptr);
+	}
+
+
+	WAVE_NODISCARD UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
+	{
+		UniqueVariableDeclPtrList var_decl_list;
+		QualifiedType variable_type{};
+		ParseTypeQualifier(variable_type);
+		ParseTypeSpecifier(variable_type);
+		do 
 		{
-			if (!variable_type.HasRawType()) Diag(missing_type_specifier);
-			if (variable_type->Is(TypeKind::Void)) Diag(void_invalid_context);
-		}
-		else
-		{
+			if (!var_decl_list.empty()) Expect(TokenKind::comma);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			SourceLocation const& loc = current_token->GetLocation();
+			std::string_view name = current_token->GetIdentifier(); ++current_token;
+
+			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal)) init_expr = ParseAssignmentExpression();
-			Expect(TokenKind::semicolon);
-		}
-		return sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr));
+
+			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr));
+			var_decl_list.push_back(std::move(var_decl));
+
+		} while (!Consume(TokenKind::semicolon));
+
+		return var_decl_list;
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()
@@ -173,8 +215,8 @@ namespace wave
 		{
 			if (current_token->IsType())
 			{
-				UniqueVariableDeclPtr decl = ParseVariableDeclaration(false);
-				stmts.push_back(sema->ActOnDeclStmt(std::move(decl)));
+				UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
+				stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
 			}
 			else
 			{
@@ -236,8 +278,8 @@ namespace wave
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsType())
 		{
-			UniqueDeclPtr decl = ParseVariableDeclaration(false);
-			init_stmt = MakeUnique<DeclStmt>(std::move(decl));
+			UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
+			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
 		}
 		else init_stmt = ParseExpressionStatement();
 

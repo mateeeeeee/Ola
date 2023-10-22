@@ -15,16 +15,13 @@ exit:                                             ; preds = %return, %entry
 
 define i64 @main() {
 entry:
-  %0 = alloca i64, align 8
-  %1 = call i64 @add(i64 5, i64 4)
-  %.cast = inttoptr i64 %1 to ptr
-  store ptr %.cast, ptr %0, align 8
+  %0 = call i64 @add(i64 5, i64 4)
   br label %exit
 
 return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %2 = load i64, ptr %0, align 8
-  ret i64 %2
+  %1 = add i64 %0, 1
+  ret i64 %1
 }

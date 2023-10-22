@@ -47,7 +47,7 @@ namespace wave
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
-		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtr&& decl);
+		UniqueDeclStmtPtr ActOnDeclStmt(UniqueVariableDeclPtrList&& decls);
 		UniqueReturnStmtPtr ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt);
 		UniqueIfStmtPtr ActOnIfStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& then_stmt, UniqueStmtPtr&& else_stmt);
 		UniqueBreakStmtPtr ActOnBreakStmt(SourceLocation const& loc);

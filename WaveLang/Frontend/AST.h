@@ -168,15 +168,15 @@ namespace wave
 	class DeclStmt final : public Stmt
 	{
 	public:
-		DeclStmt(UniqueDeclPtr&& decl) : Stmt(StmtKind::Decl), declaration(std::move(decl)) {}
+		DeclStmt(UniqueVariableDeclPtrList&& decls) : Stmt(StmtKind::Decl), declarations(std::move(decls)) {}
 
-		Decl const* GetDecl() const { return declaration.get(); }
+		UniqueVariableDeclPtrList const& GetDecls() const { return declarations; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueDeclPtr declaration;
+		UniqueVariableDeclPtrList declarations;
 	};
 
 	class ExprStmt : public Stmt

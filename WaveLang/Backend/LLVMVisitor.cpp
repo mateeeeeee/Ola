@@ -122,7 +122,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32)
 	{
-		if (decl_stmt.GetDecl()) decl_stmt.GetDecl()->Accept(*this);
+		for(auto const& decl : decl_stmt.GetDecls())  decl->Accept(*this);
 	}
 
 	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32)

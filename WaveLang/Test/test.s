@@ -44,9 +44,10 @@ main:                                   # @main
 	movl	$5, %ecx
 	movl	$4, %edx
 	callq	add
-	movq	%rax, 32(%rsp)
+	movq	%rax, 32(%rsp)                  # 8-byte Spill
 # %bb.1:                                # %exit
-	movq	32(%rsp), %rax
+	movq	32(%rsp), %rax                  # 8-byte Reload
+	addq	$1, %rax
 	addq	$40, %rsp
 	retq
 	.seh_endproc

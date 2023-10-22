@@ -1,6 +1,4 @@
 
-* Add function calls
-
 * Start working on:
 	- floats
 	- enums

@@ -70,7 +70,7 @@ namespace wave
 	void DeclStmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
-		if (declaration) declaration->Accept(visitor, depth + 1);
+		for(auto const& decl : declarations) decl->Accept(visitor, depth + 1);
 	}
 	void ReturnStmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{

@@ -101,9 +101,9 @@ namespace wave
 		return MakeUnique<ExprStmt>(std::move(expr));
 	}
 
-	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueDeclPtr&& decl)
+	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueVariableDeclPtrList&& decls)
 	{
-		return MakeUnique<DeclStmt>(std::move(decl));
+		return MakeUnique<DeclStmt>(std::move(decls));
 	}
 
 	UniqueReturnStmtPtr Sema::ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt)
