@@ -25,7 +25,7 @@ namespace wave
 		llvm::Module module;
 
 	private:
-		bool VerifyModule();
+		static bool VerifyModule(llvm::Module&);
 	};
 
 }

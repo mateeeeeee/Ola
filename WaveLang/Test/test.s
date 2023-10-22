@@ -6,6 +6,29 @@
 	.globl	@feat.00
 .set @feat.00, 0
 	.file	"WaveModule"
+	.def	add;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	add                             # -- Begin function add
+	.p2align	4, 0x90
+add:                                    # @add
+.seh_proc add
+# %bb.0:                                # %entry
+	subq	$16, %rsp
+	.seh_stackalloc 16
+	.seh_endprologue
+	movq	%rdx, (%rsp)                    # 8-byte Spill
+	movq	%rcx, 8(%rsp)                   # 8-byte Spill
+	jmp	.LBB0_1
+.LBB0_1:                                # %exit
+	movq	(%rsp), %rcx                    # 8-byte Reload
+	movq	8(%rsp), %rax                   # 8-byte Reload
+	addq	%rcx, %rax
+	addq	$16, %rsp
+	retq
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -15,26 +38,18 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$16, %rsp
-	.seh_stackalloc 16
+	subq	$40, %rsp
+	.seh_stackalloc 40
 	.seh_endprologue
-	movq	$0, (%rsp)
-	movb	$1, %al
-	testb	$1, %al
-	jne	.LBB0_1
-	jmp	.LBB0_2
-.LBB0_1:                                # %if.then
-	movq	$5, (%rsp)
-	jmp	.LBB0_3
-.LBB0_2:                                # %if.else
-	jmp	.LBB0_3
-.LBB0_3:                                # %if.end
-	movq	(%rsp), %rax
-	movq	%rax, 8(%rsp)
-# %bb.4:                                # %exit
-	movq	8(%rsp), %rax
-	addq	$16, %rsp
+	movl	$5, %ecx
+	movl	$4, %edx
+	callq	add
+	movq	%rax, 32(%rsp)
+# %bb.1:                                # %exit
+	movq	32(%rsp), %rax
+	addq	$40, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
+	.addrsig_sym add

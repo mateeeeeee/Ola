@@ -23,7 +23,7 @@ namespace wave
 	{
 		LLVMVisitor llvm_visitor(context, module);
 		llvm_visitor.VisitAST(ast);
-		bool verified = VerifyModule();
+		bool verified = VerifyModule(module);
 		WAVE_ASSERT(verified);
 	}
 
@@ -31,7 +31,7 @@ namespace wave
 	{
 		LLVMOptimizer optimizer(module);
 		optimizer.Optimize(level);
-		bool verified = VerifyModule();
+		bool verified = VerifyModule(module);
 		WAVE_ASSERT(verified);
 	}
 
@@ -47,7 +47,7 @@ namespace wave
 		module.print(llvm_ir_file, nullptr);
 	}
 
-	bool LLVMIRGenerator::VerifyModule()
+	bool LLVMIRGenerator::VerifyModule(llvm::Module& module)
 	{
 		std::string error_msg;
 		llvm::raw_string_ostream error_stream(error_msg);

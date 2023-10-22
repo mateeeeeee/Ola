@@ -71,8 +71,7 @@ namespace wave
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration(bool is_function_def)
 	{
-		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
-
+		sema->ctx.decl_scope_stack.EnterScope();
 		bool is_public = false;
 		if (is_function_def)
 		{
@@ -105,6 +104,7 @@ namespace wave
 		if (!is_function_def)
 		{
 			Expect(TokenKind::semicolon);
+			sema->ctx.decl_scope_stack.ExitScope();
 			return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
 		}
 		else
@@ -112,6 +112,7 @@ namespace wave
 			sema->ctx.current_func = &function_type;
 			UniqueCompoundStmtPtr function_body = ParseCompoundStatement();
 			sema->ctx.current_func = nullptr;
+			sema->ctx.decl_scope_stack.ExitScope();
 			return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body));
 		}
 	}

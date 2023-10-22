@@ -38,13 +38,13 @@ namespace wave
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
 		builder.SetInsertPoint(entry_block);
 
-		llvm::Function::arg_iterator param_it = llvm_function->arg_begin();
+		llvm::Argument* param_arg = llvm_function->arg_begin();
 		for (auto& param : function_decl.GetParamDeclarations())
 		{
-			llvm::Value* llvm_param = &*param_it;
+			llvm::Value* llvm_param = &*param_arg;
 			llvm_param->setName(param->GetName());
-			llvm_value_map[&param] = llvm_param;
-			++param_it;
+			llvm_value_map[param.get()] = llvm_param;
+			++param_arg;
 		}
 
 		if (function_decl.HasDefinition())
@@ -497,19 +497,42 @@ namespace wave
 		}
 		break;
 		case BinaryExprKind::ShiftLeft:
-			break;
+		{
+			result = builder.CreateShl(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::ShiftRight:
-			break;
+		{
+			result = builder.CreateAShr(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::BitAnd:
-			break;
+		{
+			result = builder.CreateAnd(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::BitOr:
-			break;
+		{
+			result = builder.CreateOr(lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::BitXor:
-			break;
+		{
+			result = builder.CreateXor( lhs, rhs);
+		}
+		break;
 		case BinaryExprKind::LogicalAnd:
-			break;
+		{
+			llvm::Value* tmp = builder.CreateAnd(lhs, rhs);
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), 0));
+		}
+		break;
 		case BinaryExprKind::LogicalOr:
-			break;
+		{
+			llvm::Value* tmp = builder.CreateOr(lhs, rhs);
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), 0));
+		}
+		break;
 		case BinaryExprKind::Equal:
 		{
 			result = builder.CreateICmpEQ(lhs, rhs);
@@ -614,6 +637,24 @@ namespace wave
 			}
 		}
 		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
+	}
+
+	void LLVMVisitor::Visit(FunctionCallExpr const& func_call, uint32)
+	{
+		llvm::Function* called_function = module.getFunction(func_call.GetFunctionName());
+		WAVE_ASSERT(called_function);
+
+		std::vector<llvm::Value*> args;
+		for (auto const& arg_expr : func_call.GetArgs())
+		{
+			arg_expr->Accept(*this);
+			llvm::Value* arg_value = llvm_value_map[arg_expr.get()]; 
+			WAVE_ASSERT(arg_value);
+			args.push_back(arg_value);
+		}
+
+		llvm::Value* call_result = builder.CreateCall(called_function, args);
+		llvm_value_map[&func_call] = call_result;
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)

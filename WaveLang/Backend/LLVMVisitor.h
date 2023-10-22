@@ -71,7 +71,7 @@ namespace wave
 		virtual void Visit(ConstantString const&, uint32) override;
 		virtual void Visit(ConstantBool const&, uint32) override;
 		virtual void Visit(ImplicitCastExpr const&, uint32) override;
-		virtual void Visit(FunctionCallExpr const&, uint32) override {}
+		virtual void Visit(FunctionCallExpr const&, uint32) override;
 
 	private:
 		llvm::LLVMContext& context;
@@ -80,8 +80,8 @@ namespace wave
 
 		LLVMValueMap llvm_value_map;
 
-		llvm::AllocaInst* return_alloc;
-		llvm::BasicBlock* exit_block;
+		llvm::AllocaInst* return_alloc = nullptr;
+		llvm::BasicBlock* exit_block = nullptr;
 
 		std::vector<llvm::SwitchInst*> switch_instructions;
 		std::vector<llvm::BasicBlock*> continue_blocks;

@@ -1,17 +1,17 @@
-1. Refactor declarations 
 
-2. Add function calls
+* Add function calls
 
-3. Start working on:
-	- shift operators and other operators
+* Start working on:
 	- floats
 	- enums
 	- arrays
 	- global variables 
-	- sizeof, alignof, alignas
+	- sizeof, alignof, alignas, ternary
 
-4. Start working on import declaration
+* More detailed semantic analysis
 
-5. Start working on std lib implementation
+* Start working on import declaration
 
-6. Start working on classes and other oop features
+* Start working on std lib implementation
+
+* Start working on classes and other oop features

@@ -1,11 +1,12 @@
  
+
+int add(int a, int b)
+{
+    return a + b;
+}
+
 int main()
 {
-	int a = 0;
-	const int b = 1;
-	if (b) 
-		a = 5;
-	else 
-		a = 3;
-	return a;
+    int c = add(5, 4);
+    return c;
 }

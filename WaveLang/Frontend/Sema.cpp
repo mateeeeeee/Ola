@@ -288,17 +288,20 @@ namespace wave
 		case BinaryExprKind::ShiftLeft:
 		case BinaryExprKind::ShiftRight:
 		{
+			type = lhs_type;
 		}
 		break;
 		case BinaryExprKind::BitAnd:
 		case BinaryExprKind::BitOr:
 		case BinaryExprKind::BitXor:
 		{
+			type = lhs_type;
 		}
 		break;
 		case BinaryExprKind::LogicalAnd:
 		case BinaryExprKind::LogicalOr:
 		{
+			type = builtin_types::Bool;
 		}
 		break;
 		case BinaryExprKind::Equal:
@@ -313,6 +316,7 @@ namespace wave
 		break;
 		case BinaryExprKind::Comma:
 		{
+			type = rhs_type;
 		}
 		break;
 		case BinaryExprKind::Invalid:
