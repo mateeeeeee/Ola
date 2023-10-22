@@ -6,7 +6,13 @@
 namespace wave
 {
 	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module) : context(context), module(module), builder(context)
-	{}
+	{
+		void_type  = llvm::Type::getVoidTy(context);
+		bool_type  = llvm::Type::getInt1Ty(context);
+		char_type  = llvm::Type::getInt8Ty(context);
+		int_type   = llvm::Type::getInt64Ty(context);
+		float_type = llvm::Type::getDoubleTy(context);
+	}
 
 	void LLVMVisitor::VisitAST(AST const* ast)
 	{
@@ -310,7 +316,7 @@ namespace wave
 		else
 		{
 			int64 case_value = case_stmt.GetValue();
-			llvm::ConstantInt* llvm_case_value = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), case_value);
+			llvm::ConstantInt* llvm_case_value = llvm::ConstantInt::get(int_type, case_value);
 
 			llvm::Function* function = builder.GetInsertBlock()->getParent();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
@@ -336,7 +342,7 @@ namespace wave
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
-		llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
+		llvm::Value* condition = Load(int_type, condition_value);
 		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block);
 
 		switch_instructions.push_back(switch_inst);
@@ -524,13 +530,13 @@ namespace wave
 		case BinaryExprKind::LogicalAnd:
 		{
 			llvm::Value* tmp = builder.CreateAnd(lhs, rhs);
-			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), 0));
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(bool_type, 0));
 		}
 		break;
 		case BinaryExprKind::LogicalOr:
 		{
 			llvm::Value* tmp = builder.CreateOr(lhs, rhs);
-			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), 0));
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(bool_type, 0));
 		}
 		break;
 		case BinaryExprKind::Equal:
@@ -595,7 +601,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), constant_int.GetValue());
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, constant_int.GetValue());
 		llvm_value_map[&constant_int] = constant;
 	}
 
@@ -607,7 +613,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), bool_constant.GetValue());
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(bool_type, bool_constant.GetValue());
 		llvm_value_map[&bool_constant] = constant;
 	}
 
@@ -625,7 +631,7 @@ namespace wave
 			if (IsBoolean(cast_operand_type))
 			{
 				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
-				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, llvm::Type::getInt64Ty(context));
+				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, int_type);
 			}
 		}
 		else if (IsBoolean(cast_type))
@@ -665,7 +671,7 @@ namespace wave
 		}
 		else
 		{
-			llvm::Value* condition = Load(llvm::Type::getInt64Ty(context), condition_value);
+			llvm::Value* condition = Load(int_type, condition_value);
 			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
 			builder.CreateCondBr(boolean_cond, true_block, false_block);
 		}
@@ -676,15 +682,15 @@ namespace wave
 		switch (type->GetKind())
 		{
 		case TypeKind::Void:
-			return llvm::Type::getVoidTy(context);
+			return void_type;
 		case TypeKind::Bool:
-			return llvm::Type::getInt1Ty(context);
+			return bool_type;
 		case TypeKind::Char:
-			return llvm::Type::getInt8Ty(context);
+			return char_type;
 		case TypeKind::Int:
-			return llvm::Type::getInt64Ty(context);
+			return int_type;
 		case TypeKind::Float:
-			return llvm::Type::getDoubleTy(context);
+			return float_type;
 		case TypeKind::Array:
 		{
 			ArrayType const& array_type = type_cast<ArrayType>(type);

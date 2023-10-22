@@ -11,6 +11,7 @@ namespace llvm
 	class Module;
 	class Value;
 	class Type;
+	class IntegerType;
 	class AllocaInst;
 	class SwitchInst;
 }
@@ -88,6 +89,11 @@ namespace wave
 		std::vector<llvm::BasicBlock*> break_blocks;
 		std::unordered_map<std::string, llvm::BasicBlock*> label_blocks;
 
+		llvm::Type* void_type			= nullptr;
+		llvm::Type* float_type			= nullptr;
+		llvm::IntegerType* int_type		= nullptr;
+		llvm::IntegerType* bool_type	= nullptr;
+		llvm::IntegerType* char_type	= nullptr;
 	private:
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
