@@ -2,27 +2,29 @@
 1. add public modifier for function to determine is linkage external or no
 2. add Wave Std Lib : io, math
 
-<translation-unit> ::= {import-declaration}*{ <function_definition> | <function_declaration> }*
+<translation-unit> ::= { import-declaration }* { <function_definition> | <function_declaration> }*
 
 <import-declaration> ::= import <identifier>;
-<function_declaration> ::= extern fn <identifier>( <parameter-list> ) {-> <type-specifier>}?;
-<function_definition> ::= fn <identifier>( <parameter-list> ) {-> <type-specifier>}? <compound_statement>
+
+<function_declaration> ::= extern <type-specifier> <identifier>( <parameter-list> );
+<function_definition>  ::= <function_visibility> <type-specifier> <identifier>( <parameter-list> ) <compound_statement>
+<function_visibility>  ::= public | private
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
 
-<parameter-declaration> ::= {<type-qualifier>}? <declarator> : <type-specifier>
+<parameter-declaration> ::= {<type-qualifier>}? <type-specifier> <declarator>
 
 <declarator> ::= <identifier>
 
 <type-qualifier> ::= {const}?
 <type-specifier> ::= void
-                   | bool  | bool [ {<constant-expression>}? ]
-                   | char  | char [ {<constant-expression>}? ]
-                   | int   | int  [ {<constant-expression>}? ]
-                   | float | float[ {<constant-expression>}? ]
-                   | <enum-specifier> | <enum-specifier>[ {<constant-expression>}? ]
-                   | <class-specifier> | <class-specifier>[ {<constant-expression>}? ]
+                   | bool  | bool []
+                   | char  | char []
+                   | int   | int  []
+                   | float | float[]
+                   | <enum-specifier> | <enum-specifier>[]
+                   | <class-specifier> | <class-specifier>[]
 				   
 <enum-specifier> ::= enum <identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }
@@ -74,19 +76,15 @@
                         | <additive-expression> + <multiplicative-expression>
                         | <additive-expression> - <multiplicative-expression>
 
-<multiplicative-expression> ::= <cast-expression>
-                              | <multiplicative-expression> * <cast-expression>
-                              | <multiplicative-expression> / <cast-expression>
-                              | <multiplicative-expression> % <cast-expression>
-							  
-
-<cast-expression> ::= <unary-expression>
-                    | ( <type-specifier> ) <cast-expression>
+<multiplicative-expression> ::= <unary-expression>
+                              | <multiplicative-expression> * <unary-expression>
+                              | <multiplicative-expression> / <unary-expression>
+                              | <multiplicative-expression> % <unary-expression>
+							 
 
 <unary-expression> ::= <postfix-expression>
                      | ++ <unary-expression>
                      | -- <unary-expression>
-                     | <unary-operator> <cast-expression>
                      | sizeof (<unary-expression>)
                      | sizeof (<type-specifier>)
                      | typeof (<expression>)
@@ -132,7 +130,8 @@
                    | ~
                    | !
 
-<declaration> ::=  let {<type-qualifier>}? <declarator> {: <type-specifier>}?  { = <initializer>}? ;
+<declaration> ::= {<type-qualifier>}? <type-specifier> <declarator> { = <initializer>}?;
+                | {<type-qualifier>}? var <declarator> = <initializer>;
 	
 <initializer> ::= <assignment-expression>
 

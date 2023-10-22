@@ -1,13 +1,17 @@
-0. Refactor declarations 
-
-1. Add LLVMOptimizer
+1. Refactor declarations 
 
 2. Add function calls
 
-4. Start working on floats, enums, arrays
+3. Start working on:
+	- shift operators and other operators
+	- floats
+	- enums
+	- arrays
+	- global variables 
+	- sizeof, alignof, alignas
 
-5. Start working on import declaration
+4. Start working on import declaration
 
-6. Start working on std lib implementation
+5. Start working on std lib implementation
 
-7. Start working on classes and other oop features
+6. Start working on classes and other oop features
