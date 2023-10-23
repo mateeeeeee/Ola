@@ -32,4 +32,6 @@ DIAG(duplicate_default_case, error, "Duplicate default case")
 DIAG(duplicate_case_value, error, "Duplicate case value {}")
 DIAG(undeclared_label, error, "Undeclared label {}")
 DIAG(redefinition_of_label, error, "Redefinition of label {}")
+DIAG(used_nonboolean_type, error, "Used nonboolean type where boolean type is expected")
+DIAG(ternary_expr_types_incompatible, error, "Types of ternary expressions have to be the same")
 #undef DIAG

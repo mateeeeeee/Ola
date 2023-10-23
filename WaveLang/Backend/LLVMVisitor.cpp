@@ -155,7 +155,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32)
 	{
-		Expr const* cond_expr = if_stmt.GetConditionExpr();
+		Expr const* cond_expr = if_stmt.GetCondExpr();
 		Stmt const* then_stmt = if_stmt.GetThenStmt();
 		Stmt const* else_stmt = if_stmt.GetElseStmt();
 
@@ -582,9 +582,31 @@ namespace wave
 		llvm_value_map[&binary_expr] = result;
 	}
 
-	void LLVMVisitor::Visit(TernaryExpr const&, uint32)
+	void LLVMVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
 	{
+		Expr const* cond_expr = ternary_expr.GetCondExpr();
+		Expr const* true_expr = ternary_expr.GetTrueExpr();
+		Expr const* false_expr = ternary_expr.GetFalseExpr();
 
+		cond_expr->Accept(*this);
+		llvm::Value* condition_value = llvm_value_map[cond_expr];
+		WAVE_ASSERT(condition_value);
+		condition_value = Load(bool_type, condition_value);
+
+		true_expr->Accept(*this);
+		llvm::Value* true_value = llvm_value_map[true_expr];
+		WAVE_ASSERT(true_value);
+
+		false_expr->Accept(*this);
+		llvm::Value* false_value = llvm_value_map[false_expr];
+		WAVE_ASSERT(false_value);
+
+		if (condition_value->getType() != llvm::Type::getInt1Ty(context))
+		{
+			WAVE_ASSERT(false);
+		}
+
+		llvm_value_map[&ternary_expr] = builder.CreateSelect(condition_value, true_value, false_value);
 	}
 
 	void LLVMVisitor::Visit(IdentifierExpr const&, uint32)

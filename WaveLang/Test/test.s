@@ -15,17 +15,14 @@
 add:                                    # @add
 .seh_proc add
 # %bb.0:                                # %entry
-	subq	$16, %rsp
-	.seh_stackalloc 16
+	pushq	%rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	movq	%rdx, (%rsp)                    # 8-byte Spill
-	movq	%rcx, 8(%rsp)                   # 8-byte Spill
-	jmp	.LBB0_1
-.LBB0_1:                                # %exit
-	movq	(%rsp), %rcx                    # 8-byte Reload
-	movq	8(%rsp), %rax                   # 8-byte Reload
-	addq	%rcx, %rax
-	addq	$16, %rsp
+	addq	%rdx, %rcx
+	movq	%rcx, (%rsp)
+# %bb.1:                                # %exit
+	movq	(%rsp), %rax
+	popq	%rcx
 	retq
 	.seh_endproc
                                         # -- End function
@@ -38,19 +35,20 @@ add:                                    # @add
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$40, %rsp
-	.seh_stackalloc 40
+	subq	$16, %rsp
+	.seh_stackalloc 16
 	.seh_endprologue
-	movl	$5, %ecx
-	movl	$4, %edx
-	callq	add
-	movq	%rax, 32(%rsp)                  # 8-byte Spill
+	movq	$0, (%rsp)
+	xorl	%eax, %eax
+                                        # kill: def $rax killed $eax
+	movl	$10, %ecx
+	cmpq	$0, (%rsp)
+	cmovneq	%rcx, %rax
+	movq	%rax, 8(%rsp)
 # %bb.1:                                # %exit
-	movq	32(%rsp), %rax                  # 8-byte Reload
-	addq	$1, %rax
-	addq	$40, %rsp
+	movq	8(%rsp), %rax
+	addq	$16, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym add

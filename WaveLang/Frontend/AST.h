@@ -233,7 +233,7 @@ namespace wave
 
 		void SetConditionExpr(UniqueExprPtr&& _condition)
 		{
-			condition = std::move(_condition);
+			cond_expr = std::move(_condition);
 		}
 		void SetThenStmt(UniqueStmtPtr&& _then_stmt)
 		{
@@ -244,7 +244,7 @@ namespace wave
 			else_stmt = std::move(_else_stmt);
 		}
 
-		Expr const* GetConditionExpr() const { return condition.get(); }
+		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetThenStmt() const { return then_stmt.get(); }
 		Stmt const* GetElseStmt() const { return else_stmt.get(); }
 
@@ -252,7 +252,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueExprPtr condition;
+		UniqueExprPtr cond_expr;
 		UniqueStmtPtr then_stmt;
 		UniqueStmtPtr else_stmt;
 	};
@@ -536,10 +536,7 @@ namespace wave
 	class TernaryExpr : public Expr
 	{
 	public:
-		explicit TernaryExpr(SourceLocation const& loc) : Expr(ExprKind::Ternary, loc),
-			cond_expr(std::move(cond_expr)),
-			true_expr(std::move(true_expr)),
-			false_expr(std::move(false_expr))
+		explicit TernaryExpr(SourceLocation const& loc) : Expr(ExprKind::Ternary, loc)
 		{}
 
 		void SetCondExpr(UniqueExprPtr&& expr) { cond_expr = std::move(expr); }

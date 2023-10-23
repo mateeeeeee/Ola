@@ -48,10 +48,10 @@ int main(int argc, char** argv)
 	if(*ast_dump) compiler_flags |= wave::CompilerFlag_DumpAST;
 
 	wave::CompilerFlags optimization_flag = wave::CompilerFlag_None;
-	if (O0 || O1) optimization_flag = wave::CompilerFlag_O0;
-	if (O1) optimization_flag = wave::CompilerFlag_O1;
-	if (O2) optimization_flag = wave::CompilerFlag_O2;
-	if (O3) optimization_flag = wave::CompilerFlag_O3;
+	if (*O0 || *Od) optimization_flag = wave::CompilerFlag_O0;
+	if (*O1) optimization_flag = wave::CompilerFlag_O1;
+	if (*O2) optimization_flag = wave::CompilerFlag_O2;
+	if (*O3) optimization_flag = wave::CompilerFlag_O3;
 
 	compiler_flags |= optimization_flag;
 

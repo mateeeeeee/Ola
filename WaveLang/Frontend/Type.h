@@ -258,4 +258,6 @@ namespace wave
 	inline bool (*IsFloatType)(Type const& type) = IsType<TypeKind::Float>;
 	inline bool (*IsFunctionType)(Type const& type) = IsType<TypeKind::Function>;
 	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
+
+
 }

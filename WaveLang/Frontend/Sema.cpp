@@ -333,9 +333,24 @@ namespace wave
 
 	UniqueTernaryExprPtr Sema::ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr)
 	{
-		//#todo semantic analysis
+		QualifiedType const& true_type = true_expr->GetType();
+		QualifiedType const& false_type = false_expr->GetType();
+
+		if (!builtin_types::Bool.IsAssignableFrom(cond_expr->GetType()))
+		{
+			diagnostics.Report(loc, used_nonboolean_type);
+		}
+		else if(!cond_expr->GetType()->IsSameAs(builtin_types::Bool))
+		{
+			cond_expr = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(cond_expr));
+		}
+
+		QualifiedType expr_type{};
+		if (true_type->IsSameAs(false_type)) expr_type = true_type;
+		else diagnostics.Report(loc, ternary_expr_types_incompatible);
+
 		UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
-		ternary_expr->SetType(true_expr->GetType());
+		ternary_expr->SetType(expr_type);
 		ternary_expr->SetCondExpr(std::move(cond_expr));
 		ternary_expr->SetTrueExpr(std::move(true_expr));
 		ternary_expr->SetFalseExpr(std::move(false_expr));
