@@ -1,14 +1,12 @@
-//TODO: 
-1. add public modifier for function to determine is linkage external or no
-2. add Wave Std Lib : io, math
+
 
 <translation-unit> ::= { import-declaration }* { <function_definition> | <function_declaration> }*
 
 <import-declaration> ::= import <identifier>;
 
-<function_declaration> ::= extern <type-specifier> <identifier>( <parameter-list> );
-<function_definition>  ::= <function_visibility> <type-specifier> <identifier>( <parameter-list> ) <compound_statement>
-<function_visibility>  ::= public | private
+<function_declaration>    ::= extern <type-specifier> <identifier>( <parameter-list> );
+<function_definition>     ::= {<declaration_visibility>}? <type-specifier> <identifier>( <parameter-list> ) <compound_statement>
+<declaration_visibility>  ::= public | private
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
@@ -19,10 +17,10 @@
 
 <type-qualifier> ::= {const}?
 <type-specifier> ::= void
-                   | bool  | bool []
-                   | char  | char []
-                   | int   | int  []
-                   | float | float[]
+                   | bool  | bool {[]}+
+                   | char  | char {[]}+
+                   | int   | int  {[]}+
+                   | float | float{[]}+
                    | <enum-specifier> | <enum-specifier>[]
                    | <class-specifier> | <class-specifier>[]
 				   
@@ -162,3 +160,13 @@
                    | continue ;
                    | break ;
                    | return {<expression>}? ; 
+--------------------------------------------------------------------
+
+int[] arr; -- not ok
+var arr = {1,2,3,4}; //fine,  arr is of type int[4]
+var arr = [4,0]; //fine,  arr is of type int[4]
+int[] arr = int[5]{};
+int[] arr = {1,2,3,4}; //fine, arr is of type int[4]
+int[] arr = [4,0];	   //fine, arr is of type int[4] initialized with 4 zeroes
+
+int[][] arr = {{1,2,3,4},{1,2,3,4}}; arr is of type int[2][4]

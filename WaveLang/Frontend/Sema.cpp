@@ -40,7 +40,13 @@ namespace wave
 		}
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
+		var_decl->SetGlobal(ctx.decl_scope_stack.IsGlobal());
+		if (var_decl->IsGlobal() && !init_expr->IsConstexpr())
+		{
+			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
+		}
 		var_decl->SetInitExpr(std::move(init_expr));
+
 		if (has_init && !has_type_specifier)
 		{
 			QualifiedType var_type(var_decl->GetInitExpr()->GetType());
@@ -51,12 +57,14 @@ namespace wave
 		{
 			var_decl->SetType(type);
 		}
+		
 		bool result = ctx.decl_scope_stack.Insert(var_decl.get());
 		WAVE_ASSERT(result);
 		return var_decl;
 	}
 
-	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, bool is_public)
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, VisibilitySpecifier visibility)
 	{
 		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
 		{
@@ -78,7 +86,7 @@ namespace wave
 		if (body_stmt)
 		{
 			function_decl->SetBodyStmt(std::move(body_stmt));
-			function_decl->SetPublic(is_public);
+			function_decl->SetVisibility(visibility);
 			for (std::string const& goto_label : ctx.gotos)
 			{
 				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
@@ -102,7 +110,7 @@ namespace wave
 		return MakeUnique<ExprStmt>(std::move(expr));
 	}
 
-	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueVariableDeclPtrList&& decls)
+	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueDeclPtrList&& decls)
 	{
 		return MakeUnique<DeclStmt>(std::move(decls));
 	}

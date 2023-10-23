@@ -99,16 +99,31 @@ namespace wave
 
 	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
-		llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
-		llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
-
-		if (var_decl.GetInitExpr()) 
+		if (var_decl.IsGlobal())
 		{
+			WAVE_ASSERT(var_decl.GetInitExpr()->IsConstexpr());
 			var_decl.GetInitExpr()->Accept(*this);
 			llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-			Store(init_value, alloca);
+			llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
+			WAVE_ASSERT(constant_init_value);
+
+			llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
+			llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
+			llvm_value_map[&var_decl] = global_var;
 		}
-		llvm_value_map[&var_decl] = alloca;
+		else
+		{
+			llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
+			llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
+
+			if (var_decl.GetInitExpr())
+			{
+				var_decl.GetInitExpr()->Accept(*this);
+				llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
+				Store(init_value, alloca);
+			}
+			llvm_value_map[&var_decl] = alloca;
+		}
 	}
 
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
@@ -749,7 +764,8 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
-		if (!isa<llvm::AllocaInst>(ptr)) return ptr;
+		if (!ptr->getType()->isPointerTy()) return ptr;
+		//if (!isa<llvm::AllocaInst>(ptr)) return ptr;
 
 		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
 		return load_inst;
@@ -757,7 +773,8 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
-		if (!isa<llvm::AllocaInst>(value)) return builder.CreateStore(value, ptr);
+		if (!value->getType()->isPointerTy()) return builder.CreateStore(value, ptr);
+		//if (!isa<llvm::AllocaInst>(value)) return builder.CreateStore(value, ptr);
 		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}

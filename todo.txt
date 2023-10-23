@@ -9,6 +9,6 @@
 
 * Start working on import declaration
 
-* Start working on std lib implementation
+2. add Wave Std Lib : io, math, util
 
 * Start working on classes and other oop features

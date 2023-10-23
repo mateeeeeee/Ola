@@ -51,22 +51,25 @@ namespace wave
 	{
 		while (current_token->IsNot(TokenKind::eof))
 		{
-			ast->translation_unit->AddDecl(ParseGlobalDeclaration());
+			UniqueDeclPtrList decls = ParseGlobalDeclaration();
+			for(auto&& decl : decls) ast->translation_unit->AddDecl(std::move(decl));
 		}
 	}
 
-	UniqueDeclPtr Parser::ParseGlobalDeclaration()
+	UniqueDeclPtrList Parser::ParseGlobalDeclaration()
 	{
+		UniqueDeclPtrList global_decl_list;
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			return ParseFunctionDeclaration();
+			global_decl_list.push_back(ParseFunctionDeclaration());
 		}
 		else 
 		{
-			return ParseFunctionDefinition();
+			if (current_token->IsVisibilitySpecifier()) global_decl_list.push_back(ParseFunctionDefinition());
+			else global_decl_list = ParseVariableDeclaration();
 		}
-		return nullptr;
+		return global_decl_list;
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
@@ -101,9 +104,9 @@ namespace wave
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
 	{
-		bool is_public = false;
-		if (Consume(TokenKind::KW_public)) is_public = true;
-		else if (Consume(TokenKind::KW_private)) is_public = false;
+		VisibilitySpecifier visibility = VisibilitySpecifier::Invalid;
+		if (Consume(TokenKind::KW_public)) visibility = VisibilitySpecifier::Public;
+		else if (Consume(TokenKind::KW_private)) visibility = VisibilitySpecifier::Private;
 
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -135,7 +138,7 @@ namespace wave
 			function_body = ParseCompoundStatement();
 			sema->ctx.current_func = nullptr;
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), is_public);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility);
 	}
 
 	UniqueVariableDeclPtr Parser::ParseParamDeclaration()
@@ -158,9 +161,9 @@ namespace wave
 		return sema->ActOnVariableDecl(name, loc, variable_type, nullptr);
 	}
 
-	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
+	UniqueDeclPtrList Parser::ParseVariableDeclaration()
 	{
-		UniqueVariableDeclPtrList var_decl_list;
+		UniqueDeclPtrList var_decl_list;
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
@@ -214,7 +217,7 @@ namespace wave
 		{
 			if (current_token->IsTypename())
 			{
-				UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
+				UniqueDeclPtrList decl_list = ParseVariableDeclaration();
 				stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
 			}
 			else
@@ -277,7 +280,7 @@ namespace wave
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsTypename())
 		{
-			UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
+			UniqueDeclPtrList decl_list = ParseVariableDeclaration();
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
 		}
 		else init_stmt = ParseExpressionStatement();
@@ -810,7 +813,6 @@ namespace wave
 			}
 			else
 			{
-				//#todo parse constant-expression
 				Expect(TokenKind::right_square);
 			}
 		}

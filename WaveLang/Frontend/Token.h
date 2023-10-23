@@ -45,7 +45,6 @@ namespace wave
 		{
 			return IsTypeSpecifier() || IsTypeQualifier() || Is(TokenKind::KW_var);
 		}
-
 		bool IsTypeSpecifier() const
 		{
 			return IsOneOf(
@@ -56,10 +55,13 @@ namespace wave
 				TokenKind::KW_float,
 				TokenKind::KW_void);
 		}
-
 		bool IsTypeQualifier() const
 		{
 			return Is(TokenKind::KW_const);
+		}
+		bool IsVisibilitySpecifier() const
+		{
+			return IsOneOf(TokenKind::KW_private, TokenKind::KW_public);
 		}
 
 		void SetFlag(TokenFlag flag)

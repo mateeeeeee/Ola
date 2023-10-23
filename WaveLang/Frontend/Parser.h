@@ -71,11 +71,11 @@ namespace wave
 
 		void PreprocessTokens();
 		void ParseTranslationUnit();
-		WAVE_NODISCARD UniqueDeclPtr ParseGlobalDeclaration();
+		WAVE_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
 		WAVE_NODISCARD UniqueVariableDeclPtr ParseParamDeclaration();
-		WAVE_NODISCARD UniqueVariableDeclPtrList ParseVariableDeclaration();
+		WAVE_NODISCARD UniqueDeclPtrList ParseVariableDeclaration();
 
 		WAVE_NODISCARD UniqueStmtPtr ParseStatement();
 		WAVE_NODISCARD UniqueCompoundStmtPtr ParseCompoundStatement();

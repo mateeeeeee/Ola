@@ -1,12 +1,12 @@
 
 
-private int add(int a, int b)
-{
-    return a + b;
-}
+var a = 5;
 
 public int main()
 {
-    var b = add(2,3);
-    return sizeof(b);
+    var b = 5;
+    {
+         int a = 7;
+    }
+    return a + b;
 }

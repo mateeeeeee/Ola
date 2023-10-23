@@ -71,6 +71,12 @@ namespace wave
 	public:
 		VariableDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Variable, name, loc) {}
 
+		void SetGlobal(bool _global)
+		{
+			global = _global;
+		}
+		bool IsGlobal() const { return global; }
+
 		void SetInitExpr(UniqueExprPtr&& expr)
 		{
 			init_expr = std::move(expr);
@@ -82,6 +88,14 @@ namespace wave
 
 	private:
 		UniqueExprPtr init_expr;
+		bool global = false;
+	};
+
+	enum class VisibilitySpecifier : uint8 
+	{
+		Invalid,
+		Private,
+		Public
 	};
 
 	class FunctionDecl : public Decl
@@ -98,14 +112,14 @@ namespace wave
 		{
 			body_stmt = std::move(_body_stmt);
 		}
-		void SetPublic(bool _is_public)
+		void SetVisibility(VisibilitySpecifier _visibility)
 		{
-			is_public = _is_public;
+			visibility = _visibility;
 		}
 
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
-		bool IsPublic() const { return is_public; }
+		bool IsPublic() const { return visibility == VisibilitySpecifier::Public; }
 
 		bool HasDefinition() const
 		{
@@ -121,7 +135,7 @@ namespace wave
 		UniqueVariableDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
-		bool is_public = false;
+		VisibilitySpecifier visibility = VisibilitySpecifier::Invalid;
 	};
 
 
@@ -175,15 +189,15 @@ namespace wave
 	class DeclStmt final : public Stmt
 	{
 	public:
-		DeclStmt(UniqueVariableDeclPtrList&& decls) : Stmt(StmtKind::Decl), declarations(std::move(decls)) {}
+		DeclStmt(UniqueDeclPtrList&& decls) : Stmt(StmtKind::Decl), declarations(std::move(decls)) {}
 
-		UniqueVariableDeclPtrList const& GetDecls() const { return declarations; }
+		UniqueDeclPtrList const& GetDecls() const { return declarations; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueVariableDeclPtrList declarations;
+		UniqueDeclPtrList declarations;
 	};
 
 	class ExprStmt : public Stmt

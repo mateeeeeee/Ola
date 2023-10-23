@@ -44,11 +44,12 @@ namespace wave
 	private:
 		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr);
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr, bool is_public = false);
+												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr, 
+												VisibilitySpecifier visibility = VisibilitySpecifier::Private);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
-		UniqueDeclStmtPtr ActOnDeclStmt(UniqueVariableDeclPtrList&& decls);
+		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtrList&& decls);
 		UniqueReturnStmtPtr ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt);
 		UniqueIfStmtPtr ActOnIfStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& then_stmt, UniqueStmtPtr&& else_stmt);
 		UniqueBreakStmtPtr ActOnBreakStmt(SourceLocation const& loc);

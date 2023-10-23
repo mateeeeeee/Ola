@@ -41,7 +41,7 @@ namespace wave
 		llvm::raw_fd_ostream llvm_ir_file(output_file, error, llvm::sys::fs::OF_None);
 		if (error)
 		{
-			WAVE_ERROR("Error when creating llvm::raw_fd_ostream: %s", error.message().c_str());
+			WAVE_ERROR("Error when creating llvm::raw_fd_ostream: {}", error.message());
 			return;
 		}  
 		module.print(llvm_ir_file, nullptr);
@@ -54,7 +54,7 @@ namespace wave
 		if (llvm::verifyModule(module, &error_stream))
 		{
 			error_stream.flush();
-			WAVE_ERROR("Module verification failed: %s", error_msg.c_str());
+			WAVE_ERROR("Module verification failed: {}", error_msg);
 			return false;
 		}
 		return true;
