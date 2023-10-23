@@ -144,6 +144,7 @@ namespace wave
 
 			LLVMIRGenerator llvm_ir_generator{};
 			llvm_ir_generator.Generate(ast);
+			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
 			llvm_ir_generator.PrintIR(ir_file.string());
 		}
 		std::string compile_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());

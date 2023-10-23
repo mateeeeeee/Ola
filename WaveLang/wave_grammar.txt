@@ -17,12 +17,12 @@
 
 <type-qualifier> ::= {const}?
 <type-specifier> ::= void
-                   | bool  | bool {[]}+
-                   | char  | char {[]}+
-                   | int   | int  {[]}+
-                   | float | float{[]}+
-                   | <enum-specifier> | <enum-specifier>[]
-                   | <class-specifier> | <class-specifier>[]
+                   | bool {[]}*
+                   | char {[]}*
+                   | int  {[]}*
+                   | float {[]}*
+                   | <enum-specifier> {[]}*
+                   | <class-specifier> {[]}*
 				   
 <enum-specifier> ::= enum <identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }

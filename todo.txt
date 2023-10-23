@@ -6,9 +6,7 @@
 
 * More detailed semantic analysis
 
-* Start working on import declaration
-
-2. add Wave Std Lib : io, math, util
+* add Wave Std Lib : io, math, util
 
 * Start working on classes and other oop features
 
