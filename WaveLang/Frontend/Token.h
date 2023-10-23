@@ -41,17 +41,25 @@ namespace wave
 			else return Is(t1) || IsOneOf(ts...);
 		}
 
-		bool IsType() const
+		bool IsTypename() const
+		{
+			return IsTypeSpecifier() || IsTypeQualifier() || Is(TokenKind::KW_var);
+		}
+
+		bool IsTypeSpecifier() const
 		{
 			return IsOneOf(
-				TokenKind::KW_var,
-				TokenKind::KW_const,
 				TokenKind::KW_enum,
 				TokenKind::KW_bool,
 				TokenKind::KW_char,
 				TokenKind::KW_int,
 				TokenKind::KW_float,
 				TokenKind::KW_void);
+		}
+
+		bool IsTypeQualifier() const
+		{
+			return Is(TokenKind::KW_const);
 		}
 
 		void SetFlag(TokenFlag flag)

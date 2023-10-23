@@ -4,7 +4,6 @@
 	- enums
 	- arrays
 	- global variables 
-	- sizeof
 
 * More detailed semantic analysis
 

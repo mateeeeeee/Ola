@@ -212,7 +212,7 @@ namespace wave
 		UniqueStmtPtrList stmts;
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
-			if (current_token->IsType())
+			if (current_token->IsTypename())
 			{
 				UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
 				stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
@@ -275,7 +275,7 @@ namespace wave
 		Expect(TokenKind::left_round);
 
 		UniqueStmtPtr init_stmt = nullptr;
-		if (current_token->IsType())
+		if (current_token->IsTypename())
 		{
 			UniqueVariableDeclPtrList decl_list = ParseVariableDeclaration();
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
@@ -668,7 +668,23 @@ namespace wave
 
 	UniqueExprPtr Parser::ParseSizeofExpression()
 	{
-		return nullptr;
+		Expect(TokenKind::KW_sizeof);
+		Expect(TokenKind::left_round);
+		
+		SourceLocation loc = current_token->GetLocation();
+		QualifiedType type{};
+		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var))
+		{
+			ParseTypeQualifier(type);
+			ParseTypeSpecifier(type);
+		}
+		else
+		{
+			UniqueExprPtr sizeof_expr = ParseExpression();
+			type = sizeof_expr->GetType();
+		}
+		Expect(TokenKind::right_round);
+		return sema->ActOnConstantInt(type->GetSize(), loc);
 	}
 
 	UniqueConstantIntPtr Parser::ParseAlignofExpression()

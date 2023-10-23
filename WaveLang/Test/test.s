@@ -41,9 +41,7 @@ main:                                   # @main
 	movl	$3, %edx
 	callq	add
 	movq	%rax, 40(%rsp)
-	movq	40(%rsp), %rax
-	addq	$5, %rax
-	movq	%rax, 48(%rsp)
+	movq	$8, 48(%rsp)
 # %bb.1:                                # %exit
 	movq	48(%rsp), %rax
 	addq	$56, %rsp
