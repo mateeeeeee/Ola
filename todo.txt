@@ -4,7 +4,7 @@
 	- enums
 	- arrays
 	- global variables 
-	- sizeof, alignof, alignas, ternary
+	- sizeof
 
 * More detailed semantic analysis
 

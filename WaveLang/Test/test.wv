@@ -1,12 +1,12 @@
- 
 
-int add(int a, int b)
+
+private int add(int a, int b)
 {
     return a + b;
 }
 
-int main()
+public int main()
 {
-    const int b = 0;
-    return b ? 10 : 0;
+    var b = add(2,3);
+    return b + 5;
 }

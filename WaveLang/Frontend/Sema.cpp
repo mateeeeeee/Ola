@@ -56,7 +56,7 @@ namespace wave
 		return var_decl;
 	}
 
-	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt)
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, bool is_public)
 	{
 		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
 		{
@@ -78,6 +78,7 @@ namespace wave
 		if (body_stmt)
 		{
 			function_decl->SetBodyStmt(std::move(body_stmt));
+			function_decl->SetPublic(is_public);
 			for (std::string const& goto_label : ctx.gotos)
 			{
 				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);

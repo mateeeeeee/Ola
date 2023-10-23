@@ -44,6 +44,7 @@ namespace wave
 		bool IsType() const
 		{
 			return IsOneOf(
+				TokenKind::KW_var,
 				TokenKind::KW_const,
 				TokenKind::KW_enum,
 				TokenKind::KW_bool,

@@ -39,7 +39,8 @@ namespace wave
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
-		llvm::Function* llvm_function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, function_decl.GetName(), module);
+		llvm::Function* llvm_function = llvm::Function::Create(function_type, function_decl.IsPublic() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage, 
+															   function_decl.GetName(), module);
 
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
 		builder.SetInsertPoint(entry_block);

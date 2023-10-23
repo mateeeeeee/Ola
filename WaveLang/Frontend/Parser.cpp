@@ -69,7 +69,7 @@ namespace wave
 		return nullptr;
 	}
 
-	WAVE_NODISCARD UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -99,7 +99,7 @@ namespace wave
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
 	}
 
-	WAVE_NODISCARD UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
 	{
 		bool is_public = false;
 		if (Consume(TokenKind::KW_public)) is_public = true;
@@ -135,10 +135,10 @@ namespace wave
 			function_body = ParseCompoundStatement();
 			sema->ctx.current_func = nullptr;
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body));
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), is_public);
 	}
 
-	WAVE_NODISCARD UniqueVariableDeclPtr Parser::ParseParamDeclaration()
+	UniqueVariableDeclPtr Parser::ParseParamDeclaration()
 	{
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -158,8 +158,7 @@ namespace wave
 		return sema->ActOnVariableDecl(name, loc, variable_type, nullptr);
 	}
 
-
-	WAVE_NODISCARD UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
+	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
 	{
 		UniqueVariableDeclPtrList var_decl_list;
 		QualifiedType variable_type{};
@@ -762,10 +761,11 @@ namespace wave
 	{
 		switch (current_token->GetKind())
 		{
-		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void); break;
-		case TokenKind::KW_bool:  type.SetRawType(builtin_types::Bool);	break;
-		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);	break;
-		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int); break;
+		case TokenKind::KW_var:   break;
+		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void);  break;
+		case TokenKind::KW_bool:  type.SetRawType(builtin_types::Bool);	 break;
+		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);	 break;
+		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int);   break;
 		case TokenKind::KW_float: type.SetRawType(builtin_types::Float); break;
 		case TokenKind::identifier:
 		{

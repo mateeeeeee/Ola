@@ -98,8 +98,14 @@ namespace wave
 		{
 			body_stmt = std::move(_body_stmt);
 		}
+		void SetPublic(bool _is_public)
+		{
+			is_public = _is_public;
+		}
+
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
+		bool IsPublic() const { return is_public; }
 
 		bool HasDefinition() const
 		{
@@ -115,6 +121,7 @@ namespace wave
 		UniqueVariableDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
+		bool is_public = false;
 	};
 
 

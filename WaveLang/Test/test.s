@@ -7,11 +7,10 @@
 .set @feat.00, 0
 	.file	"WaveModule"
 	.def	add;
-	.scl	2;
+	.scl	3;
 	.type	32;
 	.endef
-	.globl	add                             # -- Begin function add
-	.p2align	4, 0x90
+	.p2align	4, 0x90                         # -- Begin function add
 add:                                    # @add
 .seh_proc add
 # %bb.0:                                # %entry
@@ -35,20 +34,21 @@ add:                                    # @add
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$16, %rsp
-	.seh_stackalloc 16
+	subq	$56, %rsp
+	.seh_stackalloc 56
 	.seh_endprologue
-	movq	$0, (%rsp)
-	xorl	%eax, %eax
-                                        # kill: def $rax killed $eax
-	movl	$10, %ecx
-	cmpq	$0, (%rsp)
-	cmovneq	%rcx, %rax
-	movq	%rax, 8(%rsp)
+	movl	$2, %ecx
+	movl	$3, %edx
+	callq	add
+	movq	%rax, 40(%rsp)
+	movq	40(%rsp), %rax
+	addq	$5, %rax
+	movq	%rax, 48(%rsp)
 # %bb.1:                                # %exit
-	movq	8(%rsp), %rax
-	addq	$16, %rsp
+	movq	48(%rsp), %rax
+	addq	$56, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
+	.addrsig_sym add
