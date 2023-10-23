@@ -6,14 +6,13 @@
 namespace wave
 {
 
-	Lexer::Lexer(Diagnostics& diagnostics, SourceBuffer const& source)
-		: diagnostics(diagnostics), buf_ptr(source.GetBufferStart()), cur_ptr(buf_ptr),
-		  loc{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size())}
-	{
-	}
+	Lexer::Lexer(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 
-	void Lexer::Lex()
+	void Lexer::Lex(SourceBuffer const& source)
 	{
+		buf_ptr = source.GetBufferStart(); 
+		cur_ptr = buf_ptr; 
+		loc = SourceLocation{ .filename = std::string(source.GetRefName().data(), source.GetRefName().size()) };
 		Token current_token{};
 		do
 		{

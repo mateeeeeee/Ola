@@ -17,18 +17,18 @@ namespace wave
 	class Lexer
 	{
 	public:
-		Lexer(Diagnostics& diagnostics, SourceBuffer const& source);
+		explicit Lexer(Diagnostics& diagnostics);
 		Lexer(Lexer const&) = delete;
 		Lexer& operator=(Lexer const&) = delete;
 
-		void Lex();
+		void Lex(SourceBuffer const& source);
 
-		std::vector<Token> const& GetTokens() const { return tokens; }
+		std::vector<Token>&& GetTokens() { return std::move(tokens); }
 
 	private:
 		Diagnostics& diagnostics;
-		char const* buf_ptr;
-		char const* cur_ptr;
+		char const* buf_ptr = nullptr;
+		char const* cur_ptr = nullptr;
 
 		SourceLocation loc;
 		std::vector<Token> tokens;

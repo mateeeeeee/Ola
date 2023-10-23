@@ -38,6 +38,9 @@
     <ClCompile Include="Backend\LLVMOptimizer.cpp">
       <Filter>Backend</Filter>
     </ClCompile>
+    <ClCompile Include="Frontend\ImportProcessor.cpp">
+      <Filter>Frontend\Lexer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -138,6 +141,9 @@
     <ClInclude Include="Backend\LLVMOptimizer.h">
       <Filter>Backend</Filter>
     </ClInclude>
+    <ClInclude Include="Frontend\ImportProcessor.h">
+      <Filter>Frontend\Lexer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Frontend\Diagnostics.def">
@@ -153,6 +159,12 @@
       <Filter>Test</Filter>
     </None>
     <None Include="Test\test.wv">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="Test\io.wvi">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="Test\util.wvi">
       <Filter>Test</Filter>
     </None>
   </ItemGroup>

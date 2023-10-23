@@ -19,10 +19,11 @@ namespace wave
 		using TokenPtr = std::vector<Token>::iterator;
 	public:
 
-		explicit Parser(Diagnostics& diagnostics, std::vector<Token> const& tokens);
+		explicit Parser(Diagnostics& diagnostics);
 		~Parser();
 
-		void Parse();
+		void Parse(std::vector<Token>&& tokens);
+		void Parse(std::vector<Token> const& tokens);
 		AST const* GetAST() const { return ast.get(); }
 
 	private:
@@ -69,8 +70,8 @@ namespace wave
 			diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
 		}
 
-		void PreprocessTokens();
 		void ParseTranslationUnit();
+
 		WAVE_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();

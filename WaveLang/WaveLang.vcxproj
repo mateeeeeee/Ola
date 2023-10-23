@@ -168,6 +168,7 @@
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Frontend\AST.cpp" />
     <ClCompile Include="Frontend\Diagnostics.cpp" />
+    <ClCompile Include="Frontend\ImportProcessor.cpp" />
     <ClCompile Include="Frontend\Lexer.cpp" />
     <ClCompile Include="Frontend\Parser.cpp" />
     <ClCompile Include="Frontend\Sema.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Frontend\Diagnostics.h" />
     <ClInclude Include="Frontend\ASTForwardDeclarations.h" />
     <ClInclude Include="Frontend\ASTVisitor.h" />
+    <ClInclude Include="Frontend\ImportProcessor.h" />
     <ClInclude Include="Frontend\Lexer.h" />
     <ClInclude Include="Frontend\Parser.h" />
     <ClInclude Include="Frontend\Sema.h" />
@@ -208,6 +210,9 @@
     <None Include="Frontend\Tokens.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Test\io.wvi">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Test\test.ll">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -219,6 +224,9 @@
     <None Include="Test\test.wv">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Test\util.wvi">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
   <ItemGroup>

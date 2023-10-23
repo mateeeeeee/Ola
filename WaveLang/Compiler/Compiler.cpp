@@ -4,6 +4,7 @@
 #include "Frontend/Diagnostics.h"
 #include "Frontend/SourceBuffer.h"
 #include "Frontend/Lexer.h"
+#include "Frontend/ImportProcessor.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 #include "Backend/LLVMIRGenerator.h"
@@ -51,11 +52,14 @@ namespace wave
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
 			AddBuiltins(src);
-			Lexer lex(diagnostics, src);
-			lex.Lex();
+			Lexer lex(diagnostics);
+			lex.Lex(src);
 
-			Parser parser(diagnostics, lex.GetTokens());
-			parser.Parse();
+			ImportProcessor import_processor(diagnostics);
+			import_processor.Process(lex.GetTokens());
+
+			Parser parser(diagnostics);
+			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
@@ -77,7 +81,7 @@ namespace wave
 		fs::path directory_path = input.input_directory;
 		std::vector<fs::path> assembly_files(input.sources.size());
 		std::vector<fs::path> object_files(input.sources.size());
-		fs::path output_file = directory_path /input.output_file; output_file += ".exe";
+		fs::path output_file = directory_path / input.output_file; output_file += ".exe";
 		int64 res;
 		for (uint64 i = 0; i < input.sources.size(); ++i)
 		{
@@ -129,11 +133,11 @@ namespace wave
 			Diagnostics diagnostics{};
 			SourceBuffer src(code.data(), code.size());
 			AddBuiltins(src);
-			Lexer lex(diagnostics, src);
-			lex.Lex();
+			Lexer lex(diagnostics);
+			lex.Lex(src);
 
-			Parser parser(diagnostics, lex.GetTokens());
-			parser.Parse();
+			Parser parser(diagnostics);
+			parser.Parse(lex.GetTokens());
 
 			AST const* ast = parser.GetAST();
 			if (debug) DebugVisitor debug_ast(ast);

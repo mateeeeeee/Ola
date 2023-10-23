@@ -36,6 +36,8 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
+		if (!function_decl.HasDefinition()) return;
+
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));

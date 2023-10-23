@@ -36,4 +36,6 @@ DIAG(used_nonboolean_type, error, "Used nonboolean type where boolean type is ex
 DIAG(ternary_expr_types_incompatible, error, "Types of ternary expressions have to be the same")
 DIAG(sizeof_invalid_argument, error, "Invalid argument in sizeof operator")
 DIAG(global_variable_initializer_not_constexpr, error, "Global variable initializer has to be constant expression")
+DIAG(invalid_import_path, error, "Invalid import path")
+DIAG(interface_files_invalid_declaration, error, "Interface files can only have extern function declarations")
 #undef DIAG

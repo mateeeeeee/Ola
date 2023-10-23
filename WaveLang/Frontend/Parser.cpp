@@ -6,15 +6,25 @@
 namespace wave
 {
 
-	Parser::Parser(Diagnostics& diagnostics, std::vector<Token> const& _tokens) 
-		: diagnostics(diagnostics), tokens(_tokens), current_token(tokens.begin()) {}
+	Parser::Parser(Diagnostics& diagnostics) 
+		: diagnostics(diagnostics) {}
 	Parser::~Parser() = default;
 
-	void Parser::Parse()
+	void Parser::Parse(std::vector<Token>&& _tokens)
 	{
+		tokens = std::move(_tokens);
+		current_token = tokens.begin();
 		sema = MakeUnique<Sema>(diagnostics);
 		ast = MakeUnique<AST>();
-		PreprocessTokens();
+		ParseTranslationUnit();
+	}
+
+	void Parser::Parse(std::vector<Token> const& _tokens)
+	{
+		tokens = _tokens;
+		current_token = tokens.begin();
+		sema = MakeUnique<Sema>(diagnostics);
+		ast = MakeUnique<AST>();
 		ParseTranslationUnit();
 	}
 
@@ -33,18 +43,6 @@ namespace wave
 		--current_token;
 		diagnostics.Report(current_token->GetLocation(), code);
 		++current_token;
-	}
-
-	void Parser::PreprocessTokens()
-	{
-		std::vector<Token> preprocessed_tokens{};
-		for (auto const& token : tokens)
-		{
-			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline)) preprocessed_tokens.push_back(token);
-		}
-		//#todo resolve import *.wvi 
-		std::swap(preprocessed_tokens, tokens);
-		current_token = tokens.begin();
 	}
 
 	void Parser::ParseTranslationUnit()
@@ -79,7 +77,7 @@ namespace wave
 		QualifiedType function_type{};
 		UniqueVariableDeclPtrList param_decls;
 		{
-			SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			QualifiedType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
@@ -114,7 +112,7 @@ namespace wave
 		UniqueVariableDeclPtrList param_decls;
 		UniqueCompoundStmtPtr function_body;
 		{
-			SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			QualifiedType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
@@ -210,7 +208,7 @@ namespace wave
 
 	UniqueCompoundStmtPtr Parser::ParseCompoundStatement()
 	{
-		SCOPE_STACK_GUARD(sema->ctx.decl_scope_stack);
+		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 		Expect(TokenKind::left_brace);
 		UniqueStmtPtrList stmts;
 		while (current_token->IsNot(TokenKind::right_brace))

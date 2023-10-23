@@ -3,7 +3,6 @@
 	- floats
 	- enums
 	- arrays
-	- global variables 
 
 * More detailed semantic analysis
 
@@ -12,3 +11,5 @@
 2. add Wave Std Lib : io, math, util
 
 * Start working on classes and other oop features
+
+

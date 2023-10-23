@@ -13,12 +13,12 @@ namespace wave
 	};
 
 	template<typename T> requires Symbol<T>
-	class Scope
+	class SymbolScope
 	{
 	public:
 		using SymType = T;
 	public:
-		Scope() {}
+		SymbolScope() {}
 		
 		bool Insert(SymType* symbol)
 		{
@@ -40,12 +40,12 @@ namespace wave
 	};
 
 	template<typename T> requires Symbol<T>
-	class ScopeStack 
+	class SymbolTable 
 	{
 	public:
 		using SymType = T;
 	public:
-		ScopeStack()
+		SymbolTable()
 		{
 			scopes.emplace_back();
 		}
@@ -85,21 +85,21 @@ namespace wave
 		bool IsGlobal() const { return scopes.size() == 1; }
 
 	private:
-		std::vector<Scope<SymType>> scopes;
+		std::vector<SymbolScope<SymType>> scopes;
 	};
 
 	template<typename T>
-	struct ScopeStackGuard
+	struct SymbolTableGuard
 	{
-		ScopeStackGuard(ScopeStack<T>& scope_stack) : scope_stack(scope_stack)
+		SymbolTableGuard(SymbolTable<T>& sym_table) : sym_table(sym_table)
 		{
-			scope_stack.EnterScope();
+			sym_table.EnterScope();
 		}
-		~ScopeStackGuard()
+		~SymbolTableGuard()
 		{
-			scope_stack.ExitScope();
+			sym_table.ExitScope();
 		}
-		ScopeStack<T>& scope_stack;
+		SymbolTable<T>& sym_table;
 	};
-	#define SCOPE_STACK_GUARD(scope_stack) ScopeStackGuard<std::remove_reference_t<decltype(scope_stack)>::SymType> WAVE_CONCAT(_scope_stack_guard_,__COUNTER__)(scope_stack)
+	#define SYM_TABLE_GUARD(sym_table) SymbolTableGuard<std::remove_reference_t<decltype(sym_table)>::SymType> WAVE_CONCAT(_sym_table_guard_,__COUNTER__)(sym_table)
 }

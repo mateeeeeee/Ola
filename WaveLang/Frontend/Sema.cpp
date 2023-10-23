@@ -13,7 +13,7 @@ namespace wave
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
 
-		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
@@ -34,13 +34,13 @@ namespace wave
 			diagnostics.Report(loc, missing_type_specifier_or_init_expr);
 		}
 
-		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
-		var_decl->SetGlobal(ctx.decl_scope_stack.IsGlobal());
+		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
 		if (var_decl->IsGlobal() && !init_expr->IsConstexpr())
 		{
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
@@ -58,7 +58,7 @@ namespace wave
 			var_decl->SetType(type);
 		}
 		
-		bool result = ctx.decl_scope_stack.Insert(var_decl.get());
+		bool result = ctx.decl_sym_table.Insert(var_decl.get());
 		WAVE_ASSERT(result);
 		return var_decl;
 	}
@@ -66,7 +66,13 @@ namespace wave
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
 												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, VisibilitySpecifier visibility)
 	{
-		if (ctx.decl_scope_stack.LookUpCurrentScope(name))
+		bool is_extern = body_stmt == nullptr;
+
+		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		else if(is_extern && ctx.extern_decl_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
@@ -80,6 +86,7 @@ namespace wave
 				diagnostics.Report(loc, invalid_main_function_declaration);
 			}
 		}
+
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetParamDecls(std::move(param_decls));
@@ -95,7 +102,8 @@ namespace wave
 			ctx.labels.clear();
 		}
 
-		bool result = ctx.decl_scope_stack.Insert(function_decl.get());
+
+		bool result = !is_extern ? ctx.decl_sym_table.Insert(function_decl.get()) : ctx.extern_decl_table.Insert(function_decl.get());
 		WAVE_ASSERT(result);
 		return function_decl;
 	}
@@ -415,7 +423,7 @@ namespace wave
 
 	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
 	{
-		if (Decl* decl = ctx.decl_scope_stack.LookUp(name))
+		if (Decl* decl = ctx.decl_sym_table.LookUp(name))
 		{
 			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 			return decl_ref;
