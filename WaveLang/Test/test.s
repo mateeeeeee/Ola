@@ -49,10 +49,6 @@ main:                                   # @main
 	retq
 	.seh_endproc
                                         # -- End function
-	.data
-	.p2align	3, 0x0                          # @a
-a:
-	.quad	5                               # 0x5
-
+	.lcomm	a,8,8                           # @a
 	.addrsig
 	.addrsig_sym a

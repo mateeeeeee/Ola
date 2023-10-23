@@ -56,45 +56,43 @@ namespace wave
 			++param_arg;
 		}
 
-		if (function_decl.HasDefinition())
+		return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
+		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
+
+		ConstLabelStmtPtrList labels = function_decl.GetLabels();
+		for (LabelStmt const* label : labels)
 		{
-			return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
-			exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
-
-			ConstLabelStmtPtrList labels = function_decl.GetLabels();
-			for (LabelStmt const* label : labels)
-			{
-				std::string block_name = "label."; block_name += label->GetName();
-				llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, llvm_function, exit_block);
-				label_blocks[block_name] = label_block;
-			}
-
-			function_decl.GetBodyStmt()->Accept(*this);
-
-			builder.SetInsertPoint(exit_block);
-			if (return_alloc) builder.CreateRet(Load(function_type->getReturnType(), return_alloc));
-			else builder.CreateRetVoid();
-
-			std::vector<llvm::BasicBlock*> unreachable_blocks{};
-			for (auto&& block : *llvm_function)
-				if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-			//for (auto unreachable_block : unreachable_blocks)
-			//	unreachable_block->removeFromParent();
-
-			std::vector<llvm::BasicBlock*> empty_blocks{};
-			for (auto&& block : *llvm_function)
-				if (block.empty()) empty_blocks.push_back(&block);
-			for (auto empty_block : empty_blocks)
-			{
-				builder.SetInsertPoint(empty_block);
-				builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
-				builder.CreateBr(exit_block);
-			}
-
-			label_blocks.clear();
-			exit_block = nullptr;
-			return_alloc = nullptr;
+			std::string block_name = "label."; block_name += label->GetName();
+			llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, llvm_function, exit_block);
+			label_blocks[block_name] = label_block;
 		}
+
+		function_decl.GetBodyStmt()->Accept(*this);
+
+		builder.SetInsertPoint(exit_block);
+		if (return_alloc) builder.CreateRet(Load(function_type->getReturnType(), return_alloc));
+		else builder.CreateRetVoid();
+
+		std::vector<llvm::BasicBlock*> unreachable_blocks{};
+		for (auto&& block : *llvm_function)
+			if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
+		//for (auto unreachable_block : unreachable_blocks)
+		//	unreachable_block->removeFromParent();
+
+		std::vector<llvm::BasicBlock*> empty_blocks{};
+		for (auto&& block : *llvm_function)
+			if (block.empty()) empty_blocks.push_back(&block);
+		for (auto empty_block : empty_blocks)
+		{
+			builder.SetInsertPoint(empty_block);
+			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
+			builder.CreateBr(exit_block);
+		}
+
+		label_blocks.clear();
+		exit_block = nullptr;
+		return_alloc = nullptr;
+		
 
 		llvm_value_map[&function_decl] = llvm_function;
 	}
@@ -103,15 +101,26 @@ namespace wave
 	{
 		if (var_decl.IsGlobal())
 		{
-			WAVE_ASSERT(var_decl.GetInitExpr()->IsConstexpr());
-			var_decl.GetInitExpr()->Accept(*this);
-			llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-			llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
-			WAVE_ASSERT(constant_init_value);
+			if (var_decl.GetInitExpr())
+			{
+				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
+				WAVE_ASSERT(var_decl.GetInitExpr()->IsConstexpr());
+				var_decl.GetInitExpr()->Accept(*this);
+				llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
+				llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
+				WAVE_ASSERT(constant_init_value);
 
-			llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
-			llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
-			llvm_value_map[&var_decl] = global_var;
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
+				llvm_value_map[&var_decl] = global_var;
+			}
+			else
+			{
+				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
+				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(variable_type);
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
+				llvm_value_map[&var_decl] = global_var;
+			}
+			
 		}
 		else
 		{

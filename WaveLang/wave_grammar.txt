@@ -1,6 +1,6 @@
 
 
-<translation-unit> ::= { import-declaration }* { <function_definition> | <function_declaration> }*
+<translation-unit> ::= { import-declaration }* { <function_definition> | <function_declaration> | <variable-declaration> }*
 
 <import-declaration> ::= import <identifier>;
 
@@ -128,12 +128,12 @@
                    | ~
                    | !
 
-<declaration> ::= {<type-qualifier>}? <type-specifier> <declarator> { = <initializer>}?;
-                | {<type-qualifier>}? var <declarator> = <initializer>;
+<variable-declaration> ::= {<type-qualifier>}? <type-specifier> <declarator> { = <initializer>}?;
+                         | {<type-qualifier>}? var <declarator> = <initializer>;
 	
 <initializer> ::= <assignment-expression>
 
-<compound-statement> ::= { {<declaration>}* {<statement>}* }
+<compound-statement> ::= { {<variable-declaration>}* {<statement>}* }
 
 <statement> ::= <labeled-statement>
               | <expression-statement>

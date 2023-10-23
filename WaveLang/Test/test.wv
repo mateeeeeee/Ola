@@ -3,7 +3,7 @@ import Test.util;
 
 public int f(int a) {return 2 * a;}
 
-var a = 5;
+int a;
 
 public int main()
 {

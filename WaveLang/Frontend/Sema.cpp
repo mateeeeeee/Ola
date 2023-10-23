@@ -41,7 +41,8 @@ namespace wave
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
-		if (var_decl->IsGlobal() && !init_expr->IsConstexpr())
+
+		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
 		}

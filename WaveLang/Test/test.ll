@@ -1,7 +1,7 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-@a = internal global i64 5
+@a = internal global i64 0
 
 define i64 @f(i64 %a) {
 entry:
