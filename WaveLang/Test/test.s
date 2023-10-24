@@ -18,7 +18,8 @@ main:                                   # @main
 	subq	$56, %rsp
 	.seh_stackalloc 56
 	.seh_endprologue
-	movq	$5, 40(%rsp)
+	callq	ReadInteger
+	movq	%rax, 40(%rsp)
 	movq	40(%rsp), %rcx
 	callq	PrintInteger
 	movq	40(%rsp), %rcx
@@ -33,3 +34,4 @@ main:                                   # @main
 	.addrsig
 	.addrsig_sym f
 	.addrsig_sym PrintInteger
+	.addrsig_sym ReadInteger

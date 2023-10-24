@@ -19,8 +19,8 @@ namespace wave
 {
 	namespace
 	{
-		static char const* stdlib_debug = "..\\x64\\Debug\\Stdlib.lib ";
-		static char const* stdlib_release = "..\\x64\\Release\\Stdlib.lib ";
+		static char const* stdlib_debug = "..\\x64\\Debug\\WaveStdLib.lib ";
+		static char const* stdlib_release = "..\\x64\\Release\\WaveStdLib.lib ";
 
 		void InitLogger()
 		{
