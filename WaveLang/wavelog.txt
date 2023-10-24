@@ -1,58 +1,46 @@
-[2023-10-24 00:58:31.798] [wave logger] [debug] AST Traversal:
+[2023-10-24 12:28:11.520] [wave logger] [debug] AST Traversal:
 
-[2023-10-24 00:58:31.800] [wave logger] [debug] TranslationUnit
+[2023-10-24 12:28:11.523] [wave logger] [debug] TranslationUnit
 
-[2023-10-24 00:58:31.801] [wave logger] [debug] `->FunctionDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug] `->FunctionDecl
 
-[2023-10-24 00:58:31.802] [wave logger] [debug]    `->VariableDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug]    `->VariableDecl
 
-[2023-10-24 00:58:31.803] [wave logger] [debug] `->FunctionDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug] `->FunctionDecl
 
-[2023-10-24 00:58:31.803] [wave logger] [debug]    `->VariableDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug]    `->CompoundStmt
 
-[2023-10-24 00:58:31.804] [wave logger] [debug] `->FunctionDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug]       `->DeclStmt
 
-[2023-10-24 00:58:31.805] [wave logger] [debug]    `->VariableDecl
+[2023-10-24 12:28:11.524] [wave logger] [debug]          `->VariableDecl
 
-[2023-10-24 00:58:31.806] [wave logger] [debug]    `->CompoundStmt
+[2023-10-24 12:28:11.524] [wave logger] [debug]             `->ConstantInt
 
-[2023-10-24 00:58:31.806] [wave logger] [debug]       `->ReturnStmt
+[2023-10-24 12:28:11.524] [wave logger] [debug]       `->ReturnStmt
 
-[2023-10-24 00:58:31.806] [wave logger] [debug]          `->ExprStmt
+[2023-10-24 12:28:11.524] [wave logger] [debug]          `->ExprStmt
 
-[2023-10-24 00:58:31.807] [wave logger] [debug]             `->BinaryExpr
+[2023-10-24 12:28:11.525] [wave logger] [debug]             `->FunctionCallExpr
 
-[2023-10-24 00:58:31.807] [wave logger] [debug]                `->ConstantInt
+[2023-10-24 12:28:11.525] [wave logger] [debug]                `->DeclRefExpr
 
-[2023-10-24 00:58:31.807] [wave logger] [debug]                `->DeclRefExpr
+[2023-10-24 12:28:11.921] [wave logger] [debug] AST Traversal:
 
-[2023-10-24 00:58:31.807] [wave logger] [debug] `->VariableDecl
+[2023-10-24 12:28:11.922] [wave logger] [debug] TranslationUnit
 
-[2023-10-24 00:58:31.807] [wave logger] [debug] `->FunctionDecl
+[2023-10-24 12:28:11.922] [wave logger] [debug] `->FunctionDecl
 
-[2023-10-24 00:58:31.807] [wave logger] [debug]    `->CompoundStmt
+[2023-10-24 12:28:11.922] [wave logger] [debug]    `->VariableDecl
 
-[2023-10-24 00:58:31.807] [wave logger] [debug]       `->DeclStmt
+[2023-10-24 12:28:11.923] [wave logger] [debug]    `->CompoundStmt
 
-[2023-10-24 00:58:31.808] [wave logger] [debug]          `->VariableDecl
+[2023-10-24 12:28:11.923] [wave logger] [debug]       `->ReturnStmt
 
-[2023-10-24 00:58:31.808] [wave logger] [debug]             `->ConstantInt
+[2023-10-24 12:28:11.923] [wave logger] [debug]          `->ExprStmt
 
-[2023-10-24 00:58:31.808] [wave logger] [debug]       `->CompoundStmt
+[2023-10-24 12:28:11.924] [wave logger] [debug]             `->BinaryExpr
 
-[2023-10-24 00:58:31.808] [wave logger] [debug]          `->DeclStmt
+[2023-10-24 12:28:11.924] [wave logger] [debug]                `->ConstantInt
 
-[2023-10-24 00:58:31.808] [wave logger] [debug]             `->VariableDecl
-
-[2023-10-24 00:58:31.808] [wave logger] [debug]                `->ConstantInt
-
-[2023-10-24 00:58:31.809] [wave logger] [debug]       `->ReturnStmt
-
-[2023-10-24 00:58:31.809] [wave logger] [debug]          `->ExprStmt
-
-[2023-10-24 00:58:31.809] [wave logger] [debug]             `->BinaryExpr
-
-[2023-10-24 00:58:31.809] [wave logger] [debug]                `->DeclRefExpr
-
-[2023-10-24 00:58:31.809] [wave logger] [debug]                `->DeclRefExpr
+[2023-10-24 12:28:11.924] [wave logger] [debug]                `->DeclRefExpr
 

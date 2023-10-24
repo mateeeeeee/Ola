@@ -6,27 +6,24 @@
 	.globl	@feat.00
 .set @feat.00, 0
 	.file	"WaveModule"
-	.def	main;
+	.def	f;
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	main                            # -- Begin function main
+	.globl	f                               # -- Begin function f
 	.p2align	4, 0x90
-main:                                   # @main
-.seh_proc main
+f:                                      # @f
+.seh_proc f
 # %bb.0:                                # %entry
-	subq	$56, %rsp
-	.seh_stackalloc 56
+	pushq	%rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	movq	$5, 40(%rsp)
-	movq	40(%rsp), %rcx
-	callq	f
-	movq	%rax, 48(%rsp)
+	shlq	%rcx
+	movq	%rcx, (%rsp)
 # %bb.1:                                # %exit
-	movq	48(%rsp), %rax
-	addq	$56, %rsp
+	movq	(%rsp), %rax
+	popq	%rcx
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym f

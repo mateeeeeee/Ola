@@ -58,11 +58,6 @@ namespace wave
 			lex.Lex(import_src_buffer);
 
 			std::vector<Token> imported_tokens = lex.GetTokens();
-			if (!VerifyImportTokens(imported_tokens))
-			{
-				diagnostics.Report(current_token->GetLocation(), interface_files_invalid_declaration);
-				return;
-			}
 			TokenPtr first_inserted = tokens.insert(current_token, imported_tokens.begin(), imported_tokens.end() - 1);
 			current_token = first_inserted + imported_tokens.size() - 1;
 		}

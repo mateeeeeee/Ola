@@ -36,16 +36,12 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		if (!function_decl.HasDefinition()) return;
-
+		
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
 		llvm::Function* llvm_function = llvm::Function::Create(function_type, function_decl.IsPublic() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage, 
 															   function_decl.GetName(), module);
-
-		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
-		builder.SetInsertPoint(entry_block);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
 		for (auto& param : function_decl.GetParamDeclarations())
@@ -55,6 +51,11 @@ namespace wave
 			llvm_value_map[param.get()] = llvm_param;
 			++param_arg;
 		}
+
+		if (!function_decl.HasDefinition()) return;
+
+		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
+		builder.SetInsertPoint(entry_block);
 
 		return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
@@ -700,12 +701,13 @@ namespace wave
 		WAVE_ASSERT(called_function);
 
 		std::vector<llvm::Value*> args;
+		uint32 arg_index = 0;
 		for (auto const& arg_expr : func_call.GetArgs())
 		{
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()]; 
 			WAVE_ASSERT(arg_value);
-			args.push_back(arg_value);
+			args.push_back(Load(called_function->getArg(arg_index++)->getType(), arg_value));
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);

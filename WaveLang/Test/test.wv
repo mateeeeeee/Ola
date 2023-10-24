@@ -1,15 +1,8 @@
 import Test.io;
-import Test.util;
 
-public int f(int a) {return 2 * a;}
-
-int a;
 
 public int main()
 {
     var b = 5;
-    {
-         int a = 7;
-    }
-    return a + b;
+    return f(b);
 }

@@ -23,7 +23,6 @@ namespace wave
 		struct Context
 		{
 			SymbolTable<Decl> decl_sym_table;
-			SymbolTable<FunctionDecl> extern_decl_table;
 
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;

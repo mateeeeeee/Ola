@@ -155,16 +155,16 @@
     <None Include="Test\test.ll">
       <Filter>Test</Filter>
     </None>
-    <None Include="Test\test.s">
-      <Filter>Test</Filter>
-    </None>
     <None Include="Test\test.wv">
       <Filter>Test</Filter>
     </None>
     <None Include="Test\io.wvi">
       <Filter>Test</Filter>
     </None>
-    <None Include="Test\util.wvi">
+    <None Include="Test\test2.wv">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="Test\test2.ll">
       <Filter>Test</Filter>
     </None>
   </ItemGroup>

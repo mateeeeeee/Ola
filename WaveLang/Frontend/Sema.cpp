@@ -73,10 +73,6 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
-		else if(is_extern && ctx.extern_decl_table.LookUpCurrentScope(name))
-		{
-			diagnostics.Report(loc, redefinition_of_identifier, name);
-		}
 
 		if (name == "main")
 		{
@@ -102,9 +98,12 @@ namespace wave
 			ctx.gotos.clear();
 			ctx.labels.clear();
 		}
+		else
+		{
+			function_decl->SetVisibility(VisibilitySpecifier::Public);
+		}
 
-
-		bool result = !is_extern ? ctx.decl_sym_table.Insert(function_decl.get()) : ctx.extern_decl_table.Insert(function_decl.get());
+		bool result = ctx.decl_sym_table.Insert(function_decl.get());
 		WAVE_ASSERT(result);
 		return function_decl;
 	}
