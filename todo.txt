@@ -3,7 +3,10 @@
 
 * Add Tests
 
+* Write Readme 
+
 * Start working on:
+	- external global variables
 	- static local variables
 	- arrays
 	- floats

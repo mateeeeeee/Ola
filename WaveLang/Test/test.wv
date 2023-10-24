@@ -1,13 +1,10 @@
-import io;
-
-extern void PrintInteger(int);
-extern int ReadInteger();
-extern void Assert(bool);
+import std.io;
+import std.assert;
 
 public int main()
 {
     var b = ReadInteger();
     PrintInteger(b);
     Assert(b > 10);
-    return f(b);
+    return b;
 }

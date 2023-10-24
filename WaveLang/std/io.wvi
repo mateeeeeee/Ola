@@ -1,0 +1,6 @@
+extern void PrintInteger(int i);
+extern void PrintFloat(float f);
+extern void PrintChar(char c);
+extern int ReadInteger();
+extern float ReadFloat();
+extern char ReadChar();

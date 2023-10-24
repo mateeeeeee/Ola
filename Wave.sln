@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaveTests", "WaveTests\Wave
 		{E04696FC-4687-49F8-A0E3-B6AC1A51664C} = {E04696FC-4687-49F8-A0E3-B6AC1A51664C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaveStdLib", "WaveStdLib\WaveStdLib.vcxproj", "{E04696FC-4687-49F8-A0E3-B6AC1A51664C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WaveLib", "WaveLib\WaveLib.vcxproj", "{E04696FC-4687-49F8-A0E3-B6AC1A51664C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

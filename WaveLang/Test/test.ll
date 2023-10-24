@@ -1,11 +1,17 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-declare i64 @f(i64)
-
 declare void @PrintInteger(i64)
 
+declare void @PrintFloat(double)
+
+declare void @PrintChar(i8)
+
 declare i64 @ReadInteger()
+
+declare double @ReadFloat()
+
+declare i8 @ReadChar()
 
 declare void @Assert(i1)
 
@@ -20,9 +26,8 @@ entry:
   %4 = load i64, ptr %1, align 4
   %5 = icmp sgt i64 %4, 10
   call void @Assert(i1 %5)
-  %6 = load i64, ptr %1, align 4
-  %7 = call i64 @f(i64 %6)
-  store i64 %7, ptr %0, align 4
+  %6 = load ptr, ptr %1, align 8
+  store ptr %6, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -30,6 +35,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %8 = load i64, ptr %0, align 4
-  ret i64 %8
+  %7 = load i64, ptr %0, align 4
+  ret i64 %7
 }

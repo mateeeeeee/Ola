@@ -25,8 +25,7 @@ main:                                   # @main
 	cmpq	$10, 40(%rsp)
 	setg	%cl
 	callq	Assert
-	movq	40(%rsp), %rcx
-	callq	f
+	movq	40(%rsp), %rax
 	movq	%rax, 48(%rsp)
 # %bb.1:                                # %exit
 	movq	48(%rsp), %rax
@@ -35,7 +34,6 @@ main:                                   # @main
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym f
 	.addrsig_sym PrintInteger
 	.addrsig_sym ReadInteger
 	.addrsig_sym Assert

@@ -100,7 +100,8 @@ namespace wave
 		std::vector<Token> preprocessed_tokens{};
 		for (auto const& token : tokens)
 		{
-			if (!token.Is(TokenKind::KW_import) && !token.HasFlag(TokenFlag_PartOfImportDirective))
+			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline, TokenKind::KW_import) 
+			 && !token.HasFlag(TokenFlag_PartOfImportDirective))
 				preprocessed_tokens.push_back(token);
 		}
 		std::swap(preprocessed_tokens, tokens);

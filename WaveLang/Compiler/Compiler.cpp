@@ -19,8 +19,8 @@ namespace wave
 {
 	namespace
 	{
-		static char const* stdlib_debug = "..\\x64\\Debug\\WaveStdLib.lib ";
-		static char const* stdlib_release = "..\\x64\\Release\\WaveStdLib.lib ";
+		static char const* wavelib_debug   = "..\\x64\\Debug\\wavelib.lib ";
+		static char const* wavelib_release = "..\\x64\\Release\\wavelib.lib ";
 
 		void InitLogger()
 		{
@@ -109,7 +109,7 @@ namespace wave
 		}
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file.string() + " ";
-		link_cmd += stdlib_debug;
+		link_cmd += wavelib_debug;
 		link_cmd += "-o " + output_file.string();
 		system(link_cmd.c_str());
 		
