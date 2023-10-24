@@ -102,7 +102,13 @@ namespace wave
 	{
 		if (var_decl.IsGlobal())
 		{
-			if (var_decl.GetInitExpr())
+			if (var_decl.IsExtern())
+			{
+				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
+				llvm_value_map[&var_decl] = global_var;
+			}
+			else if(var_decl.GetInitExpr())
 			{
 				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
 				WAVE_ASSERT(var_decl.GetInitExpr()->IsConstexpr());
@@ -121,7 +127,6 @@ namespace wave
 				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
 			}
-			
 		}
 		else
 		{

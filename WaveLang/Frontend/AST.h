@@ -42,6 +42,13 @@ namespace wave
 		Function
 	};
 
+	enum class DeclVisibility : uint8
+	{
+		None,
+		Private,
+		Public
+	};
+
 	class Decl : public NodeAST
 	{
 	public:
@@ -52,6 +59,12 @@ namespace wave
 		void SetType(QualifiedType const& _type) { type = _type; }
 		QualifiedType const& GetType() const { return type; }
 
+		void SetVisibility(DeclVisibility _visibility)
+		{
+			visibility = _visibility;
+		}
+		bool IsPublic() const { return visibility == DeclVisibility::Public; }
+
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
@@ -60,6 +73,7 @@ namespace wave
 		std::string name;
 		SourceLocation source_loc;
 		QualifiedType type;
+		DeclVisibility visibility = DeclVisibility::None;
 
 	protected:
 		Decl(DeclKind decl_kind, std::string_view name, SourceLocation const& loc)
@@ -71,11 +85,17 @@ namespace wave
 	public:
 		VariableDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Variable, name, loc) {}
 
-		void SetGlobal(bool _global)
+		void SetGlobal(bool _is_global)
 		{
-			global = _global;
+			is_global = _is_global;
 		}
-		bool IsGlobal() const { return global; }
+		bool IsGlobal() const { return is_global; }
+
+		void SetExtern(bool _is_extern)
+		{
+			is_extern = _is_extern;
+		}
+		bool IsExtern() const { return is_extern; }
 
 		void SetInitExpr(UniqueExprPtr&& expr)
 		{
@@ -88,14 +108,8 @@ namespace wave
 
 	private:
 		UniqueExprPtr init_expr;
-		bool global = false;
-	};
-
-	enum class VisibilitySpecifier : uint8 
-	{
-		Invalid,
-		Private,
-		Public
+		bool is_global = false;
+		bool is_extern = false;
 	};
 
 	class FunctionDecl : public Decl
@@ -112,14 +126,9 @@ namespace wave
 		{
 			body_stmt = std::move(_body_stmt);
 		}
-		void SetVisibility(VisibilitySpecifier _visibility)
-		{
-			visibility = _visibility;
-		}
 
 		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
-		bool IsPublic() const { return visibility == VisibilitySpecifier::Public; }
 
 		bool HasDefinition() const
 		{
@@ -135,7 +144,6 @@ namespace wave
 		UniqueVariableDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
-		VisibilitySpecifier visibility = VisibilitySpecifier::Invalid;
 	};
 
 

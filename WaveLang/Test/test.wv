@@ -1,10 +1,10 @@
 import std.io;
 import std.assert;
+import std.math;
 
 public int main()
 {
     var b = ReadInteger();
     PrintInteger(b);
-    Assert(b > 10);
-    return b;
+    return PI;
 }

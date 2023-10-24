@@ -1,6 +1,3 @@
-
-* Rename WaveStdLib to WaveLib
-
 * Add Tests
 
 * Write Readme 

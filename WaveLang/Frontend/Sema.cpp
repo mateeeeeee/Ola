@@ -8,7 +8,8 @@ namespace wave
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
-	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr)
+	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+												  UniqueExprPtr&& init_expr, DeclVisibility visibility, bool is_extern)
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
@@ -41,6 +42,12 @@ namespace wave
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
+		var_decl->SetExtern(is_extern);
+
+		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
+
+		if (!var_decl->IsExtern()) var_decl->SetVisibility(visibility);
+		else var_decl->SetVisibility(DeclVisibility::Public);
 
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
@@ -65,7 +72,7 @@ namespace wave
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, VisibilitySpecifier visibility)
+												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
 		bool is_extern = body_stmt == nullptr;
 
@@ -100,7 +107,7 @@ namespace wave
 		}
 		else
 		{
-			function_decl->SetVisibility(VisibilitySpecifier::Public);
+			function_decl->SetVisibility(DeclVisibility::Public);
 		}
 
 		bool result = ctx.decl_sym_table.Insert(function_decl.get());

@@ -42,10 +42,11 @@ namespace wave
 		~Sema();
 
 	private:
-		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& init_expr);
+		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+												UniqueExprPtr&& init_expr, DeclVisibility visibility = DeclVisibility::Private, bool is_extern = false);
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
 												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr, 
-												VisibilitySpecifier visibility = VisibilitySpecifier::Private);
+												DeclVisibility visibility = DeclVisibility::Private);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);

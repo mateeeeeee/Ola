@@ -77,6 +77,7 @@ namespace wave
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
 		WAVE_NODISCARD UniqueVariableDeclPtr ParseParamDeclaration();
 		WAVE_NODISCARD UniqueDeclPtrList ParseVariableDeclaration();
+		WAVE_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 
 		WAVE_NODISCARD UniqueStmtPtr ParseStatement();
 		WAVE_NODISCARD UniqueCompoundStmtPtr ParseCompoundStatement();
@@ -123,6 +124,8 @@ namespace wave
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);
+
+		bool IsFunctionDeclaration();
 	};
 
 }
