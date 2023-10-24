@@ -19,6 +19,9 @@ namespace wave
 {
 	namespace
 	{
+		static char const* stdlib_debug = "..\\x64\\Debug\\Stdlib.lib ";
+		static char const* stdlib_release = "..\\x64\\Release\\Stdlib.lib ";
+
 		void InitLogger()
 		{
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -37,7 +40,6 @@ namespace wave
 		{
 			src.Prepend("");
 		}
-
 		OptimizationLevel GetOptimizationLevelFromFlags(CompilerFlags flags)
 		{
 			if (flags & CompilerFlag_O0) return OptimizationLevel::O0;
@@ -107,6 +109,7 @@ namespace wave
 		}
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file.string() + " ";
+		link_cmd += stdlib_debug;
 		link_cmd += "-o " + output_file.string();
 		system(link_cmd.c_str());
 		

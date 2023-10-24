@@ -20,6 +20,8 @@ main:                                   # @main
 	.seh_endprologue
 	movq	$5, 40(%rsp)
 	movq	40(%rsp), %rcx
+	callq	PrintInteger
+	movq	40(%rsp), %rcx
 	callq	f
 	movq	%rax, 48(%rsp)
 # %bb.1:                                # %exit
@@ -30,3 +32,4 @@ main:                                   # @main
                                         # -- End function
 	.addrsig
 	.addrsig_sym f
+	.addrsig_sym PrintInteger

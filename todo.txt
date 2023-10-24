@@ -7,8 +7,6 @@
 
 * More detailed semantic analysis
 
-* add Wave Std Lib : io, math, util
-
 * Start working on classes and other oop features
 
 

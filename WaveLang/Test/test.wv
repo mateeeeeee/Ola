@@ -1,8 +1,10 @@
 import Test.io;
 
+extern void PrintInteger(int);
 
 public int main()
 {
     var b = 5;
+    PrintInteger(b);
     return f(b);
 }
