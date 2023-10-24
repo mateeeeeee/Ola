@@ -1,11 +1,13 @@
-import Test.io;
+import io;
 
 extern void PrintInteger(int);
 extern int ReadInteger();
+extern void Assert(bool);
 
 public int main()
 {
     var b = ReadInteger();
     PrintInteger(b);
+    Assert(b > 10);
     return f(b);
 }

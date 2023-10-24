@@ -7,6 +7,8 @@ declare void @PrintInteger(i64)
 
 declare i64 @ReadInteger()
 
+declare void @Assert(i1)
+
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
@@ -16,8 +18,11 @@ entry:
   %3 = load i64, ptr %1, align 4
   call void @PrintInteger(i64 %3)
   %4 = load i64, ptr %1, align 4
-  %5 = call i64 @f(i64 %4)
-  store i64 %5, ptr %0, align 4
+  %5 = icmp sgt i64 %4, 10
+  call void @Assert(i1 %5)
+  %6 = load i64, ptr %1, align 4
+  %7 = call i64 @f(i64 %6)
+  store i64 %7, ptr %0, align 4
   br label %exit
 
 return:                                           ; No predecessors!
@@ -25,6 +30,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %6 = load i64, ptr %0, align 4
-  ret i64 %6
+  %8 = load i64, ptr %0, align 4
+  ret i64 %8
 }

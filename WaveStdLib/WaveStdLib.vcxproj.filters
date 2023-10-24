@@ -6,6 +6,8 @@
   <ItemGroup>
     <ClInclude Include="io.h" />
     <ClInclude Include="assert.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="string.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Directory.build.props" />

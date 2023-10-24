@@ -1,5 +1,4 @@
-#pragma once
-#include <cassert>
+#include <assert.h>
 
 extern "C" void Assert(bool expr)
 {

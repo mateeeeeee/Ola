@@ -1,9 +1,13 @@
 
+* Rename WaveStdLib to WaveLib
+
+* Add Tests
+
 * Start working on:
+	- static local variables
+	- arrays
 	- floats
 	- enums
-	- arrays
-	- static local variables
 
 * More detailed semantic analysis
 

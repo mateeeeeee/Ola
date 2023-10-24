@@ -22,6 +22,9 @@ main:                                   # @main
 	movq	%rax, 40(%rsp)
 	movq	40(%rsp), %rcx
 	callq	PrintInteger
+	cmpq	$10, 40(%rsp)
+	setg	%cl
+	callq	Assert
 	movq	40(%rsp), %rcx
 	callq	f
 	movq	%rax, 48(%rsp)
@@ -35,3 +38,4 @@ main:                                   # @main
 	.addrsig_sym f
 	.addrsig_sym PrintInteger
 	.addrsig_sym ReadInteger
+	.addrsig_sym Assert
