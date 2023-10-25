@@ -9,12 +9,12 @@ namespace wave
 	class ImportProcessor
 	{
 		using TokenPtr = std::vector<Token>::iterator;
-		inline static char const* import_extension = ".wvi";
+		inline static char const* wave_extension = ".wv";
+
 	public:
 		explicit ImportProcessor(Diagnostics& diagnostics);
-
-		void Process(std::vector<Token>&& tokens);
-
+		void ProcessImports(std::vector<Token>&& tokens);
+		void RemoveImports(std::vector<Token>&& tokens);
 		std::vector<Token>&& GetProcessedTokens()  
 		{
 			return std::move(tokens);
@@ -32,6 +32,6 @@ namespace wave
 		void PreFilterTokens();
 		void PostFilterTokens();
 
-		bool VerifyImportTokens(std::vector<Token> const&);
+		std::vector<Token> GetImportTokens(std::string_view import_path);
 	};
 }

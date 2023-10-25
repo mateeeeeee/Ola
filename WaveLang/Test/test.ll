@@ -15,8 +15,6 @@ declare double @ReadFloat()
 
 declare i8 @ReadChar()
 
-declare void @Assert(i1)
-
 declare double @Abs(double)
 
 declare double @Fmod(double, double)

@@ -14,7 +14,7 @@ namespace wave
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
 
-		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
@@ -45,9 +45,7 @@ namespace wave
 		var_decl->SetExtern(is_extern);
 
 		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
-
-		if (!var_decl->IsExtern()) var_decl->SetVisibility(visibility);
-		else var_decl->SetVisibility(DeclVisibility::Public);
+		var_decl->SetVisibility(visibility);
 
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
@@ -66,8 +64,7 @@ namespace wave
 			var_decl->SetType(type);
 		}
 		
-		bool result = ctx.decl_sym_table.Insert(var_decl.get());
-		WAVE_ASSERT(result);
+		if(!name.empty()) bool result = ctx.decl_sym_table.Insert(var_decl.get());
 		return var_decl;
 	}
 

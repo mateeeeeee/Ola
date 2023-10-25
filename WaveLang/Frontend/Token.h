@@ -20,21 +20,22 @@ namespace wave
 	class Token
 	{
 	public:
-		Token() : type(TokenKind::unknown), flags(TokenFlag_None), loc{}, data{} {}
+		Token() : kind(TokenKind::unknown), flags(TokenFlag_None), loc{}, data{} {}
+		Token(TokenKind kind) : kind(kind), flags(TokenFlag_None), loc{}, data{} {}
 		
 		void Reset()
 		{
-			type = TokenKind::unknown;
+			kind = TokenKind::unknown;
 			flags = TokenFlag_None;
 			loc = {};
 			data = {};
 		}
 
-		TokenKind GetKind() const { return type; }
-		void SetKind(TokenKind t) { type = t; }
+		TokenKind GetKind() const { return kind; }
+		void SetKind(TokenKind t) { kind = t; }
 
-		bool Is(TokenKind t) const { return type == t; }
-		bool IsNot(TokenKind t) const { return type != t; }
+		bool Is(TokenKind t) const { return kind == t; }
+		bool IsNot(TokenKind t) const { return kind != t; }
 		template <typename... Ts>
 		bool IsOneOf(TokenKind t1, Ts... ts) const
 		{
@@ -86,13 +87,17 @@ namespace wave
 			flags = _flags;
 		}
 		
-		void SetIdentifier(char const* p_data, size_t count)
+		void SetIdentifier(char const* p_data, uint64 count)
 		{
 			data = std::string(p_data, count);
 		}
 		void SetIdentifier(char const* start, char const* end)
 		{
 			data = std::string(start, end - start);
+		}
+		void SetIdentifier(std::string_view identifier)
+		{
+			data = std::string(identifier);
 		}
 		std::string_view GetIdentifier() const
 		{
@@ -106,7 +111,7 @@ namespace wave
 		SourceLocation const& GetLocation() const { return loc; }
 
 	private:
-		TokenKind type;
+		TokenKind kind;
 		TokenFlags flags;
 		SourceLocation loc;
 		std::string data;

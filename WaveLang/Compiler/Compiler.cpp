@@ -58,7 +58,7 @@ namespace wave
 			lex.Lex(src);
 
 			ImportProcessor import_processor(diagnostics);
-			import_processor.Process(lex.GetTokens());
+			import_processor.ProcessImports(lex.GetTokens());
 
 			Parser parser(diagnostics);
 			parser.Parse(import_processor.GetProcessedTokens());

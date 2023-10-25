@@ -39,7 +39,7 @@
       <Filter>Backend</Filter>
     </ClCompile>
     <ClCompile Include="Frontend\ImportProcessor.cpp">
-      <Filter>Frontend\Lexer</Filter>
+      <Filter>Frontend\Parser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,7 +145,7 @@
       <Filter>Backend</Filter>
     </ClInclude>
     <ClInclude Include="Frontend\ImportProcessor.h">
-      <Filter>Frontend\Lexer</Filter>
+      <Filter>Frontend\Parser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,18 +161,19 @@
     <None Include="Test\test.wv">
       <Filter>Test</Filter>
     </None>
-    <None Include="std\io.wvi">
+    <None Include="std\io.wv">
       <Filter>std</Filter>
     </None>
-    <None Include="std\math.wvi">
+    <None Include="std\math.wv">
       <Filter>std</Filter>
     </None>
-    <None Include="std\assert.wvi">
+    <None Include="std\assert.wv">
       <Filter>std</Filter>
     </None>
-    <None Include="std\string.wvi">
+    <None Include="std\string.wv">
       <Filter>std</Filter>
     </None>
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />

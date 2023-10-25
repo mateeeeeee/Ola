@@ -3,14 +3,11 @@
 * Write Readme 
 
 * Start working on:
-	- external global variables
 	- static local variables
 	- arrays
 	- floats
 	- enums
-
 * More detailed semantic analysis
-
 * Start working on classes and other oop features
 
 

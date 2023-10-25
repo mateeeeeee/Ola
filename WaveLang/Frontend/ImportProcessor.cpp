@@ -28,12 +28,10 @@ namespace wave
 
 	ImportProcessor::ImportProcessor(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 
-	void ImportProcessor::Process(std::vector<Token>&& _tokens)
+	void ImportProcessor::ProcessImports(std::vector<Token>&& _tokens)
 	{
 		tokens = std::move(_tokens);
-
 		PreFilterTokens();
-
 		current_token = tokens.begin();
 		while (Consume(TokenKind::KW_import))
 		{
@@ -50,18 +48,34 @@ namespace wave
 			TokenPtr end_token = current_token;
 			for (; start_token != end_token; ++start_token) start_token->SetFlag(TokenFlag_PartOfImportDirective);
 
-			import_path += import_extension;
+			import_path += wave_extension;
 			if (!fs::exists(import_path)) diagnostics.Report(current_token->GetLocation(), invalid_import_path);
 			
-			SourceBuffer import_src_buffer(import_path.string());
-			Lexer lex(diagnostics);
-			lex.Lex(import_src_buffer);
+			std::vector<Token> import_tokens = GetImportTokens(import_path.string());
 
-			std::vector<Token> imported_tokens = lex.GetTokens();
-			TokenPtr first_inserted = tokens.insert(current_token, imported_tokens.begin(), imported_tokens.end() - 1);
-			current_token = first_inserted + imported_tokens.size() - 1;
+			TokenPtr first_inserted = tokens.insert(current_token, import_tokens.begin(), import_tokens.end());
+			current_token = first_inserted + import_tokens.size();
 		}
+		PostFilterTokens();
+	}
 
+	void ImportProcessor::RemoveImports(std::vector<Token>&& _tokens)
+	{
+		tokens = std::move(_tokens);
+		PreFilterTokens();
+		current_token = tokens.begin();
+		while (Consume(TokenKind::KW_import))
+		{
+			TokenPtr start_token = current_token;
+			do
+			{
+				if (current_token->IsNot(TokenKind::identifier)) diagnostics.Report(current_token->GetLocation(), unexpected_token);
+				++current_token;
+			} while (Consume(TokenKind::period));
+			Expect(TokenKind::semicolon);
+			TokenPtr end_token = current_token;
+			for (; start_token != end_token; ++start_token) start_token->SetFlag(TokenFlag_PartOfImportDirective);
+		}
 		PostFilterTokens();
 	}
 
@@ -107,21 +121,85 @@ namespace wave
 		std::swap(preprocessed_tokens, tokens);
 	}
 
-	bool ImportProcessor::VerifyImportTokens(std::vector<Token> const& import_tokens)
+	std::vector<Token> ImportProcessor::GetImportTokens(std::string_view import_path)
 	{
-		Parser parser(diagnostics);
-		parser.Parse(import_tokens);
-		UniqueDeclPtrList const& decls = parser.GetAST()->translation_unit->GetDecls();
+		//#todo: cache intermediate results of this process
+		SourceBuffer import_src_buffer(import_path);
+		Lexer lex(diagnostics);
+		lex.Lex(import_src_buffer);
+		std::vector<Token> imported_tokens = lex.GetTokens();
 
-		for (auto const& decl : decls) 
+		ImportProcessor import_processor(diagnostics);
+		import_processor.RemoveImports(std::move(imported_tokens));
+		imported_tokens = import_processor.GetProcessedTokens();
+
+		Parser parser(diagnostics);
+		parser.Parse(imported_tokens);
+		AST const* ast = parser.GetAST();
+
+		std::vector<Decl const*> global_public_decls;
+		for (auto const& decl : ast->translation_unit->GetDecls())
 		{
-			if (decl->GetDeclKind() != DeclKind::Function) return false;
-			FunctionDecl const* func_decl = ast_cast<FunctionDecl>(decl.get());
-			if (func_decl->HasDefinition()) return false;
+			if (decl->IsPublic()) global_public_decls.push_back(decl.get());
 		}
 
-		return true;
-	}
+		std::vector<Token> import_tokens{};
+		auto TypeToTokens = [](QualifiedType const& type, std::vector<Token>& tokens)
+			{
+				if (type.IsConst()) tokens.emplace_back(TokenKind::KW_const);
+				switch (type->GetKind())
+				{
+					break;
+				case TypeKind::Void:
+					tokens.emplace_back(TokenKind::KW_void); break;
+				case TypeKind::Bool:
+					tokens.emplace_back(TokenKind::KW_bool); break;
+				case TypeKind::Char:
+					tokens.emplace_back(TokenKind::KW_char); break;
+				case TypeKind::Int:
+					tokens.emplace_back(TokenKind::KW_int); break;
+				case TypeKind::Float:
+					tokens.emplace_back(TokenKind::KW_float); break;
+				case TypeKind::Array:
+					WAVE_ASSERT_MSG(false, "Not implemented yet");
+				case TypeKind::Function:
+				case TypeKind::Class:
+				case TypeKind::Invalid:
+				default:
+					WAVE_ASSERT(false);
+				}
+			};
+		for (Decl const* decl : global_public_decls)
+		{
+			import_tokens.emplace_back(TokenKind::KW_extern);
+			if (FunctionDecl const* func_decl = dynamic_ast_cast<FunctionDecl>(decl))
+			{
+				FunctionType const& func_type = type_cast<FunctionType>(func_decl->GetType());
+				TypeToTokens(func_type.GetReturnType(), import_tokens);
+				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+				tok.SetIdentifier(func_decl->GetName());
+				import_tokens.emplace_back(TokenKind::left_round);
+				std::span<FunctionParameter const> func_params = func_type.GetParameters();
+				for (auto const& param : func_params)
+				{
+					TypeToTokens(param.type, import_tokens);
+					import_tokens.emplace_back(TokenKind::comma);
+				}
+				if(!func_params.empty()) import_tokens.pop_back();
+				import_tokens.emplace_back(TokenKind::right_round);
+				import_tokens.emplace_back(TokenKind::semicolon);
+			}
+			else if (VariableDecl const* var_decl = dynamic_ast_cast<VariableDecl>(decl))
+			{
+				TypeToTokens(var_decl->GetType(), import_tokens);
+				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+				tok.SetIdentifier(var_decl->GetName());
+				import_tokens.emplace_back(TokenKind::semicolon);
+			}
+			else WAVE_ASSERT(false);
+		}
 
+		return import_tokens;
+	}
 }
 

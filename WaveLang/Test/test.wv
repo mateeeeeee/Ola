@@ -1,5 +1,4 @@
 import std.io;
-import std.assert;
 import std.math;
 
 public int main()

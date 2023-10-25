@@ -204,16 +204,17 @@
     <ClInclude Include="Utility\Enums.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="Frontend\Diagnostics.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="Frontend\Tokens.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="std\assert.wvi" />
-    <None Include="std\io.wvi" />
-    <None Include="std\math.wvi" />
-    <None Include="std\string.wvi" />
+    <None Include="std\assert.wv" />
+    <None Include="std\io.wv" />
+    <None Include="std\math.wv" />
+    <None Include="std\string.wv" />
     <None Include="Test\test.ll">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
