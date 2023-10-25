@@ -77,8 +77,6 @@ namespace wave
 		std::vector<llvm::BasicBlock*> unreachable_blocks{};
 		for (auto&& block : *llvm_function)
 			if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-		//for (auto unreachable_block : unreachable_blocks)
-		//	unreachable_block->removeFromParent();
 
 		std::vector<llvm::BasicBlock*> empty_blocks{};
 		for (auto&& block : *llvm_function)
@@ -93,7 +91,6 @@ namespace wave
 		label_blocks.clear();
 		exit_block = nullptr;
 		return_alloc = nullptr;
-		
 
 		llvm_value_map[&function_decl] = llvm_function;
 	}

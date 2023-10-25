@@ -111,6 +111,7 @@ namespace wave
 		for (auto const& obj_file : object_files) link_cmd += obj_file.string() + " ";
 		link_cmd += wavelib_debug;
 		link_cmd += "-o " + output_file.string();
+		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE ";
 		system(link_cmd.c_str());
 		
 		std::string const& exe_cmd = output_file.string();
@@ -118,7 +119,7 @@ namespace wave
 		return res;
 	}
 
-	int32 CompileTest(std::string_view input, bool debug)
+	int32 CompileSimple(std::string_view input, bool debug)
 	{
 		InitLogger();
 		std::string code(input);
@@ -136,6 +137,7 @@ namespace wave
 			Diagnostics diagnostics{};
 			SourceBuffer src(code.data(), code.size());
 			AddBuiltins(src);
+			src.Prepend("import std.assert;\n");
 			Lexer lex(diagnostics);
 			lex.Lex(src);
 

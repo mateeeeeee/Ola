@@ -1,0 +1,15 @@
+import std.assert;
+
+
+public int main()
+{
+	int i = 42; Assert(i == 42);
+	
+	i = 0; Assert(i == 0);
+	i = 5 + 20 - 4; Assert(i == 21);
+	i = 12 + 34 - 5; Assert(i == 41);
+	i = 2; i += 5; Assert(i == 7);
+	i = 5; i -= 7; Assert(i == -2);
+
+	return 0;
+}

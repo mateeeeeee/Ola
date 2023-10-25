@@ -1,19 +1,20 @@
 
 
-<translation-unit> ::= { import-declaration }* { <function_definition> | <function_declaration> | <variable-declaration> }*
+<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
 
 <import-declaration> ::= import <identifier>;
 
-<function_declaration>    ::= extern <type-specifier> <identifier>( <parameter-list> );
-<function_definition>     ::= {<declaration_visibility>}? <type-specifier> <identifier>( <parameter-list> ) <compound_statement>
-<declaration_visibility>  ::= public | private
+<declaration-visibility>  ::= public | private
+
+<function-declaration>    ::= extern <type-specifier> <identifier>( <parameter-list> );
+<function-definition>     ::= {<declaration-visibility>}? <type-specifier> <identifier>( <parameter-list> ) <compound-statement>
+
+<global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
+                                | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
-
-<parameter-declaration> ::= {<type-qualifier>}? <type-specifier> <declarator>
-
-<declarator> ::= <identifier>
+<parameter-declaration> ::= {<type-qualifier>}? <type-specifier> {<identifier>}?
 
 <type-qualifier> ::= {const}?
 <type-specifier> ::= void
@@ -128,12 +129,12 @@
                    | ~
                    | !
 
-<variable-declaration> ::= {<type-qualifier>}? <type-specifier> <declarator> { = <initializer>}?;
-                         | {<type-qualifier>}? var <declarator> = <initializer>;
+<local-variable-declaration> ::= <type-qualifier> <type-specifier> <identifier> { = <initializer>}?;
+                               | <type-qualifier> var <identifier> = <initializer>;
 	
 <initializer> ::= <assignment-expression>
 
-<compound-statement> ::= { {<variable-declaration>}* {<statement>}* }
+<compound-statement> ::= { { <local-variable-declaration> | <statement> }* }
 
 <statement> ::= <labeled-statement>
               | <expression-statement>
@@ -161,12 +162,3 @@
                    | break ;
                    | return {<expression>}? ; 
 --------------------------------------------------------------------
-
-int[] arr; -- not ok
-var arr = {1,2,3,4}; //fine,  arr is of type int[4]
-var arr = [4,0]; //fine,  arr is of type int[4]
-int[] arr = int[5]{};
-int[] arr = {1,2,3,4}; //fine, arr is of type int[4]
-int[] arr = [4,0];	   //fine, arr is of type int[4] initialized with 4 zeroes
-
-int[][] arr = {{1,2,3,4},{1,2,3,4}}; arr is of type int[2][4]
