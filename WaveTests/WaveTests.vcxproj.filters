@@ -49,6 +49,15 @@
     <None Include="Tests\test_ternary.wv">
       <Filter>Tests</Filter>
     </None>
+    <None Include="Tests\test_for.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_while.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_dowhile.wv">
+      <Filter>Tests</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">

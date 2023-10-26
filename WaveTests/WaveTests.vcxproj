@@ -123,6 +123,8 @@
     <None Include="packages.config" />
     <None Include="Tests\test_additive.wv" />
     <None Include="Tests\test_bit.wv" />
+    <None Include="Tests\test_dowhile.wv" />
+    <None Include="Tests\test_for.wv" />
     <None Include="Tests\test_goto.wv" />
     <None Include="Tests\test_ifelse.wv" />
     <None Include="Tests\test_increment.wv" />
@@ -134,6 +136,7 @@
     <None Include="Tests\test_sizeof.wv" />
     <None Include="Tests\test_switch.wv" />
     <None Include="Tests\test_ternary.wv" />
+    <None Include="Tests\test_while.wv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

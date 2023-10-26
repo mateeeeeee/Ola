@@ -1,5 +1,4 @@
 import std.assert;
-import std.io;
 
 public int main()
 {
@@ -10,7 +9,6 @@ public int main()
         sum += n;
         n++;
     } while (n < 5);
-    PrintInteger(sum);
     Assert(sum == 10);  // The sum of 0 + 1 + 2 + 3 + 4 should be 10
 
     int m = 10;
@@ -19,10 +17,8 @@ public int main()
     {
         count++;
     } while (m < 10);
-    PrintInteger(count);
     Assert(count == 1);  
 
-    // Test a do-while loop with multiple conditions
     int x = 5;
     int y = 3;
     int result = 0;
@@ -35,7 +31,6 @@ public int main()
         x--;
         y++;
     } while (x > 0 && y < 10);
-    PrintInteger(result);
     Assert(result == 5);   
 
     int z = 1;
@@ -45,12 +40,11 @@ public int main()
         total += z;
         if (total >= 10)
         {
-            break;  // Exit the loop when the total reaches or exceeds 10
+            break; 
         }
         z++;
     } while (z <= 5);
-     PrintInteger(total);
-    Assert(total == 10);  // The loop should exit with a total of 10
+    Assert(total == 10);  
 
 	return 0;
 }

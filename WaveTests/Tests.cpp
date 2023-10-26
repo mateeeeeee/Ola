@@ -43,6 +43,11 @@ TEST(Operators, Increment)
 	EXPECT_EQ(WAVE(-i test_increment.wv), 0);
 }
 
+TEST(Operators, TernaryOperator)
+{
+	EXPECT_EQ(WAVE(-i test_ternary.wv), 0);
+}
+
 TEST(Operators, Sizeof)
 {
 	EXPECT_EQ(WAVE(-i test_sizeof.wv), 0);
@@ -63,22 +68,29 @@ TEST(Control, Goto)
 	EXPECT_EQ(WAVE(-i test_goto.wv), 0);
 }
 
-TEST(Control, TernaryOperator)
+TEST(Control, Break)
 {
-	EXPECT_EQ(WAVE(-i test_ternary.wv), 0);
+
+}
+
+TEST(Control, Continue)
+{
+
 }
 
 TEST(Iteration, For)
 {
-	
+	EXPECT_EQ(WAVE(-i test_for.wv), 0);
 }
+
 TEST(Iteration, While)
 {
-	
+	EXPECT_EQ(WAVE(-i test_while.wv), 0);
 }
+
 TEST(Iteration, DoWhile)
 {
-	
+	EXPECT_EQ(WAVE(-i test_dowhile.wv), 0);
 }
 
 TEST(Declarations, Functions) 
@@ -96,12 +108,12 @@ TEST(Declarations, Import)
 
 }
 
-TEST(Functions, Calling)
+TEST(Functions, Return)
 {
 
 }
 
-TEST(Functions, Return)
+TEST(Functions, Calling)
 {
 
 }

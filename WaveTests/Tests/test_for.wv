@@ -1,0 +1,30 @@
+import std.assert;
+
+public int main()
+{
+    int sum = 0;
+    for (int i = 1; i <= 5; i++)
+    {
+        sum += i;
+    }
+    Assert(sum == 15);  
+
+    int product = 1;
+    int j = 2;
+    for (;j <= 10; j += 2)
+    {
+        product *= j;
+    }
+    Assert(product == 3840);  
+
+
+    int factorial = 1;
+    for (int k = 5; k >= 1;)
+    {
+        factorial *= k;
+        k--;
+    }
+    Assert(factorial == 120);  
+
+    return 0;
+}
