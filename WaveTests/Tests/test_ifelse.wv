@@ -1,0 +1,70 @@
+import std.assert;
+
+
+
+public int main()
+{
+	int x = 10;
+    int y = 20;
+
+    // Test a simple if statement
+
+    if(x < y) 
+        Assert(true);
+    else 
+        Assert(false);
+
+    if (x < y)
+    {
+       Assert(true);  // The condition is true, so this branch should execute
+    }
+    else
+    {
+       Assert(false);  // This branch should not execute
+    }
+
+    // Test if-else with a block
+    if (x > y)
+    {
+       Assert(false);  // The condition is false, so this branch should not execute
+    }
+    else
+    {
+       Assert(true);  // This branch should execute
+    }
+
+    // Test if-else if-else ladder
+    int a = 15;
+    if (a < 10)
+    {
+       Assert(false);  // This condition is false
+    }
+    else if (a < 20)
+    {
+       Assert(true);  // This condition is true, so this branch should execute
+    }
+    else
+    {
+       Assert(false);  // This branch should not execute
+    }
+
+    // Test nested if-else
+    int b = 5;
+    if (b > 0)
+    {
+        if (b % 2 == 0)
+        {
+           Assert(false);  // b is even, so this branch should not execute
+        }
+        else
+        {
+           Assert(true);  // b is odd, so this branch should execute
+        }
+    }
+    else
+    {
+       Assert(false);  // This branch should not execute
+    }
+
+    return 0;
+}

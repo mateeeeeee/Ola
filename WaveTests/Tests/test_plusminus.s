@@ -22,26 +22,6 @@ main:                                   # @main
 	callq	Assert
 	movl	$1, %ecx
 	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
 # %bb.1:                                # %exit
 	xorl	%eax, %eax
                                         # kill: def $rax killed $eax

@@ -1,0 +1,26 @@
+import std.assert;
+
+public int main()
+{
+	int intSize = sizeof(int);
+    Assert(intSize == 8);  
+    int floatSize = sizeof(float);
+    Assert(floatSize == 8);  
+
+    int charSize = sizeof(char);
+    Assert(charSize == 1);  
+
+    int boolSize = sizeof(bool);
+    Assert(boolSize == 1);  // Assuming a bool is 1 byte
+
+    // Test the sizeof operator with arrays
+    //int intArray[5];
+    //int arraySize = sizeof(intArray);
+    //Assert(arraySize == 20);  
+
+    //char charArray[10];
+    //int charArraySize = sizeof(charArray);
+    //Assert(charArraySize == 10);  
+
+    return 0;
+}

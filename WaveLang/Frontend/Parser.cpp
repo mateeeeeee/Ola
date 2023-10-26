@@ -846,8 +846,8 @@ namespace wave
 	{
 		TokenPtr token = current_token;
 
-		if (Consume(TokenKind::KW_public));
-		else if (Consume(TokenKind::KW_private));
+		if (Consume(TokenKind::KW_public)) {}
+		else if (Consume(TokenKind::KW_private)) {}
 
 		QualifiedType tmp{};
 		ParseTypeQualifier(tmp);

@@ -11,12 +11,6 @@ entry:
   call void @Assert(i1 true)
   call void @Assert(i1 true)
   call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
   br label %exit
 
 return:                                           ; No predecessors!

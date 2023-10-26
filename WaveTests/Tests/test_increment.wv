@@ -1,0 +1,27 @@
+import std.assert;
+
+public int main()
+{
+    int a = 5;
+    int b = ++a;  // b should be 6, a should also be 6
+    Assert(b == 6);
+    Assert(a == 6);
+
+    int c = 10;
+    int d = --c;  // d should be 9, c should also be 9
+    Assert(d == 9);
+    Assert(c == 9);
+
+    int e = 7;
+    int f = e++;  // f should be 7, e should become 8
+    Assert(f == 7);
+    Assert(e == 8);
+
+    int g = 15;
+    int h = g--;  // h should be 15, g should become 14
+    Assert(h == 15);
+    Assert(g == 14);
+
+    return 0;
+
+}

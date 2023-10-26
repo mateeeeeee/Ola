@@ -18,19 +18,46 @@ main:                                   # @main
 	subq	$56, %rsp
 	.seh_stackalloc 56
 	.seh_endprologue
-	callq	ReadInteger
-	movq	%rax, 40(%rsp)
-	movq	40(%rsp), %rcx
-	callq	PrintInteger
-	movq	PI(%rip), %rax
-	movq	%rax, 48(%rsp)
-# %bb.1:                                # %exit
+	movq	$2, 40(%rsp)
+# %bb.1:                                # %switch.header
+	movq	40(%rsp), %rax
+	movq	%rax, 32(%rsp)                  # 8-byte Spill
+	subq	$1, %rax
+	je	.LBB0_4
+	jmp	.LBB0_8
+.LBB0_8:                                # %switch.header
+	movq	32(%rsp), %rax                  # 8-byte Reload
+	subq	$2, %rax
+	je	.LBB0_5
+	jmp	.LBB0_9
+.LBB0_9:                                # %switch.header
+	movq	32(%rsp), %rax                  # 8-byte Reload
+	subq	$3, %rax
+	je	.LBB0_6
+	jmp	.LBB0_2
+.LBB0_2:                                # %switch.default
+	xorl	%ecx, %ecx
+	callq	Assert
+.LBB0_3:                                # %switch.end
+	movq	$0, 48(%rsp)
+	jmp	.LBB0_7
+.LBB0_4:                                # %switch.case1
+	xorl	%ecx, %ecx
+	callq	Assert
+	jmp	.LBB0_3
+.LBB0_5:                                # %switch.case2
+	movl	$1, %ecx
+	callq	Assert
+	jmp	.LBB0_3
+.LBB0_6:                                # %switch.case3
+	xorl	%ecx, %ecx
+	callq	Assert
+	jmp	.LBB0_3
+.LBB0_7:                                # %exit
 	movq	48(%rsp), %rax
 	addq	$56, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym PrintInteger
-	.addrsig_sym ReadInteger
-	.addrsig_sym PI
+	.addrsig_sym Assert

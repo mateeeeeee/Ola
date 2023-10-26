@@ -38,4 +38,5 @@ DIAG(sizeof_invalid_argument, error, "Invalid argument in sizeof operator")
 DIAG(global_variable_initializer_not_constexpr, error, "Global variable initializer has to be constant expression")
 DIAG(invalid_import_path, error, "Invalid import path")
 DIAG(interface_files_invalid_declaration, error, "Interface files can only have extern function declarations")
+DIAG(bool_forbidden_in_increment, error, "Use of an operand of type bool in operator++/operator-- is forbidden")
 #undef DIAG

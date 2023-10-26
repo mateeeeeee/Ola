@@ -1,0 +1,36 @@
+import std.assert;
+
+
+public int main()
+{
+    int a = 1;
+    int b = 0;
+    int and_result = a && b;
+    Assert(and_result == 0);
+
+    int c = 1;
+    int d = 1;
+    int and_result2 = c && d;
+    Assert(and_result2 == 1);
+
+    int e = 0;
+    int f = 0;
+    int or_result = e || f;
+    Assert(or_result == 0);
+
+    int g = 1;
+    int h = 0;
+    int or_result2 = g || h;
+    Assert(or_result2 == 1);
+
+    // Test logical NOT (!)
+    int m = 1;
+    int not_result = !m;
+    Assert(not_result == 0);
+
+    int n = 0;
+    int not_result2 = !n;
+    Assert(not_result2 == 1);
+
+    return 0;
+}

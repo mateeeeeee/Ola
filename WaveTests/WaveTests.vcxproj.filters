@@ -16,6 +16,39 @@
     <None Include="Tests\test_multiplicative.wv">
       <Filter>Tests</Filter>
     </None>
+    <None Include="Tests\test_relational.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_shift.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_bit.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_plusminus.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_increment.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_logical.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_sizeof.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_ifelse.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_switch.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_goto.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_ternary.wv">
+      <Filter>Tests</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">

@@ -262,8 +262,32 @@ namespace wave
 
 	UniqueUnaryExprPtr Sema::ActOnUnaryExpr(UnaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& operand)
 	{
-		//#todo semantic analysis
-
+		switch (op)
+		{
+		case UnaryExprKind::PreIncrement:
+		case UnaryExprKind::PreDecrement:
+		case UnaryExprKind::PostIncrement:
+		case UnaryExprKind::PostDecrement:
+			if (IsBoolType(operand->GetType()))
+			{
+				diagnostics.Report(loc, bool_forbidden_in_increment);
+			}
+			break;
+		case UnaryExprKind::Plus:
+			break;
+		case UnaryExprKind::Minus:
+			break;
+		case UnaryExprKind::BitNot:
+			break;
+		case UnaryExprKind::LogicalNot:
+			if (!IsBoolType(operand->GetType()))
+			{
+				operand = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(operand));
+			}
+			break;
+		default:
+			break;
+		}
 		UniqueUnaryExprPtr unary_expr = MakeUnique<UnaryExpr>(op, loc);
 		unary_expr->SetType(operand->GetType());
 		unary_expr->SetOperand(std::move(operand));

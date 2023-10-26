@@ -3,13 +3,44 @@ import std.assert;
 
 public int main()
 {
-	int i = 42; Assert(i == 42);
-	
-	i = 0; Assert(i == 0);
-	i = 5 + 20 - 4; Assert(i == 21);
-	i = 12 + 34 - 5; Assert(i == 41);
-	i = 2; i += 5; Assert(i == 7);
-	i = 5; i -= 7; Assert(i == -2);
+    int a = 5;
+    int b = 7;
+    int sum = a + b;
+    Assert(sum == 12);
 
-	return 0;
+    int c = 10;
+    int d = 3;
+    int diff = c - d;
+    Assert(diff == 7);
+
+    int e = 15;
+    int f = 7;
+    e += f;  // e is modified to 22
+    Assert(e == 22);
+
+    int g = 20;
+    int h = 3;
+    g -= h;  // g is modified to 17
+    Assert(g == 17);
+
+    int i = 8;
+    int j = 4;
+    i = i + j;  // i is modified to 12
+    Assert(i == 12);
+
+    int k = 15;
+    int l = 7;
+    l = l - k;  // l is modified to -8
+    Assert(l == -8);
+
+    int m = -5;
+    int n = -3;
+    int neg_sum = m + n;
+    Assert(neg_sum == -8);
+
+    int o = -2;
+    int neg_diff = o - 1;
+    Assert(neg_diff == -3);
+
+    return 0;
 }

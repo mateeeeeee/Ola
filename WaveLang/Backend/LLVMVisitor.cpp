@@ -75,12 +75,11 @@ namespace wave
 		else builder.CreateRetVoid();
 
 		std::vector<llvm::BasicBlock*> unreachable_blocks{};
-		for (auto&& block : *llvm_function)
-			if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
+		for (auto&& block : *llvm_function) if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
 
 		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *llvm_function)
-			if (block.empty()) empty_blocks.push_back(&block);
+		for (auto&& block : *llvm_function) if (block.empty()) empty_blocks.push_back(&block);
+
 		for (auto empty_block : empty_blocks)
 		{
 			builder.SetInsertPoint(empty_block);
@@ -89,6 +88,7 @@ namespace wave
 		}
 
 		label_blocks.clear();
+
 		exit_block = nullptr;
 		return_alloc = nullptr;
 
@@ -192,24 +192,24 @@ namespace wave
 		llvm::Function* function = builder.GetInsertBlock()->getParent();
 		llvm::BasicBlock* then_block = llvm::BasicBlock::Create(context, "if.then", function, exit_block);
 		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
-		llvm::BasicBlock* merge_block = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
+		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
 
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = llvm_value_map[cond_expr];
 		WAVE_ASSERT(condition_value);
-		ConditionalBranch(condition_value, then_block, else_stmt ? else_block : merge_block);
+		ConditionalBranch(condition_value, then_block, else_stmt ? else_block : end_block);
 
 		builder.SetInsertPoint(then_block);
 		then_stmt->Accept(*this);
-		if(!then_block->getTerminator()) builder.CreateBr(merge_block);
+		if(!then_block->getTerminator()) builder.CreateBr(end_block);
 
 		if (else_stmt)
 		{
 			builder.SetInsertPoint(else_block);
 			else_stmt->Accept(*this);
-			if (!else_block->getTerminator()) builder.CreateBr(merge_block);
+			if (!else_block->getTerminator()) builder.CreateBr(end_block);
 		}
-		builder.SetInsertPoint(merge_block);
+		builder.SetInsertPoint(end_block);
 	}
 
 	void LLVMVisitor::Visit(BreakStmt const&, uint32)
@@ -393,9 +393,6 @@ namespace wave
 				builder.CreateBr(dest_block);
 			}
 		}
-
-		builder.SetInsertPoint(default_block);
-		builder.CreateBr(end_block);
 		builder.SetInsertPoint(end_block);
 	}
 
@@ -403,6 +400,10 @@ namespace wave
 	{
 		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
 		builder.CreateBr(label_blocks[label_name]);
+
+		llvm::Function* function = builder.GetInsertBlock()->getParent();
+		llvm::BasicBlock* goto_block = llvm::BasicBlock::Create(context, "goto", function, exit_block);
+		builder.SetInsertPoint(goto_block);
 	}
 
 	void LLVMVisitor::Visit(LabelStmt const& label_stmt, uint32)
@@ -476,7 +477,7 @@ namespace wave
 		break;
 		case UnaryExprKind::LogicalNot:
 		{
-			result = builder.CreateICmpEQ(operand, llvm::ConstantInt::get(operand_value->getType(), 0));
+			result = builder.CreateICmpEQ(operand, llvm::ConstantInt::get(operand->getType(), 0));
 		}
 		break;
 		default:
@@ -554,19 +555,19 @@ namespace wave
 		break;
 		case BinaryExprKind::BitXor:
 		{
-			result = builder.CreateXor( lhs, rhs);
+			result = builder.CreateXor(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::LogicalAnd:
 		{
 			llvm::Value* tmp = builder.CreateAnd(lhs, rhs);
-			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(bool_type, 0));
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(tmp->getType(), 0));
 		}
 		break;
 		case BinaryExprKind::LogicalOr:
 		{
 			llvm::Value* tmp = builder.CreateOr(lhs, rhs);
-			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(bool_type, 0));
+			result = builder.CreateICmpNE(tmp, llvm::ConstantInt::get(tmp->getType(), 0));
 		}
 		break;
 		case BinaryExprKind::Equal:
@@ -626,10 +627,12 @@ namespace wave
 		true_expr->Accept(*this);
 		llvm::Value* true_value = llvm_value_map[true_expr];
 		WAVE_ASSERT(true_value);
+		true_value = Load(true_expr->GetType(), true_value);
 
 		false_expr->Accept(*this);
 		llvm::Value* false_value = llvm_value_map[false_expr];
 		WAVE_ASSERT(false_value);
+		false_value = Load(false_expr->GetType(), false_value);
 
 		if (condition_value->getType() != llvm::Type::getInt1Ty(context))
 		{

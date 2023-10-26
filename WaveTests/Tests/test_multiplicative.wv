@@ -3,13 +3,65 @@ import std.assert;
 
 public int main()
 {
-	int i;
-	i = 5 + 6 * 7; Assert(i == 47);
-	i = 5 * (9 - 6); Assert(i == 15);
-	i = (3 + 5) / 2; Assert(i == 4);
-	i = (12 + 4 * 4) % 11; Assert(i == 6);
-	i = 5; i *= 4; Assert(i == 20);
-	i = 7; i /= 3; Assert(i == 2);
-	i = 24; i %= 5;  Assert(i == 4);
-	return 0;
+    int a = 5;
+    int b = 7;
+    int product = a * b;
+    Assert(product == 35);
+
+    int c = 10;
+    int d = 3;
+    int result = c * d;
+    Assert(result == 30);
+
+    int e = 30;
+    int f = 5;
+    int quotient = e / f;
+    Assert(quotient == 6);
+
+    int g = 22;
+    int h = 4;
+    int division_result = g / h;
+    Assert(division_result == 5);
+
+    int i = 21;
+    int j = 4;
+    int remainder = i % j;
+    Assert(remainder == 1);
+
+    int k = 15;
+    int l = 7;
+    int modulus_result = k % l;
+    Assert(modulus_result == 1);
+
+    int m = 5;
+    int n = 4;
+    m *= n;  // m is modified to 20
+    Assert(m == 20);
+
+    int o = 12;
+    int p = 2;
+    o *= p;  // o is modified to 24
+    Assert(o == 24);
+
+    int q = 30;
+    int r = 6;
+    q /= r;  // q is modified to 5
+    Assert(q == 5);
+
+    int s = 64;
+    int t = 8;
+    s /= t;  // s is modified to 8
+    Assert(s == 8);
+
+    int u = 21;
+    int v = 5;
+    u %= v;  // u is modified to 1
+    Assert(u == 1);
+
+    int w = 15;
+    int x = 3;
+    w %= x;  // w is modified to 0
+    Assert(w == 0);
+
+    return 0;
 }
