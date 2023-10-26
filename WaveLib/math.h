@@ -2,8 +2,6 @@
 
 extern "C"
 {
-	extern int PI = 3;
-
 	double Abs(double x)
 	{
 		return fabs(x);

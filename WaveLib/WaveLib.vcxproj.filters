@@ -9,7 +9,4 @@
     <ClInclude Include="math.h" />
     <ClInclude Include="string.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Directory.build.props" />
-  </ItemGroup>
 </Project>
