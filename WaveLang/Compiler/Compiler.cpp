@@ -28,10 +28,10 @@ namespace wave
 			console_sink->set_level(spdlog::level::trace);
 			console_sink->set_pattern("[%^%l%$] %v");
 
-			auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("wavelog.txt", true);
-			file_sink->set_level(spdlog::level::trace);
+			//auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("wave_log.txt", true);
+			//file_sink->set_level(spdlog::level::trace);
 
-			std::shared_ptr<spdlog::logger> lu_logger = std::make_shared<spdlog::logger>(std::string("wave logger"), spdlog::sinks_init_list{ console_sink, file_sink });
+			std::shared_ptr<spdlog::logger> lu_logger = std::make_shared<spdlog::logger>(std::string("wave logger"), spdlog::sinks_init_list{ console_sink });
 			lu_logger->set_level(spdlog::level::trace);
 			spdlog::set_default_logger(lu_logger);
 
