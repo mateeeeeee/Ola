@@ -12,6 +12,7 @@
 
 <global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
                                 | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
+				| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
