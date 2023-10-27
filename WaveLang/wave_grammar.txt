@@ -3,7 +3,7 @@
 <translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
 
 <import-declaration> ::= import <import_identifier>;
-<import_identifier> ::= <identifier>
+<import_identifier> ::= <identifier>{.<identifier>}*
 
 <declaration-visibility>  ::= public | private
 
