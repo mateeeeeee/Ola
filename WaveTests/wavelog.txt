@@ -1,2 +1,0 @@
-[2023-10-27 12:24:56.093] [wave logger] [error] [Diagnostics][Error]: Assignment to const variable in file Tests\test_const.wv at line: 5, col: 4
-

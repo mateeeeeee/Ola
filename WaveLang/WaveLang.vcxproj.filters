@@ -70,9 +70,6 @@
     <Filter Include="Test">
       <UniqueIdentifier>{3d11edb5-5e2e-42b7-b29b-588aabbcc632}</UniqueIdentifier>
     </Filter>
-    <Filter Include="std">
-      <UniqueIdentifier>{1814c067-947d-4468-8172-f9851b684da0}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CoreTypes.h">
@@ -160,18 +157,6 @@
     </None>
     <None Include="Test\test.wv">
       <Filter>Test</Filter>
-    </None>
-    <None Include="std\io.wv">
-      <Filter>std</Filter>
-    </None>
-    <None Include="std\math.wv">
-      <Filter>std</Filter>
-    </None>
-    <None Include="std\assert.wv">
-      <Filter>std</Filter>
-    </None>
-    <None Include="std\string.wv">
-      <Filter>std</Filter>
     </None>
     <None Include="..\README.md" />
   </ItemGroup>

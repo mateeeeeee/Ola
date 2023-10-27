@@ -16,10 +16,7 @@ namespace wave
 
 	void LLVMOptimizer::Optimize(OptimizationLevel level)
 	{
-		if (level == OptimizationLevel::O0) return;
-
 		llvm::legacy::PassManager pass_manager;
-
 		switch (level)
 		{
 		case OptimizationLevel::O3:

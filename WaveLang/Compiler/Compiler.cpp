@@ -19,8 +19,8 @@ namespace wave
 {
 	namespace
 	{
-		static char const* wavelib_debug   = "..\\x64\\Debug\\wavelib.lib ";
-		static char const* wavelib_release = "..\\x64\\Release\\wavelib.lib ";
+		static char const* wavelib_debug   = "..\\..\\x64\\Debug\\wavelib.lib ";
+		static char const* wavelib_release = "..\\..\\x64\\Release\\wavelib.lib ";
 
 		void InitLogger()
 		{
@@ -80,42 +80,45 @@ namespace wave
 		OptimizationLevel opt_level = GetOptimizationLevelFromFlags(input.flags);
 		WAVE_ASSERT_MSG(use_llvm, "Only LLVM is supported for code generation");
 
-		fs::path directory_path = input.input_directory;
-		std::vector<fs::path> assembly_files(input.sources.size());
-		std::vector<fs::path> object_files(input.sources.size());
-		fs::path output_file = directory_path / input.output_file; output_file += ".exe";
-		int64 res;
+		fs::path cur_path = fs::current_path();
+		fs::current_path(cur_path / input.input_directory);
+
+		std::vector<std::string> assembly_files(input.sources.size());
+		std::vector<std::string> object_files(input.sources.size());
+		std::string output_file = input.output_file; output_file += ".exe";
 		for (uint64 i = 0; i < input.sources.size(); ++i)
 		{
-			fs::path file_name = fs::path(input.sources[i]).stem();
-			fs::path file_ext = fs::path(input.sources[i]).extension();
+			std::string file_name = fs::path(input.sources[i]).stem().string();
+			std::string file_ext = fs::path(input.sources[i]).extension().string();
 
-			fs::path ir_file = directory_path / file_name; ir_file += ".ll";
-			fs::path source_file = directory_path / input.sources[i];
+			std::string ir_file = file_name + ".ll";
+			std::string const& source_file = input.sources[i];
 
-			CompileTranslationUnit(source_file.string(), ir_file.string(), ast_dump, opt_level);
+			CompileTranslationUnit(source_file, ir_file, ast_dump, opt_level);
 
-			fs::path assembly_file = directory_path / file_name;  assembly_file += ".s";
-			fs::path object_file = directory_path / file_name; object_file += ".obj";
+			std::string assembly_file = file_name + ".s";  
+			std::string object_file = file_name + ".obj";  
 
 			object_files[i] = object_file;
 			assembly_files[i] = assembly_file;
 
-			std::string compile_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
+			std::string compile_cmd = std::format("clang -S {} -o {}", ir_file, assembly_file);
 			system(compile_cmd.c_str());
 
-			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file.string(), object_file.string());
+			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
 			system(assembly_cmd.c_str());
 		}
 		std::string link_cmd = "clang "; 
-		for (auto const& obj_file : object_files) link_cmd += obj_file.string() + " ";
+		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
 		link_cmd += wavelib_debug;
-		link_cmd += "-o " + output_file.string();
+		link_cmd += "-o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE ";
 		system(link_cmd.c_str());
 		
-		std::string const& exe_cmd = output_file.string();
-		res = system(exe_cmd.c_str());
+		std::string const& exe_cmd = output_file;
+		int64 res = system(exe_cmd.c_str());
+
+		fs::current_path(cur_path);
 		return res;
 	}
 
