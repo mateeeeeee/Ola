@@ -66,10 +66,11 @@ while.end6:                                       ; preds = %while.end6.loopexit
   %18 = load i64, ptr %11, align 8
   %19 = icmp eq i64 %17, %18
   call void @Assert(i1 %19)
-  br label %exit
-
-return:                                           ; No predecessors!
-  br label %exit
+  %20 = alloca i64, align 8
+  store i64 0, ptr %20, align 8
+  %21 = alloca i64, align 8
+  store i64 0, ptr %21, align 8
+  br label %while.cond7
 
 if.then:                                          ; preds = %while.body5
   br label %while.end6
@@ -83,6 +84,47 @@ if.end:                                           ; preds = %while.body5
 break:                                            ; No predecessors!
   br label %exit
 
-exit:                                             ; preds = %break, %if.else, %return, %while.end6
+while.cond7:                                      ; preds = %while.cond7.backedge, %while.end6
+  %22 = load i64, ptr %21, align 8
+  %23 = icmp slt i64 %22, 5
+  br i1 %23, label %while.body8, label %while.end9
+
+while.body8:                                      ; preds = %while.cond7
+  %24 = load i64, ptr %21, align 8
+  %25 = add i64 %24, 1
+  store i64 %25, ptr %21, align 8
+  %26 = and i64 %25, 1
+  %27 = icmp eq i64 %26, 0
+  br i1 %27, label %if.then10, label %if.end12
+
+while.end9:                                       ; preds = %while.cond7
+  %28 = load i64, ptr %20, align 8
+  %29 = icmp eq i64 %28, 9
+  call void @Assert(i1 %29)
+  br label %exit
+
+return:                                           ; No predecessors!
+  br label %exit
+
+if.then10:                                        ; preds = %while.body8
+  br label %while.cond7.backedge
+
+while.cond7.backedge:                             ; preds = %if.then10, %if.end12
+  br label %while.cond7
+
+if.else11:                                        ; No predecessors!
+  br label %exit
+
+if.end12:                                         ; preds = %while.body8
+  %30 = load i64, ptr %20, align 8
+  %31 = load i64, ptr %21, align 8
+  %32 = add i64 %30, %31
+  store i64 %32, ptr %20, align 8
+  br label %while.cond7.backedge
+
+continue:                                         ; No predecessors!
+  br label %exit
+
+exit:                                             ; preds = %continue, %if.else11, %return, %break, %if.else, %while.end9
   ret i64 0
 }

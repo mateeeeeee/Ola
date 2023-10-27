@@ -17,10 +17,10 @@ main:                                   # @main
 # %bb.0:                                # %entry
 	pushq	%rbp
 	.seh_pushreg %rbp
-	subq	$64, %rsp
-	.seh_stackalloc 64
-	leaq	64(%rsp), %rbp
-	.seh_setframe %rbp, 64
+	subq	$96, %rsp
+	.seh_stackalloc 96
+	leaq	96(%rsp), %rbp
+	.seh_setframe %rbp, 96
 	.seh_endprologue
 	movl	$1, %ecx
 	xorl	%eax, %eax
@@ -113,18 +113,70 @@ main:                                   # @main
 	movq	-56(%rbp), %rcx                 # 8-byte Reload
 	movq	-48(%rbp), %rax                 # 8-byte Reload
 	movq	(%rax), %rax
-	cmpq	(%rcx), %rax
+	movq	(%rcx), %rcx
+	subq	%rcx, %rax
 	sete	%cl
 	subq	$32, %rsp
 	callq	Assert
 	addq	$32, %rsp
+	movl	$16, %eax
+	movq	%rax, -88(%rbp)                 # 8-byte Spill
+	callq	__chkstk
+	subq	%rax, %rsp
+	movq	-88(%rbp), %rax                 # 8-byte Reload
+	movq	%rsp, %rcx
+	movq	%rcx, %rdx
+	movq	%rdx, -80(%rbp)                 # 8-byte Spill
+	movq	$0, (%rcx)
+	callq	__chkstk
+	subq	%rax, %rsp
+	movq	%rsp, %rax
+	movq	%rax, -72(%rbp)                 # 8-byte Spill
+	movq	$0, (%rax)
 	jmp	.LBB0_13
 .LBB0_11:                               # %if.then
 	jmp	.LBB0_10
 .LBB0_12:                               # %if.end
                                         #   in Loop: Header=BB0_7 Depth=1
 	jmp	.LBB0_7
-.LBB0_13:                               # %exit
+.LBB0_13:                               # %while.cond7
+                                        # =>This Inner Loop Header: Depth=1
+	movq	-72(%rbp), %rax                 # 8-byte Reload
+	cmpq	$5, (%rax)
+	jge	.LBB0_15
+# %bb.14:                               # %while.body8
+                                        #   in Loop: Header=BB0_13 Depth=1
+	movq	-72(%rbp), %rcx                 # 8-byte Reload
+	movq	(%rcx), %rax
+	addq	$1, %rax
+	movq	%rax, (%rcx)
+	andq	$1, %rax
+	cmpq	$0, %rax
+	je	.LBB0_16
+	jmp	.LBB0_18
+.LBB0_15:                               # %while.end9
+	movq	-80(%rbp), %rax                 # 8-byte Reload
+	cmpq	$9, (%rax)
+	sete	%cl
+	subq	$32, %rsp
+	callq	Assert
+	addq	$32, %rsp
+	jmp	.LBB0_19
+.LBB0_16:                               # %if.then10
+                                        #   in Loop: Header=BB0_13 Depth=1
+	jmp	.LBB0_17
+.LBB0_17:                               # %while.cond7.backedge
+                                        #   in Loop: Header=BB0_13 Depth=1
+	jmp	.LBB0_13
+.LBB0_18:                               # %if.end12
+                                        #   in Loop: Header=BB0_13 Depth=1
+	movq	-80(%rbp), %rax                 # 8-byte Reload
+	movq	-72(%rbp), %rdx                 # 8-byte Reload
+	movq	(%rax), %rcx
+	addq	(%rdx), %rcx
+	movq	%rcx, (%rax)
+	jmp	.LBB0_17
+.LBB0_19:                               # %exit
 	xorl	%eax, %eax
                                         # kill: def $rax killed $eax
 	movq	%rbp, %rsp

@@ -9,6 +9,22 @@ public int main()
     }
     Assert(sum == 15);  
 
+    int sum2 = 0;
+    for (int i = 1; i <= 5; i++)
+    {
+        if (i % 2 == 0) continue; 
+        sum2 += i;
+    }
+    Assert(sum2 == 9); 
+
+    int sum3 = 0;
+    for (int i = 1; i <= 10; i++)
+    {
+        sum3 += i;
+        if (i == 5) break;
+    }
+    Assert(sum3 == 15);
+
     int product = 1;
     int j = 2;
     for (;j <= 10; j += 2)

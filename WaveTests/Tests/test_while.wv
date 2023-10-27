@@ -2,7 +2,6 @@ import std.assert;
 
 public int main()
 {
-    // Test a simple while loop that increments a variable
     int sum = 0;
     int i = 1;
     while (i <= 5)
@@ -31,5 +30,19 @@ public int main()
         }
     }
     Assert(counter == countUpTo);  
+
+    int n = 0;
+    int count2 = 0;
+    while (count2 < 5)
+    {
+        count2++;
+        if (count2 % 2 == 0)
+        {
+            continue;  // Skip even counts
+        }
+        n += count2;
+    }
+    Assert(n == 9);
+
     return 0;
 }

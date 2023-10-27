@@ -301,6 +301,7 @@ namespace wave
 		Expect(TokenKind::KW_for);
 		Expect(TokenKind::left_round);
 
+		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsTypename())
 		{

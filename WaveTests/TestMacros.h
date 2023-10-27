@@ -4,7 +4,7 @@
 #define USE_DEBUG 0
 
 #define WAVE_CODE(...) WAVE_STRINGIFY(__VA_ARGS__)
-#define WAVE_CODE_EX(...) WAVE_STRINGIFY(int main(){__VA_ARGS__})
+#define WAVE_CODE_EX(...) WAVE_STRINGIFY(public int main(){__VA_ARGS__})
 
 #if _DEBUG && USE_DEBUG
 #define WAVE(...) system(WAVE_STRINGIFY(Wave --testdebug --test --directory Tests __VA_ARGS__))

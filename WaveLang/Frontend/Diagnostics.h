@@ -6,8 +6,6 @@
 
 namespace wave
 {
-	inline constexpr int32 EXIT_CODE_COMPILATION_FAILED = INT32_MAX;
-
 	enum DiagCode : uint32
 	{
 		#define DIAG(diag_code, diag_kind, diag_msg) diag_code,
@@ -44,7 +42,7 @@ namespace wave
 			output += "\n";
 
 			PrintMessage(diag_kind, output);
-			if (exit_on_error && diag_kind == DiagKind::error) std::exit(EXIT_CODE_COMPILATION_FAILED);
+			if (exit_on_error && diag_kind == DiagKind::error) std::exit(WAVE_COMPILATION_FAILED_EXIT_CODE);
 		}
 
 	private:

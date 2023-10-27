@@ -783,8 +783,6 @@ namespace wave
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
 		if (!ptr->getType()->isPointerTy()) return ptr;
-		//if (!isa<llvm::AllocaInst>(ptr)) return ptr;
-
 		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
 		return load_inst;
 	}
@@ -792,7 +790,6 @@ namespace wave
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!value->getType()->isPointerTy()) return builder.CreateStore(value, ptr);
-		//if (!isa<llvm::AllocaInst>(value)) return builder.CreateStore(value, ptr);
 		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}

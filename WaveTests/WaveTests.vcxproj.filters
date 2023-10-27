@@ -58,6 +58,12 @@
     <None Include="Tests\test_dowhile.wv">
       <Filter>Tests</Filter>
     </None>
+    <None Include="Tests\test_const.wv">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests\test_functioncalls.wv">
+      <Filter>Tests</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">

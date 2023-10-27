@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "TestMacros.h"
+#include "Core/Defines.h"
 
 using namespace wave;
+
 
 TEST(Operators, Additive)
 {
@@ -108,30 +110,16 @@ TEST(Declarations, Import)
 
 }
 
-TEST(Functions, Return)
+TEST(Function, Calls)
 {
-
-}
-
-TEST(Functions, Calling)
-{
-
-}
-
-TEST(Linkage, PublicPrivate)
-{
-
-}
-
-TEST(Linkage, Extern)
-{
-
+	EXPECT_EQ(WAVE(-i test_functioncalls.wv), 0);
 }
 
 TEST(Misc, Const)
 {
-
+	EXPECT_EQ(WAVE(-i test_const.wv), WAVE_COMPILATION_FAILED_EXIT_CODE);
 }
+
 
 TEST(Misc, Constexpr)
 {
