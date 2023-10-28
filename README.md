@@ -11,17 +11,17 @@ It's done as a learning project and its purpose is solely educational.
 
 ## Features
   * operators:
-    - additive: +, -, +=, -=, ++, --
-    - multiplicative: *, /, %, *=, /=, %=
-    - relation: ==, !=, >, >=, <, <=
-    - shift: >>, <<, >>=, <<=
-    - bitwise: &, |, ^, ~, &=, |=, ^=
-    - logic: &&, ||, !
-  * control statements: if else, switch, goto, ternary operator
-  * loop statements: for, while, do while, break, continue
+    - additive: `+`, `-`, `+=`, `-=`, `++`, `--`
+    - multiplicative: `*`, `/`, `%`, `*=`, `/=`, `%=`
+    - relation: `==`, `!=`, `>`, `>=`, `<`, `<=`
+    - shift: `>>`, `<<`, `>>=`, `<<=`
+    - bitwise: `&`, `|`, `^`, `~`, `&=`, `|=`, `^=`
+    - logic: `&&`, `||`, `!`
+  * control statements: `if` `else`, `switch`, `goto`, `?:`
+  * loop statements: `for`, `while`, `do` `while`, `break`, `continue`
+  * `sizeof`
   * functions
   * scopes
-  * sizeof
   * implicit casts
   * import statement
   * one-line comments
