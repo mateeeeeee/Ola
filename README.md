@@ -1,4 +1,4 @@
-<img align="left" src="WaveLang/wavelogo.jpg" width="120px"/>
+<img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
 Wave is toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
@@ -262,7 +262,6 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
                      | -- <unary-expression>
                      | sizeof (<unary-expression>)
                      | sizeof (<type-specifier>)
-                     | typeof (<expression>)
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
