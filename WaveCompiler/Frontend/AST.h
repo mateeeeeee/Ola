@@ -35,18 +35,21 @@ namespace wave
 		UniqueDeclPtrList declarations;
 	};
 
-
-	enum class DeclKind : bool
+	//maybe add FunctionParamDecl?
+	enum class DeclKind : uint8
 	{
 		Variable,
-		Function
+		Function,
+		Enum,
+		EnumMember,
 	};
 
 	enum class DeclVisibility : uint8
 	{
 		None,
 		Private,
-		Public
+		Public,
+		Extern
 	};
 
 	class Decl : public NodeAST
@@ -64,6 +67,9 @@ namespace wave
 			visibility = _visibility;
 		}
 		bool IsPublic() const { return visibility == DeclVisibility::Public; }
+		bool IsExtern() const { return visibility == DeclVisibility::Extern; }
+
+		virtual bool IsTag() const { return false; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -91,12 +97,6 @@ namespace wave
 		}
 		bool IsGlobal() const { return is_global; }
 
-		void SetExtern(bool _is_extern)
-		{
-			is_extern = _is_extern;
-		}
-		bool IsExtern() const { return is_extern; }
-
 		void SetInitExpr(UniqueExprPtr&& expr)
 		{
 			init_expr = std::move(expr);
@@ -109,7 +109,6 @@ namespace wave
 	private:
 		UniqueExprPtr init_expr;
 		bool is_global = false;
-		bool is_extern = false;
 	};
 
 	class FunctionDecl : public Decl
@@ -146,6 +145,53 @@ namespace wave
 		mutable ConstLabelStmtPtrList labels;
 	};
 
+	class TagDecl : public Decl
+	{
+	public:
+		virtual bool IsTag() const override { return true; }
+
+	protected:
+		TagDecl(DeclKind decl_kind, std::string_view name, SourceLocation const& loc) : Decl(decl_kind, name, loc) {}
+	};
+
+	class EnumDecl : public TagDecl
+	{
+	public:
+		EnumDecl(std::string_view name, SourceLocation const& loc)  : TagDecl(DeclKind::Enum, name, loc) {}
+
+		void SetEnumMembers(UniqueEnumMemberDeclPtrList&& _enum_members)
+		{
+			enum_members = std::move(_enum_members);
+		}
+		UniqueEnumMemberDeclPtrList const& GetEnumMembers() const { return enum_members; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueEnumMemberDeclPtrList enum_members;
+	};
+
+	class EnumMemberDecl : public Decl
+	{
+	public:
+		EnumMemberDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::EnumMember, name, loc) 
+		{
+			SetType(builtin_types::Enum);
+		}
+
+		void SetValue(int64 _value)
+		{
+			value = _value;
+		}
+		int64 GetValue() const { return value; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		int64 value = 0;
+	};
 
 	enum class StmtKind : uint8
 	{
@@ -197,6 +243,10 @@ namespace wave
 	class DeclStmt final : public Stmt
 	{
 	public:
+		DeclStmt(UniqueDeclPtr&& decl) : Stmt(StmtKind::Decl), declarations{} 
+		{
+			declarations.push_back(std::move(decl));
+		}
 		DeclStmt(UniqueDeclPtrList&& decls) : Stmt(StmtKind::Decl), declarations(std::move(decls)) {}
 
 		UniqueDeclPtrList const& GetDecls() const { return declarations; }

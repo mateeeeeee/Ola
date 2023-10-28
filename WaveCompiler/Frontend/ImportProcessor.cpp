@@ -10,22 +10,6 @@ namespace fs = std::filesystem;
 
 namespace wave
 {
-	namespace std_imports
-	{
-		static const std::string std_io = R"(
-			extern void PrintInteger(int);
-			extern void PrintFloat(float);
-		)";
-		static const std::string std_util = R"(
-			extern void Assert(bool);
-		)";
-		static const std::string std_math = R"(
-			extern int Sin(float);
-			extern int Cos(float);
-			extern int Tan(float);
-		)";
-	}
-
 	ImportProcessor::ImportProcessor(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 
 	void ImportProcessor::ProcessImports(std::vector<Token>&& _tokens)
@@ -140,7 +124,7 @@ namespace wave
 		std::vector<Decl const*> global_public_decls;
 		for (auto const& decl : ast->translation_unit->GetDecls())
 		{
-			if (decl->IsPublic()) global_public_decls.push_back(decl.get());
+			if (decl->IsPublic() || decl->IsExtern()) global_public_decls.push_back(decl.get());
 		}
 
 		std::vector<Token> import_tokens{};
@@ -167,6 +151,7 @@ namespace wave
 				case TypeKind::Invalid:
 				default:
 					WAVE_ASSERT(false);
+					break;
 				}
 			};
 		for (Decl const* decl : global_public_decls)

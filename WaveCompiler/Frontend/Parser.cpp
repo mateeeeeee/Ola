@@ -58,7 +58,11 @@ namespace wave
 	{
 		UniqueDeclPtrList global_decl_list;
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
-		if (Consume(TokenKind::KW_extern))
+		if (Consume(TokenKind::KW_enum))
+		{
+			global_decl_list.push_back(ParseEnumDeclaration());
+		}
+		else if (Consume(TokenKind::KW_extern))
 		{
 			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
 			else global_decl_list = ParseExternVariableDeclaration();
@@ -180,7 +184,7 @@ namespace wave
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal)) init_expr = ParseAssignmentExpression();
 
-			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility, false);
+			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 			var_decl_list.push_back(std::move(var_decl));
 
 		} while (!Consume(TokenKind::semicolon));
@@ -201,13 +205,53 @@ namespace wave
 			SourceLocation const& loc = current_token->GetLocation();
 			std::string_view name = current_token->GetIdentifier(); ++current_token;
 
-			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::Public, true);
+			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::Extern);
 			var_decl_list.push_back(std::move(var_decl));
 
 		} while (!Consume(TokenKind::semicolon));
 
 		return var_decl_list;
 	}
+
+	UniqueEnumDeclPtr Parser::ParseEnumDeclaration()
+	{
+		std::string enum_tag = "";
+		SourceLocation loc = current_token->GetLocation();
+		if (current_token->Is(TokenKind::identifier))
+		{
+			enum_tag = current_token->GetIdentifier();
+			++current_token;
+		}
+
+		UniqueEnumMemberDeclPtrList enum_members;
+		Expect(TokenKind::left_brace);
+		int64 val = 0;
+		while (true)
+		{
+			std::string enum_value_name;
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			SourceLocation loc = current_token->GetLocation();
+			enum_value_name = current_token->GetIdentifier(); ++current_token;
+
+			if (Consume(TokenKind::equal))
+			{
+				UniqueExprPtr enum_value_expr = ParseAssignmentExpression();
+				enum_members.push_back(sema->ActOnEnumMemberDecl(enum_value_name, loc, std::move(enum_value_expr)));
+				val = enum_members.back()->GetValue() + 1;
+			}
+			else
+			{
+				enum_members.push_back(sema->ActOnEnumMemberDecl(enum_value_name, loc, val++));
+			}
+
+			if (Consume(TokenKind::right_brace)) break;
+			Expect(TokenKind::comma);
+		}
+		Expect(TokenKind::semicolon);
+
+		return sema->ActOnEnumDecl(enum_tag, loc, std::move(enum_members));
+	}
+
 
 	UniqueStmtPtr Parser::ParseStatement()
 	{
@@ -235,14 +279,23 @@ namespace wave
 	UniqueCompoundStmtPtr Parser::ParseCompoundStatement()
 	{
 		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+		SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
 		Expect(TokenKind::left_brace);
 		UniqueStmtPtrList stmts;
 		while (current_token->IsNot(TokenKind::right_brace))
 		{
-			if (current_token->IsTypename())
+			if (IsCurrentTokenTypename())
 			{
-				UniqueDeclPtrList decl_list = ParseVariableDeclaration();
-				stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
+				if (Consume(TokenKind::KW_enum))
+				{
+					UniqueEnumDeclPtr enum_decl = ParseEnumDeclaration();
+					stmts.push_back(sema->ActOnDeclStmt(std::move(enum_decl)));
+				}
+				else
+				{
+					UniqueDeclPtrList decl_list = ParseVariableDeclaration();
+					stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
+				}
 			}
 			else
 			{
@@ -802,7 +855,15 @@ namespace wave
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetIdentifier();
-			WAVE_ASSERT(false); //#todo : check if it's enum or class
+			if (Decl* tag_decl = sema->ctx.tag_sym_table.LookUp(identifier))
+			{
+				if (tag_decl->GetDeclKind() == DeclKind::Enum)
+				{
+					type.SetRawType(builtin_types::Enum);
+				}
+				else Diag(invalid_type_specifier);
+			}
+			else Diag(invalid_type_specifier);
 		}
 		break;
 		default:
@@ -847,6 +908,11 @@ namespace wave
 		if (Consume(TokenKind::left_round)) is_function = true;
 		current_token = token;
 		return is_function;
+	}
+
+	bool Parser::IsCurrentTokenTypename()
+	{
+		return current_token->IsTypename() || sema->ctx.tag_sym_table.LookUp(current_token->GetIdentifier()) != nullptr;
 	}
 
 }

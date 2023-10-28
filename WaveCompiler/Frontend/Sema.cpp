@@ -9,7 +9,7 @@ namespace wave
 	Sema::~Sema() = default;
 
 	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												  UniqueExprPtr&& init_expr, DeclVisibility visibility, bool is_extern)
+												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
@@ -42,10 +42,9 @@ namespace wave
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
-		var_decl->SetExtern(is_extern);
+		var_decl->SetVisibility(visibility);
 
 		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
-		var_decl->SetVisibility(visibility);
 
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
@@ -64,7 +63,7 @@ namespace wave
 			var_decl->SetType(type);
 		}
 		
-		if(!name.empty()) bool result = ctx.decl_sym_table.Insert(var_decl.get());
+		if(!name.empty()) ctx.decl_sym_table.Insert(var_decl.get());
 		return var_decl;
 	}
 
@@ -112,6 +111,35 @@ namespace wave
 		return function_decl;
 	}
 
+
+	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
+	{
+		if (!name.empty() && ctx.tag_sym_table.LookUpCurrentScope(name)) diagnostics.Report(loc, redefinition_of_identifier, name);
+		UniqueEnumDeclPtr enum_decl = MakeUnique<EnumDecl>(name, loc);
+		enum_decl->SetEnumMembers(std::move(enum_members));
+		if (!name.empty()) ctx.tag_sym_table.Insert(enum_decl.get());
+		return enum_decl;
+	}
+
+	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr)
+	{
+		if (!enum_value_expr->IsConstexpr()) diagnostics.Report(loc, enumerator_value_not_constexpr, name);
+		return ActOnEnumMemberDecl(name, loc, enum_value_expr->EvaluateConstexpr());
+	}
+
+	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value)
+	{
+		if (name.empty()) diagnostics.Report(loc, expected_identifier);
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		UniqueEnumMemberDeclPtr enum_member = MakeUnique<EnumMemberDecl>(name, loc);
+		enum_member->SetValue(enum_value);
+		ctx.decl_sym_table.Insert(enum_member.get());
+		return enum_member;
+	}
+
 	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
 		return MakeUnique<CompoundStmt>(std::move(stmts));
@@ -120,6 +148,11 @@ namespace wave
 	UniqueExprStmtPtr Sema::ActOnExprStmt(UniqueExprPtr&& expr)
 	{
 		return MakeUnique<ExprStmt>(std::move(expr));
+	}
+
+	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueDeclPtr&& decl)
+	{
+		return MakeUnique<DeclStmt>(std::move(decl));
 	}
 
 	UniqueDeclStmtPtr Sema::ActOnDeclStmt(UniqueDeclPtrList&& decls)

@@ -18,27 +18,14 @@ main:                                   # @main
 	subq	$40, %rsp
 	.seh_stackalloc 40
 	.seh_endprologue
-	jmp	.LBB0_1
-.LBB0_1:                                # %label.Label1
 	movl	$1, %ecx
 	callq	Assert
 	movl	$1, %ecx
 	callq	Assert
-	movb	$1, %al
-	testb	$1, %al
-	jne	.LBB0_3
-	jmp	.LBB0_4
-.LBB0_2:                                # %label.Label2
 	movl	$1, %ecx
 	callq	Assert
 	movl	$1, %ecx
 	callq	Assert
-	jmp	.LBB0_5
-.LBB0_3:                                # %if.then
-	jmp	.LBB0_2
-.LBB0_4:                                # %if.end
-	jmp	.LBB0_2
-.LBB0_5:                                # %exit
 	xorl	%eax, %eax
                                         # kill: def $rax killed $eax
 	addq	$40, %rsp

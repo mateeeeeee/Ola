@@ -12,19 +12,10 @@
 	.endef
 	.p2align	4, 0x90                         # -- Begin function square
 square:                                 # @square
-.seh_proc square
 # %bb.0:                                # %entry
-	pushq	%rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	movq	%rcx, (%rsp)                    # 8-byte Spill
-	jmp	.LBB0_1
-.LBB0_1:                                # %exit
-	movq	(%rsp), %rax                    # 8-byte Reload
+	movq	%rcx, %rax
 	imulq	%rax, %rax
-	popq	%rcx
 	retq
-	.seh_endproc
                                         # -- End function
 	.def	add;
 	.scl	3;
@@ -32,21 +23,10 @@ square:                                 # @square
 	.endef
 	.p2align	4, 0x90                         # -- Begin function add
 add:                                    # @add
-.seh_proc add
 # %bb.0:                                # %entry
-	subq	$16, %rsp
-	.seh_stackalloc 16
-	.seh_endprologue
-	movq	%rdx, (%rsp)                    # 8-byte Spill
-	movq	%rcx, 8(%rsp)                   # 8-byte Spill
-	jmp	.LBB1_1
-.LBB1_1:                                # %exit
-	movq	(%rsp), %rcx                    # 8-byte Reload
-	movq	8(%rsp), %rax                   # 8-byte Reload
+	movq	%rdx, %rax
 	addq	%rcx, %rax
-	addq	$16, %rsp
 	retq
-	.seh_endproc
                                         # -- End function
 	.def	isEven;
 	.scl	3;
@@ -54,21 +34,11 @@ add:                                    # @add
 	.endef
 	.p2align	4, 0x90                         # -- Begin function isEven
 isEven:                                 # @isEven
-.seh_proc isEven
 # %bb.0:                                # %entry
-	pushq	%rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	movq	%rcx, (%rsp)                    # 8-byte Spill
-	jmp	.LBB2_1
-.LBB2_1:                                # %exit
-	movq	(%rsp), %rax                    # 8-byte Reload
-                                        # kill: def $al killed $al killed $rax
+	movb	%cl, %al
 	testb	$1, %al
 	sete	%al
-	popq	%rcx
 	retq
-	.seh_endproc
                                         # -- End function
 	.def	fma;
 	.scl	3;
@@ -76,24 +46,11 @@ isEven:                                 # @isEven
 	.endef
 	.p2align	4, 0x90                         # -- Begin function fma
 fma:                                    # @fma
-.seh_proc fma
 # %bb.0:                                # %entry
-	subq	$24, %rsp
-	.seh_stackalloc 24
-	.seh_endprologue
-	movq	%r8, (%rsp)                     # 8-byte Spill
-	movq	%rdx, 8(%rsp)                   # 8-byte Spill
-	movq	%rcx, 16(%rsp)                  # 8-byte Spill
-	jmp	.LBB3_1
-.LBB3_1:                                # %exit
-	movq	(%rsp), %rcx                    # 8-byte Reload
-	movq	8(%rsp), %rdx                   # 8-byte Reload
-	movq	16(%rsp), %rax                  # 8-byte Reload
-	imulq	%rdx, %rax
-	addq	%rcx, %rax
-	addq	$24, %rsp
+	movq	%rdx, %rax
+	imulq	%rcx, %rax
+	addq	%r8, %rax
 	retq
-	.seh_endproc
                                         # -- End function
 	.def	isInRange;
 	.scl	3;
@@ -101,28 +58,14 @@ fma:                                    # @fma
 	.endef
 	.p2align	4, 0x90                         # -- Begin function isInRange
 isInRange:                              # @isInRange
-.seh_proc isInRange
 # %bb.0:                                # %entry
-	subq	$24, %rsp
-	.seh_stackalloc 24
-	.seh_endprologue
-	movq	%r8, (%rsp)                     # 8-byte Spill
-	movq	%rdx, 8(%rsp)                   # 8-byte Spill
-	movq	%rcx, 16(%rsp)                  # 8-byte Spill
-	jmp	.LBB4_1
-.LBB4_1:                                # %exit
-	movq	(%rsp), %rdx                    # 8-byte Reload
-	movq	16(%rsp), %rcx                  # 8-byte Reload
-	movq	8(%rsp), %r8                    # 8-byte Reload
 	movq	%rcx, %rax
-	subq	%r8, %rax
+	subq	%rdx, %rax
 	setge	%al
-	subq	%rdx, %rcx
+	subq	%r8, %rcx
 	setle	%cl
 	andb	%cl, %al
-	addq	$24, %rsp
 	retq
-	.seh_endproc
                                         # -- End function
 	.def	main;
 	.scl	2;
@@ -188,7 +131,6 @@ main:                                   # @main
 	movb	%al, %cl
 	xorb	$-1, %cl
 	callq	Assert
-# %bb.1:                                # %exit
 	xorl	%eax, %eax
                                         # kill: def $rax killed $eax
 	addq	$40, %rsp

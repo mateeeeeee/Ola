@@ -123,6 +123,21 @@ namespace wave
 		WAVE_DEBUG("{}FunctionDecl\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(TagDecl const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}TagDecl\n", GetIndentation(depth));
+	}
+
+	void DebugVisitor::Visit(EnumDecl const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}EnumDecl\n", GetIndentation(depth));
+	}
+
+	void DebugVisitor::Visit(EnumMemberDecl const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}EnumMemberDecl\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(Stmt const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}Stmt\n", GetIndentation(depth));
@@ -262,5 +277,4 @@ namespace wave
 	{
 		WAVE_DEBUG("{}FunctionCallExpr\n", GetIndentation(depth));
 	}
-
 }

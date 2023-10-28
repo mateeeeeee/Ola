@@ -19,6 +19,9 @@ namespace wave
 	using UniqueDeclPtr				= UniquePtr<Decl>;
 	using UniqueFunctionDeclPtr		= UniquePtr<FunctionDecl>;
 	using UniqueVariableDeclPtr		= UniquePtr<VariableDecl>;
+	using UniqueTagDeclPtr			= UniquePtr<TagDecl>;
+	using UniqueEnumDeclPtr			= UniquePtr<EnumDecl>;
+	using UniqueEnumMemberDeclPtr	= UniquePtr<EnumMemberDecl>;
 
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;
@@ -50,17 +53,18 @@ namespace wave
 	using UniqueImplicitCastExprPtr	= UniquePtr<ImplicitCastExpr>;
 	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
 
-	using UniqueVariableDeclPtrList = std::vector<UniqueVariableDeclPtr>;
-	using UniqueDeclPtrList			= std::vector<UniqueDeclPtr>;
-	using UniqueStmtPtrList			= std::vector<UniqueStmtPtr>;
-	using UniqueExprPtrList			= std::vector<UniqueExprPtr>;
-	using ExprPtrList				= std::vector<Expr*>;
-	using DeclPtrList				= std::vector<Decl*>;
-	using StmtPtrList				= std::vector<Stmt*>;
-	using VariableDeclPtrList		= std::vector<VariableDecl*>;
-	using BreakStmtPtrList			= std::vector<BreakStmt*>;
-	using ContinueStmtPtrList		= std::vector<ContinueStmt*>;
-	using CaseStmtPtrList			= std::vector<CaseStmt*>;
-	using LabelStmtPtrList			= std::vector<LabelStmt*>;
-	using ConstLabelStmtPtrList		= std::vector<LabelStmt const*>;
+	using UniqueEnumMemberDeclPtrList = std::vector<UniqueEnumMemberDeclPtr>;
+	using UniqueVariableDeclPtrList   = std::vector<UniqueVariableDeclPtr>;
+	using UniqueDeclPtrList			  = std::vector<UniqueDeclPtr>;
+	using UniqueStmtPtrList			  = std::vector<UniqueStmtPtr>;
+	using UniqueExprPtrList			  = std::vector<UniqueExprPtr>;
+	using ExprPtrList				  = std::vector<Expr*>;
+	using DeclPtrList				  = std::vector<Decl*>;
+	using StmtPtrList				  = std::vector<Stmt*>;
+	using VariableDeclPtrList		  = std::vector<VariableDecl*>;
+	using BreakStmtPtrList			  = std::vector<BreakStmt*>;
+	using ContinueStmtPtrList		  = std::vector<ContinueStmt*>;
+	using CaseStmtPtrList			  = std::vector<CaseStmt*>;
+	using LabelStmtPtrList			  = std::vector<LabelStmt*>;
+	using ConstLabelStmtPtrList		  = std::vector<LabelStmt const*>;
 }

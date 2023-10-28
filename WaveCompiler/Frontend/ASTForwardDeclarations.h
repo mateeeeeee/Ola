@@ -8,6 +8,9 @@ namespace wave
 	class Decl;
 	class FunctionDecl;
 	class VariableDecl;
+	class TagDecl;
+	class EnumDecl;
+	class EnumMemberDecl;
 
 	class Stmt;
 	class CompoundStmt;

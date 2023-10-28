@@ -20,7 +20,6 @@ namespace wave
 {
 	class QualifiedType;
 
-	//add types as members
 	class LLVMVisitor : public ASTVisitor
 	{
 		friend class LLVMIRGenerator;
@@ -44,6 +43,9 @@ namespace wave
 		virtual void Visit(Decl const&, uint32) override;
 		virtual void Visit(FunctionDecl const&, uint32) override;
 		virtual void Visit(VariableDecl const&, uint32) override;
+		virtual void Visit(TagDecl const&, uint32) override;
+		virtual void Visit(EnumDecl const&, uint32) override;
+		virtual void Visit(EnumMemberDecl const&, uint32) override;
 
 		virtual void Visit(Stmt const&, uint32) override;
 		virtual void Visit(CompoundStmt const&, uint32) override;

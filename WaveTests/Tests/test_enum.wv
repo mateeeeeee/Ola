@@ -24,7 +24,7 @@ enum
 
 public int main()
 {
-		Number num = Number_zero;
+	Number num = Number_zero;
 	Assert(num == 0);
 	num = Number_one;
 	Assert(num == 1);

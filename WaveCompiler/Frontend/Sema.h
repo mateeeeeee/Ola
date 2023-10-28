@@ -15,6 +15,12 @@ namespace wave
 	class Diagnostics;
 	struct SourceLocation;
 
+	enum TagKind
+	{
+		Tag_Enum,
+		Tag_Class
+	};
+
 	class Sema 
 	{
 		friend class Parser;
@@ -23,6 +29,7 @@ namespace wave
 		struct Context
 		{
 			SymbolTable<Decl> decl_sym_table;
+			SymbolTable<TagDecl> tag_sym_table;
 
 			class QualifiedType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
@@ -42,14 +49,19 @@ namespace wave
 		~Sema();
 
 	private:
+
 		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												UniqueExprPtr&& init_expr, DeclVisibility visibility = DeclVisibility::Private, bool is_extern = false);
+												UniqueExprPtr&& init_expr, DeclVisibility visibility = DeclVisibility::Private);
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
 												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr, 
 												DeclVisibility visibility = DeclVisibility::Private);
+		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
+		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
+		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
+		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtr&& decl);
 		UniqueDeclStmtPtr ActOnDeclStmt(UniqueDeclPtrList&& decls);
 		UniqueReturnStmtPtr ActOnReturnStmt(UniqueExprStmtPtr&& expr_stmt);
 		UniqueIfStmtPtr ActOnIfStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& then_stmt, UniqueStmtPtr&& else_stmt);

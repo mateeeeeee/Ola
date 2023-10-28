@@ -48,6 +48,15 @@ namespace wave
 		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
+	void EnumMemberDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void EnumDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto&& enum_member : enum_members) enum_member->Accept(visitor, depth + 1);
+	}
 
 	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -213,6 +222,14 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+	void EnumMemberDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void EnumDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 
 	void Stmt::Accept(ASTVisitor& visitor) const
 	{
@@ -336,5 +353,6 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+
 }
 

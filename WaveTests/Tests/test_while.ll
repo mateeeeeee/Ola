@@ -6,125 +6,68 @@ declare void @Assert(i1)
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  br label %while.cond
+  store i64 1, ptr %0, align 8
+  br label %while.body
 
-while.cond:                                       ; preds = %while.body, %entry
-  %storemerge = phi i64 [ %4, %while.body ], [ 1, %entry ]
-  %.0 = phi i64 [ %3, %while.body ], [ 0, %entry ]
-  store i64 %storemerge, ptr %0, align 8
-  %1 = icmp slt i64 %storemerge, 6
-  br i1 %1, label %while.body, label %while.end
-
-while.body:                                       ; preds = %while.cond
+while.body:                                       ; preds = %entry, %while.body
+  %1 = phi i64 [ 0, %entry ], [ %3, %while.body ]
   %2 = load i64, ptr %0, align 8
-  %3 = add i64 %.0, %2
+  %3 = add i64 %2, %1
   %4 = add i64 %2, 1
-  br label %while.cond
+  store i64 %4, ptr %0, align 8
+  %5 = icmp slt i64 %4, 6
+  br i1 %5, label %while.body, label %while.cond.while.end_crit_edge
 
-while.end:                                        ; preds = %while.cond
-  %5 = icmp eq i64 %.0, 15
-  call void @Assert(i1 %5)
-  %6 = alloca i64, align 8
-  store i64 0, ptr %6, align 8
-  br label %while.cond1
-
-while.cond1:                                      ; preds = %while.body2, %while.end
-  %7 = load i64, ptr %6, align 8
-  %8 = icmp sgt i64 %7, 0
-  br i1 %8, label %while.body2, label %while.end3
-
-while.body2:                                      ; preds = %while.cond1
-  call void @Assert(i1 false)
-  br label %while.cond1
-
-while.end3:                                       ; preds = %while.cond1
-  %9 = load i64, ptr %6, align 8
-  %10 = icmp eq i64 %9, 0
-  call void @Assert(i1 %10)
+while.cond.while.end_crit_edge:                   ; preds = %while.body
+  %6 = icmp eq i64 %3, 15
+  tail call void @Assert(i1 %6)
+  %7 = alloca i64, align 8
+  store i64 0, ptr %7, align 8
+  %8 = load i64, ptr %7, align 8
+  %9 = icmp eq i64 %8, 0
+  tail call void @Assert(i1 %9)
+  %10 = alloca i64, align 8
+  store i64 5, ptr %10, align 8
   %11 = alloca i64, align 8
-  store i64 5, ptr %11, align 8
-  %12 = alloca i64, align 8
-  store i64 0, ptr %12, align 8
-  br label %while.cond4
+  store i64 0, ptr %11, align 8
+  br label %while.body5
 
-while.cond4:                                      ; preds = %if.end, %while.end3
-  br i1 true, label %while.body5, label %while.end6.loopexit
-
-while.body5:                                      ; preds = %while.cond4
-  %13 = load i64, ptr %12, align 8
-  %14 = add i64 %13, 1
-  store i64 %14, ptr %12, align 8
-  %15 = load i64, ptr %11, align 8
-  %16 = icmp eq i64 %14, %15
-  br i1 %16, label %if.then, label %if.end
-
-while.end6.loopexit:                              ; preds = %while.cond4
-  br label %while.end6
-
-while.end6:                                       ; preds = %while.end6.loopexit, %if.then
-  %17 = load i64, ptr %12, align 8
-  %18 = load i64, ptr %11, align 8
-  %19 = icmp eq i64 %17, %18
-  call void @Assert(i1 %19)
-  %20 = alloca i64, align 8
-  store i64 0, ptr %20, align 8
-  %21 = alloca i64, align 8
-  store i64 0, ptr %21, align 8
-  br label %while.cond7
+while.body5:                                      ; preds = %while.body5, %while.cond.while.end_crit_edge
+  %12 = load i64, ptr %11, align 8
+  %13 = add i64 %12, 1
+  store i64 %13, ptr %11, align 8
+  %14 = icmp eq i64 %13, 5
+  br i1 %14, label %if.then, label %while.body5
 
 if.then:                                          ; preds = %while.body5
-  br label %while.end6
+  %15 = load i64, ptr %11, align 8
+  %16 = load i64, ptr %10, align 8
+  %17 = icmp eq i64 %15, %16
+  tail call void @Assert(i1 %17)
+  %18 = alloca i64, align 8
+  store i64 0, ptr %18, align 8
+  %19 = alloca i64, align 8
+  store i64 0, ptr %19, align 8
+  %.promoted = load i64, ptr %18, align 8
+  br label %while.body8
 
-if.else:                                          ; No predecessors!
-  br label %exit
+while.body8:                                      ; preds = %if.then, %while.body8
+  %20 = phi i64 [ %.promoted, %if.then ], [ %26, %while.body8 ]
+  %21 = load i64, ptr %19, align 8
+  %22 = add i64 %21, 1
+  store i64 %22, ptr %19, align 8
+  %23 = and i64 %22, 1
+  %24 = icmp eq i64 %23, 0
+  %25 = add i64 %22, %20
+  %26 = select i1 %24, i64 %20, i64 %25
+  %27 = load i64, ptr %19, align 8
+  %28 = icmp slt i64 %27, 5
+  br i1 %28, label %while.body8, label %while.cond7.while.end9_crit_edge
 
-if.end:                                           ; preds = %while.body5
-  br label %while.cond4
-
-break:                                            ; No predecessors!
-  br label %exit
-
-while.cond7:                                      ; preds = %while.cond7.backedge, %while.end6
-  %22 = load i64, ptr %21, align 8
-  %23 = icmp slt i64 %22, 5
-  br i1 %23, label %while.body8, label %while.end9
-
-while.body8:                                      ; preds = %while.cond7
-  %24 = load i64, ptr %21, align 8
-  %25 = add i64 %24, 1
-  store i64 %25, ptr %21, align 8
-  %26 = and i64 %25, 1
-  %27 = icmp eq i64 %26, 0
-  br i1 %27, label %if.then10, label %if.end12
-
-while.end9:                                       ; preds = %while.cond7
-  %28 = load i64, ptr %20, align 8
-  %29 = icmp eq i64 %28, 9
-  call void @Assert(i1 %29)
-  br label %exit
-
-return:                                           ; No predecessors!
-  br label %exit
-
-if.then10:                                        ; preds = %while.body8
-  br label %while.cond7.backedge
-
-while.cond7.backedge:                             ; preds = %if.then10, %if.end12
-  br label %while.cond7
-
-if.else11:                                        ; No predecessors!
-  br label %exit
-
-if.end12:                                         ; preds = %while.body8
-  %30 = load i64, ptr %20, align 8
-  %31 = load i64, ptr %21, align 8
-  %32 = add i64 %30, %31
-  store i64 %32, ptr %20, align 8
-  br label %while.cond7.backedge
-
-continue:                                         ; No predecessors!
-  br label %exit
-
-exit:                                             ; preds = %continue, %if.else11, %return, %break, %if.else, %while.end9
+while.cond7.while.end9_crit_edge:                 ; preds = %while.body8
+  store i64 %26, ptr %18, align 8
+  %29 = load i64, ptr %18, align 8
+  %30 = icmp eq i64 %29, 9
+  tail call void @Assert(i1 %30)
   ret i64 0
 }

@@ -14,6 +14,9 @@ namespace wave
 		virtual void Visit(Decl const&, uint32) {}
 		virtual void Visit(FunctionDecl const&, uint32) {}
 		virtual void Visit(VariableDecl const&, uint32) {}
+		virtual void Visit(TagDecl const&, uint32) {}
+		virtual void Visit(EnumDecl const&, uint32) {}
+		virtual void Visit(EnumMemberDecl const&, uint32) {}
 
 		virtual void Visit(Stmt const&, uint32) {}
 		virtual void Visit(CompoundStmt const&, uint32) {}

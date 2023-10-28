@@ -140,6 +140,22 @@ namespace wave
 		}
 	}
 
+	void LLVMVisitor::Visit(TagDecl const&, uint32)
+	{
+		WAVE_ASSERT(false);
+	}
+
+	void LLVMVisitor::Visit(EnumDecl const& enum_decl, uint32)
+	{
+		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
+	}
+
+	void LLVMVisitor::Visit(EnumMemberDecl const& enum_member, uint32)
+	{
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, enum_member.GetValue());
+		llvm_value_map[&enum_member] = constant;
+	}
+
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
 	{
 		WAVE_ASSERT(false);

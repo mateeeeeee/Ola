@@ -22,23 +22,23 @@ It's done as a learning project and its purpose is solely educational.
   * `sizeof`
   * functions
   * scopes
+  * enums
   * implicit casts
   * import statement
   * one-line comments
   * standard library
     
 ## Todo
-  * Arrays
-  * Floats
-  * Enums
-  * Classes
+  * arrays
+  * floats
+  * classes
 
 ## Structure
 Wave consists of three parts: 
 1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler. Currently it contains 4 files: io.h, math.h, assert.h, string.h. To use it, either import the corresponding std file or declare an extern function with the correct signature.
 2. __Wave compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
-   * __Import Processor__ - receives tokens from previous phase and proceses for import statements. 
+   * __Import Processor__ - receives tokens from previous phase and processes import statements. 
    * __Parser__ - recursive descent parser that receives processed tokens and constructs Abstract Syntax Tree (AST) of a program. 
    * __Sema__ - does semantic analysis of a program. 
    * __LLVM Visitor__ - traverses AST and emits LLVM IR.
@@ -118,7 +118,7 @@ public var a = 10; // a is of type int
 public int Main() 
 {
 	int b = 3;
-	var int c = b; //c is of type int
+	var c = b; //c is of type int
 }
 ```
 
@@ -198,20 +198,23 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
                    | char {[]}*
                    | int  {[]}*
                    | float {[]}*
-                   | <enum-specifier> {[]}*
-                   | <class-specifier> {[]}*
+                   | <enum-identifier> {[]}*
+                   | <class-identifier> {[]}*
 				   
-<enum-specifier> ::= enum <identifier> { <enumerator-list> }
+<enum-specifier> ::= enum <enum-identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }
-                   | enum <identifier>
 
 <enumerator-list> ::= <enumerator>
                     | <enumerator-list> , <enumerator>
 
 <enumerator> ::= <identifier>
                | <identifier> = <constant-expression>
+
+<enum-identifier> ::= <identifier>
 			   
 <class-specifier> ::= ... (TODO)
+
+<class-identifier> ::= <identifier>
 
 <constant-expression> ::= <conditional-expression>
 

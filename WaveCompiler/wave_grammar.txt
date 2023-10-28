@@ -1,5 +1,3 @@
-
-
 <translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
 
 <import-declaration> ::= import <import_identifier>;
@@ -12,7 +10,8 @@
 
 <global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
                                 | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
-				| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
+								| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
+
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
@@ -24,20 +23,23 @@
                    | char {[]}*
                    | int  {[]}*
                    | float {[]}*
-                   | <enum-specifier> {[]}*
-                   | <class-specifier> {[]}*
+                   | <enum-identifier> {[]}*
+                   | <class-identifier> {[]}*
 				   
-<enum-specifier> ::= enum <identifier> { <enumerator-list> }
+<enum-specifier> ::= enum <enum-identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }
-                   | enum <identifier>
 
 <enumerator-list> ::= <enumerator>
                     | <enumerator-list> , <enumerator>
 
 <enumerator> ::= <identifier>
                | <identifier> = <constant-expression>
+
+<enum-identifier> ::= <identifier>
 			   
 <class-specifier> ::= ... (TODO)
+
+<class-identifier> ::= <identifier>
 
 <constant-expression> ::= <conditional-expression>
 
@@ -88,7 +90,6 @@
                      | -- <unary-expression>
                      | sizeof (<unary-expression>)
                      | sizeof (<type-specifier>)
-                     | typeof (<expression>)
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
@@ -167,4 +168,4 @@ identifier ::= letter { letter | digit | _ }*
 <jump-statement> ::= goto <identifier> ;
                    | continue ;
                    | break ;
-                   | return {<expression>}? ; 
+                   | return {<expression>}? ;
