@@ -2,7 +2,8 @@
 
 <translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
 
-<import-declaration> ::= import <identifier>;
+<import-declaration> ::= import <import_identifier>;
+<import_identifier> ::= <identifier>{.<identifier>}*
 
 <declaration-visibility>  ::= public | private
 
@@ -11,6 +12,7 @@
 
 <global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
                                 | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
+				| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
 
 <parameter-list> ::= <parameter-declaration>
                    | <parameter-list>, <parameter-declaration>
@@ -98,6 +100,11 @@
                        | <constant>
                        | <string>
                        | ( <expression> )
+
+letter	::= {[a-z|A-Z]}
+digit	::= [0-9]
+identifier ::= letter { letter | digit | _ }*
+<string> ::= "{ch}", where ch denotes any printable ASCII character 
 
 <constant> ::= <integer-constant>
              | <character-constant>
