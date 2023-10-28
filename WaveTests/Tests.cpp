@@ -70,16 +70,6 @@ TEST(Control, Goto)
 	EXPECT_EQ(WAVE(-i test_goto.wv), 0);
 }
 
-TEST(Control, Break)
-{
-
-}
-
-TEST(Control, Continue)
-{
-
-}
-
 TEST(Iteration, For)
 {
 	EXPECT_EQ(WAVE(-i test_for.wv), 0);

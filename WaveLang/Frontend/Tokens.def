@@ -98,8 +98,6 @@ KEYWORD(public)
 KEYWORD(private)
 
 KEYWORD(sizeof)
-KEYWORD(alignas)
-KEYWORD(alignof)
 
 KEYWORD(var)
 KEYWORD(import)

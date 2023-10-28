@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 {
 	CLI::App cli_parser{ "Wave compiler" };
 	CLI::Option* ast_dump = cli_parser.add_flag("--astdump", "Dump AST to output/log");
-	CLI::Option* test_debug = cli_parser.add_flag("--testdebug", "Print debug information during compilation process");
+	CLI::Option* test_debug = cli_parser.add_flag("--testdebug", "Print debug information during tests");
 	CLI::Option* test = cli_parser.add_flag("--test", "used for running g-tests");
 	CLI::Option* Od = cli_parser.add_flag("--Od", "No optimizations");
 	CLI::Option* O0 = cli_parser.add_flag("--O0", "No optimizations");

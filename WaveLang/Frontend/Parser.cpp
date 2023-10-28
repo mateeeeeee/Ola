@@ -644,8 +644,6 @@ namespace wave
 			unary_kind = UnaryExprKind::LogicalNot;
 			break;
 		case TokenKind::KW_sizeof: return ParseSizeofExpression();
-		case TokenKind::KW_alignof: return ParseAlignofExpression();
-		case TokenKind::KW_alignas: return ParseAlignasExpression();
 		default:
 			return ParsePostFixExpression();
 		}
@@ -713,16 +711,6 @@ namespace wave
 		}
 		Expect(TokenKind::right_round);
 		return sema->ActOnConstantInt(type->GetSize(), loc);
-	}
-
-	UniqueConstantIntPtr Parser::ParseAlignofExpression()
-	{
-		return nullptr;
-	}
-
-	UniqueConstantIntPtr Parser::ParseAlignasExpression()
-	{
-		return nullptr;
 	}
 
 	UniqueExprPtr Parser::ParsePrimaryExpression()
