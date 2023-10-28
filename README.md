@@ -1,7 +1,7 @@
 <img align="left" src="WaveLang/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is toy C-like programming language that uses LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
+Wave is toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
 It's done as a learning project and its purpose is solely educational.
 
 ## Dependencies
@@ -98,7 +98,7 @@ public int Main()
 ```
 
 ### Variables
-Variable declaration has a slightly different syntax for global and local variables:
+Variable declaration has a slightly different grammar rule for global and local variables:
 
 ```
 <global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
