@@ -1,7 +1,7 @@
 <img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
+Wave is a toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
 It's done as a learning project and its purpose is solely educational.
 
 ## Dependencies
@@ -78,7 +78,7 @@ File `main.wv`
 ```
 import util.math;
 
-public int Main() 
+public int main() 
 {
 	int a = 3;
 	return Add(a, 2);
@@ -90,7 +90,7 @@ File `main.wv` is equivalent to:
 extern float PI;
 extern int Add(int a, int b);
 
-public int Main() 
+public int main() 
 {
 	int a = 3;
 	return Add(a, 2);
@@ -115,7 +115,7 @@ One of the things they have in common is omitting the type of the variable and d
 
 ```
 public var a = 10; // a is of type int
-public int Main() 
+public int main() 
 {
 	int b = 3;
 	var c = b; //c is of type int
