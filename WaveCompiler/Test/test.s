@@ -18,58 +18,18 @@ main:                                   # @main
 	subq	$72, %rsp
 	.seh_stackalloc 72
 	.seh_endprologue
-	movq	$0, 56(%rsp)
-	cmpq	$0, 56(%rsp)
+	movq	$5, 56(%rsp)
+	xorl	%eax, %eax
+                                        # kill: def $rax killed $eax
+	subq	56(%rsp), %rax
+	movq	%rax, 48(%rsp)
+	cmpq	$-5, 48(%rsp)
 	sete	%cl
 	callq	Assert
-	movq	$1, 56(%rsp)
-	cmpq	$1, 56(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$2, 56(%rsp)
-	cmpq	$2, 56(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$0, 48(%rsp)
-	cmpq	$0, 48(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$5, 48(%rsp)
-	cmpq	$5, 48(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$3, 48(%rsp)
-	cmpq	$3, 48(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$4, 48(%rsp)
-	cmpq	$4, 48(%rsp)
-	sete	%cl
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movq	$0, 40(%rsp)
-	cmpq	$0, 40(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$1, 40(%rsp)
-	cmpq	$1, 40(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$2, 40(%rsp)
-	cmpq	$2, 40(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$0, 32(%rsp)
-	cmpq	$0, 32(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$1, 32(%rsp)
-	cmpq	$1, 32(%rsp)
-	sete	%cl
-	callq	Assert
-	movq	$3, 32(%rsp)
-	cmpq	$3, 32(%rsp)
+	movq	$10, 40(%rsp)
+	movq	40(%rsp), %rax
+	movq	%rax, 32(%rsp)
+	cmpq	$10, 32(%rsp)
 	sete	%cl
 	callq	Assert
 	movq	$0, 64(%rsp)

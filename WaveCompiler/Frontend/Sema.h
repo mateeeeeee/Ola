@@ -84,6 +84,7 @@ namespace wave
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
+		UniqueInitializerListExprPtr ActOnInitializerListExpr() { return nullptr; }
 
 	private:
 		Diagnostics& diagnostics;

@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 		}
 		else if (!input_files.empty())
 		{
-			if (output_file.empty()) output_file = "test";
+			if (output_file.empty()) output_file = input_files[0];
 
 			wave::CompilerInput compiler_input{};
 			compiler_input.flags = test_debug_flag ? wave::CompilerFlag_DumpAST | wave::CompilerFlag_O0 : wave::CompilerFlag_O3;
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 		WAVE_WARN("No input files provided!");
 		return 0;
 	}
-	if (output_file.empty()) output_file = "out";
+	if (output_file.empty()) output_file = input_files[0];
 	if (directory.empty()) directory = "Test";
 
 	wave::CompilerFlags compiler_flags = wave::CompilerFlag_None;

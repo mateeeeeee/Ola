@@ -47,5 +47,6 @@ namespace wave
 		virtual void Visit(ConstantFloat const&, uint32) override;
 		virtual void Visit(ImplicitCastExpr const&, uint32) override;
 		virtual void Visit(FunctionCallExpr const&, uint32) override;
+		virtual void Visit(InitializerListExpr const&, uint32) override;
 	};
 }

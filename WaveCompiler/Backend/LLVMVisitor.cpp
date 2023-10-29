@@ -735,6 +735,11 @@ namespace wave
 		llvm_value_map[&func_call] = call_result;
 	}
 
+	void LLVMVisitor::Visit(InitializerListExpr const& init_list, uint32)
+	{
+
+	}
+
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
 		if (IsBoolean(condition_value->getType()))

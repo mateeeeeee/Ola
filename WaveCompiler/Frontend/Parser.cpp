@@ -252,7 +252,6 @@ namespace wave
 		return sema->ActOnEnumDecl(enum_tag, loc, std::move(enum_members));
 	}
 
-
 	UniqueStmtPtr Parser::ParseStatement()
 	{
 		switch (current_token->GetKind())
@@ -832,6 +831,11 @@ namespace wave
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnIdentifier(name, loc);
+	}
+
+	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
+	{
+		return sema->ActOnInitializerListExpr();
 	}
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)

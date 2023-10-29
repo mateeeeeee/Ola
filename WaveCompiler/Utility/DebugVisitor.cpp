@@ -277,4 +277,9 @@ namespace wave
 	{
 		WAVE_DEBUG("{}FunctionCallExpr\n", GetIndentation(depth));
 	}
+
+	void DebugVisitor::Visit(InitializerListExpr const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}InitializerListExpr\n", GetIndentation(depth));
+	}
 }

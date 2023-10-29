@@ -92,7 +92,7 @@ namespace wave
 			std::string file_ext = fs::path(input.sources[i]).extension().string();
 
 			std::string ir_file = file_name + ".ll";
-			std::string const& source_file = input.sources[i];
+			std::string source_file = input.sources[i]; source_file += ".wv";
 
 			CompileTranslationUnit(source_file, ir_file, ast_dump, opt_level);
 

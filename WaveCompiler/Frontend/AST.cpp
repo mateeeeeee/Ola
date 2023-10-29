@@ -205,6 +205,11 @@ namespace wave
 		visitor.Visit(*this, depth);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
+	void InitializerListExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto const& element_expr : element_exprs) element_expr->Accept(visitor, depth + 1);
+	}
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
 	{
@@ -353,6 +358,11 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+	void InitializerListExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+
 
 }
 

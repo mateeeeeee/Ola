@@ -520,7 +520,8 @@ namespace wave
 		StringLiteral,
 		BoolLiteral,
 		DeclRef,
-		ImplicitCast
+		ImplicitCast,
+		InitializerList
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -775,6 +776,26 @@ namespace wave
 	private:
 		std::string function_name;
 		UniqueExprPtrList func_args;
+	};
+
+	class InitializerListExpr final : public Expr
+	{
+	public:
+		explicit InitializerListExpr(SourceLocation const& loc) : Expr(ExprKind::InitializerList, loc) {}
+
+		bool IsEmpty() const { return element_exprs.empty(); }
+
+		void SetElementExprs(UniqueExprPtrList&& _element_exprs)
+		{
+			element_exprs = std::move(_element_exprs);
+		}
+		UniqueExprPtrList const& GetElementExprs() const { return element_exprs; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueExprPtrList element_exprs;
 	};
 
 	struct AST

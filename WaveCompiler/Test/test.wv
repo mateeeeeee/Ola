@@ -1,66 +1,14 @@
 import std.assert;
 
-enum Number
-{
-	Number_zero,
-	Number_one, 
-	Number_two
-};
-
-enum Number2
-{
-	Number2_zero, 
-	Number2_five = 5, 
-	Number2_three = 3, 
-	Number2_four
-};
-
-enum 
-{
-	zero,
-	one, 
-	two
-};
-
 public int main()
 {
-		Number num = Number_zero;
-	Assert(num == 0);
-	num = Number_one;
-	Assert(num == 1);
-	num = Number_two;
-	Assert(num == 2);
+    int a = 5;
+    int b = -a;
+    Assert(b == -5);
 
-	Number2 num2 = Number2_zero;
-	Assert(num2 == 0);
-	num2 = Number2_five;
-	Assert(num2 == 5);
-	num2 = Number2_three;
-	Assert(num2 == 3);
-	num2 = Number2_four;
-	Assert(num2 == 4);
-	Assert(sizeof(num2) == 8);
+    int c = 10;
+    int d = +c;
+    Assert(d == 10);
 
-	int a = zero;
-	Assert(a == 0);
-	a = one;
-	Assert(a == 1);
-	a = two;
-	Assert(a == 2);
-
-	enum LocalNumber
-	{
-		Local_zero,
-		Local_one,
-		Local_three = 3
-	};
-	
-	LocalNumber b = Local_zero;
-	Assert(b == 0);
-	b = Local_one;
-	Assert(b == 1);
-	b = Local_three;
-	Assert(b == 3);
-
-	return 0;
+    return 0;
 }

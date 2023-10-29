@@ -41,6 +41,7 @@ namespace wave
 	class ConstantFloat;
 	class ImplicitCastExpr;
 	class FunctionCallExpr;
+	class InitializerListExpr;
 
 	struct AST;
 }

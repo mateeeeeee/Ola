@@ -120,6 +120,7 @@ namespace wave
 		WAVE_NODISCARD UniqueConstantBoolPtr ParseConstantBool();
 		WAVE_NODISCARD UniqueConstantFloatPtr ParseConstantFloat();
 		WAVE_NODISCARD UniqueIdentifierExprPtr ParseIdentifier();
+		WAVE_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
 		void ParseTypeQualifier(QualifiedType& type);
 		void ParseTypeSpecifier(QualifiedType& type);
