@@ -496,6 +496,15 @@ namespace wave
 		}
 	}
 
+	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtrList&& expr_list)
+	{
+		//do semantic validation: 1. check if all initializer elements have same time 2. check if it matches with type if it's specified
+		UniqueInitializerListExprPtr init_list_expr = MakeUnique<InitializerListExpr>(loc);
+		init_list_expr->SetType(type);
+		init_list_expr->SetElementExprs(std::move(expr_list));
+		return init_list_expr;
+	}
+
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)
 	{
 		QualifiedType const& cast_type = type;

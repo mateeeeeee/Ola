@@ -835,7 +835,19 @@ namespace wave
 
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
 	{
-		return sema->ActOnInitializerListExpr();
+		SourceLocation loc = current_token->GetLocation();
+		QualifiedType type{};
+		ParseTypeSpecifier(type);
+		Expect(TokenKind::left_brace);
+		UniqueExprPtrList expr_list;
+		while (true)
+		{
+			expr_list.push_back(ParseAssignmentExpression());
+			if (Consume(TokenKind::right_brace)) break;
+			Expect(TokenKind::comma);
+		}
+
+		return sema->ActOnInitializerListExpr(loc, type, std::move(expr_list));
 	}
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)

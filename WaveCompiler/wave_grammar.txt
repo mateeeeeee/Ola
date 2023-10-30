@@ -137,10 +137,11 @@ identifier ::= letter { letter | digit | _ }*
                    | ~
                    | !
 
-<local-variable-declaration> ::= <type-qualifier> <type-specifier> <identifier> { = <initializer>}?;
-                               | <type-qualifier> var <identifier> = <initializer>;
+<local-variable-declaration> ::= <type-qualifier> <type-specifier> <identifier> { = {<initializer> | <init-list-expr> }}?;
+                               | <type-qualifier> var <identifier> = {<initializer> | <init-list-expr> };
 	
 <initializer> ::= <assignment-expression>
+<init-list-expr> ::= {<type-specifier>{[<constant-expression>]}+}?{ <initializer>{,<initializer>}* }
 
 <compound-statement> ::= { { <local-variable-declaration> | <statement> }* }
 
