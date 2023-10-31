@@ -31,11 +31,12 @@ namespace wave
 		constexpr void SetAlign(uint32 _align) { align = _align; }
 		constexpr void SetSize(uint32 _size) { size = _size; }
 
-		bool IsSameAs(Type const& t) const
+		virtual bool IsSameAs(Type const& t) const
 		{
 			return kind == t.kind;
 		}
 		virtual bool IsAssignableFrom(Type const&) const { return true; }
+		virtual bool IsComplete() const { return true; }
 
 		TypeKind GetKind() const { return kind; }
 		bool Is(TypeKind t) const { return kind == t; }
@@ -190,18 +191,17 @@ namespace wave
 		{
 			if (other.IsNot(TypeKind::Array)) return false;
 			ArrayType const& other_array_type = type_cast<ArrayType>(other);
-
-			bool is_underlying_type_array = base_type->Is(TypeKind::Array);
-			bool is_other_underlying_type_array = other_array_type.base_type->Is(TypeKind::Array);
-			if (!is_underlying_type_array && !is_other_underlying_type_array)
-			{
-				return base_type->GetKind() == other_array_type.base_type->GetKind();
-			}
-			else if (is_underlying_type_array && is_other_underlying_type_array)
-			{
-				return base_type->IsAssignableFrom(*other_array_type.base_type);
-			}
-			else return false;
+			return base_type->IsAssignableFrom(other_array_type.base_type);
+		}
+		virtual bool IsSameAs(Type const& other) const override
+		{
+			if (other.IsNot(TypeKind::Array)) return false;
+			ArrayType const& other_array_type = type_cast<ArrayType>(other);
+			return base_type->IsSameAs(other_array_type.base_type);
+		}
+		virtual bool IsComplete() const override
+		{
+			return array_size > 0;
 		}
 
 		QualifiedType const& GetBaseType() const { return base_type; }

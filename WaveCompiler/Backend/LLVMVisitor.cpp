@@ -40,7 +40,7 @@ namespace wave
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
-		llvm::Function* llvm_function = llvm::Function::Create(function_type, function_decl.IsPublic() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage, 
+		llvm::Function* llvm_function = llvm::Function::Create(function_type, function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage,
 															   function_decl.GetName(), module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
@@ -97,6 +97,8 @@ namespace wave
 
 	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
+		bool is_array = var_decl.GetType()->Is(TypeKind::Array);
+
 		if (var_decl.IsGlobal())
 		{
 			if (var_decl.IsExtern())
@@ -105,23 +107,47 @@ namespace wave
 				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
 			}
-			else if(var_decl.GetInitExpr())
+			else if(Expr const* init_expr = var_decl.GetInitExpr())
 			{
 				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
-				WAVE_ASSERT(var_decl.GetInitExpr()->IsConstexpr());
-				var_decl.GetInitExpr()->Accept(*this);
-				llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-				llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
-				WAVE_ASSERT(constant_init_value);
+				if (is_array)
+				{
+					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
+					WAVE_ASSERT(init_list_expr);
+					init_list_expr->Accept(*this);
 
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
-				llvm_value_map[&var_decl] = global_var;
+					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
+					std::vector<llvm::Constant*> array_init_list(init_list.size());
+					for (uint64 i = 0; i < init_list.size(); ++i)
+					{
+						WAVE_ASSERT(init_list[i]->IsConstexpr());
+						array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
+					}
+					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(variable_type), array_init_list);
+
+					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+					llvm::GlobalVariable* myArray = new llvm::GlobalVariable( module, variable_type, true, linkage, constant_array);
+				}
+				else
+				{
+					WAVE_ASSERT(init_expr->IsConstexpr());
+					init_expr->Accept(*this);
+					llvm::Value* init_value = llvm_value_map[init_expr];
+					llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
+					WAVE_ASSERT(constant_init_value);
+
+					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), linkage, constant_init_value, var_decl.GetName());
+					llvm_value_map[&var_decl] = global_var;
+				}
 			}
 			else
 			{
 				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
 				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(variable_type);
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::InternalLinkage, constant_init_value, var_decl.GetName());
+
+				llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), linkage, constant_init_value, var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
 			}
 		}
@@ -130,13 +156,31 @@ namespace wave
 			llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
 			llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
 
-			if (var_decl.GetInitExpr())
+			if (Expr const* init_expr = var_decl.GetInitExpr())
 			{
-				var_decl.GetInitExpr()->Accept(*this);
-				llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-				Store(init_value, alloca);
+				init_expr->Accept(*this);
+				if (is_array)
+				{
+					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
+					WAVE_ASSERT(init_list_expr);
+					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
+
+					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
+					for (uint64 i = 0; i < init_list.size(); ++i)
+					{
+						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloca, { zero, index });
+						Store(llvm_value_map[init_list[i].get()], ptr);
+					}
+				}
+				else
+				{
+					llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
+					Store(init_value, alloca);
+				}
 			}
 			llvm_value_map[&var_decl] = alloca;
+			
 		}
 	}
 
@@ -163,7 +207,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(CompoundStmt const& compound_stmt, uint32)
 	{
-		for (auto const& statement : compound_stmt.GetStmts()) statement->Accept(*this);
+		for (auto const& stmt : compound_stmt.GetStmts()) stmt->Accept(*this);
 	}
 
 	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32)
@@ -737,7 +781,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(InitializerListExpr const& init_list, uint32)
 	{
-
+		for (auto const& element_expr : init_list.GetInitList()) element_expr->Accept(*this);
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)

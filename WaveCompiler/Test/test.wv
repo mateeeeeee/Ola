@@ -1,14 +1,11 @@
 import std.assert;
 
+//private void f(int[] arg)
+//{
+//}
+
 public int main()
 {
-    int a = 5;
-    int b = -a;
-    Assert(b == -5);
-
-    int c = 10;
-    int d = +c;
-    Assert(d == 10);
-
+    int[] a = {1,2,3};
     return 0;
 }

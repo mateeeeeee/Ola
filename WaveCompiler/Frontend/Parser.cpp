@@ -95,14 +95,14 @@ namespace wave
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
-				UniqueVariableDeclPtr param_decl = ParseParamDeclaration();
+				UniqueVariableDeclPtr param_decl = ParseFunctionParamDeclaration();
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
 			function_type.SetRawType(FunctionType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls));
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern);
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
@@ -131,7 +131,7 @@ namespace wave
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
-				UniqueVariableDeclPtr param_decl = ParseParamDeclaration();
+				UniqueVariableDeclPtr param_decl = ParseFunctionParamDeclaration();
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -144,7 +144,7 @@ namespace wave
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility);
 	}
 
-	UniqueVariableDeclPtr Parser::ParseParamDeclaration()
+	UniqueVariableDeclPtr Parser::ParseFunctionParamDeclaration()
 	{
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -158,18 +158,18 @@ namespace wave
 			++current_token;
 		}
 
-		if (!variable_type.HasRawType()) Diag(missing_type_specifier);
-		if (variable_type->Is(TypeKind::Void)) Diag(void_invalid_context);
-
-		return sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::None);
+		return sema->ActOnFunctionParamDecl(name, loc, variable_type);
 	}
 
 	UniqueDeclPtrList Parser::ParseVariableDeclaration()
 	{
 		DeclVisibility visibility = DeclVisibility::None;
-		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
-
+		if (sema->ctx.decl_sym_table.IsGlobal())
+		{
+			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+		}
+		
 		UniqueDeclPtrList var_decl_list;
 		QualifiedType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -182,7 +182,12 @@ namespace wave
 			std::string_view name = current_token->GetIdentifier(); ++current_token;
 
 			UniqueExprPtr init_expr = nullptr;
-			if (Consume(TokenKind::equal)) init_expr = ParseAssignmentExpression();
+			if (Consume(TokenKind::equal))
+			{
+				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
+					 init_expr = ParseInitializerListExpression();
+				else init_expr = ParseAssignmentExpression();
+			}
 
 			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 			var_decl_list.push_back(std::move(var_decl));
@@ -837,7 +842,7 @@ namespace wave
 	{
 		SourceLocation loc = current_token->GetLocation();
 		QualifiedType type{};
-		ParseTypeSpecifier(type);
+		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true);
 		Expect(TokenKind::left_brace);
 		UniqueExprPtrList expr_list;
 		while (true)
@@ -858,7 +863,7 @@ namespace wave
 		}
 	}
 
-	void Parser::ParseTypeSpecifier(QualifiedType& type)
+	void Parser::ParseTypeSpecifier(QualifiedType& type, bool array_size_required)
 	{
 		switch (current_token->GetKind())
 		{
@@ -896,14 +901,29 @@ namespace wave
 				return;
 			}
 
-			if (Consume(TokenKind::right_square))
+			if (array_size_required)
 			{
-				ArrayType array_type(type);
+				UniqueExprPtr array_size_expr = ParseConditionalExpression();
+				if (!array_size_expr->IsConstexpr())
+				{
+					//Diag();
+					return;
+				}
+				int64 array_size = array_size_expr->EvaluateConstexpr();
+				if(array_size <= 0)
+				{
+					//Diag();
+					return;
+				}
+				Expect(TokenKind::right_square);
+				ArrayType array_type(type, array_size);
 				type.SetRawType(array_type);
 			}
 			else
 			{
 				Expect(TokenKind::right_square);
+				ArrayType array_type(type);
+				type.SetRawType(array_type);
 			}
 		}
 	}

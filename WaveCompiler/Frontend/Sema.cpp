@@ -4,7 +4,6 @@
 
 namespace wave
 {
-
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
@@ -39,11 +38,14 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
+		if (has_type_specifier && type->Is(TypeKind::Void))
+		{
+			diagnostics.Report(loc, void_invalid_context);
+		}
 
 		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
 		var_decl->SetVisibility(visibility);
-
 		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
 
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
@@ -52,7 +54,7 @@ namespace wave
 		}
 		var_decl->SetInitExpr(std::move(init_expr));
 
-		if (has_init && !has_type_specifier)
+		if ((has_init && !has_type_specifier) || type->Is(TypeKind::Array))
 		{
 			QualifiedType var_type(var_decl->GetInitExpr()->GetType());
 			if (type.IsConst()) var_type.AddConst();
@@ -62,16 +64,39 @@ namespace wave
 		{
 			var_decl->SetType(type);
 		}
-		
+
 		if(!name.empty()) ctx.decl_sym_table.Insert(var_decl.get());
 		return var_decl;
 	}
 
-	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+	UniqueVariableDeclPtr Sema::ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type)
+	{
+		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		if (!type.HasRawType())
+		{
+			diagnostics.Report(loc, missing_type_specifier);
+		}
+		if (type->Is(TypeKind::Void))
+		{
+			diagnostics.Report(loc, void_invalid_context);
+		}
+
+		std::unique_ptr<VariableDecl> param_decl = MakeUnique<VariableDecl>(name, loc);
+		param_decl->SetGlobal(false);
+		param_decl->SetVisibility(DeclVisibility::None);
+		param_decl->SetType(type);
+		if (!name.empty()) ctx.decl_sym_table.Insert(param_decl.get());
+		return param_decl;
+
+	}
+
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type,
 												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
 		bool is_extern = body_stmt == nullptr;
-
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -89,21 +114,17 @@ namespace wave
 
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
+		function_decl->SetVisibility(visibility);
 		function_decl->SetParamDecls(std::move(param_decls));
 		if (body_stmt)
 		{
 			function_decl->SetBodyStmt(std::move(body_stmt));
-			function_decl->SetVisibility(visibility);
 			for (std::string const& goto_label : ctx.gotos)
 			{
 				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
 			}
 			ctx.gotos.clear();
 			ctx.labels.clear();
-		}
-		else
-		{
-			function_decl->SetVisibility(DeclVisibility::Public);
 		}
 
 		bool result = ctx.decl_sym_table.Insert(function_decl.get());
@@ -498,10 +519,46 @@ namespace wave
 
 	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtrList&& expr_list)
 	{
-		//do semantic validation: 1. check if all initializer elements have same time 2. check if it matches with type if it's specified
+		if(!type.HasRawType() && expr_list.empty())
+		{
+			diagnostics.Report(loc, invalid_init_list_expression);
+			return nullptr;
+		}
+
+		QualifiedType expr_type{};
+		if (type.HasRawType())
+		{
+			WAVE_ASSERT(type->Is(TypeKind::Array));
+			ArrayType const& array_type = type_cast<ArrayType>(type);
+			WAVE_ASSERT(array_type.GetArraySize() > 0);
+			if (array_type.GetArraySize() < expr_list.size())
+			{
+				diagnostics.Report(loc, array_size_not_positive);
+				return nullptr;
+			}
+			QualifiedType const& base_type = array_type.GetBaseType();
+			expr_type = base_type;
+		}
+		else
+		{
+			expr_type = expr_list.front()->GetType();
+			QualifiedType base_type(expr_type);
+			ArrayType arr_type(base_type, expr_list.size());
+			const_cast<QualifiedType&>(type).SetRawType(arr_type);
+		}
+
+		for (auto const& expr : expr_list)
+		{
+			if (!expr->GetType()->IsSameAs(expr_type))
+			{
+				diagnostics.Report(loc, init_list_element_expressions_type_mismatch);
+				return nullptr;
+			}
+		}
+
 		UniqueInitializerListExprPtr init_list_expr = MakeUnique<InitializerListExpr>(loc);
 		init_list_expr->SetType(type);
-		init_list_expr->SetElementExprs(std::move(expr_list));
+		init_list_expr->SetInitList(std::move(expr_list));
 		return init_list_expr;
 	}
 
@@ -518,6 +575,5 @@ namespace wave
 		cast_expr->SetOperand(std::move(expr));
 		return cast_expr;
 	}
-
 }
 

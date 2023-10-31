@@ -67,6 +67,7 @@ namespace wave
 			visibility = _visibility;
 		}
 		bool IsPublic() const { return visibility == DeclVisibility::Public; }
+		bool IsPrivate() const { return visibility == DeclVisibility::Private; }
 		bool IsExtern() const { return visibility == DeclVisibility::Extern; }
 
 		virtual bool IsTag() const { return false; }
@@ -783,19 +784,26 @@ namespace wave
 	public:
 		explicit InitializerListExpr(SourceLocation const& loc) : Expr(ExprKind::InitializerList, loc) {}
 
-		bool IsEmpty() const { return element_exprs.empty(); }
+		bool IsEmpty() const { return init_list.empty(); }
 
-		void SetElementExprs(UniqueExprPtrList&& _element_exprs)
+		void SetInitList(UniqueExprPtrList&& _init_list)
 		{
-			element_exprs = std::move(_element_exprs);
+			init_list = std::move(_init_list);
 		}
-		UniqueExprPtrList const& GetElementExprs() const { return element_exprs; }
+		UniqueExprPtrList const& GetInitList() const { return init_list; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		virtual bool IsConstexpr() const 
+		{ 
+			bool is_constexpr = true;
+			for (auto const& init_elem : init_list) if (!init_elem->IsConstexpr()) return false;
+			return true;
+		}
+
 	private:
-		UniqueExprPtrList element_exprs;
+		UniqueExprPtrList init_list;
 	};
 
 	struct AST

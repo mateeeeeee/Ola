@@ -51,10 +51,11 @@ namespace wave
 	private:
 
 		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												UniqueExprPtr&& init_expr, DeclVisibility visibility = DeclVisibility::Private);
+												UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueVariableDeclPtr ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type);
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
-												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt = nullptr, 
-												DeclVisibility visibility = DeclVisibility::Private);
+												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
+												DeclVisibility visibility);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);

@@ -208,7 +208,7 @@ namespace wave
 	void InitializerListExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
-		for (auto const& element_expr : element_exprs) element_expr->Accept(visitor, depth + 1);
+		for (auto const& init_elem : init_list) init_elem->Accept(visitor, depth + 1);
 	}
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
