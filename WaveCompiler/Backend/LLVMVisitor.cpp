@@ -126,7 +126,9 @@ namespace wave
 					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(variable_type), array_init_list);
 
 					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-					llvm::GlobalVariable* myArray = new llvm::GlobalVariable( module, variable_type, true, linkage, constant_array);
+					llvm::GlobalVariable* global_array = new llvm::GlobalVariable( module, variable_type, var_decl.GetType().IsConst(), linkage, constant_array, var_decl.GetName());
+
+					llvm_value_map[&var_decl] = global_array;
 				}
 				else
 				{
@@ -180,7 +182,6 @@ namespace wave
 				}
 			}
 			llvm_value_map[&var_decl] = alloca;
-			
 		}
 	}
 
