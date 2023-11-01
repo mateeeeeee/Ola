@@ -782,7 +782,7 @@ namespace wave
 		}
 		else
 		{
-			UniqueExprPtr sizeof_expr = ParseExpression();
+			UniqueExprPtr sizeof_expr = ParseUnaryExpression();
 			type = sizeof_expr->GetType();
 		}
 		Expect(TokenKind::right_round);
@@ -794,7 +794,7 @@ namespace wave
 		Expect(TokenKind::KW_length);
 		Expect(TokenKind::left_round);
 		SourceLocation loc = current_token->GetLocation();
-		UniqueExprPtr length_expr = ParseExpression();
+		UniqueExprPtr length_expr = ParseUnaryExpression();
 		QualifiedType const& type = length_expr->GetType();
 		Expect(TokenKind::right_round);
 		return sema->ActOnLengthOperator(type, loc);

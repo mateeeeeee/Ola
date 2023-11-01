@@ -90,6 +90,7 @@
                      | -- <unary-expression>
                      | sizeof (<unary-expression>)
                      | sizeof (<type-specifier>)
+                     | length (<unary-expression>)
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]

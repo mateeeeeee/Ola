@@ -266,6 +266,7 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
                      | -- <unary-expression>
                      | sizeof (<unary-expression>)
                      | sizeof (<type-specifier>)
+                     | length (<unary-expression>)
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
