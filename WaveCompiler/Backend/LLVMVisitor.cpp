@@ -97,37 +97,41 @@ namespace wave
 
 	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
-		bool is_array = var_decl.GetType()->Is(TypeKind::Array);
+		QualifiedType const& var_type = var_decl.GetType();
+		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
+		bool const is_array = var_type->Is(TypeKind::Array);
 
 		if (var_decl.IsGlobal())
 		{
 			if (var_decl.IsExtern())
 			{
-				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
 			}
 			else if(Expr const* init_expr = var_decl.GetInitExpr())
 			{
-				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
 				if (is_array)
 				{
+					ArrayType const& array_type = type_cast<ArrayType>(var_type);
+					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
+
 					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
 					WAVE_ASSERT(init_list_expr);
 					init_list_expr->Accept(*this);
 
 					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
-					std::vector<llvm::Constant*> array_init_list(init_list.size());
-					for (uint64 i = 0; i < init_list.size(); ++i)
+					std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
+					for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
 					{
-						WAVE_ASSERT(init_list[i]->IsConstexpr());
-						array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
+						if (i < init_list.size()) 
+							array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
+						else					  
+							array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
 					}
-					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(variable_type), array_init_list);
+					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_type), array_init_list);
 
 					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-					llvm::GlobalVariable* global_array = new llvm::GlobalVariable( module, variable_type, var_decl.GetType().IsConst(), linkage, constant_array, var_decl.GetName());
-
+					llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_array, var_decl.GetName());
 					llvm_value_map[&var_decl] = global_array;
 				}
 				else
@@ -139,25 +143,21 @@ namespace wave
 					WAVE_ASSERT(constant_init_value);
 
 					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), linkage, constant_init_value, var_decl.GetName());
+					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_init_value, var_decl.GetName());
 					llvm_value_map[&var_decl] = global_var;
 				}
 			}
 			else
 			{
-				llvm::Type* variable_type = ConvertToLLVMType(var_decl.GetType());
-				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(variable_type);
-
+				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(llvm_type);
 				llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, variable_type, var_decl.GetType().IsConst(), linkage, constant_init_value, var_decl.GetName());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_init_value, var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
 			}
 		}
 		else
 		{
-			llvm::Type* llvm_type = ConvertToLLVMType(var_decl.GetType());
 			llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
-
 			if (Expr const* init_expr = var_decl.GetInitExpr())
 			{
 				init_expr->Accept(*this);

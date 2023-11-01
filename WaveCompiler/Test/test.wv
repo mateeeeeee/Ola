@@ -1,12 +1,10 @@
 import std.assert;
 
-//private void f(int[] arg)
-//{
-//}
+var global_arr = int[5]{1,2,3};
 
 public int main()
 {
-    int[] a = {1,2,3};
+    var a = int[10]{1,2,3};
     int b = 10;
     return length(a);
 }

@@ -6,8 +6,7 @@
 namespace wave
 {
 
-	Parser::Parser(Diagnostics& diagnostics) 
-		: diagnostics(diagnostics) {}
+	Parser::Parser(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Parser::~Parser() = default;
 
 	void Parser::Parse(std::vector<Token>&& _tokens)
@@ -869,10 +868,7 @@ namespace wave
 
 	void Parser::ParseTypeQualifier(QualifiedType& type)
 	{
-		if (Consume(TokenKind::KW_const))
-		{
-			type.AddConst();
-		}
+		if (Consume(TokenKind::KW_const)) type.AddConst();
 	}
 
 	void Parser::ParseTypeSpecifier(QualifiedType& type, bool array_size_required)
