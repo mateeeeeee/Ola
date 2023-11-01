@@ -6,6 +6,17 @@
 	.globl	@feat.00
 .set @feat.00, 0
 	.file	"WaveModule"
+	.def	f;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function f
+f:                                      # @f
+# %bb.0:                                # %entry
+	movq	$100, (%rcx)
+# %bb.1:                                # %exit
+	retq
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -15,31 +26,23 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$56, %rsp
-	.seh_stackalloc 56
+	subq	$72, %rsp
+	.seh_stackalloc 72
 	.seh_endprologue
-	movq	$12, 8(%rsp)
-	movq	$2, 16(%rsp)
-	movq	$3, 24(%rsp)
-	movq	$0, 32(%rsp)
-	movq	$0, 40(%rsp)
-	movq	(%rsp), %rax
-	movq	%rax, (%rsp)
-	movq	(%rsp), %rax
-	movq	%rax, 48(%rsp)
+	movq	$1, 40(%rsp)
+	movq	$2, 48(%rsp)
+	movq	$3, 56(%rsp)
+	movq	$10, 40(%rsp)
+	movq	40(%rsp), %rcx
+	movl	$3, %edx
+	callq	f
+	movq	40(%rsp), %rax
+	movq	%rax, 64(%rsp)
 # %bb.1:                                # %exit
-	movq	48(%rsp), %rax
-	addq	$56, %rsp
+	movq	64(%rsp), %rax
+	addq	$72, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
-	.data
-	.p2align	4, 0x0                          # @a
-a:
-	.quad	12                              # 0xc
-	.quad	2                               # 0x2
-	.quad	3                               # 0x3
-	.quad	0                               # 0x0
-	.quad	0                               # 0x0
-
 	.addrsig
+	.addrsig_sym f

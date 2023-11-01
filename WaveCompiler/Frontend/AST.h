@@ -808,7 +808,10 @@ namespace wave
 	class ArrayAccessExpr final : public Expr
 	{
 	public:
-		explicit ArrayAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc) {}
+		explicit ArrayAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc) 
+		{
+			SetValueCategory(ExprValueCategory::LValue);
+		}
 
 		void SetArrayExpr(UniqueExprPtr&& _array_expr)
 		{

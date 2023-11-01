@@ -40,8 +40,8 @@ namespace wave
 		QualifiedType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
-		llvm::Function* llvm_function = llvm::Function::Create(function_type, function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage,
-															   function_decl.GetName(), module);
+		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetName(), module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
 		for (auto& param : function_decl.GetParamDeclarations())
@@ -57,7 +57,7 @@ namespace wave
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
 		builder.SetInsertPoint(entry_block);
 
-		return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
+		if(!function_type->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
 
 		ConstLabelStmtPtrList labels = function_decl.GetLabels();
@@ -84,6 +84,11 @@ namespace wave
 		{
 			builder.SetInsertPoint(empty_block);
 			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
+			builder.CreateBr(exit_block);
+		}
+		if (entry_block->getTerminator() == nullptr)
+		{
+			builder.SetInsertPoint(entry_block);
 			builder.CreateBr(exit_block);
 		}
 
@@ -801,12 +806,23 @@ namespace wave
 		index_expr->Accept(*this);
 
 		llvm::Value* array_value = llvm_value_map[array_expr];
-		llvm::Value* bracket_value = llvm_value_map[index_expr];
-		llvm::Type* arr_type = ConvertToLLVMType(array_expr->GetType());
+		llvm::Value* index_value = llvm_value_map[index_expr];
 
 		llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
-		llvm::Value* ptr = builder.CreateGEP(arr_type, array_value, { zero, bracket_value });
-		llvm_value_map[&array_access] = ptr;
+		ArrayType const& array_type = type_cast<ArrayType>(array_expr->GetType());
+		llvm::Type* arr_type = ConvertToLLVMType(array_type);
+
+		if (array_type.GetArraySize() > 0)
+		{
+			llvm::Value* ptr = builder.CreateGEP(arr_type, array_value, { zero, index_value });
+			llvm_value_map[&array_access] = ptr;
+		}
+		else
+		{
+			llvm::Type* base_type = ConvertToLLVMType(array_type.GetBaseType());
+			llvm::Value* ptr = builder.CreateInBoundsGEP(base_type, array_value, index_value);
+			llvm_value_map[&array_access] = ptr;
+		}
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
@@ -840,7 +856,8 @@ namespace wave
 		case TypeKind::Array:
 		{
 			ArrayType const& array_type = type_cast<ArrayType>(type);
-			return llvm::ArrayType::get(ConvertToLLVMType(array_type.GetBaseType()), array_type.GetArraySize());
+			if (array_type.GetArraySize() > 0) return llvm::ArrayType::get(ConvertToLLVMType(array_type.GetBaseType()), array_type.GetArraySize());
+			else return llvm::PointerType::get(ConvertToLLVMType(array_type.GetBaseType()), 0);
 		}
 		case TypeKind::Function:
 		{

@@ -1,10 +1,14 @@
 import std.assert;
 
-var a = int[5]{12,2,3};
+void f(int[] a, int size)
+{
+    a[0] = 100;
+}
 
 public int main()
 {
-    var a = int[5]{12,2,3};
-    int b = a[2];
-    return b;
+    var a = int[3]{1,2,3};
+    a[0] = 10;
+    //f(a, length(a));
+    return a[0];
 }
