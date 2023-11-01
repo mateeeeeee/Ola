@@ -98,7 +98,7 @@ KEYWORD(public)
 KEYWORD(private)
 
 KEYWORD(sizeof)
-
+KEYWORD(length)
 KEYWORD(var)
 KEYWORD(import)
 

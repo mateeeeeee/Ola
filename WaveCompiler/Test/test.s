@@ -18,7 +18,10 @@ main:                                   # @main
 	subq	$32, %rsp
 	.seh_stackalloc 32
 	.seh_endprologue
-	movq	$0, 24(%rsp)
+	movq	$1, (%rsp)
+	movq	$2, 8(%rsp)
+	movq	$3, 16(%rsp)
+	movq	$3, 24(%rsp)
 # %bb.1:                                # %exit
 	movq	24(%rsp), %rax
 	addq	$32, %rsp

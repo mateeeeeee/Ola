@@ -7,5 +7,6 @@ import std.assert;
 public int main()
 {
     int[] a = {1,2,3};
-    return 0;
+    int b = 10;
+    return length(a);
 }

@@ -488,6 +488,17 @@ namespace wave
 		return MakeUnique<ConstantInt>(value, loc);
 	}
 
+	UniqueConstantIntPtr Sema::ActOnLengthOperator(QualifiedType const& type, SourceLocation const& loc)
+	{
+		if (!IsArrayType(type))
+		{
+			diagnostics.Report(loc, length_operator_argument_not_array);
+			return nullptr;
+		}
+		ArrayType const& array_type = type_cast<ArrayType>(type);
+		return ActOnConstantInt(array_type.GetArraySize(), loc);
+	}
+
 	UniqueConstantStringPtr Sema::ActOnConstantString(std::string_view str, SourceLocation const& loc)
 	{
 		return MakeUnique<ConstantString>(str, loc);

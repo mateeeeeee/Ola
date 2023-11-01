@@ -701,6 +701,7 @@ namespace wave
 			unary_kind = UnaryExprKind::LogicalNot;
 			break;
 		case TokenKind::KW_sizeof: return ParseSizeofExpression();
+		case TokenKind::KW_length: return ParseLengthExpression();
 		default:
 			return ParsePostFixExpression();
 		}
@@ -749,27 +750,6 @@ namespace wave
 		return expr;
 	}
 
-	UniqueExprPtr Parser::ParseSizeofExpression()
-	{
-		Expect(TokenKind::KW_sizeof);
-		Expect(TokenKind::left_round);
-		
-		SourceLocation loc = current_token->GetLocation();
-		QualifiedType type{};
-		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var))
-		{
-			ParseTypeQualifier(type);
-			ParseTypeSpecifier(type);
-		}
-		else
-		{
-			UniqueExprPtr sizeof_expr = ParseExpression();
-			type = sizeof_expr->GetType();
-		}
-		Expect(TokenKind::right_round);
-		return sema->ActOnConstantInt(type->GetSize(), loc);
-	}
-
 	UniqueExprPtr Parser::ParsePrimaryExpression()
 	{
 		switch (current_token->GetKind())
@@ -787,6 +767,38 @@ namespace wave
 		}
 		WAVE_ASSERT(false);
 		return nullptr;
+	}
+
+	UniqueConstantIntPtr Parser::ParseSizeofExpression()
+	{
+		Expect(TokenKind::KW_sizeof);
+		Expect(TokenKind::left_round);
+
+		SourceLocation loc = current_token->GetLocation();
+		QualifiedType type{};
+		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var))
+		{
+			ParseTypeQualifier(type);
+			ParseTypeSpecifier(type);
+		}
+		else
+		{
+			UniqueExprPtr sizeof_expr = ParseExpression();
+			type = sizeof_expr->GetType();
+		}
+		Expect(TokenKind::right_round);
+		return sema->ActOnConstantInt(type->GetSize(), loc);
+	}
+
+	UniqueConstantIntPtr Parser::ParseLengthExpression()
+	{
+		Expect(TokenKind::KW_length);
+		Expect(TokenKind::left_round);
+		SourceLocation loc = current_token->GetLocation();
+		UniqueExprPtr length_expr = ParseExpression();
+		QualifiedType const& type = length_expr->GetType();
+		Expect(TokenKind::right_round);
+		return sema->ActOnLengthOperator(type, loc);
 	}
 
 	UniqueConstantIntPtr Parser::ParseConstantInt()

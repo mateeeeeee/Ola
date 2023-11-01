@@ -19,7 +19,7 @@ It's done as a learning project and its purpose is solely educational.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`, `while`, `do` `while`, `break`, `continue`
-  * `sizeof`
+  * `sizeof`, `length` operators
   * functions
   * scopes
   * enums
@@ -29,13 +29,13 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * arrays
+  * arrays (wip)
   * floats
   * classes
 
 ## Structure
 Wave consists of three parts: 
-1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler. Currently it contains 4 files: io.h, math.h, assert.h, string.h. To use it, either import the corresponding std file or declare an extern function with the correct signature.
+1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: io.h, math.h, assert.h, string.h.
 2. __Wave compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
    * __Import Processor__ - receives tokens from previous phase and processes import statements. 
@@ -49,9 +49,9 @@ Wave consists of three parts:
 ## Syntax
 The translation unit, at the top level, consists of import statements and global declarations. All the import statements must be at the top of the file.
 If the global declaration is extern, it means it's defined somewhere else. If not, it can be either private or public. By default, both function and variable declarations
-are private. Private declarations are not visible outside of the translation unit where they are defined unlike public ones. 
+are private. Private declarations are not visible outside of the translation unit in which they are defined. 
 ### Import statement
-Import statement has a following syntax:
+Import statement has a following grammar:
 ```
 <import-declaration> ::= import <import_identifier>;
 <import_identifier> ::= <identifier>{.<identifier>}*
@@ -149,6 +149,7 @@ public int main()
 - `public`
 - `private`
 - `sizeof`
+- `length`
 - `var`
 - `import`
 

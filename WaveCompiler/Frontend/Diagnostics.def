@@ -44,4 +44,5 @@ DIAG(incomplete_type_declaration, error, "Enumerator value for '{}' is not an in
 DIAG(invalid_init_list_expression, error, "Invalid initializer list expression")
 DIAG(array_size_not_positive, error, "Array size must be a positive integer")
 DIAG(init_list_element_expressions_type_mismatch, error, "Initializer list elements must have the same type")
+DIAG(length_operator_argument_not_array, error, "Only array variables can be passed to length operator")
 #undef DIAG

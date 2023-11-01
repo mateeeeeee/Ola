@@ -363,6 +363,5 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 
-
 }
 

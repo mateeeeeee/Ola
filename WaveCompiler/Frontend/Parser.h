@@ -113,8 +113,9 @@ namespace wave
 		WAVE_NODISCARD UniqueExprPtr ParseMultiplicativeExpression();
 		WAVE_NODISCARD UniqueExprPtr ParseUnaryExpression();
 		WAVE_NODISCARD UniqueExprPtr ParsePostFixExpression();
-		WAVE_NODISCARD UniqueExprPtr ParseSizeofExpression();
 		WAVE_NODISCARD UniqueExprPtr ParsePrimaryExpression();
+		WAVE_NODISCARD UniqueConstantIntPtr ParseSizeofExpression();
+		WAVE_NODISCARD UniqueConstantIntPtr ParseLengthExpression();
 		WAVE_NODISCARD UniqueConstantIntPtr ParseConstantInt();
 		WAVE_NODISCARD UniqueConstantStringPtr ParseConstantString();
 		WAVE_NODISCARD UniqueConstantBoolPtr ParseConstantBool();
