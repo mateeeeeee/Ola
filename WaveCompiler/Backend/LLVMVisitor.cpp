@@ -123,10 +123,8 @@ namespace wave
 					std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
 					for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
 					{
-						if (i < init_list.size()) 
-							array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
-						else					  
-							array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
+						if (i < init_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
+						else					   array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
 					}
 					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_type), array_init_list);
 
@@ -157,12 +155,15 @@ namespace wave
 		}
 		else
 		{
-			llvm::AllocaInst* alloca = builder.CreateAlloca(llvm_type, nullptr);
+			llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 			if (Expr const* init_expr = var_decl.GetInitExpr())
 			{
 				init_expr->Accept(*this);
 				if (is_array)
 				{
+					ArrayType const& array_type = type_cast<ArrayType>(var_type);
+					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
+
 					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
 					WAVE_ASSERT(init_list_expr);
 					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
@@ -171,17 +172,23 @@ namespace wave
 					for (uint64 i = 0; i < init_list.size(); ++i)
 					{
 						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
-						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloca, { zero, index });
+						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 						Store(llvm_value_map[init_list[i].get()], ptr);
+					}
+					for (uint64 i = init_list.size(); i < array_type.GetArraySize(); ++i)
+					{
+						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
+						Store(llvm::Constant::getNullValue(llvm_element_type), ptr);
 					}
 				}
 				else
 				{
 					llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
-					Store(init_value, alloca);
+					Store(init_value, alloc);
 				}
 			}
-			llvm_value_map[&var_decl] = alloca;
+			llvm_value_map[&var_decl] = alloc;
 		}
 	}
 
@@ -785,6 +792,23 @@ namespace wave
 		for (auto const& element_expr : init_list.GetInitList()) element_expr->Accept(*this);
 	}
 
+	void LLVMVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
+	{
+		Expr const* array_expr = array_access.GetArrayExpr();
+		Expr const* index_expr = array_access.GetIndexExpr();
+
+		array_expr->Accept(*this);
+		index_expr->Accept(*this);
+
+		llvm::Value* array_value = llvm_value_map[array_expr];
+		llvm::Value* bracket_value = llvm_value_map[index_expr];
+		llvm::Type* arr_type = ConvertToLLVMType(array_expr->GetType());
+
+		llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
+		llvm::Value* ptr = builder.CreateGEP(arr_type, array_value, { zero, bracket_value });
+		llvm_value_map[&array_access] = ptr;
+	}
+
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
 		if (IsBoolean(condition_value->getType()))
@@ -874,7 +898,6 @@ namespace wave
 	{
 		return type->isDoubleTy();
 	}
-
 }
 
 

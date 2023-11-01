@@ -1,23 +1,12 @@
 import std.assert;
 
-extern int[] extern_arr;
-int[] global_arr = {1,2,3};
-var global_arr2 = int[5]{1,2};
 
 public void main()
 {
-	int[] arr = {1,2,3}; //arr of type int[3]
-	int[] arr2 = int[5]{1,2,3}; //arr of type int[5] - elements: 1,2,3,0,0
-	var arr3 = {1,2,3,4}; //arr of type int[4]
-	int[][] arr4 = {{1,2,3,4},{1,2,3,4}}; arr is of type int[2][4]
-
-	Assert(length(arr) == 3);
-	Assert(length(arr2) == 5);
-	Assert(length(arr3) == 4);
-	Assert(length(arr4) == 2);
-	Assert(length(arr4[0]) == 2);
-
-	arr2 = arr; //assignment is shallow copy
-
-	//add bracket operators
+	//todo
+	//cover both local and global declarations, using var, int[], initializer list with and without e.g. int[5]{}
+	//cover bracket operator on both global and local, check that it throws an compiler error when accessing array with constant expression outside bounds
+	//cover sizeof operator
+	//cover length operator
+	//cover passing arrays to functions
 }

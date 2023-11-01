@@ -19,17 +19,17 @@ It's done as a learning project and its purpose is solely educational.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`, `while`, `do` `while`, `break`, `continue`
-  * `sizeof`, `length` operators
-  * functions
-  * scopes
+  * arrays
   * enums
+  * functions
+  * `sizeof`, `length` operators
   * implicit casts
+  * scopes
   * import statement
   * one-line comments
   * standard library
     
 ## Todo
-  * arrays (wip)
   * floats
   * classes
 
@@ -39,8 +39,8 @@ Wave consists of three parts:
 2. __Wave compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
    * __Import Processor__ - receives tokens from previous phase and processes import statements. 
-   * __Parser__ - recursive descent parser that receives processed tokens and constructs Abstract Syntax Tree (AST) of a program. 
-   * __Sema__ - does semantic analysis of a program. 
+   * __Parser__ - recursive descent parser that receives processed tokens and constructs Abstract Syntax Tree (AST) of a translation unit. 
+   * __Sema__ - does semantic analysis of a translation unit. 
    * __LLVM Visitor__ - traverses AST and emits LLVM IR.
    * __LLVM Optimizer__ - applies optimizations to the generated LLVM IR produced by LLVM Visitor based on the optimization level used.
 4. __Wave tests__
@@ -119,6 +119,31 @@ public int main()
 {
 	int b = 3;
 	var c = b; //c is of type int
+}
+```
+
+### Arrays
+
+```
+import std.assert;
+
+var arr1 = {1,2,3}; //arr1 is of type int[3] 
+int[] arr2 = {1,2,3,4}; //arr2 is of type int[4] 
+int[] arr3 = int[7]{1,2,3,4}; //arr2 is of type int[7] and initialized with {1,2,3,4,0,0,0} 
+
+public int main() 
+{
+    Assert(length(arr1) == 3);
+    Assert(sizeof(arr2) == 32); // 4*sizeof(int) = 32
+    Assert(arr3[6] == 0);
+    var arr4 = int[3]{1,2,3};
+
+	int b = arr4[2]; 
+    Assert(b == 3);
+
+    int d = 10;
+    const int c = arr4[10]; //compiler error, index out of bounds
+    const int c = arr4[d];  //not a compiler error since d is not constexpr (runtime error)
 }
 ```
 

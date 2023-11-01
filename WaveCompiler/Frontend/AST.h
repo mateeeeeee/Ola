@@ -522,7 +522,8 @@ namespace wave
 		BoolLiteral,
 		DeclRef,
 		ImplicitCast,
-		InitializerList
+		InitializerList,
+		ArrayAccess
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -784,8 +785,6 @@ namespace wave
 	public:
 		explicit InitializerListExpr(SourceLocation const& loc) : Expr(ExprKind::InitializerList, loc) {}
 
-		bool IsEmpty() const { return init_list.empty(); }
-
 		void SetInitList(UniqueExprPtrList&& _init_list)
 		{
 			init_list = std::move(_init_list);
@@ -804,6 +803,31 @@ namespace wave
 
 	private:
 		UniqueExprPtrList init_list;
+	};
+
+	class ArrayAccessExpr final : public Expr
+	{
+	public:
+		explicit ArrayAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc) {}
+
+		void SetArrayExpr(UniqueExprPtr&& _array_expr)
+		{
+			array_expr = std::move(_array_expr);
+		}
+		void SetIndexExpr(UniqueExprPtr&& _bracket_expr)
+		{
+			bracket_expr = std::move(_bracket_expr);
+		}
+
+		Expr const* GetArrayExpr() const { return array_expr.get(); }
+		Expr const* GetIndexExpr() const { return bracket_expr.get(); }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueExprPtr array_expr;
+		UniqueExprPtr bracket_expr;
 	};
 
 	struct AST

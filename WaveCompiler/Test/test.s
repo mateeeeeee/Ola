@@ -15,24 +15,28 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$96, %rsp
-	.seh_stackalloc 96
+	subq	$56, %rsp
+	.seh_stackalloc 56
 	.seh_endprologue
-	movq	$1, 8(%rsp)
+	movq	$12, 8(%rsp)
 	movq	$2, 16(%rsp)
 	movq	$3, 24(%rsp)
-	movq	$10, (%rsp)
-	movq	$10, 88(%rsp)
+	movq	$0, 32(%rsp)
+	movq	$0, 40(%rsp)
+	movq	(%rsp), %rax
+	movq	%rax, (%rsp)
+	movq	(%rsp), %rax
+	movq	%rax, 48(%rsp)
 # %bb.1:                                # %exit
-	movq	88(%rsp), %rax
-	addq	$96, %rsp
+	movq	48(%rsp), %rax
+	addq	$56, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.data
-	.p2align	4, 0x0                          # @global_arr
-global_arr:
-	.quad	1                               # 0x1
+	.p2align	4, 0x0                          # @a
+a:
+	.quad	12                              # 0xc
 	.quad	2                               # 0x2
 	.quad	3                               # 0x3
 	.quad	0                               # 0x0

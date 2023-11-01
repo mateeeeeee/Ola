@@ -743,8 +743,13 @@ namespace wave
 		}
 		case TokenKind::left_square:
 		{
-			WAVE_ASSERT_MSG(false, "For now...");
+			++current_token;
+			UniqueExprPtr index_expr = ParseExpression();
+			Expect(TokenKind::right_square);
+			return sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
 		}
+		case TokenKind::period:
+			WAVE_ASSERT_MSG(false, "Not yet implemented");
 		}
 		return expr;
 	}

@@ -94,6 +94,7 @@
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
+                       | <postfix-expression> . <identifier>
                        | <postfix-expression> ( {<assignment-expression>}* )
                        | <postfix-expression> ++
                        | <postfix-expression> --

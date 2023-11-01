@@ -76,6 +76,7 @@ namespace wave
 		virtual void Visit(ImplicitCastExpr const&, uint32) override;
 		virtual void Visit(FunctionCallExpr const&, uint32) override;
 		virtual void Visit(InitializerListExpr const&, uint32) override;
+		virtual void Visit(ArrayAccessExpr const&, uint32) override;
 
 	private:
 		llvm::LLVMContext& context;

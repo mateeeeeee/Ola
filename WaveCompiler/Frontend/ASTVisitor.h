@@ -48,6 +48,6 @@ namespace wave
 		virtual void Visit(ImplicitCastExpr const&, uint32) {}
 		virtual void Visit(FunctionCallExpr const&, uint32) {}
 		virtual void Visit(InitializerListExpr const&, uint32) {}
-
+		virtual void Visit(ArrayAccessExpr const&, uint32) {}
 	};
 }

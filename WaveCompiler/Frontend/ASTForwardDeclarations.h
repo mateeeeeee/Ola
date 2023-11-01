@@ -42,6 +42,7 @@ namespace wave
 	class ImplicitCastExpr;
 	class FunctionCallExpr;
 	class InitializerListExpr;
+	class ArrayAccessExpr;
 
 	struct AST;
 }

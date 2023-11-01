@@ -87,7 +87,7 @@ namespace wave
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtrList&& expr_list);
-
+		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;

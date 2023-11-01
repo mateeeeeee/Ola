@@ -492,7 +492,7 @@ namespace wave
 	{
 		if (!IsArrayType(type))
 		{
-			diagnostics.Report(loc, length_operator_argument_not_array);
+			diagnostics.Report(loc, length_operand_not_array);
 			return nullptr;
 		}
 		ArrayType const& array_type = type_cast<ArrayType>(type);
@@ -571,6 +571,37 @@ namespace wave
 		init_list_expr->SetType(type);
 		init_list_expr->SetInitList(std::move(expr_list));
 		return init_list_expr;
+	}
+
+	UniqueArrayAccessExprPtr Sema::ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr)
+	{
+		if (!IsArrayType(array_expr->GetType()))
+		{
+			diagnostics.Report(loc, subscripted_value_not_array);
+			return nullptr;
+		}
+		if (!IsIntegerType(index_expr->GetType()))
+		{
+			diagnostics.Report(loc, array_subscript_not_integer);
+			return nullptr;
+		}
+
+		ArrayType const& array_type = type_cast<ArrayType>(array_expr->GetType());
+		if (index_expr->IsConstexpr())
+		{
+			int64 bracket_value = index_expr->EvaluateConstexpr();
+			if (bracket_value < 0 || bracket_value > array_type.GetArraySize())
+			{
+				diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);
+				return nullptr;
+			}
+		}
+
+		UniqueArrayAccessExprPtr array_access_expr = MakeUnique<ArrayAccessExpr>(loc);
+		array_access_expr->SetArrayExpr(std::move(array_expr));
+		array_access_expr->SetIndexExpr(std::move(index_expr));
+		array_access_expr->SetType(array_type.GetBaseType());
+		return array_access_expr;
 	}
 
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr)

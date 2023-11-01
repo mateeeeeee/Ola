@@ -44,5 +44,8 @@ DIAG(incomplete_type_declaration, error, "Enumerator value for '{}' is not an in
 DIAG(invalid_init_list_expression, error, "Invalid initializer list expression")
 DIAG(array_size_not_positive, error, "Array size must be a positive integer")
 DIAG(init_list_element_expressions_type_mismatch, error, "Initializer list elements must have the same type")
-DIAG(length_operator_argument_not_array, error, "Only array variables can be passed to length operator")
+DIAG(length_operand_not_array, error, "length operand is not an array")
+DIAG(subscripted_value_not_array, error, "Subscripted value is not an array")
+DIAG(array_subscript_not_integer, error, "Array subscript is not an integer")
+DIAG(array_index_outside_of_bounds, error, "array index {} is outside array's bounds")
 #undef DIAG
