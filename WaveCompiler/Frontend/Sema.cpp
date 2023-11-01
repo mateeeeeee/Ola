@@ -247,6 +247,7 @@ namespace wave
 		std::string_view array_name = array_id->GetName();
 		
 		//todo
+		return nullptr;
 	}
 
 	UniqueWhileStmtPtr Sema::ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt)

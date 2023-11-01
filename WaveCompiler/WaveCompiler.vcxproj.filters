@@ -159,8 +159,10 @@
       <Filter>Test</Filter>
     </None>
     <None Include="..\README.md" />
+    <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />
+    <Text Include="todo.txt" />
   </ItemGroup>
 </Project>

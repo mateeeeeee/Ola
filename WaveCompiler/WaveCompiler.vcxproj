@@ -205,6 +205,7 @@
     <ClInclude Include="Utility\Enums.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.gitignore" />
     <None Include="..\README.md" />
     <None Include="Frontend\Diagnostics.def">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -222,6 +223,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="todo.txt" />
     <Text Include="wave_grammar.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

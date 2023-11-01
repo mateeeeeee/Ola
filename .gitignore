@@ -19,6 +19,8 @@ mono_crash.*
 Libraries/LLVM/llvm_win64_17_0_1/
 Libraries/LLVM/llvm-project_17_0_1/
 WaveTests/Wave.exe
+WaveCompiler/todo.txt
+
 
 # Build results
 [Dd]ebug/
