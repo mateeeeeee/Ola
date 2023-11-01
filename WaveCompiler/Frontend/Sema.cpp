@@ -240,6 +240,15 @@ namespace wave
 		return for_stmt;
 	}
 
+	//<for-each-stmt> ::= foreach(var <identifier> : <identifier>) <body-stmt> -> for(int i = 0; i < array_size; ++i) var <identifier> = array[i]; <body-stmt>
+	UniqueForStmtPtr Sema::ActOnForeachStmt(UniqueIdentifierExprPtr&& var_id, UniqueIdentifierExprPtr&& array_id, UniqueStmtPtr&& body_stmt)
+	{
+		std::string_view var_name = var_id->GetName();
+		std::string_view array_name = array_id->GetName();
+		
+		//todo
+	}
+
 	UniqueWhileStmtPtr Sema::ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt)
 	{
 		UniqueWhileStmtPtr while_stmt = MakeUnique<WhileStmt>();

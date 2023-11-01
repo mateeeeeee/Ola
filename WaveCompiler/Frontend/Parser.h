@@ -88,6 +88,7 @@ namespace wave
 		WAVE_NODISCARD UniqueBreakStmtPtr ParseBreakStatement();
 		WAVE_NODISCARD UniqueContinueStmtPtr ParseContinueStatement();
 		WAVE_NODISCARD UniqueForStmtPtr ParseForStatement();
+		WAVE_NODISCARD UniqueForStmtPtr ParseForeachStatement();
 		WAVE_NODISCARD UniqueWhileStmtPtr ParseWhileStatement();
 		WAVE_NODISCARD UniqueDoWhileStmtPtr ParseDoWhileStatement();
 		WAVE_NODISCARD UniqueCaseStmtPtr ParseCaseStatement();

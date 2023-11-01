@@ -266,6 +266,7 @@ namespace wave
 		case TokenKind::KW_continue: return ParseContinueStatement();
 		case TokenKind::KW_break: return ParseBreakStatement();
 		case TokenKind::KW_for: return ParseForStatement();
+		case TokenKind::KW_foreach: return ParseForeachStatement();
 		case TokenKind::KW_while: return ParseWhileStatement();
 		case TokenKind::KW_do: return ParseDoWhileStatement();
 		case TokenKind::KW_switch: return ParseSwitchStatement();
@@ -387,6 +388,25 @@ namespace wave
 		sema->ctx.stmts_using_break_count--;
 
 		return sema->ActOnForStmt(std::move(init_stmt), std::move(cond_expr), std::move(iter_expr), std::move(body_stmt));
+	}
+
+	UniqueForStmtPtr Parser::ParseForeachStatement()
+	{
+		Expect(TokenKind::KW_foreach);
+		Expect(TokenKind::left_round);
+		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+		Expect(TokenKind::KW_var);
+		UniqueIdentifierExprPtr var_identifier = ParseIdentifier();
+		Expect(TokenKind::colon);
+		UniqueIdentifierExprPtr array_identifier = ParseIdentifier();
+
+		sema->ctx.stmts_using_break_count++;
+		sema->ctx.stmts_using_continue_count++;
+		UniqueStmtPtr body_stmt = ParseStatement();
+		sema->ctx.stmts_using_continue_count--;
+		sema->ctx.stmts_using_break_count--;
+
+		return sema->ActOnForeachStmt(std::move(var_identifier), std::move(array_identifier), std::move(body_stmt));
 	}
 
 	UniqueWhileStmtPtr Parser::ParseWhileStatement()

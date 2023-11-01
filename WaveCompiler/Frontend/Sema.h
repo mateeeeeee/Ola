@@ -69,6 +69,7 @@ namespace wave
 		UniqueBreakStmtPtr ActOnBreakStmt(SourceLocation const& loc);
 		UniqueContinueStmtPtr ActOnContinueStmt(SourceLocation const& loc);
 		UniqueForStmtPtr ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt);
+		UniqueForStmtPtr ActOnForeachStmt(UniqueIdentifierExprPtr&& var_id, UniqueIdentifierExprPtr&& array_id, UniqueStmtPtr&& body_stmt);
 		UniqueWhileStmtPtr ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueDoWhileStmtPtr ActOnDoWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueCaseStmtPtr ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr = nullptr);

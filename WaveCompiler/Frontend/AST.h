@@ -640,12 +640,14 @@ namespace wave
 
 	class IdentifierExpr : public Expr
 	{
+	public:
+		std::string_view GetName() const { return name; }
+
 	protected:
 		explicit IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
-		std::string_view GetName() const { return name; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
