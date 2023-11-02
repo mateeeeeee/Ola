@@ -233,6 +233,7 @@ namespace wave
 	public:
 		CompoundStmt(UniqueStmtPtrList&& stmts) : Stmt(StmtKind::Compound), statements(std::move(stmts)) {}
 		UniqueStmtPtrList const& GetStmts() const { return statements; }
+		UniqueStmtPtrList&& TakeStmts() { return std::move(statements); }
 
 		void AddStmt(UniqueStmtPtr&& stmt)
 		{

@@ -1,16 +1,12 @@
 import std.assert;
 import std.io;
 
-void f(int[] a, int size)
-{
-    a[0] = 100;
-}
 
 public int main()
 {
-    var a = int[3]{1,2,3};
+    var a = int[6]{1,2,3};
     a[0] = 10;
-    foreach(var e : a)
+    foreach(int e : a)
     {
         PrintInteger(e);
     }

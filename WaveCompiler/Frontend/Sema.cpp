@@ -242,53 +242,58 @@ namespace wave
 
 	UniqueForStmtPtr Sema::ActOnForeachStmt(SourceLocation const& loc, UniqueVariableDeclPtr&& var_decl, UniqueIdentifierExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt)
 	{
-		//QualifiedType arr_type{};
-		//if (Decl* decl = ctx.decl_sym_table.LookUp(array_name))
-		//{
-		//	arr_type = decl->GetType();
-		//}
-		//else
-		//{
-		//	diagnostics.Report(loc, undeclared_identifier, array_name);
-		//	return nullptr;
-		//}
-		//ArrayType const* array_type = dynamic_type_cast<ArrayType>(arr_type);
-		//if (!array_type)
-		//{
-		//	diagnostics.Report(loc, non_array_expr_in_foreach);
-		//	return nullptr;
-		//}
-		//
-		//static uint64 foreach_id = 0;
-		//std::string foreach_index_name = "__foreach" + std::to_string(foreach_id++);
-		//UniqueVariableDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, builtin_types::Int, ActOnConstantInt(0, loc), DeclVisibility::None);
-		//UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
-		//UniqueIdentifierExprPtr identifier = ActOnIdentifier(foreach_index_name, loc);
-		//UniqueExprPtr cond_expr = ActOnBinaryExpr(BinaryExprKind::Less, loc, std::move(identifier), ActOnConstantInt(array_type->GetArraySize(), loc));
-		//identifier = ActOnIdentifier(foreach_index_name, loc);
-		//UniqueExprPtr iter_expr = ActOnUnaryExpr(UnaryExprKind::PostIncrement, loc, std::move(identifier));
-		//identifier = ActOnIdentifier(foreach_index_name, loc);
-		//UniqueVariableDeclPtr var_decl = ActOnVariableDecl(var_name, loc, array_type->GetBaseType(), ActOnArrayAccessExpr(loc, ActOnIdentifier(array_name, loc), std::move(identifier)), DeclVisibility::None);
-		//UniqueStmtPtr array_access_stmt = MakeUnique<DeclStmt>(std::move(var_decl));
-		//if (CompoundStmt* compound_stmt = dynamic_ast_cast<CompoundStmt>(body_stmt.get()))
-		//{
-		//	compound_stmt->AddStmt(std::move(array_access_stmt));
-		//}
-		//else
-		//{
-		//	UniqueStmtPtrList stmts = {};
-		//	stmts.push_back(std::move(array_access_stmt));
-		//	stmts.push_back(std::move(body_stmt));
-		//	body_stmt = ActOnCompoundStmt(std::move(stmts));
-		//}
-		//
-		//UniqueForStmtPtr foreach_stmt = MakeUnique<ForStmt>();
-		//foreach_stmt->SetInitStmt(std::move(init_stmt));
-		//foreach_stmt->SetCondExpr(std::move(cond_expr));
-		//foreach_stmt->SetIterExpr(std::move(iter_expr));
-		//foreach_stmt->SetBodyStmt(std::move(body_stmt));
-		//return foreach_stmt;
-		return nullptr;
+		QualifiedType arr_type = array_identifier->GetType();
+		ArrayType const* array_type = dynamic_type_cast<ArrayType>(arr_type);
+		if (!array_type)
+		{
+			diagnostics.Report(loc, non_array_expr_in_foreach);
+			return nullptr;
+		}
+
+		static uint64 foreach_id = 0;
+		std::string foreach_index_name = "__foreach_index" + std::to_string(foreach_id++);
+		UniqueVariableDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, builtin_types::Int, ActOnConstantInt(0, loc), DeclVisibility::None);
+		
+		UniqueIdentifierExprPtr foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
+		UniqueExprPtr cond_expr = ActOnBinaryExpr(BinaryExprKind::Less, loc, std::move(foreach_index_identifier), ActOnConstantInt(array_type->GetArraySize(), loc));
+		foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
+		UniqueExprPtr iter_expr = ActOnUnaryExpr(UnaryExprKind::PostIncrement, loc, std::move(foreach_index_identifier));
+		foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
+
+		QualifiedType var_type = var_decl->GetType();
+		if (var_type.HasRawType())
+		{
+			if (!var_type->IsSameAs(array_type->GetBaseType()))
+			{
+				diagnostics.Report(var_decl->GetLocation(), foreach_loop_type_mismatch);
+			}
+		}
+		else var_decl->SetType(array_type->GetBaseType());
+		WAVE_ASSERT(var_decl->GetInitExpr() == nullptr);
+		var_decl->SetInitExpr(ActOnArrayAccessExpr(loc, std::move(array_identifier), MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc)));
+
+		UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
+		UniqueStmtPtr array_access_stmt = MakeUnique<DeclStmt>(std::move(var_decl));
+		if (CompoundStmt* compound_stmt = dynamic_ast_cast<CompoundStmt>(body_stmt.get()))
+		{
+			UniqueStmtPtrList _stmts = std::move(compound_stmt->TakeStmts());
+			_stmts.insert(std::begin(_stmts), std::move(array_access_stmt));
+			body_stmt = ActOnCompoundStmt(std::move(_stmts));
+		}
+		else
+		{
+			UniqueStmtPtrList stmts = {};
+			stmts.push_back(std::move(array_access_stmt));
+			stmts.push_back(std::move(body_stmt));
+			body_stmt = ActOnCompoundStmt(std::move(stmts));
+		}
+
+		UniqueForStmtPtr foreach_stmt = MakeUnique<ForStmt>();
+		foreach_stmt->SetInitStmt(std::move(init_stmt));
+		foreach_stmt->SetCondExpr(std::move(cond_expr));
+		foreach_stmt->SetIterExpr(std::move(iter_expr));
+		foreach_stmt->SetBodyStmt(std::move(body_stmt));
+		return foreach_stmt;
 	}
 
 	UniqueWhileStmtPtr Sema::ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt)

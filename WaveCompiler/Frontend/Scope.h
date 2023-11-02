@@ -35,6 +35,13 @@ namespace wave
 			}
 			else return nullptr;
 		}
+
+		bool Remove(std::string_view sym_name)
+		{
+			std::string name(sym_name);
+			return sym_map.erase(name) == 1;
+		}
+
 	private:
 		std::unordered_map<std::string_view, SymType*> sym_map;
 	};
@@ -80,6 +87,15 @@ namespace wave
 		{
 			if (SymType* sym = scopes.back().LookUp(sym_name)) return sym;
 			return nullptr;
+		}
+
+		bool Remove(std::string_view sym_name)
+		{
+			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
+			{
+				if (scope->Remove(sym_name)) return true;
+			}
+			return false;
 		}
 
 		bool IsGlobal() const { return scopes.size() == 1; }

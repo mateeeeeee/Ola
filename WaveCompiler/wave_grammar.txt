@@ -167,6 +167,7 @@ identifier ::= letter { letter | digit | _ }*
 <iteration-statement> ::= while ( <expression> ) <statement>
                         | do <statement> while ( <expression> ) ;
                         | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
+                        | foreach (<type-qualifier> <type-specifier> <identifier> : <identifier>) <statement>
 
 <jump-statement> ::= goto <identifier> ;
                    | continue ;

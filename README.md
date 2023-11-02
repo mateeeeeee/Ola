@@ -18,7 +18,7 @@ It's done as a learning project and its purpose is solely educational.
     - bitwise: `&`, `|`, `^`, `~`, `&=`, `|=`, `^=`
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
-  * loop statements: `for`, `while`, `do` `while`, `break`, `continue`
+  * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
   * arrays
   * enums
   * functions
@@ -145,6 +145,34 @@ public int main()
     int d = 10;
     const int c = arr4[10]; //compiler error, index out of bounds
     const int c = arr4[d];  //not a compiler error since d is not constexpr (runtime error)
+}
+```
+
+Arrays also support `foreach` statement for iterating over them.
+```
+import std.io;
+
+public int main()
+{
+    var a = int[6]{1,2,3};
+    a[0] = 10;
+    foreach(int e : a)
+    {
+        PrintInteger(e);  //prints 10,2,3,0,0,0
+    } 
+    return 0;
+}
+```
+Foreach statement has the following grammar:
+```
+foreach (<type-qualifier> <type-specifier> <identifier> : <array_identifier>) <statement>
+```
+It gets translated to the equivalent for loop:
+```
+for(int i = 0; i < length(<array_identifier>); ++i)
+{
+    var <identifier> = <array_identifier>[i];
+    <statement>
 }
 ```
 
@@ -370,6 +398,7 @@ identifier ::= letter { letter | digit | _ }*
 <iteration-statement> ::= while ( <expression> ) <statement>
                         | do <statement> while ( <expression> ) ;
                         | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
+                        | foreach (<type-qualifier> <type-specifier> <identifier> : <identifier>) <statement>
 
 <jump-statement> ::= goto <identifier> ;
                    | continue ;

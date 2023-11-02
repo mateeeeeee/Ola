@@ -807,6 +807,7 @@ namespace wave
 
 		llvm::Value* array_value = llvm_value_map[array_expr];
 		llvm::Value* index_value = llvm_value_map[index_expr];
+		index_value = Load(int_type, index_value);
 
 		llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
 		ArrayType const& array_type = type_cast<ArrayType>(array_expr->GetType());
