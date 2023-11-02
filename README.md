@@ -31,7 +31,6 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * foreach, using alias
   * floats
   * classes
 
