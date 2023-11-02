@@ -276,9 +276,7 @@ namespace wave
 		UniqueStmtPtr array_access_stmt = MakeUnique<DeclStmt>(std::move(var_decl));
 		if (CompoundStmt* compound_stmt = dynamic_ast_cast<CompoundStmt>(body_stmt.get()))
 		{
-			UniqueStmtPtrList _stmts = std::move(compound_stmt->TakeStmts());
-			_stmts.insert(std::begin(_stmts), std::move(array_access_stmt));
-			body_stmt = ActOnCompoundStmt(std::move(_stmts));
+			compound_stmt->AddBeginStmt(std::move(array_access_stmt));
 		}
 		else
 		{

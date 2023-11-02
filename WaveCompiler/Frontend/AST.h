@@ -233,11 +233,10 @@ namespace wave
 	public:
 		CompoundStmt(UniqueStmtPtrList&& stmts) : Stmt(StmtKind::Compound), statements(std::move(stmts)) {}
 		UniqueStmtPtrList const& GetStmts() const { return statements; }
-		UniqueStmtPtrList&& TakeStmts() { return std::move(statements); }
 
-		void AddStmt(UniqueStmtPtr&& stmt)
+		void AddBeginStmt(UniqueStmtPtr&& stmt)
 		{
-			statements.push_back(std::move(stmt));
+			statements.insert(std::begin(statements), std::move(stmt));
 		}
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
