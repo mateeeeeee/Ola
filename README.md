@@ -23,6 +23,7 @@ It's done as a learning project and its purpose is solely educational.
   * enums
   * functions
   * `sizeof`, `length` operators
+  * `alias`
   * implicit casts
   * scopes
   * import statement
@@ -175,6 +176,31 @@ for(int i = 0; i < length(<array_identifier>); ++i)
     <statement>
 }
 ```
+### Alias
+Alias is similar to `typedef` in C or even more to `using` alias in C++. Its grammar is:
+```
+<alias-declaration> ::= alias <alias-identifier> = <type-qualifier><type-specifier>;
+```
+The following example shows its usage:
+```
+import std.assert;
+import std.io;
+
+ alias IntArray = int[];
+
+public int main()
+{
+    alias MyInt = int;
+
+    IntArray a = MyInt[6]{1,2,3};
+    foreach(MyInt e : a)
+    {
+        PrintInteger(e);
+    }
+    return 0;
+}
+```
+Currently, only one alias is built-in: `alias string = char[]`.
 
 ### Keywords
 - `while`
@@ -230,7 +256,7 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
 
 ## Grammar 
 ```
-<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
+<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> | <alias-declaration> }*
 
 <import-declaration> ::= import <import_identifier>;
 <import_identifier> ::= <identifier>{.<identifier>}*
@@ -257,7 +283,10 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
                    | float {[]}*
                    | <enum-identifier> {[]}*
                    | <class-identifier> {[]}*
-				   
+                   | <alias-identifier> {[]}*
+
+<alias-declaration> ::= alias <alias-identifier> = <type-qualifier><type-specifier>;
+	   
 <enum-specifier> ::= enum <enum-identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }
 
@@ -326,6 +355,7 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
 
 <postfix-expression> ::= <primary-expression>
                        | <postfix-expression> [ <expression> ]
+                       | <postfix-expression> . <identifier>
                        | <postfix-expression> ( {<assignment-expression>}* )
                        | <postfix-expression> ++
                        | <postfix-expression> --
@@ -376,7 +406,7 @@ identifier ::= letter { letter | digit | _ }*
 <initializer> ::= <assignment-expression>
 <init-list-expr> ::= {<type-specifier>{[<constant-expression>]}+}?{ <initializer>{,<initializer>}* }
 
-<compound-statement> ::= { { <local-variable-declaration> | <statement> }* }
+<compound-statement> ::= { { <local-variable-declaration> | <statement> | <alias-declaration> }* }
 
 <statement> ::= <labeled-statement>
               | <expression-statement>

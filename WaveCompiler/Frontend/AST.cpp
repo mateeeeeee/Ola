@@ -57,6 +57,10 @@ namespace wave
 		visitor.Visit(*this, depth);
 		for (auto&& enum_member : enum_members) enum_member->Accept(visitor, depth + 1);
 	}
+	void AliasDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -239,6 +243,10 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 	void EnumDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void AliasDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

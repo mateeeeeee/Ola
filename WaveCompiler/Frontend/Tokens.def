@@ -84,7 +84,7 @@ KEYWORD(return)
 KEYWORD(enum)
 KEYWORD(class)
 KEYWORD(const)
-
+KEYWORD(alias)
 KEYWORD(bool)
 KEYWORD(char)
 KEYWORD(int)

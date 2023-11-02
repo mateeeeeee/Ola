@@ -61,6 +61,10 @@ namespace wave
 		{
 			global_decl_list.push_back(ParseEnumDeclaration());
 		}
+		else if (Consume(TokenKind::KW_alias))
+		{
+			global_decl_list.push_back(ParseAliasDeclaration());
+		}
 		else if (Consume(TokenKind::KW_extern))
 		{
 			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
@@ -256,6 +260,24 @@ namespace wave
 		return sema->ActOnEnumDecl(enum_tag, loc, std::move(enum_members));
 	}
 
+	UniqueAliasDeclPtr Parser::ParseAliasDeclaration()
+	{
+		std::string alias_name = "";
+		SourceLocation loc = current_token->GetLocation();
+		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+		alias_name = current_token->GetIdentifier();
+		++current_token;
+
+		Expect(TokenKind::equal);
+
+		QualifiedType aliased_type{};
+		ParseTypeQualifier(aliased_type);
+		ParseTypeSpecifier(aliased_type);
+		Expect(TokenKind::semicolon);
+
+		return sema->ActOnAliasDecl(alias_name, loc, aliased_type);
+	}
+
 	UniqueStmtPtr Parser::ParseStatement()
 	{
 		switch (current_token->GetKind())
@@ -294,6 +316,11 @@ namespace wave
 				{
 					UniqueEnumDeclPtr enum_decl = ParseEnumDeclaration();
 					stmts.push_back(sema->ActOnDeclStmt(std::move(enum_decl)));
+				}
+				else if (Consume(TokenKind::KW_alias))
+				{
+					UniqueAliasDeclPtr alias_decl = ParseAliasDeclaration();
+					stmts.push_back(sema->ActOnDeclStmt(std::move(alias_decl)));
 				}
 				else
 				{
@@ -918,6 +945,12 @@ namespace wave
 				{
 					type.SetRawType(builtin_types::Enum);
 				}
+				else if (tag_decl->GetDeclKind() == DeclKind::Alias)
+				{
+					bool const is_const = type.IsConst();
+					type = tag_decl->GetType();
+					if (is_const) type.AddConst();
+				}
 				else Diag(invalid_type_specifier);
 			}
 			else Diag(invalid_type_specifier);
@@ -942,13 +975,13 @@ namespace wave
 				UniqueExprPtr array_size_expr = ParseConditionalExpression();
 				if (!array_size_expr->IsConstexpr())
 				{
-					//Diag();
+					Diag(array_size_not_constexpr);
 					return;
 				}
 				int64 array_size = array_size_expr->EvaluateConstexpr();
 				if(array_size <= 0)
 				{
-					//Diag();
+					Diag(array_size_not_positive);
 					return;
 				}
 				Expect(TokenKind::right_square);

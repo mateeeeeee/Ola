@@ -100,6 +100,16 @@ TEST(Declarations, Import)
 
 }
 
+TEST(Declarations, Alias)
+{
+	EXPECT_EQ(WAVE(-i test_alias), 0);
+}
+
+TEST(Declarations, Enum)
+{
+	EXPECT_EQ(WAVE(-i test_enum), 0);
+}
+
 TEST(Function, Calls)
 {
 	EXPECT_EQ(WAVE(-i test_functioncalls), 0);
@@ -116,7 +126,5 @@ TEST(Misc, Constexpr)
 
 }
 
-TEST(Misc, Enum)
-{
 
-}
+

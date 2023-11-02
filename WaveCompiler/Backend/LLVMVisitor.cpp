@@ -213,6 +213,11 @@ namespace wave
 		llvm_value_map[&enum_member] = constant;
 	}
 
+	void LLVMVisitor::Visit(AliasDecl const&, uint32)
+	{
+		//alias declaration doesn't generate any code
+	}
+
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
 	{
 		WAVE_ASSERT(false);

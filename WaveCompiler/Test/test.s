@@ -28,7 +28,6 @@ main:                                   # @main
 	movq	$0, -32(%rbp)
 	movq	$0, -24(%rbp)
 	movq	$0, -16(%rbp)
-	movq	$10, -56(%rbp)
 	movq	$0, -64(%rbp)
 	jmp	.LBB0_2
 .LBB0_1:                                # %for.body
@@ -65,8 +64,7 @@ main:                                   # @main
 	movq	%rax, -64(%rbp)
 	jmp	.LBB0_2
 .LBB0_4:                                # %for.end
-	movq	-56(%rbp), %rax
-	movq	%rax, -8(%rbp)
+	movq	$0, -8(%rbp)
 # %bb.5:                                # %exit
 	movq	-8(%rbp), %rax
 	movq	%rbp, %rsp

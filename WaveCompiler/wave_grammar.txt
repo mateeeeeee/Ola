@@ -1,4 +1,4 @@
-<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> }*
+<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> | <alias-declaration> }*
 
 <import-declaration> ::= import <import_identifier>;
 <import_identifier> ::= <identifier>{.<identifier>}*
@@ -25,7 +25,10 @@
                    | float {[]}*
                    | <enum-identifier> {[]}*
                    | <class-identifier> {[]}*
-				   
+                   | <alias-identifier> {[]}*
+
+<alias-declaration> ::= alias <alias-identifier> = <type-qualifier><type-specifier>;
+	   
 <enum-specifier> ::= enum <enum-identifier> { <enumerator-list> }
                    | enum { <enumerator-list> }
 
@@ -145,7 +148,7 @@ identifier ::= letter { letter | digit | _ }*
 <initializer> ::= <assignment-expression>
 <init-list-expr> ::= {<type-specifier>{[<constant-expression>]}+}?{ <initializer>{,<initializer>}* }
 
-<compound-statement> ::= { { <local-variable-declaration> | <statement> }* }
+<compound-statement> ::= { { <local-variable-declaration> | <statement> | <alias-declaration> }* }
 
 <statement> ::= <labeled-statement>
               | <expression-statement>

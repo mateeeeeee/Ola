@@ -70,6 +70,9 @@
     <None Include="Tests\test_array.wv">
       <Filter>Tests</Filter>
     </None>
+    <None Include="Tests\test_alias.wv">
+      <Filter>Tests</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">

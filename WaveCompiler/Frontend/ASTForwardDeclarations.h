@@ -11,6 +11,7 @@ namespace wave
 	class TagDecl;
 	class EnumDecl;
 	class EnumMemberDecl;
+	class AliasDecl;
 
 	class Stmt;
 	class CompoundStmt;

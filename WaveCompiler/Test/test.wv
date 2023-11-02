@@ -1,14 +1,16 @@
 import std.assert;
 import std.io;
 
+ alias IntArray = int[];
 
 public int main()
 {
-    var a = int[6]{1,2,3};
-    a[0] = 10;
-    foreach(int e : a)
+    alias MyInt = int;
+
+    IntArray a = MyInt[6]{1,2,3};
+    foreach(MyInt e : a)
     {
         PrintInteger(e);
     }
-    return a[0];
+    return 0;
 }

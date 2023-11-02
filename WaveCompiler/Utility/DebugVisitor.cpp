@@ -138,6 +138,11 @@ namespace wave
 		WAVE_DEBUG("{}EnumMemberDecl\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(AliasDecl const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}AliasDecl\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(Stmt const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}Stmt\n", GetIndentation(depth));

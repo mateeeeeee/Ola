@@ -34,7 +34,6 @@ namespace wave
 			std::shared_ptr<spdlog::logger> lu_logger = std::make_shared<spdlog::logger>(std::string("wave logger"), spdlog::sinks_init_list{ console_sink });
 			lu_logger->set_level(spdlog::level::trace);
 			spdlog::set_default_logger(lu_logger);
-
 		}
 		void AddBuiltins(SourceBuffer& src)
 		{

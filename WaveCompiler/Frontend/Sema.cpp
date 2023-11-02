@@ -161,6 +161,22 @@ namespace wave
 		return enum_member;
 	}
 
+	UniqueAliasDeclPtr Sema::ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type)
+	{
+		if (ctx.tag_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		if (!type.HasRawType())
+		{
+			diagnostics.Report(loc, aliasing_var_forbidden);
+		}
+		UniqueAliasDeclPtr alias_decl = MakeUnique<AliasDecl>(name, loc, type);
+
+		ctx.tag_sym_table.Insert(alias_decl.get());
+		return alias_decl;
+	}
+
 	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
 		return MakeUnique<CompoundStmt>(std::move(stmts));

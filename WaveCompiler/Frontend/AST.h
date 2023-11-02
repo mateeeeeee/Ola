@@ -35,13 +35,13 @@ namespace wave
 		UniqueDeclPtrList declarations;
 	};
 
-	//maybe add FunctionParamDecl?
 	enum class DeclKind : uint8
 	{
 		Variable,
 		Function,
 		Enum,
 		EnumMember,
+		Alias
 	};
 
 	enum class DeclVisibility : uint8
@@ -192,6 +192,18 @@ namespace wave
 
 	private:
 		int64 value = 0;
+	};
+
+	class AliasDecl : public TagDecl
+	{
+	public:
+		AliasDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& aliased_type) : TagDecl(DeclKind::Alias, name, loc)
+		{
+			SetType(aliased_type);
+		}
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 	};
 
 	enum class StmtKind : uint8

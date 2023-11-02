@@ -122,6 +122,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Tests\test_additive.wv" />
+    <None Include="Tests\test_alias.wv" />
     <None Include="Tests\test_array.wv" />
     <None Include="Tests\test_bit.wv" />
     <None Include="Tests\test_const.wv" />

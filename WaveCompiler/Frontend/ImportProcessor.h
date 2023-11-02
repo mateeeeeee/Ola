@@ -33,5 +33,7 @@ namespace wave
 		void PostFilterTokens();
 
 		std::vector<Token> GetImportTokens(std::string_view import_path);
+
+		static void AddBuiltins(std::vector<Token>&);
 	};
 }

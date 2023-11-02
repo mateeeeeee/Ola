@@ -22,6 +22,7 @@ namespace wave
 	using UniqueTagDeclPtr			= UniquePtr<TagDecl>;
 	using UniqueEnumDeclPtr			= UniquePtr<EnumDecl>;
 	using UniqueEnumMemberDeclPtr	= UniquePtr<EnumMemberDecl>;
+	using UniqueAliasDeclPtr		= UniquePtr<AliasDecl>;
 
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;
