@@ -234,6 +234,11 @@ namespace wave
 		CompoundStmt(UniqueStmtPtrList&& stmts) : Stmt(StmtKind::Compound), statements(std::move(stmts)) {}
 		UniqueStmtPtrList const& GetStmts() const { return statements; }
 
+		void AddStmt(UniqueStmtPtr&& stmt)
+		{
+			statements.push_back(std::move(stmt));
+		}
+
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 

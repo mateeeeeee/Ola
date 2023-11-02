@@ -26,23 +26,19 @@ f:                                      # @f
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$72, %rsp
-	.seh_stackalloc 72
+	subq	$32, %rsp
+	.seh_stackalloc 32
 	.seh_endprologue
-	movq	$1, 40(%rsp)
-	movq	$2, 48(%rsp)
-	movq	$3, 56(%rsp)
-	movq	$10, 40(%rsp)
-	movq	40(%rsp), %rcx
-	movl	$3, %edx
-	callq	f
-	movq	40(%rsp), %rax
-	movq	%rax, 64(%rsp)
+	movq	$1, (%rsp)
+	movq	$2, 8(%rsp)
+	movq	$3, 16(%rsp)
+	movq	$10, (%rsp)
+	movq	(%rsp), %rax
+	movq	%rax, 24(%rsp)
 # %bb.1:                                # %exit
-	movq	64(%rsp), %rax
-	addq	$72, %rsp
+	movq	24(%rsp), %rax
+	addq	$32, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym f

@@ -155,6 +155,7 @@ public int main()
 - `case`
 - `default`
 - `for`
+- `foreach`
 - `goto`
 - `continue`
 - `do`
@@ -171,6 +172,7 @@ public int main()
 - `void`
 - `true`
 - `false`
+- `alias`
 - `extern`
 - `public`
 - `private`

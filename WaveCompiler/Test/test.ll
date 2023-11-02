@@ -27,11 +27,9 @@ entry:
   %5 = getelementptr [3 x i64], ptr %1, i64 0, i64 0
   %6 = load i64, ptr %5, align 4
   store i64 10, ptr %5, align 4
-  %7 = load ptr, ptr %1, align 8
-  call void @f(ptr %7, i64 3)
-  %8 = getelementptr [3 x i64], ptr %1, i64 0, i64 0
-  %9 = load ptr, ptr %8, align 8
-  store ptr %9, ptr %0, align 8
+  %7 = getelementptr [3 x i64], ptr %1, i64 0, i64 0
+  %8 = load ptr, ptr %7, align 8
+  store ptr %8, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -39,6 +37,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %10 = load i64, ptr %0, align 4
-  ret i64 %10
+  %9 = load i64, ptr %0, align 4
+  ret i64 %9
 }

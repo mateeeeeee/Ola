@@ -392,21 +392,28 @@ namespace wave
 
 	UniqueForStmtPtr Parser::ParseForeachStatement()
 	{
-		Expect(TokenKind::KW_foreach);
-		Expect(TokenKind::left_round);
-		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-		Expect(TokenKind::KW_var);
-		UniqueIdentifierExprPtr var_identifier = ParseIdentifier();
-		Expect(TokenKind::colon);
-		UniqueIdentifierExprPtr array_identifier = ParseIdentifier();
-
-		sema->ctx.stmts_using_break_count++;
-		sema->ctx.stmts_using_continue_count++;
-		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_continue_count--;
-		sema->ctx.stmts_using_break_count--;
-
-		return sema->ActOnForeachStmt(std::move(var_identifier), std::move(array_identifier), std::move(body_stmt));
+		//Expect(TokenKind::KW_foreach);
+		//Expect(TokenKind::left_round);
+		//SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+		//SourceLocation loc = current_token->GetLocation();
+		//Expect(TokenKind::KW_var);
+		//
+		//if (current_token->IsNot(TokenKind::identifier)) Diag(unexpected_token);
+		//std::string_view var_identifier = current_token->GetIdentifier(); ++current_token;
+		//
+		//Expect(TokenKind::colon);
+		//if (current_token->IsNot(TokenKind::identifier)) Diag(unexpected_token);
+		//std::string_view array_identifier = current_token->GetIdentifier(); ++current_token;
+		//Expect(TokenKind::right_round);
+		//
+		//sema->ctx.stmts_using_break_count++;
+		//sema->ctx.stmts_using_continue_count++;
+		//UniqueStmtPtr body_stmt = ParseStatement();
+		//sema->ctx.stmts_using_continue_count--;
+		//sema->ctx.stmts_using_break_count--;
+		//
+		//return sema->ActOnForeachStmt(loc, var_identifier, array_identifier, std::move(body_stmt));
+		return nullptr;
 	}
 
 	UniqueWhileStmtPtr Parser::ParseWhileStatement()

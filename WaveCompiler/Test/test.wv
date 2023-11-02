@@ -1,4 +1,5 @@
 import std.assert;
+import std.io;
 
 void f(int[] a, int size)
 {
@@ -9,6 +10,9 @@ public int main()
 {
     var a = int[3]{1,2,3};
     a[0] = 10;
-    //f(a, length(a));
+    foreach(var e : a)
+    {
+        PrintInteger(e);
+    }
     return a[0];
 }
