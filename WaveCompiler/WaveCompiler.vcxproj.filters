@@ -61,14 +61,14 @@
     <Filter Include="Frontend\Diagnostics">
       <UniqueIdentifier>{678164f4-4a70-47a1-871d-c5a20ffedd77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Frontend\Lexer">
-      <UniqueIdentifier>{64f50d84-7450-46f5-b0b8-0c1eb5a5ff42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Frontend\Parser">
       <UniqueIdentifier>{e5a9bd14-d512-4ead-9d1d-b77b278fa8c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test">
       <UniqueIdentifier>{3d11edb5-5e2e-42b7-b29b-588aabbcc632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frontend\Lexer">
+      <UniqueIdentifier>{64f50d84-7450-46f5-b0b8-0c1eb5a5ff42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

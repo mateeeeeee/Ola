@@ -19,7 +19,7 @@ It's done as a learning project and its purpose is solely educational.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
-  * arrays
+  * one-dimensional arrays
   * enums
   * functions
   * `sizeof`, `length` operators
@@ -31,6 +31,9 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
+  * arrays
+    - array aliasing
+    - multidimensional arrays
   * floats
   * classes
 
@@ -132,6 +135,11 @@ var arr1 = {1,2,3}; //arr1 is of type int[3]
 int[] arr2 = {1,2,3,4}; //arr2 is of type int[4] 
 int[] arr3 = int[7]{1,2,3,4}; //arr2 is of type int[7] and initialized with {1,2,3,4,0,0,0} 
 
+private void modifyArray(int[] arr)
+{
+    arr[0] = 10;
+}
+
 public int main() 
 {
     Assert(length(arr1) == 3);
@@ -145,6 +153,10 @@ public int main()
     int d = 10;
     const int c = arr4[10]; //compiler error, index out of bounds
     const int c = arr4[d];  //not a compiler error since d is not constexpr (runtime error)
+
+    modifyArray(arr4);
+
+    return arr4[0]; //returns 10
 }
 ```
 

@@ -913,7 +913,8 @@ namespace wave
 		UniqueExprPtrList expr_list;
 		while (true)
 		{
-			expr_list.push_back(ParseAssignmentExpression());
+			if(current_token->Is(TokenKind::left_brace)) expr_list.push_back(ParseInitializerListExpression());
+			else expr_list.push_back(ParseAssignmentExpression());
 			if (Consume(TokenKind::right_brace)) break;
 			Expect(TokenKind::comma);
 		}

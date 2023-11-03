@@ -6,6 +6,17 @@
 	.globl	@feat.00
 .set @feat.00, 0
 	.file	"WaveModule"
+	.def	f;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function f
+f:                                      # @f
+# %bb.0:                                # %entry
+	movq	$10, (%rcx)
+# %bb.1:                                # %exit
+	retq
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -15,62 +26,21 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	pushq	%rbp
-	.seh_pushreg %rbp
-	subq	$80, %rsp
-	.seh_stackalloc 80
-	leaq	80(%rsp), %rbp
-	.seh_setframe %rbp, 80
+	subq	$72, %rsp
+	.seh_stackalloc 72
 	.seh_endprologue
-	movq	$1, -56(%rbp)
-	movq	$2, -48(%rbp)
-	movq	$3, -40(%rbp)
-	movq	$0, -32(%rbp)
-	movq	$0, -24(%rbp)
-	movq	$0, -16(%rbp)
-	movq	$0, -64(%rbp)
-	jmp	.LBB0_2
-.LBB0_1:                                # %for.body
-                                        #   in Loop: Header=BB0_2 Depth=1
-	movl	$16, %eax
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	%rsp, %rax
-	movq	-64(%rbp), %rcx
-	movq	-56(%rbp,%rcx,8), %rcx
-	movq	%rcx, (%rax)
-	movq	(%rax), %rcx
-	subq	$32, %rsp
-	callq	PrintInteger
-	addq	$32, %rsp
-	jmp	.LBB0_3
-.LBB0_2:                                # %for.cond
-                                        # =>This Inner Loop Header: Depth=1
-	cmpq	$6, -64(%rbp)
-	jl	.LBB0_1
-	jmp	.LBB0_4
-.LBB0_3:                                # %for.iter
-                                        #   in Loop: Header=BB0_2 Depth=1
-	movq	-64(%rbp), %rax
-	movq	%rax, -72(%rbp)                 # 8-byte Spill
-	movl	$16, %eax
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-72(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	-64(%rbp), %rdx
-	movq	%rdx, (%rcx)
-	addq	$1, %rax
-	movq	%rax, -64(%rbp)
-	jmp	.LBB0_2
-.LBB0_4:                                # %for.end
-	movq	$0, -8(%rbp)
-# %bb.5:                                # %exit
-	movq	-8(%rbp), %rax
-	movq	%rbp, %rsp
-	popq	%rbp
+	movq	$1, 40(%rsp)
+	movq	$2, 48(%rsp)
+	movq	$3, 56(%rsp)
+	leaq	40(%rsp), %rcx
+	callq	f
+	movq	40(%rsp), %rax
+	movq	%rax, 64(%rsp)
+# %bb.1:                                # %exit
+	movq	64(%rsp), %rax
+	addq	$72, %rsp
 	retq
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym PrintInteger
+	.addrsig_sym f

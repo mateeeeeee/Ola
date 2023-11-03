@@ -895,9 +895,20 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
-		if (!ptr->getType()->isPointerTy()) return ptr;
-		llvm::LoadInst* load_inst = builder.CreateLoad(llvm_type, ptr);
-		return load_inst;
+		if (ptr->getType()->isPointerTy())
+		{
+			if (isa<llvm::AllocaInst>(ptr))
+			{
+				llvm::AllocaInst* alloc = cast<llvm::AllocaInst>(ptr);
+				if (alloc->getAllocatedType()->isArrayTy())
+				{
+					llvm::ArrayType* array_type = cast<llvm::ArrayType>(alloc->getAllocatedType());
+					return builder.CreateInBoundsGEP(array_type->getArrayElementType(), ptr, llvm::ConstantInt::get(context, llvm::APInt(64, 0, true)));
+				}
+			}
+			return builder.CreateLoad(llvm_type, ptr);
+		}
+		return ptr;
 	}
 
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
