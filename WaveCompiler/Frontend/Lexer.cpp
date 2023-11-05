@@ -21,7 +21,6 @@ namespace wave
 
 			if (!result)
 			{
-				//Report(diag::lexing_failed);
 				return;
 			}
 			if (!tokens.empty())
@@ -75,6 +74,10 @@ namespace wave
 		case '"':
 		{
 			return LexString(token);
+		}
+		case '\'':
+		{
+			return LexChar(token);
 		}
 		case '.':
 		{
@@ -153,6 +156,14 @@ namespace wave
 		{
 			t.SetKind(GetKeywordType(identifier));
 		}
+		UpdatePointersAndLocation();
+		return true;
+	}
+
+	bool Lexer::LexChar(Token& t)
+	{
+		FillToken(t, TokenKind::char_literal, [](char c) -> bool { return c != '\''; });
+		++cur_ptr;
 		UpdatePointersAndLocation();
 		return true;
 	}

@@ -258,6 +258,11 @@ namespace wave
 		WAVE_DEBUG("{}ConstantInt\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(ConstantChar const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}ConstantChar\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(ConstantString const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}ConstantString\n", GetIndentation(depth));

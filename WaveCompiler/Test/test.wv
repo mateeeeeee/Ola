@@ -1,18 +1,14 @@
 import std.assert;
 import std.io;
+import std.string;
+
 
 public int main()
 {
-	int[] arr1 = {1,2,3};
-    int[] arr2 = arr1; //arr2 and arr1 alias each other
+	 char[] name = char[16]{};
+    ReadString(name, length(name)); //from std.io
+    PrintString(name);
 
-    int[] arr3 = arr2;
-
-   //arr1[1] = 200;
-   //PrintInteger(arr2[1]);
-
-    //int[] arr3 = {1,1,1,1,1,1,1,1,1,1,1};
-    //arr2 = arr3;
-    //PrintInteger(arr2[6]);
-    return 0;
+    name[0] = 'L';
+    PrintString(name);
 }

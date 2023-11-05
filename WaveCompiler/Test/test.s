@@ -16,21 +16,39 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 48
-	.seh_stackalloc 48
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp + 16], 1
-	mov	qword ptr [rsp + 24], 2
-	mov	qword ptr [rsp + 32], 3
-	lea	rax, [rsp + 16]
-	mov	qword ptr [rsp + 8], rax
-	mov	rax, qword ptr [rsp + 8]
-	mov	qword ptr [rsp], rax
-	mov	qword ptr [rsp + 40], 0
+	mov	byte ptr [rsp + 32], 0
+	mov	byte ptr [rsp + 33], 0
+	mov	byte ptr [rsp + 34], 0
+	mov	byte ptr [rsp + 35], 0
+	mov	byte ptr [rsp + 36], 0
+	mov	byte ptr [rsp + 37], 0
+	mov	byte ptr [rsp + 38], 0
+	mov	byte ptr [rsp + 39], 0
+	mov	byte ptr [rsp + 40], 0
+	mov	byte ptr [rsp + 41], 0
+	mov	byte ptr [rsp + 42], 0
+	mov	byte ptr [rsp + 43], 0
+	mov	byte ptr [rsp + 44], 0
+	mov	byte ptr [rsp + 45], 0
+	mov	byte ptr [rsp + 46], 0
+	mov	byte ptr [rsp + 47], 0
+	lea	rcx, [rsp + 32]
+	mov	edx, 16
+	call	ReadString
+	lea	rcx, [rsp + 32]
+	call	PrintString
+	mov	byte ptr [rsp + 32], 76
+	lea	rcx, [rsp + 32]
+	call	PrintString
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 40]
-	add	rsp, 48
+	mov	rax, qword ptr [rsp + 48]
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
+	.addrsig_sym PrintString
+	.addrsig_sym ReadString

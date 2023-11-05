@@ -812,6 +812,7 @@ namespace wave
 		case TokenKind::identifier: return ParseIdentifier(); 
 		case TokenKind::int_number: return ParseConstantInt();
 		case TokenKind::float_number: return ParseConstantFloat();
+		case TokenKind::char_literal: return ParseConstantChar();
 		case TokenKind::string_literal: return ParseConstantString(); 
 		case TokenKind::KW_true:
 		case TokenKind::KW_false:  return ParseConstantBool();
@@ -865,6 +866,15 @@ namespace wave
 		return sema->ActOnConstantInt(value, loc);
 	}
 
+	UniqueConstantCharPtr Parser::ParseConstantChar()
+	{
+		WAVE_ASSERT(current_token->Is(TokenKind::char_literal));
+		std::string_view char_string = current_token->GetIdentifier();
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnConstantChar(char_string, loc);
+	}
+
 	UniqueConstantStringPtr Parser::ParseConstantString()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::string_literal));
@@ -911,14 +921,16 @@ namespace wave
 		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true);
 		Expect(TokenKind::left_brace);
 		UniqueExprPtrList expr_list;
-		while (true)
+		if (!Consume(TokenKind::right_brace))
 		{
-			if(current_token->Is(TokenKind::left_brace)) expr_list.push_back(ParseInitializerListExpression());
-			else expr_list.push_back(ParseAssignmentExpression());
-			if (Consume(TokenKind::right_brace)) break;
-			Expect(TokenKind::comma);
+			while (true)
+			{
+				if (current_token->Is(TokenKind::left_brace)) expr_list.push_back(ParseInitializerListExpression());
+				else expr_list.push_back(ParseAssignmentExpression());
+				if (Consume(TokenKind::right_brace)) break;
+				Expect(TokenKind::comma);
+			}
 		}
-
 		return sema->ActOnInitializerListExpr(loc, type, std::move(expr_list));
 	}
 

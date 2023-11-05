@@ -48,6 +48,7 @@ namespace wave
 	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
 	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;
 	using UniqueConstantIntPtr		= UniquePtr<ConstantInt>;
+	using UniqueConstantCharPtr		= UniquePtr<ConstantChar>;
 	using UniqueConstantStringPtr	= UniquePtr<ConstantString>;
 	using UniqueConstantBoolPtr		= UniquePtr<ConstantBool>;
 	using UniqueConstantFloatPtr	= UniquePtr<ConstantFloat>;

@@ -18,6 +18,7 @@ TOKEN(int_number)
 TOKEN(float_number)
 TOKEN(identifier)
 TOKEN(string_literal)
+TOKEN(char_literal)
 
 PUNCTUATOR(left_square, "[")
 PUNCTUATOR(right_square, "]")

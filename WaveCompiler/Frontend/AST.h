@@ -537,6 +537,7 @@ namespace wave
 		FloatLiteral,
 		StringLiteral,
 		BoolLiteral,
+		CharLiteral,
 		DeclRef,
 		ImplicitCast,
 		InitializerList,
@@ -708,15 +709,36 @@ namespace wave
 		int64 value;
 	};
 
+	class ConstantChar final : public Expr
+	{
+	public:
+		ConstantChar(char c, SourceLocation const& loc) : Expr(ExprKind::CharLiteral, loc), c(c)
+		{
+			SetValueCategory(ExprValueCategory::RValue);
+			SetType(builtin_types::Char);
+		}
+		char GetChar() const { return c; }
+
+		virtual bool IsConstexpr() const { return true; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		char c;
+	};
+
 	class ConstantString final : public Expr
 	{
 	public:
 		ConstantString(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str) 
 		{
 			SetValueCategory(ExprValueCategory::RValue);
-			SetType(QualifiedType(ArrayType(builtin_types::Char, (uint32)str.size()), Qualifier_Const));
+			SetType(QualifiedType(ArrayType(builtin_types::Char, (uint32)str.size() + 1), Qualifier_Const));
 		}
 		std::string_view GetString() const { return str; }
+
+		virtual bool IsConstexpr() const { return true; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

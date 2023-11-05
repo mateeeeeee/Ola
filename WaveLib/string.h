@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern "C"
 {
@@ -34,4 +36,18 @@ extern "C"
 	{
 		return (char)toupper(ch);
 	}
+
+	double StringToFloat(char* str)
+	{
+		return atof(str);
+	}
+	int64_t StringToInteger(char* str)
+	{
+		return atoll(str);
+	}
+	void StringCopy(char* dst, char* src)
+	{
+		strcpy(dst, src);
+	}
+
 }

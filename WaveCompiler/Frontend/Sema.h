@@ -84,6 +84,7 @@ namespace wave
 		UniqueFunctionCallExprPtr ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
 		UniqueConstantIntPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
 		UniqueConstantIntPtr ActOnLengthOperator(QualifiedType const& type, SourceLocation const& loc);
+		UniqueConstantCharPtr ActOnConstantChar(std::string_view str, SourceLocation const& loc);
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);

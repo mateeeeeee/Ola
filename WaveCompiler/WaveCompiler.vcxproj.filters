@@ -70,6 +70,9 @@
     <Filter Include="Frontend\Lexer">
       <UniqueIdentifier>{64f50d84-7450-46f5-b0b8-0c1eb5a5ff42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test\std">
+      <UniqueIdentifier>{a72db876-d6f5-47c6-b3e7-23593fc9bb24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CoreTypes.h">
@@ -160,6 +163,18 @@
     </None>
     <None Include="..\README.md" />
     <None Include="..\.gitignore" />
+    <None Include="Test\std\assert.wv">
+      <Filter>Test\std</Filter>
+    </None>
+    <None Include="Test\std\io.wv">
+      <Filter>Test\std</Filter>
+    </None>
+    <None Include="Test\std\math.wv">
+      <Filter>Test\std</Filter>
+    </None>
+    <None Include="Test\std\string.wv">
+      <Filter>Test\std</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="wave_grammar.txt" />

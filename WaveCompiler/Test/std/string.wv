@@ -7,3 +7,7 @@ extern bool IsDigit(char ch);
 extern bool IsSpace(char ch);
 extern char ToLower(char ch);
 extern char ToUpper(char ch);
+
+extern float StringToFloat(char[] str);
+extern int StringToInteger(char[] str);
+extern void StringCopy(char[] src, char[] dst);

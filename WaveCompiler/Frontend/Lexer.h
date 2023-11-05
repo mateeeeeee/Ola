@@ -37,6 +37,7 @@ namespace wave
 		bool LexToken(Token&);
 		bool LexNumber(Token&);
 		bool LexIdentifier(Token&);
+		bool LexChar(Token&);
 		bool LexString(Token&);
 		bool LexEndOfFile(Token&);
 		bool LexNewLine(Token&);

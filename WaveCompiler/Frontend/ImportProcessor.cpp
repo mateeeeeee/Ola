@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <functional>
 #include "ImportProcessor.h"
 #include "Diagnostics.h"
 #include "SourceBuffer.h"
@@ -129,12 +130,12 @@ namespace wave
 		}
 
 		std::vector<Token> import_tokens{};
-		auto TypeToTokens = [](QualifiedType const& type, std::vector<Token>& tokens)
+		std::function<void(QualifiedType const& type, std::vector<Token>& tokens)> TypeToTokens
+			= [&TypeToTokens](QualifiedType const& type, std::vector<Token>& tokens)
 			{
 				if (type.IsConst()) tokens.emplace_back(TokenKind::KW_const);
 				switch (type->GetKind())
 				{
-					break;
 				case TypeKind::Void:
 					tokens.emplace_back(TokenKind::KW_void); break;
 				case TypeKind::Bool:
@@ -146,8 +147,14 @@ namespace wave
 				case TypeKind::Float:
 					tokens.emplace_back(TokenKind::KW_float); break;
 				case TypeKind::Array:
-					WAVE_ASSERT_MSG(false, "Not implemented yet");
-				case TypeKind::Function:
+				{
+					ArrayType const& arr_type = type_cast<ArrayType>(type);
+					TypeToTokens(arr_type.GetBaseType(), tokens);
+					tokens.emplace_back(TokenKind::left_square);
+					tokens.emplace_back(TokenKind::right_square);
+				}
+				break;
+				case TypeKind::Function: 
 				case TypeKind::Class:
 				case TypeKind::Invalid:
 				default:

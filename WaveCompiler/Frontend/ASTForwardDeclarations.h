@@ -37,6 +37,7 @@ namespace wave
 	class IdentifierExpr;
 	class DeclRefExpr;
 	class ConstantInt;
+	class ConstantChar;
 	class ConstantString;
 	class ConstantBool;
 	class ConstantFloat;

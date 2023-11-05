@@ -3,6 +3,7 @@
 #endif
 
 DIAG(invalid_number_literal, error, "Invalid number literal")
+DIAG(invalid_char_literal, error, "Invalid char literal")
 DIAG(unknown_character, error, "Unknown character")
 
 DIAG(unexpected_token, error, "Unexpected token")

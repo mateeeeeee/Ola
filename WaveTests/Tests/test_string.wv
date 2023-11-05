@@ -1,0 +1,8 @@
+import std.assert;
+import std.string;
+
+public int main()
+{
+
+	return 0;
+}

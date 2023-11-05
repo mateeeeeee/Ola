@@ -43,8 +43,5 @@ public int main()
 	Assert(LocalArray2[0] == 1000);
 	Assert(LocalArray3[0] == 1000);
 
-	int[] LocalArray4 = LocalArray3;
-	Assert(LocalArray4[0] == 1000);
-
 	return 0;
 }

@@ -186,6 +186,10 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
+	void ConstantChar::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 	void ConstantString::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -352,6 +356,10 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+	void ConstantChar::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 	void ConstantString::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
@@ -381,6 +389,5 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
-
 }
 

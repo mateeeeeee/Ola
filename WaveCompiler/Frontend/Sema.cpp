@@ -580,6 +580,16 @@ namespace wave
 		return ActOnConstantInt(array_type.GetArraySize(), loc);
 	}
 
+	UniqueConstantCharPtr Sema::ActOnConstantChar(std::string_view str, SourceLocation const& loc)
+	{
+		if (str.size() != 1)
+		{
+			diagnostics.Report(loc, invalid_char_literal);
+			return nullptr;
+		}
+		return MakeUnique<ConstantChar>(str[0], loc);
+	}
+
 	UniqueConstantStringPtr Sema::ActOnConstantString(std::string_view str, SourceLocation const& loc)
 	{
 		return MakeUnique<ConstantString>(str, loc);

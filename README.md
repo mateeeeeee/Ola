@@ -20,6 +20,7 @@ It's done as a learning project and its purpose is solely educational.
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
   * one-dimensional arrays
+  * strings
   * enums
   * functions
   * `sizeof`, `length` operators
@@ -209,6 +210,27 @@ for(int i = 0; i < length(<array_identifier>); ++i)
     <statement>
 }
 ```
+
+### Strings
+Strings are just char arrays. `string` type is a built-in alias for `char[]`. 
+
+```
+import std.io;
+import std.string;
+public int main()
+{
+    char[] name = char[16]{};
+    ReadString(name, length(name)); //from std.io
+    name[0] = 'M';
+    PrintString(name);
+
+    string stringNumber = "12345";
+    int integer = StringToInteger(number);  //from std.string
+	PrintInteger(integer); //prints 12345
+
+    return 0;
+}
+```
 ### Alias
 Alias is similar to `typedef` in C or even more to `using` alias in C++. Its grammar is:
 ```
@@ -233,7 +255,7 @@ public int main()
     return 0;
 }
 ```
-Currently, only one alias is built-in: `alias string = char[]`.
+Currently there is only one built-in alias is: `alias string = char[]`.
 
 ### Keywords
 - `while`

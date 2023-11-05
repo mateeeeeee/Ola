@@ -139,6 +139,7 @@
     <None Include="Tests\test_relational.wv" />
     <None Include="Tests\test_shift.wv" />
     <None Include="Tests\test_sizeof.wv" />
+    <None Include="Tests\test_string.wv" />
     <None Include="Tests\test_switch.wv" />
     <None Include="Tests\test_ternary.wv" />
     <None Include="Tests\test_while.wv" />

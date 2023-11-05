@@ -121,22 +121,30 @@ namespace wave
 					ArrayType const& array_type = type_cast<ArrayType>(var_type);
 					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
 
-					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
-					WAVE_ASSERT(init_list_expr);
-					init_list_expr->Accept(*this);
-
-					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
-					std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
-					for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
+					if (InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr))
 					{
-						if (i < init_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
-						else					   array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
-					}
-					llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_type), array_init_list);
+						init_list_expr->Accept(*this);
+						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
+						std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
+						for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
+						{
+							if (i < init_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
+							else					   array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
+						}
+						llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_type), array_init_list);
 
-					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-					llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_array, var_decl.GetName());
-					llvm_value_map[&var_decl] = global_array;
+						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_array, var_decl.GetName());
+						llvm_value_map[&var_decl] = global_array;
+					}
+					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
+					{
+						string->Accept(*this);
+						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(llvm_value_map[string]), var_decl.GetName());
+						llvm_value_map[&var_decl] = global_string;
+					}
+					else WAVE_ASSERT(false);
 				}
 				else
 				{
@@ -186,6 +194,21 @@ namespace wave
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 							Store(llvm::Constant::getNullValue(llvm_element_type), ptr);
 						}
+						llvm_value_map[&var_decl] = alloc;
+					}
+					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
+					{
+						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
+						std::string_view str = string->GetString();
+						for (uint64 i = 0; i < str.size(); ++i)
+						{
+							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
+							Store(llvm::ConstantInt::get(char_type, str[i], true), ptr);
+						}
+						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, str.size(), true));
+						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
+						Store(llvm::ConstantInt::get(char_type, '\0', true), ptr);
 						llvm_value_map[&var_decl] = alloc;
 					}
 					else if (DeclRefExpr const* decl_ref_expr = dynamic_ast_cast<DeclRefExpr>(init_expr))
@@ -744,10 +767,16 @@ namespace wave
 		llvm_value_map[&decl_ref] = value;
 	}
 
-	void LLVMVisitor::Visit(ConstantInt const& constant_int, uint32)
+	void LLVMVisitor::Visit(ConstantInt const& int_constant, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, constant_int.GetValue());
-		llvm_value_map[&constant_int] = constant;
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, int_constant.GetValue());
+		llvm_value_map[&int_constant] = constant;
+	}
+
+	void LLVMVisitor::Visit(ConstantChar const& char_constant, uint32)
+	{
+		llvm::ConstantInt* constant = llvm::ConstantInt::get(char_type, char_constant.GetChar(), true);
+		llvm_value_map[&char_constant] = constant;
 	}
 
 	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32)

@@ -2,8 +2,12 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#pragma warning( push )
+#pragma warning( disable : 6031 )
+
 extern "C"
 {
+
 	void PrintInteger(int64_t i)
 	{
 		printf("%" PRId64 "\n", i);
@@ -16,7 +20,11 @@ extern "C"
 	{
 		printf("%c\n", c);
 	}
-
+	void PrintString(char* str)
+	{
+		printf("%s", str);
+	}
+	
 	int64_t ReadInteger()
 	{
 		int64_t i;
@@ -35,4 +43,11 @@ extern "C"
 		scanf("%c", &c);
 		return c;
 	}
+	void ReadString(char* str, int64_t str_size)
+	{
+		unsigned int buf_size = (unsigned int)str_size;
+		scanf_s("%s", str, buf_size);
+	}
 }
+#pragma warning( pop )
+
