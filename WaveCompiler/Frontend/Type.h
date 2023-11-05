@@ -59,12 +59,6 @@ namespace wave
 	};
 
 	template<typename T> requires std::derived_from<T, Type>
-	inline bool isa(Type const& t)
-	{
-		return t.GetKind() == std::declval<T>().GetKind();
-	}
-
-	template<typename T> requires std::derived_from<T, Type>
 	inline T& type_cast(Type& t)
 	{
 		return static_cast<T&>(t);

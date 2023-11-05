@@ -101,7 +101,7 @@ namespace wave
 			object_files[i] = object_file;
 			assembly_files[i] = assembly_file;
 
-			std::string compile_cmd = std::format("clang -S {} -o {}", ir_file, assembly_file);
+			std::string compile_cmd = std::format("clang -S {} -o {}  -masm=intel", ir_file, assembly_file);
 			system(compile_cmd.c_str());
 
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);

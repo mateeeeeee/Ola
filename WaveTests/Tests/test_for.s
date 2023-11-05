@@ -5,6 +5,7 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
 	.def	main;
 	.scl	2;
@@ -15,196 +16,196 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	pushq	%rbp
-	.seh_pushreg %rbp
-	subq	$160, %rsp
+	push	rbp
+	.seh_pushreg rbp
+	sub	rsp, 160
 	.seh_stackalloc 160
-	leaq	128(%rsp), %rbp
-	.seh_setframe %rbp, 128
+	lea	rbp, [rsp + 128]
+	.seh_setframe rbp, 128
 	.seh_endprologue
-	movq	$1, 24(%rbp)
-	xorl	%eax, %eax
+	mov	qword ptr [rbp + 24], 1
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	movq	%rax, 16(%rbp)                  # 8-byte Spill
+	mov	qword ptr [rbp + 16], rax       # 8-byte Spill
 .LBB0_1:                                # %for.body
                                         # =>This Inner Loop Header: Depth=1
-	movq	16(%rbp), %rdx                  # 8-byte Reload
-	movq	24(%rbp), %rcx
-	movq	%rcx, %rax
-	addq	%rdx, %rax
-	movq	%rax, 8(%rbp)                   # 8-byte Spill
-	addq	$1, %rcx
-	movq	%rcx, 24(%rbp)
-	cmpq	$6, %rcx
-	movq	%rax, 16(%rbp)                  # 8-byte Spill
+	mov	rdx, qword ptr [rbp + 16]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp + 24]
+	mov	rax, rcx
+	add	rax, rdx
+	mov	qword ptr [rbp + 8], rax        # 8-byte Spill
+	add	rcx, 1
+	mov	qword ptr [rbp + 24], rcx
+	cmp	rcx, 6
+	mov	qword ptr [rbp + 16], rax       # 8-byte Spill
 	jl	.LBB0_1
 # %bb.2:                                # %for.cond.for.end_crit_edge
-	movq	8(%rbp), %rax                   # 8-byte Reload
-	subq	$15, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	movl	$16, %eax
-	movq	%rax, -24(%rbp)                 # 8-byte Spill
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-24(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, %rdx
-	movq	%rdx, -16(%rbp)                 # 8-byte Spill
-	movq	$0, (%rcx)
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-16(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, -8(%rbp)                  # 8-byte Spill
-	movq	$1, (%rcx)
-	movq	(%rax), %rax
-	movq	%rax, (%rbp)                    # 8-byte Spill
+	mov	rax, qword ptr [rbp + 8]        # 8-byte Reload
+	sub	rax, 15
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	eax, 16
+	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 16], rdx       # 8-byte Spill
+	mov	qword ptr [rcx], 0
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 16]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rbp - 8], rcx        # 8-byte Spill
+	mov	qword ptr [rcx], 1
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rbp], rax            # 8-byte Spill
 .LBB0_3:                                # %for.body1
                                         # =>This Inner Loop Header: Depth=1
-	movq	(%rbp), %rcx                    # 8-byte Reload
-	movq	-8(%rbp), %rdx                  # 8-byte Reload
-	movq	(%rdx), %rax
-	movq	%rax, %r8
-	andq	$1, %r8
-	addq	%rcx, %rax
-	cmpq	$0, %r8
-	cmoveq	%rcx, %rax
-	movq	%rax, -32(%rbp)                 # 8-byte Spill
-	movq	(%rdx), %rcx
-	addq	$1, %rcx
-	movq	%rcx, (%rdx)
-	cmpq	$6, %rcx
-	movq	%rax, (%rbp)                    # 8-byte Spill
+	mov	rcx, qword ptr [rbp]            # 8-byte Reload
+	mov	rdx, qword ptr [rbp - 8]        # 8-byte Reload
+	mov	rax, qword ptr [rdx]
+	mov	r8, rax
+	and	r8, 1
+	add	rax, rcx
+	cmp	r8, 0
+	cmove	rax, rcx
+	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
+	mov	rcx, qword ptr [rdx]
+	add	rcx, 1
+	mov	qword ptr [rdx], rcx
+	cmp	rcx, 6
+	mov	qword ptr [rbp], rax            # 8-byte Spill
 	jl	.LBB0_3
 # %bb.4:                                # %for.cond2.for.end4_crit_edge
-	movq	-16(%rbp), %rax                 # 8-byte Reload
-	movq	-32(%rbp), %rcx                 # 8-byte Reload
-	movq	%rcx, (%rax)
-	movq	(%rax), %rax
-	subq	$9, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	movl	$16, %eax
-	movq	%rax, -64(%rbp)                 # 8-byte Spill
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-64(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, %rdx
-	movq	%rdx, -56(%rbp)                 # 8-byte Spill
-	movq	$0, (%rcx)
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, -48(%rbp)                 # 8-byte Spill
-	movq	$1, (%rcx)
-	movq	(%rax), %rax
-	movq	%rax, -40(%rbp)                 # 8-byte Spill
+	mov	rax, qword ptr [rbp - 16]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 32]       # 8-byte Reload
+	mov	qword ptr [rax], rcx
+	mov	rax, qword ptr [rax]
+	sub	rax, 9
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	eax, 16
+	mov	qword ptr [rbp - 64], rax       # 8-byte Spill
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 64]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 56], rdx       # 8-byte Spill
+	mov	qword ptr [rcx], 0
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rbp - 48], rcx       # 8-byte Spill
+	mov	qword ptr [rcx], 1
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rbp - 40], rax       # 8-byte Spill
 .LBB0_5:                                # %for.body5
                                         # =>This Inner Loop Header: Depth=1
-	movq	-48(%rbp), %rax                 # 8-byte Reload
-	movq	-40(%rbp), %rdx                 # 8-byte Reload
-	movq	(%rax), %rax
-	movq	%rax, -80(%rbp)                 # 8-byte Spill
-	movq	%rax, %rcx
-	addq	%rdx, %rcx
-	movq	%rcx, -72(%rbp)                 # 8-byte Spill
-	cmpq	$5, %rax
+	mov	rax, qword ptr [rbp - 48]       # 8-byte Reload
+	mov	rdx, qword ptr [rbp - 40]       # 8-byte Reload
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rbp - 80], rax       # 8-byte Spill
+	mov	rcx, rax
+	add	rcx, rdx
+	mov	qword ptr [rbp - 72], rcx       # 8-byte Spill
+	cmp	rax, 5
 	je	.LBB0_8
 	jmp	.LBB0_9
 .LBB0_6:                                # %for.cond6.for.end8.loopexit_crit_edge
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	movq	-72(%rbp), %rcx                 # 8-byte Reload
-	movq	%rcx, (%rax)
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 72]       # 8-byte Reload
+	mov	qword ptr [rax], rcx
 .LBB0_7:                                # %for.end8
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	movq	(%rax), %rax
-	subq	$15, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	movl	$16, %eax
-	movq	%rax, -112(%rbp)                # 8-byte Spill
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	%rsp, %rax
-	movq	$1, (%rax)
-	movq	(%rax), %rcx
-	imulq	$3840, %rcx, %rcx               # imm = 0xF00
-	movq	%rcx, (%rax)
-	movq	(%rax), %rax
-	subq	$3840, %rax                     # imm = 0xF00
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	movq	-112(%rbp), %rax                # 8-byte Reload
-	addq	$32, %rsp
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-112(%rbp), %rax                # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, %rdx
-	movq	%rdx, -104(%rbp)                # 8-byte Spill
-	movq	$1, (%rcx)
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-104(%rbp), %rax                # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, -96(%rbp)                 # 8-byte Spill
-	movq	$5, (%rcx)
-	movq	(%rax), %rax
-	movq	%rax, -88(%rbp)                 # 8-byte Spill
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rax, qword ptr [rax]
+	sub	rax, 15
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	eax, 16
+	mov	qword ptr [rbp - 112], rax      # 8-byte Spill
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, rsp
+	mov	qword ptr [rax], 1
+	mov	rcx, qword ptr [rax]
+	imul	rcx, rcx, 3840
+	mov	qword ptr [rax], rcx
+	mov	rax, qword ptr [rax]
+	sub	rax, 3840
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	mov	rax, qword ptr [rbp - 112]      # 8-byte Reload
+	add	rsp, 32
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 112]      # 8-byte Reload
+	mov	rcx, rsp
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 104], rdx      # 8-byte Spill
+	mov	qword ptr [rcx], 1
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 104]      # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rbp - 96], rcx       # 8-byte Spill
+	mov	qword ptr [rcx], 5
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rbp - 88], rax       # 8-byte Spill
 	jmp	.LBB0_10
 .LBB0_8:                                # %if.then9
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	movq	-72(%rbp), %rcx                 # 8-byte Reload
-	movq	%rcx, (%rax)
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 72]       # 8-byte Reload
+	mov	qword ptr [rax], rcx
 	jmp	.LBB0_7
 .LBB0_9:                                # %if.end11
                                         #   in Loop: Header=BB0_5 Depth=1
-	movq	-72(%rbp), %rax                 # 8-byte Reload
-	movq	-48(%rbp), %rdx                 # 8-byte Reload
-	movq	-80(%rbp), %rcx                 # 8-byte Reload
-	addq	$1, %rcx
-	movq	%rcx, (%rdx)
-	cmpq	$11, %rcx
-	movq	%rax, -40(%rbp)                 # 8-byte Spill
+	mov	rax, qword ptr [rbp - 72]       # 8-byte Reload
+	mov	rdx, qword ptr [rbp - 48]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 80]       # 8-byte Reload
+	add	rcx, 1
+	mov	qword ptr [rdx], rcx
+	cmp	rcx, 11
+	mov	qword ptr [rbp - 40], rax       # 8-byte Spill
 	jl	.LBB0_5
 	jmp	.LBB0_6
 .LBB0_10:                               # %for.body16
                                         # =>This Inner Loop Header: Depth=1
-	movq	-88(%rbp), %rdx                 # 8-byte Reload
-	movq	-96(%rbp), %r8                  # 8-byte Reload
-	movq	(%r8), %rax
-	movq	%rax, %rcx
-	addq	$-1, %rcx
-	movq	%rcx, (%r8)
-	imulq	%rdx, %rax
-	movq	%rax, -120(%rbp)                # 8-byte Spill
-	cmpq	$0, %rcx
-	movq	%rax, -88(%rbp)                 # 8-byte Spill
+	mov	rdx, qword ptr [rbp - 88]       # 8-byte Reload
+	mov	r8, qword ptr [rbp - 96]        # 8-byte Reload
+	mov	rax, qword ptr [r8]
+	mov	rcx, rax
+	add	rcx, -1
+	mov	qword ptr [r8], rcx
+	imul	rax, rdx
+	mov	qword ptr [rbp - 120], rax      # 8-byte Spill
+	cmp	rcx, 0
+	mov	qword ptr [rbp - 88], rax       # 8-byte Spill
 	jg	.LBB0_10
 # %bb.11:                               # %for.cond17.for.end19_crit_edge
-	movq	-104(%rbp), %rax                # 8-byte Reload
-	movq	-120(%rbp), %rcx                # 8-byte Reload
-	movq	%rcx, (%rax)
-	cmpq	$120, (%rax)
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	xorl	%eax, %eax
+	mov	rax, qword ptr [rbp - 104]      # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 120]      # 8-byte Reload
+	mov	qword ptr [rax], rcx
+	cmp	qword ptr [rax], 120
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	leaq	32(%rbp), %rsp
-	popq	%rbp
-	retq
+	lea	rsp, [rbp + 32]
+	pop	rbp
+	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig

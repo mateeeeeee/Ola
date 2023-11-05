@@ -3,6 +3,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
 
+
 namespace wave
 {
 	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module) : context(context), module(module), builder(context)
@@ -160,7 +161,6 @@ namespace wave
 		}
 		else
 		{
-			llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 			if (Expr const* init_expr = var_decl.GetInitExpr())
 			{
 				init_expr->Accept(*this);
@@ -168,32 +168,47 @@ namespace wave
 				{
 					ArrayType const& array_type = type_cast<ArrayType>(var_type);
 					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
-
-					InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr);
-					WAVE_ASSERT(init_list_expr);
-					UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
-
 					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
-					for (uint64 i = 0; i < init_list.size(); ++i)
+					if (InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr))
 					{
-						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
-						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
-						Store(llvm_value_map[init_list[i].get()], ptr);
+						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
+						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
+
+						for (uint64 i = 0; i < init_list.size(); ++i)
+						{
+							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
+							Store(llvm_value_map[init_list[i].get()], ptr);
+						}
+						for (uint64 i = init_list.size(); i < array_type.GetArraySize(); ++i)
+						{
+							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
+							Store(llvm::Constant::getNullValue(llvm_element_type), ptr);
+						}
+						llvm_value_map[&var_decl] = alloc;
 					}
-					for (uint64 i = init_list.size(); i < array_type.GetArraySize(); ++i)
+					else if (DeclRefExpr const* decl_ref_expr = dynamic_ast_cast<DeclRefExpr>(init_expr))
 					{
-						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
-						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
-						Store(llvm::Constant::getNullValue(llvm_element_type), ptr);
+						WAVE_ASSERT(IsArrayType(decl_ref_expr->GetType()));
+						llvm::Type* decl_ref_type = ConvertToLLVMType(decl_ref_expr->GetType());
+						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm::PointerType::get(llvm_element_type, 0), nullptr);
+						llvm::Value* ptr = nullptr;
+						if (decl_ref_type->isArrayTy()) ptr = builder.CreateInBoundsGEP(decl_ref_type, llvm_value_map[decl_ref_expr], { zero, zero });
+						else ptr = builder.CreateLoad(decl_ref_type, llvm_value_map[decl_ref_expr]);
+						builder.CreateStore(ptr, alloc);
+						llvm_value_map[&var_decl] = alloc;
 					}
+					else WAVE_ASSERT(false);
 				}
 				else
 				{
+					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
 					Store(init_value, alloc);
+					llvm_value_map[&var_decl] = alloc;
 				}
 			}
-			llvm_value_map[&var_decl] = alloc;
 		}
 	}
 
@@ -712,10 +727,7 @@ namespace wave
 		WAVE_ASSERT(false_value);
 		false_value = Load(false_expr->GetType(), false_value);
 
-		if (condition_value->getType() != llvm::Type::getInt1Ty(context))
-		{
-			WAVE_ASSERT(false);
-		}
+		if (condition_value->getType() != llvm::Type::getInt1Ty(context)) WAVE_ASSERT(false);
 
 		llvm_value_map[&ternary_expr] = builder.CreateSelect(condition_value, true_value, false_value);
 	}
@@ -815,18 +827,24 @@ namespace wave
 		index_value = Load(int_type, index_value);
 
 		llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
-		ArrayType const& array_type = type_cast<ArrayType>(array_expr->GetType());
-		llvm::Type* arr_type = ConvertToLLVMType(array_type);
-
-		if (array_type.GetArraySize() > 0)
+		if (llvm::AllocaInst* alloc = dyn_cast<llvm::AllocaInst>(array_value))
 		{
-			llvm::Value* ptr = builder.CreateGEP(arr_type, array_value, { zero, index_value });
-			llvm_value_map[&array_access] = ptr;
+			llvm::Type* alloc_type = alloc->getAllocatedType();
+			if (alloc_type->isArrayTy())
+			{
+				llvm::Value* ptr = builder.CreateGEP(alloc_type, alloc, { zero, index_value });
+				llvm_value_map[&array_access] = ptr;
+			}
+			else if (alloc_type->isPointerTy())
+			{
+				llvm::Value* ptr = builder.CreateInBoundsGEP(alloc_type, Load(alloc_type, alloc), index_value);
+				llvm_value_map[&array_access] = ptr;
+			}
+			else WAVE_ASSERT(false);
 		}
 		else
 		{
-			llvm::Type* base_type = ConvertToLLVMType(array_type.GetBaseType());
-			llvm::Value* ptr = builder.CreateInBoundsGEP(base_type, array_value, index_value);
+			llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
 			llvm_value_map[&array_access] = ptr;
 		}
 	}
@@ -902,8 +920,9 @@ namespace wave
 				llvm::AllocaInst* alloc = cast<llvm::AllocaInst>(ptr);
 				if (alloc->getAllocatedType()->isArrayTy())
 				{
+					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
 					llvm::ArrayType* array_type = cast<llvm::ArrayType>(alloc->getAllocatedType());
-					return builder.CreateInBoundsGEP(array_type->getArrayElementType(), ptr, llvm::ConstantInt::get(context, llvm::APInt(64, 0, true)));
+					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
 				}
 			}
 			return builder.CreateLoad(llvm_type, ptr);
@@ -914,7 +933,7 @@ namespace wave
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!value->getType()->isPointerTy()) return builder.CreateStore(value, ptr);
-		llvm::LoadInst* load = builder.CreateLoad(value->getType(), value);
+		llvm::Value* load = Load(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}
 

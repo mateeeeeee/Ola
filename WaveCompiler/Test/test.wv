@@ -1,15 +1,18 @@
 import std.assert;
 import std.io;
 
-
-void f(int[] arr)
-{
-    arr[0] = 10;
-}
-
 public int main()
 {
-    int[] arr = {1,2,3};
-    f(arr);
-    return arr[0];
+	int[] arr1 = {1,2,3};
+    int[] arr2 = arr1; //arr2 and arr1 alias each other
+
+    int[] arr3 = arr2;
+
+   //arr1[1] = 200;
+   //PrintInteger(arr2[1]);
+
+    //int[] arr3 = {1,1,1,1,1,1,1,1,1,1,1};
+    //arr2 = arr3;
+    //PrintInteger(arr2[6]);
+    return 0;
 }

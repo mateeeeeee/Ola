@@ -5,18 +5,8 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	f;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function f
-f:                                      # @f
-# %bb.0:                                # %entry
-	movq	$10, (%rcx)
-# %bb.1:                                # %exit
-	retq
-                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -26,21 +16,21 @@ f:                                      # @f
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$72, %rsp
-	.seh_stackalloc 72
+	sub	rsp, 48
+	.seh_stackalloc 48
 	.seh_endprologue
-	movq	$1, 40(%rsp)
-	movq	$2, 48(%rsp)
-	movq	$3, 56(%rsp)
-	leaq	40(%rsp), %rcx
-	callq	f
-	movq	40(%rsp), %rax
-	movq	%rax, 64(%rsp)
+	mov	qword ptr [rsp + 16], 1
+	mov	qword ptr [rsp + 24], 2
+	mov	qword ptr [rsp + 32], 3
+	lea	rax, [rsp + 16]
+	mov	qword ptr [rsp + 8], rax
+	mov	rax, qword ptr [rsp + 8]
+	mov	qword ptr [rsp], rax
+	mov	qword ptr [rsp + 40], 0
 # %bb.1:                                # %exit
-	movq	64(%rsp), %rax
-	addq	$72, %rsp
-	retq
+	mov	rax, qword ptr [rsp + 40]
+	add	rsp, 48
+	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym f

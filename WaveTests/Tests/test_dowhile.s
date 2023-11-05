@@ -5,6 +5,7 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
 	.def	main;
 	.scl	2;
@@ -15,140 +16,140 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	pushq	%rbp
-	.seh_pushreg %rbp
-	subq	$96, %rsp
+	push	rbp
+	.seh_pushreg rbp
+	sub	rsp, 96
 	.seh_stackalloc 96
-	leaq	96(%rsp), %rbp
-	.seh_setframe %rbp, 96
+	lea	rbp, [rsp + 96]
+	.seh_setframe rbp, 96
 	.seh_endprologue
-	movq	$0, -8(%rbp)
-	xorl	%eax, %eax
+	mov	qword ptr [rbp - 8], 0
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	movq	%rax, -16(%rbp)                 # 8-byte Spill
+	mov	qword ptr [rbp - 16], rax       # 8-byte Spill
 .LBB0_1:                                # %dowhile.body
                                         # =>This Inner Loop Header: Depth=1
-	movq	-16(%rbp), %rdx                 # 8-byte Reload
-	movq	-8(%rbp), %rax
-	movq	%rax, %rcx
-	addq	$1, %rcx
-	movq	%rcx, -8(%rbp)
-	addq	%rdx, %rax
-	movq	%rax, -24(%rbp)                 # 8-byte Spill
-	cmpq	$5, %rcx
-	movq	%rax, -16(%rbp)                 # 8-byte Spill
+	mov	rdx, qword ptr [rbp - 16]       # 8-byte Reload
+	mov	rax, qword ptr [rbp - 8]
+	mov	rcx, rax
+	add	rcx, 1
+	mov	qword ptr [rbp - 8], rcx
+	add	rax, rdx
+	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
+	cmp	rcx, 5
+	mov	qword ptr [rbp - 16], rax       # 8-byte Spill
 	jl	.LBB0_1
 # %bb.2:                                # %dowhile.end
-	movq	-24(%rbp), %rax                 # 8-byte Reload
-	subq	$10, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	movl	$16, %eax
-	movq	%rax, -56(%rbp)                 # 8-byte Spill
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	%rsp, %rcx
-	movq	$0, (%rcx)
-	movq	(%rcx), %rax
-	movq	%rax, %rdx
-	incq	%rdx
-	movq	%rdx, (%rcx)
-	testq	%rax, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	addq	$32, %rsp
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	-56(%rbp), %rax                 # 8-byte Reload
-	movq	%rsp, %rcx
-	movq	%rcx, %rdx
-	movq	%rdx, -48(%rbp)                 # 8-byte Spill
-	movq	$5, (%rcx)
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	%rsp, %rax
-	movq	%rax, -40(%rbp)                 # 8-byte Spill
-	movq	$3, (%rax)
-	xorl	%eax, %eax
+	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
+	sub	rax, 10
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	eax, 16
+	mov	qword ptr [rbp - 56], rax       # 8-byte Spill
+	call	__chkstk
+	sub	rsp, rax
+	mov	rcx, rsp
+	mov	qword ptr [rcx], 0
+	mov	rax, qword ptr [rcx]
+	mov	rdx, rax
+	inc	rdx
+	mov	qword ptr [rcx], rdx
+	test	rax, rax
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	add	rsp, 32
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 48], rdx       # 8-byte Spill
+	mov	qword ptr [rcx], 5
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, rsp
+	mov	qword ptr [rbp - 40], rax       # 8-byte Spill
+	mov	qword ptr [rax], 3
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	movq	%rax, -32(%rbp)                 # 8-byte Spill
+	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
 .LBB0_3:                                # %dowhile.body4
                                         # =>This Inner Loop Header: Depth=1
-	movq	-32(%rbp), %rax                 # 8-byte Reload
-	movq	-48(%rbp), %rcx                 # 8-byte Reload
-	movq	-40(%rbp), %r8                  # 8-byte Reload
-	movq	(%rcx), %r9
-	movq	(%r8), %r10
-	movq	%r9, %rdx
-	addq	%rax, %rdx
-	cmpq	%r10, %r9
-	cmovgq	%rdx, %rax
-	movq	%rax, -64(%rbp)                 # 8-byte Spill
-	movq	(%rcx), %rdx
-	addq	$-1, %rdx
-	movq	%rdx, (%rcx)
-	movq	(%r8), %rdx
-	addq	$1, %rdx
-	movq	%rdx, (%r8)
-	cmpq	$0, (%rcx)
-	setg	%cl
-	cmpq	$10, %rdx
-	setl	%dl
-	andb	%dl, %cl
-	testb	$1, %cl
-	movq	%rax, -32(%rbp)                 # 8-byte Spill
+	mov	rax, qword ptr [rbp - 32]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 48]       # 8-byte Reload
+	mov	r8, qword ptr [rbp - 40]        # 8-byte Reload
+	mov	r9, qword ptr [rcx]
+	mov	r10, qword ptr [r8]
+	mov	rdx, r9
+	add	rdx, rax
+	cmp	r9, r10
+	cmovg	rax, rdx
+	mov	qword ptr [rbp - 64], rax       # 8-byte Spill
+	mov	rdx, qword ptr [rcx]
+	add	rdx, -1
+	mov	qword ptr [rcx], rdx
+	mov	rdx, qword ptr [r8]
+	add	rdx, 1
+	mov	qword ptr [r8], rdx
+	cmp	qword ptr [rcx], 0
+	setg	cl
+	cmp	rdx, 10
+	setl	dl
+	and	cl, dl
+	test	cl, 1
+	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
 	jne	.LBB0_3
 # %bb.4:                                # %dowhile.end6
-	movq	-64(%rbp), %rax                 # 8-byte Reload
-	subq	$5, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	movl	$16, %eax
-	callq	__chkstk
-	subq	%rax, %rsp
-	movq	%rsp, %rax
-	movq	%rax, -80(%rbp)                 # 8-byte Spill
-	movq	$1, (%rax)
-	xorl	%eax, %eax
+	mov	rax, qword ptr [rbp - 64]       # 8-byte Reload
+	sub	rax, 5
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	eax, 16
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, rsp
+	mov	qword ptr [rbp - 80], rax       # 8-byte Spill
+	mov	qword ptr [rax], 1
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	movq	%rax, -72(%rbp)                 # 8-byte Spill
+	mov	qword ptr [rbp - 72], rax       # 8-byte Spill
 .LBB0_5:                                # %dowhile.body7
                                         # =>This Inner Loop Header: Depth=1
-	movq	-80(%rbp), %rax                 # 8-byte Reload
-	movq	-72(%rbp), %rcx                 # 8-byte Reload
-	movq	(%rax), %rax
-	movq	%rax, -96(%rbp)                 # 8-byte Spill
-	addq	%rcx, %rax
-	movq	%rax, -88(%rbp)                 # 8-byte Spill
-	cmpq	$9, %rax
+	mov	rax, qword ptr [rbp - 80]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 72]       # 8-byte Reload
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rbp - 96], rax       # 8-byte Spill
+	add	rax, rcx
+	mov	qword ptr [rbp - 88], rax       # 8-byte Spill
+	cmp	rax, 9
 	jle	.LBB0_7
 .LBB0_6:                                # %dowhile.end9
-	movq	-88(%rbp), %rax                 # 8-byte Reload
-	cmpq	$10, %rax
-	sete	%cl
-	subq	$32, %rsp
-	callq	Assert
-	addq	$32, %rsp
-	xorl	%eax, %eax
+	mov	rax, qword ptr [rbp - 88]       # 8-byte Reload
+	cmp	rax, 10
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	movq	%rbp, %rsp
-	popq	%rbp
-	retq
+	mov	rsp, rbp
+	pop	rbp
+	ret
 .LBB0_7:                                # %if.end12
                                         #   in Loop: Header=BB0_5 Depth=1
-	movq	-88(%rbp), %rax                 # 8-byte Reload
-	movq	-80(%rbp), %rdx                 # 8-byte Reload
-	movq	-96(%rbp), %rcx                 # 8-byte Reload
-	addq	$1, %rcx
-	movq	%rcx, (%rdx)
-	cmpq	$6, %rcx
-	movq	%rax, -72(%rbp)                 # 8-byte Spill
+	mov	rax, qword ptr [rbp - 88]       # 8-byte Reload
+	mov	rdx, qword ptr [rbp - 80]       # 8-byte Reload
+	mov	rcx, qword ptr [rbp - 96]       # 8-byte Reload
+	add	rcx, 1
+	mov	qword ptr [rdx], rcx
+	cmp	rcx, 6
+	mov	qword ptr [rbp - 72], rax       # 8-byte Spill
 	jl	.LBB0_5
 	jmp	.LBB0_6
 	.seh_endproc

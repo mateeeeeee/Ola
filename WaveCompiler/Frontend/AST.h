@@ -713,7 +713,8 @@ namespace wave
 	public:
 		ConstantString(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str) 
 		{
-			SetType(ArrayType(builtin_types::Char, (uint32)str.size()));
+			SetValueCategory(ExprValueCategory::RValue);
+			SetType(QualifiedType(ArrayType(builtin_types::Char, (uint32)str.size()), Qualifier_Const));
 		}
 		std::string_view GetString() const { return str; }
 
@@ -858,26 +859,25 @@ namespace wave
 		std::unique_ptr<TranslationUnit> translation_unit;
 	};
 
-	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To> && std::is_base_of_v<NodeAST, From>
 	inline To* dynamic_ast_cast(From* from)
 	{
 		return dynamic_cast<To*>(from);
-	}
-	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	}							 
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To> && std::is_base_of_v<NodeAST, From>
 	inline To const* dynamic_ast_cast(From const* from)
 	{
 		return dynamic_cast<To const*>(from);
-	}
-	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	}				 
+																				 
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To> && std::is_base_of_v<NodeAST, From>
 	inline To* ast_cast(From* from)
 	{
 		return static_cast<To*>(from);
-	}
-	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To>&& std::is_base_of_v<NodeAST, From>
+	}									 
+	template<typename To, typename From> requires std::is_base_of_v<NodeAST, To> && std::is_base_of_v<NodeAST, From>
 	inline To const* ast_cast(From const* from)
 	{
 		return static_cast<To const*>(from);
 	}
-
-
 }

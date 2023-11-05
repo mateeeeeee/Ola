@@ -12,6 +12,7 @@ namespace wave
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = type.HasRawType();
+		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
 
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -43,7 +44,7 @@ namespace wave
 			diagnostics.Report(loc, void_invalid_context);
 		}
 
-		std::unique_ptr<VariableDecl> var_decl = MakeUnique<VariableDecl>(name, loc);
+		UniqueVariableDeclPtr var_decl = MakeUnique<VariableDecl>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
 		var_decl->SetVisibility(visibility);
 		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
@@ -52,13 +53,23 @@ namespace wave
 		{
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
 		}
+
 		var_decl->SetInitExpr(std::move(init_expr));
 
-		if ((has_init && !has_type_specifier) || type->Is(TypeKind::Array))
+		if ((has_init && !has_type_specifier) || IsArrayType(type))
 		{
-			QualifiedType var_type(var_decl->GetInitExpr()->GetType());
-			if (type.IsConst()) var_type.AddConst();
-			var_decl->SetType(var_type);
+			if (IsArrayType(type) && init_expr_is_decl_ref)
+			{
+				QualifiedType const& base_type = type_cast<ArrayType>(type).GetBaseType();
+				QualifiedType var_type(ArrayType(base_type), type.IsConst() ? Qualifier_Const : Qualifier_None);
+				var_decl->SetType(var_type);
+			}
+			else
+			{
+				QualifiedType var_type(var_decl->GetInitExpr()->GetType());
+				if (type.IsConst()) var_type.AddConst();
+				var_decl->SetType(var_type);
+			}
 		}
 		else
 		{
@@ -84,7 +95,7 @@ namespace wave
 			diagnostics.Report(loc, void_invalid_context);
 		}
 
-		std::unique_ptr<VariableDecl> param_decl = MakeUnique<VariableDecl>(name, loc);
+		UniqueVariableDeclPtr param_decl = MakeUnique<VariableDecl>(name, loc);
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
 		param_decl->SetType(type);
@@ -660,7 +671,7 @@ namespace wave
 		if (index_expr->IsConstexpr())
 		{
 			int64 bracket_value = index_expr->EvaluateConstexpr();
-			if (bracket_value < 0 || bracket_value > array_type.GetArraySize())
+			if (array_type.GetArraySize() > 0 && (bracket_value < 0 || bracket_value >= array_type.GetArraySize()))
 			{
 				diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);
 				return nullptr;

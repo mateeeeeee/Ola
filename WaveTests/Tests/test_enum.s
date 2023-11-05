@@ -5,6 +5,7 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
 	.def	main;
 	.scl	2;
@@ -15,41 +16,41 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$40, %rsp
+	sub	rsp, 40
 	.seh_stackalloc 40
 	.seh_endprologue
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	movl	$1, %ecx
-	callq	Assert
-	xorl	%eax, %eax
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	addq	$40, %rsp
-	retq
+	add	rsp, 40
+	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig

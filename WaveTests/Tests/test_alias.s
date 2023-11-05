@@ -5,6 +5,7 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
 	.def	main;
 	.scl	2;
@@ -14,8 +15,8 @@
 	.p2align	4, 0x90
 main:                                   # @main
 # %bb.0:                                # %entry
-	xorl	%eax, %eax
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	retq
+	ret
                                         # -- End function
 	.addrsig

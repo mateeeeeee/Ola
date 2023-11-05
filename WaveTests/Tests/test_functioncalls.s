@@ -5,6 +5,7 @@
 	.endef
 	.globl	@feat.00
 .set @feat.00, 0
+	.intel_syntax noprefix
 	.file	"WaveModule"
 	.def	square;
 	.scl	3;
@@ -13,9 +14,9 @@
 	.p2align	4, 0x90                         # -- Begin function square
 square:                                 # @square
 # %bb.0:                                # %entry
-	movq	%rcx, %rax
-	imulq	%rax, %rax
-	retq
+	mov	rax, rcx
+	imul	rax, rax
+	ret
                                         # -- End function
 	.def	add;
 	.scl	3;
@@ -24,9 +25,9 @@ square:                                 # @square
 	.p2align	4, 0x90                         # -- Begin function add
 add:                                    # @add
 # %bb.0:                                # %entry
-	movq	%rdx, %rax
-	addq	%rcx, %rax
-	retq
+	mov	rax, rdx
+	add	rax, rcx
+	ret
                                         # -- End function
 	.def	isEven;
 	.scl	3;
@@ -35,10 +36,10 @@ add:                                    # @add
 	.p2align	4, 0x90                         # -- Begin function isEven
 isEven:                                 # @isEven
 # %bb.0:                                # %entry
-	movb	%cl, %al
-	testb	$1, %al
-	sete	%al
-	retq
+	mov	al, cl
+	test	al, 1
+	sete	al
+	ret
                                         # -- End function
 	.def	fma;
 	.scl	3;
@@ -47,10 +48,10 @@ isEven:                                 # @isEven
 	.p2align	4, 0x90                         # -- Begin function fma
 fma:                                    # @fma
 # %bb.0:                                # %entry
-	movq	%rdx, %rax
-	imulq	%rcx, %rax
-	addq	%r8, %rax
-	retq
+	mov	rax, rdx
+	imul	rax, rcx
+	add	rax, r8
+	ret
                                         # -- End function
 	.def	isInRange;
 	.scl	3;
@@ -59,13 +60,13 @@ fma:                                    # @fma
 	.p2align	4, 0x90                         # -- Begin function isInRange
 isInRange:                              # @isInRange
 # %bb.0:                                # %entry
-	movq	%rcx, %rax
-	subq	%rdx, %rax
-	setge	%al
-	subq	%r8, %rcx
-	setle	%cl
-	andb	%cl, %al
-	retq
+	mov	rax, rcx
+	sub	rax, rdx
+	setge	al
+	sub	rcx, r8
+	setle	cl
+	and	al, cl
+	ret
                                         # -- End function
 	.def	main;
 	.scl	2;
@@ -76,65 +77,65 @@ isInRange:                              # @isInRange
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	subq	$40, %rsp
+	sub	rsp, 40
 	.seh_stackalloc 40
 	.seh_endprologue
-	movl	$5, %ecx
-	callq	square
-	cmpq	$25, %rax
-	sete	%cl
-	callq	Assert
-	movl	$8, %ecx
-	callq	isEven
-	movb	%al, %cl
-	callq	Assert
-	movq	$-4, %rcx
-	callq	square
-	cmpq	$16, %rax
-	sete	%cl
-	callq	Assert
-	movl	$7, %ecx
-	callq	isEven
-	movb	%al, %cl
-	xorb	$-1, %cl
-	callq	Assert
-	movl	$5, %ecx
-	movl	$12, %edx
-	callq	add
-	cmpq	$17, %rax
-	sete	%cl
-	callq	Assert
-	movl	$2, %ecx
-	movl	$3, %edx
-	movl	$4, %r8d
-	callq	fma
-	cmpq	$10, %rax
-	sete	%cl
-	callq	Assert
-	movl	$5, %ecx
-	movl	$1, %edx
-	movl	$10, %r8d
-	callq	isInRange
-	movb	%al, %cl
-	callq	Assert
-	movl	$6, %ecx
-	movl	$2, %edx
-	movl	$8, %r8d
-	callq	fma
-	cmpq	$20, %rax
-	sete	%cl
-	callq	Assert
-	movl	$5, %ecx
-	movl	$6, %edx
-	movl	$10, %r8d
-	callq	isInRange
-	movb	%al, %cl
-	xorb	$-1, %cl
-	callq	Assert
-	xorl	%eax, %eax
+	mov	ecx, 5
+	call	square
+	cmp	rax, 25
+	sete	cl
+	call	Assert
+	mov	ecx, 8
+	call	isEven
+	mov	cl, al
+	call	Assert
+	mov	rcx, -4
+	call	square
+	cmp	rax, 16
+	sete	cl
+	call	Assert
+	mov	ecx, 7
+	call	isEven
+	mov	cl, al
+	xor	cl, -1
+	call	Assert
+	mov	ecx, 5
+	mov	edx, 12
+	call	add
+	cmp	rax, 17
+	sete	cl
+	call	Assert
+	mov	ecx, 2
+	mov	edx, 3
+	mov	r8d, 4
+	call	fma
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	mov	ecx, 5
+	mov	edx, 1
+	mov	r8d, 10
+	call	isInRange
+	mov	cl, al
+	call	Assert
+	mov	ecx, 6
+	mov	edx, 2
+	mov	r8d, 8
+	call	fma
+	cmp	rax, 20
+	sete	cl
+	call	Assert
+	mov	ecx, 5
+	mov	edx, 6
+	mov	r8d, 10
+	call	isInRange
+	mov	cl, al
+	xor	cl, -1
+	call	Assert
+	xor	eax, eax
                                         # kill: def $rax killed $eax
-	addq	$40, %rsp
-	retq
+	add	rsp, 40
+	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig

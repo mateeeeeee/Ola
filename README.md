@@ -31,9 +31,7 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * arrays
-    - array aliasing
-    - multidimensional arrays
+  * multidimensional arrays
   * floats
   * classes
 
@@ -157,6 +155,30 @@ public int main()
     modifyArray(arr4);
 
     return arr4[0]; //returns 10
+}
+```
+
+Two arrays can alias each other:
+```
+public int main() 
+{
+    int[] arr1 = {1,2,3};
+    int[] arr2 = arr1; //arr2 and arr1 alias each other
+
+    arr2[0] = 100;
+    Assert(arr1[0] == 100);
+
+    arr1[1] = 200;
+    Assert(arr2[1] == 100);
+
+    int[] arr3 = {1,1,1,1,1,1,1,1,1};
+    arr2 = arr3; 
+    Assert(arr2[7] == 1);
+
+    int[] arr4 = arr2;
+    Assert(arr4[5] == 1);
+
+    return 0;
 }
 ```
 

@@ -15,17 +15,6 @@ declare double @ReadFloat()
 
 declare i8 @ReadChar()
 
-define internal void @f(ptr %arr) {
-entry:
-  %0 = getelementptr inbounds i64, ptr %arr, i64 0
-  %1 = load i64, ptr %0, align 4
-  store i64 10, ptr %0, align 4
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
@@ -36,11 +25,13 @@ entry:
   store i64 2, ptr %3, align 4
   %4 = getelementptr [3 x i64], ptr %1, i64 0, i64 2
   store i64 3, ptr %4, align 4
-  %5 = getelementptr inbounds i64, ptr %1, i64 0
-  call void @f(ptr %5)
-  %6 = getelementptr [3 x i64], ptr %1, i64 0, i64 0
-  %7 = load ptr, ptr %6, align 8
-  store ptr %7, ptr %0, align 8
+  %5 = alloca ptr, align 8
+  %6 = getelementptr inbounds [3 x i64], ptr %1, i64 0, i64 0
+  store ptr %6, ptr %5, align 8
+  %7 = alloca ptr, align 8
+  %8 = load ptr, ptr %5, align 8
+  store ptr %8, ptr %7, align 8
+  store i64 0, ptr %0, align 4
   br label %exit
 
 return:                                           ; No predecessors!
@@ -48,6 +39,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %8 = load i64, ptr %0, align 4
-  ret i64 %8
+  %9 = load i64, ptr %0, align 4
+  ret i64 %9
 }
