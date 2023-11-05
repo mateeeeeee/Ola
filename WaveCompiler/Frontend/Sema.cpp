@@ -65,9 +65,9 @@ namespace wave
 			{
 				diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
 			}
-
+			QualifiedType base_type = IsArrayType(decl_type) ? init_expr_type.GetBaseType() : decl_type.GetBaseType();
 			uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
-			QualifiedType var_type(ArrayType(decl_type.GetBaseType(), array_size));
+			QualifiedType var_type(ArrayType(base_type, array_size));
 			var_decl->SetType(var_type);
 		}
 		else if ((has_init && !has_type_specifier))

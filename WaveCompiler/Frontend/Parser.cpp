@@ -796,7 +796,14 @@ namespace wave
 			++current_token;
 			UniqueExprPtr index_expr = ParseExpression();
 			Expect(TokenKind::right_square);
-			return sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
+			expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
+			while (Consume(TokenKind::left_square))
+			{
+				index_expr = ParseExpression();
+				expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
+				Expect(TokenKind::right_square);
+			}
+			return expr;
 		}
 		case TokenKind::period:
 			WAVE_ASSERT_MSG(false, "Not yet implemented");

@@ -5,8 +5,7 @@ import std.string;
 
 public int main()
 {
-	const char[] name = char[16]{};
-    ReadString(name, length(name)); //from std.io
-    const char[] nameAlias = name;
-    PrintString(nameAlias);
+	int[][] int2d = int[2][2]{}; //{{1,2},{3,4}};
+	int2d[0][0] = 5;
+	return int2d[0][0];
 }
