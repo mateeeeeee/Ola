@@ -16,36 +16,35 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	mov	byte ptr [rsp + 32], 0
-	mov	byte ptr [rsp + 33], 0
-	mov	byte ptr [rsp + 34], 0
-	mov	byte ptr [rsp + 35], 0
-	mov	byte ptr [rsp + 36], 0
-	mov	byte ptr [rsp + 37], 0
-	mov	byte ptr [rsp + 38], 0
-	mov	byte ptr [rsp + 39], 0
-	mov	byte ptr [rsp + 40], 0
-	mov	byte ptr [rsp + 41], 0
-	mov	byte ptr [rsp + 42], 0
-	mov	byte ptr [rsp + 43], 0
-	mov	byte ptr [rsp + 44], 0
-	mov	byte ptr [rsp + 45], 0
-	mov	byte ptr [rsp + 46], 0
-	mov	byte ptr [rsp + 47], 0
-	lea	rcx, [rsp + 32]
+	mov	byte ptr [rsp + 48], 0
+	mov	byte ptr [rsp + 49], 0
+	mov	byte ptr [rsp + 50], 0
+	mov	byte ptr [rsp + 51], 0
+	mov	byte ptr [rsp + 52], 0
+	mov	byte ptr [rsp + 53], 0
+	mov	byte ptr [rsp + 54], 0
+	mov	byte ptr [rsp + 55], 0
+	mov	byte ptr [rsp + 56], 0
+	mov	byte ptr [rsp + 57], 0
+	mov	byte ptr [rsp + 58], 0
+	mov	byte ptr [rsp + 59], 0
+	mov	byte ptr [rsp + 60], 0
+	mov	byte ptr [rsp + 61], 0
+	mov	byte ptr [rsp + 62], 0
+	mov	byte ptr [rsp + 63], 0
+	lea	rcx, [rsp + 48]
 	mov	edx, 16
 	call	ReadString
-	lea	rcx, [rsp + 32]
-	call	PrintString
-	mov	byte ptr [rsp + 32], 76
-	lea	rcx, [rsp + 32]
+	lea	rax, [rsp + 48]
+	mov	qword ptr [rsp + 40], rax
+	mov	rcx, qword ptr [rsp + 40]
 	call	PrintString
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 48]
-	add	rsp, 56
+	mov	rax, qword ptr [rsp + 64]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function

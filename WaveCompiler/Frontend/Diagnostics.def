@@ -53,4 +53,5 @@ DIAG(array_size_not_constexpr, error, "Array size is not an integer constant")
 DIAG(non_array_expr_in_foreach, error, "Cannot use foreach loop with a non-array expression")
 DIAG(foreach_loop_type_mismatch, error, "Foreach loop type mismatch")
 DIAG(aliasing_var_forbidden, error, "Aliasing 'var' is forbidden")
+DIAG(assigning_const_array_to_non_const_array, error, "Assigning const array to non-const array is not allowed")
 #undef DIAG

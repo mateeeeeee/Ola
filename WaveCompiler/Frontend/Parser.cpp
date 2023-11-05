@@ -1000,12 +1000,14 @@ namespace wave
 				Expect(TokenKind::right_square);
 				ArrayType array_type(type, array_size);
 				type.SetRawType(array_type);
+				type.RemoveConst();
 			}
 			else
 			{
 				Expect(TokenKind::right_square);
 				ArrayType array_type(type);
 				type.SetRawType(array_type);
+				type.RemoveConst();
 			}
 		}
 	}

@@ -56,20 +56,25 @@ namespace wave
 
 		var_decl->SetInitExpr(std::move(init_expr));
 
-		if ((has_init && !has_type_specifier) || IsArrayType(type))
+		if (IsArrayType(type))
 		{
-			if (IsArrayType(type) && init_expr_is_decl_ref)
+			ArrayType const& decl_type = type_cast<ArrayType>(type); 
+			ArrayType const& init_expr_type = type_cast<ArrayType>(var_decl->GetInitExpr()->GetType());
+			
+			if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
 			{
-				QualifiedType const& base_type = type_cast<ArrayType>(type).GetBaseType();
-				QualifiedType var_type(ArrayType(base_type), type.IsConst() ? Qualifier_Const : Qualifier_None);
-				var_decl->SetType(var_type);
+				diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
 			}
-			else
-			{
-				QualifiedType var_type(var_decl->GetInitExpr()->GetType());
-				if (type.IsConst()) var_type.AddConst();
-				var_decl->SetType(var_type);
-			}
+
+			uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
+			QualifiedType var_type(ArrayType(decl_type.GetBaseType(), array_size));
+			var_decl->SetType(var_type);
+		}
+		else if ((has_init && !has_type_specifier))
+		{
+			QualifiedType var_type(var_decl->GetInitExpr()->GetType());
+			if (type.IsConst()) var_type.AddConst();
+			var_decl->SetType(var_type);
 		}
 		else
 		{

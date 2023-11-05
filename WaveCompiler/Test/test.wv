@@ -5,10 +5,8 @@ import std.string;
 
 public int main()
 {
-	 char[] name = char[16]{};
+	const char[] name = char[16]{};
     ReadString(name, length(name)); //from std.io
-    PrintString(name);
-
-    name[0] = 'L';
-    PrintString(name);
+    const char[] nameAlias = name;
+    PrintString(nameAlias);
 }

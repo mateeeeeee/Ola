@@ -79,16 +79,14 @@ entry:
   store i8 0, ptr %17, align 1
   %18 = getelementptr inbounds [16 x i8], ptr %1, i64 0, i64 0
   call void @ReadString(ptr %18, i64 16)
-  %19 = getelementptr inbounds [16 x i8], ptr %1, i64 0, i64 0
-  call void @PrintString(ptr %19)
-  %20 = getelementptr [16 x i8], ptr %1, i64 0, i64 0
-  %21 = load i8, ptr %20, align 1
-  store i8 76, ptr %20, align 1
-  %22 = getelementptr inbounds [16 x i8], ptr %1, i64 0, i64 0
-  call void @PrintString(ptr %22)
+  %19 = alloca ptr, align 8
+  %20 = getelementptr inbounds [16 x i8], ptr %1, i64 0, i64 0
+  store ptr %20, ptr %19, align 8
+  %21 = load ptr, ptr %19, align 8
+  call void @PrintString(ptr %21)
   br label %exit
 
 exit:                                             ; preds = %entry
-  %23 = load i64, ptr %0, align 4
-  ret i64 %23
+  %22 = load i64, ptr %0, align 4
+  ret i64 %22
 }
