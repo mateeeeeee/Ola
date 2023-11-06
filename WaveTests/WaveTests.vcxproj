@@ -115,7 +115,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WaveLang\WaveLang.vcxproj">
+    <ProjectReference Include="..\WaveCompiler\WaveCompiler.vcxproj">
       <Project>{958a5741-4869-443b-a922-44c1eb6b6347}</Project>
     </ProjectReference>
   </ItemGroup>

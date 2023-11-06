@@ -123,18 +123,11 @@ namespace wave
 
 					if (InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr))
 					{
+						WAVE_ASSERT(init_list_expr->IsConstexpr());
 						init_list_expr->Accept(*this);
-						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
-						std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
-						for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
-						{
-							if (i < init_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_list[i].get()]);
-							else					   array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
-						}
-						llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_type), array_init_list);
-
+						
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_array, var_decl.GetName());
+						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(llvm_value_map[init_list_expr]), var_decl.GetName());
 						llvm_value_map[&var_decl] = global_array;
 					}
 					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
@@ -211,14 +204,14 @@ namespace wave
 						Store(llvm::ConstantInt::get(char_type, '\0', true), ptr);
 						llvm_value_map[&var_decl] = alloc;
 					}
-					else if (DeclRefExpr const* decl_ref_expr = dynamic_ast_cast<DeclRefExpr>(init_expr))
+					else if (init_expr->GetExprKind() == ExprKind::DeclRef || init_expr->GetExprKind() == ExprKind::ArrayAccess)
 					{
-						WAVE_ASSERT(IsArrayType(decl_ref_expr->GetType()));
-						llvm::Type* decl_ref_type = ConvertToLLVMType(decl_ref_expr->GetType());
+						WAVE_ASSERT(IsArrayType(init_expr->GetType()));
+						llvm::Type* init_expr_type = ConvertToLLVMType(init_expr->GetType());
 						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm::PointerType::get(llvm_element_type, 0), nullptr);
 						llvm::Value* ptr = nullptr;
-						if (decl_ref_type->isArrayTy()) ptr = builder.CreateInBoundsGEP(decl_ref_type, llvm_value_map[decl_ref_expr], { zero, zero });
-						else ptr = builder.CreateLoad(decl_ref_type, llvm_value_map[decl_ref_expr]);
+						if (init_expr_type->isArrayTy()) ptr = builder.CreateInBoundsGEP(init_expr_type, llvm_value_map[init_expr], { zero, zero });
+						else ptr = builder.CreateLoad(init_expr_type, llvm_value_map[init_expr]);
 						builder.CreateStore(ptr, alloc);
 						llvm_value_map[&var_decl] = alloc;
 					}
@@ -838,9 +831,26 @@ namespace wave
 		llvm_value_map[&func_call] = call_result;
 	}
 
-	void LLVMVisitor::Visit(InitializerListExpr const& init_list, uint32)
+	void LLVMVisitor::Visit(InitializerListExpr const& initializer_list, uint32)
 	{
-		for (auto const& element_expr : init_list.GetInitList()) element_expr->Accept(*this);
+		UniqueExprPtrList const& init_expr_list = initializer_list.GetInitList();
+		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
+		if (initializer_list.IsConstexpr())
+		{
+			ArrayType const& array_type = type_cast<ArrayType>(initializer_list.GetType());
+			llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
+			llvm::Type* llvm_array_type = ConvertToLLVMType(array_type);
+
+			std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
+			for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
+			{
+				if (i < init_expr_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(llvm_value_map[init_expr_list[i].get()]);
+				else array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
+			}
+			llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_array_type), array_init_list);
+			llvm_value_map[&initializer_list] = constant_array;
+		}
+		
 	}
 
 	void LLVMVisitor::Visit(ArrayAccessExpr const& array_access, uint32)

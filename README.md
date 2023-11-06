@@ -32,7 +32,6 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * multidimensional arrays (wip)
   * floats
   * classes
 
@@ -178,6 +177,32 @@ public int main()
 
     int[] arr4 = arr2;
     Assert(arr4[5] == 1);
+
+    return 0;
+}
+```
+Note that when declaring an array variable to alias another variable its type is considered to be `int[]` and not `int[N]`, in other words the variable doesn't
+keep the information on how big is the array it is aliasing. That makes it possible to later alias another array. The same happens when function takes an array as 
+an argument. Semantically it acts more as a pointer than array. For that reason calling `length` operator on that kind of variable doesn't make sense.
+
+Multidimensional arrays are also possible:
+```
+public int main() 
+{
+    int sum2d = 0;
+	int[][] int2d = int[2][2]{ {1,2}, {3,4}}; 
+	for(int i = 0; i < 2; ++i)
+	{
+		for(int j = 0; j < 2; ++j)
+		{
+			sum2d += int2d[i][j];
+		}
+	}
+	Assert(sum2d == 10); 
+
+    int[] firstRow = sum2d[0];
+    Assert(firstRow[0] == 1);
+    Assert(firstRow[1] == 2);
 
     return 0;
 }

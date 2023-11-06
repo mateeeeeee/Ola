@@ -43,5 +43,17 @@ public int main()
 	Assert(LocalArray2[0] == 1000);
 	Assert(LocalArray3[0] == 1000);
 
+	int sum2d = 0;
+	int[][] int2d = int[2][2]{ {1,2}, {3,4}}; 
+	for(int i = 0; i < 2; ++i)
+	{
+		for(int j = 0; j < 2; ++j)
+		{
+			sum2d += int2d[i][j];
+		}
+	}
+	Assert(sum2d == 10);  //#todo: sum2d = 8 when int2d is global..
+
+
 	return 0;
 }

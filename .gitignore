@@ -20,6 +20,10 @@ Libraries/LLVM/llvm_win64_17_0_1/
 Libraries/LLVM/llvm-project_17_0_1/
 WaveTests/Wave.exe
 WaveCompiler/todo.txt
+WaveTests/Tests/*.exe
+WaveTests/Tests/*.s
+WaveTests/Tests/*.ll
+WaveCompiler/WaveCompiler.args.json
 
 
 # Build results
@@ -367,3 +371,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
