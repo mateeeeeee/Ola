@@ -1,5 +1,5 @@
-#include "io.h"
-#include "assert.h"
-#include "math.h"
-#include "string.h"
+#include "waveio.h"
+#include "waveassert.h"
+#include "wavemath.h"
+#include "wavestring.h"
 

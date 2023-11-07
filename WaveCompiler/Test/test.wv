@@ -6,21 +6,5 @@ import std.string;
 
 public int main()
 {
-	int sum = 0;
-	int[] firstRow = int2d[0];
-	int[] secondRow = int2d[1];
-
-	PrintInteger(firstRow[0]);
-	PrintInteger(firstRow[1]);
-	PrintInteger(secondRow[0]);
-	PrintInteger(secondRow[1]);
-	//for(int i = 0; i < 2; ++i)
-	//{
-	//	for(int j = 0; j < 2; ++j)
-	//	{
-	//		//sum += int2d[i][j];
-	//		PrintInteger(int2d[i][j]);
-	//	}
-	//}
-	return sum;
+	return 0;
 }

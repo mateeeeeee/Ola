@@ -25,6 +25,14 @@ WaveTests/Tests/*.s
 WaveTests/Tests/*.ll
 WaveCompiler/WaveCompiler.args.json
 
+/.vs
+build/
+bin/
+*.sln 
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
 
 # Build results
 [Dd]ebug/

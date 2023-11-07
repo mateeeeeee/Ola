@@ -2,6 +2,9 @@
 #include "Core/Logger.h"
 #include "Compiler/Compiler.h"
 
+#include <filesystem>
+#include <cstdio>
+
 int main(int argc, char** argv)
 {
 	CLI::App cli_parser{ "Wave compiler" };
@@ -24,6 +27,8 @@ int main(int argc, char** argv)
 	CLI::Option* test_input_opt = cli_parser.add_option("--simple", simple_input, "input code in the form of a string");
 
 	CLI11_PARSE(cli_parser, argc, argv);
+
+	printf("%s", std::filesystem::current_path().string().c_str());
 
 	if (*test)
 	{

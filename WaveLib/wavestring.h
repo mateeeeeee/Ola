@@ -1,6 +1,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
+using namespace std;
 
 extern "C"
 {
@@ -47,7 +50,7 @@ extern "C"
 	}
 	void StringCopy(char* dst, char* src)
 	{
-		strcpy(dst, src);
+		
 	}
 
 }
