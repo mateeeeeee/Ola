@@ -1,9 +1,13 @@
+
+configure_file(${CMAKE_SOURCE_DIR}/wave_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/WaveConfig.h)
+
 set(SOURCE
   Tests.cpp
 )
 
 set(HEADERS
   TestMacros.h
+  autogen/WaveConfig.h
 )
 
 add_executable(WaveTests ${SOURCE} ${HEADERS})
@@ -28,5 +32,4 @@ target_link_libraries(WaveTests PRIVATE gtest_main)
 target_include_directories(WaveTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(WaveTests PRIVATE ${CMAKE_SOURCE_DIR}/WaveCompiler/)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Tests DESTINATION ${CMAKE_BINARY_DIR}/WaveTests/Tests)
 

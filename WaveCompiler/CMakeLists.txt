@@ -1,4 +1,6 @@
 
+configure_file(${CMAKE_SOURCE_DIR}/wave_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/WaveConfig.h)
+
 set(CORE_FILES
   Core/CoreTypes.h
   Core/Defines.h
@@ -55,7 +57,12 @@ set(COMPILER_FILES
   Compiler/Compiler.cpp
 )
 
-add_executable(WaveCompiler main.cpp ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES})
+set(TEST_FILES
+	Test/test.wv
+	Test/test.ll
+)
+
+add_executable(WaveCompiler main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 set_target_properties(WaveCompiler PROPERTIES OUTPUT_NAME Wave)
 
@@ -65,6 +72,7 @@ source_group("Utility"  FILES ${UTILITY_FILES})
 source_group("Frontend" FILES ${FRONTEND_FILES})
 source_group("Backend"  FILES ${BACKEND_FILES})
 source_group("Compiler" FILES ${COMPILER_FILES})
+source_group("Test" 	FILES ${TEST_FILES})
 
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/include)
@@ -204,8 +212,6 @@ if(MSVC)
 else()                                                   
     add_definitions(-include Core/CoreTypes.h -include Core/Defines.h)
 endif()
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Test DESTINATION ${CMAKE_BINARY_DIR}/WaveCompiler)
 
 install(TARGETS WaveCompiler DESTINATION bin)
 

@@ -44,7 +44,7 @@ declare void @StringCopy(ptr, ptr)
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  store i64 0, ptr %0, align 4
+  store i64 100, ptr %0, align 4
   br label %exit
 
 return:                                           ; No predecessors!

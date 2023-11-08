@@ -1,6 +1,7 @@
 #include "CLI/CLI.hpp"
 #include "Core/Logger.h"
 #include "Compiler/Compiler.h"
+#include "autogen/WaveConfig.h"
 
 #include <filesystem>
 #include <cstdio>
@@ -28,8 +29,6 @@ int main(int argc, char** argv)
 
 	CLI11_PARSE(cli_parser, argc, argv);
 
-	printf("%s", std::filesystem::current_path().string().c_str());
-
 	if (*test)
 	{
 		bool test_debug_flag = (bool)*test_debug;
@@ -41,6 +40,7 @@ int main(int argc, char** argv)
 		else if (!input_files.empty())
 		{
 			if (output_file.empty()) output_file = input_files[0];
+			if (directory.empty()) directory = WAVE_CONCAT(WAVE_TESTS_PATH, "Tests");
 
 			wave::CompilerInput compiler_input{};
 			compiler_input.flags = test_debug_flag ? wave::CompilerFlag_DumpAST | wave::CompilerFlag_O0 : wave::CompilerFlag_O3;
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	if (output_file.empty()) output_file = input_files[0];
-	if (directory.empty()) directory = "Test";
+	if (directory.empty()) directory = WAVE_CONCAT(WAVE_COMPILER_PATH, "Test");
 
 	wave::CompilerFlags compiler_flags = wave::CompilerFlag_None;
 	if(*ast_dump) compiler_flags |= wave::CompilerFlag_DumpAST;

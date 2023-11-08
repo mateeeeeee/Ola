@@ -12,6 +12,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "autogen/WaveConfig.h"
 
 namespace fs = std::filesystem;
 
@@ -19,9 +20,11 @@ namespace wave
 {
 	namespace
 	{
-		static char const* wavelib_debug   = "../bin/Debug/wavelib.lib";
-		static char const* wavelib_release = "../bin/Release/wavelib.lib";
-
+#if 1
+		static char const* wavelib = WAVE_BINARY_PATH"Debug/wavelib.lib";
+#else 
+		static char const* wavelib = WAVE_BINARY_PATH"Release/wavelib.lib";
+#endif
 		void InitLogger()
 		{
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -80,8 +83,7 @@ namespace wave
 		WAVE_ASSERT_MSG(use_llvm, "Only LLVM is supported for code generation");
 
 		fs::path cur_path = fs::current_path();
-		fs::path wavelib_path = cur_path / wavelib_debug;
-		fs::current_path(cur_path / input.input_directory);
+		fs::current_path(input.input_directory);
 
 		std::vector<std::string> assembly_files(input.sources.size());
 		std::vector<std::string> object_files(input.sources.size());
@@ -111,7 +113,7 @@ namespace wave
 		
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
-		link_cmd += wavelib_path.string();
+		link_cmd += wavelib;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE ";
 		system(link_cmd.c_str());

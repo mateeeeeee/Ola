@@ -6,5 +6,5 @@ import std.string;
 
 public int main()
 {
-	return 0;
+	return 100;
 }

@@ -19,7 +19,7 @@ main:                                   # @main
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	qword ptr [rsp], 0
+	mov	qword ptr [rsp], 100
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
 	pop	rcx

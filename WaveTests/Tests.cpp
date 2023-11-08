@@ -1,6 +1,4 @@
-#include "pch.h"
 #include "TestMacros.h"
-#include "Core/Defines.h"
 
 using namespace wave;
 
