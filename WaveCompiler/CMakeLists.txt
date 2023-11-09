@@ -1,4 +1,6 @@
 
+find_package(LLVM 17.0 REQUIRED CONFIG)
+
 configure_file(${CMAKE_SOURCE_DIR}/wave_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/WaveConfig.h)
 
 set(CORE_FILES
@@ -66,7 +68,7 @@ add_executable(WaveCompiler main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILIT
 
 set_target_properties(WaveCompiler PROPERTIES OUTPUT_NAME Wave)
 
-source_group(" " FILES main.cpp)
+source_group(" " 		FILES main.cpp)
 source_group("Core"     FILES ${CORE_FILES})
 source_group("Utility"  FILES ${UTILITY_FILES})
 source_group("Frontend" FILES ${FRONTEND_FILES})
@@ -77,9 +79,8 @@ source_group("Test" 	FILES ${TEST_FILES})
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/include)
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/CLI11/include)
-target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/LLVM/llvm-project_17_0_1/llvm/include)
-target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/LLVM/llvm_win64_17_0_1/include)
-
+target_include_directories(WaveCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
+target_compile_definitions(WaveCompiler PRIVATE ${LLVM_DEFINITIONS})
 
 set(LLVM_LIBRARIES
 LLVMAnalysis.lib
@@ -159,12 +160,11 @@ LLVMDebugInfoCodeView.lib
 LLVMDemangle.lib
 )
 
-set(LLVM_LIBRARY_PATH ${CMAKE_SOURCE_DIR}Libraries/LLVM/llvm_win64_17_0_1/)
+target_link_directories(WaveCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
+target_link_libraries(WaveCompiler PRIVATE ${LLVM_LIBRARIES})
 
 target_link_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/lib/Release/)
 target_link_libraries(WaveCompiler PRIVATE spdlog)
-target_link_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/LLVM/llvm_win64_17_0_1/Release/lib)
-target_link_libraries(WaveCompiler PRIVATE ${LLVM_LIBRARIES})
 
 set(DISABLED_WARNINGS
 	/wd4141
@@ -214,15 +214,3 @@ else()
 endif()
 
 install(TARGETS WaveCompiler DESTINATION bin)
-
-
-# Include directories for external libraries
-
-# Find and configure LLVM
-#find_package(LLVM 17 REQUIRED CONFIG)
-#message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-#include_directories(${LLVM_INCLUDE_DIRS})
-#add_definitions(${LLVM_DEFINITIONS})
-#target_link_libraries(WaveCompiler
-#     ${LLVM_LIBRARIES}
-#)
