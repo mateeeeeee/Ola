@@ -608,6 +608,8 @@ namespace wave
 
 		llvm::Value* lhs = Load(lhs_expr->GetType(), lhs_value);
 		llvm::Value* rhs = Load(rhs_expr->GetType(), rhs_value);
+		bool const is_float_expr = IsFloat(lhs->getType()) || IsFloat(rhs->getType());
+
 
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
@@ -619,26 +621,28 @@ namespace wave
 		break;
 		case BinaryExprKind::Add:
 		{
-			result = builder.CreateAdd(lhs, rhs);
+
+			result = is_float_expr ? builder.CreateFAdd(lhs, rhs) : builder.CreateAdd(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Subtract:
 		{
-			result = builder.CreateSub(lhs, rhs);
+			result = is_float_expr ? builder.CreateFSub(lhs, rhs) : builder.CreateSub(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Multiply:
 		{
-			result = builder.CreateMul(lhs, rhs);
+			result = is_float_expr ? builder.CreateFMul(lhs, rhs) : builder.CreateMul(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Divide:
 		{
-			result = builder.CreateSDiv(lhs, rhs);
+			result = is_float_expr ? builder.CreateFDiv(lhs, rhs) : builder.CreateSDiv(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Modulo:
 		{
+			WAVE_ASSERT(!is_float_expr);
 			result = builder.CreateSRem(lhs, rhs);
 		}
 		break;
@@ -681,32 +685,32 @@ namespace wave
 		break;
 		case BinaryExprKind::Equal:
 		{
-			result = builder.CreateICmpEQ(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpOEQ(lhs, rhs) : builder.CreateICmpEQ(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::NotEqual:
 		{
-			result = builder.CreateICmpNE(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpONE(lhs, rhs) : builder.CreateICmpNE(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Less:
 		{
-			result = builder.CreateICmpSLT(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpOLT(lhs, rhs) : builder.CreateICmpSLT(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Greater:
 		{
-			result = builder.CreateICmpSGT(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpOGT(lhs, rhs) : builder.CreateICmpSGT(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::LessEqual:
 		{
-			result = builder.CreateICmpSLE(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpOLE(lhs, rhs) : builder.CreateICmpSLE(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::GreaterEqual:
 		{
-			result = builder.CreateICmpSGE(lhs, rhs);
+			result = is_float_expr ? builder.CreateFCmpOGE(lhs, rhs) : builder.CreateICmpSGE(lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Comma:

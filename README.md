@@ -19,8 +19,9 @@ It's done as a learning project and its purpose is solely educational.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
-  * one-dimensional arrays
+  * arrays
   * strings
+  * floats (wip)
   * enums
   * functions
   * `sizeof`, `length` operators
@@ -32,7 +33,6 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * floats (wip)
   * classes
 
 ## Structure

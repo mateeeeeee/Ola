@@ -465,9 +465,25 @@ namespace wave
 		case BinaryExprKind::Subtract:
 		case BinaryExprKind::Multiply:
 		case BinaryExprKind::Divide:
-		case BinaryExprKind::Modulo:
 		{
 			type = lhs_type;
+		}
+		break;
+		case BinaryExprKind::Modulo:
+		{
+			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			{
+				diagnostics.Report(loc, modulo_operands_not_integral);
+			}
+			if (!IsIntegerType(lhs_type))
+			{
+				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
+			}
+			if (!IsIntegerType(rhs_type))
+			{
+				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
+			}
+			type = builtin_types::Int;
 		}
 		break;
 		case BinaryExprKind::ShiftLeft:
