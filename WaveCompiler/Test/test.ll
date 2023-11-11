@@ -1,7 +1,8 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-declare void @Assert(i1)
+@arr2d = internal global [2 x [2 x i64]] [[2 x i64] [i64 1, i64 2], [2 x i64] [i64 3, i64 4]]
+@arr1d = internal global [4 x i64] [i64 1, i64 2, i64 3, i64 4]
 
 declare void @PrintInteger(i64)
 
@@ -19,32 +20,14 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-declare i1 @IsAlnum(i8)
-
-declare i1 @IsAlpha(i8)
-
-declare i1 @IsLower(i8)
-
-declare i1 @IsUpper(i8)
-
-declare i1 @IsDigit(i8)
-
-declare i1 @IsSpace(i8)
-
-declare i8 @ToLower(i8)
-
-declare i8 @ToUpper(i8)
-
-declare double @StringToFloat(ptr)
-
-declare i64 @StringToInteger(ptr)
-
-declare void @StringCopy(ptr, ptr)
-
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  store i64 100, ptr %0, align 4
+  %1 = alloca i64, align 8
+  %2 = load ptr, ptr getelementptr inbounds (ptr, ptr @arr2d, i64 1), align 8
+  store ptr %2, ptr %1, align 8
+  %3 = load ptr, ptr %1, align 8
+  store ptr %3, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -52,6 +35,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %1 = load i64, ptr %0, align 4
-  ret i64 %1
+  %4 = load i64, ptr %0, align 4
+  ret i64 %4
 }

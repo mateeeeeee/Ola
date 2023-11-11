@@ -1,8 +1,10 @@
-import std.assert;
 import std.io;
-import std.string;
+
+int[][] arr2d = {{1,2},{3,4}};
+int[]   arr1d = {1,2,3,4};
 
 public int main()
 {
-	return 100;
+	int x = arr2d[0][1];
+	return x;
 }

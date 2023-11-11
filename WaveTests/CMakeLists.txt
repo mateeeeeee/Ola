@@ -10,9 +10,35 @@ set(HEADERS
   autogen/WaveConfig.h
 )
 
-add_executable(WaveTests ${SOURCE} ${HEADERS})
+set(WAVE_TESTS
+	Tests/test_ternary.wv
+	Tests/test_while.wv
+	Tests/test_additive.wv
+	Tests/test_alias.wv
+	Tests/test_array.wv
+	Tests/test_bit.wv
+	Tests/test_const.wv
+	Tests/test_dowhile.wv
+	Tests/test_enum.wv
+	Tests/test_for.wv
+	Tests/test_functioncalls.wv
+	Tests/test_goto.wv
+	Tests/test_ifelse.wv
+	Tests/test_increment.wv
+	Tests/test_logical.wv
+	Tests/test_multiplicative.wv
+	Tests/test_plusminus.wv
+	Tests/test_relational.wv
+	Tests/test_shift.wv
+	Tests/test_sizeof.wv
+	Tests/test_string.wv
+	Tests/test_switch.wv
+)
+
+add_executable(WaveTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})
 
 source_group(" " FILES ${SOURCE} ${HEADERS})
+source_group("Tests" FILES ${WAVE_TESTS})
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 		cmake_policy(SET CMP0135 NEW)

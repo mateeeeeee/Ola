@@ -881,8 +881,16 @@ namespace wave
 			}
 			else WAVE_ASSERT(false);
 		}
-		else
+		else 
 		{
+			QualifiedType const& array_expr_type = array_expr->GetType();
+			WAVE_ASSERT(IsArrayType(array_expr_type));
+			ArrayType const& array_type = type_cast<ArrayType>(array_expr_type);
+			if (IsArrayType(array_type.GetBaseType()))
+			{
+				uint32 array_size = array_type.GetArraySize();
+				index_value = builder.CreateMul(index_value, llvm::ConstantInt::get(int_type, array_size));
+			}
 			llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
 			llvm_value_map[&array_access] = ptr;
 		}
