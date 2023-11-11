@@ -2,8 +2,6 @@ import std.assert;
 import std.io;
 import std.string;
 
-
-
 public int main()
 {
 	return 100;

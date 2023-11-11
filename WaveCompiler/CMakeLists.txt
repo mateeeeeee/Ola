@@ -80,7 +80,7 @@ target_include_directories(WaveCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/include)
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/CLI11/include)
 target_include_directories(WaveCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
-target_compile_definitions(WaveCompiler PRIVATE ${LLVM_DEFINITIONS})
+#target_compile_definitions(WaveCompiler PRIVATE ${LLVM_DEFINITIONS})
 
 set(LLVM_LIBRARIES
 LLVMAnalysis.lib

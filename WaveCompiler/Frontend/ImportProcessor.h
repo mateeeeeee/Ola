@@ -2,6 +2,7 @@
 #include <vector>
 #include "Token.h"
 
+
 namespace wave
 {
 	class Diagnostics;
@@ -9,7 +10,8 @@ namespace wave
 	class ImportProcessor
 	{
 		using TokenPtr = std::vector<Token>::iterator;
-		inline static char const* wave_extension = ".wv";
+		static char const* wave_extension; 
+		static char const* wave_lib_path; 
 
 	public:
 		explicit ImportProcessor(Diagnostics& diagnostics);

@@ -6,11 +6,16 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "AST.h"
+#include "autogen/WaveConfig.h"
+
 
 namespace fs = std::filesystem;
 
 namespace wave
 {
+	char const* ImportProcessor::wave_extension = ".wv";
+	char const* ImportProcessor::wave_lib_path = WAVE_COMPILER_PATH;
+
 	ImportProcessor::ImportProcessor(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 
 	void ImportProcessor::ProcessImports(std::vector<Token>&& _tokens)
@@ -34,7 +39,11 @@ namespace wave
 			for (; start_token != end_token; ++start_token) start_token->SetFlag(TokenFlag_PartOfImportDirective);
 
 			import_path += wave_extension;
-			if (!fs::exists(import_path)) diagnostics.Report(current_token->GetLocation(), invalid_import_path);
+			if (!fs::exists(import_path))
+			{
+				import_path = fs::path(wave_lib_path) / import_path;
+				if (!fs::exists(import_path)) diagnostics.Report(current_token->GetLocation(), invalid_import_path);
+			}
 			
 			std::vector<Token> import_tokens = GetImportTokens(import_path.string());
 
