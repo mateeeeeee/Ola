@@ -245,6 +245,12 @@ namespace wave
 	{
 		return type.Is(K);
 	}
+	template<TypeKind K, TypeKind... Ks>
+	inline bool IsTypeOneOf(Type const& type)
+	{
+		return type.IsOneOf(K, Ks...);
+	}
+
 	inline bool (*IsVoidType)(Type const& type) = IsType<TypeKind::Void>;
 	inline bool (*IsArrayType)(Type const& type) = IsType<TypeKind::Array>;
 	inline bool (*IsIntegerType)(Type const& type) = IsType<TypeKind::Int>;
@@ -253,6 +259,5 @@ namespace wave
 	inline bool (*IsFloatType)(Type const& type) = IsType<TypeKind::Float>;
 	inline bool (*IsFunctionType)(Type const& type) = IsType<TypeKind::Function>;
 	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
-
-
+	inline bool (*IsIntegralType)(Type const& type) = IsTypeOneOf<TypeKind::Int, TypeKind::Bool>;
 }

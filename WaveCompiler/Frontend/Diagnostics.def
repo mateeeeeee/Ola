@@ -55,4 +55,6 @@ DIAG(non_array_expr_in_foreach, error, "Cannot use foreach loop with a non-array
 DIAG(foreach_loop_type_mismatch, error, "Foreach loop type mismatch")
 DIAG(aliasing_var_forbidden, error, "Aliasing 'var' is forbidden")
 DIAG(assigning_const_array_to_non_const_array, error, "Assigning const array to non-const array is not allowed")
+DIAG(shift_operands_not_integral, error, "Shift operators are only defined for integral types")
+DIAG(bitwise_operands_not_integral, error, "Bitwise operators are only defined for integral types")
 #undef DIAG

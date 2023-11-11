@@ -5,6 +5,5 @@ int[]   arr1d = {1,2,3,4};
 
 public int main()
 {
-	int x = arr2d[0][1];
-	return x;
+	PrintFloat(f);
 }

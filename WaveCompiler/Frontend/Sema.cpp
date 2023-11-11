@@ -473,19 +473,51 @@ namespace wave
 		case BinaryExprKind::ShiftLeft:
 		case BinaryExprKind::ShiftRight:
 		{
-			type = lhs_type;
+			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			{
+				diagnostics.Report(loc, shift_operands_not_integral);
+			}
+			if (!IsIntegerType(lhs_type))
+			{
+				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
+			}
+			if (!IsIntegerType(rhs_type))
+			{
+				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
+			}
+			type = builtin_types::Int;
 		}
 		break;
 		case BinaryExprKind::BitAnd:
 		case BinaryExprKind::BitOr:
 		case BinaryExprKind::BitXor:
 		{
-			type = lhs_type;
+			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			{
+				diagnostics.Report(loc, bitwise_operands_not_integral);
+			}
+			if (!IsIntegerType(lhs_type))
+			{
+				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
+			}
+			if (!IsIntegerType(rhs_type))
+			{
+				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
+			}
+			type = builtin_types::Int;
 		}
 		break;
 		case BinaryExprKind::LogicalAnd:
 		case BinaryExprKind::LogicalOr:
 		{
+			if (!IsBoolType(lhs_type))
+			{
+				lhs = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(lhs));
+			}
+			if (!IsBoolType(rhs_type))
+			{
+				rhs = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(rhs));
+			}
 			type = builtin_types::Bool;
 		}
 		break;

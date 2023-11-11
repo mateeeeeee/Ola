@@ -32,7 +32,7 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * floats
+  * floats (wip)
   * classes
 
 ## Structure

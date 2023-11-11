@@ -784,6 +784,12 @@ namespace wave
 		llvm_value_map[&bool_constant] = constant;
 	}
 
+	void LLVMVisitor::Visit(ConstantFloat const& float_constant, uint32)
+	{
+		llvm::Constant* constant = llvm::ConstantFP::get(float_type, float_constant.GetValue());
+		llvm_value_map[&float_constant] = constant;
+	}
+
 	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
 	{
 		Expr const* cast_operand_expr = cast_expr.GetOperand();
@@ -800,6 +806,11 @@ namespace wave
 				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, int_type);
 			}
+			else if (IsFloat(cast_operand_type))
+			{
+
+			}
+			else WAVE_ASSERT(false);
 		}
 		else if (IsBoolean(cast_type))
 		{
@@ -808,6 +819,23 @@ namespace wave
 				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
 			}
+			else if (IsFloat(cast_operand_type))
+			{
+
+			}
+			else WAVE_ASSERT(false);
+		}
+		else if (IsFloat(cast_type))
+		{
+			if (IsBoolean(cast_operand_type))
+			{
+				
+			}
+			else if (IsInteger(cast_operand_type))
+			{
+
+			}
+			else WAVE_ASSERT(false);
 		}
 		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
