@@ -582,6 +582,11 @@ namespace wave
 			return nullptr;
 		}
 		ArrayType const& array_type = type_cast<ArrayType>(type);
+		if (array_type.GetArraySize() == 0)
+		{
+			diagnostics.Report(loc, length_operand_incomplete_array);
+			return nullptr;
+		}
 		return ActOnConstantInt(array_type.GetArraySize(), loc);
 	}
 
