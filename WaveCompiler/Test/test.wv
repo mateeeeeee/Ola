@@ -1,36 +1,13 @@
 import std.io;
 
-int[][] arr2d = {{1,2},{3,4}};
-int[]   arr1d = {1,2,3,4};
-
-
-void func(int a)
+int add(int a, int b)
 {
-	if(a > 0)
-	{
-		PrintInteger(a);
-	}
-	else
-	{
-		PrintInteger(-a);
-	}
+	return a + b;
 }
 
 public int main()
 {
-	func(5);
-	float f = 1.0;
-	float d = f + 2.0;
-	if(d > 2.5)
-	{
-		char[] str = "da";
-		PrintString(str);
-	}
-	else
-	{
-		char[] str = "ne";
-		PrintString(str); //cannot call PrintString("ne"); check why
-	}
-	PrintFloat(d);
+	int c = add(3, true);
+	PrintInteger(c);
 	return 0;
 }

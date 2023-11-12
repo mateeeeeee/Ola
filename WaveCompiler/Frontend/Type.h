@@ -237,7 +237,7 @@ namespace wave
 		static constexpr CharType  Char  = CharType();
 		static constexpr IntType   Int   = IntType();
 		static constexpr FloatType Float = FloatType();
-		static constexpr IntType   Enum = Int;
+		static constexpr IntType   Enum  = Int;
 	}
 
 	template<TypeKind K>

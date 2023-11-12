@@ -58,4 +58,8 @@ DIAG(assigning_const_array_to_non_const_array, error, "Assigning const array to 
 DIAG(shift_operands_not_integral, error, "Shift operators are only defined for integral types")
 DIAG(bitwise_operands_not_integral, error, "Bitwise operators are only defined for integral types")
 DIAG(modulo_operands_not_integral, error, "Modulo operator are only defined for integral types")
+DIAG(no_return_statement_found_in_non_void_function, warning, "No return statement found in a non-void function")
+DIAG(too_many_args_to_function_call, error, "Too many arguments to function call")
+DIAG(too_few_args_to_function_call, error, "Too few arguments to function call")
+DIAG(incompatible_function_argument, error, "Incompatible function call argument")
 #undef DIAG

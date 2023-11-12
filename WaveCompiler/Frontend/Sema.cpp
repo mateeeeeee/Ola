@@ -4,6 +4,16 @@
 
 namespace wave
 {
+	namespace
+	{
+		QualifiedType GetCommonType(QualifiedType const& type1, QualifiedType const& type2)
+		{
+			
+
+			return QualifiedType{};
+		}
+	}
+
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
@@ -118,10 +128,10 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 
+		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
+		WAVE_ASSERT(func_type);
 		if (name == "main")
 		{
-			FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
-			WAVE_ASSERT(func_type);
 			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParameters().empty())
 			{
 				diagnostics.Report(loc, invalid_main_function_declaration);
@@ -141,6 +151,12 @@ namespace wave
 			}
 			ctx.gotos.clear();
 			ctx.labels.clear();
+
+			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
+			{
+				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
+			}
+			ctx.return_stmt_encountered = false;
 		}
 
 		bool result = ctx.decl_sym_table.Insert(function_decl.get());
@@ -609,6 +625,29 @@ namespace wave
 		QualifiedType const& func_expr_type = decl->GetType();
 		WAVE_ASSERT(IsFunctionType(func_expr_type));
 		FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
+		std::span<FunctionParameter const> func_params = func_type.GetParameters();
+		if (args.size() != func_params.size())
+		{
+			if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+			else diagnostics.Report(loc, too_few_args_to_function_call);
+			return nullptr;
+		}
+
+		for (uint64 i = 0; i < func_params.size(); ++i)
+		{
+			UniqueExprPtr& arg = args[i];
+			FunctionParameter const& func_param = func_params[i];
+			
+			if (!func_param.type->IsAssignableFrom(arg->GetType()))
+			{
+				diagnostics.Report(loc, incompatible_function_argument);
+				return nullptr;
+			}
+			else if (!func_param.type->IsSameAs(arg->GetType()))
+			{
+				arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
+			}
+		}
 
 		std::string_view func_name = decl->GetName();
 		UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(loc, func_name);

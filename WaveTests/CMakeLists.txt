@@ -31,8 +31,10 @@ set(WAVE_TESTS
 	Tests/test_relational.wv
 	Tests/test_shift.wv
 	Tests/test_sizeof.wv
-	Tests/test_string.wv
 	Tests/test_switch.wv
+	Tests/test_string.wv
+	Tests/test_floats.wv
+	Tests/test_implicitcasts.wv
 )
 
 add_executable(WaveTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})
