@@ -112,7 +112,6 @@ namespace wave
 			 && !token.HasFlag(TokenFlag_PartOfImportDirective))
 				preprocessed_tokens.push_back(token);
 		}
-		AddBuiltins(preprocessed_tokens);
 		std::swap(preprocessed_tokens, tokens);
 	}
 
@@ -203,18 +202,5 @@ namespace wave
 
 		return import_tokens;
 	}
-
-	void ImportProcessor::AddBuiltins(std::vector<Token>& tokens)
-	{
-		//alias string = char[];
-		tokens.emplace_back(TokenKind::KW_alias);
-		Token& token = tokens.emplace_back(TokenKind::identifier); token.SetIdentifier("string");
-		tokens.emplace_back(TokenKind::equal);
-		tokens.emplace_back(TokenKind::KW_char); 
-		tokens.emplace_back(TokenKind::left_square);
-		tokens.emplace_back(TokenKind::right_square);
-		tokens.emplace_back(TokenKind::semicolon);
-	}
-
 }
 

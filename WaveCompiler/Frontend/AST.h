@@ -200,6 +200,7 @@ namespace wave
 		AliasDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& aliased_type) : TagDecl(DeclKind::Alias, name, loc)
 		{
 			SetType(aliased_type);
+			SetVisibility(DeclVisibility::Public);
 		}
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -759,6 +760,8 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		virtual bool IsConstexpr() const { return true; }
+
 	private:
 		bool value;
 	};
@@ -774,6 +777,8 @@ namespace wave
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
+		virtual bool IsConstexpr() const { return true; }
 
 	private:
 		double value;

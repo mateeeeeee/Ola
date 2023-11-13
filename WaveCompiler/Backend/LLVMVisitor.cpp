@@ -1004,6 +1004,7 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
+		//#todo: refactor this
 		if (ptr->getType()->isPointerTy())
 		{
 			if (isa<llvm::AllocaInst>(ptr))
@@ -1016,7 +1017,7 @@ namespace wave
 					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
 				}
 			}
-			else if (isa<llvm::GlobalVariable>(ptr))
+			else if (llvm_type->isPointerTy() && isa<llvm::GlobalVariable>(ptr))
 			{
 				return ptr;
 			}
