@@ -4,16 +4,6 @@
 
 namespace wave
 {
-	namespace
-	{
-		QualifiedType GetCommonType(QualifiedType const& type1, QualifiedType const& type2)
-		{
-			
-
-			return QualifiedType{};
-		}
-	}
-
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
@@ -482,7 +472,29 @@ namespace wave
 		case BinaryExprKind::Multiply:
 		case BinaryExprKind::Divide:
 		{
-			type = lhs_type;
+			if (lhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function) ||
+				rhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function))
+			{
+				diagnostics.Report(loc, invalid_operands);
+				return nullptr;
+			}
+
+			TypeKind lhs_type_kind = lhs_type->GetKind();
+			TypeKind rhs_type_kind = rhs_type->GetKind();
+			if (lhs_type_kind == rhs_type_kind)
+			{
+				type = lhs_type.RawType();
+			}
+			else if (lhs_type_kind > rhs_type_kind)
+			{
+				type = lhs_type.RawType();
+				rhs = ActOnImplicitCastExpr(loc, type, std::move(rhs));
+			}
+			else
+			{
+				type = rhs_type.RawType();
+				lhs = ActOnImplicitCastExpr(loc, type, std::move(lhs));
+			}
 		}
 		break;
 		case BinaryExprKind::Modulo:
@@ -560,6 +572,26 @@ namespace wave
 		case BinaryExprKind::LessEqual:
 		case BinaryExprKind::GreaterEqual:
 		{
+			if (lhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function) ||
+				rhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function))
+			{
+				diagnostics.Report(loc, invalid_operands);
+				return nullptr;
+			}
+
+			TypeKind lhs_type_kind = lhs_type->GetKind();
+			TypeKind rhs_type_kind = rhs_type->GetKind();
+			if (lhs_type_kind > rhs_type_kind)
+			{
+				type = lhs_type.RawType();
+				rhs = ActOnImplicitCastExpr(loc, type, std::move(rhs));
+			}
+			else if (lhs_type_kind < rhs_type_kind)
+			{
+				type = rhs_type.RawType();
+				lhs = ActOnImplicitCastExpr(loc, type, std::move(lhs));
+			}
+
 			type = builtin_types::Bool;
 		}
 		break;

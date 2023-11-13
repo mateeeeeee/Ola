@@ -1,13 +1,6 @@
 import std.io;
 
-int add(int a, int b)
-{
-	return a + b;
-}
-
 public int main()
 {
-	int c = add(3, true);
-	PrintInteger(c);
-	return 0;
+	return 1000;
 }

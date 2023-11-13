@@ -62,4 +62,5 @@ DIAG(no_return_statement_found_in_non_void_function, warning, "No return stateme
 DIAG(too_many_args_to_function_call, error, "Too many arguments to function call")
 DIAG(too_few_args_to_function_call, error, "Too few arguments to function call")
 DIAG(incompatible_function_argument, error, "Incompatible function call argument")
+DIAG(invalid_operands, error, "Invalid operands")
 #undef DIAG

@@ -779,7 +779,13 @@ namespace wave
 	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
-		llvm_value_map[&string_constant] = constant;
+		
+		static uint32 counter = 0;
+		std::string name = "__StringLiteral"; name += std::to_string(counter++);
+
+		llvm::GlobalValue::LinkageTypes linkage = llvm::Function::InternalLinkage;
+		llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, ConvertToLLVMType(string_constant.GetType()), true, linkage, constant, name);
+		llvm_value_map[&string_constant] = global_string;
 	}
 
 	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32)
@@ -803,16 +809,17 @@ namespace wave
 
 		llvm::Type* cast_type = ConvertToLLVMType(cast_expr.GetType());
 		llvm::Type* cast_operand_type = ConvertToLLVMType(cast_operand_expr->GetType());
+
+		llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 		if (IsInteger(cast_type))
 		{
 			if (IsBoolean(cast_operand_type))
 			{
-				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateZExt(cast_operand, int_type);
 			}
 			else if (IsFloat(cast_operand_type))
 			{
-
+				llvm_value_map[&cast_expr] = builder.CreateFPToSI(cast_operand, int_type);
 			}
 			else WAVE_ASSERT(false);
 		}
@@ -820,12 +827,11 @@ namespace wave
 		{
 			if (IsInteger(cast_operand_type))
 			{
-				llvm::Value* cast_operand = Load(cast_operand_type, cast_operand_value);
 				llvm_value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
 			}
 			else if (IsFloat(cast_operand_type))
 			{
-
+				llvm_value_map[&cast_expr] = builder.CreateFPToSI(cast_operand, bool_type);
 			}
 			else WAVE_ASSERT(false);
 		}
@@ -833,11 +839,11 @@ namespace wave
 		{
 			if (IsBoolean(cast_operand_type))
 			{
-				
+				llvm_value_map[&cast_expr] = builder.CreateSIToFP(cast_operand, float_type);
 			}
 			else if (IsInteger(cast_operand_type))
 			{
-
+				llvm_value_map[&cast_expr] = builder.CreateSIToFP(cast_operand, float_type);
 			}
 			else WAVE_ASSERT(false);
 		}
@@ -934,10 +940,16 @@ namespace wave
 		{
 			builder.CreateCondBr(condition_value, true_block, false_block);
 		}
-		else
+		else if(IsInteger(condition_value->getType()))
 		{
 			llvm::Value* condition = Load(int_type, condition_value);
 			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+			builder.CreateCondBr(boolean_cond, true_block, false_block);
+		}
+		else if (IsFloat(condition_value->getType()))
+		{
+			llvm::Value* condition = Load(int_type, condition_value);
+			llvm::Value* boolean_cond = builder.CreateFCmpONE(condition, llvm::ConstantFP::get(context, llvm::APFloat(0.0)));
 			builder.CreateCondBr(boolean_cond, true_block, false_block);
 		}
 	}
@@ -1003,6 +1015,10 @@ namespace wave
 					llvm::ArrayType* array_type = cast<llvm::ArrayType>(alloc->getAllocatedType());
 					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
 				}
+			}
+			else if (isa<llvm::GlobalVariable>(ptr))
+			{
+				return ptr;
 			}
 			return builder.CreateLoad(llvm_type, ptr);
 		}
