@@ -1,3 +1,2 @@
-
-
 extern void Assert(bool);
+extern void AssertMsg(bool, char[]);

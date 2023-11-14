@@ -1,6 +1,67 @@
 import std.assert;
+import std.io;
+
+const bool  globalBool = true;
+const int   globalInt = 42;
+const float globalFloat = 10.5;
+
+
+public int boolFunction(bool value)
+{
+    return value;
+}
+
+public int intFunction(int value)
+{
+   return value;
+}
+
+public int floatFunction(float value)
+{
+    return value;
+}
+
+
+public int testImplicitCasts()
+{
+    bool boolValue = true;
+    int boolToInt = boolValue;
+    Assert(boolToInt == 1);
+
+    float boolToFloat = boolValue;
+    Assert(boolToFloat == 1.0);
+    
+    int intValue = 123;
+    bool intToBool = intValue;
+    Assert(intToBool == true);
+    
+    float intToFloat = intValue;
+    Assert(intToFloat == 123.0);
+    
+    float floatValue = 5.67;
+    bool floatToBool = floatValue;
+    Assert(floatToBool == true);
+    
+    int floatToInt = floatValue;
+    Assert(floatToInt == 5);
+    
+    bool assignedBool = globalInt; // Should be true since globalInt is non-zero
+    Assert(assignedBool == true);
+    
+    int assignedInt = globalFloat; // Should be 10 since globalFloat is cast to int
+    Assert(assignedInt == 10);
+    
+    float assignedFloat = globalBool; // Should be 1.0 since globalBool is true
+    Assert(assignedFloat == 1.0);
+    
+    Assert(boolFunction(globalInt) == 1);    
+    Assert(intFunction(globalFloat) == 10);  
+    Assert(floatFunction(globalBool) == 1);  
+
+    return 0;
+}
 
 public int main()
 {
-	return 0;
+    return testImplicitCasts();
 }
