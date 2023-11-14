@@ -1,17 +1,34 @@
 import std.assert;
-import std.io;
+import std.string;
 
-const float globalFloat = 10.0;
+char[] globalString = "global"; 
+
+void PassStringLiteral(char[] literal)
+{
+	Assert(literal[0] == 'L');
+}
+
+void PassStringVariable(char[] variable)
+{
+	Assert(variable[0] == 'V');
+}
 
 public int main()
 {
-	float localFloat = 3 * 3.3;
-	Assert(globalFloat > localFloat);
-	float diff = globalFloat - localFloat;
-	float diffCubed = diff * diff * diff;
-	int int1 = diffCubed * 999;
-	Assert(int1 == 0);
-	int int2 = diffCubed * 1000;
-	Assert(int2 == 1);
+	Assert(length(globalString) == 7);
+	
+	char[] localString = "local";
+
+	Assert(length(localString) == 6);
+	char[] localAlias = localString;
+	Assert(localAlias[0] == 'l');
+	
+	PassStringLiteral("Literal");
+	PassStringVariable("Variable");
+	
+	char[] numString = "12345";
+	int number = StringToInteger(numString);
+	Assert(number == 12345);
+
 	return 0;
 }

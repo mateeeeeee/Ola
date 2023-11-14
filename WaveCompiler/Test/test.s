@@ -7,74 +7,118 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
+	.def	PassStringLiteral;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function PassStringLiteral
+PassStringLiteral:                      # @PassStringLiteral
+.seh_proc PassStringLiteral
+# %bb.0:                                # %entry
+	sub	rsp, 40
+	.seh_stackalloc 40
+	.seh_endprologue
+	cmp	byte ptr [rcx], 76
+	sete	cl
+	call	Assert
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 40
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	PassStringVariable;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function PassStringVariable
+PassStringVariable:                     # @PassStringVariable
+.seh_proc PassStringVariable
+# %bb.0:                                # %entry
+	sub	rsp, 40
+	.seh_stackalloc 40
+	.seh_endprologue
+	cmp	byte ptr [rcx], 86
+	sete	cl
+	call	Assert
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 40
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	__real@408f400000000000         # -- Begin function main
-	.section	.rdata,"dr",discard,__real@408f400000000000
-	.p2align	3, 0x0
-__real@408f400000000000:
-	.quad	0x408f400000000000              # double 1000
-	.globl	__real@408f380000000000
-	.section	.rdata,"dr",discard,__real@408f380000000000
-	.p2align	3, 0x0
-__real@408f380000000000:
-	.quad	0x408f380000000000              # double 999
-	.globl	__real@4023cccccccccccc
-	.section	.rdata,"dr",discard,__real@4023cccccccccccc
-	.p2align	3, 0x0
-__real@4023cccccccccccc:
-	.quad	0x4023cccccccccccc              # double 9.8999999999999985
-	.text
-	.globl	main
+	.globl	main                            # -- Begin function main
 	.p2align	4, 0x90
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 88
-	.seh_stackalloc 88
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	movsd	xmm0, qword ptr [rip + __real@4023cccccccccccc] # xmm0 = mem[0],zero
-	movsd	qword ptr [rsp + 72], xmm0
-	movsd	xmm0, qword ptr [rip + globalFloat] # xmm0 = mem[0],zero
-	ucomisd	xmm0, qword ptr [rsp + 72]
-	seta	cl
+	mov	ecx, 1
 	call	Assert
-	movsd	xmm0, qword ptr [rip + globalFloat] # xmm0 = mem[0],zero
-	subsd	xmm0, qword ptr [rsp + 72]
-	movsd	qword ptr [rsp + 64], xmm0
-	movsd	xmm0, qword ptr [rsp + 64]      # xmm0 = mem[0],zero
-	mulsd	xmm0, qword ptr [rsp + 64]
-	mulsd	xmm0, qword ptr [rsp + 64]
-	movsd	qword ptr [rsp + 56], xmm0
-	movsd	xmm0, qword ptr [rip + __real@408f380000000000] # xmm0 = mem[0],zero
-	mulsd	xmm0, qword ptr [rsp + 56]
-	cvttsd2si	rax, xmm0
+	mov	byte ptr [rsp + 58], 108
+	mov	byte ptr [rsp + 59], 111
+	mov	byte ptr [rsp + 60], 99
+	mov	byte ptr [rsp + 61], 97
+	mov	byte ptr [rsp + 62], 108
+	mov	byte ptr [rsp + 63], 0
+	mov	ecx, 1
+	call	Assert
+	lea	rax, [rsp + 58]
 	mov	qword ptr [rsp + 48], rax
-	cmp	qword ptr [rsp + 48], 0
+	mov	rax, qword ptr [rsp + 48]
+	cmp	byte ptr [rax], 108
 	sete	cl
 	call	Assert
-	movsd	xmm0, qword ptr [rip + __real@408f400000000000] # xmm0 = mem[0],zero
-	mulsd	xmm0, qword ptr [rsp + 56]
-	cvttsd2si	rax, xmm0
-	mov	qword ptr [rsp + 40], rax
-	cmp	qword ptr [rsp + 40], 1
+	lea	rcx, [rip + __StringLiteral1]
+	call	PassStringLiteral
+	lea	rcx, [rip + __StringLiteral2]
+	call	PassStringVariable
+	mov	byte ptr [rsp + 42], 49
+	mov	byte ptr [rsp + 43], 50
+	mov	byte ptr [rsp + 44], 51
+	mov	byte ptr [rsp + 45], 52
+	mov	byte ptr [rsp + 46], 53
+	mov	byte ptr [rsp + 47], 0
+	lea	rcx, [rsp + 42]
+	call	StringToInteger
+	mov	qword ptr [rsp + 32], rax
+	cmp	qword ptr [rsp + 32], 12345
 	sete	cl
 	call	Assert
-	mov	qword ptr [rsp + 80], 0
+	mov	qword ptr [rsp + 64], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 80]
-	add	rsp, 88
+	mov	rax, qword ptr [rsp + 64]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
+	.data
+globalString:                           # @globalString
+	.asciz	"global"
+
 	.section	.rdata,"dr"
-	.p2align	3, 0x0                          # @globalFloat
-globalFloat:
-	.quad	0x4024000000000000              # double 10
+__StringLiteral0:                       # @__StringLiteral0
+	.asciz	"local"
+
+__StringLiteral1:                       # @__StringLiteral1
+	.asciz	"Literal"
+
+__StringLiteral2:                       # @__StringLiteral2
+	.asciz	"Variable"
+
+__StringLiteral3:                       # @__StringLiteral3
+	.asciz	"12345"
 
 	.addrsig
 	.addrsig_sym Assert
-	.addrsig_sym globalFloat
-	.globl	_fltused
+	.addrsig_sym StringToInteger
+	.addrsig_sym PassStringLiteral
+	.addrsig_sym PassStringVariable
+	.addrsig_sym __StringLiteral1
+	.addrsig_sym __StringLiteral2

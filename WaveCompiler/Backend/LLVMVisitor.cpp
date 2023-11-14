@@ -132,9 +132,10 @@ namespace wave
 					}
 					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
 					{
-						string->Accept(*this);
+						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
+
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(llvm_value_map[string]), var_decl.GetName());
+						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant, var_decl.GetName());
 						llvm_value_map[&var_decl] = global_string;
 					}
 					else WAVE_ASSERT(false);
