@@ -1,8 +1,7 @@
 import std.assert;
 import std.string;
 
-//locals and globals
-//char[] globalString = "global"; doesnt work
+char[] globalString = "global";
 
 void PassStringLiteral(char[] literal)
 {
@@ -16,7 +15,7 @@ void PassStringVariable(char[] variable)
 
 public int main()
 {
-	//Assert(length(globalString) == 7);
+	Assert(length(globalString) == 7);
 	
 	char[] localString = "local";
 
