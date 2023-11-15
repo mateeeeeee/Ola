@@ -1,6 +1,13 @@
 
+class Foo
+{
+	private int x;
+	public void Init() {x = 5;}
+	public int GetX() const {return x;}
+};
 
 public int main()
 {
+   //Foo f; f.Init();
    return 0;
 }

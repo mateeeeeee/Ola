@@ -378,11 +378,15 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
 
 <enum-identifier> ::= <identifier>
 			   
-<class-specifier> ::= class <class-identifier> <class-body>
+<class-specifier> ::= class <class-identifier> <class-body>;
 
-<class-body> ::= { { <variable-declaration> | <function-definition> }* }
+<class-body> ::= { { <class-variable-declaration> | <class-function-definition> }* }
 
 <class-identifier> ::= <identifier>
+
+<class-variable-declaration> ::= {<declaration-visibility>}? {<type-qualifier>}? <type-specifier> {<identifier>}?;
+
+<class-function-definition> ::= {<declaration-visibility>}? <type-specifier> <identifier>( <parameter-list> ) {const}? <compound-statement>
 
 <constant-expression> ::= <conditional-expression>
 

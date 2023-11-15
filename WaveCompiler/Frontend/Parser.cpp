@@ -157,7 +157,42 @@ namespace wave
 
 	UniqueMemberFunctionDeclPtr Parser::ParseMemberFunctionDefinition()
 	{
-		return nullptr;
+		DeclVisibility visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = "";
+		QualType function_type{};
+		UniqueParamVariableDeclPtrList param_decls;
+		bool is_const = false;
+		UniqueCompoundStmtPtr function_body;
+		{
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			QualType return_type{};
+			ParseTypeSpecifier(return_type);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+
+			SourceLocation const& loc = current_token->GetLocation();
+			name = current_token->GetIdentifier(); ++current_token;
+			Expect(TokenKind::left_round);
+
+			std::vector<FunctionParameter> param_types{};
+			while (!Consume(TokenKind::right_round))
+			{
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+				UniqueParamVariableDeclPtr param_decl = ParseParamVariableDeclaration();
+				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_decls.push_back(std::move(param_decl));
+			}
+			function_type.SetType(FunctionType(return_type, param_types));
+			if (Consume(TokenKind::KW_const)) is_const = true;
+			sema->ctx.current_func = &function_type;
+			function_body = ParseCompoundStatement();
+			sema->ctx.current_func = nullptr;
+		}
+		return sema->ActOnMemberFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, is_const);
 	}
 
 	UniqueParamVariableDeclPtr Parser::ParseParamVariableDeclaration()
@@ -179,7 +214,27 @@ namespace wave
 
 	UniqueMemberVariableDeclPtrList Parser::ParseMemberVariableDeclaration()
 	{
-		return {};
+		DeclVisibility visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+
+		UniqueMemberVariableDeclPtrList member_var_decl_list;
+		QualType variable_type{};
+		ParseTypeQualifier(variable_type);
+		ParseTypeSpecifier(variable_type);
+		do
+		{
+			if (!member_var_decl_list.empty()) Expect(TokenKind::comma);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			SourceLocation const& loc = current_token->GetLocation();
+			std::string_view name = current_token->GetIdentifier(); ++current_token;
+
+			UniqueMemberVariableDeclPtr var_decl = sema->ActOnMemberVariableDecl(name, loc, variable_type, visibility);
+			member_var_decl_list.push_back(std::move(var_decl));
+
+		} while (!Consume(TokenKind::semicolon));
+
+		return member_var_decl_list;
 	}
 
 	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
@@ -327,15 +382,15 @@ namespace wave
 						}
 						else if (!parse_function && is_function_declaration)
 						{
-							sema->ctx.force_ignore_decls = true;
-							std::ignore = ParseFunctionDefinition();
-							sema->ctx.force_ignore_decls = false;
+							sema->ctx.ignore_member_decls = true;
+							std::ignore = ParseMemberFunctionDefinition();
+							sema->ctx.ignore_member_decls = false;
 						}
 						else if (parse_function && !is_function_declaration)
 						{
-							sema->ctx.force_ignore_decls = true;
-							std::ignore = ParseVariableDeclaration();
-							sema->ctx.force_ignore_decls = false;
+							sema->ctx.ignore_member_decls = true;
+							std::ignore = ParseMemberVariableDeclaration();
+							sema->ctx.ignore_member_decls = false;
 						}
 					}
 				};

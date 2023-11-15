@@ -10,8 +10,6 @@ namespace wave
 	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
-		if (ctx.force_ignore_decls) return nullptr;
-
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = !type.IsNull();
 		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
@@ -89,8 +87,6 @@ namespace wave
 
 	UniqueParamVariableDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
-		if (ctx.force_ignore_decls) return nullptr;
-
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -112,16 +108,34 @@ namespace wave
 		return param_decl;
 	}
 
-	UniqueMemberVariableDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
+	UniqueMemberVariableDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, DeclVisibility visibility)
 	{
-		return nullptr;
+		if (ctx.ignore_member_decls) return nullptr;
+
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		if (type.IsNull())
+		{
+			diagnostics.Report(loc, missing_type_specifier);
+		}
+		if (type->Is(TypeKind::Void))
+		{
+			diagnostics.Report(loc, void_invalid_context);
+		}
+
+		UniqueMemberVariableDeclPtr member_variable_decl = MakeUnique<MemberVariableDecl>(name, loc);
+		member_variable_decl->SetGlobal(false);
+		member_variable_decl->SetVisibility(visibility);
+		member_variable_decl->SetType(type);
+		ctx.decl_sym_table.Insert(member_variable_decl.get());
+		return member_variable_decl;
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												  UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
-		if (ctx.force_ignore_decls) return nullptr;
-
 		bool is_extern = body_stmt == nullptr;
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -166,7 +180,39 @@ namespace wave
 
 	UniqueMemberFunctionDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
 	{
-		return nullptr;
+		if (ctx.ignore_member_decls) return nullptr;
+
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
+		WAVE_ASSERT(func_type);
+
+		UniqueMemberFunctionDeclPtr member_function_decl = MakeUnique<MemberFunctionDecl>(name, loc);
+		member_function_decl->SetType(type);
+		member_function_decl->SetConst(is_const);
+		member_function_decl->SetVisibility(visibility);
+		member_function_decl->SetParamDecls(std::move(param_decls));
+		WAVE_ASSERT(body_stmt);
+		{
+			member_function_decl->SetBodyStmt(std::move(body_stmt));
+			for (std::string const& goto_label : ctx.gotos)
+			{
+				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
+			}
+			ctx.gotos.clear();
+			ctx.labels.clear();
+
+			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
+			{
+				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
+			}
+			ctx.return_stmt_encountered = false;
+		}
+
+		bool result = ctx.decl_sym_table.Insert(member_function_decl.get());
+		return member_function_decl;
 	}
 
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
@@ -186,7 +232,6 @@ namespace wave
 
 	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value)
 	{
-
 		if (name.empty()) diagnostics.Report(loc, expected_identifier);
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{

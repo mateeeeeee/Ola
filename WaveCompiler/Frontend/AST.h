@@ -203,7 +203,7 @@ namespace wave
 		}
 		ClassDecl const* GetParentDecl() const { return parent; }
 
-		void SetConst(bool _is_const = true) { is_const = _is_const; }
+		void SetConst(bool _is_const) { is_const = _is_const; }
 		bool IsConst() const { return is_const; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -283,11 +283,14 @@ namespace wave
 		void SetMemberVariables(UniqueMemberVariableDeclPtrList&& _member_variables)
 		{
 			member_variables = std::move(_member_variables);
+			for (auto& member_variable : member_variables) member_variable->SetParentDecl(this);
 		}
 		UniqueMemberVariableDeclPtrList const& GetMemberVariables() const { return member_variables; }
 		void SetMemberFunctions(UniqueMemberFunctionDeclPtrList&& _member_functions)
 		{
 			member_functions = std::move(_member_functions);
+			for (auto& member_function : member_functions) member_function->SetParentDecl(this);
+
 		}
 		UniqueMemberFunctionDeclPtrList const& GetMemberFunctions() const { return member_functions; }
 

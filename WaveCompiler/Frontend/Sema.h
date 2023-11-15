@@ -28,7 +28,7 @@ namespace wave
 		using CaseStmtCallback = std::function<void(CaseStmt*)>;
 		struct Context
 		{
-			bool force_ignore_decls = false;
+			bool ignore_member_decls = false;
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
 
@@ -54,7 +54,7 @@ namespace wave
 		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueExprPtr&& init_expr, DeclVisibility visibility);
 		UniqueParamVariableDeclPtr ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
-		UniqueMemberVariableDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
+		UniqueMemberVariableDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, DeclVisibility visibility);
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility);
