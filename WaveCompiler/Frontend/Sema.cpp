@@ -483,16 +483,16 @@ namespace wave
 			TypeKind rhs_type_kind = rhs_type->GetKind();
 			if (lhs_type_kind == rhs_type_kind)
 			{
-				type = lhs_type.RawType();
+				type = *lhs_type;
 			}
 			else if (lhs_type_kind > rhs_type_kind)
 			{
-				type = lhs_type.RawType();
+				type = *lhs_type;
 				rhs = ActOnImplicitCastExpr(loc, type, std::move(rhs));
 			}
 			else
 			{
-				type = rhs_type.RawType();
+				type = *rhs_type;
 				lhs = ActOnImplicitCastExpr(loc, type, std::move(lhs));
 			}
 		}
@@ -583,12 +583,12 @@ namespace wave
 			TypeKind rhs_type_kind = rhs_type->GetKind();
 			if (lhs_type_kind > rhs_type_kind)
 			{
-				type = lhs_type.RawType();
+				type = *lhs_type;
 				rhs = ActOnImplicitCastExpr(loc, type, std::move(rhs));
 			}
 			else if (lhs_type_kind < rhs_type_kind)
 			{
-				type = rhs_type.RawType();
+				type = *rhs_type;
 				lhs = ActOnImplicitCastExpr(loc, type, std::move(lhs));
 			}
 
@@ -775,7 +775,7 @@ namespace wave
 			expr_type = expr_list.front()->GetType();
 			QualType base_type(expr_type);
 			ArrayType arr_type(base_type, expr_list.size());
-			const_cast<QualType&>(type).SetRawType(arr_type);
+			const_cast<QualType&>(type).SetType(arr_type);
 		}
 
 		for (auto const& expr : expr_list)

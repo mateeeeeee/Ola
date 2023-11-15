@@ -102,7 +102,7 @@ namespace wave
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetRawType(FunctionType(return_type, param_types));
+			function_type.SetType(FunctionType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern);
@@ -138,7 +138,7 @@ namespace wave
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetRawType(FunctionType(return_type, param_types));
+			function_type.SetType(FunctionType(return_type, param_types));
 
 			sema->ctx.current_func = &function_type;
 			function_body = ParseCompoundStatement();
@@ -951,10 +951,10 @@ namespace wave
 		switch (current_token->GetKind())
 		{
 		case TokenKind::KW_var:   break;
-		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void);  break;
+		case TokenKind::KW_void:  type.SetType(builtin_types::Void);  break;
 		case TokenKind::KW_bool:  type.SetType(builtin_types::Bool);	 break;
-		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);	 break;
-		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int);   break;
+		case TokenKind::KW_char:  type.SetType(builtin_types::Char);	 break;
+		case TokenKind::KW_int:   type.SetType(builtin_types::Int);   break;
 		case TokenKind::KW_float: type.SetType(builtin_types::Float); break;
 		case TokenKind::identifier:
 		{
@@ -963,7 +963,7 @@ namespace wave
 			{
 				if (tag_decl->GetDeclKind() == DeclKind::Enum)
 				{
-					type.SetRawType(builtin_types::Enum);
+					type.SetType(builtin_types::Enum);
 				}
 				else if (tag_decl->GetDeclKind() == DeclKind::Alias)
 				{
@@ -1006,14 +1006,14 @@ namespace wave
 				}
 				Expect(TokenKind::right_square);
 				ArrayType array_type(type, array_size);
-				type.SetRawType(array_type);
+				type.SetType(array_type);
 				type.RemoveConst();
 			}
 			else
 			{
 				Expect(TokenKind::right_square);
 				ArrayType array_type(type);
-				type.SetRawType(array_type);
+				type.SetType(array_type);
 				type.RemoveConst();
 			}
 		}
