@@ -16,14 +16,17 @@ namespace wave
 
 	using UniqueTranslationUnitPtr	= UniquePtr<TranslationUnit>;
 
-	using UniqueDeclPtr				= UniquePtr<Decl>;
-	using UniqueFunctionDeclPtr		= UniquePtr<FunctionDecl>;
-	using UniqueVariableDeclPtr		= UniquePtr<VariableDecl>;
-	using UniqueTagDeclPtr			= UniquePtr<TagDecl>;
-	using UniqueEnumDeclPtr			= UniquePtr<EnumDecl>;
-	using UniqueEnumMemberDeclPtr	= UniquePtr<EnumMemberDecl>;
-	using UniqueAliasDeclPtr		= UniquePtr<AliasDecl>;
-	using UniqueClassDeclPtr		= UniquePtr<ClassDecl>;
+	using UniqueDeclPtr				  = UniquePtr<Decl>;
+	using UniqueFunctionDeclPtr		  = UniquePtr<FunctionDecl>;
+	using UniqueMemberFunctionDeclPtr = UniquePtr<MemberFunctionDecl>;
+	using UniqueVariableDeclPtr		  = UniquePtr<VariableDecl>;
+	using UniqueParamVariableDeclPtr  = UniquePtr<ParamVariableDecl>;
+	using UniqueMemberVariableDeclPtr = UniquePtr<MemberVariableDecl>;
+	using UniqueTagDeclPtr			  = UniquePtr<TagDecl>;
+	using UniqueEnumDeclPtr			  = UniquePtr<EnumDecl>;
+	using UniqueEnumMemberDeclPtr	  = UniquePtr<EnumMemberDecl>;
+	using UniqueAliasDeclPtr		  = UniquePtr<AliasDecl>;
+	using UniqueClassDeclPtr		  = UniquePtr<ClassDecl>;
 
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;
@@ -58,19 +61,22 @@ namespace wave
 	using UniqueInitializerListExprPtr = UniquePtr<InitializerListExpr>;
 	using UniqueArrayAccessExprPtr	= UniquePtr<ArrayAccessExpr>;
 
-	using UniqueEnumMemberDeclPtrList = std::vector<UniqueEnumMemberDeclPtr>;
-	using UniqueVariableDeclPtrList   = std::vector<UniqueVariableDeclPtr>;
-	using UniqueFunctionDeclPtrList   = std::vector<UniqueFunctionDeclPtr>;
-	using UniqueDeclPtrList			  = std::vector<UniqueDeclPtr>;
-	using UniqueStmtPtrList			  = std::vector<UniqueStmtPtr>;
-	using UniqueExprPtrList			  = std::vector<UniqueExprPtr>;
-	using ExprPtrList				  = std::vector<Expr*>;
-	using DeclPtrList				  = std::vector<Decl*>;
-	using StmtPtrList				  = std::vector<Stmt*>;
-	using VariableDeclPtrList		  = std::vector<VariableDecl*>;
-	using BreakStmtPtrList			  = std::vector<BreakStmt*>;
-	using ContinueStmtPtrList		  = std::vector<ContinueStmt*>;
-	using CaseStmtPtrList			  = std::vector<CaseStmt*>;
-	using LabelStmtPtrList			  = std::vector<LabelStmt*>;
-	using ConstLabelStmtPtrList		  = std::vector<LabelStmt const*>;
+	using UniqueEnumMemberDeclPtrList	  = std::vector<UniqueEnumMemberDeclPtr>;
+	using UniqueVariableDeclPtrList		  = std::vector<UniqueVariableDeclPtr>;
+	using UniqueParamVariableDeclPtrList  = std::vector<UniqueParamVariableDeclPtr>;
+	using UniqueMemberVariableDeclPtrList = std::vector<UniqueMemberVariableDeclPtr>;
+	using UniqueFunctionDeclPtrList		  = std::vector<UniqueFunctionDeclPtr>;
+	using UniqueMemberFunctionDeclPtrList = std::vector<UniqueMemberFunctionDeclPtr>;
+	using UniqueDeclPtrList				  = std::vector<UniqueDeclPtr>;
+	using UniqueStmtPtrList				  = std::vector<UniqueStmtPtr>;
+	using UniqueExprPtrList				  = std::vector<UniqueExprPtr>;
+	using ExprPtrList					  = std::vector<Expr*>;
+	using DeclPtrList					  = std::vector<Decl*>;
+	using StmtPtrList					  = std::vector<Stmt*>;
+	using VariableDeclPtrList			  = std::vector<VariableDecl*>;
+	using BreakStmtPtrList				  = std::vector<BreakStmt*>;
+	using ContinueStmtPtrList			  = std::vector<ContinueStmt*>;
+	using CaseStmtPtrList				  = std::vector<CaseStmt*>;
+	using LabelStmtPtrList				  = std::vector<LabelStmt*>;
+	using ConstLabelStmtPtrList			  = std::vector<LabelStmt const*>;
 }

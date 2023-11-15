@@ -91,7 +91,7 @@ namespace wave
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
 		QualType function_type{};
-		UniqueVariableDeclPtrList param_decls;
+		UniqueParamVariableDeclPtrList param_decls;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			QualType return_type{};
@@ -106,7 +106,7 @@ namespace wave
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
-				UniqueVariableDeclPtr param_decl = ParseFunctionParamDeclaration();
+				UniqueParamVariableDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -125,7 +125,7 @@ namespace wave
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
 		QualType function_type{};
-		UniqueVariableDeclPtrList param_decls;
+		UniqueParamVariableDeclPtrList param_decls;
 		UniqueCompoundStmtPtr function_body;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
@@ -142,7 +142,7 @@ namespace wave
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
-				UniqueVariableDeclPtr param_decl = ParseFunctionParamDeclaration();
+				UniqueParamVariableDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -155,7 +155,12 @@ namespace wave
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility);
 	}
 
-	UniqueVariableDeclPtr Parser::ParseFunctionParamDeclaration()
+	UniqueMemberFunctionDeclPtr Parser::ParseMemberFunctionDefinition()
+	{
+		return nullptr;
+	}
+
+	UniqueParamVariableDeclPtr Parser::ParseParamVariableDeclaration()
 	{
 		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -169,7 +174,12 @@ namespace wave
 			++current_token;
 		}
 
-		return sema->ActOnFunctionParamDecl(name, loc, variable_type);
+		return sema->ActOnParamVariableDecl(name, loc, variable_type);
+	}
+
+	UniqueMemberVariableDeclPtrList Parser::ParseMemberVariableDeclaration()
+	{
+		return {};
 	}
 
 	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
@@ -296,8 +306,8 @@ namespace wave
 			++current_token;
 		}
 
-		UniqueVariableDeclPtrList member_variables;
-		UniqueFunctionDeclPtrList member_functions;
+		UniqueMemberVariableDeclPtrList member_variables;
+		UniqueMemberFunctionDeclPtrList member_functions;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
@@ -309,10 +319,10 @@ namespace wave
 					while (!Consume(TokenKind::right_brace))
 					{
 						bool is_function_declaration = IsFunctionDeclaration();
-						if (parse_function && is_function_declaration) member_functions.push_back(ParseFunctionDefinition());
+						if (parse_function && is_function_declaration) member_functions.push_back(ParseMemberFunctionDefinition());
 						else if (!parse_function && !is_function_declaration)
 						{
-							UniqueVariableDeclPtrList var_decls = ParseVariableDeclaration();
+							UniqueMemberVariableDeclPtrList var_decls = ParseMemberVariableDeclaration();
 							for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
 						}
 						else if (!parse_function && is_function_declaration)
@@ -485,7 +495,7 @@ namespace wave
 		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 		SourceLocation loc = current_token->GetLocation();
 
-		UniqueVariableDeclPtr var_decl = ParseFunctionParamDeclaration(); //function param decl doesn't parse for init expr
+		UniqueVariableDeclPtr var_decl = ParseParamVariableDeclaration(); //function param decl doesn't parse for init expr
 		Expect(TokenKind::colon);
 		UniqueIdentifierExprPtr array_expr = ParseIdentifier();
 		Expect(TokenKind::right_round);

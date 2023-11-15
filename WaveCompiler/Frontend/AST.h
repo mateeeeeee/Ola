@@ -16,7 +16,6 @@ namespace wave
 		NodeAST() = default;
 	};
 
-
 	class TranslationUnit final : public NodeAST
 	{
 	public:
@@ -38,7 +37,10 @@ namespace wave
 	enum class DeclKind : uint8
 	{
 		Variable,
+		ParamVariable,
+		MemberVariable,
 		Function,
+		MemberFunction,
 		Enum,
 		EnumMember,
 		Alias,
@@ -109,8 +111,47 @@ namespace wave
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueExprPtr init_expr;
+		UniqueExprPtr init_expr = nullptr;
 		bool is_global = false;
+
+	protected:
+		VariableDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
+	};
+	
+	class ParamVariableDecl final : public VariableDecl
+	{
+	public:
+		ParamVariableDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::ParamVariable, name, loc) {}
+		
+		void SetParentDecl(FunctionDecl const* _parent)
+		{
+			parent = _parent;
+		}
+		FunctionDecl const* GetParentDecl() const { return parent; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		FunctionDecl const* parent = nullptr;
+	};
+
+	class MemberVariableDecl final : public VariableDecl
+	{
+	public:
+		MemberVariableDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::MemberVariable, name, loc) {}
+
+		void SetParentDecl(ClassDecl const* _parent)
+		{
+			parent = _parent;
+		}
+		ClassDecl const* GetParentDecl() const { return parent; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		ClassDecl const* parent = nullptr;
 	};
 
 	class FunctionDecl : public Decl
@@ -119,16 +160,17 @@ namespace wave
 	public:
 		FunctionDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Function, name, loc) {}
 
-		void SetParamDecls(UniqueVariableDeclPtrList&& param_decls)
+		void SetParamDecls(UniqueParamVariableDeclPtrList&& param_decls)
 		{
 			param_declarations = std::move(param_decls);
+			for (auto& param_decl : param_declarations) param_decl->SetParentDecl(this);
 		}
 		void SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt)
 		{
 			body_stmt = std::move(_body_stmt);
 		}
 
-		UniqueVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
+		UniqueParamVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 
 		bool HasDefinition() const
@@ -141,10 +183,35 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-	private:
-		UniqueVariableDeclPtrList param_declarations;
+	protected:
+		UniqueParamVariableDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
+
+	protected:
+		FunctionDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
+	};
+
+	class MemberFunctionDecl final : public FunctionDecl
+	{
+	public:
+		MemberFunctionDecl(std::string_view name, SourceLocation const& loc) : FunctionDecl(DeclKind::MemberFunction, name, loc) {}
+
+		void SetParentDecl(ClassDecl const* _parent)
+		{
+			parent = _parent;
+		}
+		ClassDecl const* GetParentDecl() const { return parent; }
+
+		void SetConst(bool _is_const = true) { is_const = _is_const; }
+		bool IsConst() const { return is_const; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		ClassDecl const* parent = nullptr;
+		bool is_const = false;
 	};
 
 	class TagDecl : public Decl
@@ -213,23 +280,23 @@ namespace wave
 	public:
 		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
 
-		void SetMemberVariables(UniqueVariableDeclPtrList&& _member_variables)
+		void SetMemberVariables(UniqueMemberVariableDeclPtrList&& _member_variables)
 		{
 			member_variables = std::move(_member_variables);
 		}
-		UniqueVariableDeclPtrList const& GetMemberVariables() const { return member_variables; }
-		void SetMemberFunctions(UniqueFunctionDeclPtrList&& _member_functions)
+		UniqueMemberVariableDeclPtrList const& GetMemberVariables() const { return member_variables; }
+		void SetMemberFunctions(UniqueMemberFunctionDeclPtrList&& _member_functions)
 		{
 			member_functions = std::move(_member_functions);
 		}
-		UniqueFunctionDeclPtrList const& GetMemberFunctions() const { return member_functions; }
+		UniqueMemberFunctionDeclPtrList const& GetMemberFunctions() const { return member_functions; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
-		UniqueVariableDeclPtrList member_variables;
-		UniqueFunctionDeclPtrList member_functions;
+		UniqueMemberVariableDeclPtrList member_variables;
+		UniqueMemberFunctionDeclPtrList member_functions;
 	};
 
 	enum class StmtKind : uint8

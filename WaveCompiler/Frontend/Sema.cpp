@@ -87,7 +87,7 @@ namespace wave
 		return var_decl;
 	}
 
-	UniqueVariableDeclPtr Sema::ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
+	UniqueParamVariableDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
 		if (ctx.force_ignore_decls) return nullptr;
 
@@ -104,17 +104,21 @@ namespace wave
 			diagnostics.Report(loc, void_invalid_context);
 		}
 
-		UniqueVariableDeclPtr param_decl = MakeUnique<VariableDecl>(name, loc);
+		UniqueParamVariableDeclPtr param_decl = MakeUnique<ParamVariableDecl>(name, loc);
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
 		param_decl->SetType(type);
 		if (!name.empty()) ctx.decl_sym_table.Insert(param_decl.get());
 		return param_decl;
+	}
 
+	UniqueMemberVariableDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
+	{
+		return nullptr;
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
-												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
+												  UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
 		if (ctx.force_ignore_decls) return nullptr;
 
@@ -160,6 +164,10 @@ namespace wave
 		return function_decl;
 	}
 
+	UniqueMemberFunctionDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
+	{
+		return nullptr;
+	}
 
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
 	{
@@ -206,7 +214,7 @@ namespace wave
 		return alias_decl;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueVariableDeclPtrList&& member_variables, UniqueFunctionDeclPtrList&& member_functions)
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueMemberVariableDeclPtrList&& member_variables, UniqueMemberFunctionDeclPtrList&& member_functions)
 	{
 		//todo semantic analysis
 		if (ctx.tag_sym_table.LookUpCurrentScope(name))

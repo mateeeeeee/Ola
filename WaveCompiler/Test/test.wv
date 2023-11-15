@@ -1,12 +1,5 @@
 
 
-class Clazz
-{
-    int x;
-
-    public int GetX() {return x;}
-};
-
 public int main()
 {
    return 0;

@@ -26,7 +26,6 @@ namespace wave
 	}
 
 
-
 	void TranslationUnit::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -42,7 +41,21 @@ namespace wave
 		visitor.Visit(*this, depth);
 		if (init_expr) init_expr->Accept(visitor, depth + 1);
 	}
+	void ParamVariableDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void MemberVariableDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 	void FunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
+		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
+	}
+	void MemberFunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
@@ -67,7 +80,6 @@ namespace wave
 		for (auto const& member_variable : member_variables) member_variable->Accept(visitor, depth + 1);
 		for (auto const& member_function : member_functions) member_function->Accept(visitor, depth + 1);
 	}
-
 
 	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -245,7 +257,19 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+	void ParamVariableDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void MemberVariableDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 	void FunctionDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void MemberFunctionDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

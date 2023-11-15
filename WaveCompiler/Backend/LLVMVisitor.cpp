@@ -101,6 +101,11 @@ namespace wave
 		llvm_value_map[&function_decl] = llvm_function;
 	}
 
+	void LLVMVisitor::Visit(MemberFunctionDecl const& member_function, uint32)
+	{
+		member_function.Accept(*this);
+	}
+
 	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
 		QualType const& var_type = var_decl.GetType();
@@ -227,6 +232,14 @@ namespace wave
 				}
 			}
 		}
+	}
+
+	void LLVMVisitor::Visit(MemberVariableDecl const& member_var, uint32)
+	{
+	}
+
+	void LLVMVisitor::Visit(ParamVariableDecl const& param_var, uint32)
+	{
 	}
 
 	void LLVMVisitor::Visit(TagDecl const&, uint32)
