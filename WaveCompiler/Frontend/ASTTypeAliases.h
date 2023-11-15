@@ -23,6 +23,7 @@ namespace wave
 	using UniqueEnumDeclPtr			= UniquePtr<EnumDecl>;
 	using UniqueEnumMemberDeclPtr	= UniquePtr<EnumMemberDecl>;
 	using UniqueAliasDeclPtr		= UniquePtr<AliasDecl>;
+	using UniqueClassDeclPtr		= UniquePtr<ClassDecl>;
 
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;
@@ -59,6 +60,7 @@ namespace wave
 
 	using UniqueEnumMemberDeclPtrList = std::vector<UniqueEnumMemberDeclPtr>;
 	using UniqueVariableDeclPtrList   = std::vector<UniqueVariableDeclPtr>;
+	using UniqueFunctionDeclPtrList   = std::vector<UniqueFunctionDeclPtr>;
 	using UniqueDeclPtrList			  = std::vector<UniqueDeclPtr>;
 	using UniqueStmtPtrList			  = std::vector<UniqueStmtPtr>;
 	using UniqueExprPtrList			  = std::vector<UniqueExprPtr>;

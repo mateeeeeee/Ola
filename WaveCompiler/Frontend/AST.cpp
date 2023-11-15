@@ -61,6 +61,13 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
+	void ClassDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto const& member_variable : member_variables) member_variable->Accept(visitor, depth + 1);
+		for (auto const& member_function : member_functions) member_function->Accept(visitor, depth + 1);
+	}
+
 
 	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -254,6 +261,10 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+	void ClassDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 
 	void Stmt::Accept(ASTVisitor& visitor) const
 	{
@@ -389,5 +400,6 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
+
 }
 

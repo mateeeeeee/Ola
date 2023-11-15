@@ -57,7 +57,11 @@ namespace wave
 	{
 		UniqueDeclPtrList global_decl_list;
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
-		if (Consume(TokenKind::KW_enum))
+		if (Consume(TokenKind::KW_class))
+		{
+			global_decl_list.push_back(ParseClassDeclaration());
+		}
+		else if (Consume(TokenKind::KW_enum))
 		{
 			global_decl_list.push_back(ParseEnumDeclaration());
 		}
@@ -73,7 +77,11 @@ namespace wave
 		else 
 		{
 			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition());
-			else global_decl_list = ParseVariableDeclaration();
+			else
+			{
+				UniqueVariableDeclPtrList variable_decls = ParseVariableDeclaration();
+				for (auto& variable_decl : variable_decls) global_decl_list.push_back(std::move(variable_decl));
+			}
 		}
 		return global_decl_list;
 	}
@@ -164,7 +172,7 @@ namespace wave
 		return sema->ActOnFunctionParamDecl(name, loc, variable_type);
 	}
 
-	UniqueDeclPtrList Parser::ParseVariableDeclaration()
+	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
 	{
 		DeclVisibility visibility = DeclVisibility::None;
 		if (sema->ctx.decl_sym_table.IsGlobal())
@@ -173,7 +181,7 @@ namespace wave
 			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
 		}
 		
-		UniqueDeclPtrList var_decl_list;
+		UniqueVariableDeclPtrList var_decl_list;
 		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
@@ -278,6 +286,45 @@ namespace wave
 		return sema->ActOnAliasDecl(alias_name, loc, aliased_type);
 	}
 
+	UniqueClassDeclPtr Parser::ParseClassDeclaration()
+	{
+		std::string class_name = "";
+		SourceLocation loc = current_token->GetLocation();
+		if (current_token->Is(TokenKind::identifier))
+		{
+			class_name = current_token->GetIdentifier();
+			++current_token;
+		}
+
+		UniqueVariableDeclPtrList member_variables;
+		UniqueFunctionDeclPtrList member_functions;
+		{
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
+			TokenPtr start_token = current_token;
+
+			auto ParseClassMembers = [&](bool parse_function)
+				{
+					Expect(TokenKind::left_brace);
+					while (Consume(TokenKind::right_brace))
+					{
+						bool is_function_declaration = IsFunctionDeclaration();
+						if (parse_function && is_function_declaration) member_functions.push_back(ParseFunctionDefinition());
+						else if (!parse_function && !is_function_declaration)
+						{
+							UniqueVariableDeclPtrList var_decls = ParseVariableDeclaration();
+							for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
+						}
+					}
+				};
+			ParseClassMembers(false);
+			current_token = start_token;
+			ParseClassMembers(true);
+			Expect(TokenKind::semicolon);
+		}
+		return sema->ActOnClassDecl(class_name, loc, std::move(member_variables), std::move(member_functions));
+	}
+
 	UniqueStmtPtr Parser::ParseStatement()
 	{
 		switch (current_token->GetKind())
@@ -324,8 +371,8 @@ namespace wave
 				}
 				else
 				{
-					UniqueDeclPtrList decl_list = ParseVariableDeclaration();
-					stmts.push_back(sema->ActOnDeclStmt(std::move(decl_list)));
+					UniqueVariableDeclPtrList variable_decls = ParseVariableDeclaration();
+					for (auto& variable_decl : variable_decls) stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
 				}
 			}
 			else
@@ -389,7 +436,9 @@ namespace wave
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsTypename())
 		{
-			UniqueDeclPtrList decl_list = ParseVariableDeclaration();
+			UniqueVariableDeclPtrList variable_decls = ParseVariableDeclaration();
+			UniqueDeclPtrList decl_list; decl_list.reserve(variable_decls.size());
+			for (auto& variable_decl : variable_decls) decl_list.push_back(std::move(variable_decl));
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
 		}
 		else init_stmt = ParseExpressionStatement();

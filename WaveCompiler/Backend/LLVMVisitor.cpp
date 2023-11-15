@@ -250,6 +250,11 @@ namespace wave
 		//alias declaration doesn't generate any code
 	}
 
+	void LLVMVisitor::Visit(ClassDecl const&, uint32)
+	{
+		//todo
+	}
+
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
 	{
 		WAVE_ASSERT(false);

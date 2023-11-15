@@ -41,7 +41,8 @@ namespace wave
 		Function,
 		Enum,
 		EnumMember,
-		Alias
+		Alias,
+		Class
 	};
 
 	enum class DeclVisibility : uint8
@@ -205,6 +206,30 @@ namespace wave
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+	};
+
+	class ClassDecl : public TagDecl
+	{
+	public:
+		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
+
+		void SetMemberVariables(UniqueVariableDeclPtrList&& _member_variables)
+		{
+			member_variables = std::move(_member_variables);
+		}
+		UniqueVariableDeclPtrList const& GetMemberVariables() const { return member_variables; }
+		void SetMemberFunctions(UniqueFunctionDeclPtrList&& _member_functions)
+		{
+			member_functions = std::move(_member_functions);
+		}
+		UniqueFunctionDeclPtrList const& GetMemberFunctions() const { return member_functions; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueVariableDeclPtrList member_variables;
+		UniqueFunctionDeclPtrList member_functions;
 	};
 
 	enum class StmtKind : uint8

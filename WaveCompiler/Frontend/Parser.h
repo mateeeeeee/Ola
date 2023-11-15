@@ -76,10 +76,11 @@ namespace wave
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
 		WAVE_NODISCARD UniqueVariableDeclPtr ParseFunctionParamDeclaration();
-		WAVE_NODISCARD UniqueDeclPtrList ParseVariableDeclaration();
+		WAVE_NODISCARD UniqueVariableDeclPtrList ParseVariableDeclaration();
 		WAVE_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 		WAVE_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		WAVE_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();
+		WAVE_NODISCARD UniqueClassDeclPtr ParseClassDeclaration();
 
 		WAVE_NODISCARD UniqueStmtPtr ParseStatement();
 		WAVE_NODISCARD UniqueCompoundStmtPtr ParseCompoundStatement();

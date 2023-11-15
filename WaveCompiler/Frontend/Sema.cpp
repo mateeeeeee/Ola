@@ -199,6 +199,20 @@ namespace wave
 		return alias_decl;
 	}
 
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueVariableDeclPtrList&& member_variables, UniqueFunctionDeclPtrList&& member_functions)
+	{
+		//todo semantic analysis
+		if (ctx.tag_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		UniqueClassDeclPtr class_decl = MakeUnique<ClassDecl>(name, loc);
+		class_decl->SetMemberVariables(std::move(member_variables));
+		class_decl->SetMemberFunctions(std::move(member_functions));
+		ctx.tag_sym_table.Insert(class_decl.get());
+		return class_decl;
+	}
+
 	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
 		return MakeUnique<CompoundStmt>(std::move(stmts));

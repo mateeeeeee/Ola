@@ -12,6 +12,7 @@ namespace wave
 	class EnumDecl;
 	class EnumMemberDecl;
 	class AliasDecl;
+	class ClassDecl;
 
 	class Stmt;
 	class CompoundStmt;
