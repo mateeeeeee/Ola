@@ -40,7 +40,9 @@
 
 <enum-identifier> ::= <identifier>
 			   
-<class-specifier> ::= ... (TODO)
+<class-specifier> ::= class <class-identifier> <class-body>
+
+<class-body> ::= { { <variable-declaration> | <function-definition> }* }
 
 <class-identifier> ::= <identifier>
 

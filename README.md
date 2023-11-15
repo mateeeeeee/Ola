@@ -378,7 +378,9 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
 
 <enum-identifier> ::= <identifier>
 			   
-<class-specifier> ::= ... (TODO)
+<class-specifier> ::= class <class-identifier> <class-body>
+
+<class-body> ::= { { <variable-declaration> | <function-definition> }* }
 
 <class-identifier> ::= <identifier>
 
@@ -514,4 +516,4 @@ identifier ::= letter { letter | digit | _ }*
                    | continue ;
                    | break ;
                    | return {<expression>}? ;
-```
+```	
