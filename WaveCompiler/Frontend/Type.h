@@ -101,23 +101,24 @@ namespace wave
 		}
 
 		bool IsConst() const { return qualifiers & Qualifier_Const; }
-		void AddConst() { qualifiers |= Qualifier_Const; }
-		void RemoveConst() { qualifiers &= ~Qualifier_Const; }
+		void AddConst()		 { qualifiers |= Qualifier_Const; }
+		void RemoveConst()   { qualifiers &= ~Qualifier_Const; }
 
-		bool HasRawType() const { return type != nullptr; }
+		bool IsNull() const  { return type == nullptr; }
+
+		operator Type const& ()  const  { return *type; }
+		const Type& operator* () const  { return *type; }
+		const Type* operator->() const  { return type.get(); }
+		Type* operator->()				{ return type.get(); }
+
+		Type* GetTypePtr()				{ return type.get(); }
+		Type const* GetTypePtr() const  { return type.get(); }
+
 		template<typename _Ty> requires std::derived_from<_Ty, Type>
-		void SetRawType(_Ty const& _type)
+		void SetType(_Ty const& _type)
 		{
 			type = std::make_shared<_Ty>(_type);
 		}
-		void ResetRawType() { type = nullptr; }
-		Type const& RawType() const { return *type; }
-		Type& RawType() { return *type; }
-
-		Type const* operator->() const { return type.get(); }
-		Type* operator->() { return type.get(); }
-		Type const& operator*() const { return RawType(); }
-		operator Type const& () const { return RawType(); }
 
 	private:
 		std::shared_ptr<Type> type = nullptr;

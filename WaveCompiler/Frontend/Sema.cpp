@@ -11,7 +11,7 @@ namespace wave
 												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		bool const has_init = (init_expr != nullptr);
-		bool const has_type_specifier = type.HasRawType();
+		bool const has_type_specifier = !type.IsNull();
 		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
 
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
@@ -91,7 +91,7 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
-		if (!type.HasRawType())
+		if (type.IsNull())
 		{
 			diagnostics.Report(loc, missing_type_specifier);
 		}
@@ -189,7 +189,7 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
-		if (!type.HasRawType())
+		if (type.IsNull())
 		{
 			diagnostics.Report(loc, aliasing_var_forbidden);
 		}
@@ -299,7 +299,7 @@ namespace wave
 		foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
 
 		QualType var_type = var_decl->GetType();
-		if (var_type.HasRawType())
+		if (!var_type.IsNull())
 		{
 			if (!var_type->IsSameAs(array_type->GetBaseType()))
 			{
@@ -750,14 +750,14 @@ namespace wave
 
 	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list)
 	{
-		if(!type.HasRawType() && expr_list.empty())
+		if(type.IsNull() && expr_list.empty())
 		{
 			diagnostics.Report(loc, invalid_init_list_expression);
 			return nullptr;
 		}
 
 		QualType expr_type{};
-		if (type.HasRawType())
+		if (!type.IsNull())
 		{
 			WAVE_ASSERT(type->Is(TypeKind::Array));
 			ArrayType const& array_type = type_cast<ArrayType>(type);

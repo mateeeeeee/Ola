@@ -952,10 +952,10 @@ namespace wave
 		{
 		case TokenKind::KW_var:   break;
 		case TokenKind::KW_void:  type.SetRawType(builtin_types::Void);  break;
-		case TokenKind::KW_bool:  type.SetRawType(builtin_types::Bool);	 break;
+		case TokenKind::KW_bool:  type.SetType(builtin_types::Bool);	 break;
 		case TokenKind::KW_char:  type.SetRawType(builtin_types::Char);	 break;
 		case TokenKind::KW_int:   type.SetRawType(builtin_types::Int);   break;
-		case TokenKind::KW_float: type.SetRawType(builtin_types::Float); break;
+		case TokenKind::KW_float: type.SetType(builtin_types::Float); break;
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetIdentifier();
