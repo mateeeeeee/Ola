@@ -1,10 +1,8 @@
-import std.assert;
+import std.math;
 import std.io;
 
 
 public int main()
 {
-    bool flag = false;
-    Assert(flag);
-    return 0;
+    PrintFloat(PI);
 }

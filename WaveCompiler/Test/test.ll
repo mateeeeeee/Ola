@@ -1,11 +1,70 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-declare void @Assert(i1)
+@E = external global double
+@LOG2E = external global double
+@LOG10E = external global double
+@LN2 = external global double
+@LN10 = external global double
+@PI = external global double
+@PI_2 = external global double
+@PI_4 = external global double
+@SQRT2 = external global double
+@SQRT1_2 = external global double
 
-declare void @AssertMsg(i1, ptr)
+declare double @Fabs(double)
 
-declare void @PrintInteger(i64)
+declare double @Fmod(double, double)
+
+declare double @Ffma(double, double, double)
+
+declare double @Fmax(double, double)
+
+declare double @Fmin(double, double)
+
+declare double @Ceil(double)
+
+declare double @Floor(double)
+
+declare double @Round(double)
+
+declare double @Trunc(double)
+
+declare double @Sqrt(double)
+
+declare double @Cbrt(double)
+
+declare double @Pow(double, double)
+
+declare double @Log(double)
+
+declare double @Log2(double)
+
+declare double @Log10(double)
+
+declare double @Exp(double)
+
+declare double @Sin(double)
+
+declare double @Cos(double)
+
+declare double @Tan(double)
+
+declare double @Asin(double)
+
+declare double @Acos(double)
+
+declare double @Atan(double)
+
+declare double @Atan2(double, double)
+
+declare i64 @Abs(i64)
+
+declare i64 @Min(i64, i64)
+
+declare i64 @Max(i64, i64)
+
+declare void @PrintInt(i64)
 
 declare void @PrintFloat(double)
 
@@ -13,7 +72,7 @@ declare void @PrintChar(i8)
 
 declare void @PrintString(ptr)
 
-declare i64 @ReadInteger()
+declare i64 @ReadInt()
 
 declare double @ReadFloat()
 
@@ -24,18 +83,11 @@ declare void @ReadString(ptr, i64)
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca i1, align 1
-  store i1 false, ptr %1, align 1
-  %2 = load i1, ptr %1, align 1
-  call void @Assert(i1 %2)
-  store i64 0, ptr %0, align 4
+  %1 = load double, ptr @PI, align 8
+  call void @PrintFloat(double %1)
   br label %exit
 
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %0, align 4
-  ret i64 %3
+exit:                                             ; preds = %entry
+  %2 = load i64, ptr %0, align 4
+  ret i64 %2
 }

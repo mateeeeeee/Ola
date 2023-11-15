@@ -44,13 +44,13 @@ extern "C"
 	{
 		return atof(str);
 	}
-	int64_t StringToInteger(char* str)
+	int64_t StringToInt(char* str)
 	{
 		return atoll(str);
 	}
-	void StringCopy(char* dst, char* src)
+	void StringCopy(char* dst, char* src, int64_t size)
 	{
-		
+		memcpy(dst, src, size);
 	}
 
 }

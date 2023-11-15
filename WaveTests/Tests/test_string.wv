@@ -27,7 +27,7 @@ public int main()
 	PassStringVariable("Variable");
 
 	char[] numString = "12345";
-	int number = StringToInteger(numString);
+	int number = StringToInt(numString);
 	Assert(number == 12345);
 
 	return 0;

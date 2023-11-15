@@ -2,7 +2,18 @@
 
 extern "C"
 {
-	double Abs(double x)
+	extern double E        = 2.71828182845904523536 ;  // e
+	extern double LOG2E    = 1.44269504088896340736 ;  // log2(e)
+	extern double LOG10E   = 0.434294481903251827651;  // log10(e)
+	extern double LN2      = 0.693147180559945309417;  // ln(2)
+	extern double LN10     = 2.30258509299404568402 ;  // ln(10)
+	extern double PI       = 3.14159265358979323846 ;  // pi
+	extern double PI_2     = 1.57079632679489661923 ;  // pi/2
+	extern double PI_4     = 0.785398163397448309616;  // pi/4
+	extern double SQRT2    = 1.41421356237309504880 ;  // sqrt(2)
+	extern double SQRT1_2  = 0.707106781186547524401;  // 1/sqrt(2)
+
+	double Fabs(double x)
 	{
 		return fabs(x);
 	}
@@ -96,5 +107,18 @@ extern "C"
 	double Atan2(double y, double x)
 	{
 		return atan2(y, x);
+	}
+
+	int64_t Abs(int64_t x)
+	{
+		return x > 0 ? x : -x;
+	}
+	int64_t Min(int64_t x, int64_t y)
+	{
+		return x < y ? x : y;
+	}
+	int64_t Max(int64_t x, int64_t y)
+	{
+		return x > y ? x : y;
 	}
 }

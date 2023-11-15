@@ -16,18 +16,18 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	sub	rsp, 40
+	.seh_stackalloc 40
 	.seh_endprologue
-	mov	byte ptr [rsp + 47], 0
-	mov	cl, byte ptr [rsp + 47]
-	call	Assert
-	mov	qword ptr [rsp + 48], 0
+	movsd	xmm0, qword ptr [rip + PI]      # xmm0 = mem[0],zero
+	call	PrintFloat
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 48]
-	add	rsp, 56
+	mov	rax, qword ptr [rsp + 32]
+	add	rsp, 40
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym Assert
+	.addrsig_sym PrintFloat
+	.addrsig_sym PI
+	.globl	_fltused

@@ -1,8 +1,8 @@
-extern void PrintInteger(int i);
+extern void PrintInt(int i);
 extern void PrintFloat(float f);
 extern void PrintChar(char c);
 extern void PrintString(char[] str);
-extern int ReadInteger();
+extern int ReadInt();
 extern float ReadFloat();
 extern char ReadChar();
 extern void ReadString(char[] str, int size);

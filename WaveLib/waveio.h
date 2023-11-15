@@ -8,7 +8,7 @@
 extern "C"
 {
 
-	void PrintInteger(int64_t i)
+	void PrintInt(int64_t i)
 	{
 		printf("%" PRId64 "\n", i);
 	}
@@ -25,7 +25,7 @@ extern "C"
 		printf("%s", str);
 	}
 	
-	int64_t ReadInteger()
+	int64_t ReadInt()
 	{
 		int64_t i;
 		scanf("%" SCNd64, &i);
