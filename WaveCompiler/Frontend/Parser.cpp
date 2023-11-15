@@ -306,7 +306,7 @@ namespace wave
 			auto ParseClassMembers = [&](bool parse_function)
 				{
 					Expect(TokenKind::left_brace);
-					while (Consume(TokenKind::right_brace))
+					while (!Consume(TokenKind::right_brace))
 					{
 						bool is_function_declaration = IsFunctionDeclaration();
 						if (parse_function && is_function_declaration) member_functions.push_back(ParseFunctionDefinition());
@@ -314,6 +314,18 @@ namespace wave
 						{
 							UniqueVariableDeclPtrList var_decls = ParseVariableDeclaration();
 							for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
+						}
+						else if (!parse_function && is_function_declaration)
+						{
+							sema->ctx.force_ignore_decls = true;
+							std::ignore = ParseFunctionDefinition();
+							sema->ctx.force_ignore_decls = false;
+						}
+						else if (parse_function && !is_function_declaration)
+						{
+							sema->ctx.force_ignore_decls = true;
+							std::ignore = ParseVariableDeclaration();
+							sema->ctx.force_ignore_decls = false;
 						}
 					}
 				};

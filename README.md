@@ -33,7 +33,7 @@ It's done as a learning project and its purpose is solely educational.
   * standard library
     
 ## Todo
-  * classes
+  * classes (wip)
 
 ## Structure
 Wave consists of three parts: 

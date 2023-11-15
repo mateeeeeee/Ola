@@ -10,6 +10,8 @@ namespace wave
 	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
+		if (ctx.force_ignore_decls) return nullptr;
+
 		bool const has_init = (init_expr != nullptr);
 		bool const has_type_specifier = !type.IsNull();
 		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
@@ -87,6 +89,8 @@ namespace wave
 
 	UniqueVariableDeclPtr Sema::ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
+		if (ctx.force_ignore_decls) return nullptr;
+
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -112,6 +116,8 @@ namespace wave
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												  UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
+		if (ctx.force_ignore_decls) return nullptr;
+
 		bool is_extern = body_stmt == nullptr;
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -172,6 +178,7 @@ namespace wave
 
 	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value)
 	{
+
 		if (name.empty()) diagnostics.Report(loc, expected_identifier);
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{

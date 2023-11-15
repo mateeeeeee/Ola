@@ -28,6 +28,7 @@ namespace wave
 		using CaseStmtCallback = std::function<void(CaseStmt*)>;
 		struct Context
 		{
+			bool force_ignore_decls = false;
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
 

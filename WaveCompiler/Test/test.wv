@@ -1,8 +1,13 @@
-import std.math;
-import std.io;
 
+
+class Clazz
+{
+    int x;
+
+    public int GetX() {return x;}
+};
 
 public int main()
 {
-    PrintFloat(PI);
+   return 0;
 }
