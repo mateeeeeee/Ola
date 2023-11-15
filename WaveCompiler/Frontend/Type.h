@@ -89,13 +89,13 @@ namespace wave
 	DEFINE_ENUM_BIT_OPERATORS(QualifierFlag);
 	using Qualifiers = uint8;
 
-	class QualifiedType
+	class QualType
 	{
 		friend class Type;
 	public:
-		explicit QualifiedType(Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers) {}
+		explicit QualType(Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers) {}
 		template<typename _Ty> requires std::derived_from<_Ty, Type>
-		QualifiedType(_Ty const& _type, Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers)
+		QualType(_Ty const& _type, Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers)
 		{
 			type = std::make_shared<_Ty>(_type);
 		}
@@ -177,8 +177,8 @@ namespace wave
 	class ArrayType : public Type
 	{
 	public:
-		explicit ArrayType(QualifiedType const& type) : Type{ TypeKind::Array, 0, type->GetAlign() }, base_type(type) {}
-		ArrayType(QualifiedType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
+		explicit ArrayType(QualType const& type) : Type{ TypeKind::Array, 0, type->GetAlign() }, base_type(type) {}
+		ArrayType(QualType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
 			base_type(type), array_size(array_size) {}
 
 		virtual bool IsAssignableFrom(Type const& other) const override
@@ -198,23 +198,23 @@ namespace wave
 			return array_size > 0;
 		}
 
-		QualifiedType const& GetBaseType() const { return base_type; }
+		QualType const& GetBaseType() const { return base_type; }
 		uint32 GetArraySize() const { return array_size; }
 
 	private:
-		QualifiedType base_type;
+		QualType base_type;
 		uint32 array_size = 0;
 	};
 
 	struct FunctionParameter
 	{
 		std::string name = "";
-		QualifiedType type;
+		QualType type;
 	};
 	class FunctionType : public Type
 	{
 	public:
-		explicit FunctionType(QualifiedType const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
+		explicit FunctionType(QualType const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
 		return_type(return_type), params(params){}
 
 		virtual bool IsAssignableFrom(Type const& other) const override
@@ -222,11 +222,11 @@ namespace wave
 			return false;
 		}
 
-		QualifiedType const& GetReturnType() const { return return_type; }
+		QualType const& GetReturnType() const { return return_type; }
 		std::span<FunctionParameter const> GetParameters() const { return params; }
 
 	private:
-		QualifiedType return_type;
+		QualType return_type;
 		std::vector<FunctionParameter> params;
 	};
 

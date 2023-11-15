@@ -138,8 +138,8 @@ namespace wave
 		}
 
 		std::vector<Token> import_tokens{};
-		std::function<void(QualifiedType const& type, std::vector<Token>& tokens)> TypeToTokens
-			= [&TypeToTokens](QualifiedType const& type, std::vector<Token>& tokens)
+		std::function<void(QualType const& type, std::vector<Token>& tokens)> TypeToTokens
+			= [&TypeToTokens](QualType const& type, std::vector<Token>& tokens)
 			{
 				if (type.IsConst()) tokens.emplace_back(TokenKind::KW_const);
 				switch (type->GetKind())

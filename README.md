@@ -21,7 +21,7 @@ It's done as a learning project and its purpose is solely educational.
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
   * arrays
   * strings
-  * floats (wip)
+  * floats 
   * enums
   * functions
   * `sizeof`, `length` operators

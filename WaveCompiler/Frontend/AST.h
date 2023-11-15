@@ -59,8 +59,8 @@ namespace wave
 		SourceLocation GetLocation() const { return source_loc; }
 		std::string_view GetName() const { return name; }
 
-		void SetType(QualifiedType const& _type) { type = _type; }
-		QualifiedType const& GetType() const { return type; }
+		void SetType(QualType const& _type) { type = _type; }
+		QualType const& GetType() const { return type; }
 
 		void SetVisibility(DeclVisibility _visibility)
 		{
@@ -79,7 +79,7 @@ namespace wave
 		DeclKind const decl_kind;
 		std::string name;
 		SourceLocation source_loc;
-		QualifiedType type;
+		QualType type;
 		DeclVisibility visibility = DeclVisibility::None;
 
 	protected:
@@ -197,7 +197,7 @@ namespace wave
 	class AliasDecl : public TagDecl
 	{
 	public:
-		AliasDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& aliased_type) : TagDecl(DeclKind::Alias, name, loc)
+		AliasDecl(std::string_view name, SourceLocation const& loc, QualType const& aliased_type) : TagDecl(DeclKind::Alias, name, loc)
 		{
 			SetType(aliased_type);
 			SetVisibility(DeclVisibility::Public);
@@ -576,8 +576,8 @@ namespace wave
 		ExprKind GetExprKind() const { return kind; }
 		bool IsLValue() const { return value_category == ExprValueCategory::LValue; }
 
-		void SetType(QualifiedType const& _type) { type = _type; }
-		QualifiedType const& GetType() const { return type; }
+		void SetType(QualType const& _type) { type = _type; }
+		QualType const& GetType() const { return type; }
 
 		virtual bool IsConstexpr() const { return false; }
 		virtual int64 EvaluateConstexpr() const { return 0; }
@@ -588,7 +588,7 @@ namespace wave
 	protected:
 		ExprKind const kind;
 		SourceLocation loc;
-		QualifiedType type;
+		QualType type;
 		ExprValueCategory value_category = ExprValueCategory::RValue;
 
 	protected:
@@ -735,7 +735,7 @@ namespace wave
 		ConstantString(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str) 
 		{
 			SetValueCategory(ExprValueCategory::RValue);
-			SetType(QualifiedType(ArrayType(builtin_types::Char, (uint32)str.size() + 1), Qualifier_Const));
+			SetType(QualType(ArrayType(builtin_types::Char, (uint32)str.size() + 1), Qualifier_Const));
 		}
 		std::string_view GetString() const { return str; }
 
@@ -787,7 +787,7 @@ namespace wave
 	class ImplicitCastExpr : public Expr
 	{
 	public:
-		ImplicitCastExpr(SourceLocation const& loc, QualifiedType const& qtype) : Expr(ExprKind::ImplicitCast, loc), operand(nullptr)
+		ImplicitCastExpr(SourceLocation const& loc, QualType const& qtype) : Expr(ExprKind::ImplicitCast, loc), operand(nullptr)
 		{
 			SetType(qtype);
 			SetValueCategory(ExprValueCategory::RValue);

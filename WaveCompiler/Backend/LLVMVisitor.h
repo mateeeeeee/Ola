@@ -18,7 +18,7 @@ namespace llvm
 
 namespace wave
 {
-	class QualifiedType;
+	class QualType;
 
 	class LLVMVisitor : public ASTVisitor
 	{
@@ -104,9 +104,9 @@ namespace wave
 	private:
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
-		llvm::Type* ConvertToLLVMType(QualifiedType const&);
+		llvm::Type* ConvertToLLVMType(QualType const&);
 
-		[[maybe_unused]] llvm::Value* Load(QualifiedType const&, llvm::Value*);
+		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 

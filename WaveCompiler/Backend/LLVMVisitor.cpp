@@ -38,7 +38,7 @@ namespace wave
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
 		
-		QualifiedType const& type = function_decl.GetType();
+		QualType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
@@ -103,7 +103,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
 	{
-		QualifiedType const& var_type = var_decl.GetType();
+		QualType const& var_type = var_decl.GetType();
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
 		bool const is_array = var_type->Is(TypeKind::Array);
 
@@ -921,7 +921,7 @@ namespace wave
 		}
 		else 
 		{
-			QualifiedType const& array_expr_type = array_expr->GetType();
+			QualType const& array_expr_type = array_expr->GetType();
 			WAVE_ASSERT(IsArrayType(array_expr_type));
 			ArrayType const& array_type = type_cast<ArrayType>(array_expr_type);
 			if (IsArrayType(array_type.GetBaseType()))
@@ -954,7 +954,7 @@ namespace wave
 		}
 	}
 
-	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualifiedType const& type)
+	llvm::Type* LLVMVisitor::ConvertToLLVMType(QualType const& type)
 	{
 		switch (type->GetKind())
 		{
@@ -996,7 +996,7 @@ namespace wave
 		return nullptr;
 	}
 
-	llvm::Value* LLVMVisitor::Load(QualifiedType const& type, llvm::Value* ptr)
+	llvm::Value* LLVMVisitor::Load(QualType const& type, llvm::Value* ptr)
 	{
 		llvm::Type* llvm_type = ConvertToLLVMType(type);
 		return Load(llvm_type, ptr);

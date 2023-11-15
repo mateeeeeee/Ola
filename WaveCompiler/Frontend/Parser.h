@@ -7,7 +7,7 @@
 
 namespace wave
 {
-	class QualifiedType;
+	class QualType;
 	class Sema;
 	class Parser;
 	
@@ -126,8 +126,8 @@ namespace wave
 		WAVE_NODISCARD UniqueIdentifierExprPtr ParseIdentifier();
 		WAVE_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
-		void ParseTypeQualifier(QualifiedType& type);
-		void ParseTypeSpecifier(QualifiedType& type, bool array_size_required = false);
+		void ParseTypeQualifier(QualType& type);
+		void ParseTypeSpecifier(QualType& type, bool array_size_required = false);
 
 		bool IsFunctionDeclaration();
 		bool IsCurrentTokenTypename();

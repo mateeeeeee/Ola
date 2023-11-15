@@ -31,7 +31,7 @@ namespace wave
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
 
-			class QualifiedType const* current_func = nullptr;
+			class QualType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 
 			uint32 stmts_using_break_count = 0; 
@@ -50,16 +50,16 @@ namespace wave
 
 	private:
 
-		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueVariableDeclPtr ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type);
-		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type, 
+		UniqueVariableDeclPtr ActOnFunctionParamDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
+		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
 												DeclVisibility visibility);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
-		UniqueAliasDeclPtr ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualifiedType const& type);
+		UniqueAliasDeclPtr ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
@@ -83,19 +83,19 @@ namespace wave
 		UniqueTernaryExprPtr ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr);
 		UniqueFunctionCallExprPtr ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
 		UniqueConstantIntPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
-		UniqueConstantIntPtr ActOnLengthOperator(QualifiedType const& type, SourceLocation const& loc);
+		UniqueConstantIntPtr ActOnLengthOperator(QualType const& type, SourceLocation const& loc);
 		UniqueConstantCharPtr ActOnConstantChar(std::string_view str, SourceLocation const& loc);
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
-		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtrList&& expr_list);
+		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
 	private:
 		Diagnostics& diagnostics;
 		Context ctx;
 
 	private:
-		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualifiedType const& type, UniqueExprPtr&& expr);
+		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
 	};
 }

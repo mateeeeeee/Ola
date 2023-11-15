@@ -82,11 +82,11 @@ namespace wave
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
-		QualifiedType function_type{};
+		QualType function_type{};
 		UniqueVariableDeclPtrList param_decls;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-			QualifiedType return_type{};
+			QualType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
@@ -116,12 +116,12 @@ namespace wave
 
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
-		QualifiedType function_type{};
+		QualType function_type{};
 		UniqueVariableDeclPtrList param_decls;
 		UniqueCompoundStmtPtr function_body;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-			QualifiedType return_type{};
+			QualType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
@@ -149,7 +149,7 @@ namespace wave
 
 	UniqueVariableDeclPtr Parser::ParseFunctionParamDeclaration()
 	{
-		QualifiedType variable_type{};
+		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
 
@@ -174,7 +174,7 @@ namespace wave
 		}
 		
 		UniqueDeclPtrList var_decl_list;
-		QualifiedType variable_type{};
+		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
 		do 
@@ -203,7 +203,7 @@ namespace wave
 	UniqueDeclPtrList Parser::ParseExternVariableDeclaration()
 	{
 		UniqueDeclPtrList var_decl_list;
-		QualifiedType variable_type{};
+		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
 		do
@@ -270,7 +270,7 @@ namespace wave
 
 		Expect(TokenKind::equal);
 
-		QualifiedType aliased_type{};
+		QualType aliased_type{};
 		ParseTypeQualifier(aliased_type);
 		ParseTypeSpecifier(aliased_type);
 		Expect(TokenKind::semicolon);
@@ -837,7 +837,7 @@ namespace wave
 		Expect(TokenKind::left_round);
 
 		SourceLocation loc = current_token->GetLocation();
-		QualifiedType type{};
+		QualType type{};
 		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var))
 		{
 			ParseTypeQualifier(type);
@@ -858,7 +858,7 @@ namespace wave
 		Expect(TokenKind::left_round);
 		SourceLocation loc = current_token->GetLocation();
 		UniqueExprPtr length_expr = ParseUnaryExpression();
-		QualifiedType const& type = length_expr->GetType();
+		QualType const& type = length_expr->GetType();
 		Expect(TokenKind::right_round);
 		return sema->ActOnLengthOperator(type, loc);
 	}
@@ -924,7 +924,7 @@ namespace wave
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
 	{
 		SourceLocation loc = current_token->GetLocation();
-		QualifiedType type{};
+		QualType type{};
 		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true);
 		Expect(TokenKind::left_brace);
 		UniqueExprPtrList expr_list;
@@ -941,12 +941,12 @@ namespace wave
 		return sema->ActOnInitializerListExpr(loc, type, std::move(expr_list));
 	}
 
-	void Parser::ParseTypeQualifier(QualifiedType& type)
+	void Parser::ParseTypeQualifier(QualType& type)
 	{
 		if (Consume(TokenKind::KW_const)) type.AddConst();
 	}
 
-	void Parser::ParseTypeSpecifier(QualifiedType& type, bool array_size_required)
+	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_required)
 	{
 		switch (current_token->GetKind())
 		{
@@ -1026,7 +1026,7 @@ namespace wave
 		if (Consume(TokenKind::KW_public)) {}
 		else if (Consume(TokenKind::KW_private)) {}
 
-		QualifiedType tmp{};
+		QualType tmp{};
 		ParseTypeQualifier(tmp);
 		ParseTypeSpecifier(tmp);
 		Expect(TokenKind::identifier);
