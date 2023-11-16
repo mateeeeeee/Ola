@@ -7,85 +7,6 @@ namespace wave
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
-
-	template<typename Decl> requires std::is_base_of_v<VariableDecl, Decl>
-	UniquePtr<Decl> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
-	{
-		bool const has_init = (init_expr != nullptr);
-		bool const has_type_specifier = !type.IsNull();
-		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
-
-		if (ctx.decl_sym_table.LookUpCurrentScope(name))
-		{
-			diagnostics.Report(loc, redefinition_of_identifier, name);
-		}
-
-		if (has_init && has_type_specifier)
-		{
-			if (!type->IsAssignableFrom(init_expr->GetType()))
-			{
-				diagnostics.Report(loc, incompatible_initializer);
-			}
-			else if (!type->IsSameAs(init_expr->GetType()))
-			{
-				init_expr = ActOnImplicitCastExpr(loc, type, std::move(init_expr));
-			}
-		}
-		else if (!has_init && !has_type_specifier)
-		{
-			diagnostics.Report(loc, missing_type_specifier_or_init_expr);
-		}
-
-		if (ctx.decl_sym_table.LookUpCurrentScope(name))
-		{
-			diagnostics.Report(loc, redefinition_of_identifier, name);
-		}
-		if (has_type_specifier && type->Is(TypeKind::Void))
-		{
-			diagnostics.Report(loc, void_invalid_context);
-		}
-
-		UniquePtr<Decl> var_decl = MakeUnique<Decl>(name, loc);
-		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
-		var_decl->SetVisibility(visibility);
-		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
-
-		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
-		{
-			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
-		}
-
-		var_decl->SetInitExpr(std::move(init_expr));
-
-		if (IsArrayType(type))
-		{
-			ArrayType const& decl_type = type_cast<ArrayType>(type);
-			ArrayType const& init_expr_type = type_cast<ArrayType>(var_decl->GetInitExpr()->GetType());
-
-			if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
-			{
-				diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
-			}
-			QualType base_type = IsArrayType(decl_type) ? init_expr_type.GetBaseType() : decl_type.GetBaseType();
-			uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
-			QualType var_type(ArrayType(base_type, array_size));
-			var_decl->SetType(var_type);
-		}
-		else if ((has_init && !has_type_specifier))
-		{
-			QualType var_type(var_decl->GetInitExpr()->GetType());
-			if (type.IsConst()) var_type.AddConst();
-			var_decl->SetType(var_type);
-		}
-		else
-		{
-			var_decl->SetType(type);
-		}
-
-		ctx.decl_sym_table.Insert(var_decl.get());
-		return var_decl;
-	}
-
 	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
@@ -900,5 +821,92 @@ namespace wave
 		cast_expr->SetOperand(std::move(expr));
 		return cast_expr;
 	}
+
+	template<typename Decl> requires std::is_base_of_v<VariableDecl, Decl>
+	UniquePtr<Decl> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	{
+		bool const has_init = (init_expr != nullptr);
+		bool const has_type_specifier = !type.IsNull();
+		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
+
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+
+		if (has_init && has_type_specifier)
+		{
+			if (!type->IsAssignableFrom(init_expr->GetType()))
+			{
+				diagnostics.Report(loc, incompatible_initializer);
+			}
+			else if (!type->IsSameAs(init_expr->GetType()))
+			{
+				init_expr = ActOnImplicitCastExpr(loc, type, std::move(init_expr));
+			}
+		}
+		else if (!has_init && !has_type_specifier)
+		{
+			diagnostics.Report(loc, missing_type_specifier_or_init_expr);
+		}
+
+		if (ctx.decl_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+		}
+		if (has_type_specifier && type->Is(TypeKind::Void))
+		{
+			diagnostics.Report(loc, void_invalid_context);
+		}
+
+		UniquePtr<Decl> var_decl = MakeUnique<Decl>(name, loc);
+		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
+		var_decl->SetVisibility(visibility);
+		WAVE_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
+
+		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
+		{
+			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
+		}
+		var_decl->SetInitExpr(std::move(init_expr));
+
+		bool is_array = (has_type_specifier && IsArrayType(type)) || (has_init && IsArrayType(var_decl->GetInitExpr()->GetType()));
+		if (is_array)
+		{
+			ArrayType const& init_expr_type = type_cast<ArrayType>(var_decl->GetInitExpr()->GetType());
+			QualType base_type{};
+			if (has_type_specifier)
+			{
+				ArrayType const& decl_type = type_cast<ArrayType>(type);
+				if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
+				{
+					diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
+				}
+				base_type = decl_type.GetBaseType();
+			}
+			else
+			{
+				base_type = init_expr_type.GetBaseType();
+			}
+			if (type.IsConst()) base_type.AddConst();
+			uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
+			QualType var_type(ArrayType(base_type, array_size));
+			var_decl->SetType(var_type);
+		}
+		else if ((has_init && !has_type_specifier))
+		{
+			QualType var_type(var_decl->GetInitExpr()->GetType());
+			if (type.IsConst()) var_type.AddConst();
+			var_decl->SetType(var_type);
+		}
+		else
+		{
+			var_decl->SetType(type);
+		}
+
+		ctx.decl_sym_table.Insert(var_decl.get());
+		return var_decl;
+	}
+
 }
 
