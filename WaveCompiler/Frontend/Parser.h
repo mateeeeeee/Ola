@@ -77,8 +77,8 @@ namespace wave
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
 		WAVE_NODISCARD UniqueMemberFunctionDeclPtr ParseMemberFunctionDefinition();
 		WAVE_NODISCARD UniqueParamVariableDeclPtr ParseParamVariableDeclaration();
-		WAVE_NODISCARD UniqueMemberVariableDeclPtrList ParseMemberVariableDeclaration();
 		WAVE_NODISCARD UniqueVariableDeclPtrList ParseVariableDeclaration();
+		WAVE_NODISCARD UniqueMemberVariableDeclPtrList ParseMemberVariableDeclaration();
 		WAVE_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 		WAVE_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		WAVE_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();

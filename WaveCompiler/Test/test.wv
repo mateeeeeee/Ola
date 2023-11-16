@@ -1,7 +1,7 @@
 
 class Foo
 {
-	private int x;
+	private int x = 12;
 	public void Init() {x = 5;}
 	public int GetX() const {return x;}
 };

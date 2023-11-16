@@ -51,10 +51,10 @@ namespace wave
 
 	private:
 
-		UniqueVariableDeclPtr ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
-												UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueParamVariableDeclPtr ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
-		UniqueMemberVariableDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, DeclVisibility visibility);
+		UniqueVariableDeclPtr       ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueMemberVariableDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueParamVariableDeclPtr  ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
+
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility);
@@ -104,5 +104,9 @@ namespace wave
 
 	private:
 		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
+
+		template<typename Decl> requires std::is_base_of_v<VariableDecl, Decl>
+		UniquePtr<Decl> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
 	};
+
 }

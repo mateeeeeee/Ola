@@ -212,6 +212,42 @@ namespace wave
 		return sema->ActOnParamVariableDecl(name, loc, variable_type);
 	}
 
+	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
+	{
+		DeclVisibility visibility = DeclVisibility::None;
+		if (sema->ctx.decl_sym_table.IsGlobal())
+		{
+			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+		}
+
+		UniqueVariableDeclPtrList var_decl_list;
+		QualType variable_type{};
+		ParseTypeQualifier(variable_type);
+		ParseTypeSpecifier(variable_type);
+		do
+		{
+			if (!var_decl_list.empty()) Expect(TokenKind::comma);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			SourceLocation const& loc = current_token->GetLocation();
+			std::string_view name = current_token->GetIdentifier(); ++current_token;
+
+			UniqueExprPtr init_expr = nullptr;
+			if (Consume(TokenKind::equal))
+			{
+				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
+					init_expr = ParseInitializerListExpression();
+				else init_expr = ParseAssignmentExpression();
+			}
+
+			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
+			var_decl_list.push_back(std::move(var_decl));
+
+		} while (!Consume(TokenKind::semicolon));
+
+		return var_decl_list;
+	}
+
 	UniqueMemberVariableDeclPtrList Parser::ParseMemberVariableDeclaration()
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
@@ -229,48 +265,20 @@ namespace wave
 			SourceLocation const& loc = current_token->GetLocation();
 			std::string_view name = current_token->GetIdentifier(); ++current_token;
 
-			UniqueMemberVariableDeclPtr var_decl = sema->ActOnMemberVariableDecl(name, loc, variable_type, visibility);
+			UniqueExprPtr init_expr = nullptr;
+			if (Consume(TokenKind::equal))
+			{
+				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
+					init_expr = ParseInitializerListExpression();
+				else init_expr = ParseAssignmentExpression();
+			}
+
+			UniqueMemberVariableDeclPtr var_decl = sema->ActOnMemberVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 			member_var_decl_list.push_back(std::move(var_decl));
 
 		} while (!Consume(TokenKind::semicolon));
 
 		return member_var_decl_list;
-	}
-
-	UniqueVariableDeclPtrList Parser::ParseVariableDeclaration()
-	{
-		DeclVisibility visibility = DeclVisibility::None;
-		if (sema->ctx.decl_sym_table.IsGlobal())
-		{
-			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
-		}
-		
-		UniqueVariableDeclPtrList var_decl_list;
-		QualType variable_type{};
-		ParseTypeQualifier(variable_type);
-		ParseTypeSpecifier(variable_type);
-		do 
-		{
-			if (!var_decl_list.empty()) Expect(TokenKind::comma);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-			SourceLocation const& loc = current_token->GetLocation();
-			std::string_view name = current_token->GetIdentifier(); ++current_token;
-
-			UniqueExprPtr init_expr = nullptr;
-			if (Consume(TokenKind::equal))
-			{
-				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
-					 init_expr = ParseInitializerListExpression();
-				else init_expr = ParseAssignmentExpression();
-			}
-
-			UniqueVariableDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
-			var_decl_list.push_back(std::move(var_decl));
-
-		} while (!Consume(TokenKind::semicolon));
-
-		return var_decl_list;
 	}
 
 	UniqueDeclPtrList Parser::ParseExternVariableDeclaration()
@@ -1078,8 +1086,8 @@ namespace wave
 		{
 		case TokenKind::KW_var:   break;
 		case TokenKind::KW_void:  type.SetType(builtin_types::Void);  break;
-		case TokenKind::KW_bool:  type.SetType(builtin_types::Bool);	 break;
-		case TokenKind::KW_char:  type.SetType(builtin_types::Char);	 break;
+		case TokenKind::KW_bool:  type.SetType(builtin_types::Bool);  break;
+		case TokenKind::KW_char:  type.SetType(builtin_types::Char);  break;
 		case TokenKind::KW_int:   type.SetType(builtin_types::Int);   break;
 		case TokenKind::KW_float: type.SetType(builtin_types::Float); break;
 		case TokenKind::identifier:
@@ -1096,6 +1104,10 @@ namespace wave
 					bool const is_const = type.IsConst();
 					type = tag_decl->GetType();
 					if (is_const) type.AddConst();
+				}
+				else if (tag_decl->GetDeclKind() == DeclKind::Class)
+				{
+					WAVE_ASSERT_MSG(false, "todo");
 				}
 				else Diag(invalid_type_specifier);
 			}
