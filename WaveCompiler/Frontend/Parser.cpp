@@ -952,7 +952,7 @@ namespace wave
 		{
 			++current_token;
 			UniqueExprPtr member_expr = ParseExpression();
-			expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(member_expr)); 
+			expr = sema->ActOnMemberAccessExpr(loc, std::move(expr), std::move(member_expr)); 
 			return expr;
 		}
 		}

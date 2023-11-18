@@ -16,7 +16,7 @@ class Foo
 public int main()
 {	
 	Foo foo; 
-	PrintInt(foo.x);
+   //PrintInt(foo.x);
    //foo.Init(5);
    //int fooX = foo.GetX();
    //PrintInt(fooX);

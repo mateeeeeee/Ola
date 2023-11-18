@@ -297,6 +297,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		
 	private:
 		UniqueMemberVariableDeclPtrList member_variables;
 		UniqueMemberFunctionDeclPtrList member_functions;
@@ -977,6 +978,7 @@ namespace wave
 
 	class MemberAccessExpr final : public Expr
 	{
+	public:
 		explicit MemberAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc)
 		{
 			SetValueCategory(ExprValueCategory::LValue);

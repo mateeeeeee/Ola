@@ -806,7 +806,39 @@ namespace wave
 
 	UniqueMemberAccessExprPtr Sema::ActOnMemberAccessExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr)
 	{
-		return nullptr;
+		if (!IsClassType(class_expr->GetType()))
+		{
+			diagnostics.Report(loc, subscripted_value_not_array);
+			return nullptr;
+		}
+
+		ClassType const& class_type = type_cast<ClassType>(class_expr->GetType());
+		ClassDecl const* class_decl = class_type.GetClassDecl();
+		QualType const& member_type = member_expr->GetType();
+
+		bool member_is_decl_ref = member_expr->GetExprKind() == ExprKind::DeclRef;
+		bool member_is_function_call = member_expr->GetExprKind() == ExprKind::FunctionCall;
+		if (!member_is_decl_ref && !member_is_function_call)
+		{
+			diagnostics.Report(loc, invalid_member_access);
+			return nullptr;
+		}
+
+		if (member_is_decl_ref)
+		{
+			DeclRefExpr* member_var_ref = ast_cast<DeclRefExpr>(member_expr.get());
+		}
+		else if (member_is_function_call)
+		{
+			FunctionCallExpr* member_func_ref = ast_cast<FunctionCallExpr>(member_expr.get());
+		}
+
+
+		UniqueMemberAccessExprPtr array_access_expr = MakeUnique<MemberAccessExpr>(loc);
+		array_access_expr->SetClassExpr(std::move(class_expr));
+		array_access_expr->SetMemberExpr(std::move(member_expr));
+		array_access_expr->SetType(member_type);
+		return array_access_expr;
 	}
 
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)
