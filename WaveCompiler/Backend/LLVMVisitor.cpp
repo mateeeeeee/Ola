@@ -158,6 +158,24 @@ namespace wave
 					llvm_value_map[&var_decl] = global_var;
 				}
 			}
+			else if (IsClassType(var_type))
+			{
+				ClassType const& class_type = type_cast<ClassType>(var_type);
+				ClassDecl const* class_decl = class_type.GetClassDecl();
+
+				UniqueMemberVariableDeclPtrList const& member_vars = class_decl->GetMemberVariables();
+				std::vector<llvm::Constant*> initializers; initializers.reserve(member_vars.size());
+				for (uint64 i = 0; i < member_vars.size(); ++i)
+				{
+					member_vars[i]->Accept(*this);
+					initializers.push_back(cast<llvm::Constant>(llvm_value_map[member_vars[i].get()]));
+				}
+
+				llvm::StructType* llvm_struct_type = cast<llvm::StructType>(llvm_type);
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 
+																		 llvm::ConstantStruct::get(llvm_struct_type, initializers), var_decl.GetName());
+				llvm_value_map[&var_decl] = global_var;
+			}
 			else
 			{
 				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(llvm_type);
@@ -231,11 +249,43 @@ namespace wave
 					llvm_value_map[&var_decl] = alloc;
 				}
 			}
+			else if (IsClassType(var_type))
+			{
+				QualType const& var_type = var_decl.GetType();
+				ClassType const& class_type = type_cast<ClassType>(var_type);
+				ClassDecl const* class_decl = class_type.GetClassDecl();
+
+				llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
+				llvm_value_map[&var_decl] = struct_alloc;
+
+				UniqueMemberVariableDeclPtrList  const& member_vars = class_decl->GetMemberVariables();
+				for (uint64 i = 0; i < member_vars.size(); ++i)
+				{
+					member_vars[i]->Accept(*this);
+					llvm::Value* member_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
+					Store(llvm_value_map[member_vars[i].get()], member_ptr);
+				}
+			}
+			
 		}
 	}
 
 	void LLVMVisitor::Visit(MemberVariableDecl const& member_var, uint32)
 	{
+		QualType const& var_type = member_var.GetType();
+		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
+
+		if (Expr const* init_expr = member_var.GetInitExpr())
+		{
+			init_expr->Accept(*this);
+			llvm::Value* init_value = llvm_value_map[init_expr];
+			WAVE_ASSERT(isa<llvm::Constant>(init_value));
+			llvm_value_map[&member_var] = cast<llvm::Constant>(init_value);
+		}
+		else
+		{
+			llvm_value_map[&member_var] = llvm::Constant::getNullValue(llvm_type);
+		}
 	}
 
 	void LLVMVisitor::Visit(ParamVariableDecl const& param_var, uint32)
@@ -265,7 +315,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(ClassDecl const&, uint32)
 	{
-		//todo
+
 	}
 
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
@@ -953,6 +1003,11 @@ namespace wave
 		}
 	}
 
+	void LLVMVisitor::Visit(MemberAccessExpr const& member_access, uint32)
+	{
+		//todo
+	}
+
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
 		if (IsBoolean(condition_value->getType()))
@@ -1008,8 +1063,18 @@ namespace wave
 			return llvm::FunctionType::get(return_type, param_types, false);
 		}
 		case TypeKind::Class:
-			WAVE_ASSERT_MSG(false, "Not supported yet");
-			break;
+		{
+			ClassType const& class_type = type_cast<ClassType>(type);
+			ClassDecl const* class_decl = class_type.GetClassDecl();
+			llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
+
+			UniqueMemberVariableDeclPtrList const& member_variables = class_decl->GetMemberVariables();
+			std::vector<llvm::Type*> llvm_member_types; llvm_member_types.reserve(member_variables.size());
+			for (auto const& member_var : member_variables) llvm_member_types.push_back(ConvertToLLVMType(member_var->GetType()));
+			llvm_class_type->setBody(llvm_member_types, false);
+
+			return llvm_class_type;
+		}
 		default:
 			WAVE_UNREACHABLE();
 		}

@@ -244,6 +244,14 @@ namespace wave
 		array_expr->Accept(visitor, depth + 1);
 		bracket_expr->Accept(visitor, depth + 1);
 	}
+	void MemberAccessExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		WAVE_ASSERT(class_expr && member_expr);
+		visitor.Visit(*this, depth);
+		class_expr->Accept(visitor, depth + 1);
+		member_expr->Accept(visitor, depth + 1);
+	}
+
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
 	{
@@ -421,6 +429,10 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 	void ArrayAccessExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void MemberAccessExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

@@ -38,8 +38,6 @@ namespace wave
 
 	UniqueMemberVariableDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
-		if (ctx.ignore_member_decls) return nullptr;
-
 		return ActOnVariableDeclCommon<MemberVariableDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
 
@@ -90,8 +88,6 @@ namespace wave
 
 	UniqueMemberFunctionDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
 	{
-		if (ctx.ignore_member_decls) return nullptr;
-
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -806,6 +802,11 @@ namespace wave
 		array_access_expr->SetIndexExpr(std::move(index_expr));
 		array_access_expr->SetType(array_type.GetBaseType());
 		return array_access_expr;
+	}
+
+	UniqueMemberAccessExprPtr Sema::ActOnMemberAccessExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr)
+	{
+		return nullptr;
 	}
 
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)

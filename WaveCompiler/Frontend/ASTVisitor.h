@@ -55,5 +55,6 @@ namespace wave
 		virtual void Visit(FunctionCallExpr const&, uint32) {}
 		virtual void Visit(InitializerListExpr const&, uint32) {}
 		virtual void Visit(ArrayAccessExpr const&, uint32) {}
+		virtual void Visit(MemberAccessExpr const&, uint32) {}
 	};
 }

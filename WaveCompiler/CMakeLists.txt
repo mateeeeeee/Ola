@@ -69,6 +69,7 @@ add_executable(WaveCompiler main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILIT
 set_target_properties(WaveCompiler PROPERTIES OUTPUT_NAME Wave)
 
 source_group(" " 		FILES main.cpp)
+source_group("autogen" 	FILES autogen/WaveConfig.h)
 source_group("Core"     FILES ${CORE_FILES})
 source_group("Utility"  FILES ${UTILITY_FILES})
 source_group("Frontend" FILES ${FRONTEND_FILES})

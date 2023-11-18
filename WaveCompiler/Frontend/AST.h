@@ -975,6 +975,33 @@ namespace wave
 		UniqueExprPtr bracket_expr;
 	};
 
+	class MemberAccessExpr final : public Expr
+	{
+		explicit MemberAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc)
+		{
+			SetValueCategory(ExprValueCategory::LValue);
+		}
+
+		void SetClassExpr(UniqueExprPtr&& _class_expr)
+		{
+			class_expr = std::move(_class_expr);
+		}
+		void SetMemberExpr(UniqueExprPtr&& _member_expr)
+		{
+			member_expr = std::move(_member_expr);
+		}
+
+		Expr const* GetClassExpr() const { return class_expr.get(); }
+		Expr const* GetMemberExpr() const { return member_expr.get(); }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueExprPtr class_expr;
+		UniqueExprPtr member_expr;
+	};
+
 	struct AST
 	{
 		AST() { translation_unit = std::make_unique<TranslationUnit>(); }

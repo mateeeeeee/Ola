@@ -298,6 +298,7 @@ Currently there is only one built-in alias is: `alias string = char[]`.
 - `return`
 - `enum`
 - `class`
+- `this`
 - `const`
 - `bool`
 - `char`

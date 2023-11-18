@@ -16,17 +16,14 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 32
-	.seh_stackalloc 32
+	sub	rsp, 16
+	.seh_stackalloc 16
 	.seh_endprologue
-	mov	qword ptr [rsp], 1
-	mov	qword ptr [rsp + 8], 2
-	mov	qword ptr [rsp + 16], 3
-	mov	qword ptr [rsp], 10
-	mov	qword ptr [rsp + 24], 0
+	mov	qword ptr [rsp], 5
+	mov	qword ptr [rsp + 8], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 24]
-	add	rsp, 32
+	mov	rax, qword ptr [rsp + 8]
+	add	rsp, 16
 	ret
 	.seh_endproc
                                         # -- End function

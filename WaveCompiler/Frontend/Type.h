@@ -231,6 +231,30 @@ namespace wave
 		std::vector<FunctionParameter> params;
 	};
 
+	class ClassDecl;
+	class ClassType : public Type
+	{
+	public:
+		explicit ClassType(ClassDecl const* class_decl) 
+			: Type{ TypeKind::Class, 0, 0 }, class_decl(class_decl) {}
+
+		virtual bool IsAssignableFrom(Type const& other) const override
+		{
+			return IsSameAs(other);
+		}
+		virtual bool IsSameAs(Type const& other) const override
+		{
+			if (other.GetKind() != TypeKind::Class) return false;
+			ClassType const& class_type = type_cast<ClassType>(other);
+			return class_decl == class_type.GetClassDecl();
+		}
+
+		ClassDecl const* GetClassDecl() const { return class_decl; }
+
+	private:
+		ClassDecl const* class_decl;
+	};
+
 	namespace builtin_types
 	{
 		static constexpr VoidType  Void  = VoidType();

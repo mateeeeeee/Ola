@@ -317,4 +317,10 @@ namespace wave
 	{
 		WAVE_DEBUG("{}ArrayAccessExpr\n", GetIndentation(depth));
 	}
+
+	void DebugVisitor::Visit(MemberAccessExpr const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}MemberAccessExpr\n", GetIndentation(depth));
+	}
+
 }
