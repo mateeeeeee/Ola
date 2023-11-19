@@ -49,7 +49,7 @@ namespace wave
 	class FunctionCallExpr;
 	class InitializerListExpr;
 	class ArrayAccessExpr;
-	class MemberAccessExpr;
+	class MemberExpr;
 
 	struct AST;
 }

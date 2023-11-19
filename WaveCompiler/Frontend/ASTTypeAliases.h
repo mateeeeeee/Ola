@@ -60,7 +60,7 @@ namespace wave
 	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
 	using UniqueInitializerListExprPtr = UniquePtr<InitializerListExpr>;
 	using UniqueArrayAccessExprPtr	= UniquePtr<ArrayAccessExpr>;
-	using UniqueMemberAccessExprPtr	= UniquePtr<MemberAccessExpr>;
+	using UniqueMemberExprPtr		= UniquePtr<MemberExpr>;
 
 	using UniqueEnumMemberDeclPtrList	  = std::vector<UniqueEnumMemberDeclPtr>;
 	using UniqueVariableDeclPtrList		  = std::vector<UniqueVariableDeclPtr>;

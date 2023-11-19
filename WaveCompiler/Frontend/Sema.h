@@ -31,6 +31,7 @@ namespace wave
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
 
+			Expr const* current_class_expr = nullptr;
 			class QualType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 
@@ -97,7 +98,7 @@ namespace wave
 		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
-		UniqueMemberAccessExprPtr ActOnMemberAccessExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr);
+		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr);
 
 	private:
 		Diagnostics& diagnostics;

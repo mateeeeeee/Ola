@@ -951,8 +951,10 @@ namespace wave
 		case TokenKind::period:
 		{
 			++current_token;
-			UniqueExprPtr member_expr = ParseExpression();
-			expr = sema->ActOnMemberAccessExpr(loc, std::move(expr), std::move(member_expr)); 
+			sema->ctx.current_class_expr = expr.get();
+			UniqueExprPtr member_expr = ParsePostFixExpression();
+			sema->ctx.current_class_expr = nullptr;
+			expr = sema->ActOnMemberExpr(loc, std::move(expr), std::move(member_expr)); 
 			return expr;
 		}
 		}

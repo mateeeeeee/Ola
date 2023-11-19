@@ -6,7 +6,7 @@ class Foo
 		x = y;
 	}
 	
-	public int GetX() const {return x;}
+	public int GetX() const {return x; }
 
 	public int x = 5;
 };
@@ -15,7 +15,9 @@ class Foo
 
 public int main()
 {	
-	Foo foo; 
+   Foo foo;
+   //int myX = foo.GetX();
+   //foo.x = 10;
    //PrintInt(foo.x);
    //foo.Init(5);
    //int fooX = foo.GetX();

@@ -1003,9 +1003,11 @@ namespace wave
 		}
 	}
 
-	void LLVMVisitor::Visit(MemberAccessExpr const& member_access, uint32)
+	void LLVMVisitor::Visit(MemberExpr const& member_access, uint32)
 	{
-		//todo
+		Expr const* class_expr = member_access.GetClassExpr();
+		//Expr const* member_expr = member_access.GetMemberExpr();
+		class_expr->Accept(*this);
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)

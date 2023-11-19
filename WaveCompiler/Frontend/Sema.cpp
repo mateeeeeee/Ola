@@ -628,7 +628,7 @@ namespace wave
 
 		DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
 		Decl const* decl = decl_ref->GetDecl();
-		if (decl->GetDeclKind() != DeclKind::Function)
+		if (decl->GetDeclKind() != DeclKind::Function && decl->GetDeclKind() != DeclKind::MemberFunction)
 		{
 			diagnostics.Report(loc, invalid_function_call);
 			return nullptr;
@@ -721,6 +721,27 @@ namespace wave
 			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 			return decl_ref;
 		}
+		else if (Expr const* current_class_expr = ctx.current_class_expr)
+		{
+			QualType const& class_expr_type = current_class_expr->GetType();
+			ClassType const* class_type = dynamic_type_cast<ClassType>(class_expr_type);
+			if (!class_type)
+			{
+				diagnostics.Report(loc, invalid_member_access);
+				return nullptr;
+			}
+			ClassDecl const* class_decl = class_type->GetClassDecl();
+			if (Decl* class_member_decl = class_decl->FindDecl(name))
+			{
+				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
+				return decl_ref;
+			}
+			else
+			{
+				diagnostics.Report(loc, invalid_member_access);
+				return nullptr;
+			}
+		}
 		else
 		{
 			diagnostics.Report(loc, undeclared_identifier, name);
@@ -804,7 +825,7 @@ namespace wave
 		return array_access_expr;
 	}
 
-	UniqueMemberAccessExprPtr Sema::ActOnMemberAccessExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr)
+	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr)
 	{
 		if (!IsClassType(class_expr->GetType()))
 		{
@@ -816,27 +837,8 @@ namespace wave
 		ClassDecl const* class_decl = class_type.GetClassDecl();
 		QualType const& member_type = member_expr->GetType();
 
-		bool member_is_decl_ref = member_expr->GetExprKind() == ExprKind::DeclRef;
-		bool member_is_function_call = member_expr->GetExprKind() == ExprKind::FunctionCall;
-		if (!member_is_decl_ref && !member_is_function_call)
-		{
-			diagnostics.Report(loc, invalid_member_access);
-			return nullptr;
-		}
-
-		if (member_is_decl_ref)
-		{
-			DeclRefExpr* member_var_ref = ast_cast<DeclRefExpr>(member_expr.get());
-		}
-		else if (member_is_function_call)
-		{
-			FunctionCallExpr* member_func_ref = ast_cast<FunctionCallExpr>(member_expr.get());
-		}
-
-
-		UniqueMemberAccessExprPtr array_access_expr = MakeUnique<MemberAccessExpr>(loc);
+		UniqueMemberExprPtr array_access_expr = MakeUnique<MemberExpr>(loc);
 		array_access_expr->SetClassExpr(std::move(class_expr));
-		array_access_expr->SetMemberExpr(std::move(member_expr));
 		array_access_expr->SetType(member_type);
 		return array_access_expr;
 	}

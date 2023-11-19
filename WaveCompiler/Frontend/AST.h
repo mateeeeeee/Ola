@@ -74,6 +74,7 @@ namespace wave
 		bool IsExtern() const { return visibility == DeclVisibility::Extern; }
 
 		virtual bool IsTag() const { return false; }
+		virtual bool IsMember() const { return false; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -147,6 +148,8 @@ namespace wave
 		}
 		ClassDecl const* GetParentDecl() const { return parent; }
 
+		virtual bool IsMember() const override { return true; }
+
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
@@ -205,6 +208,8 @@ namespace wave
 
 		void SetConst(bool _is_const) { is_const = _is_const; }
 		bool IsConst() const { return is_const; }
+
+		virtual bool IsMember() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -297,7 +302,25 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		
+		Decl* FindDecl(std::string_view name) const
+		{
+			for (uint32 i = 0; i < member_variables.size(); ++i)
+			{
+				if (member_variables[i]->GetName().compare(name) == 0)
+				{
+					return member_variables[i].get();
+				}
+			}
+			for (uint32 i = 0; i < member_functions.size(); ++i)
+			{
+				if (member_functions[i]->GetName().compare(name) == 0)
+				{
+					return member_functions[i].get();
+				}
+			}
+			return nullptr;
+		}
+
 	private:
 		UniqueMemberVariableDeclPtrList member_variables;
 		UniqueMemberFunctionDeclPtrList member_functions;
@@ -638,7 +661,8 @@ namespace wave
 		DeclRef,
 		ImplicitCast,
 		InitializerList,
-		ArrayAccess
+		ArrayAccess, 
+		Member
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -902,7 +926,7 @@ namespace wave
 		UniqueExprPtr operand;
 	};
 
-	class FunctionCallExpr final : public Expr
+	class FunctionCallExpr : public Expr
 	{
 	public:
 		FunctionCallExpr(SourceLocation const& loc, std::string_view function_name)
@@ -976,10 +1000,10 @@ namespace wave
 		UniqueExprPtr bracket_expr;
 	};
 
-	class MemberAccessExpr final : public Expr
+	class MemberExpr final : public Expr
 	{
 	public:
-		explicit MemberAccessExpr(SourceLocation const& loc) : Expr(ExprKind::ArrayAccess, loc)
+		explicit MemberExpr(SourceLocation const& loc) : Expr(ExprKind::Member, loc), decl(nullptr)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
@@ -988,20 +1012,20 @@ namespace wave
 		{
 			class_expr = std::move(_class_expr);
 		}
-		void SetMemberExpr(UniqueExprPtr&& _member_expr)
-		{
-			member_expr = std::move(_member_expr);
-		}
-
 		Expr const* GetClassExpr() const { return class_expr.get(); }
-		Expr const* GetMemberExpr() const { return member_expr.get(); }
+
+		void SetMemberDecl(MemberVariableDecl const* _decl)
+		{
+			decl = _decl;
+		}
+		MemberVariableDecl const* GetMemberDecl() const { return decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr class_expr;
-		UniqueExprPtr member_expr;
+		MemberVariableDecl const* decl;
 	};
 
 	struct AST
