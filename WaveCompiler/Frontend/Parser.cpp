@@ -155,7 +155,7 @@ namespace wave
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility);
 	}
 
-	UniqueMemberFunctionDeclPtr Parser::ParseMemberFunctionDefinition(bool first_pass)
+	UniqueMethodDeclPtr Parser::ParseMemberFunctionDefinition(bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
 		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
@@ -264,13 +264,13 @@ namespace wave
 		return var_decl_list;
 	}
 
-	UniqueMemberVariableDeclPtrList Parser::ParseMemberVariableDeclaration(bool first_pass)
+	UniqueFieldDeclPtrList Parser::ParseMemberVariableDeclaration(bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
 		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
 		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
 
-		UniqueMemberVariableDeclPtrList member_var_decl_list;
+		UniqueFieldDeclPtrList member_var_decl_list;
 		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
 		ParseTypeSpecifier(variable_type);
@@ -290,7 +290,7 @@ namespace wave
 			}
 			if (first_pass)
 			{
-				UniqueMemberVariableDeclPtr var_decl = sema->ActOnMemberVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
+				UniqueFieldDeclPtr var_decl = sema->ActOnMemberVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 				member_var_decl_list.push_back(std::move(var_decl));
 			}
 		} while (!Consume(TokenKind::semicolon));
@@ -386,8 +386,8 @@ namespace wave
 			++current_token;
 		}
 
-		UniqueMemberVariableDeclPtrList member_variables;
-		UniqueMemberFunctionDeclPtrList member_functions;
+		UniqueFieldDeclPtrList member_variables;
+		UniqueMethodDeclPtrList member_functions;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
@@ -401,12 +401,12 @@ namespace wave
 						bool is_function_declaration = IsFunctionDeclaration();
 						if (is_function_declaration)
 						{
-							UniqueMemberFunctionDeclPtr member_function = ParseMemberFunctionDefinition(first_pass);
+							UniqueMethodDeclPtr member_function = ParseMemberFunctionDefinition(first_pass);
 							if(!first_pass) member_functions.push_back(std::move(member_function));
 						}
 						else 
 						{
-							UniqueMemberVariableDeclPtrList var_decls = ParseMemberVariableDeclaration(first_pass);
+							UniqueFieldDeclPtrList var_decls = ParseMemberVariableDeclaration(first_pass);
 							if (first_pass) for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
 						}
 					}
@@ -902,62 +902,67 @@ namespace wave
 		return sema->ActOnUnaryExpr(unary_kind, loc, std::move(operand));
 	}
 
+	//foo.bars[10].x = 10;
 	UniqueExprPtr Parser::ParsePostFixExpression()
 	{
 		UniqueExprPtr expr = ParsePrimaryExpression();
 		SourceLocation loc = current_token->GetLocation();
-		switch (current_token->GetKind())
+
+		while (true)
 		{
-		case TokenKind::left_round:
-		{
-			++current_token;
-			UniqueExprPtrList args;
-			if (!Consume(TokenKind::right_round))
+			switch (current_token->GetKind())
 			{
-				while (true)
+			case TokenKind::left_round:
+			{
+				++current_token;
+				UniqueExprPtrList args;
+				if (!Consume(TokenKind::right_round))
 				{
-					UniqueExprPtr arg_expr = ParseAssignmentExpression();
-					args.push_back(std::move(arg_expr));
-					if (Consume(TokenKind::right_round)) break;
-					Expect(TokenKind::comma);
+					while (true)
+					{
+						UniqueExprPtr arg_expr = ParseAssignmentExpression();
+						args.push_back(std::move(arg_expr));
+						if (Consume(TokenKind::right_round)) break;
+						Expect(TokenKind::comma);
+					}
 				}
+				expr = sema->ActOnFunctionCallExpr(loc, std::move(expr), std::move(args));
 			}
-			return sema->ActOnFunctionCallExpr(loc, std::move(expr), std::move(args));
-		}
-		case TokenKind::plus_plus:
-		{
-			++current_token;
-			return sema->ActOnUnaryExpr(UnaryExprKind::PostIncrement, loc, std::move(expr));
-		}
-		case TokenKind::minus_minus:
-		{
-			++current_token;
-			return sema->ActOnUnaryExpr(UnaryExprKind::PostDecrement, loc, std::move(expr));
-		}
-		case TokenKind::left_square:
-		{
-			++current_token;
-			UniqueExprPtr index_expr = ParseExpression();
-			Expect(TokenKind::right_square);
-			expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
-			while (Consume(TokenKind::left_square))
+			break;
+			case TokenKind::plus_plus:
 			{
-				index_expr = ParseExpression();
-				expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
-				Expect(TokenKind::right_square);
+				++current_token;
+				expr = sema->ActOnUnaryExpr(UnaryExprKind::PostIncrement, loc, std::move(expr));
 			}
-			return expr;
+			break;
+			case TokenKind::minus_minus:
+			{
+				++current_token;
+				expr = sema->ActOnUnaryExpr(UnaryExprKind::PostDecrement, loc, std::move(expr));
+			}
+			break;
+			case TokenKind::left_square:
+			{
+				++current_token;
+				UniqueExprPtr index_expr = ParseExpression();
+				Expect(TokenKind::right_square);
+				expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(index_expr));
+			}
+			break;
+			case TokenKind::period:
+			{
+				++current_token;
+				sema->ctx.current_class_expr_stack.push_back(expr.get());
+				UniqueDeclRefExprPtr member_identifier = ParseMemberIdentifier();
+				sema->ctx.current_class_expr_stack.pop_back();
+				expr = sema->ActOnMemberExpr(loc, std::move(expr), std::move(member_identifier));
+			}
+			break;
+			default:
+				return expr;
+			}
 		}
-		case TokenKind::period:
-		{
-			++current_token;
-			sema->ctx.current_class_expr = expr.get();
-			UniqueExprPtr member_expr = ParsePostFixExpression();
-			sema->ctx.current_class_expr = nullptr;
-			expr = sema->ActOnMemberExpr(loc, std::move(expr), std::move(member_expr)); 
-			return expr;
-		}
-		}
+
 		return expr;
 	}
 
@@ -1062,13 +1067,21 @@ namespace wave
 		return sema->ActOnConstantFloat(value, loc);
 	}
 
-	UniqueIdentifierExprPtr Parser::ParseIdentifier()
+	UniqueDeclRefExprPtr Parser::ParseIdentifier()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::identifier));
 		std::string_view name = current_token->GetIdentifier();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnIdentifier(name, loc);
+	}
+
+	UniqueDeclRefExprPtr Parser::ParseMemberIdentifier()
+	{
+		std::string_view name = current_token->GetIdentifier();
+		SourceLocation loc = current_token->GetLocation();
+		Expect(TokenKind::identifier);
+		return sema->ActOnMemberIdentifier(name, loc);
 	}
 
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()

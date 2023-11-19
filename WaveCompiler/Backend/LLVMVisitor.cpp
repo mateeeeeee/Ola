@@ -101,7 +101,7 @@ namespace wave
 		llvm_value_map[&function_decl] = llvm_function;
 	}
 
-	void LLVMVisitor::Visit(MemberFunctionDecl const& member_function, uint32)
+	void LLVMVisitor::Visit(MethodDecl const& member_function, uint32)
 	{
 		member_function.Accept(*this);
 	}
@@ -163,12 +163,12 @@ namespace wave
 				ClassType const& class_type = type_cast<ClassType>(var_type);
 				ClassDecl const* class_decl = class_type.GetClassDecl();
 
-				UniqueMemberVariableDeclPtrList const& member_vars = class_decl->GetMemberVariables();
-				std::vector<llvm::Constant*> initializers; initializers.reserve(member_vars.size());
-				for (uint64 i = 0; i < member_vars.size(); ++i)
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				std::vector<llvm::Constant*> initializers; initializers.reserve(fields.size());
+				for (uint64 i = 0; i < fields.size(); ++i)
 				{
-					member_vars[i]->Accept(*this);
-					initializers.push_back(cast<llvm::Constant>(llvm_value_map[member_vars[i].get()]));
+					fields[i]->Accept(*this);
+					initializers.push_back(cast<llvm::Constant>(llvm_value_map[fields[i].get()]));
 				}
 
 				llvm::StructType* llvm_struct_type = cast<llvm::StructType>(llvm_type);
@@ -258,19 +258,19 @@ namespace wave
 				llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 				llvm_value_map[&var_decl] = struct_alloc;
 
-				UniqueMemberVariableDeclPtrList  const& member_vars = class_decl->GetMemberVariables();
-				for (uint64 i = 0; i < member_vars.size(); ++i)
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				for (uint64 i = 0; i < fields.size(); ++i)
 				{
-					member_vars[i]->Accept(*this);
-					llvm::Value* member_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
-					Store(llvm_value_map[member_vars[i].get()], member_ptr);
+					fields[i]->Accept(*this);
+					llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
+					Store(llvm_value_map[fields[i].get()], field_ptr);
 				}
 			}
 			
 		}
 	}
 
-	void LLVMVisitor::Visit(MemberVariableDecl const& member_var, uint32)
+	void LLVMVisitor::Visit(FieldDecl const& member_var, uint32)
 	{
 		QualType const& var_type = member_var.GetType();
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
@@ -1006,8 +1006,19 @@ namespace wave
 	void LLVMVisitor::Visit(MemberExpr const& member_access, uint32)
 	{
 		Expr const* class_expr = member_access.GetClassExpr();
-		//Expr const* member_expr = member_access.GetMemberExpr();
+		Decl const* member_decl = member_access.GetMemberDecl();
 		class_expr->Accept(*this);
+		if (member_decl->GetDeclKind() == DeclKind::Field)
+		{
+			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+			llvm::Value* field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), llvm_value_map[class_expr], field_decl->GetFieldIndex());
+			llvm_value_map[&member_access] = field_value;
+		}
+		else if (member_decl->GetDeclKind() == DeclKind::Method)
+		{
+
+		}
+		else WAVE_ASSERT(false);
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
@@ -1070,7 +1081,7 @@ namespace wave
 			ClassDecl const* class_decl = class_type.GetClassDecl();
 			llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
 
-			UniqueMemberVariableDeclPtrList const& member_variables = class_decl->GetMemberVariables();
+			UniqueFieldDeclPtrList const& member_variables = class_decl->GetFields();
 			std::vector<llvm::Type*> llvm_member_types; llvm_member_types.reserve(member_variables.size());
 			for (auto const& member_var : member_variables) llvm_member_types.push_back(ConvertToLLVMType(member_var->GetType()));
 			llvm_class_type->setBody(llvm_member_types, false);

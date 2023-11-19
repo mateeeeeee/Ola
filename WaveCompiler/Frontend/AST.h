@@ -38,9 +38,9 @@ namespace wave
 	{
 		Variable,
 		ParamVariable,
-		MemberVariable,
+		Field,
 		Function,
-		MemberFunction,
+		Method,
 		Enum,
 		EnumMember,
 		Alias,
@@ -137,16 +137,21 @@ namespace wave
 		FunctionDecl const* parent = nullptr;
 	};
 
-	class MemberVariableDecl final : public VariableDecl
+	class FieldDecl final : public VariableDecl
 	{
 	public:
-		MemberVariableDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::MemberVariable, name, loc) {}
+		FieldDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::Field, name, loc) {}
 
 		void SetParentDecl(ClassDecl const* _parent)
 		{
 			parent = _parent;
 		}
 		ClassDecl const* GetParentDecl() const { return parent; }
+		void SetFieldIndex(uint32 i)
+		{
+			index = i;
+		}
+		uint32 GetFieldIndex() const { return index; }
 
 		virtual bool IsMember() const override { return true; }
 
@@ -155,6 +160,7 @@ namespace wave
 
 	private:
 		ClassDecl const* parent = nullptr;
+		uint32 index = -1;
 	};
 
 	class FunctionDecl : public Decl
@@ -195,10 +201,10 @@ namespace wave
 		FunctionDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
 	};
 
-	class MemberFunctionDecl final : public FunctionDecl
+	class MethodDecl final : public FunctionDecl
 	{
 	public:
-		MemberFunctionDecl(std::string_view name, SourceLocation const& loc) : FunctionDecl(DeclKind::MemberFunction, name, loc) {}
+		MethodDecl(std::string_view name, SourceLocation const& loc) : FunctionDecl(DeclKind::Method, name, loc) {}
 
 		void SetParentDecl(ClassDecl const* _parent)
 		{
@@ -285,19 +291,24 @@ namespace wave
 	public:
 		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
 
-		void SetMemberVariables(UniqueMemberVariableDeclPtrList&& _member_variables)
+		void SetFields(UniqueFieldDeclPtrList&& _member_variables)
 		{
 			member_variables = std::move(_member_variables);
-			for (auto& member_variable : member_variables) member_variable->SetParentDecl(this);
+			for (uint32 i = 0; i < member_variables.size(); ++i)
+			{
+				auto& member_variable = member_variables[i];
+				member_variable->SetParentDecl(this);
+				member_variable->SetFieldIndex(i);
+			}
 		}
-		UniqueMemberVariableDeclPtrList const& GetMemberVariables() const { return member_variables; }
-		void SetMemberFunctions(UniqueMemberFunctionDeclPtrList&& _member_functions)
+		UniqueFieldDeclPtrList const& GetFields() const { return member_variables; }
+		void SetMethods(UniqueMethodDeclPtrList&& _member_functions)
 		{
 			member_functions = std::move(_member_functions);
 			for (auto& member_function : member_functions) member_function->SetParentDecl(this);
 
 		}
-		UniqueMemberFunctionDeclPtrList const& GetMemberFunctions() const { return member_functions; }
+		UniqueMethodDeclPtrList const& GetMethods() const { return member_functions; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -322,8 +333,8 @@ namespace wave
 		}
 
 	private:
-		UniqueMemberVariableDeclPtrList member_variables;
-		UniqueMemberFunctionDeclPtrList member_functions;
+		UniqueFieldDeclPtrList member_variables;
+		UniqueMethodDeclPtrList member_functions;
 	};
 
 	enum class StmtKind : uint8
@@ -1014,18 +1025,18 @@ namespace wave
 		}
 		Expr const* GetClassExpr() const { return class_expr.get(); }
 
-		void SetMemberDecl(MemberVariableDecl const* _decl)
+		void SetMemberDecl(Decl const* _decl)
 		{
 			decl = _decl;
 		}
-		MemberVariableDecl const* GetMemberDecl() const { return decl; }
+		Decl const* GetMemberDecl() const { return decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:
 		UniqueExprPtr class_expr;
-		MemberVariableDecl const* decl;
+		Decl const* decl;
 	};
 
 	struct AST

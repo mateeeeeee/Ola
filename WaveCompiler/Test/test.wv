@@ -14,14 +14,14 @@ class Foo
 
 
 public int main()
-{	
-   Foo foo;
-   //int myX = foo.GetX();
-   //foo.x = 10;
-   //PrintInt(foo.x);
-   //foo.Init(5);
-   //int fooX = foo.GetX();
-   //PrintInt(fooX);
-   //Foo foo2 = foo;
-   return 0;
+{  
+	Foo foo;
+    foo.x = 10;
+    //int myX = foo.GetX();
+    //PrintInt(foo.x);
+    //foo.Init(5);
+    //int fooX = foo.GetX();
+    //PrintInt(fooX);
+    //Foo foo2 = foo;
+    return foo.x;
 }

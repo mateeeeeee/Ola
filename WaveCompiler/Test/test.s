@@ -20,7 +20,9 @@ main:                                   # @main
 	.seh_stackalloc 16
 	.seh_endprologue
 	mov	qword ptr [rsp], 5
-	mov	qword ptr [rsp + 8], 0
+	mov	qword ptr [rsp], 10
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rsp + 8], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 8]
 	add	rsp, 16

@@ -123,7 +123,7 @@ namespace wave
 		WAVE_DEBUG("{}ParamVariableDecl\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(MemberVariableDecl const&, uint32 depth)
+	void DebugVisitor::Visit(FieldDecl const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}MemberVariableDecl\n", GetIndentation(depth));
 	}
@@ -133,7 +133,7 @@ namespace wave
 		WAVE_DEBUG("{}FunctionDecl\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(MemberFunctionDecl const&, uint32 depth)
+	void DebugVisitor::Visit(MethodDecl const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}MemberFunctionDecl\n", GetIndentation(depth));
 	}

@@ -36,9 +36,9 @@ namespace wave
 		return param_decl;
 	}
 
-	UniqueMemberVariableDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	UniqueFieldDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
-		return ActOnVariableDeclCommon<MemberVariableDecl>(name, loc, type, std::move(init_expr), visibility);
+		return ActOnVariableDeclCommon<FieldDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
@@ -86,7 +86,7 @@ namespace wave
 		return function_decl;
 	}
 
-	UniqueMemberFunctionDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
+	UniqueMethodDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
 	{
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -95,7 +95,7 @@ namespace wave
 		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
 		WAVE_ASSERT(func_type);
 
-		UniqueMemberFunctionDeclPtr member_function_decl = MakeUnique<MemberFunctionDecl>(name, loc);
+		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
 		member_function_decl->SetType(type);
 		member_function_decl->SetConst(is_const);
 		member_function_decl->SetVisibility(visibility);
@@ -165,7 +165,7 @@ namespace wave
 		return alias_decl;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueMemberVariableDeclPtrList&& member_variables, UniqueMemberFunctionDeclPtrList&& member_functions)
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions)
 	{
 		//todo semantic analysis
 		if (ctx.tag_sym_table.LookUpCurrentScope(name))
@@ -173,8 +173,8 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 		UniqueClassDeclPtr class_decl = MakeUnique<ClassDecl>(name, loc);
-		class_decl->SetMemberVariables(std::move(member_variables));
-		class_decl->SetMemberFunctions(std::move(member_functions));
+		class_decl->SetFields(std::move(member_variables));
+		class_decl->SetMethods(std::move(member_functions));
 		ctx.tag_sym_table.Insert(class_decl.get());
 		return class_decl;
 	}
@@ -628,7 +628,7 @@ namespace wave
 
 		DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
 		Decl const* decl = decl_ref->GetDecl();
-		if (decl->GetDeclKind() != DeclKind::Function && decl->GetDeclKind() != DeclKind::MemberFunction)
+		if (decl->GetDeclKind() != DeclKind::Function && decl->GetDeclKind() != DeclKind::Method)
 		{
 			diagnostics.Report(loc, invalid_function_call);
 			return nullptr;
@@ -714,15 +714,25 @@ namespace wave
 		return MakeUnique<ConstantFloat>(value, loc);
 	}
 
-	UniqueIdentifierExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
+	UniqueDeclRefExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
 	{
 		if (Decl* decl = ctx.decl_sym_table.LookUp(name))
 		{
 			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 			return decl_ref;
 		}
-		else if (Expr const* current_class_expr = ctx.current_class_expr)
+		else
 		{
+			diagnostics.Report(loc, undeclared_identifier, name);
+			return nullptr;
+		}
+	}
+
+	UniqueDeclRefExprPtr Sema::ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc)
+	{
+		if (!ctx.current_class_expr_stack.empty())
+		{
+			Expr const* current_class_expr = ctx.current_class_expr_stack.back();
 			QualType const& class_expr_type = current_class_expr->GetType();
 			ClassType const* class_type = dynamic_type_cast<ClassType>(class_expr_type);
 			if (!class_type)
@@ -825,20 +835,23 @@ namespace wave
 		return array_access_expr;
 	}
 
-	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr)
+	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_expr)
 	{
 		if (!IsClassType(class_expr->GetType()))
 		{
 			diagnostics.Report(loc, subscripted_value_not_array);
 			return nullptr;
 		}
+		bool class_type_is_const = class_expr->GetType().IsConst();
 
 		ClassType const& class_type = type_cast<ClassType>(class_expr->GetType());
 		ClassDecl const* class_decl = class_type.GetClassDecl();
-		QualType const& member_type = member_expr->GetType();
+		QualType member_type = member_expr->GetType();
+		if (class_type_is_const) member_type.AddConst();
 
 		UniqueMemberExprPtr array_access_expr = MakeUnique<MemberExpr>(loc);
 		array_access_expr->SetClassExpr(std::move(class_expr));
+		array_access_expr->SetMemberDecl(member_expr->GetDecl());
 		array_access_expr->SetType(member_type);
 		return array_access_expr;
 	}

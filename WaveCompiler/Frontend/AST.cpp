@@ -45,7 +45,7 @@ namespace wave
 	{
 		visitor.Visit(*this, depth);
 	}
-	void MemberVariableDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void FieldDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -55,7 +55,7 @@ namespace wave
 		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
-	void MemberFunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void MethodDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
@@ -268,7 +268,7 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
-	void MemberVariableDecl::Accept(ASTVisitor& visitor) const
+	void FieldDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
@@ -276,7 +276,7 @@ namespace wave
 	{
 		visitor.Visit(*this, 0);
 	}
-	void MemberFunctionDecl::Accept(ASTVisitor& visitor) const
+	void MethodDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

@@ -7,10 +7,10 @@ namespace wave
 
 	class Decl;
 	class FunctionDecl;
-	class MemberFunctionDecl;
+	class MethodDecl;
 	class VariableDecl;
 	class ParamVariableDecl;
-	class MemberVariableDecl;
+	class FieldDecl;
 	class TagDecl;
 	class EnumDecl;
 	class EnumMemberDecl;

@@ -31,7 +31,7 @@ namespace wave
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
 
-			Expr const* current_class_expr = nullptr;
+			std::vector<Expr const*> current_class_expr_stack;
 			class QualType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 
@@ -52,13 +52,13 @@ namespace wave
 	private:
 
 		UniqueVariableDeclPtr       ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueMemberVariableDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueFieldDeclPtr ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
 		UniqueParamVariableDeclPtr  ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility);
-		UniqueMemberFunctionDeclPtr ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
+		UniqueMethodDeclPtr ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility, bool is_const);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
@@ -66,7 +66,7 @@ namespace wave
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
 		UniqueAliasDeclPtr ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, SourceLocation const& loc, 
-										  UniqueMemberVariableDeclPtrList&& member_variables, UniqueMemberFunctionDeclPtrList&& member_functions);
+										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
@@ -95,10 +95,11 @@ namespace wave
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
-		UniqueIdentifierExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
+		UniqueDeclRefExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
+		UniqueDeclRefExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
-		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueExprPtr&& member_expr);
+		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier);
 
 	private:
 		Diagnostics& diagnostics;

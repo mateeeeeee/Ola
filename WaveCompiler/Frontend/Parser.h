@@ -75,10 +75,10 @@ namespace wave
 		WAVE_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
-		WAVE_NODISCARD UniqueMemberFunctionDeclPtr ParseMemberFunctionDefinition(bool first_pass);
+		WAVE_NODISCARD UniqueMethodDeclPtr ParseMemberFunctionDefinition(bool first_pass);
 		WAVE_NODISCARD UniqueParamVariableDeclPtr ParseParamVariableDeclaration();
 		WAVE_NODISCARD UniqueVariableDeclPtrList ParseVariableDeclaration();
-		WAVE_NODISCARD UniqueMemberVariableDeclPtrList ParseMemberVariableDeclaration(bool first_pass);
+		WAVE_NODISCARD UniqueFieldDeclPtrList ParseMemberVariableDeclaration(bool first_pass);
 		WAVE_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 		WAVE_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		WAVE_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();
@@ -126,7 +126,8 @@ namespace wave
 		WAVE_NODISCARD UniqueConstantStringPtr ParseConstantString();
 		WAVE_NODISCARD UniqueConstantBoolPtr ParseConstantBool();
 		WAVE_NODISCARD UniqueConstantFloatPtr ParseConstantFloat();
-		WAVE_NODISCARD UniqueIdentifierExprPtr ParseIdentifier();
+		WAVE_NODISCARD UniqueDeclRefExprPtr ParseIdentifier();
+		WAVE_NODISCARD UniqueDeclRefExprPtr ParseMemberIdentifier();
 		WAVE_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
 		void ParseTypeQualifier(QualType& type);

@@ -18,10 +18,10 @@ namespace wave
 
 	using UniqueDeclPtr				  = UniquePtr<Decl>;
 	using UniqueFunctionDeclPtr		  = UniquePtr<FunctionDecl>;
-	using UniqueMemberFunctionDeclPtr = UniquePtr<MemberFunctionDecl>;
+	using UniqueMethodDeclPtr		  = UniquePtr<MethodDecl>;
 	using UniqueVariableDeclPtr		  = UniquePtr<VariableDecl>;
 	using UniqueParamVariableDeclPtr  = UniquePtr<ParamVariableDecl>;
-	using UniqueMemberVariableDeclPtr = UniquePtr<MemberVariableDecl>;
+	using UniqueFieldDeclPtr		  = UniquePtr<FieldDecl>;
 	using UniqueTagDeclPtr			  = UniquePtr<TagDecl>;
 	using UniqueEnumDeclPtr			  = UniquePtr<EnumDecl>;
 	using UniqueEnumMemberDeclPtr	  = UniquePtr<EnumMemberDecl>;
@@ -65,9 +65,9 @@ namespace wave
 	using UniqueEnumMemberDeclPtrList	  = std::vector<UniqueEnumMemberDeclPtr>;
 	using UniqueVariableDeclPtrList		  = std::vector<UniqueVariableDeclPtr>;
 	using UniqueParamVariableDeclPtrList  = std::vector<UniqueParamVariableDeclPtr>;
-	using UniqueMemberVariableDeclPtrList = std::vector<UniqueMemberVariableDeclPtr>;
+	using UniqueFieldDeclPtrList		  = std::vector<UniqueFieldDeclPtr>;
 	using UniqueFunctionDeclPtrList		  = std::vector<UniqueFunctionDeclPtr>;
-	using UniqueMemberFunctionDeclPtrList = std::vector<UniqueMemberFunctionDeclPtr>;
+	using UniqueMethodDeclPtrList		  = std::vector<UniqueMethodDeclPtr>;
 	using UniqueDeclPtrList				  = std::vector<UniqueDeclPtr>;
 	using UniqueStmtPtrList				  = std::vector<UniqueStmtPtr>;
 	using UniqueExprPtrList				  = std::vector<UniqueExprPtr>;
