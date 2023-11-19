@@ -36,12 +36,12 @@ namespace wave
 	{
 		WAVE_ASSERT(false);
 	}
-	void VariableDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void VarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		if (init_expr) init_expr->Accept(visitor, depth + 1);
 	}
-	void ParamVariableDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ParamVarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -227,7 +227,7 @@ namespace wave
 		visitor.Visit(*this, depth);
 		operand->Accept(visitor, depth + 1);
 	}
-	void FunctionCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	void CallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
@@ -250,7 +250,12 @@ namespace wave
 		visitor.Visit(*this, depth);
 		class_expr->Accept(visitor, depth + 1);
 	}
-
+	void MemberCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		member_expr->Accept(visitor, depth + 1);
+		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
+	}
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
 	{
@@ -260,11 +265,11 @@ namespace wave
 	{
 		WAVE_ASSERT(false);
 	}
-	void VariableDecl::Accept(ASTVisitor& visitor) const
+	void VarDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ParamVariableDecl::Accept(ASTVisitor& visitor) const
+	void ParamVarDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
@@ -419,7 +424,7 @@ namespace wave
 		WAVE_ASSERT(operand);
 		visitor.Visit(*this, 0);
 	}
-	void FunctionCallExpr::Accept(ASTVisitor& visitor) const
+	void CallExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
@@ -432,6 +437,10 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 	void MemberExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void MemberCallExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

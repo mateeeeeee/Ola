@@ -64,5 +64,5 @@ DIAG(too_few_args_to_function_call, error, "Too few arguments to function call")
 DIAG(incompatible_function_argument, error, "Incompatible function call argument")
 DIAG(invalid_operands, error, "Invalid operands")
 DIAG(invalid_member_access, error, "Invalid member access")
-DIAG(accessed_value_not_class, error, "Invalid class access")
+DIAG(private_member_access, error, "Accessing private member")
 #undef DIAG

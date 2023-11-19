@@ -14,8 +14,8 @@ namespace wave
 		virtual void Visit(Decl const&, uint32) {}
 		virtual void Visit(FunctionDecl const&, uint32) {}
 		virtual void Visit(MethodDecl const&, uint32) {}
-		virtual void Visit(VariableDecl const&, uint32) {}
-		virtual void Visit(ParamVariableDecl const&, uint32) {}
+		virtual void Visit(VarDecl const&, uint32) {}
+		virtual void Visit(ParamVarDecl const&, uint32) {}
 		virtual void Visit(FieldDecl const&, uint32) {}
 		virtual void Visit(TagDecl const&, uint32) {}
 		virtual void Visit(EnumDecl const&, uint32) {}
@@ -52,9 +52,10 @@ namespace wave
 		virtual void Visit(ConstantBool const&, uint32) {}
 		virtual void Visit(ConstantFloat const&, uint32) {}
 		virtual void Visit(ImplicitCastExpr const&, uint32) {}
-		virtual void Visit(FunctionCallExpr const&, uint32) {}
+		virtual void Visit(CallExpr const&, uint32) {}
 		virtual void Visit(InitializerListExpr const&, uint32) {}
 		virtual void Visit(ArrayAccessExpr const&, uint32) {}
 		virtual void Visit(MemberExpr const&, uint32) {}
+		virtual void Visit(MemberCallExpr const&, uint32) {}
 	};
 }

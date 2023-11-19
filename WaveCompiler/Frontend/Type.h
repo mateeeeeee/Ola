@@ -207,7 +207,7 @@ namespace wave
 		uint32 array_size = 0;
 	};
 
-	struct FunctionParameter
+	struct FunctionParams
 	{
 		std::string name = "";
 		QualType type;
@@ -215,7 +215,7 @@ namespace wave
 	class FunctionType : public Type
 	{
 	public:
-		explicit FunctionType(QualType const& return_type, std::vector<FunctionParameter> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
+		explicit FunctionType(QualType const& return_type, std::vector<FunctionParams> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
 		return_type(return_type), params(params){}
 
 		virtual bool IsAssignableFrom(Type const& other) const override
@@ -224,11 +224,11 @@ namespace wave
 		}
 
 		QualType const& GetReturnType() const { return return_type; }
-		std::span<FunctionParameter const> GetParameters() const { return params; }
+		std::span<FunctionParams const> GetParams() const { return params; }
 
 	private:
 		QualType return_type;
-		std::vector<FunctionParameter> params;
+		std::vector<FunctionParams> params;
 	};
 
 	class ClassDecl;

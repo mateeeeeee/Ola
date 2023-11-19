@@ -180,7 +180,7 @@ namespace wave
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetIdentifier(func_decl->GetName());
 				import_tokens.emplace_back(TokenKind::left_round);
-				std::span<FunctionParameter const> func_params = func_type.GetParameters();
+				std::span<FunctionParams const> func_params = func_type.GetParams();
 				for (auto const& param : func_params)
 				{
 					TypeToTokens(param.type, import_tokens);
@@ -190,7 +190,7 @@ namespace wave
 				import_tokens.emplace_back(TokenKind::right_round);
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
-			else if (VariableDecl const* var_decl = dynamic_ast_cast<VariableDecl>(decl))
+			else if (VarDecl const* var_decl = dynamic_ast_cast<VarDecl>(decl))
 			{
 				TypeToTokens(var_decl->GetType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);

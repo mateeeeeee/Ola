@@ -1,22 +1,29 @@
+import std.io;
 
 class Foo
 {
-	public void Init(int y) 
-	{
-		x = y;
-	}
+    public void PrintX()
+    {
+        PrintInt(x);
+    }
 	
 	public int GetX() const {return x; }
 
 	public int x = 5;
 };
 
+//todo for classes:
+//method calls
+//passing to functions and assignments
+//using this keyword
+
 
 
 public int main()
 {  
 	Foo foo;
-    foo.x = 10;
+    foo.PrintX();
+    //foo.x = 10;
     //int myX = foo.GetX();
     //PrintInt(foo.x);
     //foo.Init(5);

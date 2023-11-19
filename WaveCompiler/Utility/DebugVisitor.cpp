@@ -113,12 +113,12 @@ namespace wave
 		WAVE_DEBUG("{}Decl\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(VariableDecl const&, uint32 depth)
+	void DebugVisitor::Visit(VarDecl const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}VariableDecl\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ParamVariableDecl const&, uint32 depth)
+	void DebugVisitor::Visit(ParamVarDecl const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}ParamVariableDecl\n", GetIndentation(depth));
 	}
@@ -303,7 +303,7 @@ namespace wave
 		WAVE_DEBUG("{}ImplicitCastExpr\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(FunctionCallExpr const&, uint32 depth)
+	void DebugVisitor::Visit(CallExpr const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}FunctionCallExpr\n", GetIndentation(depth));
 	}
@@ -323,4 +323,8 @@ namespace wave
 		WAVE_DEBUG("{}MemberAccessExpr\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(MemberCallExpr const&, uint32 depth)
+	{
+		WAVE_DEBUG("{}MemberCallExpr\n", GetIndentation(depth));
+	}
 }

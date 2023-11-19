@@ -91,10 +91,10 @@ namespace wave
 			: decl_kind(decl_kind), name(name), source_loc(loc) {}
 	};
 
-	class VariableDecl : public Decl
+	class VarDecl : public Decl
 	{
 	public:
-		VariableDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Variable, name, loc) {}
+		VarDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Variable, name, loc) {}
 
 		void SetGlobal(bool _is_global)
 		{
@@ -116,13 +116,13 @@ namespace wave
 		bool is_global = false;
 
 	protected:
-		VariableDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
+		VarDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
 	};
 	
-	class ParamVariableDecl final : public VariableDecl
+	class ParamVarDecl final : public VarDecl
 	{
 	public:
-		ParamVariableDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::ParamVariable, name, loc) {}
+		ParamVarDecl(std::string_view name, SourceLocation const& loc) : VarDecl(DeclKind::ParamVariable, name, loc) {}
 		
 		void SetParentDecl(FunctionDecl const* _parent)
 		{
@@ -137,10 +137,10 @@ namespace wave
 		FunctionDecl const* parent = nullptr;
 	};
 
-	class FieldDecl final : public VariableDecl
+	class FieldDecl final : public VarDecl
 	{
 	public:
-		FieldDecl(std::string_view name, SourceLocation const& loc) : VariableDecl(DeclKind::Field, name, loc) {}
+		FieldDecl(std::string_view name, SourceLocation const& loc) : VarDecl(DeclKind::Field, name, loc) {}
 
 		void SetParentDecl(ClassDecl const* _parent)
 		{
@@ -169,7 +169,7 @@ namespace wave
 	public:
 		FunctionDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Function, name, loc) {}
 
-		void SetParamDecls(UniqueParamVariableDeclPtrList&& param_decls)
+		void SetParamDecls(UniqueParamVarDeclPtrList&& param_decls)
 		{
 			param_declarations = std::move(param_decls);
 			for (auto& param_decl : param_declarations) param_decl->SetParentDecl(this);
@@ -179,7 +179,7 @@ namespace wave
 			body_stmt = std::move(_body_stmt);
 		}
 
-		UniqueParamVariableDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
+		UniqueParamVarDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 
 		bool HasDefinition() const
@@ -193,7 +193,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&) const override;
 
 	protected:
-		UniqueParamVariableDeclPtrList param_declarations;
+		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
 
@@ -663,7 +663,7 @@ namespace wave
 		Unary,
 		Binary,
 		Ternary,
-		FunctionCall,
+		Call,
 		IntLiteral,
 		FloatLiteral,
 		StringLiteral,
@@ -673,7 +673,8 @@ namespace wave
 		ImplicitCast,
 		InitializerList,
 		ArrayAccess, 
-		Member
+		Member,
+		MemberCall
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -937,11 +938,11 @@ namespace wave
 		UniqueExprPtr operand;
 	};
 
-	class FunctionCallExpr : public Expr
+	class CallExpr : public Expr
 	{
 	public:
-		FunctionCallExpr(SourceLocation const& loc, std::string_view function_name)
-			: Expr(ExprKind::FunctionCall, loc), function_name(function_name) {}
+		CallExpr(SourceLocation const& loc, std::string_view function_name)
+			: Expr(ExprKind::Call, loc), function_name(function_name) {}
 
 		void SetArgs(UniqueExprPtrList&& args)
 		{
@@ -953,9 +954,13 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-	private:
+	protected:
 		std::string function_name;
 		UniqueExprPtrList func_args;
+
+	protected:
+		CallExpr(ExprKind kind, SourceLocation const& loc, std::string_view function_name) 
+			: Expr(kind, loc), function_name(function_name) {}
 	};
 
 	class InitializerListExpr final : public Expr
@@ -1037,6 +1042,25 @@ namespace wave
 	private:
 		UniqueExprPtr class_expr;
 		Decl const* decl;
+	};
+
+	class MemberCallExpr final : public CallExpr
+	{
+	public:
+		MemberCallExpr(SourceLocation const& loc, std::string_view function_name)
+			: CallExpr(ExprKind::MemberCall, loc, function_name) {}
+
+		void SetMemberExpr(UniqueExprPtr&& _member_expr)
+		{
+			member_expr = std::move(_member_expr);
+		}
+		Expr const* GetMemberExpr() const { return member_expr.get(); }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		UniqueExprPtr member_expr;
 	};
 
 	struct AST

@@ -8,8 +8,8 @@ namespace wave
 	class Decl;
 	class FunctionDecl;
 	class MethodDecl;
-	class VariableDecl;
-	class ParamVariableDecl;
+	class VarDecl;
+	class ParamVarDecl;
 	class FieldDecl;
 	class TagDecl;
 	class EnumDecl;
@@ -46,10 +46,11 @@ namespace wave
 	class ConstantBool;
 	class ConstantFloat;
 	class ImplicitCastExpr;
-	class FunctionCallExpr;
+	class CallExpr;
 	class InitializerListExpr;
 	class ArrayAccessExpr;
 	class MemberExpr;
+	class MemberCallExpr;
 
 	struct AST;
 }

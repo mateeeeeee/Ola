@@ -7,13 +7,13 @@ namespace wave
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
-	UniqueVariableDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
+	UniqueVarDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
-		return ActOnVariableDeclCommon<VariableDecl>(name, loc, type, std::move(init_expr), visibility);
+		return ActOnVariableDeclCommon<VarDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
 
-	UniqueParamVariableDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
+	UniqueParamVarDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -28,7 +28,7 @@ namespace wave
 			diagnostics.Report(loc, void_invalid_context);
 		}
 
-		UniqueParamVariableDeclPtr param_decl = MakeUnique<ParamVariableDecl>(name, loc);
+		UniqueParamVarDeclPtr param_decl = MakeUnique<ParamVarDecl>(name, loc);
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
 		param_decl->SetType(type);
@@ -36,13 +36,13 @@ namespace wave
 		return param_decl;
 	}
 
-	UniqueFieldDeclPtr Sema::ActOnMemberVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	UniqueFieldDeclPtr Sema::ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		return ActOnVariableDeclCommon<FieldDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
-												  UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
+												  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
 	{
 		bool is_extern = body_stmt == nullptr;
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
@@ -54,7 +54,7 @@ namespace wave
 		WAVE_ASSERT(func_type);
 		if (name == "main")
 		{
-			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParameters().empty())
+			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParams().empty())
 			{
 				diagnostics.Report(loc, invalid_main_function_declaration);
 			}
@@ -86,7 +86,7 @@ namespace wave
 		return function_decl;
 	}
 
-	UniqueMethodDeclPtr Sema::ActOnMemberFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVariableDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
+	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
 	{
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -258,7 +258,7 @@ namespace wave
 		return for_stmt;
 	}
 
-	UniqueForStmtPtr Sema::ActOnForeachStmt(SourceLocation const& loc, UniqueVariableDeclPtr&& var_decl, UniqueIdentifierExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt)
+	UniqueForStmtPtr Sema::ActOnForeachStmt(SourceLocation const& loc, UniqueVarDeclPtr&& var_decl, UniqueIdentifierExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt)
 	{
 		QualType arr_type = array_identifier->GetType();
 		ArrayType const* array_type = dynamic_type_cast<ArrayType>(arr_type);
@@ -270,7 +270,7 @@ namespace wave
 
 		static uint64 foreach_id = 0;
 		std::string foreach_index_name = "__foreach_index" + std::to_string(foreach_id++);
-		UniqueVariableDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, builtin_types::Int, ActOnConstantInt(0, loc), DeclVisibility::None);
+		UniqueVarDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, builtin_types::Int, ActOnConstantInt(0, loc), DeclVisibility::None);
 		
 		UniqueIdentifierExprPtr foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
 		UniqueExprPtr cond_expr = ActOnBinaryExpr(BinaryExprKind::Less, loc, std::move(foreach_index_identifier), ActOnConstantInt(array_type->GetArraySize(), loc));
@@ -618,54 +618,101 @@ namespace wave
 		return ternary_expr;
 	}
 
-	UniqueFunctionCallExprPtr Sema::ActOnFunctionCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
+	UniqueCallExprPtr Sema::ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
-		if (func_expr->GetExprKind() != ExprKind::DeclRef)
+		if (func_expr->GetExprKind() == ExprKind::DeclRef)
 		{
-			diagnostics.Report(loc, invalid_function_call);
-			return nullptr;
-		}
-
-		DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
-		Decl const* decl = decl_ref->GetDecl();
-		if (decl->GetDeclKind() != DeclKind::Function && decl->GetDeclKind() != DeclKind::Method)
-		{
-			diagnostics.Report(loc, invalid_function_call);
-			return nullptr;
-		}
-
-		QualType const& func_expr_type = decl->GetType();
-		WAVE_ASSERT(IsFunctionType(func_expr_type));
-		FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
-		std::span<FunctionParameter const> func_params = func_type.GetParameters();
-		if (args.size() != func_params.size())
-		{
-			if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
-			else diagnostics.Report(loc, too_few_args_to_function_call);
-			return nullptr;
-		}
-
-		for (uint64 i = 0; i < func_params.size(); ++i)
-		{
-			UniqueExprPtr& arg = args[i];
-			FunctionParameter const& func_param = func_params[i];
-			
-			if (!func_param.type->IsAssignableFrom(arg->GetType()))
+			DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
+			Decl const* decl = decl_ref->GetDecl();
+			if (decl->GetDeclKind() != DeclKind::Function)
 			{
-				diagnostics.Report(loc, incompatible_function_argument);
+				diagnostics.Report(loc, invalid_function_call);
 				return nullptr;
 			}
-			else if (!func_param.type->IsSameAs(arg->GetType()))
-			{
-				arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
-			}
-		}
 
-		std::string_view func_name = decl->GetName();
-		UniqueFunctionCallExprPtr func_call_expr = MakeUnique<FunctionCallExpr>(loc, func_name);
-		func_call_expr->SetType(func_type.GetReturnType());
-		func_call_expr->SetArgs(std::move(args));
-		return func_call_expr;
+			QualType const& func_expr_type = decl->GetType();
+			WAVE_ASSERT(IsFunctionType(func_expr_type));
+			FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
+			std::span<FunctionParams const> func_params = func_type.GetParams();
+			if (args.size() != func_params.size())
+			{
+				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+				else diagnostics.Report(loc, too_few_args_to_function_call);
+				return nullptr;
+			}
+
+			for (uint64 i = 0; i < func_params.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				FunctionParams const& func_param = func_params[i];
+
+				if (!func_param.type->IsAssignableFrom(arg->GetType()))
+				{
+					diagnostics.Report(loc, incompatible_function_argument);
+					return nullptr;
+				}
+				else if (!func_param.type->IsSameAs(arg->GetType()))
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
+				}
+			}
+
+			std::string_view func_name = decl->GetName();
+			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
+			func_call_expr->SetType(func_type.GetReturnType());
+			func_call_expr->SetArgs(std::move(args));
+			return func_call_expr;
+		}
+		else if (func_expr->GetExprKind() == ExprKind::Member)
+		{
+			MemberExpr const* member_expr = ast_cast<MemberExpr>(func_expr.get());
+			Decl const* decl = member_expr->GetMemberDecl();
+			if (decl->GetDeclKind() != DeclKind::Method)
+			{
+				diagnostics.Report(loc, invalid_function_call);
+				return nullptr;
+			}
+			MethodDecl const* method_decl = ast_cast<MethodDecl>(decl);
+
+			QualType const& method_type = decl->GetType();
+			WAVE_ASSERT(IsFunctionType(method_type));
+			FunctionType const& func_type = type_cast<FunctionType>(method_type);
+			std::span<FunctionParams const> func_params = func_type.GetParams();
+			if (args.size() != func_params.size())
+			{
+				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+				else diagnostics.Report(loc, too_few_args_to_function_call);
+				return nullptr;
+			}
+
+			for (uint64 i = 0; i < func_params.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				FunctionParams const& func_param = func_params[i];
+
+				if (!func_param.type->IsAssignableFrom(arg->GetType()))
+				{
+					diagnostics.Report(loc, incompatible_function_argument);
+					return nullptr;
+				}
+				else if (!func_param.type->IsSameAs(arg->GetType()))
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
+				}
+			}
+
+			std::string_view func_name = decl->GetName();
+			UniqueMemberCallExprPtr func_call_expr = MakeUnique<MemberCallExpr>(loc, func_name);
+			func_call_expr->SetType(func_type.GetReturnType());
+			func_call_expr->SetArgs(std::move(args));
+			func_call_expr->SetMemberExpr(std::move(func_expr));
+			return func_call_expr;
+		}
+		else
+		{
+			diagnostics.Report(loc, invalid_function_call);
+			return nullptr;
+		}
 	}
 
 	UniqueConstantIntPtr Sema::ActOnConstantInt(int64 value, SourceLocation const& loc)
@@ -835,23 +882,29 @@ namespace wave
 		return array_access_expr;
 	}
 
-	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_expr)
+	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier)
 	{
 		if (!IsClassType(class_expr->GetType()))
 		{
-			diagnostics.Report(loc, subscripted_value_not_array);
+			diagnostics.Report(loc, invalid_member_access);
 			return nullptr;
 		}
+		if (member_identifier->GetDecl()->IsPrivate())
+		{
+			diagnostics.Report(loc, private_member_access);
+			return nullptr;
+		}
+
 		bool class_type_is_const = class_expr->GetType().IsConst();
 
 		ClassType const& class_type = type_cast<ClassType>(class_expr->GetType());
 		ClassDecl const* class_decl = class_type.GetClassDecl();
-		QualType member_type = member_expr->GetType();
+		QualType member_type = member_identifier->GetType();
 		if (class_type_is_const) member_type.AddConst();
 
 		UniqueMemberExprPtr array_access_expr = MakeUnique<MemberExpr>(loc);
 		array_access_expr->SetClassExpr(std::move(class_expr));
-		array_access_expr->SetMemberDecl(member_expr->GetDecl());
+		array_access_expr->SetMemberDecl(member_identifier->GetDecl());
 		array_access_expr->SetType(member_type);
 		return array_access_expr;
 	}
@@ -870,7 +923,7 @@ namespace wave
 		return cast_expr;
 	}
 
-	template<typename Decl> requires std::is_base_of_v<VariableDecl, Decl>
+	template<typename Decl> requires std::is_base_of_v<VarDecl, Decl>
 	UniquePtr<Decl> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		bool const has_init = (init_expr != nullptr);

@@ -37,7 +37,6 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		
 		QualType const& type = function_decl.GetType();
 		WAVE_ASSERT(IsFunctionType(type));
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
@@ -101,12 +100,12 @@ namespace wave
 		llvm_value_map[&function_decl] = llvm_function;
 	}
 
-	void LLVMVisitor::Visit(MethodDecl const& member_function, uint32)
+	void LLVMVisitor::Visit(MethodDecl const& method_decl, uint32)
 	{
-		member_function.Accept(*this);
+		
 	}
 
-	void LLVMVisitor::Visit(VariableDecl const& var_decl, uint32)
+	void LLVMVisitor::Visit(VarDecl const& var_decl, uint32)
 	{
 		QualType const& var_type = var_decl.GetType();
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
@@ -288,7 +287,7 @@ namespace wave
 		}
 	}
 
-	void LLVMVisitor::Visit(ParamVariableDecl const& param_var, uint32)
+	void LLVMVisitor::Visit(ParamVarDecl const& param_var, uint32)
 	{
 	}
 
@@ -919,7 +918,7 @@ namespace wave
 		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
 
-	void LLVMVisitor::Visit(FunctionCallExpr const& func_call, uint32)
+	void LLVMVisitor::Visit(CallExpr const& func_call, uint32)
 	{
 		llvm::Function* called_function = module.getFunction(func_call.GetFunctionName());
 		WAVE_ASSERT(called_function);
@@ -1003,22 +1002,28 @@ namespace wave
 		}
 	}
 
-	void LLVMVisitor::Visit(MemberExpr const& member_access, uint32)
+	void LLVMVisitor::Visit(MemberExpr const& member_expr, uint32)
 	{
-		Expr const* class_expr = member_access.GetClassExpr();
-		Decl const* member_decl = member_access.GetMemberDecl();
+		Expr const* class_expr = member_expr.GetClassExpr();
+		Decl const* member_decl = member_expr.GetMemberDecl();
 		class_expr->Accept(*this);
 		if (member_decl->GetDeclKind() == DeclKind::Field)
 		{
 			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
 			llvm::Value* field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), llvm_value_map[class_expr], field_decl->GetFieldIndex());
-			llvm_value_map[&member_access] = field_value;
+			llvm_value_map[&member_expr] = field_value;
 		}
 		else if (member_decl->GetDeclKind() == DeclKind::Method)
 		{
-
+			MethodDecl const* field_decl = ast_cast<MethodDecl>(member_decl);
+			return;
 		}
 		else WAVE_ASSERT(false);
+	}
+
+	void LLVMVisitor::Visit(MemberCallExpr const&, uint32)
+	{
+
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
@@ -1065,7 +1070,7 @@ namespace wave
 		case TypeKind::Function:
 		{
 			FunctionType const& function_type = type_cast<FunctionType>(type);
-			std::span<FunctionParameter const> function_params = function_type.GetParameters();
+			std::span<FunctionParams const> function_params = function_type.GetParams();
 
 			llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());

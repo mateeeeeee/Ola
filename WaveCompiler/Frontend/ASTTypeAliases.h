@@ -19,8 +19,8 @@ namespace wave
 	using UniqueDeclPtr				  = UniquePtr<Decl>;
 	using UniqueFunctionDeclPtr		  = UniquePtr<FunctionDecl>;
 	using UniqueMethodDeclPtr		  = UniquePtr<MethodDecl>;
-	using UniqueVariableDeclPtr		  = UniquePtr<VariableDecl>;
-	using UniqueParamVariableDeclPtr  = UniquePtr<ParamVariableDecl>;
+	using UniqueVarDeclPtr			  = UniquePtr<VarDecl>;
+	using UniqueParamVarDeclPtr		  = UniquePtr<ParamVarDecl>;
 	using UniqueFieldDeclPtr		  = UniquePtr<FieldDecl>;
 	using UniqueTagDeclPtr			  = UniquePtr<TagDecl>;
 	using UniqueEnumDeclPtr			  = UniquePtr<EnumDecl>;
@@ -57,14 +57,15 @@ namespace wave
 	using UniqueConstantBoolPtr		= UniquePtr<ConstantBool>;
 	using UniqueConstantFloatPtr	= UniquePtr<ConstantFloat>;
 	using UniqueImplicitCastExprPtr	= UniquePtr<ImplicitCastExpr>;
-	using UniqueFunctionCallExprPtr = UniquePtr<FunctionCallExpr>;
+	using UniqueCallExprPtr			= UniquePtr<CallExpr>;
 	using UniqueInitializerListExprPtr = UniquePtr<InitializerListExpr>;
 	using UniqueArrayAccessExprPtr	= UniquePtr<ArrayAccessExpr>;
 	using UniqueMemberExprPtr		= UniquePtr<MemberExpr>;
+	using UniqueMemberCallExprPtr	= UniquePtr<MemberCallExpr>;
 
 	using UniqueEnumMemberDeclPtrList	  = std::vector<UniqueEnumMemberDeclPtr>;
-	using UniqueVariableDeclPtrList		  = std::vector<UniqueVariableDeclPtr>;
-	using UniqueParamVariableDeclPtrList  = std::vector<UniqueParamVariableDeclPtr>;
+	using UniqueVarDeclPtrList			  = std::vector<UniqueVarDeclPtr>;
+	using UniqueParamVarDeclPtrList		  = std::vector<UniqueParamVarDeclPtr>;
 	using UniqueFieldDeclPtrList		  = std::vector<UniqueFieldDeclPtr>;
 	using UniqueFunctionDeclPtrList		  = std::vector<UniqueFunctionDeclPtr>;
 	using UniqueMethodDeclPtrList		  = std::vector<UniqueMethodDeclPtr>;
@@ -74,7 +75,7 @@ namespace wave
 	using ExprPtrList					  = std::vector<Expr*>;
 	using DeclPtrList					  = std::vector<Decl*>;
 	using StmtPtrList					  = std::vector<Stmt*>;
-	using VariableDeclPtrList			  = std::vector<VariableDecl*>;
+	using VariableDeclPtrList			  = std::vector<VarDecl*>;
 	using BreakStmtPtrList				  = std::vector<BreakStmt*>;
 	using ContinueStmtPtrList			  = std::vector<ContinueStmt*>;
 	using CaseStmtPtrList				  = std::vector<CaseStmt*>;
