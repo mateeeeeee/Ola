@@ -36,8 +36,8 @@ namespace wave
 
 	enum class DeclKind : uint8
 	{
-		Variable,
-		ParamVariable,
+		Var,
+		ParamVar,
 		Field,
 		Function,
 		Method,
@@ -94,7 +94,7 @@ namespace wave
 	class VarDecl : public Decl
 	{
 	public:
-		VarDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Variable, name, loc) {}
+		VarDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Var, name, loc) {}
 
 		void SetGlobal(bool _is_global)
 		{
@@ -122,7 +122,7 @@ namespace wave
 	class ParamVarDecl final : public VarDecl
 	{
 	public:
-		ParamVarDecl(std::string_view name, SourceLocation const& loc) : VarDecl(DeclKind::ParamVariable, name, loc) {}
+		ParamVarDecl(std::string_view name, SourceLocation const& loc) : VarDecl(DeclKind::ParamVar, name, loc) {}
 		
 		void SetParentDecl(FunctionDecl const* _parent)
 		{
@@ -179,7 +179,7 @@ namespace wave
 			body_stmt = std::move(_body_stmt);
 		}
 
-		UniqueParamVarDeclPtrList const& GetParamDeclarations() const { return param_declarations; }
+		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 
 		bool HasDefinition() const

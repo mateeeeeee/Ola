@@ -4,11 +4,8 @@ class Foo
 {
     public void PrintX()
     {
-        PrintInt(x);
+        PrintInt(this.x);
     }
-	
-	public int GetX() const {return x; }
-
 	public int x = 5;
 };
 
@@ -16,8 +13,6 @@ class Foo
 //method calls
 //passing to functions and assignments
 //using this keyword
-
-
 
 public int main()
 {  
