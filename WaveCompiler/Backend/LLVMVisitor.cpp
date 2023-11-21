@@ -685,19 +685,22 @@ namespace wave
 		WAVE_ASSERT(operand_value);
 		llvm::Value* operand = Load(operand_expr->GetType(), operand_value);
 
+		bool const is_float_expr = IsFloat(operand->getType());
 		llvm::Value* result = nullptr;
 		switch (unary_expr.GetUnaryKind())
 		{
 		case UnaryExprKind::PreIncrement:
 		{
-			llvm::Value* incremented_value = builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
+			llvm::Value* incremented_value = is_float_expr ? builder.CreateFAdd(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
+															 builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(incremented_value, operand_value);
 			result = incremented_value;
 		}
 		break;
 		case UnaryExprKind::PreDecrement:
 		{
-			llvm::Value* decremented_value = builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
+			llvm::Value* decremented_value = is_float_expr ? builder.CreateFSub(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
+															 builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(decremented_value, operand_value);
 			result = decremented_value;
 		}
@@ -706,7 +709,8 @@ namespace wave
 		{
 			result = builder.CreateAlloca(operand_value->getType());
 			Store(operand_value, result);
-			llvm::Value* incremented_value = builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
+			llvm::Value* incremented_value = is_float_expr ? builder.CreateFAdd(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
+															 builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(incremented_value, operand_value);
 		}
 		break;
@@ -714,7 +718,8 @@ namespace wave
 		{
 			result = builder.CreateAlloca(operand_value->getType());
 			Store(operand_value, result);
-			llvm::Value* decremented_value = builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
+			llvm::Value* decremented_value = is_float_expr ? builder.CreateFSub(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
+															 builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(decremented_value, operand_value);
 		}
 		break;
@@ -995,6 +1000,19 @@ namespace wave
 			}
 			else WAVE_ASSERT(false);
 		}
+		else if (IsRef(cast_type))
+		{
+			if (IsRef(cast_operand_type))
+			{
+				llvm_value_map[&cast_expr] = cast_operand;
+			}
+			else
+			{
+				llvm::AllocaInst* alloc = builder.CreateAlloca(cast_operand_type, nullptr);
+				Store(cast_operand, alloc);
+				llvm_value_map[&cast_expr] = alloc;
+			}
+		}
 		else WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
 
@@ -1009,15 +1027,9 @@ namespace wave
 		{
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
-			if (arg_expr->GetType()->Is(TypeKind::Class))
-			{
-				args.push_back(arg_value);
-			}
-			else
-			{
-				WAVE_ASSERT(arg_value);
-				args.push_back(Load(called_function->getArg(arg_index++)->getType(), arg_value));
-			}
+			WAVE_ASSERT(arg_value);
+			llvm::Value* loaded_arg = Load(called_function->getArg(arg_index++)->getType(), arg_value);
+			args.push_back(loaded_arg);
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
@@ -1220,6 +1232,11 @@ namespace wave
 			struct_type_map[class_decl] = llvm_class_type;
 			return llvm_class_type;
 		}
+		case TypeKind::Ref:
+		{
+			RefType const& ref_type = type_cast<RefType>(type);
+			return llvm::PointerType::get(ConvertToLLVMType(ref_type.GetReferredType()), 0);
+		}
 		default:
 			WAVE_UNREACHABLE();
 		}
@@ -1278,7 +1295,7 @@ namespace wave
 		return type->isDoubleTy();
 	}
 
-	bool LLVMVisitor::IsReference(llvm::Type* type)
+	bool LLVMVisitor::IsRef(llvm::Type* type)
 	{
 		return type->isPointerTy();
 	}

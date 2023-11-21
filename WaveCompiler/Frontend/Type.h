@@ -19,7 +19,7 @@ namespace wave
 		Function,
 		Array,
 		Class,
-		Reference
+		Ref
 	};
 
 	class Type
@@ -258,19 +258,19 @@ namespace wave
 	class RefType : public Type
 	{
 	public:
-		explicit RefType(QualType const& type) :Type(TypeKind::Reference, 8, 8), type(type) {}
+		explicit RefType(QualType const& type) :Type(TypeKind::Ref, 8, 8), type(type) {}
 
 		QualType const& GetReferredType() const { return type; }
 
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return false;
+			return type->IsAssignableFrom(other) || IsSameAs(other);
 		}
 		virtual bool IsSameAs(Type const& other) const override
 		{
-			if (other.IsNot(TypeKind::Reference)) return false;
+			if (other.IsNot(TypeKind::Ref)) return false;
 			RefType const& other_ref_type = type_cast<RefType>(other);
-			return other_ref_type.IsSameAs(type);
+			return type->IsSameAs(other_ref_type);
 		}
 
 	private:
@@ -307,5 +307,5 @@ namespace wave
 	inline bool (*IsFunctionType)(Type const& type) = IsType<TypeKind::Function>;
 	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
 	inline bool (*IsIntegralType)(Type const& type) = IsTypeOneOf<TypeKind::Int, TypeKind::Bool>;
-	inline bool (*IsRefType)(Type const& type) = IsType<TypeKind::Reference>;
+	inline bool (*IsRefType)(Type const& type) = IsType<TypeKind::Ref>;
 }

@@ -117,11 +117,12 @@ namespace wave
 
 		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
+		[[maybe_unused]] llvm::Value* Store(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 
 		static bool IsBoolean(llvm::Type*);
 		static bool IsInteger(llvm::Type*);
 		static bool IsFloat(llvm::Type*);
-		static bool IsReference(llvm::Type*);
+		static bool IsRef(llvm::Type*);
 	};
 }

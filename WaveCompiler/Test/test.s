@@ -7,66 +7,41 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	"Foo::SetX";
-	.scl	2;
-	.type	32;
-	.endef
-	.globl	"Foo::SetX"                     # -- Begin function Foo::SetX
-	.p2align	4, 0x90
-"Foo::SetX":                            # @"Foo::SetX"
-# %bb.0:                                # %entry
-	mov	qword ptr [rcx], rdx
-# %bb.1:                                # %exit
-	ret
-                                        # -- End function
-	.def	"Foo::GetX";
-	.scl	2;
-	.type	32;
-	.endef
-	.globl	"Foo::GetX"                     # -- Begin function Foo::GetX
-	.p2align	4, 0x90
-"Foo::GetX":                            # @"Foo::GetX"
-.seh_proc "Foo::GetX"
-# %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	mov	rax, qword ptr [rcx]
-	mov	qword ptr [rsp], rax
-# %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	pop	rcx
-	ret
-	.seh_endproc
-                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	main                            # -- Begin function main
+	.globl	__real@3ff0000000000000         # -- Begin function main
+	.section	.rdata,"dr",discard,__real@3ff0000000000000
+	.p2align	3, 0x0
+__real@3ff0000000000000:
+	.quad	0x3ff0000000000000              # double 1
+	.globl	__real@4002666666666666
+	.section	.rdata,"dr",discard,__real@4002666666666666
+	.p2align	3, 0x0
+__real@4002666666666666:
+	.quad	0x4002666666666666              # double 2.2999999999999998
+	.text
+	.globl	main
 	.p2align	4, 0x90
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	sub	rsp, 16
+	.seh_stackalloc 16
 	.seh_endprologue
-	mov	qword ptr [rsp + 48], 5
-	mov	qword ptr [rsp + 56], 10
-	lea	rcx, [rsp + 48]
-	mov	edx, 12
-	call	"Foo::SetX"
-	mov	rax, qword ptr [rsp + 48]
-	mov	qword ptr [rsp + 32], rax
-	lea	rcx, [rsp + 32]
-	call	"Foo::GetX"
-	mov	qword ptr [rsp + 64], rax
+	movsd	xmm0, qword ptr [rip + __real@4002666666666666] # xmm0 = mem[0],zero
+	movsd	qword ptr [rsp], xmm0
+	movsd	xmm0, qword ptr [rip + __real@3ff0000000000000] # xmm0 = mem[0],zero
+	addsd	xmm0, qword ptr [rsp]
+	movsd	qword ptr [rsp], xmm0
+	cvttsd2si	rax, qword ptr [rsp]
+	mov	qword ptr [rsp + 8], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 64]
-	add	rsp, 72
+	mov	rax, qword ptr [rsp + 8]
+	add	rsp, 16
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym "Foo::SetX"
-	.addrsig_sym "Foo::GetX"
+	.globl	_fltused

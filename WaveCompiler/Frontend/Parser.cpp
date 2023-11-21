@@ -439,7 +439,7 @@ namespace wave
 		case TokenKind::identifier:
 			if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
 			return ParseExpressionStatement();
-		case TokenKind::KW_this:
+		default:
 			return ParseExpressionStatement();
 		}
 		return nullptr;
