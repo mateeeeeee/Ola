@@ -3,25 +3,16 @@ source_filename = "WaveModule"
 
 %S = type { i64, i64 }
 
+@__StringLiteral0 = internal constant [2 x i8] c"1\00"
+@__StringLiteral1 = internal constant [2 x i8] c"2\00"
+@__StringLiteral2 = internal constant [2 x i8] c"3\00"
+@__StringLiteral3 = internal constant [2 x i8] c"4\00"
+@__StringLiteral4 = internal constant [2 x i8] c"5\00"
+@__StringLiteral5 = internal constant [2 x i8] c"6\00"
+
 declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
-
-declare void @PrintInt(i64)
-
-declare void @PrintFloat(double)
-
-declare void @PrintChar(i8)
-
-declare void @PrintString(ptr)
-
-declare i64 @ReadInt()
-
-declare double @ReadFloat()
-
-declare i8 @ReadChar()
-
-declare void @ReadString(ptr, i64)
 
 define void @"S::SetX"(ptr %this, i64 %x) {
 entry:
@@ -117,31 +108,29 @@ entry:
   %8 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
   %9 = load i64, ptr %8, align 4
   %10 = icmp eq i64 %9, 20
-  call void @Assert(i1 %10)
+  call void @AssertMsg(i1 %10, ptr @__StringLiteral0)
   %11 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
   %12 = load i64, ptr %11, align 4
   %13 = icmp eq i64 %12, 20
-  call void @Assert(i1 %13)
-  %14 = alloca %S, align 8
-  %15 = load ptr, ptr %1, align 8
-  store ptr %15, ptr %14, align 8
+  call void @AssertMsg(i1 %13, ptr @__StringLiteral1)
+  %14 = call i64 @"S::GetX"(ptr %1)
+  %15 = icmp eq i64 %14, 20
+  call void @AssertMsg(i1 %15, ptr @__StringLiteral2)
   %16 = call i64 @"S::GetY"(ptr %1)
-  call void @PrintInt(i64 %16)
-  %17 = call i64 @"S::GetX"(ptr %14)
-  %18 = icmp eq i64 %17, 20
-  call void @Assert(i1 %18)
-  %19 = getelementptr inbounds %S, ptr %14, i32 0, i32 0
-  %20 = getelementptr inbounds %S, ptr %14, i32 0, i32 0
-  %21 = load i64, ptr %20, align 4
-  %22 = add i64 %21, 10
-  %23 = load i64, ptr %19, align 4
-  store i64 %22, ptr %19, align 4
-  %24 = call i64 @"S::GetX"(ptr %1)
-  %25 = icmp eq i64 %24, 20
-  call void @Assert(i1 %25)
-  %26 = call i64 @"S::GetX"(ptr %14)
-  %27 = icmp eq i64 %26, 30
-  call void @Assert(i1 %27)
+  %17 = icmp eq i64 %16, 20
+  call void @AssertMsg(i1 %17, ptr @__StringLiteral3)
+  %18 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %19 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %20 = load i64, ptr %19, align 4
+  %21 = add i64 %20, 10
+  %22 = load i64, ptr %18, align 4
+  store i64 %21, ptr %18, align 4
+  %23 = call i64 @"S::GetX"(ptr %1)
+  %24 = icmp eq i64 %23, 20
+  call void @AssertMsg(i1 %24, ptr @__StringLiteral4)
+  %25 = call i64 @"S::GetX"(ptr %1)
+  %26 = icmp eq i64 %25, 30
+  call void @AssertMsg(i1 %26, ptr @__StringLiteral5)
   store i64 0, ptr %0, align 4
   br label %exit
 
@@ -150,6 +139,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %28 = load i64, ptr %0, align 4
-  ret i64 %28
+  %27 = load i64, ptr %0, align 4
+  ret i64 %27
 }

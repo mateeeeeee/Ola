@@ -1,5 +1,4 @@
 import std.assert;
-import std.io;
 
 public class S
 {
@@ -23,13 +22,13 @@ public int main()
 {
 	S s; s.x = 10; s.y = 10;
 	ModifyS(s);
-	Assert(s.x == 20);
-	Assert(s.y == 20);
+	AssertMsg(s.x == 20, "1");
+	AssertMsg(s.y == 20, "2");
 	S s2 = s;
-	Assert(s2.GetX() == 20);
-	//Assert(s2.GetY() == 20);
+	AssertMsg(s2.GetX() == 20, "3");
+	AssertMsg(s2.GetY() == 20, "4");
 	s2.x += 10;
-	Assert(s.GetX() == 20);
-	Assert(s2.GetX() == 30);
+	AssertMsg(s.GetX() == 30, "5");
+	AssertMsg(s2.GetX() == 30, "6");
 	return 0;
 }

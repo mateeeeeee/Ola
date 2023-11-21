@@ -263,10 +263,10 @@ public int main()
 {  
 	Foo foo;
 	foo.SetX(12);
-	Foo foo2 = foo;
-	foo.SetX(24);
-	ModifyFoo(foo); //foo.x is now 100
-    return foo2.GetX(); //returns 12 because foo2 is a copy
+	Foo foo2 = foo; //foo2 is a reference to foo
+	foo.SetX(24); //foo2.x is also 24
+	ModifyFoo(foo); //foo.x and foo2.x are now 100 
+    return foo2.GetX(); //returns 100
 }
 ```
 Class declaration consists of a sequence of method definitions and field declarations, Those declarations can be interleaved.

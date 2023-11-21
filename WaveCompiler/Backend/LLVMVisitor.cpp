@@ -194,6 +194,7 @@ namespace wave
 		QualType const& var_type = var_decl.GetType();
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
 		bool const is_array = var_type->Is(TypeKind::Array);
+		bool const is_class = var_type->Is(TypeKind::Class);
 
 		if (var_decl.IsGlobal())
 		{
@@ -241,7 +242,7 @@ namespace wave
 					llvm_value_map[&var_decl] = global_var;
 				}
 			}
-			else if (IsClassType(var_type))
+			else if (is_class)
 			{
 				ClassType const& class_type = type_cast<ClassType>(var_type);
 				ClassDecl const* class_decl = class_type.GetClassDecl();
@@ -324,15 +325,19 @@ namespace wave
 					}
 					else WAVE_ASSERT(false);
 				}
+				else if (is_class)
+				{
+					llvm_value_map[&var_decl] = llvm_value_map[init_expr];
+				}
 				else
 				{
 					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
-					llvm::Value* init_value = llvm_value_map[var_decl.GetInitExpr()];
+					llvm::Value* init_value = llvm_value_map[init_expr];
 					Store(init_value, alloc);
 					llvm_value_map[&var_decl] = alloc;
 				}
 			}
-			else if (IsClassType(var_type))
+			else if (is_class)
 			{
 				QualType const& var_type = var_decl.GetType();
 				ClassType const& class_type = type_cast<ClassType>(var_type);

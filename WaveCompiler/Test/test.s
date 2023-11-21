@@ -96,55 +96,84 @@ ModifyS:                                # @ModifyS
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp + 48], 0
-	mov	qword ptr [rsp + 56], 0
-	mov	qword ptr [rsp + 48], 10
-	mov	qword ptr [rsp + 56], 10
-	lea	rcx, [rsp + 48]
+	mov	qword ptr [rsp + 32], 0
+	mov	qword ptr [rsp + 40], 0
+	mov	qword ptr [rsp + 32], 10
+	mov	qword ptr [rsp + 40], 10
+	lea	rcx, [rsp + 32]
 	call	ModifyS
-	cmp	qword ptr [rsp + 48], 20
+	cmp	qword ptr [rsp + 32], 20
 	sete	cl
-	call	Assert
-	cmp	qword ptr [rsp + 56], 20
+	lea	rdx, [rip + __StringLiteral0]
+	call	AssertMsg
+	cmp	qword ptr [rsp + 40], 20
 	sete	cl
-	call	Assert
-	mov	rax, qword ptr [rsp + 48]
-	mov	qword ptr [rsp + 32], rax
-	lea	rcx, [rsp + 48]
-	call	"S::GetY"
-	mov	rcx, rax
-	call	PrintInt
+	lea	rdx, [rip + __StringLiteral1]
+	call	AssertMsg
 	lea	rcx, [rsp + 32]
 	call	"S::GetX"
 	cmp	rax, 20
 	sete	cl
-	call	Assert
+	lea	rdx, [rip + __StringLiteral2]
+	call	AssertMsg
+	lea	rcx, [rsp + 32]
+	call	"S::GetY"
+	cmp	rax, 20
+	sete	cl
+	lea	rdx, [rip + __StringLiteral3]
+	call	AssertMsg
 	mov	rax, qword ptr [rsp + 32]
 	add	rax, 10
 	mov	qword ptr [rsp + 32], rax
-	lea	rcx, [rsp + 48]
+	lea	rcx, [rsp + 32]
 	call	"S::GetX"
 	cmp	rax, 20
 	sete	cl
-	call	Assert
+	lea	rdx, [rip + __StringLiteral4]
+	call	AssertMsg
 	lea	rcx, [rsp + 32]
 	call	"S::GetX"
 	cmp	rax, 30
 	sete	cl
-	call	Assert
-	mov	qword ptr [rsp + 64], 0
+	lea	rdx, [rip + __StringLiteral5]
+	call	AssertMsg
+	mov	qword ptr [rsp + 48], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 64]
-	add	rsp, 72
+	mov	rax, qword ptr [rsp + 48]
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
+	.section	.rdata,"dr"
+__StringLiteral0:                       # @__StringLiteral0
+	.asciz	"1"
+
+__StringLiteral1:                       # @__StringLiteral1
+	.asciz	"2"
+
+__StringLiteral2:                       # @__StringLiteral2
+	.asciz	"3"
+
+__StringLiteral3:                       # @__StringLiteral3
+	.asciz	"4"
+
+__StringLiteral4:                       # @__StringLiteral4
+	.asciz	"5"
+
+__StringLiteral5:                       # @__StringLiteral5
+	.asciz	"6"
+
 	.addrsig
-	.addrsig_sym Assert
-	.addrsig_sym PrintInt
+	.addrsig_sym AssertMsg
 	.addrsig_sym "S::GetX"
 	.addrsig_sym "S::GetY"
 	.addrsig_sym ModifyS
+	.addrsig_sym __StringLiteral0
+	.addrsig_sym __StringLiteral1
+	.addrsig_sym __StringLiteral2
+	.addrsig_sym __StringLiteral3
+	.addrsig_sym __StringLiteral4
+	.addrsig_sym __StringLiteral5
