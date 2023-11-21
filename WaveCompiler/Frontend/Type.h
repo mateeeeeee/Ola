@@ -126,6 +126,28 @@ namespace wave
 		Qualifiers qualifiers = Qualifier_None;
 	};
 
+	class RefType : public Type
+	{
+	public:
+		explicit RefType(QualType const& type) :Type(TypeKind::Ref, 8, 8), type(type) {}
+
+		QualType const& GetReferredType() const { return type; }
+
+		virtual bool IsAssignableFrom(Type const& other) const override
+		{
+			return type->IsAssignableFrom(other) || IsSameAs(other);
+		}
+		virtual bool IsSameAs(Type const& other) const override
+		{
+			if (other.IsNot(TypeKind::Ref)) return false;
+			RefType const& other_ref_type = type_cast<RefType>(other);
+			return type->IsSameAs(other_ref_type);
+		}
+
+	private:
+		QualType type;
+	};
+
 	class VoidType : public Type
 	{
 	public:
@@ -162,7 +184,8 @@ namespace wave
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
+			return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float) ||
+				(other.Is(TypeKind::Ref) && type_cast<RefType>(other).GetReferredType()->Is(TypeKind::Int));
 		}
 	};
 
@@ -253,28 +276,6 @@ namespace wave
 
 	private:
 		ClassDecl const* class_decl;
-	};
-
-	class RefType : public Type
-	{
-	public:
-		explicit RefType(QualType const& type) :Type(TypeKind::Ref, 8, 8), type(type) {}
-
-		QualType const& GetReferredType() const { return type; }
-
-		virtual bool IsAssignableFrom(Type const& other) const override
-		{
-			return type->IsAssignableFrom(other) || IsSameAs(other);
-		}
-		virtual bool IsSameAs(Type const& other) const override
-		{
-			if (other.IsNot(TypeKind::Ref)) return false;
-			RefType const& other_ref_type = type_cast<RefType>(other);
-			return type->IsSameAs(other_ref_type);
-		}
-
-	private:
-		QualType type;
 	};
 
 	namespace builtin_types

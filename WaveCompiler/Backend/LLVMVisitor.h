@@ -110,6 +110,7 @@ namespace wave
 		llvm::IntegerType* int_type		= nullptr;
 		llvm::IntegerType* bool_type	= nullptr;
 		llvm::IntegerType* char_type	= nullptr;
+
 	private:
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);

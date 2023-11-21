@@ -1,10 +1,26 @@
 
 
+//void f(ref int a)
+//{
+//	a++;
+//}
+
 public int main()
 {  
-	float f = 2.3;
-	++f;
-	return f;
+	int b = 10;
+	ref int c = b;
+	++c;
+	return c;
 }
 
 
+//int main()	  			     
+//{  			  
+//	int a = 10;	  
+//	int* b = &a;  
+//	++(*b);		  
+//}
+//%0 = load ptr, ptr %b, align 8, !dbg !225
+//%1 = load i32, ptr %0, align 4, !dbg !226
+//%inc = add nsw i32 %1, 1, !dbg !226
+//store i32 %inc, ptr %0, align 4, !dbg !226

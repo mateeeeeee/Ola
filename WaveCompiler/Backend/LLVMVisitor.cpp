@@ -740,7 +740,8 @@ namespace wave
 		break;
 		case UnaryExprKind::LogicalNot:
 		{
-			result = builder.CreateICmpEQ(operand, llvm::ConstantInt::get(operand->getType(), 0));
+			result = is_float_expr ? builder.CreateFCmpUEQ(operand, llvm::ConstantFP::get(operand->getType(), 0.0)):
+			                         builder.CreateICmpEQ(operand, llvm::ConstantInt::get(operand->getType(), 0));
 		}
 		break;
 		default:
@@ -974,6 +975,10 @@ namespace wave
 			{
 				llvm_value_map[&cast_expr] = builder.CreateFPToSI(cast_operand, int_type);
 			}
+			else if (IsRef(cast_operand_type))
+			{
+				llvm_value_map[&cast_expr] = builder.CreateLoad(int_type, cast_operand);
+			}
 			else WAVE_ASSERT(false);
 		}
 		else if (IsBoolean(cast_type))
@@ -986,6 +991,10 @@ namespace wave
 			{
 				llvm_value_map[&cast_expr] = builder.CreateFPToUI(cast_operand, bool_type);
 			}
+			else if (IsRef(cast_operand_type))
+			{
+				llvm_value_map[&cast_expr] = builder.CreateLoad(bool_type, cast_operand);
+			}
 			else WAVE_ASSERT(false);
 		}
 		else if (IsFloat(cast_type))
@@ -997,6 +1006,10 @@ namespace wave
 			else if (IsInteger(cast_operand_type))
 			{
 				llvm_value_map[&cast_expr] = builder.CreateSIToFP(cast_operand, float_type);
+			}
+			else if (IsRef(cast_operand_type))
+			{
+				llvm_value_map[&cast_expr] = builder.CreateLoad(float_type, cast_operand);
 			}
 			else WAVE_ASSERT(false);
 		}
