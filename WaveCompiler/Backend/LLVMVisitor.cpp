@@ -180,6 +180,9 @@ namespace wave
 
 		label_blocks.clear();
 
+		this_value = nullptr;
+		this_struct_type = nullptr;
+
 		exit_block = nullptr;
 		return_alloc = nullptr;
 
@@ -1041,8 +1044,13 @@ namespace wave
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
 			WAVE_ASSERT(arg_value);
-			llvm::Value* loaded_arg = Load(called_function->getArg(arg_index++)->getType(), arg_value);
-			args.push_back(loaded_arg);
+			llvm::Value* arg = arg_value;
+			if (!IsClassType(arg_expr->GetType()))
+			{
+				arg = Load(called_function->getArg(arg_index++)->getType(), arg);
+
+			}
+			args.push_back(arg);
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
@@ -1121,21 +1129,20 @@ namespace wave
 		class_expr->Accept(*this);
 		if (member_decl->GetDeclKind() == DeclKind::Field)
 		{
-			if (!this_struct_type)
+			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+			llvm::Value* field_value = nullptr;
+			if (!this_value)
 			{
-				llvm::AllocaInst* alloc = builder.CreateAlloca(ConvertToLLVMType(class_expr->GetType()), nullptr);
-				builder.CreateStore(llvm_value_map[class_expr], alloc);
-				FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
-				llvm::Value* field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), alloc, field_decl->GetFieldIndex());
+				llvm::Value* struct_value = llvm_value_map[class_expr];
+				field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), struct_value, field_decl->GetFieldIndex());
 				llvm_value_map[&member_expr] = field_value;
 			}
 			else
 			{
 				FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
-				llvm::Value* field_value = builder.CreateStructGEP(this_struct_type, this_value, field_decl->GetFieldIndex());
-				llvm_value_map[&member_expr] = field_value;
+				field_value = builder.CreateStructGEP(this_struct_type, this_value, field_decl->GetFieldIndex());
 			}
-			
+			llvm_value_map[&member_expr] = field_value;
 		}
 		else if (member_decl->GetDeclKind() == DeclKind::Method)
 		{
@@ -1235,7 +1242,9 @@ namespace wave
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
 			for (auto const& func_param : function_params)
 			{
-				param_types.push_back(ConvertToLLVMType(func_param.type));
+				llvm::Type* param_type = ConvertToLLVMType(func_param.type);
+				if (IsClassType(func_param.type)) param_type = llvm::PointerType::get(param_type, 0);
+				param_types.push_back(param_type);
 			}
 			return llvm::FunctionType::get(return_type, param_types, false);
 		}

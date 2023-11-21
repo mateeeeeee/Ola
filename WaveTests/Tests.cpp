@@ -108,6 +108,11 @@ TEST(Declarations, Enum)
 	EXPECT_EQ(WAVE(-i test_enum), 0);
 }
 
+TEST(Declarations, Class)
+{
+	EXPECT_EQ(WAVE(-i test_class), 0);
+}
+
 TEST(Function, Calls)
 {
 	EXPECT_EQ(WAVE(-i test_functioncalls), 0);

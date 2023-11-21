@@ -35,6 +35,7 @@ set(WAVE_TESTS
 	Tests/test_string.wv
 	Tests/test_floats.wv
 	Tests/test_implicitcasts.wv
+	Tests/test_class.wv
 )
 
 add_executable(WaveTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})

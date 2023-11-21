@@ -254,12 +254,18 @@ public class Foo
 	private int y = 10;
 };
 
+void ModifyFoo(Foo foo) //passed by reference
+{
+	foo.SetX(100);
+}
+
 public int main()
 {  
 	Foo foo;
 	foo.SetX(12);
 	Foo foo2 = foo;
 	foo.SetX(24);
+	ModifyFoo(foo); //foo.x is now 100
     return foo2.GetX(); //returns 12 because foo2 is a copy
 }
 ```

@@ -1,5 +1,4 @@
 import std.assert;
-import std.io;
 
 public class S
 {
