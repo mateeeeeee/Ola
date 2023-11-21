@@ -86,6 +86,7 @@ namespace wave
 		virtual void Visit(ArrayAccessExpr const&, uint32) override;
 		virtual void Visit(MemberExpr const&, uint32) override;
 		virtual void Visit(MemberCallExpr const&, uint32) override;
+		virtual void Visit(ThisExpr const&, uint32) override;
 
 	private:
 		llvm::LLVMContext& context;
@@ -94,6 +95,8 @@ namespace wave
 
 		LLVMValueMap llvm_value_map;
 
+		llvm::Type* this_struct_type = nullptr;
+		llvm::Value* this_value = nullptr;
 		llvm::AllocaInst* return_alloc = nullptr;
 		llvm::BasicBlock* exit_block = nullptr;
 

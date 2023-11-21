@@ -32,6 +32,7 @@ namespace wave
 			SymbolTable<TagDecl> tag_sym_table;
 
 			std::vector<Expr const*> current_class_expr_stack;
+			bool is_method_const = false;
 			class QualType const* current_func = nullptr;
 			bool return_stmt_encountered = false;
 
@@ -77,7 +78,7 @@ namespace wave
 		UniqueBreakStmtPtr ActOnBreakStmt(SourceLocation const& loc);
 		UniqueContinueStmtPtr ActOnContinueStmt(SourceLocation const& loc);
 		UniqueForStmtPtr ActOnForStmt(UniqueStmtPtr&& init_stmt, UniqueExprPtr&& cond_expr, UniqueExprPtr&& iter_expr, UniqueStmtPtr&& body_stmt);
-		UniqueForStmtPtr ActOnForeachStmt(SourceLocation const& loc, UniqueVarDeclPtr&& var_decl, UniqueIdentifierExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt);
+		UniqueForStmtPtr ActOnForeachStmt(SourceLocation const& loc, UniqueVarDeclPtr&& var_decl, UniqueExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt);
 		UniqueWhileStmtPtr ActOnWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueDoWhileStmtPtr ActOnDoWhileStmt(UniqueExprPtr&& cond_expr, UniqueStmtPtr&& body_stmt);
 		UniqueCaseStmtPtr ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr = nullptr);
@@ -95,11 +96,12 @@ namespace wave
 		UniqueConstantStringPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueConstantBoolPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueConstantFloatPtr ActOnConstantFloat(double value, SourceLocation const& loc);
-		UniqueDeclRefExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
+		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
 		UniqueDeclRefExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
 		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier);
+		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, bool implicit);
 
 	private:
 		Diagnostics& diagnostics;

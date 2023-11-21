@@ -51,6 +51,7 @@ namespace wave
 	class ArrayAccessExpr;
 	class MemberExpr;
 	class MemberCallExpr;
+	class ThisExpr;
 
 	struct AST;
 }

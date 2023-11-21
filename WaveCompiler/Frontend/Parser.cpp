@@ -57,32 +57,41 @@ namespace wave
 	{
 		UniqueDeclPtrList global_decl_list;
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
-		if (Consume(TokenKind::KW_class))
-		{
-			global_decl_list.push_back(ParseClassDeclaration());
-		}
-		else if (Consume(TokenKind::KW_enum))
-		{
-			global_decl_list.push_back(ParseEnumDeclaration());
-		}
-		else if (Consume(TokenKind::KW_alias))
-		{
-			global_decl_list.push_back(ParseAliasDeclaration());
-		}
-		else if (Consume(TokenKind::KW_extern))
+		if (Consume(TokenKind::KW_extern))
 		{
 			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
 			else global_decl_list = ParseExternVariableDeclaration();
 		}
-		else 
+		else
 		{
-			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition());
+			DeclVisibility visibility = DeclVisibility::Private;
+			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+
+			if (Consume(TokenKind::KW_class))
+			{
+				global_decl_list.push_back(ParseClassDeclaration());
+			}
+			else if (Consume(TokenKind::KW_enum))
+			{
+				global_decl_list.push_back(ParseEnumDeclaration());
+			}
+			else if (Consume(TokenKind::KW_alias))
+			{
+				global_decl_list.push_back(ParseAliasDeclaration());
+			}
 			else
 			{
-				UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration();
-				for (auto& variable_decl : variable_decls) global_decl_list.push_back(std::move(variable_decl));
+				if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition(visibility));
+				else
+				{
+					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(visibility);
+					for (auto& variable_decl : variable_decls) global_decl_list.push_back(std::move(variable_decl));
+				}
 			}
+			global_decl_list.back()->SetVisibility(visibility);
 		}
+
 		return global_decl_list;
 	}
 
@@ -98,7 +107,7 @@ namespace wave
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
-			name = current_token->GetIdentifier(); ++current_token;
+			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
 			std::vector<FunctionParams> param_types{};
@@ -116,12 +125,8 @@ namespace wave
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern);
 	}
 
-	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
 	{
-		DeclVisibility visibility = DeclVisibility::Private;
-		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
-
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
 		QualType function_type{};
@@ -134,7 +139,7 @@ namespace wave
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
 			SourceLocation const& loc = current_token->GetLocation();
-			name = current_token->GetIdentifier(); ++current_token;
+			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
 			std::vector<FunctionParams> param_types{};
@@ -174,7 +179,7 @@ namespace wave
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
 			SourceLocation const& loc = current_token->GetLocation();
-			name = current_token->GetIdentifier(); ++current_token;
+			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
 			std::vector<FunctionParams> param_types{};
@@ -203,7 +208,9 @@ namespace wave
 			else
 			{
 				sema->ctx.current_func = &function_type;
+				sema->ctx.is_method_const = is_const;
 				function_body = ParseCompoundStatement();
+				sema->ctx.is_method_const = false;
 				sema->ctx.current_func = nullptr;
 				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, is_const);
 			}
@@ -221,22 +228,15 @@ namespace wave
 		std::string_view name = "";
 		if (current_token->Is(TokenKind::identifier))
 		{
-			name = current_token->GetIdentifier(); 
+			name = current_token->GetData(); 
 			++current_token;
 		}
 
 		return sema->ActOnParamVariableDecl(name, loc, variable_type);
 	}
 
-	UniqueVarDeclPtrList Parser::ParseVariableDeclaration()
+	UniqueVarDeclPtrList Parser::ParseVariableDeclaration(DeclVisibility visibility)
 	{
-		DeclVisibility visibility = DeclVisibility::None;
-		if (sema->ctx.decl_sym_table.IsGlobal())
-		{
-			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
-		}
-
 		UniqueVarDeclPtrList var_decl_list;
 		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -246,7 +246,7 @@ namespace wave
 			if (!var_decl_list.empty()) Expect(TokenKind::comma);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 			SourceLocation const& loc = current_token->GetLocation();
-			std::string_view name = current_token->GetIdentifier(); ++current_token;
+			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
@@ -279,7 +279,7 @@ namespace wave
 			if (!member_var_decl_list.empty()) Expect(TokenKind::comma);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 			SourceLocation const& loc = current_token->GetLocation();
-			std::string_view name = current_token->GetIdentifier(); ++current_token;
+			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
@@ -309,7 +309,7 @@ namespace wave
 			if (!var_decl_list.empty()) Expect(TokenKind::comma);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 			SourceLocation const& loc = current_token->GetLocation();
-			std::string_view name = current_token->GetIdentifier(); ++current_token;
+			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::Extern);
 			var_decl_list.push_back(std::move(var_decl));
@@ -325,7 +325,7 @@ namespace wave
 		SourceLocation loc = current_token->GetLocation();
 		if (current_token->Is(TokenKind::identifier))
 		{
-			enum_tag = current_token->GetIdentifier();
+			enum_tag = current_token->GetData();
 			++current_token;
 		}
 
@@ -337,7 +337,7 @@ namespace wave
 			std::string enum_value_name;
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 			SourceLocation loc = current_token->GetLocation();
-			enum_value_name = current_token->GetIdentifier(); ++current_token;
+			enum_value_name = current_token->GetData(); ++current_token;
 
 			if (Consume(TokenKind::equal))
 			{
@@ -363,7 +363,7 @@ namespace wave
 		std::string alias_name = "";
 		SourceLocation loc = current_token->GetLocation();
 		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
-		alias_name = current_token->GetIdentifier();
+		alias_name = current_token->GetData();
 		++current_token;
 
 		Expect(TokenKind::equal);
@@ -382,7 +382,7 @@ namespace wave
 		SourceLocation loc = current_token->GetLocation();
 		if (current_token->Is(TokenKind::identifier))
 		{
-			class_name = current_token->GetIdentifier();
+			class_name = current_token->GetData();
 			++current_token;
 		}
 
@@ -439,6 +439,8 @@ namespace wave
 		case TokenKind::identifier:
 			if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
 			return ParseExpressionStatement();
+		case TokenKind::KW_this:
+			return ParseExpressionStatement();
 		}
 		return nullptr;
 	}
@@ -465,7 +467,7 @@ namespace wave
 				}
 				else
 				{
-					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration();
+					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
 					for (auto& variable_decl : variable_decls) stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
 				}
 			}
@@ -530,7 +532,7 @@ namespace wave
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsTypename())
 		{
-			UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration();
+			UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
 			UniqueDeclPtrList decl_list; decl_list.reserve(variable_decls.size());
 			for (auto& variable_decl : variable_decls) decl_list.push_back(std::move(variable_decl));
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
@@ -569,7 +571,7 @@ namespace wave
 
 		UniqueVarDeclPtr var_decl = ParseParamVariableDeclaration(); //function param decl doesn't parse for init expr
 		Expect(TokenKind::colon);
-		UniqueIdentifierExprPtr array_expr = ParseIdentifier();
+		UniqueExprPtr array_expr = ParseIdentifier();
 		Expect(TokenKind::right_round);
 		
 		sema->ctx.stmts_using_break_count++;
@@ -636,7 +638,7 @@ namespace wave
 	{
 		SourceLocation loc = current_token->GetLocation();
 		Expect(TokenKind::KW_goto);
-		std::string_view label_name = current_token->GetIdentifier();
+		std::string_view label_name = current_token->GetData();
 		Expect(TokenKind::identifier);
 		Expect(TokenKind::semicolon);
 		return sema->ActOnGotoStmt(loc, label_name);
@@ -645,7 +647,7 @@ namespace wave
 	UniqueLabelStmtPtr Parser::ParseLabelStatement()
 	{
 		SourceLocation loc = current_token->GetLocation();
-		std::string_view label_name = current_token->GetIdentifier();
+		std::string_view label_name = current_token->GetData();
 		Expect(TokenKind::identifier);
 		Expect(TokenKind::colon);
 		return sema->ActOnLabelStmt(loc, label_name);
@@ -902,7 +904,6 @@ namespace wave
 		return sema->ActOnUnaryExpr(unary_kind, loc, std::move(operand));
 	}
 
-	//foo.bars[10].x = 10;
 	UniqueExprPtr Parser::ParsePostFixExpression()
 	{
 		UniqueExprPtr expr = ParsePrimaryExpression();
@@ -912,7 +913,7 @@ namespace wave
 		{
 			switch (current_token->GetKind())
 			{
-			case TokenKind::left_round:
+			case TokenKind::left_round: 
 			{
 				++current_token;
 				UniqueExprPtrList args;
@@ -977,8 +978,8 @@ namespace wave
 		case TokenKind::char_literal: return ParseConstantChar();
 		case TokenKind::string_literal: return ParseConstantString(); 
 		case TokenKind::KW_true:
-		case TokenKind::KW_false:  return ParseConstantBool();
-
+		case TokenKind::KW_false: return ParseConstantBool();
+		case TokenKind::KW_this:  return ParseThisExpression();
 		default:
 			Diag(unexpected_token);
 		}
@@ -1021,8 +1022,8 @@ namespace wave
 	UniqueConstantIntPtr Parser::ParseConstantInt()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::int_number));
-		std::string_view string_number = current_token->GetIdentifier();
-		int64 value = std::stoll(current_token->GetIdentifier().data(), nullptr, 0);
+		std::string_view string_number = current_token->GetData();
+		int64 value = std::stoll(current_token->GetData().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnConstantInt(value, loc);
@@ -1031,7 +1032,7 @@ namespace wave
 	UniqueConstantCharPtr Parser::ParseConstantChar()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::char_literal));
-		std::string_view char_string = current_token->GetIdentifier();
+		std::string_view char_string = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnConstantChar(char_string, loc);
@@ -1040,7 +1041,7 @@ namespace wave
 	UniqueConstantStringPtr Parser::ParseConstantString()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::string_literal));
-		std::string_view str = current_token->GetIdentifier();
+		std::string_view str = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnConstantString(str, loc);
@@ -1060,25 +1061,33 @@ namespace wave
 	UniqueConstantFloatPtr Parser::ParseConstantFloat()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::float_number));
-		std::string_view string_number = current_token->GetIdentifier();
-		double value = std::stod(current_token->GetIdentifier().data(), nullptr);
+		std::string_view string_number = current_token->GetData();
+		double value = std::stod(current_token->GetData().data(), nullptr);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnConstantFloat(value, loc);
 	}
 
-	UniqueDeclRefExprPtr Parser::ParseIdentifier()
+	UniqueExprPtr Parser::ParseIdentifier()
 	{
 		WAVE_ASSERT(current_token->Is(TokenKind::identifier));
-		std::string_view name = current_token->GetIdentifier();
+		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnIdentifier(name, loc);
 	}
 
+	UniqueThisExprPtr Parser::ParseThisExpression()
+	{
+		WAVE_ASSERT(current_token->Is(TokenKind::KW_this));
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnThisExpr(loc, false);
+	}
+
 	UniqueDeclRefExprPtr Parser::ParseMemberIdentifier()
 	{
-		std::string_view name = current_token->GetIdentifier();
+		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		Expect(TokenKind::identifier);
 		return sema->ActOnMemberIdentifier(name, loc);
@@ -1121,7 +1130,7 @@ namespace wave
 		case TokenKind::KW_float: type.SetType(builtin_types::Float); break;
 		case TokenKind::identifier:
 		{
-			std::string_view identifier = current_token->GetIdentifier();
+			std::string_view identifier = current_token->GetData();
 			if (TagDecl* tag_decl = sema->ctx.tag_sym_table.LookUp(identifier))
 			{
 				if (tag_decl->GetDeclKind() == DeclKind::Enum)
@@ -1207,7 +1216,7 @@ namespace wave
 
 	bool Parser::IsCurrentTokenTypename()
 	{
-		return current_token->IsTypename() || sema->ctx.tag_sym_table.LookUp(current_token->GetIdentifier()) != nullptr;
+		return current_token->IsTypename() || sema->ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
 	}
 
 }

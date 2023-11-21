@@ -140,6 +140,9 @@ namespace wave
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
 		builder.SetInsertPoint(entry_block);
 
+		this_struct_type = class_type;
+		this_value = llvm_function->arg_begin();
+
 		if (!llvm_function_type->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(llvm_function_type->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
 
@@ -1088,13 +1091,13 @@ namespace wave
 		if (member_decl->GetDeclKind() == DeclKind::Field)
 		{
 			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
-			llvm::Value* field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), llvm_value_map[class_expr], field_decl->GetFieldIndex());
+			llvm::Value* field_value = builder.CreateStructGEP(this_struct_type, llvm_value_map[class_expr], field_decl->GetFieldIndex());
 			llvm_value_map[&member_expr] = field_value;
 		}
 		else if (member_decl->GetDeclKind() == DeclKind::Method)
 		{
 			MethodDecl const* field_decl = ast_cast<MethodDecl>(member_decl);
-			return;
+			WAVE_ASSERT(false);
 		}
 		else WAVE_ASSERT(false);
 	}
@@ -1121,8 +1124,7 @@ namespace wave
 
 		member_expr->GetClassExpr()->Accept(*this);
 		llvm::Value* this_value = llvm_value_map[member_expr->GetClassExpr()];
-		args.push_back(Load(called_function->getArg(arg_index++)->getType(), this_value));
-
+		args.push_back(this_value);
 		for (auto const& arg_expr : method_call.GetArgs())
 		{
 			arg_expr->Accept(*this);
@@ -1133,6 +1135,11 @@ namespace wave
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
 		llvm_value_map[&method_call] = call_result;
+	}
+
+	void LLVMVisitor::Visit(ThisExpr const& this_expr, uint32)
+	{
+		llvm_value_map[&this_expr] = this_value;
 	}
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)

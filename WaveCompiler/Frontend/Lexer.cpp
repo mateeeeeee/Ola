@@ -151,7 +151,7 @@ namespace wave
 	bool Lexer::LexIdentifier(Token& t)
 	{
 		FillToken(t, TokenKind::identifier, [](char c) -> bool { return std::isalnum(c) || c == '_'; });
-		std::string_view identifier = t.GetIdentifier();
+		std::string_view identifier = t.GetData();
 		if (IsKeyword(identifier))
 		{
 			t.SetKind(GetKeywordType(identifier));

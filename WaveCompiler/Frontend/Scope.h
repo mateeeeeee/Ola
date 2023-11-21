@@ -83,6 +83,15 @@ namespace wave
 			}
 			return nullptr;
 		}
+		SymType* LookUpMember(std::string_view sym_name)
+		{
+			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
+			{
+				SymType* sym = scope->LookUp(sym_name);
+				if (sym && sym->IsMember()) return sym;
+			}
+			return nullptr;
+		}
 		SymType* LookUpCurrentScope(std::string_view sym_name)
 		{
 			if (SymType* sym = scopes.back().LookUp(sym_name)) return sym;

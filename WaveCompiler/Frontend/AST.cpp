@@ -256,6 +256,10 @@ namespace wave
 		member_expr->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
+	void ThisExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 	void TranslationUnit::Accept(ASTVisitor& visitor) const
 	{
@@ -441,6 +445,10 @@ namespace wave
 		visitor.Visit(*this, 0);
 	}
 	void MemberCallExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void ThisExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

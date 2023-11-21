@@ -327,4 +327,10 @@ namespace wave
 	{
 		WAVE_DEBUG("{}MemberCallExpr\n", GetIndentation(depth));
 	}
+
+	void DebugVisitor::Visit(ThisExpr const& this_expr, uint32 depth)
+	{
+		WAVE_DEBUG("{}ThisExpr {}\n", GetIndentation(depth), this_expr.IsImplicit() ? "(implicit)" : "");
+	}
+
 }

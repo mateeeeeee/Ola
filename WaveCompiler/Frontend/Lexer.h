@@ -54,7 +54,7 @@ namespace wave
 		{
 			t.SetLocation(loc);
 			t.SetKind(type);
-			t.SetIdentifier(cur_ptr, end);
+			t.SetData(cur_ptr, end);
 			cur_ptr = end;
 		}
 		template<CharPredicate P>
@@ -69,7 +69,7 @@ namespace wave
 			t.SetKind(type);
 			char const* tmp_ptr = cur_ptr;
 			Consume(tmp_ptr, std::forward<P>(predicate));
-			t.SetIdentifier(cur_ptr, tmp_ptr);
+			t.SetData(cur_ptr, tmp_ptr);
 			cur_ptr = tmp_ptr;
 		}
 	};

@@ -674,7 +674,8 @@ namespace wave
 		InitializerList,
 		ArrayAccess, 
 		Member,
-		MemberCall
+		MemberCall,
+		This
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -1061,6 +1062,24 @@ namespace wave
 
 	private:
 		UniqueExprPtr member_expr;
+	};
+
+	class ThisExpr final : public Expr
+	{
+	public:
+		ThisExpr(SourceLocation const& loc) : Expr(ExprKind::This, loc) {}
+
+		void SetImplicit(bool _implicit)
+		{
+			implicit = _implicit;
+		}
+		bool IsImplicit() const { return implicit; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+	private:
+		bool implicit = false;
 	};
 
 	struct AST

@@ -87,19 +87,19 @@ namespace wave
 			flags = _flags;
 		}
 		
-		void SetIdentifier(char const* p_data, uint64 count)
+		void SetData(char const* p_data, uint64 count)
 		{
 			data = std::string(p_data, count);
 		}
-		void SetIdentifier(char const* start, char const* end)
+		void SetData(char const* start, char const* end)
 		{
 			data = std::string(start, end - start);
 		}
-		void SetIdentifier(std::string_view identifier)
+		void SetData(std::string_view identifier)
 		{
 			data = std::string(identifier);
 		}
-		std::string_view GetIdentifier() const
+		std::string_view GetData() const
 		{
 			return data;
 		}

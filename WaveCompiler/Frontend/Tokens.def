@@ -84,6 +84,7 @@ KEYWORD(else)
 KEYWORD(return)
 KEYWORD(enum)
 KEYWORD(class)
+KEYWORD(this)
 KEYWORD(const)
 KEYWORD(alias)
 KEYWORD(bool)
@@ -103,6 +104,7 @@ KEYWORD(sizeof)
 KEYWORD(length)
 KEYWORD(var)
 KEYWORD(import)
+KEYWORD(ref)
 
 #undef KEYWORD
 #undef PUNCTUATOR

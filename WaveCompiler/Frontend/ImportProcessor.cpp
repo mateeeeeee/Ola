@@ -30,7 +30,7 @@ namespace wave
 			do 
 			{
 				if (current_token->IsNot(TokenKind::identifier)) diagnostics.Report(current_token->GetLocation(), unexpected_token);
-				std::string import_name(current_token->GetIdentifier());
+				std::string import_name(current_token->GetData());
 				import_path /= import_name;
 				++current_token;
 			} while (Consume(TokenKind::period));
@@ -137,9 +137,7 @@ namespace wave
 			if (decl->IsPublic() || decl->IsExtern()) global_public_decls.push_back(decl.get());
 		}
 
-		std::vector<Token> import_tokens{};
-		std::function<void(QualType const& type, std::vector<Token>& tokens)> TypeToTokens
-			= [&TypeToTokens](QualType const& type, std::vector<Token>& tokens)
+		std::function<void(QualType const& type, std::vector<Token>& tokens)> TypeToTokens = [&TypeToTokens](QualType const& type, std::vector<Token>& tokens)
 			{
 				if (type.IsConst()) tokens.emplace_back(TokenKind::KW_const);
 				switch (type->GetKind())
@@ -170,15 +168,17 @@ namespace wave
 					break;
 				}
 			};
+
+		std::vector<Token> import_tokens{};
 		for (Decl const* decl : global_public_decls)
 		{
-			import_tokens.emplace_back(TokenKind::KW_extern);
 			if (FunctionDecl const* func_decl = dynamic_ast_cast<FunctionDecl>(decl))
 			{
+				import_tokens.emplace_back(TokenKind::KW_extern);
 				FunctionType const& func_type = type_cast<FunctionType>(func_decl->GetType());
 				TypeToTokens(func_type.GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
-				tok.SetIdentifier(func_decl->GetName());
+				tok.SetData(func_decl->GetName());
 				import_tokens.emplace_back(TokenKind::left_round);
 				std::span<FunctionParams const> func_params = func_type.GetParams();
 				for (auto const& param : func_params)
@@ -192,10 +192,43 @@ namespace wave
 			}
 			else if (VarDecl const* var_decl = dynamic_ast_cast<VarDecl>(decl))
 			{
+				import_tokens.emplace_back(TokenKind::KW_extern);
 				TypeToTokens(var_decl->GetType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
-				tok.SetIdentifier(var_decl->GetName());
+				tok.SetData(var_decl->GetName());
 				import_tokens.emplace_back(TokenKind::semicolon);
+			}
+			else if (AliasDecl const* alias_decl = dynamic_ast_cast<AliasDecl>(decl))
+			{
+				import_tokens.emplace_back(TokenKind::KW_alias);
+				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+				tok.SetData(alias_decl->GetName());
+				import_tokens.emplace_back(TokenKind::equal);
+				TypeToTokens(alias_decl->GetType(), import_tokens);
+				import_tokens.emplace_back(TokenKind::semicolon);
+			}
+			else if (EnumDecl const* enum_decl = dynamic_ast_cast<EnumDecl>(decl))
+			{
+				import_tokens.emplace_back(TokenKind::KW_enum);
+				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+				tok.SetData(enum_decl->GetName());
+				import_tokens.emplace_back(TokenKind::left_brace);
+				for (auto const& enum_member : enum_decl->GetEnumMembers())
+				{
+					Token& name_tok = import_tokens.emplace_back(TokenKind::identifier);
+					name_tok.SetData(enum_member->GetName());
+					import_tokens.emplace_back(TokenKind::equal);
+					Token& value_tok = import_tokens.emplace_back(TokenKind::int_number);
+					value_tok.SetData(std::to_string(enum_member->GetValue()));
+					import_tokens.emplace_back(TokenKind::comma);
+				}
+				import_tokens.pop_back();
+				import_tokens.emplace_back(TokenKind::right_brace);
+				import_tokens.emplace_back(TokenKind::semicolon);
+			}
+			else if (ClassDecl const* class_decl = dynamic_ast_cast<ClassDecl>(decl))
+			{
+				//todo
 			}
 			else WAVE_ASSERT(false);
 		}

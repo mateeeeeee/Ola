@@ -1,10 +1,12 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-%Foo.0 = type { i64 }
-%Foo.1 = type { i64 }
+%Foo = type { i64, i64 }
+%Foo.0 = type { i64, i64 }
+%Foo.1 = type { i64, i64 }
+%Foo.2 = type { i64, i64 }
 
-@__StringLiteral0 = internal constant [5 x i8] c"ajmo\00"
+@z = internal global i64 100
 
 declare void @PrintInt(i64)
 
@@ -22,26 +24,23 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-define void @"Foo::PrintX"(ptr %this) {
+define void @"Foo::SetX"(ptr %this, i64 %x) {
 entry:
-  call void @PrintString(ptr @__StringLiteral0)
+  %0 = getelementptr inbounds %Foo, ptr %this, i32 0, i32 0
+  %1 = load i64, ptr %0, align 4
+  store i64 %x, ptr %0, align 4
   br label %exit
 
 exit:                                             ; preds = %entry
   ret void
 }
 
-define i64 @main() {
+define i64 @"Foo::GetX"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %Foo.0, align 8
-  %2 = getelementptr inbounds %Foo.0, ptr %1, i32 0, i32 0
-  store i64 5, ptr %2, align 4
-  %3 = load ptr, ptr %1, align 8
-  call void @"Foo::PrintX"(ptr %3)
-  %4 = getelementptr inbounds %Foo.1, ptr %1, i32 0, i32 0
-  %5 = load ptr, ptr %4, align 8
-  store ptr %5, ptr %0, align 8
+  %1 = getelementptr inbounds %Foo.0, ptr %this, i32 0, i32 0
+  %2 = load ptr, ptr %1, align 8
+  store ptr %2, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -49,6 +48,32 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %6 = load i64, ptr %0, align 4
-  ret i64 %6
+  %3 = load i64, ptr %0, align 4
+  ret i64 %3
+}
+
+define i64 @main() {
+entry:
+  %0 = alloca i64, align 8
+  %1 = alloca %Foo.1, align 8
+  %2 = getelementptr inbounds %Foo.1, ptr %1, i32 0, i32 0
+  store i64 5, ptr %2, align 4
+  %3 = getelementptr inbounds %Foo.1, ptr %1, i32 0, i32 1
+  store i64 10, ptr %3, align 4
+  call void @"Foo::SetX"(ptr %1, i64 12)
+  %4 = alloca %Foo.2, align 8
+  %5 = load ptr, ptr %1, align 8
+  store ptr %5, ptr %4, align 8
+  call void @"Foo::SetX"(ptr %1, i64 24)
+  %6 = call i64 @"Foo::GetX"(ptr %4)
+  store i64 %6, ptr %0, align 4
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %7 = load i64, ptr %0, align 4
+  ret i64 %7
 }

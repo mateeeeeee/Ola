@@ -31,9 +31,11 @@ It's done as a learning project and its purpose is solely educational.
   * import statement
   * one-line comments
   * standard library
-    
-## Todo
   * classes (wip)
+	- methods and fields
+	- this keyword
+## Todo
+  * ref type
 
 ## Structure
 Wave consists of three parts: 
@@ -236,6 +238,37 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 }
 ```
 
+### Classes
+```
+public class Foo
+{
+	public void SetX(int x)
+	{
+		this.x = x; 
+	}
+    public int GetX() const
+	{
+		return x;
+	}
+	int x = 5; //private
+	private int y = 10;
+};
+
+public int main()
+{  
+	Foo foo;
+	foo.SetX(12);
+	Foo foo2 = foo;
+	foo.SetX(24);
+    return foo2.GetX(); //returns 12 because foo2 is a copy
+}
+```
+Class declaration consists of a sequence of method definitions and field declarations, Those declarations can be interleaved.
+Every method or field declaration has a visibility, either `public` or `private`. By default, if nothing is specified, the visibility
+is `private` which means it cannot be used outside of the class. 
+
+`this` keyword can be used to disambiguate between symbols.
+
 ### Strings
 Strings are just char arrays. `string` type is a built-in alias for `char[]`. 
 
@@ -280,7 +313,6 @@ public int main()
     return 0;
 }
 ```
-Currently there is only one built-in alias is: `alias string = char[]`.
 
 ### Keywords
 - `while`
@@ -315,6 +347,7 @@ Currently there is only one built-in alias is: `alias string = char[]`.
 - `length`
 - `var`
 - `import`
+- `ref`
 
 ### Types
 There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. `void` can be used when specifying that the return type of a function. All other types can form composite array type. Function type consists of the return type, and list of parameter types. Every cast in Wave is implicit, which means that explicit casts don't exist.
@@ -334,191 +367,3 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
   * -o     : Output file
   * --directory : Directory of project files
   * --simple : input code in the form of a string
-
-## Grammar 
-```
-<translation-unit> ::= { import-declaration }* { <function-definition> | <function-declaration> | <global-variable-declaration> | <alias-declaration> }*
-
-<import-declaration> ::= import <import_identifier>;
-<import_identifier> ::= <identifier>{.<identifier>}*
-
-<declaration-visibility>  ::= public | private
-
-<function-declaration>    ::= extern <type-specifier> <identifier>( <parameter-list> );
-<function-definition>     ::= {<declaration-visibility>}? <type-specifier> <identifier>( <parameter-list> ) <compound-statement>
-
-<global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
-                                | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
-								| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
-
-
-<parameter-list> ::= <parameter-declaration>
-                   | <parameter-list>, <parameter-declaration>
-<parameter-declaration> ::= {<type-qualifier>}? <type-specifier> {<identifier>}?
-
-<type-qualifier> ::= {const}?
-<type-specifier> ::= void
-                   | bool {[]}*
-                   | char {[]}*
-                   | int  {[]}*
-                   | float {[]}*
-                   | <enum-identifier> {[]}*
-                   | <class-identifier> {[]}*
-                   | <alias-identifier> {[]}*
-
-<alias-declaration> ::= alias <alias-identifier> = <type-qualifier><type-specifier>;
-	   
-<enum-specifier> ::= enum <enum-identifier> { <enumerator-list> }
-                   | enum { <enumerator-list> }
-
-<enumerator-list> ::= <enumerator>
-                    | <enumerator-list> , <enumerator>
-
-<enumerator> ::= <identifier>
-               | <identifier> = <constant-expression>
-
-<enum-identifier> ::= <identifier>
-			   
-<class-specifier> ::= class <class-identifier> <class-body>;
-
-<class-body> ::= { { <class-variable-declaration> | <class-function-definition> }* }
-
-<class-identifier> ::= <identifier>
-
-<class-variable-declaration> ::= {<declaration-visibility>}? {<type-qualifier>}? <type-specifier> {<identifier>}?;
-
-<class-function-definition> ::= {<declaration-visibility>}? <type-specifier> <identifier>( <parameter-list> ) {const}? <compound-statement>
-
-<constant-expression> ::= <conditional-expression>
-
-<conditional-expression> ::= <logical-or-expression>
-                           | <logical-or-expression> ? <expression> : <conditional-expression>
-
-<logical-or-expression> ::= <logical-and-expression>
-                          | <logical-or-expression> || <logical-and-expression>
-
-<logical-and-expression> ::= <inclusive-or-expression>
-                           | <logical-and-expression> && <inclusive-or-expression>
-
-<inclusive-or-expression> ::= <exclusive-or-expression>
-                            | <inclusive-or-expression> | <exclusive-or-expression>
-
-<exclusive-or-expression> ::= <and-expression>
-                            | <exclusive-or-expression> ^ <and-expression>
-
-<and-expression> ::= <equality-expression>
-                   | <and-expression> & <equality-expression>
-
-<equality-expression> ::= <relational-expression>
-                        | <equality-expression> == <relational-expression>
-                        | <equality-expression> != <relational-expression>
-
-<relational-expression> ::= <shift-expression>
-                          | <relational-expression> < <shift-expression>
-                          | <relational-expression> > <shift-expression>
-                          | <relational-expression> <= <shift-expression>
-                          | <relational-expression> >= <shift-expression>
-
-<shift-expression> ::= <additive-expression>
-                     | <shift-expression> << <additive-expression>
-                     | <shift-expression> >> <additive-expression>
-
-<additive-expression> ::= <multiplicative-expression>
-                        | <additive-expression> + <multiplicative-expression>
-                        | <additive-expression> - <multiplicative-expression>
-
-<multiplicative-expression> ::= <unary-expression>
-                              | <multiplicative-expression> * <unary-expression>
-                              | <multiplicative-expression> / <unary-expression>
-                              | <multiplicative-expression> % <unary-expression>
-							 
-
-<unary-expression> ::= <postfix-expression>
-                     | ++ <unary-expression>
-                     | -- <unary-expression>
-                     | sizeof (<unary-expression>)
-                     | sizeof (<type-specifier>)
-                     | length (<unary-expression>)
-
-<postfix-expression> ::= <primary-expression>
-                       | <postfix-expression> [ <expression> ]
-                       | <postfix-expression> . <identifier>
-                       | <postfix-expression> ( {<assignment-expression>}* )
-                       | <postfix-expression> ++
-                       | <postfix-expression> --
-
-<primary-expression> ::= <identifier>
-                       | <constant>
-                       | <string>
-                       | ( <expression> )
-
-letter	::= {[a-z|A-Z]}
-digit	::= [0-9]
-identifier ::= letter { letter | digit | _ }*
-<string> ::= "{ch}", where ch denotes any printable ASCII character 
-
-<constant> ::= <integer-constant>
-             | <character-constant>
-             | <floating-constant>
-             | <enumeration-constant>
-			 
-<expression> ::= <assignment-expression>
-               | <expression> , <assignment-expression>
-
-<assignment-expression> ::= <conditional-expression>
-                          | <unary-expression> <assignment-operator> <assignment-expression>
-
-<assignment-operator> ::= =
-                        | *=
-                        | /=
-                        | %=
-                        | +=
-                        | -=
-                        | <<=
-                        | >>=
-                        | &=
-                        | ^=
-                        | |=
-
-<unary-operator> ::= &
-                   | *
-                   | +
-                   | -
-                   | ~
-                   | !
-
-<local-variable-declaration> ::= <type-qualifier> <type-specifier> <identifier> { = {<initializer> | <init-list-expr> }}?;
-                               | <type-qualifier> var <identifier> = {<initializer> | <init-list-expr> };
-	
-<initializer> ::= <assignment-expression>
-<init-list-expr> ::= {<type-specifier>{[<constant-expression>]}+}?{ <initializer>{,<initializer>}* }
-
-<compound-statement> ::= { { <local-variable-declaration> | <statement> | <alias-declaration> }* }
-
-<statement> ::= <labeled-statement>
-              | <expression-statement>
-              | <compound-statement>
-              | <selection-statement>
-              | <iteration-statement>
-              | <jump-statement>
-
-<labeled-statement> ::= <identifier> : <statement>
-                      | case <constant-expression> : <statement>
-                      | default : <statement>
-
-<expression-statement> ::= {<expression>}? ;
-
-<selection-statement> ::= if ( <expression> ) <statement>
-                        | if ( <expression> ) <statement> else <statement>
-                        | switch ( <expression> ) <statement>
-
-<iteration-statement> ::= while ( <expression> ) <statement>
-                        | do <statement> while ( <expression> ) ;
-                        | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
-                        | foreach (<type-qualifier> <type-specifier> <identifier> : <identifier>) <statement>
-
-<jump-statement> ::= goto <identifier> ;
-                   | continue ;
-                   | break ;
-                   | return {<expression>}? ;
-```	
