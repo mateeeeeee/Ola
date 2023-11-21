@@ -1121,9 +1121,21 @@ namespace wave
 		class_expr->Accept(*this);
 		if (member_decl->GetDeclKind() == DeclKind::Field)
 		{
-			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
-			llvm::Value* field_value = builder.CreateStructGEP(this_struct_type, llvm_value_map[class_expr], field_decl->GetFieldIndex());
-			llvm_value_map[&member_expr] = field_value;
+			if (!this_struct_type)
+			{
+				llvm::AllocaInst* alloc = builder.CreateAlloca(ConvertToLLVMType(class_expr->GetType()), nullptr);
+				builder.CreateStore(llvm_value_map[class_expr], alloc);
+				FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+				llvm::Value* field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), alloc, field_decl->GetFieldIndex());
+				llvm_value_map[&member_expr] = field_value;
+			}
+			else
+			{
+				FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+				llvm::Value* field_value = builder.CreateStructGEP(this_struct_type, this_value, field_decl->GetFieldIndex());
+				llvm_value_map[&member_expr] = field_value;
+			}
+			
 		}
 		else if (member_decl->GetDeclKind() == DeclKind::Method)
 		{
@@ -1231,6 +1243,7 @@ namespace wave
 		{
 			ClassType const& class_type = type_cast<ClassType>(type);
 			ClassDecl const* class_decl = class_type.GetClassDecl();
+			if (class_decl == nullptr) return nullptr;
 
 			using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*, VoidPointerHash>;
 			static LLVMStructTypeMap struct_type_map;
