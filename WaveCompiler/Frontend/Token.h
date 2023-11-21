@@ -45,7 +45,7 @@ namespace wave
 
 		bool IsTypename() const
 		{
-			return IsTypeSpecifier() || IsTypeQualifier() || IsOneOf(TokenKind::KW_var, TokenKind::KW_alias);
+			return IsTypeSpecifier() || IsTypeQualifier() || IsOneOf(TokenKind::KW_var, TokenKind::KW_alias, TokenKind::KW_ref);
 		}
 		bool IsTypeSpecifier() const
 		{

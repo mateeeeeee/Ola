@@ -759,7 +759,6 @@ namespace wave
 		llvm::Value* rhs = Load(rhs_expr->GetType(), rhs_value);
 		bool const is_float_expr = IsFloat(lhs->getType()) || IsFloat(rhs->getType());
 
-
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
 		{
@@ -996,7 +995,7 @@ namespace wave
 			}
 			else WAVE_ASSERT(false);
 		}
-		WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
+		else WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
 
 	void LLVMVisitor::Visit(CallExpr const& call_expr, uint32)
@@ -1009,9 +1008,16 @@ namespace wave
 		for (auto const& arg_expr : call_expr.GetArgs())
 		{
 			arg_expr->Accept(*this);
-			llvm::Value* arg_value = llvm_value_map[arg_expr.get()]; 
-			WAVE_ASSERT(arg_value);
-			args.push_back(Load(called_function->getArg(arg_index++)->getType(), arg_value));
+			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
+			if (arg_expr->GetType()->Is(TypeKind::Class))
+			{
+				args.push_back(arg_value);
+			}
+			else
+			{
+				WAVE_ASSERT(arg_value);
+				args.push_back(Load(called_function->getArg(arg_index++)->getType(), arg_value));
+			}
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
@@ -1200,13 +1206,18 @@ namespace wave
 		{
 			ClassType const& class_type = type_cast<ClassType>(type);
 			ClassDecl const* class_decl = class_type.GetClassDecl();
+
+			using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*, VoidPointerHash>;
+			static LLVMStructTypeMap struct_type_map;
+			if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
+
 			llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
 
 			UniqueFieldDeclPtrList const& member_variables = class_decl->GetFields();
 			std::vector<llvm::Type*> llvm_member_types; llvm_member_types.reserve(member_variables.size());
 			for (auto const& member_var : member_variables) llvm_member_types.push_back(ConvertToLLVMType(member_var->GetType()));
 			llvm_class_type->setBody(llvm_member_types, false);
-
+			struct_type_map[class_decl] = llvm_class_type;
 			return llvm_class_type;
 		}
 		default:
@@ -1266,6 +1277,12 @@ namespace wave
 	{
 		return type->isDoubleTy();
 	}
+
+	bool LLVMVisitor::IsReference(llvm::Type* type)
+	{
+		return type->isPointerTy();
+	}
+
 }
 
 

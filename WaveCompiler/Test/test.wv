@@ -1,7 +1,5 @@
 import std.io;
 
-int z = 100;
-
 public class Foo
 {
 	public void SetX(int x)
@@ -16,17 +14,10 @@ public class Foo
 	int y = 10;
 };
 
-
 public int main()
 {  
 	Foo foo;
 	foo.SetX(12);
 	Foo foo2 = foo;
-	foo.SetX(24);
-    return foo2.GetX();
+	return foo2.GetX();
 }
-
-
-//todo for classes:
-//passing to functions
-//semantic analysis improvements

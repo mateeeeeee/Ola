@@ -122,5 +122,6 @@ namespace wave
 		static bool IsBoolean(llvm::Type*);
 		static bool IsInteger(llvm::Type*);
 		static bool IsFloat(llvm::Type*);
+		static bool IsReference(llvm::Type*);
 	};
 }

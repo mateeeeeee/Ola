@@ -1097,7 +1097,7 @@ namespace wave
 	{
 		SourceLocation loc = current_token->GetLocation();
 		QualType type{};
-		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true);
+		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true, false);
 		Expect(TokenKind::left_brace);
 		UniqueExprPtrList expr_list;
 		if (!Consume(TokenKind::right_brace))
@@ -1118,8 +1118,11 @@ namespace wave
 		if (Consume(TokenKind::KW_const)) type.AddConst();
 	}
 
-	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_required)
+	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_required, bool allow_ref)
 	{
+		bool is_ref = false;
+		if(allow_ref) is_ref = Consume(TokenKind::KW_ref);
+
 		switch (current_token->GetKind())
 		{
 		case TokenKind::KW_var:   break;
@@ -1193,6 +1196,14 @@ namespace wave
 				type.SetType(array_type);
 				type.RemoveConst();
 			}
+		}
+
+		if (is_ref)
+		{
+			bool is_const = type.IsConst();
+			type.RemoveConst();
+			RefType ref_type(type);
+			type = QualType(ref_type, is_const ? Qualifier_Const : Qualifier_None);
 		}
 	}
 

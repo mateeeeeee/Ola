@@ -133,7 +133,7 @@ namespace wave
 		WAVE_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
 		void ParseTypeQualifier(QualType& type);
-		void ParseTypeSpecifier(QualType& type, bool array_size_required = false);
+		void ParseTypeSpecifier(QualType& type, bool array_size_required = false, bool allow_ref = true);
 
 		bool IsFunctionDeclaration();
 		bool IsCurrentTokenTypename();

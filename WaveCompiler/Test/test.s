@@ -58,9 +58,6 @@ main:                                   # @main
 	call	"Foo::SetX"
 	mov	rax, qword ptr [rsp + 48]
 	mov	qword ptr [rsp + 32], rax
-	lea	rcx, [rsp + 48]
-	mov	edx, 24
-	call	"Foo::SetX"
 	lea	rcx, [rsp + 32]
 	call	"Foo::GetX"
 	mov	qword ptr [rsp + 64], rax
@@ -70,11 +67,6 @@ main:                                   # @main
 	ret
 	.seh_endproc
                                         # -- End function
-	.data
-	.p2align	3, 0x0                          # @z
-z:
-	.quad	100                             # 0x64
-
 	.addrsig
 	.addrsig_sym "Foo::SetX"
 	.addrsig_sym "Foo::GetX"

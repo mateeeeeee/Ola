@@ -2,11 +2,6 @@
 source_filename = "WaveModule"
 
 %Foo = type { i64, i64 }
-%Foo.0 = type { i64, i64 }
-%Foo.1 = type { i64, i64 }
-%Foo.2 = type { i64, i64 }
-
-@z = internal global i64 100
 
 declare void @PrintInt(i64)
 
@@ -38,7 +33,7 @@ exit:                                             ; preds = %entry
 define i64 @"Foo::GetX"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
-  %1 = getelementptr inbounds %Foo.0, ptr %this, i32 0, i32 0
+  %1 = getelementptr inbounds %Foo, ptr %this, i32 0, i32 0
   %2 = load ptr, ptr %1, align 8
   store ptr %2, ptr %0, align 8
   br label %exit
@@ -55,16 +50,15 @@ exit:                                             ; preds = %return, %entry
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %Foo.1, align 8
-  %2 = getelementptr inbounds %Foo.1, ptr %1, i32 0, i32 0
+  %1 = alloca %Foo, align 8
+  %2 = getelementptr inbounds %Foo, ptr %1, i32 0, i32 0
   store i64 5, ptr %2, align 4
-  %3 = getelementptr inbounds %Foo.1, ptr %1, i32 0, i32 1
+  %3 = getelementptr inbounds %Foo, ptr %1, i32 0, i32 1
   store i64 10, ptr %3, align 4
   call void @"Foo::SetX"(ptr %1, i64 12)
-  %4 = alloca %Foo.2, align 8
+  %4 = alloca %Foo, align 8
   %5 = load ptr, ptr %1, align 8
   store ptr %5, ptr %4, align 8
-  call void @"Foo::SetX"(ptr %1, i64 24)
   %6 = call i64 @"Foo::GetX"(ptr %4)
   store i64 %6, ptr %0, align 4
   br label %exit

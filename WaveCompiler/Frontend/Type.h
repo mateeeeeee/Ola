@@ -264,7 +264,7 @@ namespace wave
 
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			if (other.IsNot(type->GetKind())) return false;
+			return false;
 		}
 		virtual bool IsSameAs(Type const& other) const override
 		{
