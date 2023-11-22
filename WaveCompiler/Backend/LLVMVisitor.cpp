@@ -108,6 +108,7 @@ namespace wave
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
 		bool const is_array = var_type->Is(TypeKind::Array);
 		bool const is_class = var_type->Is(TypeKind::Class);
+		bool const is_ref   = var_type->Is(TypeKind::Ref);
 
 		if (var_decl.IsGlobal())
 		{
@@ -172,6 +173,10 @@ namespace wave
 				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 
 																		 llvm::ConstantStruct::get(llvm_struct_type, initializers), var_decl.GetName());
 				llvm_value_map[&var_decl] = global_var;
+			}
+			else if (is_ref)
+			{
+				WAVE_ASSERT_MSG(false, "todo");
 			}
 			else
 			{
@@ -241,6 +246,13 @@ namespace wave
 				else if (is_class)
 				{
 					llvm_value_map[&var_decl] = llvm_value_map[init_expr];
+				}
+				else if (is_ref)
+				{
+					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm::Value* init_value = llvm_value_map[init_expr];
+					builder.CreateStore(init_value, alloc);
+					llvm_value_map[&var_decl] = alloc;
 				}
 				else
 				{
@@ -348,10 +360,6 @@ namespace wave
 			llvm::Value* return_expr_value = llvm_value_map[expr_stmt->GetExpr()];
 			WAVE_ASSERT(return_expr_value);
 			llvm_value_map[&return_stmt] = Store(return_expr_value, return_alloc);
-		}
-		else 
-		{
-			llvm_value_map[&return_stmt] = nullptr;
 		}
 		builder.CreateBr(exit_block);
 
@@ -690,7 +698,10 @@ namespace wave
 		{
 		case BinaryExprKind::Assign:
 		{
-			result = Store(rhs_value, lhs_value);
+			if (IsRefType(lhs_expr->GetType()))
+				 result = builder.CreateStore(rhs_value, lhs_value);
+			else 
+				 result = Store(rhs_value, lhs_value);
 		}
 		break;
 		case BinaryExprKind::Add:

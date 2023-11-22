@@ -12,5 +12,13 @@ public int main()
 {
 	int a = 9;
 	ModifyInt(a);
-	return a;
+	Assert(a == 10);
+	ref int b = a;
+	Assert(b == 10);
+	int c = b;
+	Assert(c == a);
+	b = c;
+	++c;
+	Assert(b == c);
+	return 0;
 }

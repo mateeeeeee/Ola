@@ -15,16 +15,22 @@
 ModifyInt:                              # @ModifyInt
 .seh_proc ModifyInt
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 16
+	.seh_stackalloc 16
 	.seh_endprologue
-	mov	qword ptr [rsp], rcx
-	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rsp + 8], rcx
+	mov	rax, qword ptr [rsp + 8]
 	mov	rcx, qword ptr [rax]
 	add	rcx, 1
 	mov	qword ptr [rax], rcx
+	mov	rax, qword ptr [rax]
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rsp], rax
+	mov	rax, qword ptr [rsp]
+	add	rax, 1
+	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
-	pop	rax
+	add	rsp, 16
 	ret
 	.seh_endproc
                                         # -- End function
@@ -40,7 +46,7 @@ main:                                   # @main
 	sub	rsp, 56
 	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp + 40], 0
+	mov	qword ptr [rsp + 40], 9
 	lea	rcx, [rsp + 40]
 	call	ModifyInt
 	mov	rax, qword ptr [rsp + 40]

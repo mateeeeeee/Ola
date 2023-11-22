@@ -113,6 +113,11 @@ TEST(Declarations, Class)
 	EXPECT_EQ(WAVE(-i test_class), 0);
 }
 
+TEST(Declarations, Ref)
+{
+	EXPECT_EQ(WAVE(-i test_ref), 0);
+}
+
 TEST(Function, Calls)
 {
 	EXPECT_EQ(WAVE(-i test_functioncalls), 0);
