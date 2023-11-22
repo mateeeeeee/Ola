@@ -54,50 +54,7 @@ namespace wave
 
 		if (!function_decl.HasDefinition()) return;
 
-		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
-		builder.SetInsertPoint(entry_block);
-
-		if(!function_type->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(function_type->getReturnType(), nullptr);
-		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
-
-		ConstLabelStmtPtrList labels = function_decl.GetLabels();
-		for (LabelStmt const* label : labels)
-		{
-			std::string block_name = "label."; block_name += label->GetName();
-			llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, llvm_function, exit_block);
-			label_blocks[block_name] = label_block;
-		}
-
-		function_decl.GetBodyStmt()->Accept(*this);
-
-		builder.SetInsertPoint(exit_block);
-		if (return_alloc) builder.CreateRet(Load(function_type->getReturnType(), return_alloc));
-		else builder.CreateRetVoid();
-
-		std::vector<llvm::BasicBlock*> unreachable_blocks{};
-		for (auto&& block : *llvm_function) if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-
-		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *llvm_function) if (block.empty()) empty_blocks.push_back(&block);
-
-		for (auto empty_block : empty_blocks)
-		{
-			builder.SetInsertPoint(empty_block);
-			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
-			builder.CreateBr(exit_block);
-		}
-		if (entry_block->getTerminator() == nullptr)
-		{
-			builder.SetInsertPoint(entry_block);
-			builder.CreateBr(exit_block);
-		}
-
-		label_blocks.clear();
-
-		exit_block = nullptr;
-		return_alloc = nullptr;
-
-		llvm_value_map[&function_decl] = llvm_function;
+		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
 
 	void LLVMVisitor::Visit(MethodDecl const& method_decl, uint32)
@@ -136,57 +93,13 @@ namespace wave
 			++param_arg;
 		}
 
-		//todo: move this to common
-		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", llvm_function);
-		builder.SetInsertPoint(entry_block);
-
 		this_struct_type = class_type;
 		this_value = llvm_function->arg_begin();
 
-		if (!llvm_function_type->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(llvm_function_type->getReturnType(), nullptr);
-		exit_block = llvm::BasicBlock::Create(context, "exit", llvm_function);
-
-		ConstLabelStmtPtrList labels = method_decl.GetLabels();
-		for (LabelStmt const* label : labels)
-		{
-			std::string block_name = "label."; block_name += label->GetName();
-			llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, llvm_function, exit_block);
-			label_blocks[block_name] = label_block;
-		}
-
-		method_decl.GetBodyStmt()->Accept(*this);
-
-		builder.SetInsertPoint(exit_block);
-		if (return_alloc) builder.CreateRet(Load(llvm_function_type->getReturnType(), return_alloc));
-		else builder.CreateRetVoid();
-
-		std::vector<llvm::BasicBlock*> unreachable_blocks{};
-		for (auto&& block : *llvm_function) if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-
-		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *llvm_function) if (block.empty()) empty_blocks.push_back(&block);
-
-		for (auto empty_block : empty_blocks)
-		{
-			builder.SetInsertPoint(empty_block);
-			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
-			builder.CreateBr(exit_block);
-		}
-		if (entry_block->getTerminator() == nullptr)
-		{
-			builder.SetInsertPoint(entry_block);
-			builder.CreateBr(exit_block);
-		}
-
-		label_blocks.clear();
+		VisitFunctionDeclCommon(method_decl, llvm_function);
 
 		this_value = nullptr;
 		this_struct_type = nullptr;
-
-		exit_block = nullptr;
-		return_alloc = nullptr;
-
-		llvm_value_map[&method_decl] = llvm_function;
 	}
 
 	void LLVMVisitor::Visit(VarDecl const& var_decl, uint32)
@@ -354,7 +267,6 @@ namespace wave
 					Store(llvm_value_map[fields[i].get()], field_ptr);
 				}
 			}
-			
 		}
 	}
 
@@ -1049,12 +961,7 @@ namespace wave
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
 			WAVE_ASSERT(arg_value);
-			llvm::Value* arg = arg_value;
-			if (!IsClassType(arg_expr->GetType()))
-			{
-				arg = Load(called_function->getArg(arg_index++)->getType(), arg);
-
-			}
+			llvm::Value* arg = Load(called_function->getArg(arg_index++)->getType(), arg_value);
 			args.push_back(arg);
 		}
 
@@ -1197,6 +1104,62 @@ namespace wave
 		llvm_value_map[&this_expr] = this_value;
 	}
 
+	void LLVMVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
+	{
+		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", func);
+		builder.SetInsertPoint(entry_block);
+
+		for (auto& param : func_decl.GetParamDecls())
+		{
+			llvm::Value* arg_value = llvm_value_map[param.get()];
+			llvm::AllocaInst* arg_alloc = builder.CreateAlloca(arg_value->getType(), nullptr);
+			builder.CreateStore(arg_value, arg_alloc);
+			llvm_value_map[param.get()] = arg_alloc;
+		}
+
+		if (!func->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(func->getReturnType(), nullptr);
+		exit_block = llvm::BasicBlock::Create(context, "exit", func);
+
+		ConstLabelStmtPtrList labels = func_decl.GetLabels();
+		for (LabelStmt const* label : labels)
+		{
+			std::string block_name = "label."; block_name += label->GetName();
+			llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, func, exit_block);
+			label_blocks[block_name] = label_block;
+		}
+
+		func_decl.GetBodyStmt()->Accept(*this);
+
+		builder.SetInsertPoint(exit_block);
+		if (return_alloc) builder.CreateRet(Load(func->getReturnType(), return_alloc));
+		else builder.CreateRetVoid();
+
+		std::vector<llvm::BasicBlock*> unreachable_blocks{};
+		for (auto&& block : *func) if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
+
+		std::vector<llvm::BasicBlock*> empty_blocks{};
+		for (auto&& block : *func) if (block.empty()) empty_blocks.push_back(&block);
+
+		for (auto empty_block : empty_blocks)
+		{
+			builder.SetInsertPoint(empty_block);
+			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
+			builder.CreateBr(exit_block);
+		}
+		if (entry_block->getTerminator() == nullptr)
+		{
+			builder.SetInsertPoint(entry_block);
+			builder.CreateBr(exit_block);
+		}
+
+		label_blocks.clear();
+
+		exit_block = nullptr;
+		return_alloc = nullptr;
+
+		llvm_value_map[&func_decl] = func;
+	}
+
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
 		if (IsBoolean(condition_value->getType()))
@@ -1248,7 +1211,6 @@ namespace wave
 			for (auto const& func_param : function_params)
 			{
 				llvm::Type* param_type = ConvertToLLVMType(func_param.type);
-				if (IsClassType(func_param.type)) param_type = llvm::PointerType::get(param_type, 0);
 				param_types.push_back(param_type);
 			}
 			return llvm::FunctionType::get(return_type, param_types, false);
@@ -1339,7 +1301,6 @@ namespace wave
 	{
 		return type->isPointerTy();
 	}
-
 }
 
 

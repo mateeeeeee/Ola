@@ -11,6 +11,7 @@ namespace llvm
 	class Module;
 	class Value;
 	class Type;
+	class Function;
 	class IntegerType;
 	class AllocaInst;
 	class SwitchInst;
@@ -113,12 +114,13 @@ namespace wave
 
 	private:
 
+		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
+
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
 		llvm::Type* ConvertToLLVMType(QualType const&);
 
 		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
-		[[maybe_unused]] llvm::Value* Store(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 
 		static bool IsBoolean(llvm::Type*);

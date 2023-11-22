@@ -16,19 +16,21 @@ void ModifyS(S s)
 {
 	s.x *= 2;
 	s.y *= 2;
+	Assert(s.x == 20);
+	Assert(s.y == 20);
 }
 
 public int main()
 {
 	S s; s.x = 10; s.y = 10;
 	ModifyS(s);
-	Assert(s.x == 20);
-	Assert(s.y == 20);
+	Assert(s.x == 10);
+	Assert(s.y == 10);
 	S s2 = s;
-	Assert(s2.GetX() == 20);
-	Assert(s2.GetY() == 20);
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
 	s2.x += 10;
-	Assert(s.GetX() == 30);
-	Assert(s2.GetX() == 30);
+	Assert(s.GetX() == 20);
+	Assert(s2.GetX() == 20);
 	return 0;
 }
