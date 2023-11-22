@@ -605,7 +605,7 @@ namespace wave
 		WAVE_ASSERT(operand_value);
 		llvm::Value* operand = Load(operand_expr->GetType(), operand_value);
 
-		bool const is_float_expr = IsFloat(operand->getType());
+		bool const is_float_expr = IsFloatType(operand_expr->GetType());
 		llvm::Value* result = nullptr;
 		switch (unary_expr.GetUnaryKind())
 		{
@@ -935,16 +935,7 @@ namespace wave
 		}
 		else if (IsRef(cast_type))
 		{
-			if (IsRef(cast_operand_type))
-			{
-				llvm_value_map[&cast_expr] = cast_operand;
-			}
-			else
-			{
-				llvm::AllocaInst* alloc = builder.CreateAlloca(cast_operand_type, nullptr);
-				Store(cast_operand, alloc);
-				llvm_value_map[&cast_expr] = alloc;
-			}
+			llvm_value_map[&cast_expr] = cast_operand_value;
 		}
 		else WAVE_ASSERT(llvm_value_map[&cast_expr] != nullptr);
 	}
@@ -961,8 +952,12 @@ namespace wave
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
 			WAVE_ASSERT(arg_value);
-			llvm::Value* arg = Load(called_function->getArg(arg_index++)->getType(), arg_value);
-			args.push_back(arg);
+
+			llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
+			if (arg_type->isPointerTy()) args.push_back(arg_value);
+			else args.push_back(Load(arg_type, arg_value));
+			
+			arg_index++;
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
@@ -1114,7 +1109,15 @@ namespace wave
 			llvm::Value* arg_value = llvm_value_map[param.get()];
 			llvm::AllocaInst* arg_alloc = builder.CreateAlloca(arg_value->getType(), nullptr);
 			builder.CreateStore(arg_value, arg_alloc);
-			llvm_value_map[param.get()] = arg_alloc;
+			if (IsRefType(param->GetType()))
+			{
+				llvm::Value* arg_ref = builder.CreateLoad(arg_value->getType(), arg_alloc);
+				llvm_value_map[param.get()] = arg_ref;
+			}
+			else
+			{
+				llvm_value_map[param.get()] = arg_alloc;
+			}
 		}
 
 		if (!func->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(func->getReturnType(), nullptr);
@@ -1247,7 +1250,10 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Load(QualType const& type, llvm::Value* ptr)
 	{
-		llvm::Type* llvm_type = ConvertToLLVMType(type);
+		llvm::Type* llvm_type = nullptr;
+		if (RefType const* ref_type = dynamic_type_cast<RefType>(type))
+			 llvm_type = ConvertToLLVMType(ref_type->GetReferredType());
+		else llvm_type = ConvertToLLVMType(type);
 		return Load(llvm_type, ptr);
 	}
 

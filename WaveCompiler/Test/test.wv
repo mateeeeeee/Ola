@@ -1,37 +1,13 @@
-import std.assert;
 import std.io;
 
-public class S
+void ModifyInt(ref int a)
 {
-	public int x = 0;
-	public int y = 0;
-
-	public void SetX(int x) {this.x = x;}
-	public void SetY(int y) {this.y = y;}
-
-	public int GetX() const {return x;}
-	public int GetY() const {return y;}
-};
-
-void ModifyS(S s)
-{
-	s.x *= 2;
-	s.y *= 2;
-	Assert(s.x == 20);
-	Assert(s.y == 20);
+	++a;
 }
 
 public int main()
 {
-	S s; s.x = 10; s.y = 10;
-	ModifyS(s);
-	Assert(s.x == 10);
-	Assert(s.y == 10);
-	S s2 = s;
-	Assert(s2.GetX() == 10);
-	Assert(s2.GetY() == 10);
-	s2.x += 10;
-	Assert(s.GetX() == 20);
-	Assert(s2.GetX() == 20);
-	return 0;
+	int a = 0;
+	ModifyInt(a);
+	return a;
 }
