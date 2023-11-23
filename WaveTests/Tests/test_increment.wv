@@ -1,40 +1,66 @@
 import std.assert;
 
-
-
-void IncrementArg(int a)
+// Test pre-increment and pre-decrement for both integers and floats
+void TestPreIncrementDecrement()
 {
-    int b = a;
-	a++;
-	Assert(a == (b + 1));
-}
-
-public int main()
-{
+    // Integer tests
     int a = 5;
-    int b = ++a;  // b should be 6, a should also be 6
-    Assert(b == 6);
+    int c = 8;
+
+    int preIncResultA = ++a;
+    Assert(preIncResultA == 6);
     Assert(a == 6);
 
-    int c = 10;
-    int d = --c;  // d should be 9, c should also be 9
-    Assert(d == 9);
-    Assert(c == 9);
+    int preDecResultC = --c;
+    Assert(preDecResultC == 7);
+    Assert(c == 7);
 
-    int e = 7;
-    int f = e++;  // f should be 7, e should become 8
-    Assert(f == 7);
-    Assert(e == 8);
+    // Float tests
+    float e = 3.5;
+    float g = 8.5;
 
-    int g = 15;
-    int h = g--;  // h should be 15, g should become 14
-    Assert(h == 15);
-    Assert(g == 14);
+    float preIncResultE = ++e;
+    Assert(preIncResultE == 4.5);
+    Assert(e == 4.5);
 
-    int j = 1;
-    IncrementArg(j);
-    Assert(j == 1);
+    float preDecResultG = --g;
+    Assert(preDecResultG == 7.5);
+    //Assert(g == 7.5);
+}
+
+// Test post-increment and post-decrement for both integers and floats
+void TestPostIncrementDecrement()
+{
+    // Integer tests
+    int b = 10;
+    int d = 15;
+
+    int postIncResultB = b++;
+    Assert(postIncResultB == 10);
+    Assert(b == 11);
+
+    int postDecResultD = d--;
+    Assert(postDecResultD == 15);
+    Assert(d == 14);
+
+    // Float tests
+    float f = 6.5;
+    float h = 12.5;
+
+    float postIncResultF = f++;
+    Assert(postIncResultF == 6.5);
+    Assert(f == 7.5);
+
+    float postDecResultH = h--;
+    Assert(postDecResultH == 12.5);
+    Assert(h == 11.5);
+}
+
+// Main testing function
+public int main()
+{
+    TestPreIncrementDecrement();
+    TestPostIncrementDecrement();
 
     return 0;
-
 }

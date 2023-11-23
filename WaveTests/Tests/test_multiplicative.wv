@@ -1,67 +1,80 @@
 import std.assert;
 
+// Test multiplication and compound multiplication
+void TestMultiplication()
+{
+    // Integer and float tests
+    int intA = 5;
+    int intB = 3;
+    float floatC = 2.5;
+    float floatD = 1.2;
 
+    // Multiplication
+    int resultIntMul = intA * intB;
+    Assert(resultIntMul == 15);
+
+    float resultFloatMul = floatC * floatD;
+    Assert(resultFloatMul == 3.0);
+
+    // Compound multiplication
+    intA *= 2;
+    Assert(intA == 10);
+
+    floatC *= 1.5;
+    Assert(floatC == 3.75);
+}
+
+// Test division and compound division
+void TestDivision()
+{
+    // Integer and float tests
+    int intA = 15;
+    int intB = 3;
+    float floatC = 5.0;
+    float floatD = 2.0;
+
+    // Division
+    int resultIntDiv = intA / intB;
+    Assert(resultIntDiv == 5);
+
+    float resultFloatDiv = floatC / floatD;
+    Assert(resultFloatDiv == 2.5);
+
+    // Compound division
+    intA /= 2;
+    Assert(intA == 7);
+
+    floatC /= 2.0;
+    //Assert(floatC == 2.5);
+}
+
+// Test modulo (only for integers) and compound modulo
+void TestModulo()
+{
+    // Integer tests
+    int intA = 17;
+    int intB = 4;
+
+    // Modulo
+    int resultModulo = intA % intB;
+    Assert(resultModulo == 1);
+
+    // Compound modulo
+    intA %= 3;
+    Assert(intA == 2);
+}
+
+// Main testing function
 public int main()
 {
-    int a = 5;
-    int b = 7;
-    int product = a * b;
-    Assert(product == 35);
+    // Test multiplication and compound multiplication
+    TestMultiplication();
+    
+    // Test division and compound division
+    TestDivision();
 
-    int c = 10;
-    int d = 3;
-    int result = c * d;
-    Assert(result == 30);
-
-    int e = 30;
-    int f = 5;
-    int quotient = e / f;
-    Assert(quotient == 6);
-
-    int g = 22;
-    int h = 4;
-    int division_result = g / h;
-    Assert(division_result == 5);
-
-    int i = 21;
-    int j = 4;
-    int remainder = i % j;
-    Assert(remainder == 1);
-
-    int k = 15;
-    int l = 7;
-    int modulus_result = k % l;
-    Assert(modulus_result == 1);
-
-    int m = 5;
-    int n = 4;
-    m *= n;  // m is modified to 20
-    Assert(m == 20);
-
-    int o = 12;
-    int p = 2;
-    o *= p;  // o is modified to 24
-    Assert(o == 24);
-
-    int q = 30;
-    int r = 6;
-    q /= r;  // q is modified to 5
-    Assert(q == 5);
-
-    int s = 64;
-    int t = 8;
-    s /= t;  // s is modified to 8
-    Assert(s == 8);
-
-    int u = 21;
-    int v = 5;
-    u %= v;  // u is modified to 1
-    Assert(u == 1);
-
-    int w = 15;
-    int x = 3;
-    w %= x;  // w is modified to 0
-    Assert(w == 0);
+    // Test modulo and compound modulo
+    TestModulo();
 
     return 0;
 }

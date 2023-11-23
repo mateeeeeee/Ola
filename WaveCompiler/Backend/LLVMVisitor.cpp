@@ -250,21 +250,29 @@ namespace wave
 					llvm_value_map[&var_decl] = alloc;
 				}
 			}
-			else if (is_class)
+			else
 			{
-				QualType const& var_type = var_decl.GetType();
-				ClassType const& class_type = type_cast<ClassType>(var_type);
-				ClassDecl const* class_decl = class_type.GetClassDecl();
-
-				llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
-				llvm_value_map[&var_decl] = struct_alloc;
-
-				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-				for (uint64 i = 0; i < fields.size(); ++i)
+				if (is_class)
 				{
-					fields[i]->Accept(*this);
-					llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
-					Store(llvm_value_map[fields[i].get()], field_ptr);
+					QualType const& var_type = var_decl.GetType();
+					ClassType const& class_type = type_cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type.GetClassDecl();
+
+					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm_value_map[&var_decl] = struct_alloc;
+
+					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+					for (uint64 i = 0; i < fields.size(); ++i)
+					{
+						fields[i]->Accept(*this);
+						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
+						Store(llvm_value_map[fields[i].get()], field_ptr);
+					}
+				}
+				else
+				{
+					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm_value_map[&var_decl] = alloc;
 				}
 			}
 		}
@@ -650,7 +658,7 @@ namespace wave
 		break;
 		case UnaryExprKind::Minus:
 		{
-			result = builder.CreateNeg(operand);
+			result = is_float_expr ? builder.CreateFNeg(operand) : builder.CreateNeg(operand);
 		}
 		break;
 		case UnaryExprKind::BitNot:

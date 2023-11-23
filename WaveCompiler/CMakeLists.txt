@@ -195,6 +195,7 @@ set(DISABLED_WARNINGS
 	/wd4703
 	/wd4389
 	/wd4611
+	/wd4804
 	/wd4805
 	/wd4204
 	/wd4577

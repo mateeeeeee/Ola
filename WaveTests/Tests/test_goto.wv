@@ -1,36 +1,80 @@
 import std.assert;
 
-
-public int main()
+// Test using goto to break out of nested loops
+void TestGotoNestedLoops()
 {
-    int x = 0;
-    int y = 0;
+    int targetValue = 5;
+    int i, j;
 
-    // Test a basic goto statement
-    goto Label1;
-
-    x = 1;  // This should not execute
-
-Label1:
-    y = 2;  // This should execute
-
-    Assert(x == 0);  // x should still be 0
-    Assert(y == 2);  // y should be 2
-
-    // Test a conditional goto statement
-    int choice = 1;
-    if (choice == 1)
+    for (i = 0; i < 10; i++)
     {
-        goto Label2;
+        for (j = 0; j < 10; j++)
+        {
+            if (i * j == targetValue)
+            {
+                goto Found;
+            }
+        }
     }
 
-    x = 3;  // This should not execute
+Found:
+    Assert(i * j == targetValue);
+}
 
-Label2:
-    y = 4;  // This should execute
+// Test using goto for error handling
+int TestGotoErrorHandling()
+{
+    int result = 0;
 
-    Assert(x == 0);  // x should still be 0
-    Assert(y == 4);  // y should be 4
+    // Simulate some code that might encounter an error
+    int errorCode = 1;
+
+    if (errorCode != 0)
+    {
+        goto HandleError;
+    }
+
+    // Normal execution
+    result = 42;
+    return result;
+
+HandleError:
+    // Handle the error
+    result = -1;
+    return result;
+}
+
+// Test using goto for jumping to the end of a function
+int TestGotoEndOfFunction()
+{
+    int result = 0;
+
+    // Some code...
+
+    if (result != 0)
+    {
+        goto CleanUpAndReturn;
+    }
+
+    // More code...
+
+CleanUpAndReturn:
+    // Clean up resources and return
+    return result;
+}
+
+// Main testing function
+public int main()
+{
+    TestGotoNestedLoops();
+    
+    // Test using goto for error handling
+    int errorHandlingResult = TestGotoErrorHandling();
+    Assert(errorHandlingResult == -1);
+
+    // Test using goto to jump to the end of a function
+    int endOfFunctionResult = TestGotoEndOfFunction();
+    Assert(endOfFunctionResult == 0);
 
     return 0;
 }

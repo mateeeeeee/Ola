@@ -10,5 +10,12 @@ public int main()
     int d = +c;
     Assert(d == 10);
 
+    float f = 10.0;
+    float g = +f;
+    Assert(g == 10.0);
+
+    float e = -f;
+    Assert(e == -10.0);
+
     return 0;
 }

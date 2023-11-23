@@ -1,46 +1,39 @@
 import std.assert;
 
+// Test left shift and right shift with integers
+void TestShiftOperatorsIntegers()
+{
+    int intA = 5;
+    int intB = 2;
+
+    // Left shift
+    int leftShiftResult = intA << intB;
+    Assert(leftShiftResult == 20);
+
+    // Right shift
+    int rightShiftResult = intA >> intB;
+    Assert(rightShiftResult == 1);
+}
+
+void TestCompoundShiftOperatorsIntegers()
+{
+    int intA = 5;
+    int intB = 2;
+
+    // Compound left shift
+    intA <<= intB;
+    Assert(intA == 20);
+
+    // Compound right shift
+    intA >>= intB;
+    Assert(intA == 5);
+}
+
+// Main testing function
 public int main()
 {
-        int a = 5;      // 0000 0101
-    int b = 2;
-    a = a << b;     // 0001 0100 (20 in decimal)
-    Assert(a == 20);
-
-    int c = 8;      // 0000 1000
-    int d = 3;
-    c = c << d;     // 0100 0000 (64 in decimal)
-    Assert(c == 64);
-     
-    int e = 32;     // 0010 0000
-    int f = 3;
-    e = e >> f;     // 0000 0010 (2 in decimal)
-    Assert(e == 4);
-    
-    int g = 255;    // 1111 1111
-    int h = 4;
-    g = g >> h;     // 0000 1111 (15 in decimal)
-    Assert(g == 15);
-    
-    int x = 3;      // 0000 0011
-    int y = 2;
-    x <<= y;        // 0000 1100 (12 in decimal)
-    Assert(x == 12);
-    
-    int z = 16;     // 0001 0000
-    int w = 4;
-    z <<= w;        // 1000 0000 (256 in decimal)
-    Assert(z == 256);
-    
-    int p = 64;     // 0100 0000
-    int q = 2;
-    p >>= q;        // 0001 0000 (16 in decimal)
-    Assert(p == 16);
-    
-    int r = 128;    // 1000 0000
-    int s = 5;
-    r >>= s;        // 0000 0010 (2 in decimal)
-    Assert(r == 4);
+    TestShiftOperatorsIntegers();
+    TestCompoundShiftOperatorsIntegers();
 
     return 0;
 }

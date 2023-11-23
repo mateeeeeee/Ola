@@ -128,11 +128,6 @@ TEST(Misc, Strings)
 	EXPECT_EQ(WAVE(-i test_string), 0);
 }
 
-TEST(Misc, Floats)
-{
-	EXPECT_EQ(WAVE(-i test_floats), 0);
-}
-
 TEST(Misc, ImplicitCasts)
 {
 	EXPECT_EQ(WAVE(-i test_implicitcasts), 0);

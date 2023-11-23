@@ -759,6 +759,40 @@ namespace wave
 		Expr const* GetLHS() const { return lhs.get(); }
 		Expr const* GetRHS() const { return rhs.get(); }
 
+		virtual bool IsConstexpr() const
+		{
+			return lhs->IsConstexpr() && rhs->IsConstexpr();
+		}
+		virtual int64 EvaluateConstexpr() const
+		{
+			switch (op)
+			{
+			case BinaryExprKind::Add:			return lhs->EvaluateConstexpr() + rhs->EvaluateConstexpr();
+			case BinaryExprKind::Subtract:		return lhs->EvaluateConstexpr() - rhs->EvaluateConstexpr();
+			case BinaryExprKind::Multiply:		return lhs->EvaluateConstexpr() * rhs->EvaluateConstexpr();
+			case BinaryExprKind::Divide:		return lhs->EvaluateConstexpr() / rhs->EvaluateConstexpr();
+			case BinaryExprKind::Modulo:		return lhs->EvaluateConstexpr() % rhs->EvaluateConstexpr();
+			case BinaryExprKind::ShiftLeft:		return lhs->EvaluateConstexpr() << rhs->EvaluateConstexpr();
+			case BinaryExprKind::ShiftRight:	return lhs->EvaluateConstexpr() >> rhs->EvaluateConstexpr();
+			case BinaryExprKind::BitAnd:		return lhs->EvaluateConstexpr() & rhs->EvaluateConstexpr();
+			case BinaryExprKind::BitOr:			return lhs->EvaluateConstexpr() | rhs->EvaluateConstexpr();
+			case BinaryExprKind::BitXor:		return lhs->EvaluateConstexpr() ^ rhs->EvaluateConstexpr();
+			case BinaryExprKind::Assign:		return lhs->EvaluateConstexpr();
+			case BinaryExprKind::Comma:			return rhs->EvaluateConstexpr();
+			case BinaryExprKind::LogicalAnd:	return lhs->EvaluateConstexpr() && rhs->EvaluateConstexpr();
+			case BinaryExprKind::LogicalOr:		return lhs->EvaluateConstexpr() || rhs->EvaluateConstexpr();
+			case BinaryExprKind::Equal:			return lhs->EvaluateConstexpr() == rhs->EvaluateConstexpr();
+			case BinaryExprKind::NotEqual:		return lhs->EvaluateConstexpr() != rhs->EvaluateConstexpr();
+			case BinaryExprKind::Less:			return lhs->EvaluateConstexpr() <  rhs->EvaluateConstexpr();
+			case BinaryExprKind::Greater:		return lhs->EvaluateConstexpr() > rhs->EvaluateConstexpr();
+			case BinaryExprKind::LessEqual:		return lhs->EvaluateConstexpr() <= rhs->EvaluateConstexpr();
+			case BinaryExprKind::GreaterEqual:	return lhs->EvaluateConstexpr() >= rhs->EvaluateConstexpr();
+			default:
+				WAVE_UNREACHABLE();
+			}
+			return 0;
+		}
+
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
@@ -819,6 +853,16 @@ namespace wave
 		Decl const* GetDecl() const { return decl; }
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
+		virtual bool IsConstexpr() const
+		{
+			return decl->GetDeclKind() == DeclKind::EnumMember;
+		}
+		virtual int64 EvaluateConstexpr() const
+		{
+			EnumMemberDecl* enum_member_decl = static_cast<EnumMemberDecl*>(decl);
+			return enum_member_decl->GetValue();
+		}
 
 	private:
 		Decl* decl;

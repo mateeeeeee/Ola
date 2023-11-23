@@ -1,50 +1,107 @@
 import std.assert;
 
+// Test basic do-while loop with int
+void TestDoWhileLoopInt()
+{
+    int sum = 0;
+    int i = 1;
+
+    do
+    {
+        sum += i;
+        i++;
+    } while (i <= 5);
+
+    Assert(sum == 15);
+}
+
+// Test basic do-while loop with bool
+void TestDoWhileLoopBool()
+{
+    bool condition = true;
+    int iterations = 0;
+
+    do
+    {
+        iterations++;
+        if (iterations == 3)
+        {
+            condition = false;
+        }
+    } while (condition);
+
+    Assert(iterations == 3);
+}
+
+// Test nested do-while loops
+void TestNestedDoWhileLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    do
+    {
+        do
+        {
+            innerCounter++;
+        } while (innerCounter < 2);
+
+        outerCounter++;
+    } while (outerCounter < 3);
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 4);
+}
+
+// Test do-while loop with break statement
+void TestDoWhileLoopWithBreak()
+{
+    int sum = 0;
+    int i = 1;
+
+    do
+    {
+        sum += i;
+        i++;
+
+        if (i > 5)
+        {
+            break;
+        }
+    } while (true);
+
+    Assert(sum == 15);
+}
+
+// Test do-while loop with continue statement
+void TestDoWhileLoopWithContinue()
+{
+    int sum = 0;
+    int i = 0;
+
+    do
+    {
+        i++;
+
+        if (i % 2 == 0)
+        {
+            continue;
+        }
+
+        sum += i;
+    } while (i < 5);
+
+    Assert(sum == 9);
+}
+
+// Main testing function
 public int main()
 {
-    int n = 0;
-    int sum = 0;
-    do
-    {
-        sum += n;
-        n++;
-    } while (n < 5);
-    Assert(sum == 10);  // The sum of 0 + 1 + 2 + 3 + 4 should be 10
+    TestDoWhileLoopInt();
+    TestDoWhileLoopBool();
+    TestNestedDoWhileLoops();
+    TestDoWhileLoopWithBreak();
+    TestDoWhileLoopWithContinue();
 
-    int m = 10;
-    int count = 0;
-    do
-    {
-        count++;
-    } while (m < 10);
-    Assert(count == 1);  
-
-    int x = 5;
-    int y = 3;
-    int result = 0;
-    do
-    {
-        if (x > y)
-        {
-            result += x;
-        }
-        x--;
-        y++;
-    } while (x > 0 && y < 10);
-    Assert(result == 5);   
-
-    int z = 1;
-    int total = 0;
-    do
-    {
-        total += z;
-        if (total >= 10)
-        {
-            break; 
-        }
-        z++;
-    } while (z <= 5);
-    Assert(total == 10);  
-
-	return 0;
+    return 0;
 }
