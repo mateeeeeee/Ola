@@ -34,8 +34,9 @@ It's done as a learning project and its purpose is solely educational.
   * classes (wip)
 	- methods and fields
 	- `this` keyword
+  
 ## Todo
-  * ref
+  * ref (wip)
 
 ## Structure
 Wave consists of three parts: 

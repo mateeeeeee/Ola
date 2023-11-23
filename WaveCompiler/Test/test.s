@@ -7,108 +7,110 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	TestTernaryOperatorIntegers;
+	.def	FooByRef;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function TestTernaryOperatorIntegers
-TestTernaryOperatorIntegers:            # @TestTernaryOperatorIntegers
-.seh_proc TestTernaryOperatorIntegers
+	.p2align	4, 0x90                         # -- Begin function FooByRef
+FooByRef:                               # @FooByRef
+.seh_proc FooByRef
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	push	rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	mov	qword ptr [rsp + 48], 5
-	mov	qword ptr [rsp + 40], 10
-	mov	rcx, qword ptr [rsp + 48]
-	mov	rdx, qword ptr [rsp + 40]
-	mov	rax, qword ptr [rsp + 48]
-	cmp	rcx, rdx
-	cmovle	rax, qword ptr [rsp + 40]
-	mov	qword ptr [rsp + 32], rax
-	cmp	qword ptr [rsp + 32], 10
-	sete	cl
-	call	Assert
+	mov	qword ptr [rsp], rcx
+	mov	rax, qword ptr [rsp]
+	mov	rcx, qword ptr [rax]
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
 # %bb.1:                                # %exit
-	nop
-	add	rsp, 56
+	pop	rax
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	TestTernaryOperatorFloats;
+	.def	FooByValue;
 	.scl	3;
 	.type	32;
 	.endef
-	.globl	__real@4008000000000000         # -- Begin function TestTernaryOperatorFloats
-	.section	.rdata,"dr",discard,__real@4008000000000000
-	.p2align	3, 0x0
-__real@4008000000000000:
-	.quad	0x4008000000000000              # double 3
-	.globl	__real@4004000000000000
-	.section	.rdata,"dr",discard,__real@4004000000000000
-	.p2align	3, 0x0
-__real@4004000000000000:
-	.quad	0x4004000000000000              # double 2.5
-	.text
-	.p2align	4, 0x90
-TestTernaryOperatorFloats:              # @TestTernaryOperatorFloats
-.seh_proc TestTernaryOperatorFloats
+	.p2align	4, 0x90                         # -- Begin function FooByValue
+FooByValue:                             # @FooByValue
+.seh_proc FooByValue
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	push	rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	movsd	xmm0, qword ptr [rip + __real@4004000000000000] # xmm0 = mem[0],zero
-	movsd	qword ptr [rsp + 48], xmm0
-	movsd	xmm0, qword ptr [rip + __real@4008000000000000] # xmm0 = mem[0],zero
-	movsd	qword ptr [rsp + 40], xmm0
-	movsd	xmm1, qword ptr [rsp + 48]      # xmm1 = mem[0],zero
-	movsd	xmm0, qword ptr [rsp + 40]      # xmm0 = mem[0],zero
-	movsd	xmm3, qword ptr [rsp + 48]      # xmm3 = mem[0],zero
-	movsd	xmm2, qword ptr [rsp + 40]      # xmm2 = mem[0],zero
-	cmpltsd	xmm0, xmm1
-	movaps	xmm1, xmm0
-	andpd	xmm1, xmm3
-	andnpd	xmm0, xmm2
-	orpd	xmm0, xmm1
-	movsd	qword ptr [rsp + 32], xmm0
-	movsd	xmm0, qword ptr [rsp + 32]      # xmm0 = mem[0],zero
-	movsd	xmm1, qword ptr [rip + __real@4008000000000000] # xmm1 = mem[0],zero
-	ucomisd	xmm0, xmm1
-	sete	cl
-	setnp	al
-	and	cl, al
-	call	Assert
+	mov	qword ptr [rsp], rcx
+	mov	rax, qword ptr [rsp]
+	add	rax, 1
+	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
-	nop
-	add	rsp, 56
+	pop	rax
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	TestTernaryOperatorBools;
+	.def	TestRefSimple;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function TestTernaryOperatorBools
-TestTernaryOperatorBools:               # @TestTernaryOperatorBools
-.seh_proc TestTernaryOperatorBools
+	.p2align	4, 0x90                         # -- Begin function TestRefSimple
+TestRefSimple:                          # @TestRefSimple
+.seh_proc TestRefSimple
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	sub	rsp, 88
+	.seh_stackalloc 88
 	.seh_endprologue
-	mov	byte ptr [rsp + 71], 1
-	mov	qword ptr [rsp + 56], 5
-	mov	qword ptr [rsp + 48], 10
-	mov	cl, byte ptr [rsp + 71]
+	mov	qword ptr [rsp + 80], 9
+	lea	rcx, [rsp + 80]
+	call	FooByRef
+	cmp	qword ptr [rsp + 80], 10
+	sete	cl
+	call	Assert
+	lea	rax, [rsp + 80]
+	mov	qword ptr [rsp + 72], rax
+	mov	rax, qword ptr [rsp + 72]
+	mov	qword ptr [rsp + 40], rax       # 8-byte Spill
+	mov	rcx, qword ptr [rax]
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
+	cmp	qword ptr [rsp + 80], 11
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rsp + 64], rax
+	mov	rax, qword ptr [rsp + 64]
+	add	rax, 1
+	mov	qword ptr [rsp + 64], rax
+	cmp	qword ptr [rsp + 64], 12
+	sete	cl
+	call	Assert
+	cmp	qword ptr [rsp + 80], 11
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
+	mov	qword ptr [rsp + 56], rax
 	mov	rax, qword ptr [rsp + 56]
-	test	cl, 1
-	cmove	rax, qword ptr [rsp + 48]
-	mov	qword ptr [rsp + 40], rax
-	cmp	qword ptr [rsp + 40], 5
+	mov	qword ptr [rsp + 48], rax       # 8-byte Spill
+	mov	rcx, qword ptr [rax]
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
+	cmp	qword ptr [rsp + 80], 12
+	sete	cl
+	call	Assert
+	mov	rcx, qword ptr [rsp + 48]       # 8-byte Reload
+	call	FooByRef
+	cmp	qword ptr [rsp + 80], 13
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 48]       # 8-byte Reload
+	mov	rcx, qword ptr [rax]
+	call	FooByValue
+	cmp	qword ptr [rsp + 80], 13
 	sete	cl
 	call	Assert
 # %bb.1:                                # %exit
 	nop
-	add	rsp, 72
+	add	rsp, 88
 	ret
 	.seh_endproc
                                         # -- End function
@@ -124,9 +126,7 @@ main:                                   # @main
 	sub	rsp, 40
 	.seh_stackalloc 40
 	.seh_endprologue
-	call	TestTernaryOperatorIntegers
-	call	TestTernaryOperatorFloats
-	call	TestTernaryOperatorBools
+	call	TestRefSimple
 	mov	qword ptr [rsp + 32], 0
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 32]
@@ -136,7 +136,6 @@ main:                                   # @main
                                         # -- End function
 	.addrsig
 	.addrsig_sym Assert
-	.addrsig_sym TestTernaryOperatorIntegers
-	.addrsig_sym TestTernaryOperatorFloats
-	.addrsig_sym TestTernaryOperatorBools
-	.globl	_fltused
+	.addrsig_sym FooByRef
+	.addrsig_sym FooByValue
+	.addrsig_sym TestRefSimple

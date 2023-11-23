@@ -4,30 +4,61 @@ import std.assert;
 //ref todo list
 //1. passing to function parameter
 //   - passing T variable to ref T function parameter + 
-//	 - passing ref T variable to T function parameter
-//	 - passing ref T variable to ref T function parameter
+//	 - passing ref T variable to T function parameter +
+//	 - passing ref T variable to ref T function parameter + 
 //2. assignment 
-//   - assigning T to ref T variable
-//   - assigning ref T to T variable
-//   - assigning ref T to ref T variable
+//   - assigning T to ref T variable + 
+//   - assigning ref T to T variable +
+//   - assigning ref T to ref T variable +
 //3. returning from functions
 //4. methods and fields
 //5. global variables
 
-void ModifyInt(ref int a)
+void FooByRef(ref int a)
 {
 	++a;
-	int b = a;
+}
+
+void FooByValue(int a)
+{
+	++a;
+}
+
+void TestRefSimple()
+{
+	//passing T variable to ref T function parameter
+	int a = 9;
+	FooByRef(a);
+	Assert(a == 10);
+
+	//assigning T to ref T variable 
+	ref int b = a;
 	++b;
+	Assert(a == 11);
+
+	//assigning ref T to T variable
+	int c = b;
+	++c;
+	Assert(c == 12);
+	Assert(a == 11);
+
+	////assigning ref T to ref T variable 
+	ref int d = b; 
+	++d;
+	Assert(a == 12);
+
+	//passing ref T variable to ref T function parameter
+	FooByRef(d);
+	Assert(a == 13);
+
+	//passing ref T variable to T function parameter
+	FooByValue(d);
+	Assert(a == 13);
 }
 
 public int main()
 {
-	int a = 9;
-	ModifyInt(a);
-	Assert(a == 10);
-	ref int b = a;
-	++b;
-	Assert(a == 11);
+	TestRefSimple();
+
 	return 0;
 }

@@ -1,47 +1,64 @@
 import std.assert;
 
-// Test ternary operator with integers
-void TestTernaryOperatorIntegers()
-{
-    int a = 5;
-    int b = 10;
 
-    int result = (a > b) ? a : b;
-    Assert(result == 10);
+//ref todo list
+//1. passing to function parameter
+//   - passing T variable to ref T function parameter + 
+//	 - passing ref T variable to T function parameter
+//	 - passing ref T variable to ref T function parameter
+//2. assignment 
+//   - assigning T to ref T variable + 
+//   - assigning ref T to T variable +
+//   - assigning ref T to ref T variable +
+//3. returning from functions
+//4. methods and fields
+//5. global variables
+
+void FooByRef(ref int a)
+{
+	++a;
 }
 
-// Test ternary operator with floats
-void TestTernaryOperatorFloats()
+void FooByValue(int a)
 {
-    float c = 2.5;
-    float d = 3.0;
-
-    float result = (c > d) ? c : d;
-    Assert(result == 3.0);
+	++a;
 }
 
-// Test ternary operator with bools
-void TestTernaryOperatorBools()
+void TestRefSimple()
 {
-    bool condition = true;
-    int x = 5;
-    int y = 10;
+	//passing T variable to ref T function parameter
+	int a = 9;
+	FooByRef(a);
+	Assert(a == 10);
 
-    int result = condition ? x : y;
-    Assert(result == 5);
+	//assigning T to ref T variable 
+	ref int b = a;
+	++b;
+	Assert(a == 11);
+
+	//assigning ref T to T variable
+	int c = b;
+	++c;
+	Assert(c == 12);
+	Assert(a == 11);
+
+	////assigning ref T to ref T variable 
+	ref int d = b; 
+	++d;
+	Assert(a == 12);
+
+	//passing ref T variable to ref T function parameter
+	FooByRef(d);
+	Assert(a == 13);
+
+	//passing ref T variable to T function parameter
+	FooByValue(d);
+	Assert(a == 13);
 }
 
-// Main testing function
 public int main()
 {
-    // Test ternary operator with integers
-    TestTernaryOperatorIntegers();
+	TestRefSimple();
 
-    // Test ternary operator with floats
-    TestTernaryOperatorFloats();
-
-    // Test ternary operator with bools
-    TestTernaryOperatorBools();
-
-    return 0;
+	return 0;
 }
