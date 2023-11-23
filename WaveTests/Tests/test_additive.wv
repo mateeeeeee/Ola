@@ -1,12 +1,22 @@
 import std.assert;
 
-
-public int main()
+void TestAddition()
 {
     int a = 5;
     int b = 7;
-    int sum = a + b;
-    Assert(sum == 12);
+    int c = a + b;
+    Assert(c == 12);
+
+    float d = 1.0;
+    float e = 3.5;
+    float f = d + e + 0.5;
+    Assert(f >= 4.5);
+    Assert(f <  5.5);
+}
+
+public int main()
+{
+    TestAddition();
 
     int c = 10;
     int d = 3;

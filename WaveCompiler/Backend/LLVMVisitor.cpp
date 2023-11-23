@@ -252,7 +252,8 @@ namespace wave
 					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm::Value* init_value = llvm_value_map[init_expr];
 					builder.CreateStore(init_value, alloc);
-					llvm_value_map[&var_decl] = alloc;
+					llvm::Value* arg_ref = builder.CreateLoad(llvm_type, alloc);
+					llvm_value_map[&var_decl] = arg_ref;
 				}
 				else
 				{
@@ -262,22 +263,26 @@ namespace wave
 					llvm_value_map[&var_decl] = alloc;
 				}
 			}
-			else if (is_class)
+			else 
 			{
-				QualType const& var_type = var_decl.GetType();
-				ClassType const& class_type = type_cast<ClassType>(var_type);
-				ClassDecl const* class_decl = class_type.GetClassDecl();
-
-				llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
-				llvm_value_map[&var_decl] = struct_alloc;
-
-				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-				for (uint64 i = 0; i < fields.size(); ++i)
+				if (is_class)
 				{
-					fields[i]->Accept(*this);
-					llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
-					Store(llvm_value_map[fields[i].get()], field_ptr);
+					QualType const& var_type = var_decl.GetType();
+					ClassType const& class_type = type_cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type.GetClassDecl();
+
+					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm_value_map[&var_decl] = struct_alloc;
+
+					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+					for (uint64 i = 0; i < fields.size(); ++i)
+					{
+						fields[i]->Accept(*this);
+						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
+						Store(llvm_value_map[fields[i].get()], field_ptr);
+					}
 				}
+				else WAVE_ASSERT(false);
 			}
 		}
 	}
@@ -908,7 +913,7 @@ namespace wave
 			}
 			else if (IsRef(cast_operand_type))
 			{
-				llvm_value_map[&cast_expr] = builder.CreateLoad(int_type, cast_operand);
+				llvm_value_map[&cast_expr] = builder.CreateLoad(int_type, cast_operand_value);
 			}
 			else WAVE_ASSERT(false);
 		}

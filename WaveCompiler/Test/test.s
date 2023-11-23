@@ -24,7 +24,6 @@ ModifyInt:                              # @ModifyInt
 	add	rcx, 1
 	mov	qword ptr [rax], rcx
 	mov	rax, qword ptr [rax]
-	mov	rax, qword ptr [rax]
 	mov	qword ptr [rsp], rax
 	mov	rax, qword ptr [rsp]
 	add	rax, 1
@@ -49,6 +48,18 @@ main:                                   # @main
 	mov	qword ptr [rsp + 40], 9
 	lea	rcx, [rsp + 40]
 	call	ModifyInt
+	cmp	qword ptr [rsp + 40], 10
+	sete	cl
+	call	Assert
+	lea	rax, [rsp + 40]
+	mov	qword ptr [rsp + 32], rax
+	mov	rax, qword ptr [rsp + 32]
+	mov	rcx, qword ptr [rax]
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
+	cmp	qword ptr [rsp + 40], 11
+	sete	cl
+	call	Assert
 	mov	rax, qword ptr [rsp + 40]
 	mov	qword ptr [rsp + 48], rax
 # %bb.1:                                # %exit
@@ -58,4 +69,5 @@ main:                                   # @main
 	.seh_endproc
                                         # -- End function
 	.addrsig
+	.addrsig_sym Assert
 	.addrsig_sym ModifyInt

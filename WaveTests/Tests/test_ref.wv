@@ -1,6 +1,19 @@
 import std.assert;
 
 
+//ref todo list
+//1. passing to function parameter
+//   - passing T variable to ref T function parameter + 
+//	 - passing ref T variable to T function parameter
+//	 - passing ref T variable to ref T function parameter
+//2. assignment 
+//   - assigning T to ref T variable
+//   - assigning ref T to T variable
+//   - assigning ref T to ref T variable
+//3. returning from functions
+//4. methods and fields
+//5. global variables
+
 void ModifyInt(ref int a)
 {
 	++a;
@@ -14,11 +27,7 @@ public int main()
 	ModifyInt(a);
 	Assert(a == 10);
 	ref int b = a;
-	Assert(b == 10);
-	int c = b;
-	Assert(c == a);
-	b = c;
-	++c;
-	Assert(b == c);
+	++b;
+	Assert(a == 11);
 	return 0;
 }
