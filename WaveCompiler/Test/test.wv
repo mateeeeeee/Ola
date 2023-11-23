@@ -1,64 +1,51 @@
 import std.assert;
 
-
-//ref todo list
-//1. passing to function parameter
-//   - passing T variable to ref T function parameter + 
-//	 - passing ref T variable to T function parameter
-//	 - passing ref T variable to ref T function parameter
-//2. assignment 
-//   - assigning T to ref T variable + 
-//   - assigning ref T to T variable +
-//   - assigning ref T to ref T variable +
-//3. returning from functions
-//4. methods and fields
-//5. global variables
-
-void FooByRef(ref int a)
+public class S
 {
-	++a;
+	public void Init(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+
+	public void SetX(int x) {this.x = x;}
+	public void SetY(int y) {this.y = y;}
+	
+	public int GetX() const {return x;}
+	public int GetY() const {return y;}
+
+	private int x = 0;
+	private int y = 0;
+};
+
+void StructByValue(S s)
+{
+	s.SetX(100);
+	s.SetY(100);
+	Assert(s.x == 100);
+	Assert(s.y == 100);
 }
 
-void FooByValue(int a)
-{
-	++a;
-}
-
-void TestRefSimple()
-{
-	//passing T variable to ref T function parameter
-	int a = 9;
-	FooByRef(a);
-	Assert(a == 10);
-
-	//assigning T to ref T variable 
-	ref int b = a;
-	++b;
-	Assert(a == 11);
-
-	//assigning ref T to T variable
-	int c = b;
-	++c;
-	Assert(c == 12);
-	Assert(a == 11);
-
-	////assigning ref T to ref T variable 
-	ref int d = b; 
-	++d;
-	Assert(a == 12);
-
-	//passing ref T variable to ref T function parameter
-	FooByRef(d);
-	Assert(a == 13);
-
-	//passing ref T variable to T function parameter
-	FooByValue(d);
-	Assert(a == 13);
-}
+//void StructByRef(ref S s)
+//{
+//	s.x *= 2;
+//	s.y *= 2;
+//}
 
 public int main()
 {
-	TestRefSimple();
+	S s; s.Init(10, 10);
+	StructByValue(s);
+	Assert(s.x == 10);
+	Assert(s.y == 10);
+
+	S s2 = s; //copy
+	s.SetX(25);
+	s.SetY(25);
+	Assert(s2.x == 10);
+	Assert(s2.y == 10);
+	Assert(s.y == 25);
+	Assert(s.y == 25);
 
 	return 0;
 }

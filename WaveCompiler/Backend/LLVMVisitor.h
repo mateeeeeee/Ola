@@ -9,6 +9,7 @@ namespace llvm
 {
 	class Context;
 	class Module;
+	class DataLayout;
 	class Value;
 	class Type;
 	class Function;
@@ -92,6 +93,7 @@ namespace wave
 	private:
 		llvm::LLVMContext& context;
 		llvm::Module& module;
+		std::unique_ptr<llvm::DataLayout> data_layout;
 		llvm::IRBuilder<> builder;
 
 		LLVMValueMap llvm_value_map;

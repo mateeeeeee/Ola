@@ -7,110 +7,57 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	FooByRef;
-	.scl	3;
+	.def	"S::Init";
+	.scl	2;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function FooByRef
-FooByRef:                               # @FooByRef
-.seh_proc FooByRef
+	.globl	"S::Init"                       # -- Begin function S::Init
+	.p2align	4, 0x90
+"S::Init":                              # @"S::Init"
+.seh_proc "S::Init"
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 16
+	.seh_stackalloc 16
 	.seh_endprologue
-	mov	qword ptr [rsp], rcx
+	mov	qword ptr [rsp + 8], rdx
+	mov	qword ptr [rsp], r8
+	mov	rax, qword ptr [rsp + 8]
+	mov	qword ptr [rcx], rax
 	mov	rax, qword ptr [rsp]
-	mov	rcx, qword ptr [rax]
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
+	mov	qword ptr [rcx + 8], rax
 # %bb.1:                                # %exit
-	pop	rax
+	add	rsp, 16
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	FooByValue;
+	.def	StructByValue;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function FooByValue
-FooByValue:                             # @FooByValue
-.seh_proc FooByValue
+	.p2align	4, 0x90                         # -- Begin function StructByValue
+StructByValue:                          # @StructByValue
+.seh_proc StructByValue
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp], rcx
-	mov	rax, qword ptr [rsp]
-	add	rax, 1
-	mov	qword ptr [rsp], rax
-# %bb.1:                                # %exit
-	pop	rax
-	ret
-	.seh_endproc
-                                        # -- End function
-	.def	TestRefSimple;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function TestRefSimple
-TestRefSimple:                          # @TestRefSimple
-.seh_proc TestRefSimple
-# %bb.0:                                # %entry
-	sub	rsp, 88
-	.seh_stackalloc 88
-	.seh_endprologue
-	mov	qword ptr [rsp + 80], 9
-	lea	rcx, [rsp + 80]
-	call	FooByRef
-	cmp	qword ptr [rsp + 80], 10
+	mov	qword ptr [rsp + 40], rcx
+	mov	qword ptr [rsp + 48], rdx
+	mov	rax, qword ptr [rsp + 40]
+	shl	rax
+	mov	qword ptr [rsp + 40], rax
+	mov	rax, qword ptr [rsp + 48]
+	shl	rax
+	mov	qword ptr [rsp + 48], rax
+	cmp	qword ptr [rsp + 40], 20
 	sete	cl
 	call	Assert
-	lea	rax, [rsp + 80]
-	mov	qword ptr [rsp + 72], rax
-	mov	rax, qword ptr [rsp + 72]
-	mov	qword ptr [rsp + 40], rax       # 8-byte Spill
-	mov	rcx, qword ptr [rax]
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
-	cmp	qword ptr [rsp + 80], 11
-	sete	cl
-	call	Assert
-	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
-	mov	rax, qword ptr [rax]
-	mov	qword ptr [rsp + 64], rax
-	mov	rax, qword ptr [rsp + 64]
-	add	rax, 1
-	mov	qword ptr [rsp + 64], rax
-	cmp	qword ptr [rsp + 64], 12
-	sete	cl
-	call	Assert
-	cmp	qword ptr [rsp + 80], 11
-	sete	cl
-	call	Assert
-	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
-	mov	qword ptr [rsp + 56], rax
-	mov	rax, qword ptr [rsp + 56]
-	mov	qword ptr [rsp + 48], rax       # 8-byte Spill
-	mov	rcx, qword ptr [rax]
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
-	cmp	qword ptr [rsp + 80], 12
-	sete	cl
-	call	Assert
-	mov	rcx, qword ptr [rsp + 48]       # 8-byte Reload
-	call	FooByRef
-	cmp	qword ptr [rsp + 80], 13
-	sete	cl
-	call	Assert
-	mov	rax, qword ptr [rsp + 48]       # 8-byte Reload
-	mov	rcx, qword ptr [rax]
-	call	FooByValue
-	cmp	qword ptr [rsp + 80], 13
+	cmp	qword ptr [rsp + 48], 20
 	sete	cl
 	call	Assert
 # %bb.1:                                # %exit
 	nop
-	add	rsp, 88
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
@@ -123,19 +70,54 @@ TestRefSimple:                          # @TestRefSimple
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 40
-	.seh_stackalloc 40
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	call	TestRefSimple
-	mov	qword ptr [rsp + 32], 0
+	mov	qword ptr [rsp + 48], 0
+	mov	qword ptr [rsp + 56], 0
+	lea	rcx, [rsp + 48]
+	mov	r8d, 10
+	mov	rdx, r8
+	call	"S::Init"
+	mov	rcx, qword ptr [rsp + 48]
+	mov	rdx, qword ptr [rsp + 56]
+	call	StructByValue
+	cmp	qword ptr [rsp + 48], 10
+	sete	cl
+	call	Assert
+	cmp	qword ptr [rsp + 56], 10
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 48]
+	mov	qword ptr [rsp + 32], rax
+	mov	rax, qword ptr [rsp + 56]
+	mov	qword ptr [rsp + 40], rax
+	mov	rax, qword ptr [rsp + 48]
+	shl	rax
+	mov	qword ptr [rsp + 48], rax
+	mov	rax, qword ptr [rsp + 56]
+	shl	rax
+	mov	qword ptr [rsp + 56], rax
+	cmp	qword ptr [rsp + 32], 10
+	sete	cl
+	call	Assert
+	cmp	qword ptr [rsp + 40], 10
+	sete	cl
+	call	Assert
+	cmp	qword ptr [rsp + 56], 20
+	sete	cl
+	call	Assert
+	cmp	qword ptr [rsp + 56], 20
+	sete	cl
+	call	Assert
+	mov	qword ptr [rsp + 64], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 32]
-	add	rsp, 40
+	mov	rax, qword ptr [rsp + 64]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
 	.addrsig_sym Assert
-	.addrsig_sym FooByRef
-	.addrsig_sym FooByValue
-	.addrsig_sym TestRefSimple
+	.addrsig_sym "S::Init"
+	.addrsig_sym StructByValue

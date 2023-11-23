@@ -2,12 +2,15 @@
 #include "Frontend/AST.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
+#include "llvm/IR/DataLayout.h"
 
 
 namespace wave
 {
-	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module) : context(context), module(module), builder(context)
+	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module)
+		: context(context), module(module), builder(context)
 	{
+		data_layout = std::make_unique<llvm::DataLayout>(&module);
 		void_type  = llvm::Type::getVoidTy(context);
 		bool_type  = llvm::Type::getInt1Ty(context);
 		char_type  = llvm::Type::getInt8Ty(context);
@@ -245,7 +248,15 @@ namespace wave
 				}
 				else if (is_class)
 				{
-					llvm_value_map[&var_decl] = llvm_value_map[init_expr];
+					QualType const& var_type = var_decl.GetType();
+					ClassType const& class_type = type_cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type.GetClassDecl();
+
+					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm::TypeSize struct_size = data_layout->getTypeAllocSize(llvm_type);
+
+					builder.CreateMemCpy(struct_alloc, llvm::MaybeAlign(), llvm_value_map[init_expr], llvm::MaybeAlign(), llvm::ConstantInt::get(int_type, struct_size));
+					llvm_value_map[&var_decl] = struct_alloc;
 				}
 				else if (is_ref)
 				{

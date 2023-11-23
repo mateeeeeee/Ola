@@ -1,90 +1,58 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
+%S = type { i64, i64 }
+
 declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
 
-define internal void @FooByRef(ptr %a) {
-entry:
-  %0 = alloca ptr, align 8
-  store ptr %a, ptr %0, align 8
-  %1 = load ptr, ptr %0, align 8
-  %2 = load i64, ptr %1, align 4
-  %3 = add i64 %2, 1
-  store i64 %3, ptr %1, align 4
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
-define internal void @FooByValue(i64 %a) {
+define void @"S::Init"(ptr %this, i64 %x, i64 %y) {
 entry:
   %0 = alloca i64, align 8
-  store i64 %a, ptr %0, align 4
-  %1 = load i64, ptr %0, align 4
-  %2 = add i64 %1, 1
-  store i64 %2, ptr %0, align 4
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
-define internal void @TestRefSimple() {
-entry:
-  %0 = alloca i64, align 8
-  store i64 9, ptr %0, align 4
-  %1 = load i64, ptr %0, align 4
-  call void @FooByRef(ptr %0)
-  %2 = load i64, ptr %0, align 4
-  %3 = icmp eq i64 %2, 10
-  call void @Assert(i1 %3)
+  store i64 %x, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 %y, ptr %1, align 4
+  %2 = getelementptr inbounds %S, ptr %this, i32 0, i32 0
+  %3 = load i64, ptr %2, align 4
   %4 = load i64, ptr %0, align 4
-  %5 = alloca ptr, align 8
-  store ptr %0, ptr %5, align 8
-  %6 = load ptr, ptr %5, align 8
+  %5 = load ptr, ptr %0, align 8
+  store ptr %5, ptr %2, align 8
+  %6 = getelementptr inbounds %S, ptr %this, i32 0, i32 1
   %7 = load i64, ptr %6, align 4
-  %8 = add i64 %7, 1
-  store i64 %8, ptr %6, align 4
-  %9 = load i64, ptr %0, align 4
-  %10 = icmp eq i64 %9, 11
-  call void @Assert(i1 %10)
-  %11 = load ptr, ptr %6, align 8
-  %12 = load i64, ptr %6, align 4
-  %13 = alloca i64, align 8
-  store i64 %12, ptr %13, align 4
-  %14 = load i64, ptr %13, align 4
-  %15 = add i64 %14, 1
-  store i64 %15, ptr %13, align 4
-  %16 = load i64, ptr %13, align 4
-  %17 = icmp eq i64 %16, 12
-  call void @Assert(i1 %17)
-  %18 = load i64, ptr %0, align 4
-  %19 = icmp eq i64 %18, 11
-  call void @Assert(i1 %19)
-  %20 = load ptr, ptr %6, align 8
-  %21 = alloca ptr, align 8
-  store ptr %6, ptr %21, align 8
-  %22 = load ptr, ptr %21, align 8
-  %23 = load i64, ptr %22, align 4
-  %24 = add i64 %23, 1
-  store i64 %24, ptr %22, align 4
-  %25 = load i64, ptr %0, align 4
-  %26 = icmp eq i64 %25, 12
-  call void @Assert(i1 %26)
-  %27 = load ptr, ptr %22, align 8
-  call void @FooByRef(ptr %22)
-  %28 = load i64, ptr %0, align 4
-  %29 = icmp eq i64 %28, 13
-  call void @Assert(i1 %29)
-  %30 = load ptr, ptr %22, align 8
-  %31 = load i64, ptr %22, align 4
-  call void @FooByValue(i64 %31)
-  %32 = load i64, ptr %0, align 4
-  %33 = icmp eq i64 %32, 13
-  call void @Assert(i1 %33)
+  %8 = load i64, ptr %1, align 4
+  %9 = load ptr, ptr %1, align 8
+  store ptr %9, ptr %6, align 8
+  br label %exit
+
+exit:                                             ; preds = %entry
+  ret void
+}
+
+define internal void @StructByValue(%S %s) {
+entry:
+  %0 = alloca %S, align 8
+  store %S %s, ptr %0, align 4
+  %1 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
+  %2 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
+  %3 = load i64, ptr %2, align 4
+  %4 = mul i64 %3, 2
+  %5 = load i64, ptr %1, align 4
+  store i64 %4, ptr %1, align 4
+  %6 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
+  %7 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
+  %8 = load i64, ptr %7, align 4
+  %9 = mul i64 %8, 2
+  %10 = load i64, ptr %6, align 4
+  store i64 %9, ptr %6, align 4
+  %11 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
+  %12 = load i64, ptr %11, align 4
+  %13 = icmp eq i64 %12, 20
+  call void @Assert(i1 %13)
+  %14 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
+  %15 = load i64, ptr %14, align 4
+  %16 = icmp eq i64 %15, 20
+  call void @Assert(i1 %16)
   br label %exit
 
 exit:                                             ; preds = %entry
@@ -94,7 +62,52 @@ exit:                                             ; preds = %entry
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  call void @TestRefSimple()
+  %1 = alloca %S, align 8
+  %2 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  store i64 0, ptr %2, align 4
+  %3 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  store i64 0, ptr %3, align 4
+  call void @"S::Init"(ptr %1, i64 10, i64 10)
+  %4 = load %S, ptr %1, align 4
+  call void @StructByValue(%S %4)
+  %5 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %6 = load i64, ptr %5, align 4
+  %7 = icmp eq i64 %6, 10
+  call void @Assert(i1 %7)
+  %8 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  %9 = load i64, ptr %8, align 4
+  %10 = icmp eq i64 %9, 10
+  call void @Assert(i1 %10)
+  %11 = alloca %S, align 8
+  call void @llvm.memcpy.p0.p0.i64(ptr %11, ptr %1, i64 16, i1 false)
+  %12 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %13 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %14 = load i64, ptr %13, align 4
+  %15 = mul i64 %14, 2
+  %16 = load i64, ptr %12, align 4
+  store i64 %15, ptr %12, align 4
+  %17 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  %18 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  %19 = load i64, ptr %18, align 4
+  %20 = mul i64 %19, 2
+  %21 = load i64, ptr %17, align 4
+  store i64 %20, ptr %17, align 4
+  %22 = getelementptr inbounds %S, ptr %11, i32 0, i32 0
+  %23 = load i64, ptr %22, align 4
+  %24 = icmp eq i64 %23, 10
+  call void @Assert(i1 %24)
+  %25 = getelementptr inbounds %S, ptr %11, i32 0, i32 1
+  %26 = load i64, ptr %25, align 4
+  %27 = icmp eq i64 %26, 10
+  call void @Assert(i1 %27)
+  %28 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  %29 = load i64, ptr %28, align 4
+  %30 = icmp eq i64 %29, 20
+  call void @Assert(i1 %30)
+  %31 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
+  %32 = load i64, ptr %31, align 4
+  %33 = icmp eq i64 %32, 20
+  call void @Assert(i1 %33)
   store i64 0, ptr %0, align 4
   br label %exit
 
@@ -103,6 +116,11 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %1 = load i64, ptr %0, align 4
-  ret i64 %1
+  %34 = load i64, ptr %0, align 4
+  ret i64 %34
 }
+
+; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #0
+
+attributes #0 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }

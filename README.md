@@ -241,33 +241,56 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 
 ### Classes
 ```
-public class Foo
+import std.assert;
+
+public class S
 {
-	public void SetX(int x)
+	public void Init(int x, int y)
 	{
-		this.x = x; 
+		this.x = x;
+		this.y = y;
 	}
-    public int GetX() const
-	{
-		return x;
-	}
-	int x = 5; //private
-	private int y = 10;
+
+	public void SetX(int x) {this.x = x;}
+	public void SetY(int y) {this.y = y;}
+	
+	public int GetX() const {return x;}
+	public int GetY() const {return y;}
+
+	private int x = 0;
+	private int y = 0;
 };
 
-void ModifyFoo(Foo foo) //passed by value
+void StructByValue(S s)
 {
-	foo.SetX(100);
+	s.SetX(100);
+	s.SetY(100);
+	Assert(s.x == 100);
+	Assert(s.y == 100);
 }
 
+//void StructByRef(ref S s)
+//{
+//	s.x *= 2;
+//	s.y *= 2;
+//}
+
 public int main()
-{  
-	Foo foo;
-	foo.SetX(12);
-	Foo foo2 = foo; //foo2 is a reference to foo
-	foo.SetX(24); //foo2.x is also 24
-	ModifyFoo(foo); 
-    return foo2.GetX(); //returns 24
+{
+	S s; s.Init(10, 10);
+	StructByValue(s);
+	Assert(s.x == 10);
+	Assert(s.y == 10);
+
+	S s2 = s; //copy
+	s.SetX(25);
+	s.SetY(25);
+	Assert(s2.x == 10);
+	Assert(s2.y == 10);
+	Assert(s.y == 25);
+	Assert(s.y == 25);
+
+	return 0;
 }
 ```
 Class declaration consists of a sequence of method definitions and field declarations, Those declarations can be interleaved.
