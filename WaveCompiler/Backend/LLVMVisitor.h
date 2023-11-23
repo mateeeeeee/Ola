@@ -123,6 +123,7 @@ namespace wave
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 
+		static bool IsPointer(llvm::Type*);
 		static bool IsBoolean(llvm::Type*);
 		static bool IsInteger(llvm::Type*);
 		static bool IsFloat(llvm::Type*);

@@ -1,162 +1,273 @@
 ; ModuleID = 'WaveModule'
 source_filename = "WaveModule"
 
-%S = type { i64, i64 }
-
 declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
 
-declare void @PrintInt(i64)
-
-declare void @PrintFloat(double)
-
-declare void @PrintChar(i8)
-
-declare void @PrintString(ptr)
-
-declare i64 @ReadInt()
-
-declare double @ReadFloat()
-
-declare i8 @ReadChar()
-
-declare void @ReadString(ptr, i64)
-
-define void @"S::SetX"(ptr %this, i64 %x) {
+define internal void @TestWhileLoopInt() {
 entry:
   %0 = alloca i64, align 8
-  store i64 %x, ptr %0, align 4
-  %1 = getelementptr inbounds %S, ptr %this, i32 0, i32 0
+  store i64 0, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 1, ptr %1, align 4
+  br label %while.cond
+
+while.cond:                                       ; preds = %while.body, %entry
   %2 = load i64, ptr %1, align 4
-  %3 = load i64, ptr %0, align 4
-  %4 = load ptr, ptr %0, align 8
-  store ptr %4, ptr %1, align 8
-  br label %exit
+  %3 = icmp sle i64 %2, 5
+  br i1 %3, label %while.body, label %while.end
 
-exit:                                             ; preds = %entry
-  ret void
-}
-
-define void @"S::SetY"(ptr %this, i64 %y) {
-entry:
-  %0 = alloca i64, align 8
-  store i64 %y, ptr %0, align 4
-  %1 = getelementptr inbounds %S, ptr %this, i32 0, i32 1
-  %2 = load i64, ptr %1, align 4
-  %3 = load i64, ptr %0, align 4
-  %4 = load ptr, ptr %0, align 8
-  store ptr %4, ptr %1, align 8
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
-define i64 @"S::GetX"(ptr %this) {
-entry:
-  %0 = alloca i64, align 8
-  %1 = getelementptr inbounds %S, ptr %this, i32 0, i32 0
-  %2 = load ptr, ptr %1, align 8
-  store ptr %2, ptr %0, align 8
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %0, align 4
-  ret i64 %3
-}
-
-define i64 @"S::GetY"(ptr %this) {
-entry:
-  %0 = alloca i64, align 8
-  %1 = getelementptr inbounds %S, ptr %this, i32 0, i32 1
-  %2 = load ptr, ptr %1, align 8
-  store ptr %2, ptr %0, align 8
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %0, align 4
-  ret i64 %3
-}
-
-define internal void @ModifyS(%S %s) {
-entry:
-  %0 = alloca %S, align 8
-  store %S %s, ptr %0, align 4
-  %1 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
-  %2 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
-  %3 = load i64, ptr %2, align 4
-  %4 = mul i64 %3, 2
+while.body:                                       ; preds = %while.cond
+  %4 = load i64, ptr %0, align 4
   %5 = load i64, ptr %1, align 4
-  store i64 %4, ptr %1, align 4
-  %6 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
-  %7 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
-  %8 = load i64, ptr %7, align 4
-  %9 = mul i64 %8, 2
-  %10 = load i64, ptr %6, align 4
-  store i64 %9, ptr %6, align 4
-  %11 = getelementptr inbounds %S, ptr %0, i32 0, i32 0
-  %12 = load i64, ptr %11, align 4
-  call void @PrintInt(i64 %12)
-  %13 = getelementptr inbounds %S, ptr %0, i32 0, i32 1
-  %14 = load i64, ptr %13, align 4
-  call void @PrintInt(i64 %14)
+  %6 = add i64 %4, %5
+  %7 = load i64, ptr %0, align 4
+  store i64 %6, ptr %0, align 4
+  %8 = load i64, ptr %1, align 4
+  %9 = alloca ptr, align 8
+  %10 = load ptr, ptr %1, align 8
+  store ptr %10, ptr %9, align 8
+  %11 = add i64 %8, 1
+  store i64 %11, ptr %1, align 4
+  br label %while.cond
+
+while.end:                                        ; preds = %while.cond
+  %12 = load i64, ptr %0, align 4
+  %13 = icmp eq i64 %12, 15
+  call void @Assert(i1 %13)
   br label %exit
 
-exit:                                             ; preds = %entry
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %while.end
+  ret void
+}
+
+define internal void @TestWhileLoopBool() {
+entry:
+  %0 = alloca i1, align 1
+  store i1 true, ptr %0, align 1
+  %1 = alloca i64, align 8
+  store i64 0, ptr %1, align 4
+  br label %while.cond
+
+while.cond:                                       ; preds = %if.end, %entry
+  %2 = load i1, ptr %0, align 1
+  br i1 %2, label %while.body, label %while.end
+
+while.body:                                       ; preds = %while.cond
+  %3 = load i64, ptr %1, align 4
+  %4 = alloca ptr, align 8
+  %5 = load ptr, ptr %1, align 8
+  store ptr %5, ptr %4, align 8
+  %6 = add i64 %3, 1
+  store i64 %6, ptr %1, align 4
+  %7 = load i64, ptr %1, align 4
+  %8 = icmp eq i64 %7, 3
+  br i1 %8, label %if.then, label %if.end
+
+while.end:                                        ; preds = %while.cond
+  %9 = load i64, ptr %1, align 4
+  %10 = icmp eq i64 %9, 3
+  call void @Assert(i1 %10)
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+if.then:                                          ; preds = %while.body
+  %11 = load i1, ptr %0, align 1
+  store i1 false, ptr %0, align 1
+  br label %if.end
+
+if.else:                                          ; No predecessors!
+  %nop1 = alloca i1, align 1
+  br label %exit
+
+if.end:                                           ; preds = %if.then, %while.body
+  br label %while.cond
+
+exit:                                             ; preds = %if.else, %return, %while.end
+  ret void
+}
+
+define internal void @TestNestedWhileLoops() {
+entry:
+  %0 = alloca i64, align 8
+  store i64 0, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 0, ptr %1, align 4
+  br label %while.cond
+
+while.cond:                                       ; preds = %while.end3, %entry
+  %2 = load i64, ptr %0, align 4
+  %3 = icmp slt i64 %2, 3
+  br i1 %3, label %while.body, label %while.end
+
+while.body:                                       ; preds = %while.cond
+  br label %while.cond1
+
+while.end:                                        ; preds = %while.cond
+  %4 = load i64, ptr %0, align 4
+  %5 = icmp eq i64 %4, 3
+  call void @Assert(i1 %5)
+  %6 = load i64, ptr %1, align 4
+  %7 = icmp eq i64 %6, 2
+  call void @Assert(i1 %7)
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+while.cond1:                                      ; preds = %while.body2, %while.body
+  %8 = load i64, ptr %1, align 4
+  %9 = icmp slt i64 %8, 2
+  br i1 %9, label %while.body2, label %while.end3
+
+while.body2:                                      ; preds = %while.cond1
+  %10 = load i64, ptr %1, align 4
+  %11 = alloca ptr, align 8
+  %12 = load ptr, ptr %1, align 8
+  store ptr %12, ptr %11, align 8
+  %13 = add i64 %10, 1
+  store i64 %13, ptr %1, align 4
+  br label %while.cond1
+
+while.end3:                                       ; preds = %while.cond1
+  %14 = load i64, ptr %0, align 4
+  %15 = alloca ptr, align 8
+  %16 = load ptr, ptr %0, align 8
+  store ptr %16, ptr %15, align 8
+  %17 = add i64 %14, 1
+  store i64 %17, ptr %0, align 4
+  br label %while.cond
+
+exit:                                             ; preds = %return, %while.end
+  ret void
+}
+
+define internal void @TestWhileLoopWithBreak() {
+entry:
+  %0 = alloca i64, align 8
+  store i64 0, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 1, ptr %1, align 4
+  br label %while.cond
+
+while.cond:                                       ; preds = %if.end, %entry
+  br i1 true, label %while.body, label %while.end
+
+while.body:                                       ; preds = %while.cond
+  %2 = load i64, ptr %0, align 4
+  %3 = load i64, ptr %1, align 4
+  %4 = add i64 %2, %3
+  %5 = load i64, ptr %0, align 4
+  store i64 %4, ptr %0, align 4
+  %6 = load i64, ptr %1, align 4
+  %7 = alloca ptr, align 8
+  %8 = load ptr, ptr %1, align 8
+  store ptr %8, ptr %7, align 8
+  %9 = add i64 %6, 1
+  store i64 %9, ptr %1, align 4
+  %10 = load i64, ptr %1, align 4
+  %11 = icmp sgt i64 %10, 5
+  br i1 %11, label %if.then, label %if.end
+
+while.end:                                        ; preds = %if.then, %while.cond
+  %12 = load i64, ptr %0, align 4
+  %13 = icmp eq i64 %12, 15
+  call void @Assert(i1 %13)
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+if.then:                                          ; preds = %while.body
+  br label %while.end
+
+if.else:                                          ; No predecessors!
+  %nop1 = alloca i1, align 1
+  br label %exit
+
+if.end:                                           ; preds = %while.body
+  br label %while.cond
+
+break:                                            ; No predecessors!
+  %nop2 = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %break, %if.else, %return, %while.end
+  ret void
+}
+
+define internal void @TestWhileLoopWithContinue() {
+entry:
+  %0 = alloca i64, align 8
+  store i64 0, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 0, ptr %1, align 4
+  br label %while.cond
+
+while.cond:                                       ; preds = %if.end, %if.then, %entry
+  %2 = load i64, ptr %1, align 4
+  %3 = icmp slt i64 %2, 5
+  br i1 %3, label %while.body, label %while.end
+
+while.body:                                       ; preds = %while.cond
+  %4 = load i64, ptr %1, align 4
+  %5 = alloca ptr, align 8
+  %6 = load ptr, ptr %1, align 8
+  store ptr %6, ptr %5, align 8
+  %7 = add i64 %4, 1
+  store i64 %7, ptr %1, align 4
+  %8 = load i64, ptr %1, align 4
+  %9 = srem i64 %8, 2
+  %10 = icmp eq i64 %9, 0
+  br i1 %10, label %if.then, label %if.end
+
+while.end:                                        ; preds = %while.cond
+  %11 = load i64, ptr %0, align 4
+  %12 = icmp eq i64 %11, 9
+  call void @Assert(i1 %12)
+  br label %exit
+
+if.then:                                          ; preds = %while.body
+  br label %while.cond
+
+if.else:                                          ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+if.end:                                           ; preds = %while.body
+  %13 = load i64, ptr %0, align 4
+  %14 = load i64, ptr %1, align 4
+  %15 = add i64 %13, %14
+  %16 = load i64, ptr %0, align 4
+  store i64 %15, ptr %0, align 4
+  br label %while.cond
+
+continue:                                         ; No predecessors!
+  %nop1 = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %while.end, %continue, %if.else
   ret void
 }
 
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %S, align 8
-  %2 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  store i64 0, ptr %2, align 4
-  %3 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
-  store i64 0, ptr %3, align 4
-  %4 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %5 = load i64, ptr %4, align 4
-  store i64 10, ptr %4, align 4
-  %6 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
-  %7 = load i64, ptr %6, align 4
-  store i64 10, ptr %6, align 4
-  %8 = load %S, ptr %1, align 4
-  call void @ModifyS(%S %8)
-  %9 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %10 = load i64, ptr %9, align 4
-  %11 = icmp eq i64 %10, 10
-  call void @Assert(i1 %11)
-  %12 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
-  %13 = load i64, ptr %12, align 4
-  %14 = icmp eq i64 %13, 10
-  call void @Assert(i1 %14)
-  %15 = call i64 @"S::GetX"(ptr %1)
-  %16 = icmp eq i64 %15, 10
-  call void @Assert(i1 %16)
-  %17 = call i64 @"S::GetY"(ptr %1)
-  %18 = icmp eq i64 %17, 10
-  call void @Assert(i1 %18)
-  %19 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %20 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %21 = load i64, ptr %20, align 4
-  %22 = add i64 %21, 10
-  %23 = load i64, ptr %19, align 4
-  store i64 %22, ptr %19, align 4
-  %24 = call i64 @"S::GetX"(ptr %1)
-  %25 = icmp eq i64 %24, 20
-  call void @Assert(i1 %25)
-  %26 = call i64 @"S::GetX"(ptr %1)
-  %27 = icmp eq i64 %26, 20
-  call void @Assert(i1 %27)
+  call void @TestWhileLoopInt()
+  call void @TestWhileLoopBool()
+  call void @TestNestedWhileLoops()
+  call void @TestWhileLoopWithBreak()
+  call void @TestWhileLoopWithContinue()
   store i64 0, ptr %0, align 4
   br label %exit
 
@@ -165,6 +276,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %28 = load i64, ptr %0, align 4
-  ret i64 %28
+  %1 = load i64, ptr %0, align 4
+  ret i64 %1
 }

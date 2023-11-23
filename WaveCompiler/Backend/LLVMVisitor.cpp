@@ -342,10 +342,10 @@ namespace wave
 
 	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
-		if (ExprStmt const* expr_stmt = return_stmt.GetExprStmt()) 
+		if (Expr const* return_expr = return_stmt.GetExprStmt()->GetExpr()) 
 		{
-			expr_stmt->GetExpr()->Accept(*this);
-			llvm::Value* return_expr_value = llvm_value_map[expr_stmt->GetExpr()];
+			return_expr->Accept(*this);
+			llvm::Value* return_expr_value = llvm_value_map[return_expr];
 			WAVE_ASSERT(return_expr_value);
 			llvm_value_map[&return_stmt] = Store(return_expr_value, return_alloc);
 		}
@@ -1146,10 +1146,14 @@ namespace wave
 			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
 			builder.CreateBr(exit_block);
 		}
-		if (entry_block->getTerminator() == nullptr)
+
+		for (auto&& block : *func)
 		{
-			builder.SetInsertPoint(entry_block);
-			builder.CreateBr(exit_block);
+			if (block.getTerminator() == nullptr)
+			{
+				builder.SetInsertPoint(&block);
+				builder.CreateBr(exit_block);
+			}
 		}
 
 		label_blocks.clear();
@@ -1162,6 +1166,20 @@ namespace wave
 
 	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
+		if (IsPointer(condition_value->getType()))
+		{
+			if (isa<llvm::AllocaInst>(condition_value))
+			{
+				llvm::AllocaInst* alloca_inst = cast<llvm::AllocaInst>(condition_value);
+				condition_value = builder.CreateLoad(alloca_inst->getAllocatedType(), condition_value);
+			}
+			else if (isa<llvm::GlobalVariable>(condition_value))
+			{
+				llvm::GlobalVariable* global_var_alloc = cast<llvm::GlobalVariable>(condition_value);
+				condition_value = builder.CreateLoad(global_var_alloc->getValueType(), condition_value);
+			}
+		}
+
 		if (IsBoolean(condition_value->getType()))
 		{
 			builder.CreateCondBr(condition_value, true_block, false_block);
@@ -1280,6 +1298,11 @@ namespace wave
 		if (!value->getType()->isPointerTy()) return builder.CreateStore(value, ptr);
 		llvm::Value* load = Load(value->getType(), value);
 		return builder.CreateStore(load, ptr);
+	}
+
+	bool LLVMVisitor::IsPointer(llvm::Type* type)
+	{
+		return type->isPointerTy();
 	}
 
 	bool LLVMVisitor::IsBoolean(llvm::Type* type)
