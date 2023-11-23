@@ -22,8 +22,8 @@ void StructByValue(S s)
 {
 	s.SetX(100);
 	s.SetY(100);
-	Assert(s.x == 100);
-	Assert(s.y == 100);
+	Assert(s.GetX() == 100);
+	Assert(s.GetY() == 100);
 }
 
 //void StructByRef(ref S s)
@@ -36,16 +36,16 @@ public int main()
 {
 	S s; s.Init(10, 10);
 	StructByValue(s);
-	Assert(s.x == 10);
-	Assert(s.y == 10);
+	Assert(s.GetX() == 10);
+	Assert(s.GetY() == 10);
 
 	S s2 = s; //copy
 	s.SetX(25);
 	s.SetY(25);
-	Assert(s2.x == 10);
-	Assert(s2.y == 10);
-	Assert(s.y == 25);
-	Assert(s.y == 25);
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
+	Assert(s.GetX() == 25);
+	Assert(s.GetY() == 25);
 
 	return 0;
 }

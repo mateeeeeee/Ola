@@ -30,6 +30,86 @@
 	ret
 	.seh_endproc
                                         # -- End function
+	.def	"S::SetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::SetX"                       # -- Begin function S::SetX
+	.p2align	4, 0x90
+"S::SetX":                              # @"S::SetX"
+.seh_proc "S::SetX"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	qword ptr [rsp], rdx
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rcx], rax
+# %bb.1:                                # %exit
+	pop	rax
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::SetY";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::SetY"                       # -- Begin function S::SetY
+	.p2align	4, 0x90
+"S::SetY":                              # @"S::SetY"
+.seh_proc "S::SetY"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	qword ptr [rsp], rdx
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rcx + 8], rax
+# %bb.1:                                # %exit
+	pop	rax
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::GetX"                       # -- Begin function S::GetX
+	.p2align	4, 0x90
+"S::GetX":                              # @"S::GetX"
+.seh_proc "S::GetX"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	pop	rcx
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::GetY";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::GetY"                       # -- Begin function S::GetY
+	.p2align	4, 0x90
+"S::GetY":                              # @"S::GetY"
+.seh_proc "S::GetY"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx + 8]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	pop	rcx
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	StructByValue;
 	.scl	3;
 	.type	32;
@@ -43,16 +123,20 @@ StructByValue:                          # @StructByValue
 	.seh_endprologue
 	mov	qword ptr [rsp + 40], rcx
 	mov	qword ptr [rsp + 48], rdx
-	mov	rax, qword ptr [rsp + 40]
-	shl	rax
-	mov	qword ptr [rsp + 40], rax
-	mov	rax, qword ptr [rsp + 48]
-	shl	rax
-	mov	qword ptr [rsp + 48], rax
-	cmp	qword ptr [rsp + 40], 20
+	lea	rcx, [rsp + 40]
+	mov	edx, 100
+	call	"S::SetX"
+	lea	rcx, [rsp + 40]
+	mov	edx, 100
+	call	"S::SetY"
+	lea	rcx, [rsp + 40]
+	call	"S::GetX"
+	cmp	rax, 100
 	sete	cl
 	call	Assert
-	cmp	qword ptr [rsp + 48], 20
+	lea	rcx, [rsp + 40]
+	call	"S::GetY"
+	cmp	rax, 100
 	sete	cl
 	call	Assert
 # %bb.1:                                # %exit
@@ -82,32 +166,44 @@ main:                                   # @main
 	mov	rcx, qword ptr [rsp + 48]
 	mov	rdx, qword ptr [rsp + 56]
 	call	StructByValue
-	cmp	qword ptr [rsp + 48], 10
+	lea	rcx, [rsp + 48]
+	call	"S::GetX"
+	cmp	rax, 10
 	sete	cl
 	call	Assert
-	cmp	qword ptr [rsp + 56], 10
+	lea	rcx, [rsp + 48]
+	call	"S::GetY"
+	cmp	rax, 10
 	sete	cl
 	call	Assert
 	mov	rax, qword ptr [rsp + 48]
 	mov	qword ptr [rsp + 32], rax
 	mov	rax, qword ptr [rsp + 56]
 	mov	qword ptr [rsp + 40], rax
-	mov	rax, qword ptr [rsp + 48]
-	shl	rax
-	mov	qword ptr [rsp + 48], rax
-	mov	rax, qword ptr [rsp + 56]
-	shl	rax
-	mov	qword ptr [rsp + 56], rax
-	cmp	qword ptr [rsp + 32], 10
+	lea	rcx, [rsp + 48]
+	mov	edx, 25
+	call	"S::SetX"
+	lea	rcx, [rsp + 48]
+	mov	edx, 25
+	call	"S::SetY"
+	lea	rcx, [rsp + 32]
+	call	"S::GetX"
+	cmp	rax, 10
 	sete	cl
 	call	Assert
-	cmp	qword ptr [rsp + 40], 10
+	lea	rcx, [rsp + 32]
+	call	"S::GetY"
+	cmp	rax, 10
 	sete	cl
 	call	Assert
-	cmp	qword ptr [rsp + 56], 20
+	lea	rcx, [rsp + 48]
+	call	"S::GetX"
+	cmp	rax, 25
 	sete	cl
 	call	Assert
-	cmp	qword ptr [rsp + 56], 20
+	lea	rcx, [rsp + 48]
+	call	"S::GetY"
+	cmp	rax, 25
 	sete	cl
 	call	Assert
 	mov	qword ptr [rsp + 64], 0
@@ -120,4 +216,8 @@ main:                                   # @main
 	.addrsig
 	.addrsig_sym Assert
 	.addrsig_sym "S::Init"
+	.addrsig_sym "S::SetX"
+	.addrsig_sym "S::SetY"
+	.addrsig_sym "S::GetX"
+	.addrsig_sym "S::GetY"
 	.addrsig_sym StructByValue
