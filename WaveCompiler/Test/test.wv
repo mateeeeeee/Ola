@@ -1,35 +1,118 @@
 import std.assert;
-import std.io;
 
-
-//ref todo list
-//1. passing to function parameter
-//   - passing T variable to ref T function parameter + 
-//	 - passing ref T variable to T function parameter
-//	 - passing ref T variable to ref T function parameter
-//2. assignment 
-//   - assigning T to ref T variable + 
-//   - assigning ref T to T variable
-//   - assigning ref T to ref T variable
-//3. returning from functions
-//4. methods and fields
-//5. global variables
-	
-
-void ModifyInt(ref int a)
+// Test basic while loop with int
+void TestWhileLoopInt()
 {
-	++a;
-	int b = a;
-	++b;
+    int sum = 0;
+    int i = 1;
+
+    while (i <= 5)
+    {
+        sum += i;
+        i++;
+    }
+
+    Assert(sum == 15);
+
+     return;
 }
 
+// Test basic while loop with bool
+void TestWhileLoopBool()
+{
+    bool condition = true;
+    int iterations = 0;
+
+    while (condition)
+    {
+        iterations++;
+        if (iterations == 3)
+        {
+            condition = false;
+        }
+    }
+
+    Assert(iterations == 3);
+
+    return;
+}
+
+// Test nested while loops
+void TestNestedWhileLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    while (outerCounter < 3)
+    {
+        while (innerCounter < 2)
+        {
+            innerCounter++;
+        }
+
+        outerCounter++;
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+
+     return;
+}
+
+// Test while loop with break statement
+void TestWhileLoopWithBreak()
+{
+    int sum = 0;
+    int i = 1;
+
+    while (true)
+    {
+        sum += i;
+        i++;
+
+        if (i > 5)
+        {
+            break;
+        }
+    }
+
+    Assert(sum == 15);
+
+     return;
+}
+
+// Test while loop with continue statement
+void TestWhileLoopWithContinue()
+{
+    int sum = 0;
+    int i = 0;
+
+    while (i < 5)
+    {
+        i++;
+
+        if (i % 2 == 0)
+        {
+            continue;
+        }
+
+        sum += i;
+    }
+
+    Assert(sum == 9);
+
+}
+
+// Main testing function
 public int main()
 {
-	int a = 9;
-	ModifyInt(a);
-	Assert(a == 10);
-	ref int b = a;
-	++b;
-	Assert(a == 11);
-	return a;
+    TestWhileLoopInt();
+    TestWhileLoopBool();
+    TestNestedWhileLoops();
+    TestWhileLoopWithBreak();
+    TestWhileLoopWithContinue();
+
+    // Add other tests as needed
+
+    return 0;
 }

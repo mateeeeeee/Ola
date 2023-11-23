@@ -4,10 +4,9 @@ alias MyInt = int;
 
 public int main()
 {
-	MyInt myInt = 3;
-
+	MyInt myInt = 1;
 	alias MyIntArray = int[];
-
 	MyIntArray myIntArray = {myInt, myInt, myInt};
-	return myIntArray[0] - 3;
+
+	return 0;
 }

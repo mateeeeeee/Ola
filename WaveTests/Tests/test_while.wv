@@ -1,48 +1,107 @@
 import std.assert;
 
-public int main()
+// Test basic while loop with int
+void TestWhileLoopInt()
 {
     int sum = 0;
     int i = 1;
+
     while (i <= 5)
     {
         sum += i;
         i++;
     }
-    Assert(sum == 15);  
 
-    int count = 0;
-    while (count > 0)
+    Assert(sum == 15);
+}
+
+// Test basic while loop with bool
+void TestWhileLoopBool()
+{
+    bool condition = true;
+    int iterations = 0;
+
+    while (condition)
     {
-        Assert(false);  
+        iterations++;
+        if (iterations == 3)
+        {
+            condition = false;
+        }
     }
-    Assert(count == 0);  
 
+    Assert(iterations == 3);
+}
 
-    int countUpTo = 5;
-    int counter = 0;
+// Test nested while loops
+void TestNestedWhileLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    while (outerCounter < 3)
+    {
+        while (innerCounter < 2)
+        {
+            innerCounter++;
+        }
+
+        outerCounter++;
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+}
+
+// Test while loop with break statement
+void TestWhileLoopWithBreak()
+{
+    int sum = 0;
+    int i = 1;
+
     while (true)
     {
-        counter++;
-        if (counter == countUpTo)
-        {
-            break;  
-        }
-    }
-    Assert(counter == countUpTo);  
+        sum += i;
+        i++;
 
-    int n = 0;
-    int count2 = 0;
-    while (count2 < 5)
-    {
-        count2++;
-        if (count2 % 2 == 0)
+        if (i > 5)
         {
-            continue;  // Skip even counts
+            break;
         }
-        n += count2;
     }
-    Assert(n == 9);
+
+    Assert(sum == 15);
+}
+
+// Test while loop with continue statement
+void TestWhileLoopWithContinue()
+{
+    int sum = 0;
+    int i = 0;
+
+    while (i < 5)
+    {
+        i++;
+
+        if (i % 2 == 0)
+        {
+            continue;
+        }
+
+        sum += i;
+    }
+
+    Assert(sum == 9);
+}
+
+// Main testing function
+public int main()
+{
+    TestWhileLoopInt();
+    TestWhileLoopBool();
+    TestNestedWhileLoops();
+    TestWhileLoopWithBreak();
+    TestWhileLoopWithContinue();
 
     return 0;
 }

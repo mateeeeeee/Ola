@@ -1,71 +1,120 @@
 import std.assert;
 
-public int main()
+// Test bitwise AND and compound AND for int
+void TestIntBitwiseAnd()
 {
-    int a = 12;   // 1100 in binary
-    int b = 15;   // 1111 in binary
-    int and_result = a & b;  // 1100 in binary (12 in decimal)
-    Assert(and_result == 12);
+    int a = 5;    // 0101 in binary
+    int b = 3;    // 0011 in binary
 
-    int c = 8;    // 1000 in binary
-    int d = 4;    // 0100 in binary
-    int and_result2 = c & d;  // 0000 in binary (0 in decimal)
-    Assert(and_result2 == 0);
-    
-    int e = 10;   // 1010 in binary
-    int f = 3;    // 0011 in binary
-    int or_result = e | f;  // 1011 in binary (11 in decimal)
-    Assert(or_result == 11);
-    
-    int g = 6;    // 0110 in binary
-    int h = 9;    // 1001 in binary
-    int or_result2 = g | h;  // 1111 in binary (15 in decimal)
-    Assert(or_result2 == 15);
-    
-    int i = 5;    // 0101 in binary
-    int j = 3;    // 0011 in binary
-    int xor_result = i ^ j;  // 0110 in binary (6 in decimal)
-    Assert(xor_result == 6);
-    
-    int k = 12;   // 1100 in binary
-    int l = 15;   // 1111 in binary
-    int xor_result2 = k ^ l;  // 0011 in binary (3 in decimal)
-    Assert(xor_result2 == 3);
-    
-    int m = 16;   // 10000 in binary
-    int n = 3;    // 00011 in binary
-    m &= n;       // m is modified to 00000 (0 in decimal)
-    Assert(m == 0);
-    
-    int o = 5;    // 00101 in binary
-    int p = 3;    // 00011 in binary
-    o |= p;       // o is modified to 00111 (7 in decimal)
-    Assert(o == 7);
-    
-    int q = 10;   // 01010 in binary
-    int r = 3;    // 00011 in binary
-    q ^= r;       // q is modified to 01001 (9 in decimal)
-    Assert(q == 9);
-    
+    // Test bitwise AND
+    int resultAnd = a & b;  // 0001 in binary
+    Assert(resultAnd == 1);
+
+    // Test compound bitwise AND
+    a &= b;
+    Assert(a == 1);
+}
+
+// Test bitwise OR and compound OR for int
+void TestIntBitwiseOr()
+{
+    int a = 5;    // 0101 in binary
+    int b = 3;    // 0011 in binary
+
+    // Test bitwise OR
+    int resultOr = a | b;   // 0111 in binary
+    Assert(resultOr == 7);
+
+    // Test compound bitwise OR
+    a |= b;
+    Assert(a == 7);
+}
+
+// Test bitwise XOR and compound XOR for int
+void TestIntBitwiseXor()
+{
+    int a = 5;    // 0101 in binary
+    int b = 3;    // 0011 in binary
+
+    // Test bitwise XOR
+    int resultXor = a ^ b;  // 0110 in binary
+    Assert(resultXor == 6);
+
+    // Test compound bitwise XOR
+    a ^= b;
+    Assert(a == 6);
+}
+
+// Test bitwise NOT for int
+void TestIntBitwiseNot()
+{
     int s = 5;
-    int not_result_s = ~s; 
-    Assert(not_result_s == -6); 
+    int resultNotS = ~s; 
+    Assert(resultNotS == -6); 
     
     int t = -1;
-    int not_result_t = ~t; 
-    Assert(not_result_t == 0);
+    int resultNotT = ~t; 
+    Assert(resultNotT == 0);
     
     int u = 0;
-    int not_result_u = ~u;  
-    Assert(not_result_u == -1); 
+    int resultNotU = ~u;  
+    Assert(resultNotU == -1); 
     
     int v = 255;  
-    int not_result_v = ~v;  
-    Assert(not_result_v == -256);   
+    int resultNotV = ~v;  
+    Assert(resultNotV == -256);   
     
     int z = 65535;  
-    int not_result_z = ~z;  
-    Assert(not_result_z == -65536);  
+    int resultNotZ = ~z;  
+    Assert(resultNotZ == -65536); 
+}
+
+// Test bitwise AND, OR, XOR, and NOT for bool
+void TestBoolBitOperators()
+{
+    bool p = true;
+    bool q = false;
+
+    // Test bitwise AND (logical AND for bool)
+    bool resultAnd = p & q;
+    Assert(resultAnd == false);
+
+    // Test compound bitwise AND (logical AND for bool)
+    p &= q;
+    Assert(p == false);
+
+    // Test bitwise OR (logical OR for bool)
+    bool resultOr = p | q;
+    Assert(resultOr == false);
+
+    // Test compound bitwise OR (logical OR for bool)
+    p |= q;
+    Assert(p == false);
+
+    // Test bitwise XOR (logical XOR for bool)
+    bool resultXor = p ^ q;
+    Assert(resultXor == false);
+
+    // Test compound bitwise XOR (logical XOR for bool)
+    p ^= q;
+    Assert(p == false);
+
+    // Test bitwise NOT (logical NOT for bool)
+    bool resultNotP = ~p;
+    Assert(resultNotP == true);
+
+    bool resultNotQ = ~q;
+    Assert(resultNotQ == true);
+}
+
+// Main testing function
+public int main()
+{
+    TestIntBitwiseAnd();
+    TestIntBitwiseOr();
+    TestIntBitwiseXor();
+    TestIntBitwiseNot();
+    TestBoolBitOperators();
 
     return 0;
 }

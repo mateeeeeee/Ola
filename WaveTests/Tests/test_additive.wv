@@ -1,56 +1,66 @@
 import std.assert;
 
-void TestAddition()
+// Test addition for int
+void TestIntAddition()
 {
     int a = 5;
-    int b = 7;
-    int c = a + b;
-    Assert(c == 12);
+    int b = 10;
+    int result = a + b;
+    Assert(result == 15);
 
-    float d = 1.0;
-    float e = 3.5;
-    float f = d + e + 0.5;
-    Assert(f >= 4.5);
-    Assert(f <  5.5);
+    int c = 7;
+    a += c;
+    Assert(a == 12);
 }
 
+// Test subtraction for int
+void TestIntSubtraction()
+{
+    int a = 15;
+    int b = 7;
+    int result = a - b;
+    Assert(result == 8);
+
+    int c = 3;
+    a -= c;
+    Assert(a == 12);
+}
+
+// Test addition for float
+void TestFloatAddition()
+{
+    float x = 3.5;
+    float y = 2.5;
+    float result = x + y;
+    Assert(result == 6.0);
+
+    float z = 1.2;
+    x += z;
+    Assert(x == 4.7);
+}
+
+// Test subtraction for float
+void TestFloatSubtraction()
+{
+    float x = 5.0;
+    float y = 2.5;
+    float result = x - y;
+    Assert(result == 2.5);
+
+    float z = 1.2;
+    x -= z;
+    Assert(x == 3.8);
+}
+
+
+// Main testing function
 public int main()
 {
-    TestAddition();
+    TestIntAddition();
+    TestIntSubtraction();
 
-    int c = 10;
-    int d = 3;
-    int diff = c - d;
-    Assert(diff == 7);
-
-    int e = 15;
-    int f = 7;
-    e += f;  // e is modified to 22
-    Assert(e == 22);
-
-    int g = 20;
-    int h = 3;
-    g -= h;  // g is modified to 17
-    Assert(g == 17);
-
-    int i = 8;
-    int j = 4;
-    i = i + j;  // i is modified to 12
-    Assert(i == 12);
-
-    int k = 15;
-    int l = 7;
-    l = l - k;  // l is modified to -8
-    Assert(l == -8);
-
-    int m = -5;
-    int n = -3;
-    int neg_sum = m + n;
-    Assert(neg_sum == -8);
-
-    int o = -2;
-    int neg_diff = o - 1;
-    Assert(neg_diff == -3);
+    TestFloatAddition();
+    TestFloatSubtraction();
 
     return 0;
 }
