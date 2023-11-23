@@ -1,67 +1,72 @@
 import std.assert;
-import std.io;
 
-const bool  globalBool = true;
-const int   globalInt = 42;
-const float globalFloat = 10.5;
-
-
-public int boolFunction(bool value)
+// Test implicit cast when assigning and initializing
+void TestImplicitCastAssignInit()
 {
-    return value;
+    int intVal = 42;
+    float floatVal = intVal;
+    bool boolVal = intVal;
+
+    Assert(floatVal == 42.0);
+    Assert(boolVal == true);
+
+    floatVal = 3.14;
+    intVal = floatVal;
+    boolVal = floatVal;
+
+    Assert(intVal == 3);
+    Assert(boolVal == true);
+
+    boolVal = true;
+    intVal = boolVal;
+    floatVal = boolVal;
+
+    Assert(intVal == 1);
+    Assert(floatVal == 1.0);
 }
 
-public int intFunction(int value)
+void TestImplicitCastParamBool(bool boolParam)
 {
-   return value;
+    Assert(boolParam == true);
 }
 
-public int floatFunction(float value)
+void TestImplicitCastParamInt(int intParam)
 {
-    return value;
+     Assert(intParam == 1);
+}
+
+void TestImplicitCastParamFloat(float floatParam)
+{
+     Assert(floatParam == 1.0);
+}
+
+void TestImplicitCastParam()
+{
+    int arg = 1;
+    float farg = 1.0;
+    bool barg = true;
+
+    TestImplicitCastParamBool(arg);
+    TestImplicitCastParamBool(farg);
+    TestImplicitCastParamBool(1);
+    TestImplicitCastParamBool(1.0);
+    
+    TestImplicitCastParamInt(barg);
+    TestImplicitCastParamInt(farg);
+    TestImplicitCastParamInt(true);
+    TestImplicitCastParamInt(1.0);
+
+    TestImplicitCastParamFloat(arg);
+    TestImplicitCastParamFloat(barg);
+    TestImplicitCastParamFloat(1);
+    TestImplicitCastParamFloat(true);
 }
 
 
-public int testImplicitCasts()
-{
-    bool boolValue = true;
-    int boolToInt = boolValue;
-    Assert(boolToInt == 1);
-
-    float boolToFloat = boolValue;
-    Assert(boolToFloat == 1.0);
-    
-    int intValue = 123;
-    bool intToBool = intValue;
-    Assert(intToBool == true);
-    
-    float intToFloat = intValue;
-    Assert(intToFloat == 123.0);
-    
-    float floatValue = 5.67;
-    bool floatToBool = floatValue;
-    Assert(floatToBool == true);
-    
-    int floatToInt = floatValue;
-    Assert(floatToInt == 5);
-    
-    bool assignedBool = globalInt; // Should be true since globalInt is non-zero
-    Assert(assignedBool == true);
-    
-    int assignedInt = globalFloat; // Should be 10 since globalFloat is cast to int
-    Assert(assignedInt == 10);
-    
-    float assignedFloat = globalBool; // Should be 1.0 since globalBool is true
-    Assert(assignedFloat == 1.0);
-    
-    Assert(boolFunction(globalInt) == 1);    
-    Assert(intFunction(globalFloat) == 10);  
-    Assert(floatFunction(globalBool) == 1);  
-
-    return 0;
-}
-
+// Main testing function
 public int main()
 {
-    return testImplicitCasts();
+    TestImplicitCastAssignInit();
+    TestImplicitCastParam();
+    return 0;
 }

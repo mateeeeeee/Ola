@@ -1,26 +1,48 @@
 import std.assert;
 
+// Test sizeof with types
+void TestSizeofTypes()
+{
+    Assert(sizeof(int) == 8);
+    Assert(sizeof(float) == 8);
+    Assert(sizeof(bool) == 1);
+}
+
+// Test sizeof with expressions
+void TestSizeofExpressions()
+{
+    int intVar = 42;
+    float floatVar = 3.14;
+    bool boolVar = true;
+
+    Assert(sizeof(intVar) == 8);
+    Assert(sizeof(floatVar) == 8);
+    Assert(sizeof(boolVar) == 1);
+}
+
+// Test sizeof with arrays
+void TestSizeofArrays()
+{
+    int[] intArray = int[5]{};
+    float[] floatArray = float[10]{};
+    bool[] boolArray = bool[3]{};
+
+    Assert(sizeof(intArray) == 40);  // 8 bytes per int * 5 ints
+    Assert(sizeof(floatArray) == 80);  // 8 bytes per float * 10 floats
+    Assert(sizeof(boolArray) == 3);  // 1 byte per bool * 3 bools
+}
+
+// Main testing function
 public int main()
 {
-	int intSize = sizeof(int);
-    Assert(intSize == 8);  
-    int floatSize = sizeof(float);
-    Assert(floatSize == 8);  
+    // Test sizeof with types
+    TestSizeofTypes();
 
-    int charSize = sizeof(char);
-    Assert(charSize == 1);  
+    // Test sizeof with expressions
+    TestSizeofExpressions();
 
-    int boolSize = sizeof(bool);
-    Assert(boolSize == 1);  // Assuming a bool is 1 byte
-
-    // Test the sizeof operator with arrays
-    //int intArray[5];
-    //int arraySize = sizeof(intArray);
-    //Assert(arraySize == 20);  
-
-    //char charArray[10];
-    //int charArraySize = sizeof(charArray);
-    //Assert(charArraySize == 10);  
+    // Test sizeof with arrays
+    TestSizeofArrays();
 
     return 0;
 }

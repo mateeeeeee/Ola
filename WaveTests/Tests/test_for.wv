@@ -1,46 +1,92 @@
 import std.assert;
 
-public int main()
+// Test basic for loop with int
+void TestForLoopInt()
 {
     int sum = 0;
     for (int i = 1; i <= 5; i++)
     {
         sum += i;
     }
-    Assert(sum == 15);  
+    Assert(sum == 15);
+}
 
-    int sum2 = 0;
+// Test basic for loop with bool condition
+void TestForLoopBoolCondition()
+{
+    int iterations = 0;
+    for (; iterations < 3;)
+    {
+        iterations++;
+    }
+    Assert(iterations == 3);
+}
+
+// Test basic for loop with multiple expressions
+void TestForLoopMultipleExpressions()
+{
+    int sum = 0;
+    for (int i = 1, j = 5; i <= 3; i++, j--)
+    {
+        sum += i + j;
+    }
+    Assert(sum == 18);
+}
+
+// Test nested for loops
+void TestNestedForLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    for (; outerCounter < 3; outerCounter++)
+    {
+        for (; innerCounter < 2; innerCounter++)
+        {
+        }
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+}
+
+// Test for loop with break statement
+void TestForLoopWithBreak()
+{
+    int sum = 0;
+
     for (int i = 1; i <= 5; i++)
     {
-        if (i % 2 == 0) continue; 
-        sum2 += i;
+        sum += i;
+        if (i == 3) break;
     }
-    Assert(sum2 == 9); 
 
-    int sum3 = 0;
-    for (int i = 1; i <= 10; i++)
+    Assert(sum == 6);
+}
+
+// Test for loop with continue statement
+void TestForLoopWithContinue()
+{
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++)
     {
-        sum3 += i;
-        if (i == 5) break;
+        if (i == 3) continue;
+        sum += i;
     }
-    Assert(sum3 == 15);
 
-    int product = 1;
-    int j = 2;
-    for (;j <= 10; j += 2)
-    {
-        product *= j;
-    }
-    Assert(product == 3840);  
+    Assert(sum == 12);
+}
 
-
-    int factorial = 1;
-    for (int k = 5; k >= 1;)
-    {
-        factorial *= k;
-        k--;
-    }
-    Assert(factorial == 120);  
+// Main testing function
+public int main()
+{
+    TestForLoopInt();
+    TestForLoopBoolCondition();
+    TestForLoopMultipleExpressions();
+    TestNestedForLoops();
+    TestForLoopWithBreak();
+    TestForLoopWithContinue();
 
     return 0;
 }

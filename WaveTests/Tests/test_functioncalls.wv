@@ -1,59 +1,68 @@
 import std.assert;
 
 
-private int square(int x)
+// Function that adds two integers
+int Add(int a, int b)
 {
-	return x * x;
+    return a + b;
 }
 
-private int add(int a, int b)
+// Function that calculates the product of two floats
+float Multiply(float x, float y)
 {
-	return a + b;
+    return x * y;
 }
 
-private bool isEven(int x)
+// Function that performs logical AND on two booleans
+bool LogicalAnd(bool p, bool q)
 {
-	return x % 2 == 0;
+    return p && q;
 }
 
-private int fma(int a, int b, int c)
+// Function that takes a mix of parameters: int, float, bool, and an array
+float MixParams(int a, float b, bool c, int[] arr, int size)
 {
-    return a * b + c;
+    int arrSum = 0;
+    for (int i = 0; i < size; i++)  arrSum += arr[i];
+    return a + b + (c ? 1.0 : 0.0) + arrSum;
 }
 
-private bool isInRange(int x, int lowerBound, int upperBound)
+void ConcatArrays(int[] arr1, int size1, int[] arr2, int size2, int[] result)
 {
-    return x >= lowerBound && x <= upperBound;
+    for (int i = 0; i < size1; i++)
+    {
+        result[i] = arr1[i];
+    }
+
+    for (int j = 0; j < size2; j++)
+    {
+        result[size1 + j] = arr2[j];
+    }
 }
 
+// Main testing function
 public int main()
 {
-	int result1 = square(5);
-    Assert(result1 == 25);  
+    // Test function call with integers
+    Assert(Add(3, 5) == 8);
 
-    bool result2 = isEven(8);
-    Assert(result2 == true); 
-    
-    int result3 = square(-4);
-    Assert(result3 == 16);  
-    
-    bool result4 = isEven(7);
-    Assert(result4 == false);  
-    
-    int result5 = add(5,12);
-    Assert(result5 == 17);  
-    
-    int fma1 = fma(2, 3, 4);
-    Assert(fma1 == 10);  
-    
-    bool result6 = isInRange(5, 1, 10);
-    Assert(result6 == true);  
-    
-    int fma2 = fma(6, 2, 8);
-    Assert(fma2 == 20);  
-    
-    bool result7 = isInRange(5, 6, 10);
-    Assert(result7 == false);  
+    // Test function call with floats
+    Assert(Multiply(2.5, 3.0) == 7.5);
 
+    // Test function call with booleans
+    Assert(LogicalAnd(true, false) == false);
+
+    int[] mixArr = int[2]{10, 20};
+    float mixResult = MixParams(1, 2.5, true, mixArr, length(mixArr));
+    Assert(mixResult == 34.5);
+
+    int[] arr1 = {1,2};
+    int[] arr2 = {3,4};
+    int[] arr3 = int[length(arr1) + length(arr2)]{};
+    ConcatArrays(arr1, length(arr1), arr2, length(arr2), arr3);
+    Assert(arr3[0] == 1);
+    Assert(arr3[1] == 2);
+    Assert(arr3[2] == 3);
+    Assert(arr3[3] == 4);
     return 0;
 }

@@ -1,66 +1,102 @@
 import std.assert;
 
-enum Number
+// Define an enum
+enum Color
 {
-	Number_zero,
-	Number_one, 
-	Number_two
+    Red,
+    Green,
+    Blue
 };
 
-enum Number2
+// Test global enum declaration
+Color globalColor = Red;
+
+// Test if enum values are correct
+public int TestEnumValues()
 {
-	Number2_zero, 
-	Number2_five = 5, 
-	Number2_three = 3, 
-	Number2_four
+    Color color = Blue;
+    Assert(color == Blue);
+    return 0;
+}
+
+// Test if enum values are correct after modifying a member value
+enum Day
+{
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday = 4,
+    Friday,
+    Saturday,
+    Sunday
 };
 
-enum 
+public int TestEnumValuesAfterModification()
 {
-	zero,
-	one, 
-	two
-};
+    Day weekendDay = Sunday;
+    Assert(weekendDay == Sunday);
 
+    Day midweekDay = Wednesday;
+    Assert(midweekDay == Wednesday);
+
+    return 0;
+}
+
+// Test using enum in switch statement
+public int TestEnumSwitch()
+{
+    Color switchColor = Green;
+    int result = 0;
+
+    switch (switchColor)
+    {
+        case Red:
+            result = 1;
+            break;
+        case Green:
+            result = 2;
+            break;
+        case Blue:
+            result = 3;
+            break;
+    }
+
+    Assert(result == 2);
+    return 0;
+}
+
+public int TestLocalEnumDeclaration()
+{
+    // Local enum declaration
+    enum Status
+    {
+        Active,
+        Inactive,
+        Pending
+    };
+
+    Status localStatus = Active;
+    Assert(localStatus == Active);
+    return 0;
+}
+
+// Main testing function
 public int main()
 {
-	Number num = Number_zero;
-	Assert(num == 0);
-	num = Number_one;
-	Assert(num == 1);
-	num = Number_two;
-	Assert(num == 2);
+    // Test global enum declaration
+    Assert(globalColor == Red);
 
-	Number2 num2 = Number2_zero;
-	Assert(num2 == 0);
-	num2 = Number2_five;
-	Assert(num2 == 5);
-	num2 = Number2_three;
-	Assert(num2 == 3);
-	num2 = Number2_four;
-	Assert(num2 == 4);
-	Assert(sizeof(num2) == 8);
+    // Test local enum declaration
+    TestLocalEnumDeclaration();
 
-	int a = zero;
-	Assert(a == 0);
-	a = one;
-	Assert(a == 1);
-	a = two;
-	Assert(a == 2);
+    // Test if enum values are correct
+    TestEnumValues();
 
-	enum LocalNumber
-	{
-		Local_zero,
-		Local_one,
-		Local_three = 3
-	};
-	
-	LocalNumber b = Local_zero;
-	Assert(b == 0);
-	b = Local_one;
-	Assert(b == 1);
-	b = Local_three;
-	Assert(b == 3);
+    // Test if enum values are correct after modifying a member value
+    TestEnumValuesAfterModification();
 
-	return 0;
+    // Test using enum in switch statement
+    TestEnumSwitch();
+
+    return 0;
 }

@@ -1,70 +1,99 @@
 import std.assert;
 
-
-
-public int main()
+// Test basic if-else statement
+void TestIfElseBasic()
 {
-	int x = 10;
+    int x = 10;
     int y = 20;
 
-    // Test a simple if statement
+    if (x < y) Assert(true);
+    else Assert(false);
+}
 
-    if(x < y) 
-        Assert(true);
-    else 
-        Assert(false);
-
-    if (x < y)
-    {
-       Assert(true);  // The condition is true, so this branch should execute
-    }
-    else
-    {
-       Assert(false);  // This branch should not execute
-    }
-
-    // Test if-else with a block
-    if (x > y)
-    {
-       Assert(false);  // The condition is false, so this branch should not execute
-    }
-    else
-    {
-       Assert(true);  // This branch should execute
-    }
-
-    // Test if-else if-else ladder
-    int a = 15;
-    if (a < 10)
-    {
-       Assert(false);  // This condition is false
-    }
-    else if (a < 20)
-    {
-       Assert(true);  // This condition is true, so this branch should execute
-    }
-    else
-    {
-       Assert(false);  // This branch should not execute
-    }
-
-    // Test nested if-else
+// Test if-else statement with multiple conditions
+void TestIfElseMultipleConditions()
+{
+    int a = 5;
     int b = 5;
-    if (b > 0)
+
+    if (a > b)
     {
-        if (b % 2 == 0)
+        Assert(false);
+    }
+    else if (a < b)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
+}
+
+// Test nested if-else statements
+void TestNestedIfElse()
+{
+    int num = 42;
+
+    if (num % 2 == 0)
+    {
+        if (num > 0)  Assert(true);
+        else Assert(false);
+    }
+    else Assert(false);
+
+}
+
+// Test complex nested if-else scenario
+void TestComplexNestedIfElse()
+{
+    int i = 1, j = 5, k = 5;
+
+    if (i > 0)
+    {
+        if (j < 10)
         {
-           Assert(false);  // b is even, so this branch should not execute
+            if (k == 5) Assert(true); // Condition met: i > 0, j < 10, k == 5
+            else  Assert(false); 
         }
         else
         {
-           Assert(true);  // b is odd, so this branch should execute
+            Assert(false);
         }
     }
     else
     {
-       Assert(false);  // This branch should not execute
+        if (j == 0)  Assert(false); 
+        else
+        {
+            if (k > 0) Assert(false); 
+            else  Assert(false); 
+        }
     }
+}
+
+// Test if-else statement with logical operators
+void TestIfElseLogicalOperators()
+{
+    int value = 15;
+    if (value > 10 && value < 20)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+}
+
+// Main testing function
+public int main()
+{
+    TestIfElseBasic();
+    TestIfElseMultipleConditions();
+    TestNestedIfElse();
+    TestComplexNestedIfElse();
+    TestIfElseLogicalOperators();
 
     return 0;
 }

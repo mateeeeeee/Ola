@@ -1,36 +1,106 @@
 import std.assert;
 
+// Test unary logical operators
+void TestUnaryLogicalOperators()
+{
+    bool a = true;
+    bool b = false;
 
+    // Logical NOT
+    bool notA = !a;
+    bool notB = !b;
+
+    Assert(notA == false);
+    Assert(notB == true);
+}
+
+// Test binary logical operators
+void TestBinaryLogicalOperators()
+{
+    bool trueValue = true;
+    bool falseValue = false;
+
+    // Logical AND
+    bool andResultTrueTrue = trueValue && trueValue;
+    bool andResultTrueFalse = trueValue && falseValue;
+    bool andResultFalseTrue = falseValue && trueValue;
+    bool andResultFalseFalse = falseValue && falseValue;
+
+    Assert(andResultTrueTrue == true);
+    Assert(andResultTrueFalse == false);
+    Assert(andResultFalseTrue == false);
+    Assert(andResultFalseFalse == false);
+
+    // Logical OR
+    bool orResultTrueTrue = trueValue || trueValue;
+    bool orResultTrueFalse = trueValue || falseValue;
+    bool orResultFalseTrue = falseValue || trueValue;
+    bool orResultFalseFalse = falseValue || falseValue;
+
+    Assert(orResultTrueTrue == true);
+    Assert(orResultTrueFalse == true);
+    Assert(orResultFalseTrue == true);
+    Assert(orResultFalseFalse == false);
+}
+
+// Test implicit casts with binary logical operators
+void TestBinaryLogicalOperatorsImplicitCasts()
+{
+    // Integer and float tests
+    int intValue = 42;
+    float floatValue = 3.14;
+
+    // Logical AND with implicit cast
+    bool andResultIntFloat = intValue && floatValue;
+    Assert(andResultIntFloat == true);
+
+    // Logical OR with implicit cast
+    bool orResultIntFloat = intValue || floatValue;
+    Assert(orResultIntFloat == true);
+
+    // Logical AND with two integers
+    bool andResultIntInt = intValue && intValue;
+    Assert(andResultIntInt == true);
+
+    // Logical OR with two floats
+    bool orResultFloatFloat = floatValue || floatValue;
+    Assert(orResultFloatFloat == true);
+}
+
+// Test implicit casts with unary and binary logical operators
+void TestLogicalOperatorsImplicitCasts()
+{
+    // Integer and float tests
+    int intValue = 42;
+    float floatValue = 3.14;
+
+    // Logical NOT with implicit cast
+    bool notResultInt = !intValue;
+    Assert(notResultInt == false);
+
+    // Logical AND with implicit cast
+    bool andResultFloatInt = floatValue && intValue;
+    Assert(andResultFloatInt == true);
+
+    // Logical OR with implicit cast
+    bool orResultIntFloat = intValue || floatValue;
+    Assert(orResultIntFloat == true);
+
+    // Add more tests as needed
+}
+
+// Main testing function
 public int main()
 {
-    int a = 1;
-    int b = 0;
-    int and_result = a && b;
-    Assert(and_result == 0);
+    // Test unary logical operators
+    TestUnaryLogicalOperators();
 
-    int c = 1;
-    int d = 1;
-    int and_result2 = c && d;
-    Assert(and_result2 == 1);
+    // Test binary logical operators
+    TestBinaryLogicalOperators();
 
-    int e = 0;
-    int f = 0;
-    int or_result = e || f;
-    Assert(or_result == 0);
-
-    int g = 1;
-    int h = 0;
-    int or_result2 = g || h;
-    Assert(or_result2 == 1);
-
-    // Test logical NOT (!)
-    int m = 1;
-    int not_result = !m;
-    Assert(not_result == 0);
-
-    int n = 0;
-    int not_result2 = !n;
-    Assert(not_result2 == 1);
+    // Test implicit casts with unary and binary logical operators
+    TestBinaryLogicalOperatorsImplicitCasts();
+    TestLogicalOperatorsImplicitCasts();
 
     return 0;
 }

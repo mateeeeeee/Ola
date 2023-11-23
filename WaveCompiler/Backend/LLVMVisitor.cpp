@@ -263,7 +263,7 @@ namespace wave
 					llvm_value_map[&var_decl] = alloc;
 				}
 			}
-			else 
+			else
 			{
 				if (is_class)
 				{
@@ -282,7 +282,11 @@ namespace wave
 						Store(llvm_value_map[fields[i].get()], field_ptr);
 					}
 				}
-				else WAVE_ASSERT(false);
+				else
+				{
+					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
+					llvm_value_map[&var_decl] = alloc;
+				}
 			}
 		}
 	}
@@ -663,7 +667,7 @@ namespace wave
 		break;
 		case UnaryExprKind::Minus:
 		{
-			result = builder.CreateNeg(operand);
+			result = is_float_expr ? builder.CreateFNeg(operand) : builder.CreateNeg(operand);
 		}
 		break;
 		case UnaryExprKind::BitNot:

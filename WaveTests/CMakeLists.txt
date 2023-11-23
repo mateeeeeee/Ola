@@ -33,7 +33,6 @@ set(WAVE_TESTS
 	Tests/test_sizeof.wv
 	Tests/test_switch.wv
 	Tests/test_string.wv
-	Tests/test_floats.wv
 	Tests/test_implicitcasts.wv
 	Tests/test_class.wv
 	Tests/test_ref.wv

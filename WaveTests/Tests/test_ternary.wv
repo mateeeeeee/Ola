@@ -1,35 +1,47 @@
 import std.assert;
 
-
-public int main()
+// Test ternary operator with integers
+void TestTernaryOperatorIntegers()
 {
     int a = 5;
-    int b = 7;
+    int b = 10;
 
-    // Test a simple ternary operator
-    int max = (a > b) ? a : b;  // If a is greater than b, set max to a; otherwise, set max to b
-    Assert(max == 7);
+    int result = (a > b) ? a : b;
+    Assert(result == 10);
+}
 
-    int x = 10;
+// Test ternary operator with floats
+void TestTernaryOperatorFloats()
+{
+    float c = 2.5;
+    float d = 3.0;
+
+    float result = (c > d) ? c : d;
+    Assert(result == 3.0);
+}
+
+// Test ternary operator with bools
+void TestTernaryOperatorBools()
+{
+    bool condition = true;
+    int x = 5;
     int y = 10;
 
-    // Test ternary operator with equal values
-    int result = (x != y) ? 1 : 0;  // If x is not equal to y, set result to 1; otherwise, set result to 0
-    Assert(result == 0);
+    int result = condition ? x : y;
+    Assert(result == 5);
+}
 
-    int p = -5;
-    int q = 3;
+// Main testing function
+public int main()
+{
+    // Test ternary operator with integers
+    TestTernaryOperatorIntegers();
 
-    // Test ternary operator with negative and positive values
-    int absValue = (p < 0) ? -p : p;  // If p is negative, take its absolute value; otherwise, keep p as it is
-    Assert(absValue == 5);
+    // Test ternary operator with floats
+    TestTernaryOperatorFloats();
 
-    int m = 0;
-    int n = 7;
-
-    // Test ternary operator with zero value
-    int nonZero = (m != 0) ? 1 : n;  // If m is non-zero, set nonZero to 1; otherwise, set nonZero to n
-    Assert(nonZero == 7);
+    // Test ternary operator with bools
+    TestTernaryOperatorBools();
 
     return 0;
 }

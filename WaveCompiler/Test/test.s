@@ -7,311 +7,108 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	TestWhileLoopInt;
+	.def	TestTernaryOperatorIntegers;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function TestWhileLoopInt
-TestWhileLoopInt:                       # @TestWhileLoopInt
-.seh_proc TestWhileLoopInt
+	.p2align	4, 0x90                         # -- Begin function TestTernaryOperatorIntegers
+TestTernaryOperatorIntegers:            # @TestTernaryOperatorIntegers
+.seh_proc TestTernaryOperatorIntegers
 # %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 32
-	.seh_stackalloc 32
-	lea	rbp, [rsp + 32]
-	.seh_setframe rbp, 32
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rbp - 8], 0
-	mov	qword ptr [rbp - 16], 1
-.LBB0_1:                                # %while.cond
-                                        # =>This Inner Loop Header: Depth=1
-	cmp	qword ptr [rbp - 16], 5
-	jg	.LBB0_3
-# %bb.2:                                # %while.body
-                                        #   in Loop: Header=BB0_1 Depth=1
-	mov	rax, qword ptr [rbp - 8]
-	mov	rcx, qword ptr [rbp - 16]
-	add	rax, rcx
-	mov	qword ptr [rbp - 8], rax
-	mov	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 16]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 16], rax
-	jmp	.LBB0_1
-.LBB0_3:                                # %while.end
-	cmp	qword ptr [rbp - 8], 15
+	mov	qword ptr [rsp + 48], 5
+	mov	qword ptr [rsp + 40], 10
+	mov	rcx, qword ptr [rsp + 48]
+	mov	rdx, qword ptr [rsp + 40]
+	mov	rax, qword ptr [rsp + 48]
+	cmp	rcx, rdx
+	cmovle	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rsp + 32], rax
+	cmp	qword ptr [rsp + 32], 10
 	sete	cl
-	sub	rsp, 32
 	call	Assert
-	add	rsp, 32
-# %bb.4:                                # %exit
-	mov	rsp, rbp
-	pop	rbp
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	TestWhileLoopBool;
+	.def	TestTernaryOperatorFloats;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function TestWhileLoopBool
-TestWhileLoopBool:                      # @TestWhileLoopBool
-.seh_proc TestWhileLoopBool
+	.globl	__real@4008000000000000         # -- Begin function TestTernaryOperatorFloats
+	.section	.rdata,"dr",discard,__real@4008000000000000
+	.p2align	3, 0x0
+__real@4008000000000000:
+	.quad	0x4008000000000000              # double 3
+	.globl	__real@4004000000000000
+	.section	.rdata,"dr",discard,__real@4004000000000000
+	.p2align	3, 0x0
+__real@4004000000000000:
+	.quad	0x4004000000000000              # double 2.5
+	.text
+	.p2align	4, 0x90
+TestTernaryOperatorFloats:              # @TestTernaryOperatorFloats
+.seh_proc TestTernaryOperatorFloats
 # %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 32
-	.seh_stackalloc 32
-	lea	rbp, [rsp + 32]
-	.seh_setframe rbp, 32
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	byte ptr [rbp - 1], 1
-	mov	qword ptr [rbp - 16], 0
-.LBB1_1:                                # %while.cond
-                                        # =>This Inner Loop Header: Depth=1
-	test	byte ptr [rbp - 1], 1
-	jne	.LBB1_2
-	jmp	.LBB1_3
-.LBB1_2:                                # %while.body
-                                        #   in Loop: Header=BB1_1 Depth=1
-	mov	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 16]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 16], rax
-	cmp	qword ptr [rbp - 16], 3
-	je	.LBB1_4
-	jmp	.LBB1_5
-.LBB1_3:                                # %while.end
-	cmp	qword ptr [rbp - 16], 3
+	movsd	xmm0, qword ptr [rip + __real@4004000000000000] # xmm0 = mem[0],zero
+	movsd	qword ptr [rsp + 48], xmm0
+	movsd	xmm0, qword ptr [rip + __real@4008000000000000] # xmm0 = mem[0],zero
+	movsd	qword ptr [rsp + 40], xmm0
+	movsd	xmm1, qword ptr [rsp + 48]      # xmm1 = mem[0],zero
+	movsd	xmm0, qword ptr [rsp + 40]      # xmm0 = mem[0],zero
+	movsd	xmm3, qword ptr [rsp + 48]      # xmm3 = mem[0],zero
+	movsd	xmm2, qword ptr [rsp + 40]      # xmm2 = mem[0],zero
+	cmpltsd	xmm0, xmm1
+	movaps	xmm1, xmm0
+	andpd	xmm1, xmm3
+	andnpd	xmm0, xmm2
+	orpd	xmm0, xmm1
+	movsd	qword ptr [rsp + 32], xmm0
+	movsd	xmm0, qword ptr [rsp + 32]      # xmm0 = mem[0],zero
+	movsd	xmm1, qword ptr [rip + __real@4008000000000000] # xmm1 = mem[0],zero
+	ucomisd	xmm0, xmm1
 	sete	cl
-	sub	rsp, 32
+	setnp	al
+	and	cl, al
 	call	Assert
-	add	rsp, 32
-	jmp	.LBB1_6
-.LBB1_4:                                # %if.then
-                                        #   in Loop: Header=BB1_1 Depth=1
-	mov	byte ptr [rbp - 1], 0
-.LBB1_5:                                # %if.end
-                                        #   in Loop: Header=BB1_1 Depth=1
-	jmp	.LBB1_1
-.LBB1_6:                                # %exit
-	mov	rsp, rbp
-	pop	rbp
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	TestNestedWhileLoops;
+	.def	TestTernaryOperatorBools;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function TestNestedWhileLoops
-TestNestedWhileLoops:                   # @TestNestedWhileLoops
-.seh_proc TestNestedWhileLoops
+	.p2align	4, 0x90                         # -- Begin function TestTernaryOperatorBools
+TestTernaryOperatorBools:               # @TestTernaryOperatorBools
+.seh_proc TestTernaryOperatorBools
 # %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 32
-	.seh_stackalloc 32
-	lea	rbp, [rsp + 32]
-	.seh_setframe rbp, 32
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	mov	qword ptr [rbp - 8], 0
-	mov	qword ptr [rbp - 16], 0
-.LBB2_1:                                # %while.cond
-                                        # =>This Loop Header: Depth=1
-                                        #     Child Loop BB2_4 Depth 2
-	cmp	qword ptr [rbp - 8], 3
-	jge	.LBB2_3
-# %bb.2:                                # %while.body
-                                        #   in Loop: Header=BB2_1 Depth=1
-	jmp	.LBB2_4
-.LBB2_3:                                # %while.end
-	cmp	qword ptr [rbp - 8], 3
+	mov	byte ptr [rsp + 71], 1
+	mov	qword ptr [rsp + 56], 5
+	mov	qword ptr [rsp + 48], 10
+	mov	cl, byte ptr [rsp + 71]
+	mov	rax, qword ptr [rsp + 56]
+	test	cl, 1
+	cmove	rax, qword ptr [rsp + 48]
+	mov	qword ptr [rsp + 40], rax
+	cmp	qword ptr [rsp + 40], 5
 	sete	cl
-	sub	rsp, 32
 	call	Assert
-	add	rsp, 32
-	cmp	qword ptr [rbp - 16], 2
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	jmp	.LBB2_7
-.LBB2_4:                                # %while.cond1
-                                        #   Parent Loop BB2_1 Depth=1
-                                        # =>  This Inner Loop Header: Depth=2
-	cmp	qword ptr [rbp - 16], 2
-	jge	.LBB2_6
-# %bb.5:                                # %while.body2
-                                        #   in Loop: Header=BB2_4 Depth=2
-	mov	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 16]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 16], rax
-	jmp	.LBB2_4
-.LBB2_6:                                # %while.end3
-                                        #   in Loop: Header=BB2_1 Depth=1
-	mov	rax, qword ptr [rbp - 8]
-	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 32]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 8]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 8], rax
-	jmp	.LBB2_1
-.LBB2_7:                                # %exit
-	mov	rsp, rbp
-	pop	rbp
-	ret
-	.seh_endproc
-                                        # -- End function
-	.def	TestWhileLoopWithBreak;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function TestWhileLoopWithBreak
-TestWhileLoopWithBreak:                 # @TestWhileLoopWithBreak
-.seh_proc TestWhileLoopWithBreak
-# %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 32
-	.seh_stackalloc 32
-	lea	rbp, [rsp + 32]
-	.seh_setframe rbp, 32
-	.seh_endprologue
-	mov	qword ptr [rbp - 8], 0
-	mov	qword ptr [rbp - 16], 1
-.LBB3_1:                                # %while.cond
-                                        # =>This Inner Loop Header: Depth=1
-	mov	al, 1
-	test	al, 1
-	jne	.LBB3_2
-	jmp	.LBB3_3
-.LBB3_2:                                # %while.body
-                                        #   in Loop: Header=BB3_1 Depth=1
-	mov	rax, qword ptr [rbp - 8]
-	mov	rcx, qword ptr [rbp - 16]
-	add	rax, rcx
-	mov	qword ptr [rbp - 8], rax
-	mov	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 16]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 16], rax
-	cmp	qword ptr [rbp - 16], 5
-	jg	.LBB3_4
-	jmp	.LBB3_5
-.LBB3_3:                                # %while.end
-	cmp	qword ptr [rbp - 8], 15
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	jmp	.LBB3_6
-.LBB3_4:                                # %if.then
-	jmp	.LBB3_3
-.LBB3_5:                                # %if.end
-                                        #   in Loop: Header=BB3_1 Depth=1
-	jmp	.LBB3_1
-.LBB3_6:                                # %exit
-	mov	rsp, rbp
-	pop	rbp
-	ret
-	.seh_endproc
-                                        # -- End function
-	.def	TestWhileLoopWithContinue;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function TestWhileLoopWithContinue
-TestWhileLoopWithContinue:              # @TestWhileLoopWithContinue
-.seh_proc TestWhileLoopWithContinue
-# %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 32
-	.seh_stackalloc 32
-	lea	rbp, [rsp + 32]
-	.seh_setframe rbp, 32
-	.seh_endprologue
-	mov	qword ptr [rbp - 8], 0
-	mov	qword ptr [rbp - 16], 0
-.LBB4_1:                                # %while.cond
-                                        # =>This Inner Loop Header: Depth=1
-	cmp	qword ptr [rbp - 16], 5
-	jge	.LBB4_3
-# %bb.2:                                # %while.body
-                                        #   in Loop: Header=BB4_1 Depth=1
-	mov	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
-	mov	rcx, rsp
-	mov	rdx, qword ptr [rbp - 16]
-	mov	qword ptr [rcx], rdx
-	add	rax, 1
-	mov	qword ptr [rbp - 16], rax
-	mov	rax, qword ptr [rbp - 16]
-	mov	ecx, 2
-	cqo
-	idiv	rcx
-	cmp	rdx, 0
-	je	.LBB4_4
-	jmp	.LBB4_5
-.LBB4_3:                                # %while.end
-	cmp	qword ptr [rbp - 8], 9
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	jmp	.LBB4_6
-.LBB4_4:                                # %if.then
-                                        #   in Loop: Header=BB4_1 Depth=1
-	jmp	.LBB4_1
-.LBB4_5:                                # %if.end
-                                        #   in Loop: Header=BB4_1 Depth=1
-	mov	rax, qword ptr [rbp - 8]
-	add	rax, qword ptr [rbp - 16]
-	mov	qword ptr [rbp - 8], rax
-	jmp	.LBB4_1
-.LBB4_6:                                # %exit
-	mov	rsp, rbp
-	pop	rbp
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
@@ -327,11 +124,9 @@ main:                                   # @main
 	sub	rsp, 40
 	.seh_stackalloc 40
 	.seh_endprologue
-	call	TestWhileLoopInt
-	call	TestWhileLoopBool
-	call	TestNestedWhileLoops
-	call	TestWhileLoopWithBreak
-	call	TestWhileLoopWithContinue
+	call	TestTernaryOperatorIntegers
+	call	TestTernaryOperatorFloats
+	call	TestTernaryOperatorBools
 	mov	qword ptr [rsp + 32], 0
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 32]
@@ -341,8 +136,7 @@ main:                                   # @main
                                         # -- End function
 	.addrsig
 	.addrsig_sym Assert
-	.addrsig_sym TestWhileLoopInt
-	.addrsig_sym TestWhileLoopBool
-	.addrsig_sym TestNestedWhileLoops
-	.addrsig_sym TestWhileLoopWithBreak
-	.addrsig_sym TestWhileLoopWithContinue
+	.addrsig_sym TestTernaryOperatorIntegers
+	.addrsig_sym TestTernaryOperatorFloats
+	.addrsig_sym TestTernaryOperatorBools
+	.globl	_fltused

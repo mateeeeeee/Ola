@@ -1,118 +1,47 @@
 import std.assert;
 
-// Test basic while loop with int
-void TestWhileLoopInt()
+// Test ternary operator with integers
+void TestTernaryOperatorIntegers()
 {
-    int sum = 0;
-    int i = 1;
+    int a = 5;
+    int b = 10;
 
-    while (i <= 5)
-    {
-        sum += i;
-        i++;
-    }
-
-    Assert(sum == 15);
-
-     return;
+    int result = (a > b) ? a : b;
+    Assert(result == 10);
 }
 
-// Test basic while loop with bool
-void TestWhileLoopBool()
+// Test ternary operator with floats
+void TestTernaryOperatorFloats()
+{
+    float c = 2.5;
+    float d = 3.0;
+
+    float result = (c > d) ? c : d;
+    Assert(result == 3.0);
+}
+
+// Test ternary operator with bools
+void TestTernaryOperatorBools()
 {
     bool condition = true;
-    int iterations = 0;
+    int x = 5;
+    int y = 10;
 
-    while (condition)
-    {
-        iterations++;
-        if (iterations == 3)
-        {
-            condition = false;
-        }
-    }
-
-    Assert(iterations == 3);
-
-    return;
-}
-
-// Test nested while loops
-void TestNestedWhileLoops()
-{
-    int outerCounter = 0;
-    int innerCounter = 0;
-
-    while (outerCounter < 3)
-    {
-        while (innerCounter < 2)
-        {
-            innerCounter++;
-        }
-
-        outerCounter++;
-    }
-
-    Assert(outerCounter == 3);
-    Assert(innerCounter == 2);
-
-     return;
-}
-
-// Test while loop with break statement
-void TestWhileLoopWithBreak()
-{
-    int sum = 0;
-    int i = 1;
-
-    while (true)
-    {
-        sum += i;
-        i++;
-
-        if (i > 5)
-        {
-            break;
-        }
-    }
-
-    Assert(sum == 15);
-
-     return;
-}
-
-// Test while loop with continue statement
-void TestWhileLoopWithContinue()
-{
-    int sum = 0;
-    int i = 0;
-
-    while (i < 5)
-    {
-        i++;
-
-        if (i % 2 == 0)
-        {
-            continue;
-        }
-
-        sum += i;
-    }
-
-    Assert(sum == 9);
-
+    int result = condition ? x : y;
+    Assert(result == 5);
 }
 
 // Main testing function
 public int main()
 {
-    TestWhileLoopInt();
-    TestWhileLoopBool();
-    TestNestedWhileLoops();
-    TestWhileLoopWithBreak();
-    TestWhileLoopWithContinue();
+    // Test ternary operator with integers
+    TestTernaryOperatorIntegers();
 
-    // Add other tests as needed
+    // Test ternary operator with floats
+    TestTernaryOperatorFloats();
+
+    // Test ternary operator with bools
+    TestTernaryOperatorBools();
 
     return 0;
 }

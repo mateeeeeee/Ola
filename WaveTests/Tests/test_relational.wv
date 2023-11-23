@@ -1,56 +1,97 @@
 import std.assert;
 
+// Test less than operators with integers and floats
+void TestLessThanOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA < intB);
+    Assert(floatC < floatD);
+}
+
+// Test less than or equal operators with integers and floats
+void TestLessThanOrEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA <= intB);
+    Assert(floatC <= floatD);
+}
+
+// Test greater than operators with integers and floats
+void TestGreaterThanOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA > intB == false);
+    Assert(floatC > floatD == false);
+}
+
+// Test greater than or equal operators with integers and floats
+void TestGreaterThanOrEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA >= intB == false);
+    Assert(floatC >= floatD == false);
+}
+
+// Test equal operators with integers and floats
+void TestEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA == intB == false);
+    Assert(floatC == floatD == false);
+}
+
+// Test not equal operators with integers and floats
+void TestNotEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    float floatC = 2.5;
+    float floatD = 5.0;
+
+    Assert(intA != intB == true);
+    Assert(floatC != floatD == true);
+}
+
+// Main testing function
 public int main()
 {
-	// Test relational operators with integers
-    int a = 5;
-    int b = 7;
-    int c = 5;
+    // Test less than operators
+    TestLessThanOperators();
 
-    // Test less than (<)
-    int less_than = a < b;
-    Assert(less_than == 1);
+    // Test less than or equal operators
+    TestLessThanOrEqualOperators();
 
-    // Test less than or equal to (<=)
-    int less_than_or_equal = a <= c;
-    Assert(less_than_or_equal == 1);
+    // Test greater than operators
+    TestGreaterThanOperators();
 
-    // Test equal to (==)
-    int equal_to = a == c;
-    Assert(equal_to == 1);
+    // Test greater than or equal operators
+    TestGreaterThanOrEqualOperators();
 
-    // Test not equal to (!=)
-    int not_equal_to = a != b;
-    Assert(not_equal_to == 1);
+    // Test equal operators
+    TestEqualOperators();
 
-    // Test relational operators with assignment
-    int x = 10;
-    int y = 15;
-
-    // Test less than assignment (<)
-    x = x < y;
-    Assert(x == 1);
-
-    int p = 8;
-    int q = 5;
-
-    // Test less than or equal to assignment (<=)
-    p = p <= q;
-    Assert(p == 0);
-
-    int m = 5;
-    int n = 5;
-
-    // Test equal to assignment (==)
-    m = m == n;
-    Assert(m == 1);
-
-    int g = 7;
-    int h = 10;
-
-    // Test not equal to assignment (!=)
-    g = g != h;
-    Assert(g == 1);
+    // Test not equal operators
+    TestNotEqualOperators();
 
     return 0;
 }
