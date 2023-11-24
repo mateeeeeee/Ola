@@ -56,6 +56,35 @@ void TestRefSimple()
 	Assert(a == 13);
 }
 
+int g = 9;
+ref int ReturnRef()
+{
+	return g;
+}
+int ReturnValue()
+{
+	return g;
+}
+
+void TestRefReturnSimple()
+{
+	ref int refG = ReturnRef();
+	refG++;
+	Assert(g == 10);
+
+	//ref int refGCopy = ReturnValue();
+	//refGCopy++;
+	//Assert(g == 10);
+
+	int valueG = ReturnRef();
+	valueG++;
+	Assert(g == 10);
+
+	int valueGCopy = ReturnValue();
+	valueGCopy++;
+	Assert(g == 10);
+}
+
 class S
 {
 	public void Init(int x, int y)
@@ -126,6 +155,8 @@ void TestRefStruct()
 public int main()
 {
 	TestRefSimple();
+	TestRefReturnSimple();
+
 	TestRefStruct();
 
 	return 0;

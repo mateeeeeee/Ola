@@ -1,90 +1,38 @@
+import std.io;
 import std.assert;
 
 
-//ref todo list
-//1. passing to function parameter
-//   - passing T variable to ref T function parameter + 
-//	 - passing ref T variable to T function parameter +
-//	 - passing ref T variable to ref T function parameter + 
-//2. assignment 
-//   - assigning T to ref T variable + 
-//   - assigning ref T to T variable +
-//   - assigning ref T to ref T variable +
-//3. returning from functions
-//4. methods and fields
-//5. global variables
-
-
-class S
+int g = 9;
+ref int ReturnRef()
 {
-	public void Init(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-	}
-
-	public int x = 0;
-	public int y = 0;
-};
-
-void StructByRef(ref S s)
+	return g;
+}
+int ReturnValue()
 {
-	s.x++;
-	s.y++;
+	return g;
 }
 
-void StructByValue(S s)
+void TestRefReturnSimple()
 {
-	s.x++;
-	s.y++;
-}
+	ref int refG = ReturnRef();
+	refG++;
+	Assert(g == 10);
 
-void TestRefStruct()
-{
-	S s; s.Init(9, 9);
-	StructByValue(s);
-	Assert(s.x == 9);
-	Assert(s.y == 9);
+	ref int refGCopy = ReturnValue();
+	refGCopy++;
+	Assert(g == 10);
 
-	StructByRef(s);
-	Assert(s.x == 10);
-	Assert(s.y == 10);
+	int valueG = ReturnRef();
+	valueG++;
+	Assert(g == 10);
 
-	//assigning T to ref T variable 
-	ref S s2 = s;
-	++s2.x;
-	++s2.y;
-	Assert(s.x == 11);
-	Assert(s.y == 11);
-	
-	////assigning ref T to T variable
-	S s3 = s2;
-	++s3.x;
-	++s3.y;
-	Assert(s3.x == 12);
-	Assert(s.x == 11);
-
-	////assigning ref T to ref T variable 
-	ref S s4 = s2; 
-	++s4.x;
-	++s4.y;
-	Assert(s.x == 12);
-	Assert(s.y == 12);
-	
-	//passing ref T variable to ref T function parameter
-	StructByRef(s4);
-	Assert(s.x == 13);
-	Assert(s.y == 13);
-	
-	//passing ref T variable to T function parameter
-	StructByValue(s4);
-	Assert(s.x == 13);
-	Assert(s.y == 13);
+	int valueGCopy = ReturnValue();
+	valueGCopy++;
+	Assert(g == 10);
 }
 
 public int main()
 {
-	TestRefStruct();
-
+	TestRefReturnSimple();
 	return 0;
 }

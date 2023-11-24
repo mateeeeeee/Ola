@@ -241,7 +241,7 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 You use the `ref` keyword in the following contexts:
 	- in function signature to pass parameter by reference
 	- in variable declaration to declare a reference variable
-
+	- in function signature to return by reference
 ```	
 
 void IntByRef(ref int a)
@@ -253,6 +253,13 @@ void IntByValue(int a)
 {
 	++a;
 }
+
+int g = 9;
+ref int GetRef()
+{
+	return g;
+}
+
 
 public int main()
 {
