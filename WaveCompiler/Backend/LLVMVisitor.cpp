@@ -255,7 +255,9 @@ namespace wave
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm::TypeSize struct_size = data_layout->getTypeAllocSize(llvm_type);
 
-					builder.CreateMemCpy(struct_alloc, llvm::MaybeAlign(), llvm_value_map[init_expr], llvm::MaybeAlign(), llvm::ConstantInt::get(int_type, struct_size));
+					llvm::Value* init_value = llvm_value_map[init_expr];
+					
+					builder.CreateMemCpy(struct_alloc, llvm::MaybeAlign(), init_value, llvm::MaybeAlign(), llvm::ConstantInt::get(int_type, struct_size));
 					llvm_value_map[&var_decl] = struct_alloc;
 				}
 				else if (is_ref)
@@ -964,6 +966,14 @@ namespace wave
 			}
 			else WAVE_ASSERT(false);
 		}
+		else if (IsStruct(cast_type))
+		{
+			if (IsRef(cast_operand_type))
+			{
+				llvm_value_map[&cast_expr] = cast_operand_value;
+			}
+			else WAVE_ASSERT(false);
+		}
 		else if (IsRef(cast_type))
 		{
 			llvm_value_map[&cast_expr] = cast_operand_value;
@@ -1072,7 +1082,26 @@ namespace wave
 			if (!this_value)
 			{
 				llvm::Value* struct_value = llvm_value_map[class_expr];
-				field_value = builder.CreateStructGEP(ConvertToLLVMType(class_expr->GetType()), struct_value, field_decl->GetFieldIndex());
+
+				auto GetStructType = [this](QualType const& class_expr_type) -> llvm::Type*
+					{
+						if (IsClassType(class_expr_type))
+						{
+							return ConvertToLLVMType(class_expr_type);
+						}
+						else if (IsRefType(class_expr_type))
+						{
+							RefType const& ref_type = type_cast<RefType>(class_expr_type);
+							if (IsClassType(ref_type.GetReferredType()))
+							{
+								return ConvertToLLVMType(ref_type.GetReferredType());
+							}
+							else return nullptr;
+						}
+						else return nullptr;
+					};
+
+				field_value = builder.CreateStructGEP(GetStructType(class_expr->GetType()), struct_value, field_decl->GetFieldIndex());
 				llvm_value_map[&member_expr] = field_value;
 			}
 			else
@@ -1355,6 +1384,11 @@ namespace wave
 	bool LLVMVisitor::IsFloat(llvm::Type* type)
 	{
 		return type->isDoubleTy();
+	}
+
+	bool LLVMVisitor::IsStruct(llvm::Type* type)
+	{
+		return type->isStructTy();
 	}
 
 	bool LLVMVisitor::IsRef(llvm::Type* type)

@@ -14,47 +14,6 @@ import std.assert;
 //4. methods and fields
 //5. global variables
 
-void IntByRef(ref int a)
-{
-	++a;
-}
-
-void IntByValue(int a)
-{
-	++a;
-}
-
-void TestRefSimple()
-{
-	//passing T variable to ref T function parameter
-	int a = 9;
-	IntByRef(a);
-	Assert(a == 10);
-
-	//assigning T to ref T variable 
-	ref int b = a;
-	++b;
-	Assert(a == 11);
-
-	//assigning ref T to T variable
-	int c = b;
-	++c;
-	Assert(c == 12);
-	Assert(a == 11);
-
-	////assigning ref T to ref T variable 
-	ref int d = b; 
-	++d;
-	Assert(a == 12);
-
-	//passing ref T variable to ref T function parameter
-	IntByRef(d);
-	Assert(a == 13);
-
-	//passing ref T variable to T function parameter
-	IntByValue(d);
-	Assert(a == 13);
-}
 
 class S
 {
@@ -82,7 +41,11 @@ void StructByValue(S s)
 
 void TestRefStruct()
 {
-	S s; s.Init(10, 10);
+	S s; s.Init(9, 9);
+	StructByValue(s);
+	Assert(s.x == 9);
+	Assert(s.y == 9);
+
 	StructByRef(s);
 	Assert(s.x == 10);
 	Assert(s.y == 10);
@@ -93,8 +56,8 @@ void TestRefStruct()
 	++s2.y;
 	Assert(s.x == 11);
 	Assert(s.y == 11);
-
-	//assigning ref T to T variable
+	
+	////assigning ref T to T variable
 	S s3 = s2;
 	++s3.x;
 	++s3.y;
@@ -107,12 +70,12 @@ void TestRefStruct()
 	++s4.y;
 	Assert(s.x == 12);
 	Assert(s.y == 12);
-
+	
 	//passing ref T variable to ref T function parameter
 	StructByRef(s4);
 	Assert(s.x == 13);
 	Assert(s.y == 13);
-
+	
 	//passing ref T variable to T function parameter
 	StructByValue(s4);
 	Assert(s.x == 13);
@@ -121,7 +84,6 @@ void TestRefStruct()
 
 public int main()
 {
-	TestRefSimple();
 	TestRefStruct();
 
 	return 0;

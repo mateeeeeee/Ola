@@ -263,7 +263,19 @@ namespace wave
 
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return IsSameAs(other);
+			if (!IsSameAs(other))
+			{
+				if (other.Is(TypeKind::Ref))
+				{
+					RefType const& ref_other = type_cast<RefType>(other);
+					if (!ref_other.GetReferredType()->Is(TypeKind::Class)) return false;
+					QualType const& referred_type = ref_other.GetReferredType();
+					ClassType const& referred_class_type = type_cast<ClassType>(referred_type);
+					return IsSameAs(referred_class_type);
+				}
+				else return false;
+			}
+			return true;
 		}
 		virtual bool IsSameAs(Type const& other) const override
 		{

@@ -34,9 +34,7 @@ It's done as a learning project and its purpose is solely educational.
   * classes (wip)
 	- methods and fields
 	- `this` keyword
-  
-## Todo
-  * ref (wip)
+  * `ref`
 
 ## Structure
 Wave consists of three parts: 
@@ -239,6 +237,50 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 }
 ```
 
+### ref
+You use the `ref` keyword in the following contexts:
+	- in function signature to pass parameter by reference
+	- in variable declaration to declare a reference variable
+
+```	
+
+void IntByRef(ref int a)
+{
+	++a;
+}
+
+void IntByValue(int a)
+{
+	++a;
+}
+
+public int main()
+{
+	int a = 9;
+	IntByRef(a);
+	Assert(a == 10);
+
+	ref int b = a;
+	++b;
+	Assert(a == 11);
+
+	int c = b;
+	++c;
+	Assert(c == 12);
+	Assert(a == 11);
+
+	ref int d = b; 
+	++d;
+	Assert(a == 12);
+
+	IntByRef(d);
+	Assert(a == 13);
+
+	IntByValue(d);
+	Assert(a == 13);
+}
+```
+
 ### Classes
 ```
 import std.assert;
@@ -269,27 +311,34 @@ void StructByValue(S s)
 	Assert(s.y == 100);
 }
 
-//void StructByRef(ref S s)
-//{
-//	s.x *= 2;
-//	s.y *= 2;
-//}
+void StructByRef(ref S s)
+{
+	s.SetX(1000);
+	s.SetY(1000);
+}
 
 public int main()
 {
 	S s; s.Init(10, 10);
 	StructByValue(s);
-	Assert(s.x == 10);
-	Assert(s.y == 10);
+	Assert(s.GetX() == 10);
+	Assert(s.GetY() == 10);
+	
+	StructByRef(s);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
 
-	S s2 = s; //copy
+	S s2 = s; 
 	s.SetX(25);
 	s.SetY(25);
-	Assert(s2.x == 10);
-	Assert(s2.y == 10);
-	Assert(s.y == 25);
-	Assert(s.y == 25);
-
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
+	Assert(s.GetX() == 25);
+	Assert(s.GetY() == 25);
+	
+	ref S s3 = s;
+	s3.SetX(500);
+	Assert(s.GetX() == 500);
 	return 0;
 }
 ```
@@ -300,7 +349,7 @@ is `private` which means it cannot be used outside of the class.
 `this` keyword can be used to disambiguate between symbols.
 
 ### Strings
-Strings are just char arrays. `string` type is a built-in alias for `char[]`. 
+Strings are just arrays of chars. `string` type is a built-in alias for `char[]`. 
 
 ```
 import std.io;
@@ -380,7 +429,11 @@ public int main()
 - `ref`
 
 ### Types
-There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. `void` can be used when specifying that the return type of a function. All other types can form composite array type. Function type consists of the return type, and list of parameter types. Every cast in Wave is implicit, which means that explicit casts don't exist.
+There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. 
+`void` can be used when specifying that the return type of a function. 
+All other types can form a composite array type. Function type consists of the return type, and list of parameter types. 
+Every cast in Wave is implicit, which means that explicit casts don't exist. 
+Other composite types except arrays are: classes and reference types.
 
 ## Usage
 ### Command line options
