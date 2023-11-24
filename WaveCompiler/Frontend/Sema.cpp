@@ -799,7 +799,22 @@ namespace wave
 			if (current_class_expr->GetExprKind() != ExprKind::This)
 			{
 				QualType const& class_expr_type = current_class_expr->GetType();
-				ClassType const* class_type = dynamic_type_cast<ClassType>(class_expr_type);
+
+				ClassType const* class_type = nullptr;
+
+				if (class_expr_type->GetKind() == TypeKind::Class)
+				{
+					class_type = dynamic_type_cast<ClassType>(class_expr_type);
+				}
+				else if (class_expr_type->GetKind() == TypeKind::Ref)
+				{
+					RefType const& ref_type = type_cast<RefType>(class_expr_type);
+					if (ref_type.GetReferredType()->GetKind() == TypeKind::Class)
+					{
+						class_type = dynamic_type_cast<ClassType>(ref_type.GetReferredType());
+					}
+				}
+
 				if (!class_type)
 				{
 					diagnostics.Report(loc, invalid_member_access);
@@ -900,10 +915,21 @@ namespace wave
 
 	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier)
 	{
-		if (!IsClassType(class_expr->GetType()))
+		QualType const& class_expr_type = class_expr->GetType();
+		if (!IsClassType(class_expr_type))
 		{
-			diagnostics.Report(loc, invalid_member_access);
-			return nullptr;
+			if (!IsRefType(class_expr_type))
+			{
+				diagnostics.Report(loc, invalid_member_access);
+				return nullptr;
+			}
+
+			RefType const& ref_type = type_cast<RefType>(class_expr_type);
+			if (!IsClassType(ref_type.GetReferredType()))
+			{
+				diagnostics.Report(loc, invalid_member_access);
+				return nullptr;
+			}
 		}
 		if (class_expr->GetExprKind() != ExprKind::This && member_identifier->GetDecl()->IsPrivate())
 		{
