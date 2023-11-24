@@ -64,11 +64,11 @@ set(TEST_FILES
 	Test/test.ll
 )
 
-add_executable(WaveCompiler main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
+add_executable(WaveCompiler main.cpp todo.txt autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 set_target_properties(WaveCompiler PROPERTIES OUTPUT_NAME Wave)
 
-source_group(" " 		FILES main.cpp)
+source_group(" " 		FILES main.cpp todo.txt)
 source_group("autogen" 	FILES autogen/WaveConfig.h)
 source_group("Core"     FILES ${CORE_FILES})
 source_group("Utility"  FILES ${UTILITY_FILES})
