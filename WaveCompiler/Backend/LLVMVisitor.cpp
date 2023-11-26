@@ -395,18 +395,18 @@ namespace wave
 
 	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
+		llvm::BasicBlock* current_block = builder.GetInsertBlock();
+		llvm::Function* current_function = current_block->getParent();
 		if (Expr const* return_expr = return_stmt.GetExprStmt()->GetExpr()) 
 		{
 			return_expr->Accept(*this);
 			llvm::Value* return_expr_value = llvm_value_map[return_expr];
 			WAVE_ASSERT(return_expr_value);
 
-			llvm_value_map[&return_stmt] = Store(return_expr_value, return_value);
+			if (current_function->getReturnType()->isPointerTy()) builder.CreateStore(return_expr_value, return_value);
+			else llvm_value_map[&return_stmt] = Store(return_expr_value, return_value);
 		}
 		builder.CreateBr(exit_block);
-
-		llvm::BasicBlock* current_block = builder.GetInsertBlock();
-		llvm::Function* current_function = current_block->getParent();
 		llvm::BasicBlock* return_block = llvm::BasicBlock::Create(context, "return", current_function, current_block->getNextNode());
 		builder.SetInsertPoint(return_block);
 	}
@@ -1403,8 +1403,6 @@ namespace wave
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!IsPointer(value->getType())) return builder.CreateStore(value, ptr);
-		if (isa<llvm::GetElementPtrInst>(value)) return builder.CreateStore(value, ptr);
-
 		llvm::Value* load = Load(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}
