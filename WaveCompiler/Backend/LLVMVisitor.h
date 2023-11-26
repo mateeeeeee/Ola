@@ -100,7 +100,7 @@ namespace wave
 
 		llvm::Type* this_struct_type = nullptr;
 		llvm::Value* this_value = nullptr;
-		llvm::AllocaInst* return_alloc = nullptr;
+		llvm::Value* return_value = nullptr;
 		llvm::BasicBlock* exit_block = nullptr;
 
 		std::vector<llvm::SwitchInst*> switch_instructions;

@@ -40,13 +40,18 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		QualType const& type = function_decl.GetType();
-		WAVE_ASSERT(IsFunctionType(type));
+		FunctionType const& type = function_decl.GetFunctionType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetName(), module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
+		if (IsClassType(type.GetReturnType()))
+		{
+			llvm::Value* sret_value = &(*param_arg);
+			++param_arg;
+			return_value = sret_value;
+		}
 		for (auto& param : function_decl.GetParamDecls())
 		{
 			llvm::Value* llvm_param = &*param_arg;
@@ -65,9 +70,7 @@ namespace wave
 		ClassDecl const* class_decl = method_decl.GetParentDecl();
 		llvm::Type* class_type = ConvertToLLVMType(ClassType(class_decl));
 
-		QualType const& type = method_decl.GetType();
-		WAVE_ASSERT(IsFunctionType(type));
-		FunctionType const& function_type = type_cast<FunctionType>(type);
+		FunctionType const& function_type = method_decl.GetFunctionType();
 
 		std::span<FunctionParams const> function_params = function_type.GetParams();
 		std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size() + 1);
@@ -381,14 +384,14 @@ namespace wave
 			return_expr->Accept(*this);
 			llvm::Value* return_expr_value = llvm_value_map[return_expr];
 			WAVE_ASSERT(return_expr_value);
-			llvm_value_map[&return_stmt] = Store(return_expr_value, return_alloc);
+			llvm_value_map[&return_stmt] = Store(return_expr_value, return_value);
 		}
 		builder.CreateBr(exit_block);
 
-		llvm::BasicBlock* currentBlock = builder.GetInsertBlock();
-		llvm::Function* currentFunction = currentBlock->getParent();
-		llvm::BasicBlock* returnBlock = llvm::BasicBlock::Create(context, "return", currentFunction, currentBlock->getNextNode());
-		builder.SetInsertPoint(returnBlock);
+		llvm::BasicBlock* current_block = builder.GetInsertBlock();
+		llvm::Function* current_function = current_block->getParent();
+		llvm::BasicBlock* return_block = llvm::BasicBlock::Create(context, "return", current_function, current_block->getNextNode());
+		builder.SetInsertPoint(return_block);
 	}
 
 	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32)
@@ -988,6 +991,14 @@ namespace wave
 
 		std::vector<llvm::Value*> args;
 		uint32 arg_index = 0;
+		bool return_struct = IsClassType(call_expr.GetCalleeType().GetReturnType());
+		llvm::AllocaInst* return_alloc = nullptr;
+		if (return_struct)
+		{
+			return_alloc = builder.CreateAlloca(called_function->getArg(arg_index)->getType());
+			args.push_back(return_alloc);
+			++arg_index;
+		}
 		for (auto const& arg_expr : call_expr.GetArgs())
 		{
 			arg_expr->Accept(*this);
@@ -1002,7 +1013,7 @@ namespace wave
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
-		llvm_value_map[&call_expr] = call_result;
+		llvm_value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
 	void LLVMVisitor::Visit(InitializerListExpr const& initializer_list, uint32)
@@ -1180,7 +1191,7 @@ namespace wave
 			}
 		}
 
-		if (!func->getReturnType()->isVoidTy()) return_alloc = builder.CreateAlloca(func->getReturnType(), nullptr);
+		if (!func->getReturnType()->isVoidTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", func);
 
 		ConstLabelStmtPtrList labels = func_decl.GetLabels();
@@ -1194,7 +1205,7 @@ namespace wave
 		func_decl.GetBodyStmt()->Accept(*this);
 
 		builder.SetInsertPoint(exit_block);
-		if (return_alloc) builder.CreateRet(Load(func->getReturnType(), return_alloc));
+		if (!func->getReturnType()->isVoidTy()) builder.CreateRet(Load(func->getReturnType(), return_value));
 		else builder.CreateRetVoid();
 
 		std::vector<llvm::BasicBlock*> unreachable_blocks{};
@@ -1222,7 +1233,7 @@ namespace wave
 		label_blocks.clear();
 
 		exit_block = nullptr;
-		return_alloc = nullptr;
+		return_value = nullptr;
 
 		llvm_value_map[&func_decl] = func;
 	}
@@ -1288,13 +1299,17 @@ namespace wave
 			std::span<FunctionParams const> function_params = function_type.GetParams();
 
 			llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
+			bool return_type_struct = return_type->isStructTy();
+
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
+			if (return_type_struct) param_types.push_back(return_type->getPointerTo());
+
 			for (auto const& func_param : function_params)
 			{
 				llvm::Type* param_type = ConvertToLLVMType(func_param.type);
 				param_types.push_back(param_type);
 			}
-			return llvm::FunctionType::get(return_type, param_types, false);
+			return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
 		}
 		case TypeKind::Class:
 		{

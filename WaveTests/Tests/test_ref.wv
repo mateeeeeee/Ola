@@ -138,12 +138,46 @@ void TestRefStruct()
 	Assert(s.y == 13);
 }
 
+S s;
+S ReturnValueS()
+{
+	return s;
+}
+
+ref S ReturnRefS()
+{
+	return s;
+}
+
+void TestRefReturnStruct()
+{
+	s.Init(9,9);
+
+	ref S s1 = ReturnRefS();
+	s1.x++;
+	s1.y++;
+	Assert(s.x == 10);
+	Assert(s.y == 10);
+	
+	S s2 = ReturnRefS();
+	s2.x++;
+	s2.x++;
+	Assert(s.x == 10);
+	Assert(s.y == 10);
+
+	S s3 = ReturnValueS();
+	s3.x++;
+	s3.x++;
+	Assert(s.x == 10);
+	Assert(s.y == 10);
+}
 
 public int main()
 {
 	TestRefSimple();
 	TestRefReturnSimple();
 	TestRefStruct();
+	TestRefReturnStruct();
 
 	return 0;
 }
