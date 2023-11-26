@@ -259,7 +259,7 @@ namespace wave
 	class ClassType : public Type
 	{
 	public:
-		ClassType(ClassDecl const* class_decl) : Type{ TypeKind::Class, 0, 0 }, class_decl(class_decl) {}
+		ClassType(ClassDecl const* class_decl);
 
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{

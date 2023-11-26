@@ -78,7 +78,7 @@ main:                                   # @main
 	mov	qword ptr [rsp + 48], rcx
 	mov	rcx, qword ptr [rax]
 	call	PrintInt
-	mov	qword ptr [rsp + 64], 0
+	mov	qword ptr [rsp + 64], 16
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 64]
 	add	rsp, 72

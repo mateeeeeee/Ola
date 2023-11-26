@@ -86,7 +86,7 @@ entry:
   %12 = load ptr, ptr %6, align 8
   %13 = load i64, ptr %6, align 4
   call void @PrintInt(i64 %13)
-  store i64 0, ptr %0, align 4
+  store i64 16, ptr %0, align 4
   br label %exit
 
 return:                                           ; No predecessors!

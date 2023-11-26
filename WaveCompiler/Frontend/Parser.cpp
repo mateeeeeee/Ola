@@ -994,7 +994,9 @@ namespace wave
 
 		SourceLocation loc = current_token->GetLocation();
 		QualType type{};
-		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var))
+		std::string_view identifier = current_token->GetData();
+		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_var) 
+		|| (current_token->Is(TokenKind::identifier) && sema->ctx.tag_sym_table.LookUp(identifier) != nullptr))
 		{
 			ParseTypeQualifier(type);
 			ParseTypeSpecifier(type);
