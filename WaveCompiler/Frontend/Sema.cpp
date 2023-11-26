@@ -651,6 +651,12 @@ namespace wave
 				UniqueExprPtr& arg = args[i];
 				FunctionParams const& func_param = func_params[i];
 
+				if (IsRefType(func_param.type) && !arg->IsLValue())
+				{
+					diagnostics.Report(loc, ref_var_rvalue_bind);
+					return nullptr;
+				}
+
 				if (!func_param.type->IsAssignableFrom(arg->GetType()))
 				{
 					diagnostics.Report(loc, incompatible_function_argument);
@@ -666,6 +672,8 @@ namespace wave
 			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
 			func_call_expr->SetType(func_type.GetReturnType());
 			func_call_expr->SetArgs(std::move(args));
+			func_call_expr->SetCallee(std::move(func_expr));
+			if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
 			return func_call_expr;
 		}
 		else if (func_expr->GetExprKind() == ExprKind::Member)
@@ -705,6 +713,12 @@ namespace wave
 				UniqueExprPtr& arg = args[i];
 				FunctionParams const& func_param = func_params[i];
 
+				if (IsRefType(func_param.type) && !arg->IsLValue())
+				{
+					diagnostics.Report(loc, ref_var_rvalue_bind);
+					return nullptr;
+				}
+
 				if (!func_param.type->IsAssignableFrom(arg->GetType()))
 				{
 					diagnostics.Report(loc, incompatible_function_argument);
@@ -720,7 +734,8 @@ namespace wave
 			UniqueMemberCallExprPtr func_call_expr = MakeUnique<MemberCallExpr>(loc, func_name);
 			func_call_expr->SetType(func_type.GetReturnType());
 			func_call_expr->SetArgs(std::move(args));
-			func_call_expr->SetMemberExpr(std::move(func_expr));
+			func_call_expr->SetCallee(std::move(func_expr));
+			if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
 			return func_call_expr;
 		}
 		else
@@ -967,6 +982,7 @@ namespace wave
 		if (!cast_type->IsAssignableFrom(operand_type)) diagnostics.Report(loc, invalid_cast);
 
 		UniqueImplicitCastExprPtr cast_expr = MakeUnique<ImplicitCastExpr>(loc, type);
+		cast_expr->SetLValue(expr->IsLValue());
 		cast_expr->SetOperand(std::move(expr));
 		return cast_expr;
 	}
@@ -1051,6 +1067,15 @@ namespace wave
 		else
 		{
 			var_decl->SetType(type);
+		}
+
+		QualType const& var_type = var_decl->GetType();
+		if (IsRefType(var_type))
+		{
+			if (var_decl->GetInitExpr() && !var_decl->GetInitExpr()->IsLValue())
+			{
+				diagnostics.Report(loc, ref_var_rvalue_bind);
+			}
 		}
 
 		ctx.decl_sym_table.Insert(var_decl.get());

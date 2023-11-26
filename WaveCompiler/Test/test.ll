@@ -70,45 +70,32 @@ entry:
   %8 = load i64, ptr @g, align 4
   %9 = icmp eq i64 %8, 10
   call void @Assert(i1 %9)
-  %10 = call i64 @ReturnValue()
-  %11 = alloca ptr, align 8
-  store i64 %10, ptr %11, align 4
-  %12 = load ptr, ptr %11, align 8
-  %13 = load i64, ptr %12, align 4
-  %14 = alloca ptr, align 8
-  %15 = load ptr, ptr %12, align 8
-  store ptr %15, ptr %14, align 8
-  %16 = add i64 %13, 1
-  store i64 %16, ptr %12, align 4
-  %17 = load i64, ptr @g, align 4
-  %18 = icmp eq i64 %17, 10
-  call void @Assert(i1 %18)
-  %19 = call ptr @ReturnRef()
-  %20 = load ptr, ptr %19, align 8
-  %21 = load i64, ptr %19, align 4
-  %22 = alloca i64, align 8
-  store i64 %21, ptr %22, align 4
-  %23 = load i64, ptr %22, align 4
-  %24 = alloca ptr, align 8
-  %25 = load ptr, ptr %22, align 8
-  store ptr %25, ptr %24, align 8
-  %26 = add i64 %23, 1
-  store i64 %26, ptr %22, align 4
-  %27 = load i64, ptr @g, align 4
-  %28 = icmp eq i64 %27, 10
-  call void @Assert(i1 %28)
-  %29 = call i64 @ReturnValue()
-  %30 = alloca i64, align 8
-  store i64 %29, ptr %30, align 4
-  %31 = load i64, ptr %30, align 4
-  %32 = alloca ptr, align 8
-  %33 = load ptr, ptr %30, align 8
-  store ptr %33, ptr %32, align 8
-  %34 = add i64 %31, 1
-  store i64 %34, ptr %30, align 4
-  %35 = load i64, ptr @g, align 4
-  %36 = icmp eq i64 %35, 10
-  call void @Assert(i1 %36)
+  %10 = call ptr @ReturnRef()
+  %11 = load ptr, ptr %10, align 8
+  %12 = load i64, ptr %10, align 4
+  %13 = alloca i64, align 8
+  store i64 %12, ptr %13, align 4
+  %14 = load i64, ptr %13, align 4
+  %15 = alloca ptr, align 8
+  %16 = load ptr, ptr %13, align 8
+  store ptr %16, ptr %15, align 8
+  %17 = add i64 %14, 1
+  store i64 %17, ptr %13, align 4
+  %18 = load i64, ptr @g, align 4
+  %19 = icmp eq i64 %18, 10
+  call void @Assert(i1 %19)
+  %20 = call i64 @ReturnValue()
+  %21 = alloca i64, align 8
+  store i64 %20, ptr %21, align 4
+  %22 = load i64, ptr %21, align 4
+  %23 = alloca ptr, align 8
+  %24 = load ptr, ptr %21, align 8
+  store ptr %24, ptr %23, align 8
+  %25 = add i64 %22, 1
+  store i64 %25, ptr %21, align 4
+  %26 = load i64, ptr @g, align 4
+  %27 = icmp eq i64 %26, 10
+  call void @Assert(i1 %27)
   br label %exit
 
 exit:                                             ; preds = %entry

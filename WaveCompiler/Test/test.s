@@ -53,21 +53,10 @@ ReturnValue:                            # @ReturnValue
 TestRefReturnSimple:                    # @TestRefReturnSimple
 .seh_proc TestRefReturnSimple
 # %bb.0:                                # %entry
-	sub	rsp, 104
-	.seh_stackalloc 104
+	sub	rsp, 88
+	.seh_stackalloc 88
 	.seh_endprologue
 	call	ReturnRef
-	mov	qword ptr [rsp + 96], rax
-	mov	rax, qword ptr [rsp + 96]
-	mov	rcx, qword ptr [rax]
-	mov	rdx, qword ptr [rax]
-	mov	qword ptr [rsp + 88], rdx
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
-	cmp	qword ptr [rip + g], 10
-	sete	cl
-	call	Assert
-	call	ReturnValue
 	mov	qword ptr [rsp + 80], rax
 	mov	rax, qword ptr [rsp + 80]
 	mov	rcx, qword ptr [rax]
@@ -101,7 +90,7 @@ TestRefReturnSimple:                    # @TestRefReturnSimple
 	call	Assert
 # %bb.1:                                # %exit
 	nop
-	add	rsp, 104
+	add	rsp, 88
 	ret
 	.seh_endproc
                                         # -- End function

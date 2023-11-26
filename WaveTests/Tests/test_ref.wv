@@ -1,16 +1,5 @@
 import std.assert;
 
-
-//ref todo list
-//1. passing to function parameter
-//   - passing T variable to ref T function parameter + 
-//	 - passing ref T variable to T function parameter +
-//	 - passing ref T variable to ref T function parameter + 
-//2. assignment 
-//   - assigning T to ref T variable + 
-//   - assigning ref T to T variable +
-//   - assigning ref T to ref T variable +
-//3. returning from functions
 //4. methods and fields
 //5. global variables
 
@@ -56,6 +45,7 @@ void TestRefSimple()
 	Assert(a == 13);
 }
 
+
 int g = 9;
 ref int ReturnRef()
 {
@@ -68,20 +58,16 @@ int ReturnValue()
 
 void TestRefReturnSimple()
 {
-	ref int refG = ReturnRef();
-	refG++;
+	ref int gRef = ReturnRef();
+	gRef++;
 	Assert(g == 10);
 
-	//ref int refGCopy = ReturnValue();
-	//refGCopy++;
-	//Assert(g == 10);
-
-	int valueG = ReturnRef();
-	valueG++;
+	int gRefCopy = ReturnRef();
+	gRefCopy++;
 	Assert(g == 10);
 
-	int valueGCopy = ReturnValue();
-	valueGCopy++;
+	int gValue = ReturnValue();
+	gValue++;
 	Assert(g == 10);
 }
 
@@ -152,11 +138,11 @@ void TestRefStruct()
 	Assert(s.y == 13);
 }
 
+
 public int main()
 {
 	TestRefSimple();
 	TestRefReturnSimple();
-
 	TestRefStruct();
 
 	return 0;

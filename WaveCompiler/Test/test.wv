@@ -18,10 +18,6 @@ void TestRefReturnSimple()
 	refG++;
 	Assert(g == 10);
 
-	ref int refGCopy = ReturnValue();
-	refGCopy++;
-	Assert(g == 10);
-
 	int valueG = ReturnRef();
 	valueG++;
 	Assert(g == 10);

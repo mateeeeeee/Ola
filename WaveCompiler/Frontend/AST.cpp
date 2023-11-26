@@ -230,6 +230,7 @@ namespace wave
 	void CallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
+		callee->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
 	void InitializerListExpr::Accept(ASTVisitor& visitor, uint32 depth) const
@@ -253,7 +254,7 @@ namespace wave
 	void MemberCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
-		member_expr->Accept(visitor, depth + 1);
+		callee->Accept(visitor, depth + 1);
 		for (auto const& arg : func_args) arg->Accept(visitor, depth + 1);
 	}
 	void ThisExpr::Accept(ASTVisitor& visitor, uint32 depth) const

@@ -65,4 +65,5 @@ DIAG(incompatible_function_argument, error, "Incompatible function call argument
 DIAG(invalid_operands, error, "Invalid operands")
 DIAG(invalid_member_access, error, "Invalid member access")
 DIAG(private_member_access, error, "Accessing private member")
+DIAG(ref_var_rvalue_bind, error, "reference cannot bind to a rvalue")
 #undef DIAG

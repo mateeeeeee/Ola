@@ -182,12 +182,18 @@ namespace wave
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 
+		ConstLabelStmtPtrList GetLabels() const;
+
+		FunctionType const& GetFunctionType() const
+		{
+			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
+			return type_cast<FunctionType>(GetType());
+		}
+
 		bool HasDefinition() const
 		{
 			return body_stmt != nullptr;
 		}
-
-		ConstLabelStmtPtrList GetLabels() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -214,6 +220,12 @@ namespace wave
 
 		void SetConst(bool _is_const) { is_const = _is_const; }
 		bool IsConst() const { return is_const; }
+
+		FunctionType const& GetFunctionType() const
+		{
+			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
+			return type_cast<FunctionType>(GetType());
+		}
 
 		virtual bool IsMember() const override { return true; }
 
@@ -707,6 +719,7 @@ namespace wave
 	public:
 		SourceLocation const& GetLocation() const { return loc; }
 		ExprKind GetExprKind() const { return kind; }
+		void SetLValue(bool lvalue = true) { value_category = (lvalue ? ExprValueCategory::LValue : ExprValueCategory::RValue); }
 		bool IsLValue() const { return value_category == ExprValueCategory::LValue; }
 
 		void SetType(QualType const& _type) { type = _type; }
@@ -993,14 +1006,26 @@ namespace wave
 		{
 			func_args = std::move(args);
 		}
-		std::string_view GetFunctionName() const { return function_name; }
 		UniqueExprPtrList const& GetArgs() const { return func_args; }
+		void SetCallee(UniqueExprPtr&& _callee)
+		{
+			callee = std::move(_callee);
+		}
+		Expr const* GetCallee() const { return callee.get(); }
+
+		FunctionType const* GetCalleeType() const
+		{
+			return dynamic_type_cast<FunctionType>(GetCallee()->GetType());
+		}
+
+		std::string_view GetFunctionName() const { return function_name; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	protected:
 		std::string function_name;
+		UniqueExprPtr callee;
 		UniqueExprPtrList func_args;
 
 	protected:
@@ -1095,17 +1120,8 @@ namespace wave
 		MemberCallExpr(SourceLocation const& loc, std::string_view function_name)
 			: CallExpr(ExprKind::MemberCall, loc, function_name) {}
 
-		void SetMemberExpr(UniqueExprPtr&& _member_expr)
-		{
-			member_expr = std::move(_member_expr);
-		}
-		Expr const* GetMemberExpr() const { return member_expr.get(); }
-
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
-
-	private:
-		UniqueExprPtr member_expr;
 	};
 
 	class ThisExpr final : public Expr

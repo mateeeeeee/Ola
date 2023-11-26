@@ -1121,7 +1121,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(MemberCallExpr const& method_call, uint32)
 	{
-		Expr const* expr = method_call.GetMemberExpr();
+		Expr const* expr = method_call.GetCallee();
 		WAVE_ASSERT(expr->GetExprKind() == ExprKind::Member);
 		MemberExpr const* member_expr = ast_cast<MemberExpr>(expr);
 
