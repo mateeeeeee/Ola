@@ -72,24 +72,43 @@ namespace wave
 
 		FunctionType const& function_type = method_decl.GetFunctionType();
 
-		std::span<FunctionParams const> function_params = function_type.GetParams();
-		std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size() + 1);
-		param_types.push_back(llvm::PointerType::get(class_type, 0));
-		for (auto const& func_param : function_params)
-		{
-			param_types.push_back(ConvertToLLVMType(func_param.type));
-		}
+		auto MemberTypeToLLVM = [&](FunctionType const& type)
+			{
+				std::span<FunctionParams const> function_params = type.GetParams();
 
-		llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
-		llvm::FunctionType* llvm_function_type = llvm::FunctionType::get(return_type, param_types, false);
+				llvm::Type* return_type = ConvertToLLVMType(type.GetReturnType());
+				bool return_type_struct = return_type->isStructTy();
+
+				std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
+				if (return_type_struct) param_types.push_back(return_type->getPointerTo());
+
+				param_types.push_back(class_type->getPointerTo());
+				for (auto const& func_param : function_params)
+				{
+					llvm::Type* param_type = ConvertToLLVMType(func_param.type);
+					param_types.push_back(param_type);
+				}
+				return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
+			};
+		
+		llvm::FunctionType* llvm_function_type = MemberTypeToLLVM(function_type);
 
 		llvm::Function::LinkageTypes linkage = method_decl.IsPublic() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
+		this_struct_type = class_type;
+
 		llvm::Argument* param_arg = llvm_function->arg_begin();
+		if (IsClassType(function_type.GetReturnType()))
+		{
+			llvm::Value* sret_value = &*param_arg;
+			++param_arg;
+			return_value = sret_value;
+		}
 		llvm::Value* llvm_param = &*param_arg;
 		llvm_param->setName("this");
+		this_value = llvm_param;
 		++param_arg;
 		for (auto& param : method_decl.GetParamDecls())
 		{
@@ -98,9 +117,6 @@ namespace wave
 			llvm_value_map[param.get()] = llvm_param;
 			++param_arg;
 		}
-
-		this_struct_type = class_type;
-		this_value = llvm_function->arg_begin();
 
 		VisitFunctionDeclCommon(method_decl, llvm_function);
 
@@ -1130,9 +1146,9 @@ namespace wave
 		else WAVE_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(MemberCallExpr const& method_call, uint32)
+	void LLVMVisitor::Visit(MemberCallExpr const& member_call_expr, uint32)
 	{
-		Expr const* expr = method_call.GetCallee();
+		Expr const* expr = member_call_expr.GetCallee();
 		WAVE_ASSERT(expr->GetExprKind() == ExprKind::Member);
 		MemberExpr const* member_expr = ast_cast<MemberExpr>(expr);
 
@@ -1142,7 +1158,7 @@ namespace wave
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 		std::string name(class_decl->GetName());
 		name += "::";
-		name += method_call.GetFunctionName();
+		name += member_call_expr.GetFunctionName();
 
 		llvm::Function* called_function = module.getFunction(name);
 		WAVE_ASSERT(called_function);
@@ -1150,10 +1166,19 @@ namespace wave
 		std::vector<llvm::Value*> args;
 		uint32 arg_index = 0;
 
+		bool return_struct = IsClassType(member_call_expr.GetCalleeType().GetReturnType());
+		llvm::AllocaInst* return_alloc = nullptr;
+		if (return_struct)
+		{
+			return_alloc = builder.CreateAlloca(called_function->getArg(arg_index)->getType());
+			args.push_back(return_alloc);
+			++arg_index;
+		}
+
 		member_expr->GetClassExpr()->Accept(*this);
 		llvm::Value* this_value = llvm_value_map[member_expr->GetClassExpr()];
 		args.push_back(this_value);
-		for (auto const& arg_expr : method_call.GetArgs())
+		for (auto const& arg_expr : member_call_expr.GetArgs())
 		{
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = llvm_value_map[arg_expr.get()];
@@ -1162,7 +1187,7 @@ namespace wave
 		}
 
 		llvm::Value* call_result = builder.CreateCall(called_function, args);
-		llvm_value_map[&method_call] = call_result;
+		llvm_value_map[&member_call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
 	void LLVMVisitor::Visit(ThisExpr const& this_expr, uint32)
