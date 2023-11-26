@@ -219,7 +219,7 @@ public int main()
     a[0] = 10;
     foreach(int e : a)
     {
-        PrintInteger(e);  //prints 10,2,3,0,0,0
+        PrintInt(e);  //prints 10,2,3,0,0,0
     } 
     return 0;
 }
@@ -242,6 +242,7 @@ You use the `ref` keyword in the following contexts:
 	- in function signature to pass parameter by reference
 	- in variable declaration to declare a reference variable
 	- in function signature to return by reference
+ Reference variables cannot be reassigned to reference other variable
 ```	
 
 void IntByRef(ref int a)
@@ -369,8 +370,8 @@ public int main()
     PrintString(name);
 
     string stringNumber = "12345";
-    int integer = StringToInteger(number);  //from std.string
-	PrintInteger(integer); //prints 12345
+    int integer = StringToInt(number);  //from std.string
+	PrintInt(integer); //prints 12345
 
     return 0;
 }
@@ -394,7 +395,7 @@ public int main()
     IntArray a = MyInt[6]{1,2,3};
     foreach(MyInt e : a)
     {
-        PrintInteger(e);
+        PrintInt(e);
     }
     return 0;
 }
@@ -438,9 +439,7 @@ public int main()
 ### Types
 There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. 
 `void` can be used when specifying that the return type of a function. 
-All other types can form a composite array type. Function type consists of the return type, and list of parameter types. 
-Every cast in Wave is implicit, which means that explicit casts don't exist. 
-Other composite types except arrays are: classes and reference types.
+All other types can form a composite array type. Function type consists of the return type, and list of parameter types. Other composite types except arrays and functions are classes and reference types.
 
 ## Usage
 ### Command line options
