@@ -15,12 +15,10 @@ class S
 	public int y = 0;
 };
 
-
-
 public int main()
 {
 	S s; s.Init(10, 10);
-	ref int sx = s.x;
+	ref var sx = s.x;
 	s.x++;
 	PrintInt(sx);
 	return 0;

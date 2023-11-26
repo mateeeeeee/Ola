@@ -996,7 +996,13 @@ namespace wave
 	UniquePtr<Decl> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		bool const has_init = (init_expr != nullptr);
-		bool const has_type_specifier = !type.IsNull();
+		bool has_type_specifier = !type.IsNull();
+		bool is_ref_type = IsRefType(type);
+		if (has_type_specifier && is_ref_type)
+		{
+			RefType const& ref_type = type_cast<RefType>(type);
+			has_type_specifier = !ref_type.GetReferredType().IsNull();
+		}
 		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
 
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
@@ -1066,6 +1072,7 @@ namespace wave
 		else if ((has_init && !has_type_specifier))
 		{
 			QualType var_type(var_decl->GetInitExpr()->GetType());
+			if (is_ref_type) var_type = RefType(var_type);	
 			if (type.IsConst()) var_type.AddConst();
 			var_decl->SetType(var_type);
 		}

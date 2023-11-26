@@ -73,20 +73,19 @@ entry:
   store i64 0, ptr %3, align 4
   call void @"S::Init"(ptr %1, i64 10, i64 10)
   %4 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %5 = load i64, ptr %4, align 4
-  %6 = alloca ptr, align 8
-  store ptr %4, ptr %6, align 8
-  %7 = load ptr, ptr %6, align 8
-  %8 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  %9 = load i64, ptr %8, align 4
-  %10 = alloca ptr, align 8
-  %11 = load ptr, ptr %8, align 8
-  store ptr %11, ptr %10, align 8
-  %12 = add i64 %9, 1
-  store i64 %12, ptr %8, align 4
-  %13 = load ptr, ptr %7, align 8
-  %14 = load i64, ptr %7, align 4
-  call void @PrintInt(i64 %14)
+  %5 = alloca ptr, align 8
+  store ptr %4, ptr %5, align 8
+  %6 = load ptr, ptr %5, align 8
+  %7 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
+  %8 = load i64, ptr %7, align 4
+  %9 = alloca ptr, align 8
+  %10 = load ptr, ptr %7, align 8
+  store ptr %10, ptr %9, align 8
+  %11 = add i64 %8, 1
+  store i64 %11, ptr %7, align 4
+  %12 = load ptr, ptr %6, align 8
+  %13 = load i64, ptr %6, align 4
+  call void @PrintInt(i64 %13)
   store i64 0, ptr %0, align 4
   br label %exit
 
@@ -95,6 +94,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %15 = load i64, ptr %0, align 4
-  ret i64 %15
+  %14 = load i64, ptr %0, align 4
+  ret i64 %14
 }
