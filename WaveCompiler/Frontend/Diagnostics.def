@@ -66,4 +66,6 @@ DIAG(invalid_operands, error, "Invalid operands")
 DIAG(invalid_member_access, error, "Invalid member access")
 DIAG(private_member_access, error, "Accessing private member")
 DIAG(ref_var_rvalue_bind, error, "reference cannot bind to a rvalue")
+DIAG(ref_var_needs_init, error, "reference needs to be initialized")
+DIAG(ref_var_reassignment_error, error, "reference cannot be reassigned")
 #undef DIAG

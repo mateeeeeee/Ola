@@ -441,6 +441,11 @@ namespace wave
 			}
 			else diagnostics.Report(loc, modifying_rvalue_expr);
 
+			if (IsRefType(lhs_type))
+			{
+				diagnostics.Report(loc, ref_var_reassignment_error);
+			}
+
 			if (!lhs_type->IsAssignableFrom(rhs->GetType()))
 			{
 				diagnostics.Report(loc, incompatible_initializer);
@@ -1072,7 +1077,11 @@ namespace wave
 		QualType const& var_type = var_decl->GetType();
 		if (IsRefType(var_type))
 		{
-			if (var_decl->GetInitExpr() && !var_decl->GetInitExpr()->IsLValue())
+			if (!var_decl->GetInitExpr())
+			{
+				diagnostics.Report(loc, ref_var_needs_init);
+			}
+			if (!var_decl->GetInitExpr()->IsLValue())
 			{
 				diagnostics.Report(loc, ref_var_rvalue_bind);
 			}

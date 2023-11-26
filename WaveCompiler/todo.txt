@@ -1,5 +1,4 @@
 * ref
-	- as a return parameter 
 	- ref fields and method parameters
 * arrays
 	- refactor array initialization and declaration
