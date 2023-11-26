@@ -42,6 +42,7 @@ set(FRONTEND_FILES
   Frontend/TokenTypes.cpp
   Frontend/TokenTypes.h
   Frontend/Type.h
+  Frontend/Type.cpp
 )
 
 
