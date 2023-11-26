@@ -400,6 +400,7 @@ namespace wave
 			return_expr->Accept(*this);
 			llvm::Value* return_expr_value = llvm_value_map[return_expr];
 			WAVE_ASSERT(return_expr_value);
+
 			llvm_value_map[&return_stmt] = Store(return_expr_value, return_value);
 		}
 		builder.CreateBr(exit_block);
@@ -1378,7 +1379,7 @@ namespace wave
 	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
 		//#todo: refactor this
-		if (ptr->getType()->isPointerTy())
+		if (IsPointer(ptr->getType()))
 		{
 			if (isa<llvm::AllocaInst>(ptr))
 			{
@@ -1390,7 +1391,7 @@ namespace wave
 					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
 				}
 			}
-			else if (llvm_type->isPointerTy() && isa<llvm::GlobalVariable>(ptr))
+			else if (IsPointer(llvm_type) && isa<llvm::GlobalVariable>(ptr))
 			{
 				return ptr;
 			}
@@ -1401,7 +1402,9 @@ namespace wave
 
 	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
-		if (!value->getType()->isPointerTy()) return builder.CreateStore(value, ptr);
+		if (!IsPointer(value->getType())) return builder.CreateStore(value, ptr);
+		if (isa<llvm::GetElementPtrInst>(value)) return builder.CreateStore(value, ptr);
+
 		llvm::Value* load = Load(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}

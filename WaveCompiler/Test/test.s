@@ -16,17 +16,14 @@
 "S::Init":                              # @"S::Init"
 .seh_proc "S::Init"
 # %bb.0:                                # %entry
-	sub	rsp, 16
-	.seh_stackalloc 16
+	push	rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	mov	qword ptr [rsp + 8], rdx
-	mov	qword ptr [rsp], r8
-	mov	rax, qword ptr [rsp + 8]
-	mov	qword ptr [rcx], rax
+	mov	qword ptr [rsp], rdx
 	mov	rax, qword ptr [rsp]
-	mov	qword ptr [rcx + 8], rax
+	mov	qword ptr [rcx], rax
 # %bb.1:                                # %exit
-	add	rsp, 16
+	pop	rax
 	ret
 	.seh_endproc
                                         # -- End function
@@ -42,8 +39,7 @@
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx]
-	mov	qword ptr [rsp], rax
+	mov	qword ptr [rsp], rcx
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
 	pop	rcx
@@ -59,32 +55,30 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp + 48], 0
-	mov	qword ptr [rsp + 56], 0
-	lea	rcx, [rsp + 48]
-	mov	r8d, 10
-	mov	rdx, r8
+	mov	qword ptr [rsp + 40], 0
+	lea	rcx, [rsp + 40]
+	mov	edx, 10
 	call	"S::Init"
-	lea	rax, [rsp + 48]
-	mov	qword ptr [rsp + 40], rax
-	mov	rax, qword ptr [rsp + 40]
-	mov	rcx, qword ptr [rsp + 48]
-	mov	rdx, qword ptr [rsp + 48]
-	mov	qword ptr [rsp + 32], rdx
-	add	rcx, 1
-	mov	qword ptr [rsp + 48], rcx
+	lea	rcx, [rsp + 40]
+	call	"S::X"
+	mov	qword ptr [rsp + 32], rax
+	mov	rax, qword ptr [rsp + 32]
 	mov	rcx, qword ptr [rax]
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
+	mov	rcx, qword ptr [rsp + 40]
 	call	PrintInt
-	mov	qword ptr [rsp + 64], 16
+	mov	qword ptr [rsp + 48], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 64]
-	add	rsp, 72
+	mov	rax, qword ptr [rsp + 48]
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
 	.addrsig_sym PrintInt
 	.addrsig_sym "S::Init"
+	.addrsig_sym "S::X"
