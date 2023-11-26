@@ -28,6 +28,13 @@ namespace wave
 			diagnostics.Report(loc, void_invalid_context);
 		}
 
+		if (IsRefType(type))
+		{
+			RefType const& ref_type = type_cast<RefType>(type);
+			if (ref_type.GetReferredType().IsNull()) diagnostics.Report(loc, missing_type_specifier);
+			if (ref_type.GetReferredType()->GetKind() == TypeKind::Array) diagnostics.Report(loc, arrays_cannot_be_refs);
+		}
+
 		UniqueParamVarDeclPtr param_decl = MakeUnique<ParamVarDecl>(name, loc);
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
@@ -1049,6 +1056,8 @@ namespace wave
 		bool is_array = (has_type_specifier && IsArrayType(type)) || (has_init && IsArrayType(var_decl->GetInitExpr()->GetType()));
 		if (is_array)
 		{
+			if (is_ref_type) diagnostics.Report(loc, arrays_cannot_be_refs);
+
 			ArrayType const& init_expr_type = type_cast<ArrayType>(var_decl->GetInitExpr()->GetType());
 			QualType base_type{};
 			if (has_type_specifier)

@@ -68,4 +68,5 @@ DIAG(private_member_access, error, "Accessing private member")
 DIAG(ref_var_rvalue_bind, error, "reference cannot bind to a rvalue")
 DIAG(ref_var_needs_init, error, "reference needs to be initialized")
 DIAG(ref_var_reassignment_error, error, "reference cannot be reassigned")
+DIAG(arrays_cannot_be_refs, error, "arrays cannot be reference variables")
 #undef DIAG
