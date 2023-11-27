@@ -71,4 +71,6 @@ DIAG(ref_var_reassignment_error, error, "reference cannot be reassigned")
 DIAG(nonconst_ref_init_with_const_ref, error, "non-const reference cannot be initialized with const reference")
 DIAG(arrays_cannot_be_refs, error, "arrays cannot be reference variables")
 DIAG(const_methods_cannot_return_nonconst_refs, error, "const class methods cannot have non-const ref return type")
+DIAG(multidimensional_arrays_need_initializer, error, "multidimensional arrays need initializer")
+DIAG(multidimensional_arrays_cannot_alias, error, "multidimensional arrays cannot alias other array")
 #undef DIAG

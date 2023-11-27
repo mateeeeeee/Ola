@@ -245,8 +245,13 @@ You use the `ref` keyword in the following contexts:
 	- in function/method signature to pass parameter by reference
 	- in variable/field declaration to declare a reference variable
 	- in function/method signature to return by reference
- Reference variables must be initialized at declaration and cannot be reassigned to reference other variable.
+ Reference variables must be initialized at declaration and cannot be reassigned to reference other variable. 
 ```	
+
+void IntByRef(const ref int a)
+{
+	++a; //compiler error, a is const ref
+}
 
 void IntByRef(ref int a)
 {
@@ -318,11 +323,15 @@ public class S
 		this.y = y;
 	}
 
-	public void SetX(int x) {this.x = x;}
+	public void SetX(int x) {this.x = x;} //declaring Set* as const would trigger a compile error since this.x is modified
 	public void SetY(int y) {this.y = y;}
 	
 	public int GetX() const {return x;}
 	public int GetY() const {return y;}
+	
+	//public ref int GetXByRef() const {return x;} compiler error - returning non-const ref in const method
+	public ref int GetXByRef() {return x;} //this is fine
+	public const ref int GetXByConstRef() const {return x;} //this is fine
 
 	private int x = 0;
 	private int y = 0;
@@ -370,7 +379,6 @@ public int main()
 Class declaration consists of a sequence of method definitions and field declarations, Those declarations can be interleaved.
 Every method or field declaration has a visibility, either `public` or `private`. By default, if nothing is specified, the visibility
 is `private` which means it cannot be used outside of the class. 
-
 `this` keyword can be used to disambiguate between symbols.
 
 ### Strings

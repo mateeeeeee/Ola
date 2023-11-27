@@ -1062,8 +1062,14 @@ namespace wave
 			if (Expr const* array_init_expr = var_decl->GetInitExpr())
 			{
 				ArrayType const& init_expr_type = type_cast<ArrayType>(array_init_expr->GetType());
+				bool is_multidimensional_array = init_expr_type.GetBaseType()->Is(TypeKind::Array);
+				if (is_multidimensional_array && init_expr_is_decl_ref)
+				{
+					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
+				}
+
 				QualType base_type{};
-				if (has_type_specifier)
+				if (has_type_specifier && !is_multidimensional_array)
 				{
 					ArrayType const& decl_type = type_cast<ArrayType>(type);
 					if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
@@ -1084,6 +1090,10 @@ namespace wave
 			else
 			{
 				ArrayType const& decl_type = type_cast<ArrayType>(type);
+				if (decl_type.GetBaseType()->Is(TypeKind::Array))
+				{
+					diagnostics.Report(loc, multidimensional_arrays_need_initializer);
+				}
 				QualType var_type(ArrayType(decl_type.GetBaseType(), 0));
 				var_decl->SetType(var_type);
 			}

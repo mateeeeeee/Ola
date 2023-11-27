@@ -1,9 +1,25 @@
 import std.io;
+import std.assert;
+
+int[][] Global2dArray = { {1,2}, {3,4}}; 
 
 public int main()
 {
-	auto c = 5;
-	const auto cc = c;
-	PrintInt(sizeof(cc));
+	int sum2d = 0;
+	int globalSum2d = 0;
+	int[][] int2d = Global2dArray; 
+	Global2dArray = int2d;
+	for(int i = 0; i < 2; ++i)
+	{
+		for(int j = 0; j < 2; ++j)
+		{
+			sum2d += int2d[i][j];
+			PrintInt(int2d[i][j]);  
+			globalSum2d += Global2dArray[i][j];
+		}
+	}
+	Assert(sum2d == 10);  
+	PrintInt(sum2d);  
+
 	return 0;
 }
