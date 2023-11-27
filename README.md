@@ -31,9 +31,7 @@ It's done as a learning project and its purpose is solely educational.
   * import statement
   * one-line comments
   * standard library
-  * classes (wip)
-	- methods and fields
-	- `this` keyword
+  * classes
   * `ref`
 
 ## Structure
