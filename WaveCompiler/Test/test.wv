@@ -1,18 +1,17 @@
 import std.io;
 import std.assert;
 
-class S
+void ModifyInt(ref int a)
 {
-	public void Init(int x) {this.x = x;}
-	public ref int X() { return this.x; }
-	public int x = 0;
-};
+	a = 10;
+	int b = a + 10;
+	PrintInt(b);
+}
 
 public int main()
 {
-	S s; s.Init(10);
-	ref int sx = s.X();
-	++sx;
-	PrintInt(s.x);
+	int x = 0;
+	ModifyInt(x);
+	PrintInt(x);
 	return 0;
 }

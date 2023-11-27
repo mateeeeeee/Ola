@@ -448,11 +448,6 @@ namespace wave
 			}
 			else diagnostics.Report(loc, modifying_rvalue_expr);
 
-			if (IsRefType(lhs_type))
-			{
-				diagnostics.Report(loc, ref_var_reassignment_error);
-			}
-
 			if (!lhs_type->IsAssignableFrom(rhs->GetType()))
 			{
 				diagnostics.Report(loc, incompatible_initializer);

@@ -733,17 +733,14 @@ namespace wave
 
 		llvm::Value* lhs = Load(lhs_expr->GetType(), lhs_value);
 		llvm::Value* rhs = Load(rhs_expr->GetType(), rhs_value);
-		bool const is_float_expr = IsFloat(lhs->getType()) || IsFloat(rhs->getType());
+		bool const is_float_expr = IsFloatType(lhs_expr->GetType()) || IsFloatType(rhs_expr->GetType());
 
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
 		{
 		case BinaryExprKind::Assign:
 		{
-			if (IsRefType(lhs_expr->GetType()))
-				 result = builder.CreateStore(rhs_value, lhs_value);
-			else 
-				 result = Store(rhs_value, lhs_value);
+			result = Store(rhs_value, lhs_value);
 		}
 		break;
 		case BinaryExprKind::Add:

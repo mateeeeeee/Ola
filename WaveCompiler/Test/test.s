@@ -7,42 +7,22 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	"S::Init";
-	.scl	2;
+	.def	ModifyInt;
+	.scl	3;
 	.type	32;
 	.endef
-	.globl	"S::Init"                       # -- Begin function S::Init
-	.p2align	4, 0x90
-"S::Init":                              # @"S::Init"
-.seh_proc "S::Init"
-# %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	mov	qword ptr [rsp], rdx
-	mov	rax, qword ptr [rsp]
-	mov	qword ptr [rcx], rax
-# %bb.1:                                # %exit
-	pop	rax
-	ret
-	.seh_endproc
-                                        # -- End function
-	.def	"S::X";
-	.scl	2;
-	.type	32;
-	.endef
-	.globl	"S::X"                          # -- Begin function S::X
-	.p2align	4, 0x90
-"S::X":                                 # @"S::X"
-.seh_proc "S::X"
+	.p2align	4, 0x90                         # -- Begin function ModifyInt
+ModifyInt:                              # @ModifyInt
+.seh_proc ModifyInt
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
 	mov	qword ptr [rsp], rcx
-# %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
-	pop	rcx
+	mov	qword ptr [rax], 10
+# %bb.1:                                # %exit
+	pop	rax
 	ret
 	.seh_endproc
                                         # -- End function
@@ -60,15 +40,7 @@ main:                                   # @main
 	.seh_endprologue
 	mov	qword ptr [rsp + 40], 0
 	lea	rcx, [rsp + 40]
-	mov	edx, 10
-	call	"S::Init"
-	lea	rcx, [rsp + 40]
-	call	"S::X"
-	mov	qword ptr [rsp + 32], rax
-	mov	rax, qword ptr [rsp + 32]
-	mov	rcx, qword ptr [rax]
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
+	call	ModifyInt
 	mov	rcx, qword ptr [rsp + 40]
 	call	PrintInt
 	mov	qword ptr [rsp + 48], 0
@@ -80,5 +52,4 @@ main:                                   # @main
                                         # -- End function
 	.addrsig
 	.addrsig_sym PrintInt
-	.addrsig_sym "S::Init"
-	.addrsig_sym "S::X"
+	.addrsig_sym ModifyInt
