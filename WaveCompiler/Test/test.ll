@@ -28,6 +28,13 @@ entry:
   %1 = load ptr, ptr %0, align 8
   %2 = load i64, ptr %1, align 4
   store i64 10, ptr %1, align 4
+  %3 = load ptr, ptr %1, align 8
+  %4 = load i64, ptr %1, align 4
+  %5 = add i64 10, %4
+  %6 = alloca i64, align 8
+  store i64 %5, ptr %6, align 4
+  %7 = load i64, ptr %6, align 4
+  call void @PrintInt(i64 %7)
   br label %exit
 
 exit:                                             ; preds = %entry

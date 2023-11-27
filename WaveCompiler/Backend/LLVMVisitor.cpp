@@ -74,7 +74,7 @@ namespace wave
 
 		auto MemberTypeToLLVM = [&](FunctionType const& type)
 			{
-				std::span<FunctionParams const> function_params = type.GetParams();
+				std::span<FunctionParam const> function_params = type.GetParams();
 
 				llvm::Type* return_type = ConvertToLLVMType(type.GetReturnType());
 				bool return_type_struct = return_type->isStructTy();
@@ -1319,7 +1319,7 @@ namespace wave
 		case TypeKind::Function:
 		{
 			FunctionType const& function_type = type_cast<FunctionType>(type);
-			std::span<FunctionParams const> function_params = function_type.GetParams();
+			std::span<FunctionParam const> function_params = function_type.GetParams();
 
 			llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
 			bool return_type_struct = return_type->isStructTy();

@@ -4,7 +4,7 @@ import std.assert;
 void ModifyInt(ref int a)
 {
 	a = 10;
-	int b = a + 10;
+	int b = 10 + a;
 	PrintInt(b);
 }
 

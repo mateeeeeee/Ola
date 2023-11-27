@@ -12,14 +12,14 @@ namespace wave
 	{
 		Invalid,
 		Void,
+		Ref,
 		Bool,
 		Char,
 		Int,
 		Float,
-		Function,
-		Array,
 		Class,
-		Ref
+		Array,
+		Function,
 	};
 
 	class Type
@@ -174,7 +174,13 @@ namespace wave
 		constexpr CharType() : Type{ TypeKind::Char, 1, 1 } {}
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.Is(TypeKind::Char);
+			if (other.Is(TypeKind::Ref))
+			{
+				RefType const& other_ref = type_cast<RefType>(other);
+				QualType const& referred_type = other_ref.GetReferredType();
+				return referred_type.IsNull() || referred_type->Is(TypeKind::Char);
+			}
+			else return other.Is(TypeKind::Char);
 		}
 	};
 
@@ -184,8 +190,13 @@ namespace wave
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float) ||
-				(other.Is(TypeKind::Ref) && type_cast<RefType>(other).GetReferredType()->Is(TypeKind::Int));
+			if (other.Is(TypeKind::Ref))
+			{
+				RefType const& other_ref = type_cast<RefType>(other);
+				QualType const& referred_type = other_ref.GetReferredType();
+				return referred_type.IsNull() || referred_type->Is(TypeKind::Int);
+			}
+			else return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
 		}
 	};
 
@@ -195,6 +206,13 @@ namespace wave
 		constexpr FloatType() : Type{ TypeKind::Float, 8, 8 } {}
 		virtual bool IsAssignableFrom(Type const& other) const override
 		{
+			if (other.Is(TypeKind::Ref))
+			{
+				RefType const& other_ref = type_cast<RefType>(other);
+				QualType const& referred_type = other_ref.GetReferredType();
+				return referred_type.IsNull() || referred_type->Is(TypeKind::Float);
+			}
+			else
 			return other.IsOneOf(TypeKind::Bool, TypeKind::Float, TypeKind::Int);
 		}
 	};
@@ -231,7 +249,7 @@ namespace wave
 		uint32 array_size = 0;
 	};
 
-	struct FunctionParams
+	struct FunctionParam
 	{
 		std::string name = "";
 		QualType type;
@@ -239,7 +257,7 @@ namespace wave
 	class FunctionType : public Type
 	{
 	public:
-		explicit FunctionType(QualType const& return_type, std::vector<FunctionParams> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
+		explicit FunctionType(QualType const& return_type, std::vector<FunctionParam> const& params = {}) : Type{ TypeKind::Function, 8, 8 },
 		return_type(return_type), params(params){}
 
 		virtual bool IsAssignableFrom(Type const& other) const override
@@ -248,11 +266,11 @@ namespace wave
 		}
 
 		QualType const& GetReturnType() const { return return_type; }
-		std::span<FunctionParams const> GetParams() const { return params; }
+		std::span<FunctionParam const> GetParams() const { return params; }
 
 	private:
 		QualType return_type;
-		std::vector<FunctionParams> params;
+		std::vector<FunctionParam> params;
 	};
 
 	class ClassDecl;

@@ -15,14 +15,20 @@
 ModifyInt:                              # @ModifyInt
 .seh_proc ModifyInt
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp], rcx
-	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rsp + 48], rcx
+	mov	rax, qword ptr [rsp + 48]
 	mov	qword ptr [rax], 10
+	mov	rax, qword ptr [rax]
+	add	rax, 10
+	mov	qword ptr [rsp + 40], rax
+	mov	rcx, qword ptr [rsp + 40]
+	call	PrintInt
 # %bb.1:                                # %exit
-	pop	rax
+	nop
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function

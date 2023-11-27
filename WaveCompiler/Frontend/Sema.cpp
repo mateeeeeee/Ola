@@ -645,7 +645,7 @@ namespace wave
 			QualType const& func_expr_type = decl->GetType();
 			WAVE_ASSERT(IsFunctionType(func_expr_type));
 			FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
-			std::span<FunctionParams const> func_params = func_type.GetParams();
+			std::span<FunctionParam const> func_params = func_type.GetParams();
 			if (args.size() != func_params.size())
 			{
 				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
@@ -656,7 +656,7 @@ namespace wave
 			for (uint64 i = 0; i < func_params.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
-				FunctionParams const& func_param = func_params[i];
+				FunctionParam const& func_param = func_params[i];
 
 				if (IsRefType(func_param.type) && !arg->IsLValue())
 				{
@@ -707,7 +707,7 @@ namespace wave
 			QualType const& method_type = decl->GetType();
 			WAVE_ASSERT(IsFunctionType(method_type));
 			FunctionType const& func_type = type_cast<FunctionType>(method_type);
-			std::span<FunctionParams const> func_params = func_type.GetParams();
+			std::span<FunctionParam const> func_params = func_type.GetParams();
 			if (args.size() != func_params.size())
 			{
 				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
@@ -718,7 +718,7 @@ namespace wave
 			for (uint64 i = 0; i < func_params.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
-				FunctionParams const& func_param = func_params[i];
+				FunctionParam const& func_param = func_params[i];
 
 				if (IsRefType(func_param.type) && !arg->IsLValue())
 				{

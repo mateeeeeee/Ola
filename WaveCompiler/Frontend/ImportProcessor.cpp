@@ -180,7 +180,7 @@ namespace wave
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
 				import_tokens.emplace_back(TokenKind::left_round);
-				std::span<FunctionParams const> func_params = func_type.GetParams();
+				std::span<FunctionParam const> func_params = func_type.GetParams();
 				for (auto const& param : func_params)
 				{
 					TypeToTokens(param.type, import_tokens);

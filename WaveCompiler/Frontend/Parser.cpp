@@ -110,7 +110,7 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParams> param_types{};
+			std::vector<FunctionParam> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
@@ -142,7 +142,7 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParams> param_types{};
+			std::vector<FunctionParam> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
@@ -182,7 +182,7 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParams> param_types{};
+			std::vector<FunctionParam> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
