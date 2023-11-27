@@ -7,31 +7,6 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"WaveModule"
-	.def	ModifyInt;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function ModifyInt
-ModifyInt:                              # @ModifyInt
-.seh_proc ModifyInt
-# %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
-	.seh_endprologue
-	mov	qword ptr [rsp + 48], rcx
-	mov	rax, qword ptr [rsp + 48]
-	mov	qword ptr [rax], 10
-	mov	rax, qword ptr [rax]
-	add	rax, 10
-	mov	qword ptr [rsp + 40], rax
-	mov	rcx, qword ptr [rsp + 40]
-	call	PrintInt
-# %bb.1:                                # %exit
-	nop
-	add	rsp, 56
-	ret
-	.seh_endproc
-                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -41,21 +16,22 @@ ModifyInt:                              # @ModifyInt
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	sub	rsp, 40
+	.seh_stackalloc 40
 	.seh_endprologue
-	mov	qword ptr [rsp + 40], 0
-	lea	rcx, [rsp + 40]
-	call	ModifyInt
-	mov	rcx, qword ptr [rsp + 40]
-	call	PrintInt
-	mov	qword ptr [rsp + 48], 0
+	mov	qword ptr [rsp + 8], 1
+	mov	qword ptr [rsp + 16], 2
+	mov	qword ptr [rsp + 24], 3
+	lea	rax, [rsp + 8]
+	mov	qword ptr [rsp], rax
+	mov	qword ptr [rsp + 24], 100
+	mov	rax, qword ptr [rsp]
+	mov	rax, qword ptr [rax + 16]
+	mov	qword ptr [rsp + 32], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 48]
-	add	rsp, 56
+	mov	rax, qword ptr [rsp + 32]
+	add	rsp, 40
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym PrintInt
-	.addrsig_sym ModifyInt

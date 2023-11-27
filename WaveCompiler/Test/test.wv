@@ -1,17 +1,12 @@
 import std.io;
 import std.assert;
 
-void ModifyInt(ref int a)
-{
-	a = 10;
-	int b = 10 + a;
-	PrintInt(b);
-}
 
 public int main()
 {
-	int x = 0;
-	ModifyInt(x);
-	PrintInt(x);
-	return 0;
+	int[] arr = {1,2,3};
+	int[] ptr;
+	ptr = arr;
+	arr[2] = 100;
+	return ptr[2];
 }

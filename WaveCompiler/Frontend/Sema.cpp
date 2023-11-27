@@ -1053,25 +1053,35 @@ namespace wave
 		{
 			if (is_ref_type) diagnostics.Report(loc, arrays_cannot_be_refs);
 
-			ArrayType const& init_expr_type = type_cast<ArrayType>(var_decl->GetInitExpr()->GetType());
-			QualType base_type{};
-			if (has_type_specifier)
+			if (Expr const* array_init_expr = var_decl->GetInitExpr())
 			{
-				ArrayType const& decl_type = type_cast<ArrayType>(type);
-				if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
+				ArrayType const& init_expr_type = type_cast<ArrayType>(array_init_expr->GetType());
+				QualType base_type{};
+				if (has_type_specifier)
 				{
-					diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
+					ArrayType const& decl_type = type_cast<ArrayType>(type);
+					if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
+					{
+						diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
+					}
+					base_type = decl_type.GetBaseType();
 				}
-				base_type = decl_type.GetBaseType();
+				else
+				{
+					base_type = init_expr_type.GetBaseType();
+				}
+				if (type.IsConst()) base_type.AddConst();
+				uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
+				QualType var_type(ArrayType(base_type, array_size));
+				var_decl->SetType(var_type);
 			}
 			else
 			{
-				base_type = init_expr_type.GetBaseType();
+				ArrayType const& decl_type = type_cast<ArrayType>(type);
+				QualType var_type(ArrayType(decl_type.GetBaseType(), 0));
+				var_decl->SetType(var_type);
 			}
-			if (type.IsConst()) base_type.AddConst();
-			uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
-			QualType var_type(ArrayType(base_type, array_size));
-			var_decl->SetType(var_type);
+
 		}
 		else if ((has_init && !has_type_specifier))
 		{

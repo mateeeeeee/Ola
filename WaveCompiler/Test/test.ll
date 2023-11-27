@@ -21,36 +21,28 @@ declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
 
-define internal void @ModifyInt(ptr %a) {
-entry:
-  %0 = alloca ptr, align 8
-  store ptr %a, ptr %0, align 8
-  %1 = load ptr, ptr %0, align 8
-  %2 = load i64, ptr %1, align 4
-  store i64 10, ptr %1, align 4
-  %3 = load ptr, ptr %1, align 8
-  %4 = load i64, ptr %1, align 4
-  %5 = add i64 10, %4
-  %6 = alloca i64, align 8
-  store i64 %5, ptr %6, align 4
-  %7 = load i64, ptr %6, align 4
-  call void @PrintInt(i64 %7)
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca i64, align 8
-  store i64 0, ptr %1, align 4
-  %2 = load i64, ptr %1, align 4
-  call void @ModifyInt(ptr %1)
-  %3 = load i64, ptr %1, align 4
-  call void @PrintInt(i64 %3)
-  store i64 0, ptr %0, align 4
+  %1 = alloca [3 x i64], align 8
+  %2 = getelementptr [3 x i64], ptr %1, i64 0, i64 0
+  store i64 1, ptr %2, align 4
+  %3 = getelementptr [3 x i64], ptr %1, i64 0, i64 1
+  store i64 2, ptr %3, align 4
+  %4 = getelementptr [3 x i64], ptr %1, i64 0, i64 2
+  store i64 3, ptr %4, align 4
+  %5 = alloca ptr, align 8
+  %6 = load ptr, ptr %5, align 8
+  %7 = getelementptr inbounds [3 x i64], ptr %1, i64 0, i64 0
+  %8 = getelementptr inbounds [3 x i64], ptr %1, i64 0, i64 0
+  store ptr %8, ptr %5, align 8
+  %9 = getelementptr [3 x i64], ptr %1, i64 0, i64 2
+  %10 = load i64, ptr %9, align 4
+  store i64 100, ptr %9, align 4
+  %11 = load ptr, ptr %5, align 8
+  %12 = getelementptr inbounds ptr, ptr %11, i64 2
+  %13 = load ptr, ptr %12, align 8
+  store ptr %13, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -58,6 +50,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %4 = load i64, ptr %0, align 4
-  ret i64 %4
+  %14 = load i64, ptr %0, align 4
+  ret i64 %14
 }
