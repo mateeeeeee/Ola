@@ -102,12 +102,17 @@ namespace wave
 		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
 		WAVE_ASSERT(func_type);
 
+		if (func_type->GetReturnType()->Is(TypeKind::Ref) && !func_type->GetReturnType().IsConst() && is_const)
+		{
+			diagnostics.Report(loc, const_methods_cannot_return_nonconst_refs);
+		}
+
 		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
 		member_function_decl->SetType(type);
 		member_function_decl->SetConst(is_const);
 		member_function_decl->SetVisibility(visibility);
 		member_function_decl->SetParamDecls(std::move(param_decls));
-		WAVE_ASSERT(body_stmt);
+		if(body_stmt)
 		{
 			member_function_decl->SetBodyStmt(std::move(body_stmt));
 			for (std::string const& goto_label : ctx.gotos)
@@ -1006,6 +1011,7 @@ namespace wave
 			has_type_specifier = !ref_type.GetReferredType().IsNull();
 		}
 		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
+		bool const init_expr_const_ref = has_init && IsRefType(init_expr->GetType()) && init_expr->GetType().IsConst();
 
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -1105,6 +1111,10 @@ namespace wave
 			if (!var_decl->GetInitExpr()->IsLValue())
 			{
 				diagnostics.Report(loc, ref_var_rvalue_bind);
+			}
+			if (!var_type.IsConst() && init_expr_const_ref)
+			{
+				diagnostics.Report(loc, nonconst_ref_init_with_const_ref);
 			}
 		}
 

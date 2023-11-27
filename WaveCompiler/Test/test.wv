@@ -1,12 +1,17 @@
 import std.io;
-import std.assert;
 
+
+public class S
+{
+	public int x = 10;
+	public void Init(int x) {this.x = x;}
+	public const ref int X() const { return x; }
+};
 
 public int main()
 {
-	int[] arr = {1,2,3};
-	int[] ptr;
-	ptr = arr;
-	arr[2] = 100;
-	return ptr[2];
+	const S s; 
+	const ref int sx = s.X();
+	PrintInt(s.x);
+	return 0;
 }

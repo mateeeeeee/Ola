@@ -135,6 +135,7 @@ namespace wave
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			QualType return_type{};
+			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
@@ -175,6 +176,7 @@ namespace wave
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			QualType return_type{};
+			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
@@ -195,6 +197,8 @@ namespace wave
 			if (Consume(TokenKind::KW_const)) is_const = true;
 			if (first_pass)
 			{
+				if (Consume(TokenKind::semicolon)) return nullptr;
+
 				int32 brace_count = 0;
 				Expect(TokenKind::left_brace); ++brace_count;
 				while (brace_count != 0)
@@ -207,11 +211,14 @@ namespace wave
 			}
 			else
 			{
-				sema->ctx.current_func = &function_type;
-				sema->ctx.is_method_const = is_const;
-				function_body = ParseCompoundStatement();
-				sema->ctx.is_method_const = false;
-				sema->ctx.current_func = nullptr;
+				if (!Consume(TokenKind::semicolon))
+				{
+					sema->ctx.current_func = &function_type;
+					sema->ctx.is_method_const = is_const;
+					function_body = ParseCompoundStatement();
+					sema->ctx.is_method_const = false;
+					sema->ctx.current_func = nullptr;
+				}
 				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, is_const);
 			}
 		}

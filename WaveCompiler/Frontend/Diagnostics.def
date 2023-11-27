@@ -68,5 +68,7 @@ DIAG(private_member_access, error, "Accessing private member")
 DIAG(ref_var_rvalue_bind, error, "reference cannot bind to a rvalue")
 DIAG(ref_var_needs_init, error, "reference needs to be initialized")
 DIAG(ref_var_reassignment_error, error, "reference cannot be reassigned")
+DIAG(nonconst_ref_init_with_const_ref, error, "non-const reference cannot be initialized with const reference")
 DIAG(arrays_cannot_be_refs, error, "arrays cannot be reference variables")
+DIAG(const_methods_cannot_return_nonconst_refs, error, "const class methods cannot have non-const ref return type")
 #undef DIAG

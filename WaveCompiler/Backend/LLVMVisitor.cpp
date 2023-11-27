@@ -11,10 +11,10 @@ namespace wave
 		: context(context), module(module), builder(context)
 	{
 		data_layout = std::make_unique<llvm::DataLayout>(&module);
-		void_type  = llvm::Type::getVoidTy(context);
-		bool_type  = llvm::Type::getInt1Ty(context);
-		char_type  = llvm::Type::getInt8Ty(context);
-		int_type   = llvm::Type::getInt64Ty(context);
+		void_type = llvm::Type::getVoidTy(context);
+		bool_type = llvm::Type::getInt1Ty(context);
+		char_type = llvm::Type::getInt8Ty(context);
+		int_type = llvm::Type::getInt64Ty(context);
 		float_type = llvm::Type::getDoubleTy(context);
 	}
 
@@ -93,7 +93,7 @@ namespace wave
 		
 		llvm::FunctionType* llvm_function_type = MemberTypeToLLVM(function_type);
 
-		llvm::Function::LinkageTypes linkage = !class_decl->IsPrivate() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+		llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
 		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 

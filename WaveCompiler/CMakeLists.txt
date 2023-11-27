@@ -63,6 +63,8 @@ set(COMPILER_FILES
 set(TEST_FILES
 	Test/test.wv
 	Test/test.ll
+	Test/test2.wv
+	Test/test2.ll
 )
 
 add_executable(WaveCompiler main.cpp todo.txt autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})

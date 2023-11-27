@@ -160,6 +160,13 @@ namespace wave
 					tokens.emplace_back(TokenKind::right_square);
 				}
 				break;
+				case TypeKind::Ref:
+				{
+					tokens.emplace_back(TokenKind::KW_ref); 
+					RefType const& ref_type = type_cast<RefType>(type);
+					TypeToTokens(ref_type.GetReferredType(), tokens);
+				}
+				break;
 				case TypeKind::Function: 
 				case TypeKind::Class:
 				case TypeKind::Invalid:
@@ -228,7 +235,6 @@ namespace wave
 			}
 			else if (ClassDecl const* class_decl = dynamic_ast_cast<ClassDecl>(decl))
 			{
-				import_tokens.emplace_back(TokenKind::KW_extern);
 				import_tokens.emplace_back(TokenKind::KW_class);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(class_decl->GetName());
