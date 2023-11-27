@@ -1004,7 +1004,7 @@ namespace wave
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool has_type_specifier = !type.IsNull();
-		bool is_ref_type = IsRefType(type);
+		bool is_ref_type = has_type_specifier && IsRefType(type);
 		if (has_type_specifier && is_ref_type)
 		{
 			RefType const& ref_type = type_cast<RefType>(type);

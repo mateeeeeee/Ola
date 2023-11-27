@@ -1,17 +1,9 @@
 import std.io;
 
-
-public class S
-{
-	public int x = 10;
-	public void Init(int x) {this.x = x;}
-	public const ref int X() const { return x; }
-};
-
 public int main()
 {
-	const S s; 
-	const ref int sx = s.X();
-	PrintInt(s.x);
+	auto c = 5;
+	const auto cc = c;
+	PrintInt(sizeof(cc));
 	return 0;
 }

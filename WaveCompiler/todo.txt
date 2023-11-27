@@ -1,7 +1,0 @@
-* ref
-	- ref fields and method parameters
-* arrays
-	- refactor array initialization and declaration
-	- move arrays to use ref semantics only with ref, otherwise copy
-* classes
-	- class instances as fields 

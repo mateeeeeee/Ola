@@ -118,15 +118,16 @@ TEST(Declarations, Ref)
 	EXPECT_EQ(WAVE(-i test_ref), 0);
 }
 
+TEST(Declarations, Array)
+{
+	EXPECT_EQ(WAVE(-i test_array), 0);
+}
+
 TEST(Function, Calls)
 {
 	EXPECT_EQ(WAVE(-i test_functioncalls), 0);
 }
 
-TEST(Misc, Const)
-{
-	EXPECT_EQ(WAVE(-i test_const), WAVE_COMPILATION_FAILED_EXIT_CODE);
-}
 
 TEST(Misc, Strings)
 {

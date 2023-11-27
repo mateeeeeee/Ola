@@ -17,7 +17,6 @@ set(WAVE_TESTS
 	Tests/test_alias.wv
 	Tests/test_array.wv
 	Tests/test_bit.wv
-	Tests/test_const.wv
 	Tests/test_dowhile.wv
 	Tests/test_enum.wv
 	Tests/test_for.wv

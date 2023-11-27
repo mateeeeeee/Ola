@@ -102,7 +102,7 @@ KEYWORD(private)
 
 KEYWORD(sizeof)
 KEYWORD(length)
-KEYWORD(var)
+KEYWORD(auto)
 KEYWORD(import)
 KEYWORD(ref)
 

@@ -51,15 +51,24 @@ Wave consists of three parts:
 
 ## Syntax
 The translation unit, at the top level, consists of import statements and global declarations. All the import statements must be at the top of the file.
-If the global declaration is extern, it means it's defined somewhere else. If not, it can be either private or public. By default, both function and variable declarations
+If the global declaration is extern, it means it's defined somewhere else. If not, it can be either private or public. By default, all declarations
 are private. Private declarations are not visible outside of the translation unit in which they are defined. 
+There are 5 different declarations that can be found in global scope:
+	- Function
+	- Variable
+	- Class
+	- Enum
+	- Alias
+Other types of declarations that can be be found in non-global scope are: variable, alias, field, method, enum member and function parameter.
+
 ### Import statement
 Import statement has a following grammar:
 ```
 <import-declaration> ::= import <import_identifier>;
 <import_identifier> ::= <identifier>{.<identifier>}*
 ```
-If the file specified by `<import_identifier>` exists, it will check all the global declarations of that file translation unit, and for every public declaration, add the extern declaration to a file that's importing it. 
+If the file specified by `<import_identifier>` exists, all the public global declarations will get imported. Depending on the type of declaration,
+the imported declaration will be different. For example, imported variables and functions: 
 
 File `util/math.wv`
 
@@ -99,29 +108,18 @@ public int main()
 	return Add(a, 2);
 }
 ```
+Importing enum or alias declaration will, more or less, copy paste the declaration. Importing class declaration will remove method definitions and leave
+only method declarations.
 
 ### Variables
-Variable declaration has a slightly different grammar rule for global and local variables:
-
+Variable declarations can omit the type of the variable and let the compiler deduce it from the initializer expression using `auto` keyword.
 ```
-<global-variable-declaration> ::= extern <type-qualifier> <type-specifier> <identifier>:
-                                | {<declaration-visibility>}? <type-qualifier> <type-specifier> <identifier> { = <constant-expression>}?;
-								| {<declaration-visibility>}? <type-qualifier> var <identifier> = <constant-expression>;
-
-<local-variable-declaration> ::= <type-qualifier> <type-specifier> <identifier> { = <initializer>}?;
-                               | <type-qualifier> var <identifier> = <initializer>;
-<type-qualifier> ::= {const}?
-<type-specifier> ::= void | bool | char | int | float | ...
-
-```
-One of the things they have in common is omitting the type of the variable and deducing it from the initializer expression using `var` keyword.
-
-```
-public var a = 10; // a is of type int
+public auto a = 10; // a is of type int
 public int main() 
 {
 	int b = 3;
-	var c = b; //c is of type int
+	auto c = b; //c is of type int
+	const auto d = c; //d is of type const int
 }
 ```
 
@@ -165,7 +163,7 @@ public int main()
 {
     int[] arr1 = {1,2,3};
     int[] arr2 = arr1; //arr2 and arr1 alias each other
-
+	
     arr2[0] = 100;
     Assert(arr1[0] == 100);
 
@@ -179,12 +177,17 @@ public int main()
     int[] arr4 = arr2;
     Assert(arr4[5] == 1);
 
+	int[] arr3; //not assigned, arr3 is of type int[] and can alias an array
+
+	arr3 = arr4;
+	++arr4[0];
+	Assert(arr3[0] == arr4[0]);
     return 0;
 }
 ```
-Note that when declaring an array variable to alias another variable its type is considered to be `int[]` and not `int[N]`, in other words the variable doesn't
+Note that when declaring an array variable to alias another variable (or not initializing it at all) its type is considered to be `int[]` and not `int[N]`, in other words the variable doesn't
 keep the information on how big is the array it is aliasing. That makes it possible to later alias another array. The same happens when function takes an array as 
-an argument. Semantically it acts more as a pointer than array. For that reason calling `length` operator on that kind of variable doesn't make sense.
+an argument. Semantically it acts more as a pointer than array despite the array-like declaration. For that reason calling `length` operator on that kind of variable doesn't make sense.
 
 Multidimensional arrays are also possible:
 ```
@@ -239,10 +242,10 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 
 ### ref
 You use the `ref` keyword in the following contexts:
-	- in function signature to pass parameter by reference
-	- in variable declaration to declare a reference variable
-	- in function signature to return by reference
- Reference variables cannot be reassigned to reference other variable
+	- in function/method signature to pass parameter by reference
+	- in variable/field declaration to declare a reference variable
+	- in function/method signature to return by reference
+ Reference variables must be initialized at declaration and cannot be reassigned to reference other variable.
 ```	
 
 void IntByRef(ref int a)
@@ -260,6 +263,15 @@ ref int GetRef()
 {
 	return g;
 }
+
+class S 
+{
+	public void Init(int x){this.x = x;}
+	
+	public ref int RefX() { return x;}
+	public int GetX() {return x;}
+	private int x = 1;
+};
 
 
 public int main()
@@ -286,6 +298,11 @@ public int main()
 
 	IntByValue(d);
 	Assert(a == 13);
+	
+	S s; s.Init(10);
+	ref int sx = s.RefX();
+	++sx;
+	Assert(s.GetX() == 11);
 }
 ```
 
@@ -432,7 +449,7 @@ public int main()
 - `private`
 - `sizeof`
 - `length`
-- `var`
+- `auto`
 - `import`
 - `ref`
 
