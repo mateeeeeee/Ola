@@ -1,8 +1,7 @@
 <img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is a toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
-It's done as a learning project and its purpose is solely educational.
+Wave is a C-like programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
