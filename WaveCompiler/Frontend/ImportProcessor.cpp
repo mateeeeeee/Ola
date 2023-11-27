@@ -175,7 +175,7 @@ namespace wave
 			if (FunctionDecl const* func_decl = dynamic_ast_cast<FunctionDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
-				FunctionType const& func_type = type_cast<FunctionType>(func_decl->GetType());
+				FunctionType const& func_type = func_decl->GetFunctionType();
 				TypeToTokens(func_type.GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
@@ -228,7 +228,41 @@ namespace wave
 			}
 			else if (ClassDecl const* class_decl = dynamic_ast_cast<ClassDecl>(decl))
 			{
-				//todo
+				import_tokens.emplace_back(TokenKind::KW_extern);
+				import_tokens.emplace_back(TokenKind::KW_class);
+				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+				tok.SetData(class_decl->GetName());
+				import_tokens.emplace_back(TokenKind::left_brace);
+				for (auto const& field : class_decl->GetFields())
+				{
+					if(field->IsPublic()) import_tokens.emplace_back(TokenKind::KW_public);
+					else import_tokens.emplace_back(TokenKind::KW_private);
+					TypeToTokens(field->GetType(), import_tokens);
+					Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+					tok.SetData(field->GetName());
+					import_tokens.emplace_back(TokenKind::semicolon);
+				}
+				for (auto const& method : class_decl->GetMethods())
+				{
+					if (method->IsPublic()) import_tokens.emplace_back(TokenKind::KW_public);
+					else import_tokens.emplace_back(TokenKind::KW_private);
+					FunctionType const& func_type = method->GetFunctionType();
+					TypeToTokens(func_type.GetReturnType(), import_tokens);
+					Token& tok = import_tokens.emplace_back(TokenKind::identifier);
+					tok.SetData(method->GetName());
+					import_tokens.emplace_back(TokenKind::left_round);
+					std::span<FunctionParam const> func_params = func_type.GetParams();
+					for (auto const& param : func_params)
+					{
+						TypeToTokens(param.type, import_tokens);
+						import_tokens.emplace_back(TokenKind::comma);
+					}
+					if (!func_params.empty()) import_tokens.pop_back();
+					import_tokens.emplace_back(TokenKind::right_round);
+					import_tokens.emplace_back(TokenKind::semicolon);
+				}
+				import_tokens.emplace_back(TokenKind::right_brace);
+				import_tokens.emplace_back(TokenKind::semicolon);
 			}
 			else WAVE_ASSERT(false);
 		}

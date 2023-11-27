@@ -93,7 +93,7 @@ namespace wave
 		
 		llvm::FunctionType* llvm_function_type = MemberTypeToLLVM(function_type);
 
-		llvm::Function::LinkageTypes linkage = method_decl.IsPublic() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+		llvm::Function::LinkageTypes linkage = !class_decl->IsPrivate() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
@@ -116,6 +116,13 @@ namespace wave
 			llvm_param->setName(param->GetName());
 			llvm_value_map[param.get()] = llvm_param;
 			++param_arg;
+		}
+
+		if (!method_decl.HasDefinition())
+		{
+			this_value = nullptr;
+			this_struct_type = nullptr;
+			return;
 		}
 
 		VisitFunctionDeclCommon(method_decl, llvm_function);
