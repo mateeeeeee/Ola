@@ -1,7 +1,7 @@
 <img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is a C-like programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
+Wave is a C-like programming language using LLVM for its backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -31,7 +31,7 @@ Wave is a C-like programming language using LLVM for its backend. Frontend, incl
   * one-line comments
   * standard library
   * classes
-  * `ref`
+  * reference type: `ref`
 
 ## Structure
 Wave consists of three parts: 
