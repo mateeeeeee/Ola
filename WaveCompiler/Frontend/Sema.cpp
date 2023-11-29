@@ -57,7 +57,7 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 
-		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
+		FunctionType const* func_type = dyn_type_cast<FunctionType>(type);
 		WAVE_ASSERT(func_type);
 		if (name == "main")
 		{
@@ -99,7 +99,7 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
-		FunctionType const* func_type = dynamic_type_cast<FunctionType>(type);
+		FunctionType const* func_type = dyn_type_cast<FunctionType>(type);
 		WAVE_ASSERT(func_type);
 
 		if (func_type->GetReturnType()->Is(TypeKind::Ref) && !func_type->GetReturnType().IsConst() && is_const)
@@ -273,7 +273,7 @@ namespace wave
 	UniqueForStmtPtr Sema::ActOnForeachStmt(SourceLocation const& loc, UniqueVarDeclPtr&& var_decl, UniqueExprPtr&& array_identifier, UniqueStmtPtr&& body_stmt)
 	{
 		QualType arr_type = array_identifier->GetType();
-		ArrayType const* array_type = dynamic_type_cast<ArrayType>(arr_type);
+		ArrayType const* array_type = dyn_type_cast<ArrayType>(arr_type);
 		if (!array_type)
 		{
 			diagnostics.Report(loc, non_array_expr_in_foreach);
@@ -831,14 +831,14 @@ namespace wave
 
 				if (class_expr_type->GetKind() == TypeKind::Class)
 				{
-					class_type = dynamic_type_cast<ClassType>(class_expr_type);
+					class_type = dyn_type_cast<ClassType>(class_expr_type);
 				}
 				else if (class_expr_type->GetKind() == TypeKind::Ref)
 				{
 					RefType const& ref_type = type_cast<RefType>(class_expr_type);
 					if (ref_type.GetReferredType()->GetKind() == TypeKind::Class)
 					{
-						class_type = dynamic_type_cast<ClassType>(ref_type.GetReferredType());
+						class_type = dyn_type_cast<ClassType>(ref_type.GetReferredType());
 					}
 				}
 

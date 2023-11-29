@@ -1377,7 +1377,7 @@ namespace wave
 	llvm::Value* LLVMVisitor::Load(QualType const& type, llvm::Value* ptr)
 	{
 		llvm::Type* llvm_type = nullptr;
-		if (RefType const* ref_type = dynamic_type_cast<RefType>(type))
+		if (RefType const* ref_type = dyn_type_cast<RefType>(type))
 			 llvm_type = ConvertToLLVMType(ref_type->GetReferredType());
 		else llvm_type = ConvertToLLVMType(type);
 		return Load(llvm_type, ptr);
