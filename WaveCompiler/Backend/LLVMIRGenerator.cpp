@@ -10,7 +10,7 @@
 namespace wave
 {
 
-	LLVMIRGenerator::LLVMIRGenerator() : context(), module("WaveModule", context)
+	LLVMIRGenerator::LLVMIRGenerator(std::string_view file_name) : context(), module(file_name.data(), context)
 	{
 		llvm::InitializeAllTargets();
 		llvm::InitializeAllTargetMCs();

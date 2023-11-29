@@ -20,7 +20,7 @@ namespace wave
 {
 	namespace
 	{
-#if 1
+#if WAVE_DEBUG_BUILD
 		static char const* wavelib = WAVE_BINARY_PATH"Debug/wavelib.lib";
 #else 
 		static char const* wavelib = WAVE_BINARY_PATH"Release/wavelib.lib";
@@ -30,9 +30,6 @@ namespace wave
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 			console_sink->set_level(spdlog::level::trace);
 			console_sink->set_pattern("[%^%l%$] %v");
-
-			//auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("wave_log.txt", true);
-			//file_sink->set_level(spdlog::level::trace);
 
 			std::shared_ptr<spdlog::logger> lu_logger = std::make_shared<spdlog::logger>(std::string("wave logger"), spdlog::sinks_init_list{ console_sink });
 			lu_logger->set_level(spdlog::level::trace);
@@ -67,7 +64,7 @@ namespace wave
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator{};
+			LLVMIRGenerator llvm_ir_generator(source_file);
 			llvm_ir_generator.Generate(ast);
 			llvm_ir_generator.Optimize(opt_level);
 			llvm_ir_generator.PrintIR(ir_file);
@@ -153,7 +150,7 @@ namespace wave
 			AST const* ast = parser.GetAST();
 			if (debug) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator{};
+			LLVMIRGenerator llvm_ir_generator("tmp.wv");
 			llvm_ir_generator.Generate(ast);
 			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
 			llvm_ir_generator.PrintIR(ir_file.string());

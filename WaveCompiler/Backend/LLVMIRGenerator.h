@@ -13,7 +13,7 @@ namespace wave
 	class LLVMIRGenerator
 	{
 	public:
-		LLVMIRGenerator();
+		explicit LLVMIRGenerator(std::string_view file_name);
 		~LLVMIRGenerator();
 
 		void Generate(AST const* ast);
