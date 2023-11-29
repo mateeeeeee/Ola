@@ -1,8 +1,7 @@
 <img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is a toy programming language using LLVM for its backend. Frontend, including lexer and parser, is handwritten (i.e. without using generators). 
-It's done as a learning project and its purpose is solely educational.
+Wave is a C-like programming language using LLVM for its backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -31,10 +30,8 @@ It's done as a learning project and its purpose is solely educational.
   * import statement
   * one-line comments
   * standard library
-  * classes (wip)
-	- methods and fields
-	- `this` keyword
-  * `ref`
+  * classes
+  * reference type: `ref`
 
 ## Structure
 Wave consists of three parts: 
@@ -54,11 +51,12 @@ The translation unit, at the top level, consists of import statements and global
 If the global declaration is extern, it means it's defined somewhere else. If not, it can be either private or public. By default, all declarations
 are private. Private declarations are not visible outside of the translation unit in which they are defined. 
 There are 5 different declarations that can be found in global scope:
-	- Function
-	- Variable
-	- Class
-	- Enum
-	- Alias
+- Function
+- Variable
+- Class
+- Enum
+- Alias
+
 Other types of declarations that can be be found in non-global scope are: variable, alias, field, method, enum member and function parameter.
 
 ### Import statement
@@ -242,10 +240,11 @@ for(int i = 0; i < length(<array_identifier>); ++i)
 
 ### ref
 You use the `ref` keyword in the following contexts:
-	- in function/method signature to pass parameter by reference
-	- in variable/field declaration to declare a reference variable
-	- in function/method signature to return by reference
- Reference variables must be initialized at declaration and cannot be reassigned to reference other variable. 
+- in function/method signature to pass parameter by reference
+- in variable/field declaration to declare a reference variable
+- in function/method signature to return by reference
+
+Reference variables must be initialized at declaration and cannot be reassigned to reference other variable. 
 ```	
 
 void IntByRef(const ref int a)
