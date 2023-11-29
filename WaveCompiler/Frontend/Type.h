@@ -141,7 +141,7 @@ namespace wave
 		{
 			if (other.IsNot(TypeKind::Ref)) return false;
 			RefType const& other_ref_type = type_cast<RefType>(other);
-			return type->IsSameAs(other_ref_type);
+			return type->IsSameAs(other_ref_type.GetReferredType());
 		}
 
 	private:
