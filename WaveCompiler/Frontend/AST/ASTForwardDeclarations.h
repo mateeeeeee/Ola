@@ -2,7 +2,7 @@
 
 namespace wave
 {
-	class NodeAST;
+	class ASTNode;
 	class TranslationUnit;
 
 	class Decl;

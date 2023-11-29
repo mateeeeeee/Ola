@@ -98,7 +98,7 @@ namespace wave
 		ast->translation_unit->Accept(*this, 0);
 	}
 
-	void DebugVisitor::Visit(NodeAST const&, uint32 depth)
+	void DebugVisitor::Visit(ASTNode const&, uint32 depth)
 	{
 		WAVE_DEBUG("{}Node\n", GetIndentation(depth));
 	}

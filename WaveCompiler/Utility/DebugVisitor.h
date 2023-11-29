@@ -8,7 +8,7 @@ namespace wave
 	public:
 		explicit DebugVisitor(AST const* ast);
 
-		virtual void Visit(NodeAST const&, uint32) override;
+		virtual void Visit(ASTNode const&, uint32) override;
 		virtual void Visit(TranslationUnit const&, uint32) override;
 
 		virtual void Visit(Decl const&, uint32) override;

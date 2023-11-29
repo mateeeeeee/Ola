@@ -7,7 +7,7 @@ namespace wave
 	{
 	public:
 		virtual ~ASTVisitor() = default;
-		virtual void Visit(NodeAST const&, uint32) {}
+		virtual void Visit(ASTNode const&, uint32) {}
 
 		virtual void Visit(TranslationUnit const&, uint32) {}
 

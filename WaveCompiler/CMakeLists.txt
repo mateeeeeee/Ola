@@ -40,9 +40,16 @@ set(FRONTEND_FILES
   Frontend/Type.cpp
   Frontend/AST/AST.cpp
   Frontend/AST/AST.h
+  Frontend/AST/ASTNode.h
   Frontend/AST/ASTForwardDeclarations.h
   Frontend/AST/ASTTypeAliases.h
   Frontend/AST/ASTVisitor.h
+  Frontend/AST/Decl.h
+  Frontend/AST/Decl.cpp
+  Frontend/AST/Stmt.h
+  Frontend/AST/Stmt.cpp
+  Frontend/AST/Expr.h
+  Frontend/AST/Expr.cpp
 )
 
 

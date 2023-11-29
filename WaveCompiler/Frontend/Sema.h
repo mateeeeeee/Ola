@@ -3,6 +3,9 @@
 #include <unordered_set>
 #include "Scope.h"
 #include "AST/AST.h"
+#include "AST/Decl.h"
+#include "AST/Stmt.h"
+#include "AST/Expr.h"
 
 namespace wave
 {

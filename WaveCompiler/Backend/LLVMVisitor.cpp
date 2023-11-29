@@ -1,5 +1,8 @@
 #include "LLVMVisitor.h"
 #include "Frontend/AST/AST.h"
+#include "Frontend/AST/Decl.h"
+#include "Frontend/AST/Stmt.h"
+#include "Frontend/AST/Expr.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/IR/DataLayout.h"
@@ -23,7 +26,7 @@ namespace wave
 		ast->translation_unit->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(NodeAST const&, uint32)
+	void LLVMVisitor::Visit(ASTNode const&, uint32)
 	{
 		WAVE_ASSERT(false);
 	}
