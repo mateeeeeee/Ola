@@ -17,11 +17,6 @@ set(UTILITY_FILES
 
 
 set(FRONTEND_FILES
-  Frontend/AST.cpp
-  Frontend/AST.h
-  Frontend/ASTForwardDeclarations.h
-  Frontend/ASTTypeAliases.h
-  Frontend/ASTVisitor.h
   Frontend/Diagnostics.cpp
   Frontend/Diagnostics.def
   Frontend/Diagnostics.h
@@ -43,7 +38,13 @@ set(FRONTEND_FILES
   Frontend/TokenTypes.h
   Frontend/Type.h
   Frontend/Type.cpp
+  Frontend/AST/AST.cpp
+  Frontend/AST/AST.h
+  Frontend/AST/ASTForwardDeclarations.h
+  Frontend/AST/ASTTypeAliases.h
+  Frontend/AST/ASTVisitor.h
 )
+
 
 
 set(BACKEND_FILES
@@ -63,22 +64,15 @@ set(COMPILER_FILES
 set(TEST_FILES
 	Test/test.wv
 	Test/test.ll
-	Test/test2.wv
-	Test/test2.ll
+	Test/Test2/test2.wv
+	Test/Test2/test2.ll
 )
 
-add_executable(WaveCompiler main.cpp todo.txt autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
+add_executable(WaveCompiler main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 set_target_properties(WaveCompiler PROPERTIES OUTPUT_NAME Wave)
-
-source_group(" " 		FILES main.cpp todo.txt)
-source_group("autogen" 	FILES autogen/WaveConfig.h)
-source_group("Core"     FILES ${CORE_FILES})
-source_group("Utility"  FILES ${UTILITY_FILES})
-source_group("Frontend" FILES ${FRONTEND_FILES})
-source_group("Backend"  FILES ${BACKEND_FILES})
-source_group("Compiler" FILES ${COMPILER_FILES})
-source_group("Test" 	FILES ${TEST_FILES})
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES  main.cpp autogen/WaveConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(WaveCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/include)

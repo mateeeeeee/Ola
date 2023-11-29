@@ -5,7 +5,7 @@
 #include "SourceBuffer.h"
 #include "Lexer.h"
 #include "Parser.h"
-#include "AST.h"
+#include "AST/AST.h"
 #include "autogen/WaveConfig.h"
 
 

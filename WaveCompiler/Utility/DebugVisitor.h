@@ -1,5 +1,5 @@
 #pragma once
-#include "Frontend/ASTVisitor.h"
+#include "Frontend/AST/ASTVisitor.h"
 
 namespace wave
 {

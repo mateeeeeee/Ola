@@ -1,5 +1,5 @@
 #include "LLVMVisitor.h"
-#include "Frontend/AST.h"
+#include "Frontend/AST/AST.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/IR/DataLayout.h"

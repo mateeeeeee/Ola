@@ -1,5 +1,5 @@
 #include "DebugVisitor.h"
-#include "Frontend/AST.h"
+#include "Frontend/AST/AST.h"
 #include "Core/Logger.h"
 
 namespace wave

@@ -1,8 +1,8 @@
 #pragma once
 #include "ASTTypeAliases.h"
 #include "ASTVisitor.h"
-#include "SourceLocation.h"
-#include "Type.h"
+#include "Frontend/SourceLocation.h"
+#include "Frontend/Type.h"
 
 namespace wave
 {
@@ -15,7 +15,6 @@ namespace wave
 	protected:
 		NodeAST() = default;
 	};
-
 	class TranslationUnit final : public NodeAST
 	{
 	public:

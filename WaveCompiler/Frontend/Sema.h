@@ -2,7 +2,7 @@
 #include <functional>
 #include <unordered_set>
 #include "Scope.h"
-#include "AST.h"
+#include "AST/AST.h"
 
 namespace wave
 {

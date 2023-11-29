@@ -2,7 +2,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include "Frontend/ASTVisitor.h"
+#include "Frontend/AST/ASTVisitor.h"
 #include "llvm/IR/IRBuilder.h"
 
 namespace llvm

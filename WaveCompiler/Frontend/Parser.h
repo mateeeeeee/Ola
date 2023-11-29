@@ -3,7 +3,7 @@
 #include <memory>
 #include "Token.h"
 #include "Diagnostics.h"
-#include "ASTTypeAliases.h"
+#include "AST/ASTTypeAliases.h"
 
 namespace wave
 {

@@ -1,6 +1,6 @@
 #include "Parser.h"
 #include "Diagnostics.h"
-#include "AST.h"
+#include "AST/AST.h"
 #include "Sema.h"
 
 namespace wave
