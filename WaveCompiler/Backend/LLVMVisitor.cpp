@@ -156,7 +156,7 @@ namespace wave
 					ArrayType const& array_type = type_cast<ArrayType>(var_type);
 					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
 
-					if (InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr))
+					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
 						WAVE_ASSERT(init_list_expr->IsConstexpr());
 						init_list_expr->Accept(*this);
@@ -165,7 +165,7 @@ namespace wave
 						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(llvm_value_map[init_list_expr]), var_decl.GetName());
 						llvm_value_map[&var_decl] = global_array;
 					}
-					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
+					else if (ConstantString const* string = dyn_cast<ConstantString>(init_expr))
 					{
 						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
 
@@ -228,7 +228,7 @@ namespace wave
 					ArrayType const& array_type = type_cast<ArrayType>(var_type);
 					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
 					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
-					if (InitializerListExpr const* init_list_expr = dynamic_ast_cast<InitializerListExpr>(init_expr))
+					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
 						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
@@ -247,7 +247,7 @@ namespace wave
 						}
 						llvm_value_map[&var_decl] = alloc;
 					}
-					else if (ConstantString const* string = dynamic_ast_cast<ConstantString>(init_expr))
+					else if (ConstantString const* string = dyn_cast<ConstantString>(init_expr))
 					{
 						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 						std::string_view str = string->GetString();
@@ -1112,7 +1112,7 @@ namespace wave
 		class_expr->Accept(*this);
 		if (member_decl->GetDeclKind() == DeclKind::Field)
 		{
-			FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+			FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
 			llvm::Value* field_value = nullptr;
 			if (!this_value)
 			{
@@ -1141,14 +1141,14 @@ namespace wave
 			}
 			else
 			{
-				FieldDecl const* field_decl = ast_cast<FieldDecl>(member_decl);
+				FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
 				field_value = builder.CreateStructGEP(this_struct_type, this_value, field_decl->GetFieldIndex());
 			}
 			llvm_value_map[&member_expr] = field_value;
 		}
 		else if (member_decl->GetDeclKind() == DeclKind::Method)
 		{
-			MethodDecl const* field_decl = ast_cast<MethodDecl>(member_decl);
+			MethodDecl const* field_decl = cast<MethodDecl>(member_decl);
 			WAVE_ASSERT(false);
 		}
 		else WAVE_ASSERT(false);
@@ -1158,11 +1158,11 @@ namespace wave
 	{
 		Expr const* expr = member_call_expr.GetCallee();
 		WAVE_ASSERT(expr->GetExprKind() == ExprKind::Member);
-		MemberExpr const* member_expr = ast_cast<MemberExpr>(expr);
+		MemberExpr const* member_expr = cast<MemberExpr>(expr);
 
 		Decl const* decl = member_expr->GetMemberDecl();
 		WAVE_ASSERT(decl->GetDeclKind() == DeclKind::Method);
-		MethodDecl const* method_decl = ast_cast<MethodDecl>(decl);
+		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 		std::string name(class_decl->GetName());
 		name += "::";

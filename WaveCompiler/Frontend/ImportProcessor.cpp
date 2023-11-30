@@ -179,7 +179,7 @@ namespace wave
 		std::vector<Token> import_tokens{};
 		for (Decl const* decl : global_public_decls)
 		{
-			if (FunctionDecl const* func_decl = dynamic_ast_cast<FunctionDecl>(decl))
+			if (FunctionDecl const* func_decl = dyn_cast<FunctionDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
 				FunctionType const& func_type = func_decl->GetFunctionType();
@@ -197,7 +197,7 @@ namespace wave
 				import_tokens.emplace_back(TokenKind::right_round);
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
-			else if (VarDecl const* var_decl = dynamic_ast_cast<VarDecl>(decl))
+			else if (VarDecl const* var_decl = dyn_cast<VarDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
 				TypeToTokens(var_decl->GetType(), import_tokens);
@@ -205,7 +205,7 @@ namespace wave
 				tok.SetData(var_decl->GetName());
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
-			else if (AliasDecl const* alias_decl = dynamic_ast_cast<AliasDecl>(decl))
+			else if (AliasDecl const* alias_decl = dyn_cast<AliasDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_alias);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
@@ -214,7 +214,7 @@ namespace wave
 				TypeToTokens(alias_decl->GetType(), import_tokens);
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
-			else if (EnumDecl const* enum_decl = dynamic_ast_cast<EnumDecl>(decl))
+			else if (EnumDecl const* enum_decl = dyn_cast<EnumDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_enum);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
@@ -233,7 +233,7 @@ namespace wave
 				import_tokens.emplace_back(TokenKind::right_brace);
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
-			else if (ClassDecl const* class_decl = dynamic_ast_cast<ClassDecl>(decl))
+			else if (ClassDecl const* class_decl = dyn_cast<ClassDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_class);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);

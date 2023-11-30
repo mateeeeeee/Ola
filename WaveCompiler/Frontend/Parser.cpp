@@ -1157,7 +1157,7 @@ namespace wave
 				}
 				else if (tag_decl->GetDeclKind() == DeclKind::Class)
 				{
-					ClassDecl* class_decl = ast_cast<ClassDecl>(tag_decl);
+					ClassDecl* class_decl = cast<ClassDecl>(tag_decl);
 					type.SetType(ClassType(class_decl));
 				}
 				else Diag(invalid_type_specifier);

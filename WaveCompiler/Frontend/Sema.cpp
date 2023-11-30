@@ -304,7 +304,7 @@ namespace wave
 
 		UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
 		UniqueStmtPtr array_access_stmt = MakeUnique<DeclStmt>(std::move(var_decl));
-		if (CompoundStmt* compound_stmt = dynamic_ast_cast<CompoundStmt>(body_stmt.get()))
+		if (CompoundStmt* compound_stmt = dyn_cast<CompoundStmt>(body_stmt.get()))
 		{
 			compound_stmt->AddBeginStmt(std::move(array_access_stmt));
 		}
@@ -639,7 +639,7 @@ namespace wave
 	{
 		if (func_expr->GetExprKind() == ExprKind::DeclRef)
 		{
-			DeclRefExpr const* decl_ref = ast_cast<DeclRefExpr>(func_expr.get());
+			DeclRefExpr const* decl_ref = cast<DeclRefExpr>(func_expr.get());
 			Decl const* decl = decl_ref->GetDecl();
 			if (decl->GetDeclKind() != DeclKind::Function)
 			{
@@ -690,14 +690,14 @@ namespace wave
 		}
 		else if (func_expr->GetExprKind() == ExprKind::Member)
 		{
-			MemberExpr const* member_expr = ast_cast<MemberExpr>(func_expr.get());
+			MemberExpr const* member_expr = cast<MemberExpr>(func_expr.get());
 			Decl const* decl = member_expr->GetMemberDecl();
 			if (decl->GetDeclKind() != DeclKind::Method)
 			{
 				diagnostics.Report(loc, invalid_function_call);
 				return nullptr;
 			}
-			MethodDecl const* method_decl = ast_cast<MethodDecl>(decl);
+			MethodDecl const* method_decl = cast<MethodDecl>(decl);
 			bool is_method_const = method_decl->IsConst();
 			if (!is_method_const)
 			{
