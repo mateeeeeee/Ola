@@ -24,7 +24,7 @@ namespace wave
 		~Parser();
 
 		void Parse(std::vector<Token>&& tokens);
-		void Parse(std::vector<Token> const& tokens);
+		void ParseImported(std::vector<Token> const& tokens);
 		AST const* GetAST() const { return ast.get(); }
 
 	private:
@@ -72,6 +72,7 @@ namespace wave
 		}
 
 		void ParseTranslationUnit();
+		void AddBuiltinDecls(UniqueTranslationUnitPtr& TU);
 
 		WAVE_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		WAVE_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();

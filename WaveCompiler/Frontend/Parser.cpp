@@ -15,10 +15,11 @@ namespace wave
 		current_token = tokens.begin();
 		sema = MakeUnique<Sema>(diagnostics);
 		ast = MakeUnique<AST>();
+		AddBuiltinDecls(ast->translation_unit);
 		ParseTranslationUnit();
 	}
 
-	void Parser::Parse(std::vector<Token> const& _tokens)
+	void Parser::ParseImported(std::vector<Token> const& _tokens)
 	{
 		tokens = _tokens;
 		current_token = tokens.begin();
@@ -51,6 +52,12 @@ namespace wave
 			UniqueDeclPtrList decls = ParseGlobalDeclaration();
 			for(auto&& decl : decls) ast->translation_unit->AddDecl(std::move(decl));
 		}
+	}
+
+	void Parser::AddBuiltinDecls(UniqueTranslationUnitPtr& TU)
+	{
+		UniqueAliasDeclPtr string_alias = sema->ActOnAliasDecl("string", SourceLocation{}, ArrayType(builtin_types::Char, 0));
+		TU->AddDecl(std::move(string_alias));
 	}
 
 	UniqueDeclPtrList Parser::ParseGlobalDeclaration()

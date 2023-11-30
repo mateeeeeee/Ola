@@ -1,5 +1,5 @@
 #include "Type.h"
-#include "AST/AST.h"
+#include "AST.h"
 
 namespace wave
 {

@@ -1,8 +1,9 @@
 import std.io;
-import std.assert;
 
 public int main()
 {
+	string name = "Mate";
+	PrintString(name);
 	int a = 3 + 10 + 5 + 4 + 2;
 	return a;
 }

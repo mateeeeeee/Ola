@@ -16,14 +16,28 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	eax, 24
-	mov	qword ptr [rsp], rax
-	mov	rax, qword ptr [rsp]
-	pop	rcx
+	mov	byte ptr [rsp + 43], 77
+	mov	byte ptr [rsp + 44], 97
+	mov	byte ptr [rsp + 45], 116
+	mov	byte ptr [rsp + 46], 101
+	mov	byte ptr [rsp + 47], 0
+	lea	rcx, [rsp + 43]
+	call	PrintString
+	mov	qword ptr [rsp + 32], 24
+	mov	rax, qword ptr [rsp + 32]
+	mov	qword ptr [rsp + 48], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp + 48]
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
+	.section	.rdata,"dr"
+__StringLiteral0:                       # @__StringLiteral0
+	.asciz	"Mate"
+
 	.addrsig
+	.addrsig_sym PrintString

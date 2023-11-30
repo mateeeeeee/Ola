@@ -128,7 +128,7 @@ namespace wave
 		imported_tokens = import_processor.GetProcessedTokens();
 
 		Parser parser(diagnostics);
-		parser.Parse(imported_tokens);
+		parser.ParseImported(imported_tokens);
 		AST const* ast = parser.GetAST();
 
 		std::vector<Decl const*> global_public_decls;
