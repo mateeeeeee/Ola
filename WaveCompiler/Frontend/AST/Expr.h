@@ -1,8 +1,8 @@
 #pragma once
 #include "ASTNode.h"
 #include "ASTTypeAliases.h"
+#include "Type.h"
 #include "Frontend/SourceLocation.h"
-#include "Frontend/Type.h"
 
 namespace wave
 {
@@ -92,6 +92,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Unary; }
 	private:
 		UnaryExprKind op;
 		UniqueExprPtr operand;
@@ -145,6 +146,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Binary; }
 	private:
 		UniqueExprPtr lhs, rhs;
 		BinaryExprKind op;
@@ -167,6 +169,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Ternary; }
 	private:
 		UniqueExprPtr cond_expr;
 		UniqueExprPtr true_expr;
@@ -203,6 +206,7 @@ namespace wave
 		virtual bool IsConstexpr() const;
 		virtual int64 EvaluateConstexpr() const;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::DeclRef; }
 	private:
 		Decl* decl;
 	};
@@ -222,6 +226,7 @@ namespace wave
 		virtual bool IsConstexpr() const { return true; }
 		virtual int64 EvaluateConstexpr() const { return value; }
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::IntLiteral; }
 	private:
 		int64 value;
 	};
@@ -241,6 +246,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::CharLiteral; }
 	private:
 		char c;
 	};
@@ -260,6 +266,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::StringLiteral; }
 	private:
 		std::string str;
 	};
@@ -278,6 +285,7 @@ namespace wave
 
 		virtual bool IsConstexpr() const { return true; }
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::BoolLiteral; }
 	private:
 		bool value;
 	};
@@ -296,6 +304,7 @@ namespace wave
 
 		virtual bool IsConstexpr() const { return true; }
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::FloatLiteral; }
 	private:
 		double value;
 	};
@@ -318,6 +327,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::ImplicitCast; }
 	private:
 		UniqueExprPtr operand;
 	};
@@ -350,6 +360,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call; }
 	protected:
 		std::string function_name;
 		UniqueExprPtr callee;
@@ -381,6 +392,7 @@ namespace wave
 			return true;
 		}
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::InitializerList; }
 	private:
 		UniqueExprPtrList init_list;
 	};
@@ -408,6 +420,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::ArrayAccess; }
 	private:
 		UniqueExprPtr array_expr;
 		UniqueExprPtr bracket_expr;
@@ -436,6 +449,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Member; }
 	private:
 		UniqueExprPtr class_expr;
 		Decl const* decl;
@@ -449,6 +463,8 @@ namespace wave
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::MemberCall; }
 	};
 
 	class ThisExpr final : public Expr
@@ -465,8 +481,34 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::This; }
 	private:
 		bool implicit = false;
 	};
 
+
+	template <typename T> requires std::derived_from<T, Expr>
+	inline bool isa(Expr const* expr) { return T::ClassOf(expr); }
+
+	template<typename T> requires std::derived_from<T, Expr>
+	inline T* cast(Expr* expr)
+	{
+		return static_cast<T*>(expr);
+	}
+	template<typename T> requires std::derived_from<T, Expr>
+	inline T const* cast(Expr const* expr)
+	{
+		return static_cast<T const*>(expr);
+	}
+
+	template<typename T> requires std::derived_from<T, Expr>
+	inline T* dyn_cast(Expr* expr)
+	{
+		return isa<T>(expr) ? static_cast<T*>(expr) : nullptr;
+	}
+	template<typename T> requires std::derived_from<T, Expr>
+	inline T const* dyn_cast(Expr const* expr)
+	{
+		return isa<T>(expr) ? static_cast<T const*>(expr) : nullptr;
+	}
 }

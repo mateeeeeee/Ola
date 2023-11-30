@@ -1,6 +1,6 @@
 #include "Sema.h"
 #include "Diagnostics.h"
-#include "Type.h"
+#include "AST/Type.h"
 
 namespace wave
 {

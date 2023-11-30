@@ -14,12 +14,6 @@ namespace wave
 		visitor.Visit(*this, depth);
 		for (auto&& stmt : statements) stmt->Accept(visitor, depth + 1);
 	}
-
-	ExprStmt::ExprStmt(UniqueExprPtr&& expr) : Stmt(expr ? StmtKind::Expr : StmtKind::Null), expr(std::move(expr))
-	{
-
-	}
-
 	void ExprStmt::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);

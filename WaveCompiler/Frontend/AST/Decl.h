@@ -2,8 +2,8 @@
 #include "ASTNode.h"
 #include "ASTTypeAliases.h"
 #include "Stmt.h"
+#include "Type.h"
 #include "Frontend/SourceLocation.h"
-#include "Frontend/Type.h"
 
 namespace wave
 {
@@ -83,6 +83,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Var; }
 	private:
 		UniqueExprPtr init_expr = nullptr;
 		bool is_global = false;
@@ -105,6 +106,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::ParamVar; }
 	private:
 		FunctionDecl const* parent = nullptr;
 	};
@@ -130,6 +132,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Field; }
 	private:
 		ClassDecl const* parent = nullptr;
 		uint32 index = -1;
@@ -170,6 +173,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Function; }
 	protected:
 		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
@@ -204,6 +208,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Method; }
 	private:
 		ClassDecl const* parent = nullptr;
 		bool is_const = false;
@@ -232,6 +237,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Enum; }
 	private:
 		UniqueEnumMemberDeclPtrList enum_members;
 	};
@@ -253,6 +259,7 @@ namespace wave
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::EnumMember; }
 	private:
 		int64 value = 0;
 	};
@@ -268,6 +275,8 @@ namespace wave
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Alias; }
 	};
 
 	class ClassDecl : public TagDecl
@@ -316,9 +325,36 @@ namespace wave
 			return nullptr;
 		}
 
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
 	private:
 		UniqueFieldDeclPtrList member_variables;
 		UniqueMethodDeclPtrList member_functions;
 	};
+
+
+	template <typename T> requires std::derived_from<T, Decl>
+	inline bool isa(Decl const* decl) { return T::ClassOf(decl); }
+
+	template<typename T> requires std::derived_from<T, Decl>
+	inline T* cast(Decl* decl)
+	{
+		return static_cast<T*>(decl);
+	}
+	template<typename T> requires std::derived_from<T, Decl>
+	inline T const* cast(Decl const* decl)
+	{
+		return static_cast<T const*>(decl);
+	}
+
+	template<typename T> requires std::derived_from<T, Decl>
+	inline T* dyn_cast(Decl* decl)
+	{
+		return isa<T>(decl) ? static_cast<T*>(decl) : nullptr;
+	}
+	template<typename T> requires std::derived_from<T, Decl>
+	inline T const* dyn_cast(Decl const* decl)
+	{
+		return isa<T>(decl) ? static_cast<T const*>(decl) : nullptr;
+	}
 }
 

@@ -36,8 +36,8 @@ set(FRONTEND_FILES
   Frontend/Tokens.def
   Frontend/TokenTypes.cpp
   Frontend/TokenTypes.h
-  Frontend/Type.h
-  Frontend/Type.cpp
+  Frontend/AST/Type.h
+  Frontend/AST/Type.cpp
   Frontend/AST/AST.cpp
   Frontend/AST/AST.h
   Frontend/AST/ASTNode.h
