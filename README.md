@@ -23,15 +23,15 @@ Wave is a C-like programming language using LLVM for its backend.
   * floats 
   * enums
   * functions
+  * classes
+  * reference type: `ref`
+  * automatic type deduction: `auto`
   * `sizeof`, `length` operators
-  * `alias`
+  * `alias` 
   * implicit casts
   * scopes
   * import statement
-  * one-line comments
   * standard library
-  * classes
-  * reference type: `ref`
 
 ## Structure
 Wave consists of three parts: 
