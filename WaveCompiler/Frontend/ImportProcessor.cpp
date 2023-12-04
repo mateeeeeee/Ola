@@ -182,18 +182,18 @@ namespace wave
 			if (FunctionDecl const* func_decl = dyn_cast<FunctionDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
-				FunctionType const& func_type = func_decl->GetFunctionType();
+				FuncType const& func_type = func_decl->GetFunctionType();
 				TypeToTokens(func_type.GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
 				import_tokens.emplace_back(TokenKind::left_round);
-				std::span<FunctionParam const> func_params = func_type.GetParams();
-				for (auto const& param : func_params)
+				std::span<QualType const> param_types = func_type.GetParams();
+				for (auto const& param_type : param_types)
 				{
-					TypeToTokens(param.type, import_tokens);
+					TypeToTokens(param_type, import_tokens);
 					import_tokens.emplace_back(TokenKind::comma);
 				}
-				if(!func_params.empty()) import_tokens.pop_back();
+				if(!param_types.empty()) import_tokens.pop_back();
 				import_tokens.emplace_back(TokenKind::right_round);
 				import_tokens.emplace_back(TokenKind::semicolon);
 			}
@@ -252,18 +252,18 @@ namespace wave
 				{
 					if (method->IsPublic()) import_tokens.emplace_back(TokenKind::KW_public);
 					else import_tokens.emplace_back(TokenKind::KW_private);
-					FunctionType const& func_type = method->GetFunctionType();
+					FuncType const& func_type = method->GetFunctionType();
 					TypeToTokens(func_type.GetReturnType(), import_tokens);
 					Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 					tok.SetData(method->GetName());
 					import_tokens.emplace_back(TokenKind::left_round);
-					std::span<FunctionParam const> func_params = func_type.GetParams();
-					for (auto const& param : func_params)
+					std::span<QualType const> param_types = func_type.GetParams();
+					for (auto const& param_type : param_types)
 					{
-						TypeToTokens(param.type, import_tokens);
+						TypeToTokens(param_type, import_tokens);
 						import_tokens.emplace_back(TokenKind::comma);
 					}
-					if (!func_params.empty()) import_tokens.pop_back();
+					if (!param_types.empty()) import_tokens.pop_back();
 					import_tokens.emplace_back(TokenKind::right_round);
 					import_tokens.emplace_back(TokenKind::semicolon);
 				}

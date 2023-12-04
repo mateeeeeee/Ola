@@ -72,7 +72,7 @@ namespace wave
 		return base_type->IsSameAs(other_array_type.base_type);
 	}
 
-	bool FunctionType::IsAssignableFrom(Type const& other) const
+	bool FuncType::IsAssignableFrom(Type const& other) const
 	{
 		return false;
 	}

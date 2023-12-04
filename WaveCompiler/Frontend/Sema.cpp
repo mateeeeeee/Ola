@@ -57,7 +57,7 @@ namespace wave
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
 
-		FunctionType const* func_type = dyn_type_cast<FunctionType>(type);
+		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		WAVE_ASSERT(func_type);
 		if (name == "main")
 		{
@@ -99,7 +99,7 @@ namespace wave
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 		}
-		FunctionType const* func_type = dyn_type_cast<FunctionType>(type);
+		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		WAVE_ASSERT(func_type);
 
 		if (func_type->GetReturnType()->Is(TypeKind::Ref) && !func_type->GetReturnType().IsConst() && is_const)
@@ -215,7 +215,7 @@ namespace wave
 	{
 		WAVE_ASSERT(ctx.current_func);
 		ctx.return_stmt_encountered = true;
-		FunctionType const& func_type = type_cast<FunctionType>(*ctx.current_func);
+		FuncType const& func_type = type_cast<FuncType>(*ctx.current_func);
 		QualType const& return_type = func_type.GetReturnType();
 
 		Expr const* ret_expr = expr_stmt->GetExpr();
@@ -649,34 +649,34 @@ namespace wave
 
 			QualType const& func_expr_type = decl->GetType();
 			WAVE_ASSERT(IsFunctionType(func_expr_type));
-			FunctionType const& func_type = type_cast<FunctionType>(func_expr_type);
-			std::span<FunctionParam const> func_params = func_type.GetParams();
-			if (args.size() != func_params.size())
+			FuncType const& func_type = type_cast<FuncType>(func_expr_type);
+			std::span<QualType const> param_types = func_type.GetParams();
+			if (args.size() != param_types.size())
 			{
-				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+				if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
 				else diagnostics.Report(loc, too_few_args_to_function_call);
 				return nullptr;
 			}
 
-			for (uint64 i = 0; i < func_params.size(); ++i)
+			for (uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
-				FunctionParam const& func_param = func_params[i];
+				QualType const& func_param_type = param_types[i];
 
-				if (IsRefType(func_param.type) && !arg->IsLValue())
+				if (IsRefType(func_param_type) && !arg->IsLValue())
 				{
 					diagnostics.Report(loc, ref_var_rvalue_bind);
 					return nullptr;
 				}
 
-				if (!func_param.type->IsAssignableFrom(arg->GetType()))
+				if (!func_param_type->IsAssignableFrom(arg->GetType()))
 				{
 					diagnostics.Report(loc, incompatible_function_argument);
 					return nullptr;
 				}
-				else if (!func_param.type->IsSameAs(arg->GetType()))
+				else if (!func_param_type->IsSameAs(arg->GetType()))
 				{
-					arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 				}
 			}
 
@@ -711,34 +711,34 @@ namespace wave
 
 			QualType const& method_type = decl->GetType();
 			WAVE_ASSERT(IsFunctionType(method_type));
-			FunctionType const& func_type = type_cast<FunctionType>(method_type);
-			std::span<FunctionParam const> func_params = func_type.GetParams();
-			if (args.size() != func_params.size())
+			FuncType const& func_type = type_cast<FuncType>(method_type);
+			std::span<QualType const> param_types = func_type.GetParams();
+			if (args.size() != param_types.size())
 			{
-				if (args.size() > func_params.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+				if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
 				else diagnostics.Report(loc, too_few_args_to_function_call);
 				return nullptr;
 			}
 
-			for (uint64 i = 0; i < func_params.size(); ++i)
+			for (uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
-				FunctionParam const& func_param = func_params[i];
+				QualType const& func_param_type = param_types[i];
 
-				if (IsRefType(func_param.type) && !arg->IsLValue())
+				if (IsRefType(func_param_type) && !arg->IsLValue())
 				{
 					diagnostics.Report(loc, ref_var_rvalue_bind);
 					return nullptr;
 				}
 
-				if (!func_param.type->IsAssignableFrom(arg->GetType()))
+				if (!func_param_type->IsAssignableFrom(arg->GetType()))
 				{
 					diagnostics.Report(loc, incompatible_function_argument);
 					return nullptr;
 				}
-				else if (!func_param.type->IsSameAs(arg->GetType()))
+				else if (!func_param_type->IsSameAs(arg->GetType()))
 				{
-					arg = ActOnImplicitCastExpr(loc, func_param.type, std::move(arg));
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 				}
 			}
 

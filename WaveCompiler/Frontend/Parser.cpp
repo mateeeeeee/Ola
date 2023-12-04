@@ -117,16 +117,16 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParam> param_types{};
+			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
-				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FunctionType(return_type, param_types));
+			function_type.SetType(FuncType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern);
@@ -150,16 +150,16 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParam> param_types{};
+			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
-				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FunctionType(return_type, param_types));
+			function_type.SetType(FuncType(return_type, param_types));
 
 			sema->ctx.current_func = &function_type;
 			function_body = ParseCompoundStatement();
@@ -191,16 +191,16 @@ namespace wave
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			std::vector<FunctionParam> param_types{};
+			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
 				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
-				param_types.emplace_back(std::string(param_decl->GetName()), param_decl->GetType());
+				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FunctionType(return_type, param_types));
+			function_type.SetType(FuncType(return_type, param_types));
 			if (Consume(TokenKind::KW_const)) is_const = true;
 			if (first_pass)
 			{

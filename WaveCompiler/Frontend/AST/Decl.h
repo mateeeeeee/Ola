@@ -159,10 +159,10 @@ namespace wave
 
 		ConstLabelStmtPtrList GetLabels() const;
 
-		FunctionType const& GetFunctionType() const
+		FuncType const& GetFunctionType() const
 		{
 			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
-			return type_cast<FunctionType>(GetType());
+			return type_cast<FuncType>(GetType());
 		}
 
 		bool HasDefinition() const
@@ -197,10 +197,10 @@ namespace wave
 		void SetConst(bool _is_const) { is_const = _is_const; }
 		bool IsConst() const { return is_const; }
 
-		FunctionType const& GetFunctionType() const
+		FuncType const& GetFunctionType() const
 		{
 			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
-			return type_cast<FunctionType>(GetType());
+			return type_cast<FuncType>(GetType());
 		}
 
 		virtual bool IsMember() const override { return true; }

@@ -349,10 +349,10 @@ namespace wave
 		}
 		Expr const* GetCallee() const { return callee.get(); }
 
-		FunctionType const& GetCalleeType() const
+		FuncType const& GetCalleeType() const
 		{
 			WAVE_ASSERT(GetCallee()->GetType()->GetKind() == TypeKind::Function);
-			return type_cast<FunctionType>(GetCallee()->GetType());
+			return type_cast<FuncType>(GetCallee()->GetType());
 		}
 
 		std::string_view GetFunctionName() const { return function_name; }

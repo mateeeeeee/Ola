@@ -43,7 +43,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		FunctionType const& type = function_decl.GetFunctionType();
+		FuncType const& type = function_decl.GetFunctionType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetName(), module);
@@ -73,11 +73,11 @@ namespace wave
 		ClassDecl const* class_decl = method_decl.GetParentDecl();
 		llvm::Type* class_type = ConvertToLLVMType(ClassType(class_decl));
 
-		FunctionType const& function_type = method_decl.GetFunctionType();
+		FuncType const& function_type = method_decl.GetFunctionType();
 
-		auto MemberTypeToLLVM = [&](FunctionType const& type)
+		auto MemberTypeToLLVM = [&](FuncType const& type)
 			{
-				std::span<FunctionParam const> function_params = type.GetParams();
+				std::span<QualType const> function_params = type.GetParams();
 
 				llvm::Type* return_type = ConvertToLLVMType(type.GetReturnType());
 				bool return_type_struct = return_type->isStructTy();
@@ -86,9 +86,9 @@ namespace wave
 				if (return_type_struct) param_types.push_back(return_type->getPointerTo());
 
 				param_types.push_back(class_type->getPointerTo());
-				for (auto const& func_param : function_params)
+				for (auto const& func_param_type : function_params)
 				{
-					llvm::Type* param_type = ConvertToLLVMType(func_param.type);
+					llvm::Type* param_type = ConvertToLLVMType(func_param_type);
 					param_types.push_back(param_type);
 				}
 				return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
@@ -1328,8 +1328,8 @@ namespace wave
 		}
 		case TypeKind::Function:
 		{
-			FunctionType const& function_type = type_cast<FunctionType>(type);
-			std::span<FunctionParam const> function_params = function_type.GetParams();
+			FuncType const& function_type = type_cast<FuncType>(type);
+			std::span<QualType const> function_params = function_type.GetParams();
 
 			llvm::Type* return_type = ConvertToLLVMType(function_type.GetReturnType());
 			bool return_type_struct = return_type->isStructTy();
@@ -1337,9 +1337,9 @@ namespace wave
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
 			if (return_type_struct) param_types.push_back(return_type->getPointerTo());
 
-			for (auto const& func_param : function_params)
+			for (auto const& func_param_type : function_params)
 			{
-				llvm::Type* param_type = ConvertToLLVMType(func_param.type);
+				llvm::Type* param_type = ConvertToLLVMType(func_param_type);
 				param_types.push_back(param_type);
 			}
 			return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
