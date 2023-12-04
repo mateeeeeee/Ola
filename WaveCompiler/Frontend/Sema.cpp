@@ -18,21 +18,32 @@ namespace wave
 		if (!name.empty() && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		if (type.IsNull())
 		{
 			diagnostics.Report(loc, missing_type_specifier);
+			return nullptr;
 		}
 		if (type->Is(TypeKind::Void))
 		{
 			diagnostics.Report(loc, void_invalid_context);
+			return nullptr;
 		}
 
 		if (IsRefType(type))
 		{
 			RefType const& ref_type = type_cast<RefType>(type);
-			if (ref_type.GetReferredType().IsNull()) diagnostics.Report(loc, missing_type_specifier);
-			if (ref_type.GetReferredType()->GetKind() == TypeKind::Array) diagnostics.Report(loc, arrays_cannot_be_refs);
+			if (ref_type.GetReferredType().IsNull())
+			{
+				diagnostics.Report(loc, missing_type_specifier);
+				return nullptr;
+			}
+			if (ref_type.GetReferredType()->GetKind() == TypeKind::Array)
+			{
+				diagnostics.Report(loc, arrays_cannot_be_refs);
+				return nullptr;
+			}
 		}
 
 		UniqueParamVarDeclPtr param_decl = MakeUnique<ParamVarDecl>(name, loc);
@@ -56,6 +67,7 @@ namespace wave
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 
 		FuncType const* func_type = dyn_type_cast<FuncType>(type);
@@ -65,7 +77,13 @@ namespace wave
 			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParams().empty())
 			{
 				diagnostics.Report(loc, invalid_main_function_declaration);
+				return nullptr;
 			}
+		}
+		if ((attributes & FuncAttribute_Inline) && (attributes & FuncAttribute_NoInline))
+		{
+			diagnostics.Report(loc, incompatible_function_attributes);
+			return nullptr;
 		}
 
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
@@ -73,17 +91,16 @@ namespace wave
 		function_decl->SetVisibility(visibility);
 		function_decl->SetAttributes(attributes);
 		function_decl->SetParamDecls(std::move(param_decls));
-		if (function_decl->HasAttribute(FuncAttribute_Inline) && function_decl->HasAttribute(FuncAttribute_NoInline))
-		{
-			diagnostics.Report(loc, incompatible_function_attributes);
-		}
-
 		if (body_stmt)
 		{
 			function_decl->SetBodyStmt(std::move(body_stmt));
 			for (std::string const& goto_label : ctx.gotos)
 			{
-				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
+				if (!ctx.labels.contains(goto_label))
+				{
+					diagnostics.Report(loc, undeclared_label, goto_label);
+					return nullptr;
+				}
 			}
 			ctx.gotos.clear();
 			ctx.labels.clear();
@@ -91,6 +108,7 @@ namespace wave
 			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
 			{
 				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
+				return nullptr;
 			}
 			ctx.return_stmt_encountered = false;
 		}
@@ -107,6 +125,7 @@ namespace wave
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		WAVE_ASSERT(func_type);
@@ -114,6 +133,12 @@ namespace wave
 		if (func_type->GetReturnType()->Is(TypeKind::Ref) && !func_type->GetReturnType().IsConst() && is_const)
 		{
 			diagnostics.Report(loc, const_methods_cannot_return_nonconst_refs);
+			return nullptr;
+		}
+		if ((attributes & FuncAttribute_Inline) && (attributes & FuncAttribute_NoInline))
+		{
+			diagnostics.Report(loc, incompatible_function_attributes);
+			return nullptr;
 		}
 
 		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
@@ -122,17 +147,16 @@ namespace wave
 		member_function_decl->SetVisibility(visibility);
 		member_function_decl->SetAttributes(attributes);
 		member_function_decl->SetParamDecls(std::move(param_decls));
-
-		if (member_function_decl->HasAttribute(FuncAttribute_Inline) && member_function_decl->HasAttribute(FuncAttribute_NoInline))
-		{
-			diagnostics.Report(loc, incompatible_function_attributes);
-		}
 		if(body_stmt)
 		{
 			member_function_decl->SetBodyStmt(std::move(body_stmt));
 			for (std::string const& goto_label : ctx.gotos)
 			{
-				if (!ctx.labels.contains(goto_label)) diagnostics.Report(loc, undeclared_label, goto_label);
+				if (!ctx.labels.contains(goto_label))
+				{
+					diagnostics.Report(loc, undeclared_label, goto_label);
+					return nullptr;
+				}
 			}
 			ctx.gotos.clear();
 			ctx.labels.clear();
@@ -140,6 +164,7 @@ namespace wave
 			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
 			{
 				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
+				return nullptr;
 			}
 			ctx.return_stmt_encountered = false;
 		}
@@ -150,7 +175,11 @@ namespace wave
 
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
 	{
-		if (!name.empty() && ctx.tag_sym_table.LookUpCurrentScope(name)) diagnostics.Report(loc, redefinition_of_identifier, name);
+		if (!name.empty() && ctx.tag_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
+		}
 		UniqueEnumDeclPtr enum_decl = MakeUnique<EnumDecl>(name, loc);
 		enum_decl->SetEnumMembers(std::move(enum_members));
 		if (!name.empty()) ctx.tag_sym_table.Insert(enum_decl.get());
@@ -159,16 +188,25 @@ namespace wave
 
 	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr)
 	{
-		if (!enum_value_expr->IsConstexpr()) diagnostics.Report(loc, enumerator_value_not_constexpr, name);
+		if (!enum_value_expr->IsConstexpr()) 
+		{
+			diagnostics.Report(loc, enumerator_value_not_constexpr, name);
+			return nullptr;
+		}
 		return ActOnEnumMemberDecl(name, loc, enum_value_expr->EvaluateConstexpr());
 	}
 
 	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value)
 	{
-		if (name.empty()) diagnostics.Report(loc, expected_identifier);
+		if (name.empty())
+		{
+			diagnostics.Report(loc, expected_identifier);
+			return nullptr;
+		}
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		UniqueEnumMemberDeclPtr enum_member = MakeUnique<EnumMemberDecl>(name, loc);
 		enum_member->SetValue(enum_value);
@@ -181,10 +219,12 @@ namespace wave
 		if (ctx.tag_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		if (type.IsNull())
 		{
 			diagnostics.Report(loc, aliasing_var_forbidden);
+			return nullptr;
 		}
 		UniqueAliasDeclPtr alias_decl = MakeUnique<AliasDecl>(name, loc, type);
 
@@ -194,10 +234,10 @@ namespace wave
 
 	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions)
 	{
-		//todo semantic analysis
 		if (ctx.tag_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		UniqueClassDeclPtr class_decl = MakeUnique<ClassDecl>(name, loc);
 		class_decl->SetFields(std::move(member_variables));
@@ -240,6 +280,7 @@ namespace wave
 		if (!return_type->IsAssignableFrom(ret_expr_type))
 		{
 			diagnostics.Report(loc, incompatible_return_stmt_type);
+			return nullptr;
 		}
 		else if (!return_type->IsSameAs(ret_expr_type))
 		{
@@ -261,7 +302,11 @@ namespace wave
 
 	UniqueBreakStmtPtr Sema::ActOnBreakStmt(SourceLocation const& loc)
 	{	
-		if (ctx.stmts_using_break_count == 0) diagnostics.Report(loc, stray_break);
+		if (ctx.stmts_using_break_count == 0)
+		{
+			diagnostics.Report(loc, stray_break);
+			return nullptr;
+		}
 		
 		UniqueBreakStmtPtr break_stmt = MakeUnique<BreakStmt>();
 		return break_stmt;
@@ -269,7 +314,11 @@ namespace wave
 
 	UniqueContinueStmtPtr Sema::ActOnContinueStmt(SourceLocation const& loc)
 	{
-		if (ctx.stmts_using_continue_count == 0) diagnostics.Report(loc, stray_continue);
+		if (ctx.stmts_using_continue_count == 0)
+		{
+			diagnostics.Report(loc, stray_continue);
+			return nullptr;
+		}
 
 		UniqueContinueStmtPtr continue_stmt = MakeUnique<ContinueStmt>();
 		return continue_stmt;
@@ -311,6 +360,7 @@ namespace wave
 			if (!var_type->IsSameAs(array_type->GetBaseType()))
 			{
 				diagnostics.Report(var_decl->GetLocation(), foreach_loop_type_mismatch);
+				return nullptr;
 			}
 		}
 		else var_decl->SetType(array_type->GetBaseType());
@@ -381,13 +431,21 @@ namespace wave
 		{
 			if (case_stmt->IsDefault())
 			{
-				if (default_found) diagnostics.Report(loc, duplicate_default_case);
+				if (default_found)
+				{
+					diagnostics.Report(loc, duplicate_default_case);
+					return nullptr;
+				}
 				else default_found = true;
 			}
 			else
 			{
 				int64 case_value = case_stmt->GetValue();
-				if (case_value_found[case_value]) diagnostics.Report(loc, duplicate_case_value, case_value);
+				if (case_value_found[case_value])
+				{
+					diagnostics.Report(loc, duplicate_case_value, case_value);
+					return nullptr;
+				}
 				else case_value_found[case_value] = true;
 			}
 		}
@@ -408,7 +466,11 @@ namespace wave
 	UniqueLabelStmtPtr Sema::ActOnLabelStmt(SourceLocation const& loc, std::string_view label_name)
 	{
 		std::string label(label_name);
-		if (ctx.labels.contains(label)) diagnostics.Report(loc, redefinition_of_label, label_name);
+		if (ctx.labels.contains(label))
+		{
+			diagnostics.Report(loc, redefinition_of_label, label_name);
+			return nullptr;
+		}
 		ctx.labels.insert(label);
 		return MakeUnique<LabelStmt>(label_name);
 	}
@@ -424,12 +486,21 @@ namespace wave
 			if (IsBoolType(operand->GetType()))
 			{
 				diagnostics.Report(loc, bool_forbidden_in_increment);
+				return nullptr;
 			}
 			if (operand->IsLValue())
 			{
-				if (operand->GetType().IsConst()) diagnostics.Report(loc, modifying_const_expr);
+				if (operand->GetType().IsConst())
+				{
+					diagnostics.Report(loc, modifying_const_expr);
+					return nullptr;
+				}
 			}
-			else diagnostics.Report(loc, modifying_rvalue_expr);
+			else
+			{
+				diagnostics.Report(loc, modifying_rvalue_expr);
+				return nullptr;
+			}
 			break;
 		case UnaryExprKind::Plus:
 			break;
@@ -464,13 +535,22 @@ namespace wave
 		{
 			if (lhs->IsLValue())
 			{
-				if (lhs_type.IsConst()) diagnostics.Report(loc, modifying_const_expr);
+				if (lhs_type.IsConst())
+				{
+					diagnostics.Report(loc, modifying_const_expr);
+					return nullptr;
+				}
 			}
-			else diagnostics.Report(loc, modifying_rvalue_expr);
+			else
+			{
+				diagnostics.Report(loc, modifying_rvalue_expr);
+				return nullptr;
+			}
 
 			if (!lhs_type->IsAssignableFrom(rhs->GetType()))
 			{
 				diagnostics.Report(loc, incompatible_initializer);
+				return nullptr;
 			}
 			else if (!lhs_type->IsSameAs(rhs_type))
 			{
@@ -514,6 +594,7 @@ namespace wave
 			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
 			{
 				diagnostics.Report(loc, modulo_operands_not_integral);
+				return nullptr;
 			}
 			if (!IsIntegerType(lhs_type))
 			{
@@ -532,6 +613,7 @@ namespace wave
 			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
 			{
 				diagnostics.Report(loc, shift_operands_not_integral);
+				return nullptr;
 			}
 			if (!IsIntegerType(lhs_type))
 			{
@@ -551,6 +633,7 @@ namespace wave
 			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
 			{
 				diagnostics.Report(loc, bitwise_operands_not_integral);
+				return nullptr;
 			}
 			if (!IsIntegerType(lhs_type))
 			{
@@ -632,6 +715,7 @@ namespace wave
 		if (!builtin_types::Bool.IsAssignableFrom(cond_expr->GetType()))
 		{
 			diagnostics.Report(loc, used_nonboolean_type);
+			return nullptr;
 		}
 		else if(!cond_expr->GetType()->IsSameAs(builtin_types::Bool))
 		{
@@ -841,9 +925,7 @@ namespace wave
 			if (current_class_expr->GetExprKind() != ExprKind::This)
 			{
 				QualType const& class_expr_type = current_class_expr->GetType();
-
 				ClassType const* class_type = nullptr;
-
 				if (class_expr_type->GetKind() == TypeKind::Class)
 				{
 					class_type = dyn_type_cast<ClassType>(class_expr_type);
@@ -1031,6 +1113,7 @@ namespace wave
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 
 		if (has_init && has_type_specifier)
@@ -1038,6 +1121,7 @@ namespace wave
 			if (!type->IsAssignableFrom(init_expr->GetType()))
 			{
 				diagnostics.Report(loc, incompatible_initializer);
+				return nullptr;
 			}
 			else if (!type->IsSameAs(init_expr->GetType()))
 			{
@@ -1047,15 +1131,18 @@ namespace wave
 		else if (!has_init && !has_type_specifier)
 		{
 			diagnostics.Report(loc, missing_type_specifier_or_init_expr);
+			return nullptr;
 		}
 
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
 		}
 		if (has_type_specifier && type->Is(TypeKind::Void))
 		{
 			diagnostics.Report(loc, void_invalid_context);
+			return nullptr;
 		}
 
 		UniquePtr<Decl> var_decl = MakeUnique<Decl>(name, loc);
@@ -1066,13 +1153,18 @@ namespace wave
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
+			return nullptr;
 		}
 		var_decl->SetInitExpr(std::move(init_expr));
 
 		bool is_array = (has_type_specifier && IsArrayType(type)) || (has_init && IsArrayType(var_decl->GetInitExpr()->GetType()));
 		if (is_array)
 		{
-			if (is_ref_type) diagnostics.Report(loc, arrays_cannot_be_refs);
+			if (is_ref_type)
+			{
+				diagnostics.Report(loc, arrays_cannot_be_refs);
+				return nullptr;
+			}
 
 			if (Expr const* array_init_expr = var_decl->GetInitExpr())
 			{
@@ -1081,6 +1173,7 @@ namespace wave
 				if (is_multidimensional_array && init_expr_is_decl_ref)
 				{
 					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
+					return nullptr;
 				}
 
 				QualType base_type{};
@@ -1090,6 +1183,7 @@ namespace wave
 					if (!decl_type.GetBaseType().IsConst() && init_expr_type.GetBaseType().IsConst())
 					{
 						diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
+						return nullptr;
 					}
 					base_type = decl_type.GetBaseType();
 				}
@@ -1108,6 +1202,7 @@ namespace wave
 				if (decl_type.GetBaseType()->Is(TypeKind::Array))
 				{
 					diagnostics.Report(loc, multidimensional_arrays_need_initializer);
+					return nullptr;
 				}
 				QualType var_type(ArrayType(decl_type.GetBaseType(), 0));
 				var_decl->SetType(var_type);
@@ -1132,14 +1227,17 @@ namespace wave
 			if (!var_decl->GetInitExpr())
 			{
 				diagnostics.Report(loc, ref_var_needs_init);
+				return nullptr;
 			}
 			if (!var_decl->GetInitExpr()->IsLValue())
 			{
 				diagnostics.Report(loc, ref_var_rvalue_bind);
+				return nullptr;
 			}
 			if (!var_type.IsConst() && init_expr_const_ref)
 			{
 				diagnostics.Report(loc, nonconst_ref_init_with_const_ref);
+				return nullptr;
 			}
 		}
 
