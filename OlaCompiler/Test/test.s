@@ -7,28 +7,6 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	add;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function add
-add:                                    # @add
-.seh_proc add
-# %bb.0:                                # %entry
-	sub	rsp, 24
-	.seh_stackalloc 24
-	.seh_endprologue
-	mov	qword ptr [rsp + 16], rcx
-	mov	qword ptr [rsp + 8], rdx
-	mov	rax, qword ptr [rsp + 16]
-	add	rax, qword ptr [rsp + 8]
-	mov	qword ptr [rsp], rax
-# %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	add	rsp, 24
-	ret
-	.seh_endproc
-                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -38,20 +16,22 @@ add:                                    # @add
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	sub	rsp, 40
+	.seh_stackalloc 40
 	.seh_endprologue
-	mov	edx, 5
-	mov	rcx, rdx
-	call	add
-	mov	qword ptr [rsp + 40], rax
-	mov	rax, qword ptr [rsp + 40]
-	mov	qword ptr [rsp + 48], rax
+	mov	qword ptr [rsp + 32], 5
+	mov	qword ptr [rsp + 24], 5
+	mov	rax, qword ptr [rsp + 32]
+	add	rax, qword ptr [rsp + 24]
+	mov	qword ptr [rsp + 16], rax
+	mov	rax, qword ptr [rsp + 16]
+	mov	qword ptr [rsp], rax
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rsp + 8], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 48]
-	add	rsp, 56
+	mov	rax, qword ptr [rsp + 8]
+	add	rsp, 40
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym add

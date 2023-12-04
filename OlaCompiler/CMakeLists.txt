@@ -168,9 +168,6 @@ LLVMDemangle.lib
 target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
 target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
 
-target_link_directories(OlaCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/lib/Release/)
-target_link_libraries(OlaCompiler PRIVATE spdlog)
-
 set(DISABLED_WARNINGS
 	/wd4141
 	/wd4146

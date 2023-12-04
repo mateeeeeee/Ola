@@ -17,7 +17,8 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-define internal i64 @add(i64 %a, i64 %b) {
+; Function Attrs: alwaysinline
+define internal i64 @add(i64 %a, i64 %b) #0 {
 entry:
   %0 = alloca i64, align 8
   store i64 %a, ptr %0, align 4
@@ -57,3 +58,5 @@ exit:                                             ; preds = %return, %entry
   %4 = load i64, ptr %0, align 4
   ret i64 %4
 }
+
+attributes #0 = { alwaysinline }
