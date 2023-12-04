@@ -1,7 +1,7 @@
-<img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
+<img align="left" src="OlaCompiler/olalogo.jpg" width="120px"/>
 
-# Wave
-Wave is a C-like programming language with LLVM backend. 
+# Ola
+Ola is a C-like programming language with LLVM backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -35,17 +35,17 @@ Wave is a C-like programming language with LLVM backend.
   * standard library
 
 ## Structure
-Wave consists of three parts: 
-1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: waveio.h, wavemath.h, waveassert.h, wavestring.h.
-2. __Wave compiler__ - consists of the following parts:
+Ola consists of three parts: 
+1. __Ola library__ - standard library for Ola language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: olaio.h, olamath.h, olaassert.h, olastring.h.
+2. __Ola compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
    * __Import Processor__ - receives tokens from previous phase and processes import statements. 
    * __Parser__ - recursive descent parser that receives processed tokens and constructs Abstract Syntax Tree (AST) of a translation unit. 
    * __Sema__ - does semantic analysis of a translation unit. 
    * __LLVM Visitor__ - traverses AST and emits LLVM IR.
    * __LLVM Optimizer__ - applies optimizations to the generated LLVM IR produced by LLVM Visitor based on the optimization level used.
-4. __Wave tests__
-   * UnitTest framework for testing existing Wave features. Uses GoogleTest.
+4. __Ola tests__
+   * UnitTest framework for testing existing Ola features. Uses GoogleTest.
 
 ## Syntax
 The translation unit, at the top level, consists of import statements and global declarations. All the import statements must be at the top of the file.
