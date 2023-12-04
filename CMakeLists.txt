@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Wave)
+project(Ola)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,9 +8,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(WAVE_COMPILER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/WaveCompiler/)
-set(WAVE_TESTS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/WaveTests/)
-set(WAVE_BINARY_PATH ${CMAKE_BINARY_DIR}/bin/)
+set(OLA_COMPILER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/OlaCompiler/)
+set(OLA_TESTS_PATH    ${CMAKE_CURRENT_SOURCE_DIR}/OlaTests/)
+set(OLA_BINARY_PATH   ${CMAKE_BINARY_DIR}/bin/)
 
 if(MSVC)
 	add_definitions(/MT)
@@ -31,15 +31,15 @@ elseif()
 endif()
 
 add_compile_definitions(
-  "$<$<CONFIG:DEBUG>:WAVE_DEBUG_BUILD>"
-  "$<$<CONFIG:RELEASE>: WAVE_RELEASE_BUILD>"
+  "$<$<CONFIG:DEBUG>:OLA_DEBUG_BUILD>"
+  "$<$<CONFIG:RELEASE>: OLA_RELEASE_BUILD>"
 )
 
 
 
-add_subdirectory(WaveLib)
-add_subdirectory(WaveCompiler)
-add_subdirectory(WaveTests)
+add_subdirectory(OlaLib)
+add_subdirectory(OlaCompiler)
+add_subdirectory(OlaTests)
 
-add_dependencies(WaveCompiler WaveLib)
-add_dependencies(WaveTests WaveCompiler)
+add_dependencies(OlaCompiler OlaLib)
+add_dependencies(OlaTests OlaCompiler)
