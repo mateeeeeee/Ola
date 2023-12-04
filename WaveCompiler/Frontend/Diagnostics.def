@@ -73,4 +73,5 @@ DIAG(arrays_cannot_be_refs, error, "arrays cannot be reference variables")
 DIAG(const_methods_cannot_return_nonconst_refs, error, "const class methods cannot have non-const ref return type")
 DIAG(multidimensional_arrays_need_initializer, error, "multidimensional arrays need initializer")
 DIAG(multidimensional_arrays_cannot_alias, error, "multidimensional arrays cannot alias other array")
+DIAG(incompatible_function_attributes, error, "Incompatible function attributes")
 #undef DIAG

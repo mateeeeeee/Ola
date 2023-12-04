@@ -73,6 +73,11 @@ namespace wave
 		function_decl->SetVisibility(visibility);
 		function_decl->SetAttributes(attributes);
 		function_decl->SetParamDecls(std::move(param_decls));
+		if (function_decl->HasAttribute(FuncAttribute_Inline) && function_decl->HasAttribute(FuncAttribute_NoInline))
+		{
+			diagnostics.Report(loc, incompatible_function_attributes);
+		}
+
 		if (body_stmt)
 		{
 			function_decl->SetBodyStmt(std::move(body_stmt));
@@ -117,6 +122,11 @@ namespace wave
 		member_function_decl->SetVisibility(visibility);
 		member_function_decl->SetAttributes(attributes);
 		member_function_decl->SetParamDecls(std::move(param_decls));
+
+		if (member_function_decl->HasAttribute(FuncAttribute_Inline) && member_function_decl->HasAttribute(FuncAttribute_NoInline))
+		{
+			diagnostics.Report(loc, incompatible_function_attributes);
+		}
 		if(body_stmt)
 		{
 			member_function_decl->SetBodyStmt(std::move(body_stmt));

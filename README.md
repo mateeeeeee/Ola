@@ -1,7 +1,7 @@
 <img align="left" src="WaveCompiler/wavelogo.jpg" width="120px"/>
 
 # Wave
-Wave is a C-like programming language using LLVM for its backend. 
+Wave is a C-like programming language with LLVM backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -36,7 +36,7 @@ Wave is a C-like programming language using LLVM for its backend.
 
 ## Structure
 Wave consists of three parts: 
-1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: io.h, math.h, assert.h, string.h.
+1. __Wave library__ - standard library for Wave language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: waveio.h, wavemath.h, waveassert.h, wavestring.h.
 2. __Wave compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
    * __Import Processor__ - receives tokens from previous phase and processes import statements. 
@@ -58,7 +58,13 @@ There are 5 different declarations that can be found in global scope:
 - Enum
 - Alias
 
-Other types of declarations that can be be found in non-global scope are: variable, alias, field, method, enum member and function parameter.
+Other types of declarations that can be be found in non-global scope are:
+- Variable
+- Alias
+- Field
+- Method
+- Enum member 
+- Function parameter
 
 ### Import statement
 Import statement has a following grammar:
@@ -226,18 +232,6 @@ public int main()
     return 0;
 }
 ```
-Foreach statement has the following grammar:
-```
-foreach (<type-qualifier> <type-specifier> <identifier> : <array_identifier>) <statement>
-```
-It gets translated to the equivalent for loop:
-```
-for(int i = 0; i < length(<array_identifier>); ++i)
-{
-    var <identifier> = <array_identifier>[i];
-    <statement>
-}
-```
 
 ### ref
 You use the `ref` keyword in the following contexts:
@@ -323,7 +317,7 @@ public class S
 		this.y = y;
 	}
 
-	public void SetX(int x) {this.x = x;} //declaring Set* as const would trigger a compile error since this.x is modified
+	public void SetX(int x) {this.x = x;} //declaring SetX/Y as const would trigger a compile error since this.x is modified
 	public void SetY(int y) {this.y = y;}
 	
 	public int GetX() const {return x;}
@@ -382,7 +376,7 @@ is `private` which means it cannot be used outside of the class.
 `this` keyword can be used to disambiguate between symbols.
 
 ### Strings
-Strings are just arrays of chars. `string` type is a built-in alias for `char[]`. 
+Strings are just arrays of chars. `string` is a built-in alias for `char[]`. 
 
 ```
 import std.io;
@@ -402,16 +396,13 @@ public int main()
 }
 ```
 ### Alias
-Alias is similar to `typedef` in C or even more to `using` alias in C++. Its grammar is:
-```
-<alias-declaration> ::= alias <alias-identifier> = <type-qualifier><type-specifier>;
-```
+Alias is similar to `typedef` in C or even more to `using` alias in C++. 
 The following example shows its usage:
 ```
 import std.assert;
 import std.io;
 
- alias IntArray = int[];
+alias IntArray = int[];
 
 public int main()
 {
@@ -425,6 +416,11 @@ public int main()
     return 0;
 }
 ```
+
+### Types
+There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. 
+`void` can be used when specifying that the return type of a function. 
+All other types can form a composite array type. Function type consists of the return type, and list of parameter types. Other composite types except arrays and functions are classes and reference types.
 
 ### Keywords
 - `while`
@@ -460,11 +456,8 @@ public int main()
 - `auto`
 - `import`
 - `ref`
-
-### Types
-There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-bit signed integer and float is `64-bit` floating point integer. 
-`void` can be used when specifying that the return type of a function. 
-All other types can form a composite array type. Function type consists of the return type, and list of parameter types. Other composite types except arrays and functions are classes and reference types.
+- `inline`
+- `noinline`
 
 ## Usage
 ### Command line options
