@@ -138,6 +138,14 @@ namespace wave
 		uint32 index = -1;
 	};
 
+	enum FuncAttribute : uint8
+	{
+		FuncAttribute_None = 0x00,
+		FuncAttribute_NoInline = 0x01,
+		FuncAttribute_Inline = 0x02
+	};
+	using FuncAttributes = uint8;
+
 	class FunctionDecl : public Decl
 	{
 		friend class LabelVisitor;
@@ -153,18 +161,23 @@ namespace wave
 		{
 			body_stmt = std::move(_body_stmt);
 		}
+		void SetAttributes(FuncAttributes attrs)
+		{
+			attributes = attrs;
+		}
+		bool HasAttribute(FuncAttribute attr) const
+		{
+			return (attributes & attr) == attr;
+		}
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
-
 		ConstLabelStmtPtrList GetLabels() const;
-
-		FuncType const& GetFunctionType() const
+		FuncType const& GetFuncType() const
 		{
 			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
 			return type_cast<FuncType>(GetType());
 		}
-
 		bool HasDefinition() const
 		{
 			return body_stmt != nullptr;
@@ -178,6 +191,7 @@ namespace wave
 		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
+		FuncAttributes attributes = FuncAttribute_None;
 
 	protected:
 		FunctionDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
@@ -196,12 +210,6 @@ namespace wave
 
 		void SetConst(bool _is_const) { is_const = _is_const; }
 		bool IsConst() const { return is_const; }
-
-		FuncType const& GetFunctionType() const
-		{
-			WAVE_ASSERT(GetType()->GetKind() == TypeKind::Function);
-			return type_cast<FuncType>(GetType());
-		}
 
 		virtual bool IsMember() const override { return true; }
 

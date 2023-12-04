@@ -43,7 +43,7 @@ namespace wave
 
 	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		FuncType const& type = function_decl.GetFunctionType();
+		FuncType const& type = function_decl.GetFuncType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertToLLVMType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetName(), module);
@@ -65,6 +65,8 @@ namespace wave
 
 		if (!function_decl.HasDefinition()) return;
 
+		if(function_decl.HasAttribute(FuncAttribute_Inline)) llvm_function->addFnAttr(llvm::Attribute::AlwaysInline);
+		else if(function_decl.HasAttribute(FuncAttribute_NoInline)) llvm_function->addFnAttr(llvm::Attribute::NoInline);
 		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
 
@@ -73,7 +75,7 @@ namespace wave
 		ClassDecl const* class_decl = method_decl.GetParentDecl();
 		llvm::Type* class_type = ConvertToLLVMType(ClassType(class_decl));
 
-		FuncType const& function_type = method_decl.GetFunctionType();
+		FuncType const& function_type = method_decl.GetFuncType();
 
 		auto MemberTypeToLLVM = [&](FuncType const& type)
 			{

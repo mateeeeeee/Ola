@@ -105,6 +105,8 @@ KEYWORD(length)
 KEYWORD(auto)
 KEYWORD(import)
 KEYWORD(ref)
+KEYWORD(inline)
+KEYWORD(noinline)
 
 #undef KEYWORD
 #undef PUNCTUATOR

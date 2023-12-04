@@ -182,7 +182,7 @@ namespace wave
 			if (FunctionDecl const* func_decl = dyn_cast<FunctionDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
-				FuncType const& func_type = func_decl->GetFunctionType();
+				FuncType const& func_type = func_decl->GetFuncType();
 				TypeToTokens(func_type.GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
@@ -252,7 +252,7 @@ namespace wave
 				{
 					if (method->IsPublic()) import_tokens.emplace_back(TokenKind::KW_public);
 					else import_tokens.emplace_back(TokenKind::KW_private);
-					FuncType const& func_type = method->GetFunctionType();
+					FuncType const& func_type = method->GetFuncType();
 					TypeToTokens(func_type.GetReturnType(), import_tokens);
 					Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 					tok.SetData(method->GetName());

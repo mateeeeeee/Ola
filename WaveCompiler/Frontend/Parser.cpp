@@ -129,7 +129,7 @@ namespace wave
 			function_type.SetType(FuncType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, FuncAttribute_None);
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
@@ -139,8 +139,10 @@ namespace wave
 		QualType function_type{};
 		UniqueParamVarDeclPtrList param_decls;
 		UniqueCompoundStmtPtr function_body;
+		FuncAttributes attrs = FuncAttribute_None;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
@@ -165,7 +167,7 @@ namespace wave
 			function_body = ParseCompoundStatement();
 			sema->ctx.current_func = nullptr;
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs);
 	}
 
 	UniqueMethodDeclPtr Parser::ParseMethodDefinition(bool first_pass)
@@ -180,8 +182,10 @@ namespace wave
 		UniqueParamVarDeclPtrList param_decls;
 		bool is_const = false;
 		UniqueCompoundStmtPtr function_body;
+		FuncAttributes attrs = FuncAttribute_None;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
@@ -226,7 +230,7 @@ namespace wave
 					sema->ctx.is_method_const = false;
 					sema->ctx.current_func = nullptr;
 				}
-				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, is_const);
+				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs, is_const);
 			}
 		}
 		return nullptr;
@@ -1129,6 +1133,15 @@ namespace wave
 		return sema->ActOnInitializerListExpr(loc, type, std::move(expr_list));
 	}
 
+	void Parser::ParseFunctionAttributes(uint8& attrs)
+	{
+		while (current_token->IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline))
+		{
+			if (Consume(TokenKind::KW_inline)) attrs |= FuncAttribute_Inline;
+			else if(Consume(TokenKind::KW_noinline)) attrs |= FuncAttribute_NoInline;
+		}
+	}
+
 	void Parser::ParseTypeQualifier(QualType& type)
 	{
 		if (Consume(TokenKind::KW_const)) type.AddConst();
@@ -1227,8 +1240,17 @@ namespace wave
 	{
 		TokenPtr token = current_token;
 
-		if (Consume(TokenKind::KW_public)) {}
-		else if (Consume(TokenKind::KW_private)) {}
+		Consume(TokenKind::KW_public, TokenKind::KW_private);
+		if (Consume(TokenKind::KW_inline))
+		{
+			current_token = token;
+			return true;
+		}
+		if (Consume(TokenKind::KW_noinline)) 
+		{
+			current_token = token;
+			return true;
+		}
 
 		QualType tmp{};
 		ParseTypeQualifier(tmp);

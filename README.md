@@ -22,7 +22,8 @@ Wave is a C-like programming language using LLVM for its backend.
   * strings
   * floats 
   * enums
-  * functions
+  * functions 
+	- attributes: `inline` and `noinline`
   * classes
   * reference type: `ref`
   * automatic type deduction: `auto`

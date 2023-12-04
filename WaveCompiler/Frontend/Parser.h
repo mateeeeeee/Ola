@@ -133,6 +133,7 @@ namespace wave
 		WAVE_NODISCARD UniqueDeclRefExprPtr ParseMemberIdentifier();
 		WAVE_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
+		void ParseFunctionAttributes(uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
 		void ParseTypeSpecifier(QualType& type, bool array_size_required = false, bool allow_ref = true);
 

@@ -1,9 +1,11 @@
-import std.io;
+
+int add(int a, int b)
+{
+	return a + b;
+}
 
 public int main()
 {
-	string name = "Mate";
-	PrintString(name);
-	int a = 3 + 10 + 5 + 4 + 2;
+	int a = add(5,5);
 	return a;
 }

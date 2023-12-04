@@ -7,6 +7,28 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.wv"
+	.def	add;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function add
+add:                                    # @add
+.seh_proc add
+# %bb.0:                                # %entry
+	sub	rsp, 24
+	.seh_stackalloc 24
+	.seh_endprologue
+	mov	qword ptr [rsp + 16], rcx
+	mov	qword ptr [rsp + 8], rdx
+	mov	rax, qword ptr [rsp + 16]
+	add	rax, qword ptr [rsp + 8]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	add	rsp, 24
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -19,15 +41,11 @@ main:                                   # @main
 	sub	rsp, 56
 	.seh_stackalloc 56
 	.seh_endprologue
-	mov	byte ptr [rsp + 43], 77
-	mov	byte ptr [rsp + 44], 97
-	mov	byte ptr [rsp + 45], 116
-	mov	byte ptr [rsp + 46], 101
-	mov	byte ptr [rsp + 47], 0
-	lea	rcx, [rsp + 43]
-	call	PrintString
-	mov	qword ptr [rsp + 32], 24
-	mov	rax, qword ptr [rsp + 32]
+	mov	edx, 5
+	mov	rcx, rdx
+	call	add
+	mov	qword ptr [rsp + 40], rax
+	mov	rax, qword ptr [rsp + 40]
 	mov	qword ptr [rsp + 48], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 48]
@@ -35,9 +53,5 @@ main:                                   # @main
 	ret
 	.seh_endproc
                                         # -- End function
-	.section	.rdata,"dr"
-__StringLiteral0:                       # @__StringLiteral0
-	.asciz	"Mate"
-
 	.addrsig
-	.addrsig_sym PrintString
+	.addrsig_sym add

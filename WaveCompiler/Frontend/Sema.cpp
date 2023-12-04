@@ -49,7 +49,8 @@ namespace wave
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
-												  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility)
+												  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
+												  DeclVisibility visibility, FuncAttributes attributes)
 	{
 		bool is_extern = body_stmt == nullptr;
 		if (!is_extern && ctx.decl_sym_table.LookUpCurrentScope(name))
@@ -70,6 +71,7 @@ namespace wave
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetVisibility(visibility);
+		function_decl->SetAttributes(attributes);
 		function_decl->SetParamDecls(std::move(param_decls));
 		if (body_stmt)
 		{
@@ -93,7 +95,9 @@ namespace wave
 		return function_decl;
 	}
 
-	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, DeclVisibility visibility, bool is_const)
+	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
+											  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
+											  DeclVisibility visibility, FuncAttributes attributes, bool is_const)
 	{
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -111,6 +115,7 @@ namespace wave
 		member_function_decl->SetType(type);
 		member_function_decl->SetConst(is_const);
 		member_function_decl->SetVisibility(visibility);
+		member_function_decl->SetAttributes(attributes);
 		member_function_decl->SetParamDecls(std::move(param_decls));
 		if(body_stmt)
 		{
