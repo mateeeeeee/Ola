@@ -9,6 +9,9 @@ Ola is a C-like programming language with LLVM backend.
   * [CLI11](https://github.com/CLIUtils/CLI11) for command line parsing.
 
 ## Features
+  * classes
+  * reference type: `ref`
+  * automatic type deduction: `auto`
   * operators:
     - additive: `+`, `-`, `+=`, `-=`, `++`, `--`
     - multiplicative: `*`, `/`, `%`, `*=`, `/=`, `%=`
@@ -18,21 +21,24 @@ Ola is a C-like programming language with LLVM backend.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
-  * arrays
-  * strings
-  * floats 
   * enums
   * functions 
 	- attributes: `inline` and `noinline`
-  * classes
-  * reference type: `ref`
-  * automatic type deduction: `auto`
+  * arrays
   * `sizeof`, `length` operators
-  * `alias` 
+  * `alias`
+  * strings
+  * floats 
   * implicit casts
   * scopes
   * import statement
   * standard library
+
+## Todo
+  * object oriented constructs
+      - virtual methods
+      - single inheritance
+      - interfaces
 
 ## Structure
 Ola consists of three parts: 
