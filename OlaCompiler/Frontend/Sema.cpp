@@ -89,7 +89,7 @@ namespace ola
 		UniqueFunctionDeclPtr function_decl = MakeUnique<FunctionDecl>(name, loc);
 		function_decl->SetType(type);
 		function_decl->SetVisibility(visibility);
-		function_decl->SetAttributes(attributes);
+		function_decl->SetFuncAttributes(attributes);
 		function_decl->SetParamDecls(std::move(param_decls));
 		if (body_stmt)
 		{
@@ -108,7 +108,6 @@ namespace ola
 			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
 			{
 				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
-				return nullptr;
 			}
 			ctx.return_stmt_encountered = false;
 		}
@@ -120,8 +119,9 @@ namespace ola
 
 	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 											  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
-											  DeclVisibility visibility, FuncAttributes attributes, bool is_const)
+											  DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
 	{
+		bool is_const = (method_attrs & MethodAttribute_Const) == MethodAttribute_Const;
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -135,7 +135,7 @@ namespace ola
 			diagnostics.Report(loc, const_methods_cannot_return_nonconst_refs);
 			return nullptr;
 		}
-		if ((attributes & FuncAttribute_Inline) && (attributes & FuncAttribute_NoInline))
+		if ((func_attrs & FuncAttribute_Inline) && (func_attrs & FuncAttribute_NoInline))
 		{
 			diagnostics.Report(loc, incompatible_function_attributes);
 			return nullptr;
@@ -143,9 +143,9 @@ namespace ola
 
 		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
 		member_function_decl->SetType(type);
-		member_function_decl->SetConst(is_const);
 		member_function_decl->SetVisibility(visibility);
-		member_function_decl->SetAttributes(attributes);
+		member_function_decl->SetFuncAttributes(func_attrs);
+		member_function_decl->SetMethodAttributes(method_attrs);
 		member_function_decl->SetParamDecls(std::move(param_decls));
 		if(body_stmt)
 		{
@@ -797,7 +797,7 @@ namespace ola
 				return nullptr;
 			}
 			MethodDecl const* method_decl = cast<MethodDecl>(decl);
-			bool is_method_const = method_decl->IsConst();
+			bool is_method_const = method_decl->HasMethodAttribute(MethodAttribute_Const);
 			if (!is_method_const)
 			{
 				Expr const* class_expr = member_expr->GetClassExpr();

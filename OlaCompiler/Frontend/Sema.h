@@ -64,7 +64,7 @@ namespace ola
 												DeclVisibility visibility, FuncAttributes attributes);
 		UniqueMethodDeclPtr ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-												DeclVisibility visibility, FuncAttributes attributes, bool is_const);
+												DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);

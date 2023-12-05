@@ -65,8 +65,8 @@ namespace ola
 
 		if (!function_decl.HasDefinition()) return;
 
-		if(function_decl.HasAttribute(FuncAttribute_Inline)) llvm_function->addFnAttr(llvm::Attribute::AlwaysInline);
-		else if(function_decl.HasAttribute(FuncAttribute_NoInline)) llvm_function->addFnAttr(llvm::Attribute::NoInline);
+		if(function_decl.HasFuncAttribute(FuncAttribute_Inline)) llvm_function->addFnAttr(llvm::Attribute::AlwaysInline);
+		else if(function_decl.HasFuncAttribute(FuncAttribute_NoInline)) llvm_function->addFnAttr(llvm::Attribute::NoInline);
 		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
 

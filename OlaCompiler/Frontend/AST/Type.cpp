@@ -90,7 +90,7 @@ namespace ola
 			offset += mem_type->GetSize();
 			if (GetAlign() < mem_type->GetAlign()) SetAlign(mem_type->GetAlign());
 		}
-		SetSize(AlignTo(offset, GetAlign()));
+		SetSize(GetAlign() ? AlignTo(offset, GetAlign()) : 0);
 	}
 	bool ClassType::IsAssignableFrom(Type const& other) const
 	{

@@ -62,6 +62,7 @@ namespace ola
 		std::string output = std::format("[Diagnostics][{}]: {} in file {} at line: {}, col: {}\n",
 			ToString(diag_kind), diag_msgs[code], loc.filename, loc.line, loc.column);
 		PrintMessage(diag_kind, output);
-		if (exit_on_error && diag_kind == DiagKind::error) std::exit(OLA_COMPILATION_FAILED_EXIT_CODE);
+		if (exit_on_error && diag_kind == DiagKind::error) 
+			std::exit(OLA_COMPILATION_FAILED_EXIT_CODE);
 	}
 }

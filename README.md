@@ -458,6 +458,7 @@ All other types can form a composite array type. Function type consists of the r
 - `ref`
 - `inline`
 - `noinline`
+- `virtual`
 
 ## Usage
 ### Command line options

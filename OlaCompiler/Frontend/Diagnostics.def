@@ -74,4 +74,6 @@ DIAG(const_methods_cannot_return_nonconst_refs, error, "const class methods cann
 DIAG(multidimensional_arrays_need_initializer, error, "multidimensional arrays need initializer")
 DIAG(multidimensional_arrays_cannot_alias, error, "multidimensional arrays cannot alias other array")
 DIAG(incompatible_function_attributes, error, "Incompatible function attributes")
+DIAG(function_attribute_repetition, error, "Cannot specify the same function attribute more than once")
+DIAG(method_attribute_repetition, error, "Cannot specify the same method attribute more than once")
 #undef DIAG

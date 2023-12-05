@@ -1,6 +1,10 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
+%S = type {}
+
+@__StringLiteral0 = internal constant [4 x i8] c"Alo\00"
+
 declare void @PrintInt(i64)
 
 declare void @PrintFloat(double)
@@ -17,46 +21,23 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-; Function Attrs: alwaysinline
-define internal i64 @add(i64 %a, i64 %b) #0 {
+define void @"S::Test"(ptr %this) {
 entry:
-  %0 = alloca i64, align 8
-  store i64 %a, ptr %0, align 4
-  %1 = alloca i64, align 8
-  store i64 %b, ptr %1, align 4
-  %2 = alloca i64, align 8
-  %3 = load i64, ptr %0, align 4
-  %4 = load i64, ptr %1, align 4
-  %5 = add i64 %3, %4
-  store i64 %5, ptr %2, align 4
+  call void @PrintString(ptr @__StringLiteral0)
   br label %exit
 
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %6 = load i64, ptr %2, align 4
-  ret i64 %6
+exit:                                             ; preds = %entry
+  ret void
 }
 
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = call i64 @add(i64 5, i64 5)
-  %2 = alloca i64, align 8
-  store i64 %1, ptr %2, align 4
-  %3 = load ptr, ptr %2, align 8
-  store ptr %3, ptr %0, align 8
+  %1 = alloca %S, align 8
+  call void @"S::Test"(ptr %1)
   br label %exit
 
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %4 = load i64, ptr %0, align 4
-  ret i64 %4
+exit:                                             ; preds = %entry
+  %2 = load i64, ptr %0, align 4
+  ret i64 %2
 }
-
-attributes #0 = { alwaysinline }

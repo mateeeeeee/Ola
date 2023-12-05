@@ -1,12 +1,16 @@
 import std.io;
 
-inline int add(int a, int b)
+
+class S
 {
-	return a + b;
-}
+	public void Test() const virtual
+	{
+		PrintString("Alo");
+	}
+};
 
 public int main()
 {
-	int a = add(5,5);
-	return a;
+	S s;
+	s.Test();
 }

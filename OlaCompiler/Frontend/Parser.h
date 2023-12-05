@@ -134,6 +134,7 @@ namespace ola
 		OLA_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
 		void ParseFunctionAttributes(uint8& attrs);
+		void ParseMethodAttributes(uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
 		void ParseTypeSpecifier(QualType& type, bool array_size_required = false, bool allow_ref = true);
 

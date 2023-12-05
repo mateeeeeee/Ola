@@ -180,12 +180,12 @@ namespace ola
 		std::string_view name = "";
 		QualType function_type{};
 		UniqueParamVarDeclPtrList param_decls;
-		bool is_const = false;
 		UniqueCompoundStmtPtr function_body;
-		FuncAttributes attrs = FuncAttribute_None;
+		FuncAttributes func_attrs = FuncAttribute_None;
+		MethodAttributes method_attrs = MethodAttribute_None;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-			ParseFunctionAttributes(attrs);
+			ParseFunctionAttributes(func_attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
@@ -205,7 +205,7 @@ namespace ola
 				param_decls.push_back(std::move(param_decl));
 			}
 			function_type.SetType(FuncType(return_type, param_types));
-			if (Consume(TokenKind::KW_const)) is_const = true;
+			ParseMethodAttributes(method_attrs);
 			if (first_pass)
 			{
 				if (Consume(TokenKind::semicolon)) return nullptr;
@@ -225,12 +225,12 @@ namespace ola
 				if (!Consume(TokenKind::semicolon))
 				{
 					sema->ctx.current_func = &function_type;
-					sema->ctx.is_method_const = is_const;
+					sema->ctx.is_method_const = (method_attrs & MethodAttribute_Const) == MethodAttribute_Const;
 					function_body = ParseCompoundStatement();
 					sema->ctx.is_method_const = false;
 					sema->ctx.current_func = nullptr;
 				}
-				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs, is_const);
+				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
 			}
 		}
 		return nullptr;
@@ -1137,8 +1137,61 @@ namespace ola
 	{
 		while (current_token->IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline))
 		{
-			if (Consume(TokenKind::KW_inline)) attrs |= FuncAttribute_Inline;
-			else if(Consume(TokenKind::KW_noinline)) attrs |= FuncAttribute_NoInline;
+			if (Consume(TokenKind::KW_inline))
+			{
+				if ((attrs & FuncAttribute_Inline) == 0)
+				{
+					attrs |= FuncAttribute_Inline;
+				}
+				else
+				{
+					Diag(function_attribute_repetition);
+					return;
+				}
+			}
+			else if (Consume(TokenKind::KW_noinline))
+			{
+				if ((attrs & FuncAttribute_NoInline) == 0)
+				{
+					attrs |= FuncAttribute_NoInline;
+				}
+				else
+				{
+					Diag(function_attribute_repetition);
+					return;
+				}
+			}
+		}
+	}
+
+	void Parser::ParseMethodAttributes(uint8& attrs)
+	{
+		while (current_token->IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual))
+		{
+			if (Consume(TokenKind::KW_const))
+			{
+				if ((attrs & MethodAttribute_Const) == 0)
+				{
+					attrs |= MethodAttribute_Const;
+				}
+				else
+				{
+					Diag(method_attribute_repetition);
+					return;
+				}
+			}
+			else if (Consume(TokenKind::KW_virtual))
+			{
+				if ((attrs & MethodAttribute_Virtual) == 0)
+				{
+					attrs |= MethodAttribute_Virtual;
+				}
+				else
+				{
+					Diag(method_attribute_repetition);
+					return;
+				}
+			}
 		}
 	}
 

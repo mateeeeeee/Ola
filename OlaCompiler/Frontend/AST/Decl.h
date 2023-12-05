@@ -161,13 +161,13 @@ namespace ola
 		{
 			body_stmt = std::move(_body_stmt);
 		}
-		void SetAttributes(FuncAttributes attrs)
+		void SetFuncAttributes(FuncAttributes attrs)
 		{
-			attributes = attrs;
+			func_attributes = attrs;
 		}
-		bool HasAttribute(FuncAttribute attr) const
+		bool HasFuncAttribute(FuncAttribute attr) const
 		{
-			return (attributes & attr) == attr;
+			return (func_attributes & attr) == attr;
 		}
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
@@ -191,12 +191,19 @@ namespace ola
 		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
 		mutable ConstLabelStmtPtrList labels;
-		FuncAttributes attributes = FuncAttribute_None;
+		FuncAttributes func_attributes = FuncAttribute_None;
 
 	protected:
 		FunctionDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
 	};
 
+	enum MethodAttribute : uint8
+	{
+		MethodAttribute_None = 0x00,
+		MethodAttribute_Const = 0x01,
+		MethodAttribute_Virtual = 0x02
+	};
+	using MethodAttributes = uint8;
 	class MethodDecl final : public FunctionDecl
 	{
 	public:
@@ -208,8 +215,14 @@ namespace ola
 		}
 		ClassDecl const* GetParentDecl() const { return parent; }
 
-		void SetConst(bool _is_const) { is_const = _is_const; }
-		bool IsConst() const { return is_const; }
+		void SetMethodAttributes(MethodAttributes attrs)
+		{
+			method_attrs = attrs;
+		}
+		bool HasMethodAttribute(MethodAttribute attr) const
+		{
+			return (method_attrs & attr) == attr;
+		}
 
 		virtual bool IsMember() const override { return true; }
 
@@ -219,7 +232,7 @@ namespace ola
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Method; }
 	private:
 		ClassDecl const* parent = nullptr;
-		bool is_const = false;
+		MethodAttributes method_attrs = MethodAttribute_None;
 	};
 
 	class TagDecl : public Decl
