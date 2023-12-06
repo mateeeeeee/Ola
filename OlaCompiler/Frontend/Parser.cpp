@@ -167,7 +167,7 @@ namespace ola
 		FuncAttributes func_attrs = FuncAttribute_None;
 		MethodAttributes method_attrs = MethodAttribute_None;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			//SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			ParseFunctionAttributes(func_attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);

@@ -944,6 +944,12 @@ namespace ola
 	{
 		if (!ctx.current_class_expr_stack.empty())
 		{
+			if (Decl* decl = ctx.decl_sym_table.LookUpMember(name))
+			{
+				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
+				return decl_ref;
+			}
+
 			Expr const* current_class_expr = ctx.current_class_expr_stack.back();
 			if (current_class_expr->GetExprKind() != ExprKind::This)
 			{
@@ -973,11 +979,6 @@ namespace ola
 					UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
 					return decl_ref;
 				}
-			}
-			else if (Decl* decl = ctx.decl_sym_table.LookUpMember(name))
-			{
-				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
-				return decl_ref;
 			}
 		}
 		diagnostics.Report(loc, undeclared_identifier, name);
