@@ -76,4 +76,6 @@ DIAG(multidimensional_arrays_cannot_alias, error, "multidimensional arrays canno
 DIAG(incompatible_function_attributes, error, "Incompatible function attributes")
 DIAG(function_attribute_repetition, error, "Cannot specify the same function attribute more than once")
 DIAG(method_attribute_repetition, error, "Cannot specify the same method attribute more than once")
+DIAG(expected_base_class_name, error, "Expected base class name!")
+DIAG(base_specifier_not_class, error, "Base specifier must name a class")
 #undef DIAG

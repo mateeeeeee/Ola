@@ -108,6 +108,8 @@ KEYWORD(ref)
 KEYWORD(inline)
 KEYWORD(noinline)
 KEYWORD(virtual)
+KEYWORD(extends)
+KEYWORD(implements)
 
 #undef KEYWORD
 #undef PUNCTUATOR

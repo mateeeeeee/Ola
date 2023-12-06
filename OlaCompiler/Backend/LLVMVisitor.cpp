@@ -196,7 +196,17 @@ namespace ola
 				ClassDecl const* class_decl = class_type.GetClassDecl();
 
 				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-				std::vector<llvm::Constant*> initializers; initializers.reserve(fields.size());
+				std::vector<llvm::Constant*> initializers;
+				ClassDecl const* curr_class_decl = class_decl;
+				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+				{
+					for (auto const& base_field : base_class_decl->GetFields())
+					{
+						if (!llvm_value_map[base_field.get()]) base_field->Accept(*this);
+						initializers.push_back(cast<llvm::Constant>(llvm_value_map[base_field.get()]));
+					}
+					curr_class_decl = base_class_decl;
+				}
 				for (uint64 i = 0; i < fields.size(); ++i)
 				{
 					fields[i]->Accept(*this);
@@ -318,12 +328,24 @@ namespace ola
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm_value_map[&var_decl] = struct_alloc;
 
-					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-					for (uint64 i = 0; i < fields.size(); ++i)
+					ClassDecl const* curr_class_decl = class_decl;
+					while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 					{
-						fields[i]->Accept(*this);
-						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, i);
-						Store(llvm_value_map[fields[i].get()], field_ptr);
+						UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
+						for (auto const& base_field : base_fields)
+						{
+							if (!llvm_value_map[base_field.get()]) base_field->Accept(*this);
+							llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, base_field->GetFieldIndex());
+							Store(llvm_value_map[base_field.get()], field_ptr);
+						}
+						curr_class_decl = base_class_decl;
+					}
+					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+					for (auto const& field : fields)
+					{
+						field->Accept(*this);
+						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, field->GetFieldIndex());
+						Store(llvm_value_map[field.get()], field_ptr);
 					}
 				}
 				else
@@ -1358,9 +1380,16 @@ namespace ola
 
 			llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
 
-			UniqueFieldDeclPtrList const& member_variables = class_decl->GetFields();
-			std::vector<llvm::Type*> llvm_member_types; llvm_member_types.reserve(member_variables.size());
-			for (auto const& member_var : member_variables) llvm_member_types.push_back(ConvertToLLVMType(member_var->GetType()));
+			UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+			std::vector<llvm::Type*> llvm_member_types; llvm_member_types.reserve(fields.size());
+
+			ClassDecl const* curr_class_decl = class_decl;
+			while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+			{
+				for (auto const& field : base_class_decl->GetFields()) llvm_member_types.push_back(ConvertToLLVMType(field->GetType()));
+				curr_class_decl = base_class_decl;
+			}
+			for (auto const& field : fields) llvm_member_types.push_back(ConvertToLLVMType(field->GetType()));
 			llvm_class_type->setBody(llvm_member_types, false);
 			struct_type_map[class_decl] = llvm_class_type;
 			return llvm_class_type;

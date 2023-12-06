@@ -1,16 +1,29 @@
 import std.io;
 
+//todo: 
 
-class S
+class Base
 {
-	public void Test() const virtual
+	public int x = 10;
+};
+
+class Base2 extends Base
+{
+	public int x = 20;
+};
+
+class S extends Base2
+{
+	public int z = 30;
+
+	void PrintX()
 	{
-		PrintString("Alo");
+		PrintInt(x);
 	}
 };
 
 public int main()
 {
-	float x = .9;
-	PrintFloat(x);
+	S s;
+	s.PrintX();
 }

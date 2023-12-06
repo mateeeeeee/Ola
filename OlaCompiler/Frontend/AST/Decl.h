@@ -223,6 +223,8 @@ namespace ola
 		{
 			return (method_attrs & attr) == attr;
 		}
+		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
+		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
 
 		virtual bool IsMember() const override { return true; }
 
@@ -305,51 +307,67 @@ namespace ola
 	public:
 		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
 
-		void SetFields(UniqueFieldDeclPtrList&& _member_variables)
+		void SetFields(UniqueFieldDeclPtrList&& _fields)
 		{
-			member_variables = std::move(_member_variables);
-			for (uint32 i = 0; i < member_variables.size(); ++i)
+			fields = std::move(_fields);
+			uint64 field_index_offset = base_class ? base_class->GetFieldCount() : 0;
+			for (uint32 i = 0; i < fields.size(); ++i)
 			{
-				auto& member_variable = member_variables[i];
-				member_variable->SetParentDecl(this);
-				member_variable->SetFieldIndex(i);
+				auto& field = fields[i];
+				field->SetParentDecl(this);
+				field->SetFieldIndex(field_index_offset + i);
 			}
 		}
-		UniqueFieldDeclPtrList const& GetFields() const { return member_variables; }
-		void SetMethods(UniqueMethodDeclPtrList&& _member_functions)
+		UniqueFieldDeclPtrList const& GetFields() const { return fields; }
+		void SetMethods(UniqueMethodDeclPtrList&& _methods)
 		{
-			member_functions = std::move(_member_functions);
-			for (auto& member_function : member_functions) member_function->SetParentDecl(this);
-
+			methods = std::move(_methods);
+			for (auto& method : methods) method->SetParentDecl(this);
 		}
-		UniqueMethodDeclPtrList const& GetMethods() const { return member_functions; }
+		UniqueMethodDeclPtrList const& GetMethods() const { return methods; }
+		void SetBaseClass(ClassDecl const* _base_class) 
+		{ 
+			base_class  = _base_class;
+		}
+		ClassDecl const* GetBaseClass() const { return base_class; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		Decl* FindDecl(std::string_view name) const
+		bool IsPolymorphic() const
 		{
-			for (uint32 i = 0; i < member_variables.size(); ++i)
+			for (auto const& method : methods) if (method->IsVirtual()) return true;
+			return base_class ? base_class->IsPolymorphic() : false;
+		}
+		uint64 GetFieldCount() const
+		{
+			return base_class ? base_class->GetFieldCount() + fields.size() : fields.size();
+		}
+		Decl* FindMemberDecl(std::string_view name) const
+		{
+			for (uint32 i = 0; i < fields.size(); ++i)
 			{
-				if (member_variables[i]->GetName().compare(name) == 0)
+				if (fields[i]->GetName().compare(name) == 0)
 				{
-					return member_variables[i].get();
+					return fields[i].get();
 				}
 			}
-			for (uint32 i = 0; i < member_functions.size(); ++i)
+			for (uint32 i = 0; i < methods.size(); ++i)
 			{
-				if (member_functions[i]->GetName().compare(name) == 0)
+				if (methods[i]->GetName().compare(name) == 0)
 				{
-					return member_functions[i].get();
+					return methods[i].get();
 				}
 			}
-			return nullptr;
+			return base_class ? base_class->FindMemberDecl(name) : nullptr;
 		}
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
+
 	private:
-		UniqueFieldDeclPtrList member_variables;
-		UniqueMethodDeclPtrList member_functions;
+		ClassDecl const* base_class = nullptr;
+		UniqueFieldDeclPtrList fields;
+		UniqueMethodDeclPtrList methods;
 	};
 
 

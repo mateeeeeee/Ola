@@ -10,6 +10,8 @@ Ola is a C-like programming language with LLVM backend.
 
 ## Features
   * classes
+	- access modifiers: `public`, `private`
+	- `this` keyword
   * reference type: `ref`
   * automatic type deduction: `auto`
   * operators:
@@ -35,10 +37,10 @@ Ola is a C-like programming language with LLVM backend.
   * standard library
 
 ## Todo
-  * object oriented constructs
-      - virtual methods
-      - single inheritance
-      - interfaces
+  * object oriented constructs (wip)
+      - virtual methods: `extends`
+      - single inheritance: `extends`
+      - interfaces: `implements`
 
 ## Structure
 Ola consists of three parts: 
@@ -71,6 +73,46 @@ Other types of declarations that can be be found in non-global scope are:
 - Method
 - Enum member 
 - Function parameter
+
+### Keywords
+- `while`
+- `break`
+- `switch`
+- `case`
+- `default`
+- `for`
+- `foreach`
+- `goto`
+- `continue`
+- `do`
+- `if`
+- `else`
+- `return`
+- `enum`
+- `class`
+- `this`
+- `const`
+- `bool`
+- `char`
+- `int`
+- `float`
+- `void`
+- `true`
+- `false`
+- `alias`
+- `extern`
+- `public`
+- `private`
+- `sizeof`
+- `length`
+- `auto`
+- `import`
+- `ref`
+- `inline`
+- `noinline`
+- `virtual`
+- `extends`
+- `implements`
 
 ### Import statement
 Import statement has a following grammar:
@@ -428,43 +470,6 @@ There are 5 basic types: `bool`, `char`, `float`, `int` and `void`. `int` is 64-
 `void` can be used when specifying that the return type of a function. 
 All other types can form a composite array type. Function type consists of the return type, and list of parameter types. Other composite types except arrays and functions are classes and reference types.
 
-### Keywords
-- `while`
-- `break`
-- `switch`
-- `case`
-- `default`
-- `for`
-- `foreach`
-- `goto`
-- `continue`
-- `do`
-- `if`
-- `else`
-- `return`
-- `enum`
-- `class`
-- `this`
-- `const`
-- `bool`
-- `char`
-- `int`
-- `float`
-- `void`
-- `true`
-- `false`
-- `alias`
-- `extern`
-- `public`
-- `private`
-- `sizeof`
-- `length`
-- `auto`
-- `import`
-- `ref`
-- `inline`
-- `noinline`
-- `virtual`
 
 ## Usage
 ### Command line options
