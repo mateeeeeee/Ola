@@ -1,6 +1,6 @@
 #pragma once
 #include <string_view>
-#include "TokenTypes.h"
+#include "TokenKind.h"
 #include "SourceLocation.h"
 #include "Utility/Enums.h"
 
