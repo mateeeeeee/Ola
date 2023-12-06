@@ -232,22 +232,15 @@ namespace ola
 		return alias_decl;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, std::string_view base_name, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions)
+	ClassDecl const* Sema::ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc)
 	{
-		if (ctx.tag_sym_table.LookUpCurrentScope(name))
-		{
-			diagnostics.Report(loc, redefinition_of_identifier, name);
-			return nullptr;
-		}
-
-		ClassDecl* base_class = nullptr;
 		if (!base_name.empty())
 		{
 			if (TagDecl* base_tag_decl = ctx.tag_sym_table.LookUpCurrentScope(base_name))
 			{
 				if (ClassDecl* base_class_decl = dyn_cast<ClassDecl>(base_tag_decl))
 				{
-					base_class = base_class_decl;
+					return base_class_decl;
 				}
 				else
 				{
@@ -261,6 +254,17 @@ namespace ola
 				return nullptr;
 			}
 		}
+		return nullptr;
+	}
+
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions)
+	{
+		if (ctx.tag_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
+		}
+
 		UniqueClassDeclPtr class_decl = MakeUnique<ClassDecl>(name, loc);
 		class_decl->SetBaseClass(base_class);
 		class_decl->SetFields(std::move(member_variables));
@@ -933,23 +937,22 @@ namespace ola
 			if (decl->IsMember()) return ActOnMemberExpr(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
 			else return decl_ref;
 		}
-		else
+		else if (ClassDecl const* base_class_decl = ctx.current_base_class)
 		{
-			diagnostics.Report(loc, undeclared_identifier, name);
-			return nullptr;
+			if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
+			{
+				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
+				return decl_ref;
+			}
 		}
+		diagnostics.Report(loc, undeclared_identifier, name);
+		return nullptr;
 	}
 
 	UniqueDeclRefExprPtr Sema::ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc)
 	{
 		if (!ctx.current_class_expr_stack.empty())
 		{
-			if (Decl* decl = ctx.decl_sym_table.LookUpMember(name))
-			{
-				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
-				return decl_ref;
-			}
-
 			Expr const* current_class_expr = ctx.current_class_expr_stack.back();
 			if (current_class_expr->GetExprKind() != ExprKind::This)
 			{
@@ -975,6 +978,19 @@ namespace ola
 				}
 				ClassDecl const* class_decl = class_type->GetClassDecl();
 				if (Decl* class_member_decl = class_decl->FindMemberDecl(name))
+				{
+					UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
+					return decl_ref;
+				}
+			}
+			else if (Decl* decl = ctx.decl_sym_table.LookUpMember(name))
+			{
+				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
+				return decl_ref;
+			}
+			else if (ClassDecl const* base_class_decl = ctx.current_base_class)
+			{
+				if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
 				{
 					UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
 					return decl_ref;

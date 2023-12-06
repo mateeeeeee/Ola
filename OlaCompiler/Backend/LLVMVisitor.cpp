@@ -202,14 +202,12 @@ namespace ola
 				{
 					for (auto const& base_field : base_class_decl->GetFields())
 					{
-						if (!llvm_value_map[base_field.get()]) base_field->Accept(*this);
 						initializers.push_back(cast<llvm::Constant>(llvm_value_map[base_field.get()]));
 					}
 					curr_class_decl = base_class_decl;
 				}
 				for (uint64 i = 0; i < fields.size(); ++i)
 				{
-					fields[i]->Accept(*this);
 					initializers.push_back(cast<llvm::Constant>(llvm_value_map[fields[i].get()]));
 				}
 
@@ -334,7 +332,6 @@ namespace ola
 						UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
 						for (auto const& base_field : base_fields)
 						{
-							if (!llvm_value_map[base_field.get()]) base_field->Accept(*this);
 							llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, base_field->GetFieldIndex());
 							Store(llvm_value_map[base_field.get()], field_ptr);
 						}
@@ -343,7 +340,6 @@ namespace ola
 					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 					for (auto const& field : fields)
 					{
-						field->Accept(*this);
 						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, field->GetFieldIndex());
 						Store(llvm_value_map[field.get()], field_ptr);
 					}
@@ -402,7 +398,8 @@ namespace ola
 
 	void LLVMVisitor::Visit(ClassDecl const& class_decl, uint32)
 	{
-		for (auto& method_decl : class_decl.GetMethods()) method_decl->Accept(*this);
+		for (auto& field  : class_decl.GetFields()) field->Accept(*this);
+		for (auto& method : class_decl.GetMethods()) method->Accept(*this);
 	}
 
 	void LLVMVisitor::Visit(Stmt const& stmt, uint32)

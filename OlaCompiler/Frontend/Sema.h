@@ -37,6 +37,7 @@ namespace ola
 			std::vector<Expr const*> current_class_expr_stack;
 			bool is_method_const = false;
 			class QualType const* current_func = nullptr;
+			ClassDecl const* current_base_class = nullptr;
 			bool return_stmt_encountered = false;
 
 			uint32 stmts_using_break_count = 0; 
@@ -69,7 +70,9 @@ namespace ola
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
 		UniqueAliasDeclPtr ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
-		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, std::string_view base_name, SourceLocation const& loc,
+
+		ClassDecl const* ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc);
+		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc,
 										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);

@@ -385,9 +385,10 @@ namespace ola
 		}
 		else Expect(TokenKind::identifier);
 		
-		std::string base_class_name = "";
+		ClassDecl const* base_class = nullptr;
 		if (Consume(TokenKind::KW_extends))
 		{
+			std::string base_class_name = "";
 			if (current_token->Is(TokenKind::identifier))
 			{
 				base_class_name = current_token->GetData();
@@ -403,6 +404,7 @@ namespace ola
 				Diag(expected_base_class_name);
 				return nullptr;
 			}
+			base_class = sema->ActOnBaseClassSpecifier(base_class_name, current_token->GetLocation());
 		}
 
 		UniqueFieldDeclPtrList member_variables;
@@ -410,6 +412,7 @@ namespace ola
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
+			sema->ctx.current_base_class = base_class;
 			TokenPtr start_token = current_token;
 
 			auto ParseClassMembers = [&](bool first_pass)
@@ -434,8 +437,9 @@ namespace ola
 			ParseClassMembers(true);
 			current_token = start_token;
 			ParseClassMembers(false);
+			sema->ctx.current_base_class = nullptr;
 		}
-		return sema->ActOnClassDecl(class_name, base_class_name, loc, std::move(member_variables), std::move(member_functions));
+		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions));
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()

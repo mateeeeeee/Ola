@@ -2,54 +2,28 @@ import std.io;
 
 //todo: 
 
-//class Base
-//{
-//	public int x = 10;
-//};
-//
-//class Base2 extends Base
-//{
-//	public int x = 20;
-//};
-//
-//class S extends Base2
-//{
-//	public int z = 30;
-//
-//	void PrintX()
-//	{
-//		PrintInt(this.x);
-//	}
-//};
-
-public int GetX()  
+class Base
 {
-	int x = 20;
-	return x + 10;
-}
-
-public int GetY()  
-{
-	return GetX() * 2;
-}
-
-class S
-{
-	public int GetX() const 
-	{
-		int x = 25;
-		return x + 10;
-	}
-
-	public int GetY() const 
-	{
-		return GetX() * 2;
-	}
+	public int x = 10;
 };
 
+class Base2 extends Base
+{
+	public int y = 20;
+};
+
+class S extends Base2
+{
+	public int z = 30;
+
+	public void PrintX(int x)
+	{
+		PrintInt(this.x);
+	}
+};
 
 public int main()
 {
 	S s;
-	return s.GetY() + GetY();
+	s.PrintX(100);
 }
