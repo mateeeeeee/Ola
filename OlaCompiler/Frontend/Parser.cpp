@@ -167,7 +167,7 @@ namespace ola
 		FuncAttributes func_attrs = FuncAttribute_None;
 		MethodAttributes method_attrs = MethodAttribute_None;
 		{
-			//SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			ParseFunctionAttributes(func_attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
@@ -177,7 +177,6 @@ namespace ola
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
-
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
@@ -201,7 +200,6 @@ namespace ola
 					else if (Consume(TokenKind::right_brace)) --brace_count;
 					else current_token++;
 				}
-				return nullptr;
 			}
 			else
 			{
@@ -213,10 +211,9 @@ namespace ola
 					sema->ctx.is_method_const = false;
 					sema->ctx.current_func = nullptr;
 				}
-				return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
 			}
 		}
-		return nullptr;
+		return first_pass ? nullptr : sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
 	}
 
 	UniqueParamVarDeclPtr Parser::ParseParamVariableDeclaration()
