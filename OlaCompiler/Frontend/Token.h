@@ -28,7 +28,7 @@ namespace ola
 			kind = TokenKind::unknown;
 			flags = TokenFlag_None;
 			loc = {};
-			data = {};
+			data.clear();
 		}
 
 		TokenKind GetKind() const { return kind; }

@@ -1,8 +1,6 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-%S = type {}
-
 @__StringLiteral0 = internal constant [4 x i8] c"Alo\00"
 
 declare void @PrintInt(i64)
@@ -33,11 +31,13 @@ exit:                                             ; preds = %entry
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %S, align 8
-  call void @"S::Test"(ptr %1)
+  %1 = alloca double, align 8
+  store double 9.000000e-01, ptr %1, align 8
+  %2 = load double, ptr %1, align 8
+  call void @PrintFloat(double %2)
   br label %exit
 
 exit:                                             ; preds = %entry
-  %2 = load i64, ptr %0, align 4
-  ret i64 %2
+  %3 = load i64, ptr %0, align 4
+  ret i64 %3
 }

@@ -31,7 +31,13 @@
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	main                            # -- Begin function main
+	.globl	__real@3feccccccccccccd         # -- Begin function main
+	.section	.rdata,"dr",discard,__real@3feccccccccccccd
+	.p2align	3, 0x0
+__real@3feccccccccccccd:
+	.quad	0x3feccccccccccccd              # double 0.90000000000000002
+	.text
+	.globl	main
 	.p2align	4, 0x90
 main:                                   # @main
 .seh_proc main
@@ -39,8 +45,10 @@ main:                                   # @main
 	sub	rsp, 56
 	.seh_stackalloc 56
 	.seh_endprologue
-	lea	rcx, [rsp + 40]
-	call	"S::Test"
+	movsd	xmm0, qword ptr [rip + __real@3feccccccccccccd] # xmm0 = mem[0],zero
+	movsd	qword ptr [rsp + 40], xmm0
+	movsd	xmm0, qword ptr [rsp + 40]      # xmm0 = mem[0],zero
+	call	PrintFloat
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 48]
 	add	rsp, 56
@@ -52,6 +60,7 @@ __StringLiteral0:                       # @__StringLiteral0
 	.asciz	"Alo"
 
 	.addrsig
+	.addrsig_sym PrintFloat
 	.addrsig_sym PrintString
-	.addrsig_sym "S::Test"
 	.addrsig_sym __StringLiteral0
+	.globl	_fltused

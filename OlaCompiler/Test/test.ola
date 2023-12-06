@@ -11,6 +11,6 @@ class S
 
 public int main()
 {
-	S s;
-	s.Test();
+	float x = .9;
+	PrintFloat(x);
 }
