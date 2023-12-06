@@ -2,7 +2,6 @@
 #include <vector>
 #include <memory>
 #include "Token.h"
-#include "Diagnostics.h"
 #include "AST/ASTTypeAliases.h"
 
 namespace ola
@@ -10,7 +9,9 @@ namespace ola
 	class QualType;
 	class Sema;
 	class Parser;
+	class Diagnostics;
 	
+	enum DiagCode : uint32;
 	enum class BinaryExprKind : uint8;
 	enum class DeclVisibility : uint8;
 	using ExprParseFn = UniqueExprPtr(Parser::*)();
@@ -36,40 +37,15 @@ namespace ola
 		std::unique_ptr<AST> ast;
 
 	private:
-		bool Consume(TokenKind k)
-		{
-			if (current_token->Is(k))
-			{
-				++current_token; return true;
-			}
-			else return false;
-		}
+		bool Consume(TokenKind k);
 		template<typename... Ts>
-		bool Consume(TokenKind k, Ts... ts)
-		{
-			if (current_token->IsOneOf(k, ts...))
-			{
-				++current_token; return true;
-			}
-			else return false;
-		}
+		bool Consume(TokenKind k, Ts... ts);
 		bool Expect(TokenKind k);
 		template<typename... Ts>
-		bool Expect(TokenKind k, Ts... ts)
-		{
-			if (!Consume(k, ts...))
-			{
-				Diag(unexpected_token);
-				return false;
-			}
-			return true;
-		}
+		bool Expect(TokenKind k, Ts... ts);
 		void Diag(DiagCode);
 		template<typename... Ts>
-		void Diag(DiagCode code, Ts&&... args)
-		{
-			diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
-		}
+		void Diag(DiagCode code, Ts&&... args);
 
 		void ParseTranslationUnit();
 		void AddBuiltinDecls(UniqueTranslationUnitPtr& TU);

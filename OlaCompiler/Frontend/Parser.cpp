@@ -28,23 +28,6 @@ namespace ola
 		ParseTranslationUnit();
 	}
 
-	bool Parser::Expect(TokenKind k)
-	{
-		if (!Consume(k))
-		{
-			Diag(unexpected_token);
-			return false;
-		}
-		return true;
-	}
-
-	void Parser::Diag(DiagCode code)
-	{
-		--current_token;
-		diagnostics.Report(current_token->GetLocation(), code);
-		++current_token;
-	}
-
 	void Parser::ParseTranslationUnit()
 	{
 		while (current_token->IsNot(TokenKind::eof))
@@ -1319,6 +1302,56 @@ namespace ola
 	bool Parser::IsCurrentTokenTypename()
 	{
 		return current_token->IsTypename() || sema->ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
+	}
+
+	bool Parser::Consume(TokenKind k)
+	{
+		if (current_token->Is(k))
+		{
+			++current_token; return true;
+		}
+		else return false;
+	}
+	template<typename... Ts>
+	bool Parser::Consume(TokenKind k, Ts... ts)
+	{
+		if (current_token->IsOneOf(k, ts...))
+		{
+			++current_token; return true;
+		}
+		else return false;
+	}
+
+	bool Parser::Expect(TokenKind k)
+	{
+		if (!Consume(k))
+		{
+			Diag(unexpected_token);
+			return false;
+		}
+		return true;
+	}
+	template<typename... Ts>
+	bool Parser::Expect(TokenKind k, Ts... ts)
+	{
+		if (!Consume(k, ts...))
+		{
+			Diag(unexpected_token);
+			return false;
+		}
+		return true;
+	}
+
+	void Parser::Diag(DiagCode code)
+	{
+		--current_token;
+		diagnostics.Report(current_token->GetLocation(), code);
+		++current_token;
+	}
+	template<typename... Ts>
+	void Parser::Diag(DiagCode code, Ts&&... args)
+	{
+		diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
 	}
 
 }
