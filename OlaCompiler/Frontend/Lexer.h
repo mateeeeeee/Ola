@@ -18,11 +18,10 @@ namespace ola
 	{
 	public:
 		explicit Lexer(Diagnostics& diagnostics);
-		Lexer(Lexer const&) = delete;
-		Lexer& operator=(Lexer const&) = delete;
+		OLA_NONCOPYABLE_NONMOVABLE(Lexer)
+		~Lexer() = default;
 
 		void Lex(SourceBuffer const& source);
-
 		std::vector<Token>&& GetTokens() { return std::move(tokens); }
 
 	private:

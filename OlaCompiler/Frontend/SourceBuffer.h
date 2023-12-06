@@ -9,11 +9,8 @@ namespace ola
 
 		explicit SourceBuffer(std::string_view source_file);
 		SourceBuffer(char const* buffer_start, size_t buffer_size, std::string_view refname = "");
-
-		SourceBuffer(SourceBuffer const&) = delete;
-		SourceBuffer(SourceBuffer&&) = default;
-		SourceBuffer& operator=(SourceBuffer const&) = delete;
-		SourceBuffer& operator=(SourceBuffer&&) = default;
+		OLA_NONCOPYABLE(SourceBuffer)
+		OLA_DEFAULT_MOVABLE(SourceBuffer)
 		~SourceBuffer() = default;
 
 		void Prepend(char const* str);
