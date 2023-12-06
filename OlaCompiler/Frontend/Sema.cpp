@@ -763,62 +763,61 @@ namespace ola
 
 	UniqueCallExprPtr Sema::ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
-		if (func_expr->GetExprKind() == ExprKind::DeclRef)
+		if (isa<DeclRefExpr>(func_expr.get()))
 		{
 			DeclRefExpr const* decl_ref = cast<DeclRefExpr>(func_expr.get());
 			Decl const* decl = decl_ref->GetDecl();
-			if (decl->GetDeclKind() != DeclKind::Function)
+			if (isa<FunctionDecl>(decl)) 
 			{
-				diagnostics.Report(loc, invalid_function_call);
-				return nullptr;
-			}
-
-			QualType const& func_expr_type = decl->GetType();
-			OLA_ASSERT(IsFunctionType(func_expr_type));
-			FuncType const& func_type = type_cast<FuncType>(func_expr_type);
-			std::span<QualType const> param_types = func_type.GetParams();
-			if (args.size() != param_types.size())
-			{
-				if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
-				else diagnostics.Report(loc, too_few_args_to_function_call);
-				return nullptr;
-			}
-
-			for (uint64 i = 0; i < param_types.size(); ++i)
-			{
-				UniqueExprPtr& arg = args[i];
-				QualType const& func_param_type = param_types[i];
-
-				if (IsRefType(func_param_type) && !arg->IsLValue())
+				QualType const& func_expr_type = decl->GetType();
+				OLA_ASSERT(IsFunctionType(func_expr_type));
+				FuncType const& func_type = type_cast<FuncType>(func_expr_type);
+				std::span<QualType const> param_types = func_type.GetParams();
+				if (args.size() != param_types.size())
 				{
-					diagnostics.Report(loc, ref_var_rvalue_bind);
+					if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
+					else diagnostics.Report(loc, too_few_args_to_function_call);
 					return nullptr;
 				}
 
-				if (!func_param_type->IsAssignableFrom(arg->GetType()))
+				for (uint64 i = 0; i < param_types.size(); ++i)
 				{
-					diagnostics.Report(loc, incompatible_function_argument);
-					return nullptr;
-				}
-				else if (!func_param_type->IsSameAs(arg->GetType()))
-				{
-					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
-				}
-			}
+					UniqueExprPtr& arg = args[i];
+					QualType const& func_param_type = param_types[i];
 
-			std::string_view func_name = decl->GetName();
-			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
-			func_call_expr->SetType(func_type.GetReturnType());
-			func_call_expr->SetArgs(std::move(args));
-			func_call_expr->SetCallee(std::move(func_expr));
-			if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
-			return func_call_expr;
+					if (IsRefType(func_param_type) && !arg->IsLValue())
+					{
+						diagnostics.Report(loc, ref_var_rvalue_bind);
+						return nullptr;
+					}
+
+					if (!func_param_type->IsAssignableFrom(arg->GetType()))
+					{
+						diagnostics.Report(loc, incompatible_function_argument);
+						return nullptr;
+					}
+					else if (!func_param_type->IsSameAs(arg->GetType()))
+					{
+						arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+					}
+				}
+
+				std::string_view func_name = decl->GetName();
+				UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
+				func_call_expr->SetType(func_type.GetReturnType());
+				func_call_expr->SetArgs(std::move(args));
+				func_call_expr->SetCallee(std::move(func_expr));
+				if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
+				return func_call_expr;
+			}
+			diagnostics.Report(loc, invalid_function_call);
+			return nullptr;
 		}
-		else if (func_expr->GetExprKind() == ExprKind::Member)
+		else if (isa<MemberExpr>(func_expr.get()))
 		{
 			MemberExpr const* member_expr = cast<MemberExpr>(func_expr.get());
 			Decl const* decl = member_expr->GetMemberDecl();
-			if (decl->GetDeclKind() != DeclKind::Method)
+			if (!isa<MethodDecl>(decl))
 			{
 				diagnostics.Report(loc, invalid_function_call);
 				return nullptr;
@@ -835,10 +834,8 @@ namespace ola
 				}
 			}
 
-			QualType const& method_type = decl->GetType();
-			OLA_ASSERT(IsFunctionType(method_type));
-			FuncType const& func_type = type_cast<FuncType>(method_type);
-			std::span<QualType const> param_types = func_type.GetParams();
+			FuncType const& method_type = method_decl->GetFuncType();
+			std::span<QualType const> param_types = method_type.GetParams();
 			if (args.size() != param_types.size())
 			{
 				if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
@@ -869,18 +866,15 @@ namespace ola
 			}
 
 			std::string_view func_name = decl->GetName();
-			UniqueMemberCallExprPtr func_call_expr = MakeUnique<MemberCallExpr>(loc, func_name);
-			func_call_expr->SetType(func_type.GetReturnType());
-			func_call_expr->SetArgs(std::move(args));
-			func_call_expr->SetCallee(std::move(func_expr));
-			if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
-			return func_call_expr;
+			UniqueMemberCallExprPtr method_call_expr = MakeUnique<MemberCallExpr>(loc, func_name);
+			method_call_expr->SetType(method_type.GetReturnType());
+			method_call_expr->SetArgs(std::move(args));
+			method_call_expr->SetCallee(std::move(func_expr));
+			if (IsRefType(method_call_expr->GetType())) method_call_expr->SetLValue();
+			return method_call_expr;
 		}
-		else
-		{
-			diagnostics.Report(loc, invalid_function_call);
-			return nullptr;
-		}
+		diagnostics.Report(loc, invalid_function_call);
+		return nullptr;
 	}
 
 	UniqueConstantIntPtr Sema::ActOnConstantInt(int64 value, SourceLocation const& loc)
@@ -942,7 +936,7 @@ namespace ola
 			if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
 			{
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
-				return decl_ref;
+				return ActOnMemberExpr(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
 			}
 		}
 		diagnostics.Report(loc, undeclared_identifier, name);
@@ -954,20 +948,20 @@ namespace ola
 		if (!ctx.current_class_expr_stack.empty())
 		{
 			Expr const* current_class_expr = ctx.current_class_expr_stack.back();
-			if (current_class_expr->GetExprKind() != ExprKind::This)
+			if (!isa<ThisExpr>(current_class_expr))
 			{
 				QualType const& class_expr_type = current_class_expr->GetType();
 				ClassType const* class_type = nullptr;
-				if (class_expr_type->GetKind() == TypeKind::Class)
+				if (isa<ClassType>(class_expr_type)) 
 				{
-					class_type = dyn_type_cast<ClassType>(class_expr_type);
+					class_type = &type_cast<ClassType>(class_expr_type);
 				}
-				else if (class_expr_type->GetKind() == TypeKind::Ref)
+				else if (isa<RefType>(class_expr_type))
 				{
 					RefType const& ref_type = type_cast<RefType>(class_expr_type);
-					if (ref_type.GetReferredType()->GetKind() == TypeKind::Class)
+					if (isa<ClassType>(ref_type.GetReferredType()))
 					{
-						class_type = dyn_type_cast<ClassType>(ref_type.GetReferredType());
+						class_type = &type_cast<ClassType>(ref_type.GetReferredType());
 					}
 				}
 
@@ -1095,7 +1089,7 @@ namespace ola
 				return nullptr;
 			}
 		}
-		if (class_expr->GetExprKind() != ExprKind::This && member_identifier->GetDecl()->IsPrivate())
+		if (!isa<ThisExpr>(class_expr.get()) && member_identifier->GetDecl()->IsPrivate())
 		{
 			diagnostics.Report(loc, private_member_access);
 			return nullptr;
@@ -1147,7 +1141,7 @@ namespace ola
 			RefType const& ref_type = type_cast<RefType>(type);
 			has_type_specifier = !ref_type.GetReferredType().IsNull();
 		}
-		bool const init_expr_is_decl_ref = has_init && init_expr->GetExprKind() == ExprKind::DeclRef;
+		bool const init_expr_is_decl_ref = has_init && isa<DeclRefExpr>(init_expr.get());
 		bool const init_expr_const_ref = has_init && IsRefType(init_expr->GetType()) && init_expr->GetType().IsConst();
 
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))

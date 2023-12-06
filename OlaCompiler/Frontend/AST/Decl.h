@@ -331,9 +331,6 @@ namespace ola
 		}
 		ClassDecl const* GetBaseClass() const { return base_class; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
-		virtual void Accept(ASTVisitor&) const override;
-
 		bool IsPolymorphic() const
 		{
 			for (auto const& method : methods) if (method->IsVirtual()) return true;
@@ -361,6 +358,9 @@ namespace ola
 			}
 			return base_class ? base_class->FindMemberDecl(name) : nullptr;
 		}
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
 

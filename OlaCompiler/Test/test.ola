@@ -1,29 +1,28 @@
 import std.io;
 
-//todo: 
 
 class Base
 {
-	public int x = 10;
-};
-
-class Base2 extends Base
-{
-	public int y = 20;
-};
-
-class S extends Base2
-{
-	public int z = 30;
-
-	public void PrintX(int x)
+	private int y = 10;
+	
+	public void PrintY()
 	{
-		PrintInt(this.x);
+		PrintInt(y);
+	}
+};
+
+class Derived extends Base
+{
+	public int x = 30;
+
+	public void PrintX()
+	{
+		PrintY();
+		PrintInt(x);
 	}
 };
 
 public int main()
 {
-	S s;
-	s.PrintX(100);
+	Derived d; d.PrintX();
 }

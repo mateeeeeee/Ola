@@ -22,7 +22,7 @@ extern "C"
 	}
 	void PrintString(char* str)
 	{
-		printf("%s", str);
+		printf("%s\n", str);
 	}
 	
 	int64_t ReadInt()

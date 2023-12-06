@@ -1,7 +1,8 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-%S = type { i64, i64, i64 }
+%Base = type { i64 }
+%Derived = type { i64, i64 }
 
 declare void @PrintInt(i64)
 
@@ -19,13 +20,23 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-define void @"S::PrintX"(ptr %this, i64 %x) {
+define void @"Base::PrintY"(ptr %this) {
 entry:
-  %0 = alloca i64, align 8
-  store i64 %x, ptr %0, align 4
-  %1 = getelementptr inbounds %S, ptr %this, i32 0, i32 0
-  %2 = load i64, ptr %1, align 4
-  call void @PrintInt(i64 %2)
+  %0 = getelementptr inbounds %Base, ptr %this, i32 0, i32 0
+  %1 = load i64, ptr %0, align 4
+  call void @PrintInt(i64 %1)
+  br label %exit
+
+exit:                                             ; preds = %entry
+  ret void
+}
+
+define void @"Derived::PrintX"(ptr %this) {
+entry:
+  call void @"Base::PrintY"(ptr %this)
+  %0 = getelementptr inbounds %Derived, ptr %this, i32 0, i32 1
+  %1 = load i64, ptr %0, align 4
+  call void @PrintInt(i64 %1)
   br label %exit
 
 exit:                                             ; preds = %entry
@@ -35,17 +46,15 @@ exit:                                             ; preds = %entry
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %S, align 8
-  %2 = getelementptr inbounds %S, ptr %1, i32 0, i32 1
-  store i64 20, ptr %2, align 4
-  %3 = getelementptr inbounds %S, ptr %1, i32 0, i32 0
-  store i64 10, ptr %3, align 4
-  %4 = getelementptr inbounds %S, ptr %1, i32 0, i32 2
-  store i64 30, ptr %4, align 4
-  call void @"S::PrintX"(ptr %1, i64 100)
+  %1 = alloca %Derived, align 8
+  %2 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 0
+  store i64 10, ptr %2, align 4
+  %3 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 1
+  store i64 30, ptr %3, align 4
+  call void @"Derived::PrintX"(ptr %1)
   br label %exit
 
 exit:                                             ; preds = %entry
-  %5 = load i64, ptr %0, align 4
-  ret i64 %5
+  %4 = load i64, ptr %0, align 4
+  ret i64 %4
 }
