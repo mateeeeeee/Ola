@@ -1,0 +1,83 @@
+% Use `pdflatex REFERENCE.tex` to produce `REFERENCE.pdf`.
+
+\documentclass[12pt]{report}
+% \documentclass[12pt, titlepage]{article}
+
+\title  {Ola Language Reference}
+\author {Mate Buljan}
+
+
+
+\usepackage{xcolor}
+% Uncomment for dark-mode PDF (don't try to print this).
+\definecolor{darkBG}{RGB}{19,20,21} \pagecolor{darkBG} \color{white}
+
+% Easy, interactive cross-references with '\hyperref[label]{text}'.
+\usepackage{hyperref}
+% Prevent section titles from appearing at the bottom of pages!
+\usepackage[nobottomtitles, nobottomtitles*]{titlesec}
+% Fancy verbatim markup, for better source code.
+\usepackage{fancyvrb}
+% Fancy headers, for chapter title page headers
+\usepackage{fancyhdr}
+
+% \titleformat{<command>}[<shape>]
+% {<format>}
+% {<label>}
+% {<sep>}
+% {<before-code>}
+% {<after-code>}
+
+% Remove numbering from chapter heading.
+\titleformat  {\chapter} [hang]
+{ \normalfont\huge\bfseries }
+{}{ 0pt }
+{  }
+{  }
+% Make chapter heading snug up to top of page.
+\titlespacing*{\chapter}{-21pt}{-72pt}{10pt}
+
+% Remove numbering from section heading.
+\titleformat  {\section} [hang]
+{ \normalfont\Large\bfseries }
+{}{ 0pt }
+{  }
+{  }
+% Make section heading have a sensible amount of spacing around it.
+\titlespacing*{\section}{-10pt}{24pt}{10pt}
+
+% Set variable paragraph skip (vertical blank space between paragraphs).
+\setlength{\parskip}{3pt plus 3pt minus 1pt}
+
+% I should probably just use geometry, but this works so...
+% Move fancy header upwards. It's like halfway down the page by default.
+\setlength{\headheight}{14.5pt}
+\addtolength{\topmargin}{-64pt}
+% Extend text downwards, it stops with like 3 inches on the bottom.
+\addtolength{\textheight}{128pt}
+
+\begin{document}
+
+
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\fancyhf{}
+\fancyhead[C]{\leftmark}
+\fancyfoot[C]{\thepage}
+
+% Title Page
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+  \maketitle
+\end{titlepage}
+
+\chapter{Chapter}
+\label{chapter}
+
+\section{Section}
+\label{section}
+
+\subsection*{Subsection}
+\label{subsection}
+
+\end{document}
