@@ -11,14 +11,14 @@ class Derived extends Base
 {
     int y = 2;
     public int GetY() const { return y; }
-    public int GetSum() const { return GetY() + GetX(); }
+    public int GetSum() const { return GetY() + super.GetSum(); }
 };
 
 class ExtendedDerived extends Derived 
 {
     int z = 3;
     public int GetZ() const { return z; }
-    public int GetSum() const { return GetZ() + GetY() + GetX(); }
+    public int GetSum() const { return GetZ() + super.GetSum(); }
 };
 
 void PassBase(Base b)

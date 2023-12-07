@@ -384,6 +384,12 @@ namespace ola
 	template <typename T> requires std::derived_from<T, Decl>
 	inline bool isa(Decl const* decl) { return T::ClassOf(decl); }
 
+	template <typename T, typename... Ts> requires (std::derived_from<T, Decl> && ... && std::derived_from<Ts, Decl>)
+	inline bool isoneof(Decl const* decl)
+	{
+		return (T::ClassOf(decl) || ... || Ts::ClassOf(decl));
+	}
+
 	template<typename T> requires std::derived_from<T, Decl>
 	inline T* cast(Decl* decl)
 	{

@@ -111,6 +111,10 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
+	void SuperExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 	void Expr::Accept(ASTVisitor& visitor) const
 	{
@@ -189,5 +193,8 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
-
+	void SuperExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
 }

@@ -12,7 +12,7 @@ Ola is a toy programming language with LLVM backend.
   * classes
 	- access modifiers: `public`, `private`
 	- single inheritance: `extends`
-	- `this` keyword
+	- `this` and `super` keywords
   * reference type: `ref`
   * automatic type deduction: `auto`
   * operators:
@@ -39,7 +39,6 @@ Ola is a toy programming language with LLVM backend.
 
 ## Todo
   * object oriented constructs (wip)
-	  - super keyword: `super`
       - virtual methods: `virtual`
       - interfaces: `implements`
 
@@ -111,8 +110,9 @@ Other types of declarations that can be be found in non-global scope are:
 - `ref`
 - `inline`
 - `noinline`
-- `virtual`
 - `extends`
+- `super`
+- `virtual`
 - `implements`
 
 ### Import statement
@@ -437,6 +437,13 @@ class Derived extends Base
 {
 	private int y = 100;
 	public int GetY() const {return y;}
+};
+
+class ExtDerived extends Derived
+{
+	private int y = 100;
+	public int GetY() const {return y;}
+	public int GetYSum() const {return this.y + super.y;}
 };
 
 public int main()

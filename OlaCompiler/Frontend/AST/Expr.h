@@ -23,7 +23,8 @@ namespace ola
 		ArrayAccess,
 		Member,
 		MemberCall,
-		This
+		This,
+		Super
 	};
 	enum class UnaryExprKind : uint8
 	{
@@ -470,7 +471,7 @@ namespace ola
 	class ThisExpr final : public Expr
 	{
 	public:
-		ThisExpr(SourceLocation const& loc) : Expr(ExprKind::This, loc) {}
+		explicit ThisExpr(SourceLocation const& loc) : Expr(ExprKind::This, loc) {}
 
 		void SetImplicit(bool _implicit)
 		{
@@ -486,9 +487,34 @@ namespace ola
 		bool implicit = false;
 	};
 
+	class SuperExpr final : public Expr
+	{
+	public:
+		explicit SuperExpr(SourceLocation const& loc) : Expr(ExprKind::Super, loc) {}
+
+		void SetImplicit(bool _implicit)
+		{
+			implicit = _implicit;
+		}
+		bool IsImplicit() const { return implicit; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Super; }
+	private:
+		bool implicit = false;
+	};
+
 
 	template <typename T> requires std::derived_from<T, Expr>
 	inline bool isa(Expr const* expr) { return T::ClassOf(expr); }
+
+	template <typename T, typename... Ts> requires (std::derived_from<T, Expr> && ... && std::derived_from<Ts, Expr>)
+	inline bool isoneof(Expr const* expr)
+	{
+		return (T::ClassOf(expr) || ... || Ts::ClassOf(expr));
+	}
 
 	template<typename T> requires std::derived_from<T, Expr>
 	inline T* cast(Expr* expr)

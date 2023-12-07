@@ -1003,6 +1003,7 @@ namespace ola
 		case TokenKind::KW_true:
 		case TokenKind::KW_false: return ParseConstantBool();
 		case TokenKind::KW_this:  return ParseThisExpression();
+		case TokenKind::KW_super:  return ParseSuperExpression();
 		default:
 			Diag(unexpected_token);
 		}
@@ -1108,6 +1109,14 @@ namespace ola
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnThisExpr(loc, false);
+	}
+
+	UniqueSuperExprPtr Parser::ParseSuperExpression()
+	{
+		OLA_ASSERT(current_token->Is(TokenKind::KW_super));
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnSuperExpr(loc, false);
 	}
 
 	UniqueDeclRefExprPtr Parser::ParseMemberIdentifier()

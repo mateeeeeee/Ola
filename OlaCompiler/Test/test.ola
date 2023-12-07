@@ -3,103 +3,18 @@ import std.Assert;
 class Base 
 {
     int x = 1;
-    public int GetX() const { return x; }
-    public int GetSum() const { return GetX(); }
 };
 
 class Derived extends Base
 {
-    int y = 2;
-    public int GetY() const { return y; }
-    public int GetSum() const { return GetY() + GetX(); }
+    int x = 2;
+    public int GetSum() const { return this.x + super.x; }
 };
 
-class ExtendedDerived extends Derived 
-{
-    int z = 3;
-    public int GetZ() const { return z; }
-    public int GetSum() const { return GetZ() + GetY() + GetX(); }
-};
 
-void PassBase(Base b)
-{
-    Assert(b.GetX() == 1);   
-    Assert(b.GetSum() == 1);   
-}
-void PassBaseRef(ref Base b)
-{
-    Assert(b.GetX() == 1);   
-    Assert(b.GetSum() == 1);   
-}
-
-void PassDerived(Derived d)
-{
-    Assert(d.GetX() == 1);   
-    Assert(d.GetY() == 2);   
-    Assert(d.GetSum() == 3);   
-}
-void PassDerivedRef(ref Derived d)
-{
-    Assert(d.GetX() == 1);   
-    Assert(d.GetY() == 2);   
-    Assert(d.GetSum() == 3);   
-}
-
-void TestAssignment() 
-{
-    Derived d;
-    Base b1 = d;
-    Assert(b1.GetX() == 1);   
-    Assert(b1.GetSum() == 1);  
-    PassBase(b1);
-    PassBaseRef(b1);
-
-    ExtendedDerived d2;
-    Assert(d2.GetSum() == 6);
-    Assert(d2.GetZ() == 3);
-
-    Base b2 = d2;
-    Assert(b2.GetX() == 1);   
-    Assert(b2.GetSum() == 1);   
-    PassBase(b2);
-    PassBaseRef(b2);
-
-    Derived d3 = d2;
-    Assert(d3.GetX() == 1);
-    Assert(d3.GetY() == 2);
-    Assert(d3.GetSum() == 3);
-    PassDerived(d3);
-    PassDerivedRef(d3);
-}
-
-void TestReferenceAssignment() 
-{
-    Derived d;
-    ref Base b1 = d;
-    Assert(b1.GetX() == 1);   
-    Assert(b1.GetSum() == 1);   
-
-    ExtendedDerived d2;
-    
-    ref Base b2 = d2;
-    Assert(b2.GetX() == 1);   
-    Assert(b2.GetSum() == 1);   
-
-    ref Derived d3 = d2;
-    Assert(d3.GetX() == 1);
-    Assert(d3.GetY() == 2);
-    Assert(d3.GetSum() == 3);
-
-    Base b3 = d3;
-    Assert(b3.GetX() == 1);   
-    Assert(b3.GetSum() == 1);  
-    PassBase(b3);
-    PassBaseRef(b3);
-}
 
 public int main() 
 {
-    TestAssignment();
-    TestReferenceAssignment();
-    return 0;
+    Derived d;
+    return d.GetSum();
 }

@@ -107,8 +107,9 @@ KEYWORD(import)
 KEYWORD(ref)
 KEYWORD(inline)
 KEYWORD(noinline)
-KEYWORD(virtual)
 KEYWORD(extends)
+KEYWORD(super)
+KEYWORD(virtual)
 KEYWORD(implements)
 
 #undef KEYWORD

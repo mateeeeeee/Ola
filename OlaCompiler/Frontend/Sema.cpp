@@ -936,7 +936,7 @@ namespace ola
 			if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
 			{
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
-				return ActOnMemberExpr(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
+				return ActOnMemberExpr(loc, ActOnSuperExpr(loc, true), std::move(decl_ref));
 			}
 		}
 		diagnostics.Report(loc, undeclared_identifier, name);
@@ -948,7 +948,7 @@ namespace ola
 		if (!ctx.current_class_expr_stack.empty())
 		{
 			Expr const* current_class_expr = ctx.current_class_expr_stack.back();
-			if (!isa<ThisExpr>(current_class_expr))
+			if (!isoneof<ThisExpr, SuperExpr>(current_class_expr))
 			{
 				QualType const& class_expr_type = current_class_expr->GetType();
 				ClassType const* class_type = nullptr;
@@ -977,13 +977,16 @@ namespace ola
 					return decl_ref;
 				}
 			}
-			else if (Decl* decl = ctx.decl_sym_table.LookUpMember(name))
+			else if (isa<ThisExpr>(current_class_expr))
 			{
+				Decl* decl = ctx.decl_sym_table.LookUpMember(name);
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 				return decl_ref;
 			}
-			else if (ClassDecl const* base_class_decl = ctx.current_base_class)
+			else if (isa<SuperExpr>(current_class_expr))
 			{
+				OLA_ASSERT(ctx.current_base_class);
+				ClassDecl const* base_class_decl = ctx.current_base_class;
 				if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
 				{
 					UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
@@ -1089,7 +1092,7 @@ namespace ola
 				return nullptr;
 			}
 		}
-		if (!isa<ThisExpr>(class_expr.get()) && member_identifier->GetDecl()->IsPrivate())
+		if (!isoneof<ThisExpr, SuperExpr>(class_expr.get()) && member_identifier->GetDecl()->IsPrivate())
 		{
 			diagnostics.Report(loc, private_member_access);
 			return nullptr;
@@ -1113,6 +1116,20 @@ namespace ola
 		QualType this_type(ClassType(nullptr), ctx.is_method_const ? Qualifier_Const : Qualifier_None);
 		this_expr->SetType(this_type);
 		return this_expr;
+	}
+
+	UniqueSuperExprPtr Sema::ActOnSuperExpr(SourceLocation const& loc, bool implicit)
+	{
+		if (!ctx.current_base_class)
+		{
+			diagnostics.Report(loc, super_used_in_wrong_context);
+			return nullptr;
+		}
+		UniqueSuperExprPtr super_expr = MakeUnique<SuperExpr>(loc);
+		super_expr->SetImplicit(implicit);
+		QualType super_type(ClassType(ctx.current_base_class), ctx.is_method_const ? Qualifier_Const : Qualifier_None);
+		super_expr->SetType(super_type);
+		return super_expr;
 	}
 
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)

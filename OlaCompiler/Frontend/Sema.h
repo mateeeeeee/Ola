@@ -108,6 +108,7 @@ namespace ola
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
 		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier);
 		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, bool implicit);
+		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, bool implicit);
 
 	private:
 		Diagnostics& diagnostics;

@@ -52,6 +52,7 @@ namespace ola
 	class MemberExpr;
 	class MemberCallExpr;
 	class ThisExpr;
+	class SuperExpr;
 
 	struct AST;
 }

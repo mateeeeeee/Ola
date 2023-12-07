@@ -1229,6 +1229,11 @@ namespace ola
 		llvm_value_map[&this_expr] = this_value;
 	}
 
+	void LLVMVisitor::Visit(SuperExpr const& super_expr, uint32)
+	{
+		llvm_value_map[&super_expr] = this_value;
+	}
+
 	void LLVMVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
 	{
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", func);

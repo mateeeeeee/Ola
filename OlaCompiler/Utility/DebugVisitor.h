@@ -58,5 +58,6 @@ namespace ola
 		virtual void Visit(MemberExpr const&, uint32) override;
 		virtual void Visit(MemberCallExpr const&, uint32) override;
 		virtual void Visit(ThisExpr const&, uint32) override;
+		virtual void Visit(SuperExpr const&, uint32) override;
 	};
 }

@@ -106,6 +106,7 @@ namespace ola
 		OLA_NODISCARD UniqueConstantFloatPtr ParseConstantFloat();
 		OLA_NODISCARD UniqueExprPtr ParseIdentifier();
 		OLA_NODISCARD UniqueThisExprPtr ParseThisExpression();
+		OLA_NODISCARD UniqueSuperExprPtr ParseSuperExpression();
 		OLA_NODISCARD UniqueDeclRefExprPtr ParseMemberIdentifier();
 		OLA_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
