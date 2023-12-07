@@ -10,64 +10,60 @@ namespace ola
 	}
 	bool RefType::IsSameAs(Type const& other) const
 	{
-		if (other.IsNot(TypeKind::Ref)) return false;
+		if (!isa<RefType>(other)) return false;
 		RefType const& other_ref_type = type_cast<RefType>(other);
 		return type->IsSameAs(other_ref_type.GetReferredType());
 	}
 
 	bool VoidType::IsAssignableFrom(Type const& other) const
 	{
-		return other.Is(TypeKind::Void);
+		return isa<VoidType>(other); 
 	}
 
 	bool BoolType::IsAssignableFrom(Type const& other) const
 	{
-		return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
+		return isoneof<BoolType,IntType,FloatType>(other);
 	}
 
 	bool CharType::IsAssignableFrom(Type const& other) const
 	{
-		if (other.Is(TypeKind::Ref))
+		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
 		{
-			RefType const& other_ref = type_cast<RefType>(other);
-			QualType const& referred_type = other_ref.GetReferredType();
-			return referred_type.IsNull() || referred_type->Is(TypeKind::Char);
+			QualType const& referred_type = ref_other->GetReferredType();
+			return referred_type.IsNull() || isa<CharType>(referred_type); 
 		}
-		else return other.Is(TypeKind::Char);
+		else return isa<CharType>(other);
 	}
 
 	bool IntType::IsAssignableFrom(Type const& other) const
 	{
-		if (other.Is(TypeKind::Ref))
+		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
 		{
-			RefType const& other_ref = type_cast<RefType>(other);
-			QualType const& referred_type = other_ref.GetReferredType();
-			return referred_type.IsNull() || referred_type->Is(TypeKind::Int);
+			QualType const& referred_type = ref_other->GetReferredType();
+			return referred_type.IsNull() || isa<IntType>(referred_type);
 		}
-		else return other.IsOneOf(TypeKind::Bool, TypeKind::Int, TypeKind::Float);
+		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
 
 	bool FloatType::IsAssignableFrom(Type const& other) const
 	{
-		if (other.Is(TypeKind::Ref))
+		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
 		{
-			RefType const& other_ref = type_cast<RefType>(other);
-			QualType const& referred_type = other_ref.GetReferredType();
+			QualType const& referred_type = ref_other->GetReferredType();
 			return referred_type.IsNull() || referred_type->Is(TypeKind::Float);
 		}
-		else
-			return other.IsOneOf(TypeKind::Bool, TypeKind::Float, TypeKind::Int);
+		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
 
 	bool ArrayType::IsAssignableFrom(Type const& other) const
 	{
-		if (other.IsNot(TypeKind::Array)) return false;
+		if (!isa<ArrayType>(other)) return false;
 		ArrayType const& other_array_type = type_cast<ArrayType>(other);
 		return base_type->IsAssignableFrom(other_array_type.base_type);
 	}
 	bool ArrayType::IsSameAs(Type const& other) const
 	{
-		if (other.IsNot(TypeKind::Array)) return false;
+		if (!isa<ArrayType>(other)) return false;
 		ArrayType const& other_array_type = type_cast<ArrayType>(other);
 		return base_type->IsSameAs(other_array_type.base_type);
 	}
@@ -83,6 +79,18 @@ namespace ola
 
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		uint32 offset = 0;
+		ClassDecl const* curr_base_class_decl = class_decl->GetBaseClass();
+		while (curr_base_class_decl)
+		{
+			for (auto const& field : curr_base_class_decl->GetFields())
+			{
+				QualType const& mem_type = field->GetType();
+				offset = AlignTo(offset, mem_type->GetAlign());
+				offset += mem_type->GetSize();
+				if (GetAlign() < mem_type->GetAlign()) SetAlign(mem_type->GetAlign());
+			}
+			curr_base_class_decl = curr_base_class_decl->GetBaseClass();
+		}
 		for (auto const& field : class_decl->GetFields())
 		{
 			QualType const& mem_type = field->GetType();
@@ -96,13 +104,16 @@ namespace ola
 	{
 		if (!IsSameAs(other))
 		{
-			if (other.Is(TypeKind::Ref))
+			if (RefType const* ref_other = dyn_type_cast<RefType>(other))
 			{
-				RefType const& ref_other = type_cast<RefType>(other);
-				if (!ref_other.GetReferredType()->Is(TypeKind::Class)) return false;
-				QualType const& referred_type = ref_other.GetReferredType();
+				if (!isa<ClassType>(ref_other->GetReferredType())) return false;
+				QualType const& referred_type = ref_other->GetReferredType();
 				ClassType const& referred_class_type = type_cast<ClassType>(referred_type);
 				return IsSameAs(referred_class_type);
+			}
+			else if (ClassType const* class_other = dyn_type_cast<ClassType>(other))
+			{
+				return class_other->GetClassDecl()->IsDerivedFrom(class_decl);
 			}
 			else return false;
 		}
@@ -111,7 +122,7 @@ namespace ola
 
 	bool ClassType::IsSameAs(Type const& other) const
 	{
-		if (other.GetKind() != TypeKind::Class) return false;
+		if (!isa<ClassType>(other)) return false;
 		ClassType const& class_type = type_cast<ClassType>(other);
 		return class_decl == class_type.GetClassDecl();
 	}

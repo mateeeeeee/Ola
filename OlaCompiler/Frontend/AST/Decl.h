@@ -331,6 +331,16 @@ namespace ola
 		}
 		ClassDecl const* GetBaseClass() const { return base_class; }
 
+		bool IsDerivedFrom(ClassDecl const* base) const
+		{
+			ClassDecl const* curr_base_class = base_class;
+			while (curr_base_class)
+			{
+				if (curr_base_class == base) return true;
+				curr_base_class = curr_base_class->base_class;
+			}
+			return false;
+		}
 		bool IsPolymorphic() const
 		{
 			for (auto const& method : methods) if (method->IsVirtual()) return true;

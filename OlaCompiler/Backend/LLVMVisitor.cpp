@@ -1020,6 +1020,11 @@ namespace ola
 			{
 				llvm_value_map[&cast_expr] = cast_operand_value;
 			}
+			else if (IsStruct(cast_operand_type))
+			{
+				llvm::Value* bitcast_value = builder.CreateBitCast(cast_operand_value, GetPointerType(cast_type));
+				llvm_value_map[&cast_expr] = builder.CreateStructGEP(cast_type, bitcast_value, 0);
+			}
 			else OLA_ASSERT(false);
 		}
 		else if (IsRef(cast_type))
@@ -1400,6 +1405,11 @@ namespace ola
 			OLA_UNREACHABLE();
 		}
 		return nullptr;
+	}
+
+	llvm::Type* LLVMVisitor::GetPointerType(llvm::Type* type)
+	{
+		return llvm::PointerType::get(type, 0);
 	}
 
 	llvm::Value* LLVMVisitor::Load(QualType const& type, llvm::Value* ptr)

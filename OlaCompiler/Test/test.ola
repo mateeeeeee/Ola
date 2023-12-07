@@ -1,7 +1,7 @@
 import std.io;
 
 
-class Base
+class Base 
 {
 	private int y = 10;
 	
@@ -22,7 +22,14 @@ class Derived extends Base
 	}
 };
 
+void Test(Base b)
+{
+	b.PrintY();
+}
+
 public int main()
 {
-	Derived d; d.PrintX();
+	Derived d; 
+	Base b = d;
+	b.PrintY();
 }

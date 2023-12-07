@@ -120,6 +120,7 @@ namespace ola
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
 		llvm::Type* ConvertToLLVMType(QualType const&);
+		llvm::Type* GetPointerType(llvm::Type*);
 
 		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
