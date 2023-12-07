@@ -26,10 +26,15 @@ void Test(Base b)
 {
 	b.PrintY();
 }
+void Test2(ref Base b)
+{
+	b.PrintY();
+}
 
 public int main()
 {
 	Derived d; 
-	Base b = d;
-	b.PrintY();
+	ref Derived refd = d;
+	Test(refd);
+	Test2(refd);
 }

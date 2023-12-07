@@ -83,16 +83,6 @@ TEST(Iteration, DoWhile)
 	EXPECT_EQ(OLA(-i test_dowhile), 0);
 }
 
-TEST(Declarations, Functions) 
-{
-	
-}
-
-TEST(Declarations, Variables)
-{
-
-}
-
 TEST(Declarations, Import)
 {
 
@@ -137,6 +127,11 @@ TEST(Misc, Strings)
 TEST(Misc, ImplicitCasts)
 {
 	EXPECT_EQ(OLA(-i test_implicitcasts), 0);
+}
+
+TEST(Classes, Inheritance)
+{
+	EXPECT_EQ(OLA(-i test_inheritance), 0);
 }
 
 

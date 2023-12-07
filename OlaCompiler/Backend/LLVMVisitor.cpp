@@ -276,7 +276,7 @@ namespace ola
 					{
 						OLA_ASSERT(IsArrayType(init_expr->GetType()));
 						llvm::Type* init_expr_type = ConvertToLLVMType(init_expr->GetType());
-						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm::PointerType::get(llvm_element_type, 0), nullptr);
+						llvm::AllocaInst* alloc = builder.CreateAlloca(GetPointerType(llvm_element_type), nullptr);
 						llvm::Value* ptr = nullptr;
 						if (init_expr_type->isArrayTy()) ptr = builder.CreateInBoundsGEP(init_expr_type, llvm_value_map[init_expr], { zero, zero });
 						else ptr = builder.CreateLoad(init_expr_type, llvm_value_map[init_expr]);
@@ -1350,7 +1350,7 @@ namespace ola
 		{
 			ArrayType const& array_type = type_cast<ArrayType>(type);
 			if (array_type.GetArraySize() > 0) return llvm::ArrayType::get(ConvertToLLVMType(array_type.GetBaseType()), array_type.GetArraySize());
-			else return llvm::PointerType::get(ConvertToLLVMType(array_type.GetBaseType()), 0);
+			else return GetPointerType(ConvertToLLVMType(array_type.GetBaseType()));
 		}
 		case TypeKind::Function:
 		{

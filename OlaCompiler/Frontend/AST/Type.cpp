@@ -109,7 +109,7 @@ namespace ola
 				if (!isa<ClassType>(ref_other->GetReferredType())) return false;
 				QualType const& referred_type = ref_other->GetReferredType();
 				ClassType const& referred_class_type = type_cast<ClassType>(referred_type);
-				return IsSameAs(referred_class_type);
+				return IsAssignableFrom(referred_class_type);
 			}
 			else if (ClassType const* class_other = dyn_type_cast<ClassType>(other))
 			{

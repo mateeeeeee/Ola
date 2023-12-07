@@ -35,6 +35,7 @@ set(WAVE_TESTS
 	Tests/test_implicitcasts.ola
 	Tests/test_class.ola
 	Tests/test_ref.ola
+	Tests/test_inheritance.ola
 )
 
 add_executable(OlaTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})

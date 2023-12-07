@@ -70,6 +70,26 @@ Test:                                   # @Test
 	ret
 	.seh_endproc
                                         # -- End function
+	.def	Test2;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function Test2
+Test2:                                  # @Test2
+.seh_proc Test2
+# %bb.0:                                # %entry
+	sub	rsp, 40
+	.seh_stackalloc 40
+	.seh_endprologue
+	mov	qword ptr [rsp + 32], rcx
+	mov	rcx, qword ptr [rsp + 32]
+	call	"Base::PrintY"
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 40
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -84,10 +104,14 @@ main:                                   # @main
 	.seh_endprologue
 	mov	qword ptr [rsp + 48], 10
 	mov	qword ptr [rsp + 56], 30
-	mov	rax, qword ptr [rsp + 48]
+	lea	rax, [rsp + 48]
 	mov	qword ptr [rsp + 40], rax
-	lea	rcx, [rsp + 40]
-	call	"Base::PrintY"
+	mov	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rsp + 32], rax       # 8-byte Spill
+	mov	rcx, qword ptr [rax]
+	call	Test
+	mov	rcx, qword ptr [rsp + 32]       # 8-byte Reload
+	call	Test2
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 64]
 	add	rsp, 72
@@ -97,3 +121,5 @@ main:                                   # @main
 	.addrsig
 	.addrsig_sym PrintInt
 	.addrsig_sym "Base::PrintY"
+	.addrsig_sym Test
+	.addrsig_sym Test2

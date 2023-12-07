@@ -54,6 +54,18 @@ exit:                                             ; preds = %entry
   ret void
 }
 
+define internal void @Test2(ptr %b) {
+entry:
+  %0 = alloca ptr, align 8
+  store ptr %b, ptr %0, align 8
+  %1 = load ptr, ptr %0, align 8
+  call void @"Base::PrintY"(ptr %1)
+  br label %exit
+
+exit:                                             ; preds = %entry
+  ret void
+}
+
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
@@ -63,18 +75,17 @@ entry:
   %3 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 1
   store i64 30, ptr %3, align 4
   %4 = load %Derived, ptr %1, align 4
-  %5 = getelementptr inbounds %Base, ptr %1, i32 0, i32 0
-  %6 = alloca %Base, align 8
-  call void @llvm.memcpy.p0.p0.i64(ptr %6, ptr %5, i64 8, i1 false)
-  call void @"Base::PrintY"(ptr %6)
+  %5 = alloca ptr, align 8
+  store ptr %1, ptr %5, align 8
+  %6 = load ptr, ptr %5, align 8
+  %7 = load ptr, ptr %6, align 8
+  %8 = load %Base, ptr %6, align 4
+  call void @Test(%Base %8)
+  %9 = load ptr, ptr %6, align 8
+  call void @Test2(ptr %6)
   br label %exit
 
 exit:                                             ; preds = %entry
-  %7 = load i64, ptr %0, align 4
-  ret i64 %7
+  %10 = load i64, ptr %0, align 4
+  ret i64 %10
 }
-
-; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
-declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #0
-
-attributes #0 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }

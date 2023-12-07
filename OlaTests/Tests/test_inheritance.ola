@@ -1,0 +1,7 @@
+import std.assert;
+
+
+public int main()
+{
+	return 0;
+}
