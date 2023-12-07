@@ -1,7 +1,7 @@
 <img align="left" src="OlaCompiler/olalogo.jpg" width="120px"/>
 
 # Ola
-Ola is a C-like programming language with LLVM backend. 
+Ola is a toy programming language with LLVM backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -11,6 +11,7 @@ Ola is a C-like programming language with LLVM backend.
 ## Features
   * classes
 	- access modifiers: `public`, `private`
+	- single inheritance: `extends`
 	- `this` keyword
   * reference type: `ref`
   * automatic type deduction: `auto`
@@ -38,8 +39,8 @@ Ola is a C-like programming language with LLVM backend.
 
 ## Todo
   * object oriented constructs (wip)
-      - virtual methods: `extends`
-      - single inheritance: `extends`
+	  - super keyword: `super`
+      - virtual methods: `virtual`
       - interfaces: `implements`
 
 ## Structure
@@ -422,6 +423,31 @@ Class declaration consists of a sequence of method definitions and field declara
 Every method or field declaration has a visibility, either `public` or `private`. By default, if nothing is specified, the visibility
 is `private` which means it cannot be used outside of the class. 
 `this` keyword can be used to disambiguate between symbols.
+Classes currently support single inheritance using `extends` keyword (No polymorphism for now).
+```
+import std.assert;
+
+class Base
+{
+	private int x = 10;
+	public int GetX() const {return x;}
+};
+
+class Derived extends Base
+{
+	private int y = 100;
+	public int GetY() const {return y;}
+};
+
+public int main()
+{
+	Derived d;
+	int y = d.GetY(); //y = 100
+	int x = d.GetX(); //x = 10
+	Base b = d;
+	return b.GetX();
+}
+```
 
 ### Strings
 Strings are just arrays of chars. `string` is a built-in alias for `char[]`. 
