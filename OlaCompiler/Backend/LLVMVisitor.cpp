@@ -76,7 +76,6 @@ namespace ola
 		llvm::Type* class_type = ConvertToLLVMType(ClassType(class_decl));
 
 		FuncType const& function_type = method_decl.GetFuncType();
-
 		auto MemberTypeToLLVM = [&](FuncType const& type)
 			{
 				std::span<QualType const> function_params = type.GetParams();
@@ -102,7 +101,6 @@ namespace ola
 		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
-		this_struct_type = class_type;
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
 		if (IsClassType(function_type.GetReturnType()))
@@ -113,7 +111,10 @@ namespace ola
 		}
 		llvm::Value* llvm_param = &*param_arg;
 		llvm_param->setName("this");
+
+		this_struct_type = class_type;
 		this_value = llvm_param;
+
 		++param_arg;
 		for (auto& param : method_decl.GetParamDecls())
 		{
@@ -131,7 +132,6 @@ namespace ola
 		}
 
 		VisitFunctionDeclCommon(method_decl, llvm_function);
-
 		this_value = nullptr;
 		this_struct_type = nullptr;
 	}
@@ -140,9 +140,9 @@ namespace ola
 	{
 		QualType const& var_type = var_decl.GetType();
 		llvm::Type* llvm_type = ConvertToLLVMType(var_type);
-		bool const is_array = var_type->Is(TypeKind::Array);
-		bool const is_class = var_type->Is(TypeKind::Class);
-		bool const is_ref   = var_type->Is(TypeKind::Ref);
+		bool const is_array = isa<ArrayType>(var_type); 
+		bool const is_class = isa<ClassType>(var_type); 
+		bool const is_ref   = isa<RefType>(var_type);   
 
 		if (var_decl.IsGlobal())
 		{
@@ -242,7 +242,7 @@ namespace ola
 				{
 					ArrayType const& array_type = type_cast<ArrayType>(var_type);
 					llvm::Type* llvm_element_type = ConvertToLLVMType(array_type.GetBaseType());
-					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
+					llvm::ConstantInt* zero = builder.getInt64(0); 
 					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
 						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
@@ -250,13 +250,13 @@ namespace ola
 
 						for (uint64 i = 0; i < init_list.size(); ++i)
 						{
-							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::ConstantInt* index = builder.getInt64(i); 
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 							Store(value_map[init_list[i].get()], ptr);
 						}
 						for (uint64 i = init_list.size(); i < array_type.GetArraySize(); ++i)
 						{
-							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::ConstantInt* index = builder.getInt64(i);
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 							Store(llvm::Constant::getNullValue(llvm_element_type), ptr);
 						}
@@ -268,13 +268,13 @@ namespace ola
 						std::string_view str = string->GetString();
 						for (uint64 i = 0; i < str.size(); ++i)
 						{
-							llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, i, true));
+							llvm::ConstantInt* index = builder.getInt64(i);
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 							Store(llvm::ConstantInt::get(char_type, str[i], true), ptr);
 						}
-						llvm::ConstantInt* index = llvm::ConstantInt::get(context, llvm::APInt(64, str.size(), true));
+						llvm::ConstantInt* index = builder.getInt64(str.size()); 
 						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
-						Store(llvm::ConstantInt::get(char_type, '\0', true), ptr);
+						Store(builder.getInt8('\0'), ptr);
 						value_map[&var_decl] = alloc;
 					}
 					else if (isoneof<DeclRefExpr, ArrayAccessExpr>(init_expr))
@@ -307,7 +307,7 @@ namespace ola
 
 					llvm::Value* init_value = value_map[init_expr];
 					
-					builder.CreateMemCpy(struct_alloc, llvm::MaybeAlign(), init_value, llvm::MaybeAlign(), llvm::ConstantInt::get(int_type, struct_size));
+					builder.CreateMemCpy(struct_alloc, llvm::MaybeAlign(), init_value, llvm::MaybeAlign(), builder.getInt64(struct_size));
 					value_map[&var_decl] = struct_alloc;
 				}
 				else if (is_ref)
@@ -405,7 +405,7 @@ namespace ola
 
 	void LLVMVisitor::Visit(EnumMemberDecl const& enum_member, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, enum_member.GetValue());
+		llvm::ConstantInt* constant = builder.getInt64(enum_member.GetValue()); 
 		value_map[&enum_member] = constant;
 	}
 
@@ -647,7 +647,7 @@ namespace ola
 		else
 		{
 			int64 case_value = case_stmt.GetValue();
-			llvm::ConstantInt* llvm_case_value = llvm::ConstantInt::get(int_type, case_value);
+			llvm::ConstantInt* llvm_case_value = builder.getInt64(case_value);
 
 			llvm::Function* function = builder.GetInsertBlock()->getParent();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
@@ -1206,18 +1206,21 @@ namespace ola
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 
 		llvm::Function* called_function = nullptr;
-		if (false && method_decl->IsVirtual())
+		if (method_decl->IsVirtual())
 		{
 			Expr const* class_expr = member_expr->GetClassExpr();
-			if (!value_map[class_expr]) class_expr->Accept(*this);
-			llvm::Value* struct_value = this_value ? this_value : value_map[class_expr];
-			OLA_ASSERT(struct_value);
-			llvm::Type* struct_type = this_struct_type ? this_struct_type : GetStructType(class_expr->GetType());
+			class_expr->Accept(*this);
+			llvm::Value* struct_value = value_map[class_expr];
+			llvm::Type* struct_type = GetStructType(class_expr->GetType());
 			llvm::Value* vtable_ptr = builder.CreateStructGEP(struct_type, struct_value, 0);
-			OLA_ASSERT(isa<llvm::GlobalVariable>(vtable_ptr));
-			llvm::GlobalVariable* g_Vtable = cast<llvm::GlobalVariable>(vtable_ptr);
-			//llvm::Value* vtable_entry = builder.CreateGEP(vtable, builder.getInt32(index));
-			
+			llvm::Value* vtable = builder.CreateLoad(GetPointerType(GetPointerType(char_type)), vtable_ptr);
+
+			llvm::Value* indices[] = { builder.getInt32(method_decl->GetVTableIndex()) };
+			llvm::Value* vtable_entry = builder.CreateGEP(GetPointerType(char_type), vtable, indices);
+
+
+			//llvm::Value* elementPtr = builder.CreateInBoundsGEP(vtable_ptr, vtable_ptr, indices);
+			//return builder.CreateLoad(elementPtr);
 		}
 		else
 		{
@@ -1356,7 +1359,7 @@ namespace ola
 		else if (IsInteger(condition_value->getType()))
 		{
 			llvm::Value* condition = Load(int_type, condition_value);
-			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+			llvm::Value* boolean_cond = builder.CreateICmpNE(condition, builder.getInt64(0));
 			builder.CreateCondBr(boolean_cond, true_block, false_block);
 		}
 		else if (IsFloat(condition_value->getType()))
@@ -1423,7 +1426,7 @@ namespace ola
 			std::vector<llvm::Type*> llvm_member_types;
 			if (class_decl->IsPolymorphic())
 			{
-				llvm_member_types.push_back(GetPointerType(void_type));
+				llvm_member_types.push_back(GetPointerType(GetPointerType(char_type)));
 			}
 			ClassDecl const* curr_class_decl = class_decl;
 			while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
@@ -1489,7 +1492,7 @@ namespace ola
 				llvm::AllocaInst* alloc = cast<llvm::AllocaInst>(ptr);
 				if (alloc->getAllocatedType()->isArrayTy())
 				{
-					llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
+					llvm::ConstantInt* zero = builder.getInt64(0);
 					llvm::ArrayType* array_type = cast<llvm::ArrayType>(alloc->getAllocatedType());
 					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
 				}
