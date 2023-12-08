@@ -2,16 +2,16 @@
 
 extern "C"
 {
-	extern double E        = 2.71828182845904523536 ;  // e
-	extern double LOG2E    = 1.44269504088896340736 ;  // log2(e)
-	extern double LOG10E   = 0.434294481903251827651;  // log10(e)
-	extern double LN2      = 0.693147180559945309417;  // ln(2)
-	extern double LN10     = 2.30258509299404568402 ;  // ln(10)
-	extern double PI       = 3.14159265358979323846 ;  // pi
-	extern double PI_2     = 1.57079632679489661923 ;  // pi/2
-	extern double PI_4     = 0.785398163397448309616;  // pi/4
-	extern double SQRT2    = 1.41421356237309504880 ;  // sqrt(2)
-	extern double SQRT1_2  = 0.707106781186547524401;  // 1/sqrt(2)
+	extern const double E        = 2.71828182845904523536;  
+	extern const double LOG2E    = 1.44269504088896340736;  
+	extern const double LOG10E   = 0.434294481903251827651;  
+	extern const double LN2      = 0.693147180559945309417;  
+	extern const double LN10     = 2.30258509299404568402;  
+	extern const double PI       = 3.14159265358979323846;  
+	extern const double PI_2     = 1.57079632679489661923;  
+	extern const double PI_4     = 0.785398163397448309616;  
+	extern const double SQRT2    = 1.41421356237309504880;  
+	extern const double SQRT1_2  = 0.707106781186547524401;  
 
 	double Fabs(double x)
 	{

@@ -1,20 +1,22 @@
-import std.Assert;
+import std.assert;
 
 class Base 
 {
     int x = 1;
+
+    public int GetX() virtual const {return x;}
 };
 
 class Derived extends Base
 {
     int x = 2;
-    public int GetSum() const { return this.x + super.x; }
+    public int GetX() virtual const {return x;}
 };
-
-
 
 public int main() 
 {
-    Derived d;
-    return d.GetSum();
+    //Derived d;
+    //ref Base b = d;
+    //return b.GetX();
+    return 0;
 }

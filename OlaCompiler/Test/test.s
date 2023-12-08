@@ -7,20 +7,39 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	"Derived::GetSum";
+	.def	"Base::GetX";
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	"Derived::GetSum"               # -- Begin function Derived::GetSum
+	.globl	"Base::GetX"                    # -- Begin function Base::GetX
 	.p2align	4, 0x90
-"Derived::GetSum":                      # @"Derived::GetSum"
-.seh_proc "Derived::GetSum"
+"Base::GetX":                           # @"Base::GetX"
+.seh_proc "Base::GetX"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	pop	rcx
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"Derived::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Derived::GetX"                 # -- Begin function Derived::GetX
+	.p2align	4, 0x90
+"Derived::GetX":                        # @"Derived::GetX"
+.seh_proc "Derived::GetX"
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
 	mov	rax, qword ptr [rcx + 8]
-	add	rax, qword ptr [rcx]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -40,10 +59,11 @@ main:                                   # @main
 	sub	rsp, 56
 	.seh_stackalloc 56
 	.seh_endprologue
-	mov	qword ptr [rsp + 32], 1
-	mov	qword ptr [rsp + 40], 2
-	lea	rcx, [rsp + 32]
-	call	"Derived::GetSum"
+	mov	ecx, 5
+	call	AllocateInts
+	mov	qword ptr [rsp + 40], rax
+	mov	rax, qword ptr [rsp + 40]
+	mov	rax, qword ptr [rax]
 	mov	qword ptr [rsp + 48], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 48]
@@ -52,4 +72,4 @@ main:                                   # @main
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym "Derived::GetSum"
+	.addrsig_sym AllocateInts

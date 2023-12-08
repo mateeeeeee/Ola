@@ -1,0 +1,11 @@
+extern int[] AllocateInts(int count);
+extern void FreeInts(int[] arr);
+
+extern float[] AllocateFloats(int count);
+extern void FreeFloats(float[] arr);
+
+extern char[] AllocateChars(int count);
+extern void FreeChars(char[] arr);
+
+extern bool[] AllocateBools(int count);
+extern void FreeBools(bool[] arr);

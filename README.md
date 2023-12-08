@@ -44,7 +44,8 @@ Ola is a toy programming language with LLVM backend.
 
 ## Structure
 Ola consists of three parts: 
-1. __Ola library__ - standard library for Ola language implemented in C and built as static library to be used by the compiler.  Currently it contains 4 files: olaio.h, olamath.h, olaassert.h, olastring.h.
+1. __Ola library__ - standard library for Ola language implemented in C and built as static library to be used by the compiler.  Currently it contains 5 files: 
+	olaio.h, olamath.h, olaassert.h, olastring.h, olamemory.h.
 2. __Ola compiler__ - consists of the following parts:
    * __Lexer__ - turns source file into a sequence of tokens
    * __Import Processor__ - receives tokens from previous phase and processes import statements. 

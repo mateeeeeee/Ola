@@ -272,7 +272,7 @@ namespace ola
 						Store(llvm::ConstantInt::get(char_type, '\0', true), ptr);
 						llvm_value_map[&var_decl] = alloc;
 					}
-					else if (init_expr->GetExprKind() == ExprKind::DeclRef || init_expr->GetExprKind() == ExprKind::ArrayAccess)
+					else if (isoneof<DeclRefExpr, ArrayAccessExpr>(init_expr))
 					{
 						OLA_ASSERT(IsArrayType(init_expr->GetType()));
 						llvm::Type* init_expr_type = ConvertToLLVMType(init_expr->GetType());
@@ -283,7 +283,13 @@ namespace ola
 						builder.CreateStore(ptr, alloc);
 						llvm_value_map[&var_decl] = alloc;
 					}
-					else OLA_ASSERT(false);
+					else if (isoneof<CallExpr, MemberCallExpr>(init_expr))
+					{
+						OLA_ASSERT(IsArrayType(init_expr->GetType()));
+						llvm::AllocaInst* alloc = builder.CreateAlloca(GetPointerType(llvm_element_type), nullptr);
+						builder.CreateStore(llvm_value_map[init_expr], alloc);
+						llvm_value_map[&var_decl] = alloc;
+					}
 				}
 				else if (is_class)
 				{
