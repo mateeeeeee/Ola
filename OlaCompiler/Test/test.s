@@ -56,20 +56,14 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 56
-	.seh_stackalloc 56
+	push	rax
+	.seh_stackalloc 8
 	.seh_endprologue
-	mov	ecx, 5
-	call	AllocateInts
-	mov	qword ptr [rsp + 40], rax
-	mov	rax, qword ptr [rsp + 40]
-	mov	rax, qword ptr [rax]
-	mov	qword ptr [rsp + 48], rax
+	mov	qword ptr [rsp], 0
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 48]
-	add	rsp, 56
+	mov	rax, qword ptr [rsp]
+	pop	rcx
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym AllocateInts
