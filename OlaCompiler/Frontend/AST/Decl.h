@@ -175,7 +175,7 @@ namespace ola
 		ConstLabelStmtPtrList GetLabels() const;
 		FuncType const& GetFuncType() const
 		{
-			OLA_ASSERT(GetType()->GetKind() == TypeKind::Function);
+			OLA_ASSERT(isa<FuncType>(GetType()));
 			return type_cast<FuncType>(GetType());
 		}
 		bool HasDefinition() const

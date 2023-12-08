@@ -39,7 +39,7 @@ namespace ola
 				diagnostics.Report(loc, missing_type_specifier);
 				return nullptr;
 			}
-			if (ref_type.GetReferredType()->GetKind() == TypeKind::Array)
+			if (isa<ArrayType>(ref_type.GetReferredType()))
 			{
 				diagnostics.Report(loc, arrays_cannot_be_refs);
 				return nullptr;

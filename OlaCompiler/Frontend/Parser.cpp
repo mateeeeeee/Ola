@@ -1232,17 +1232,17 @@ namespace ola
 			std::string_view identifier = current_token->GetData();
 			if (TagDecl* tag_decl = sema->ctx.tag_sym_table.LookUp(identifier))
 			{
-				if (tag_decl->GetDeclKind() == DeclKind::Enum)
+				if (isa<EnumDecl>(tag_decl))
 				{
 					type.SetType(builtin_types::Enum);
 				}
-				else if (tag_decl->GetDeclKind() == DeclKind::Alias)
+				else if (isa<AliasDecl>(tag_decl))
 				{
 					bool const is_const = type.IsConst();
 					type = tag_decl->GetType();
 					if (is_const) type.AddConst();
 				}
-				else if (tag_decl->GetDeclKind() == DeclKind::Class)
+				else if (isa<ClassDecl>(tag_decl))
 				{
 					ClassDecl* class_decl = cast<ClassDecl>(tag_decl);
 					type.SetType(ClassType(class_decl));

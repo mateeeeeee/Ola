@@ -10,7 +10,7 @@ namespace ola
 	}
 	bool DeclRefExpr::IsConstexpr() const
 	{
-		return decl->GetDeclKind() == DeclKind::EnumMember;
+		return isa<EnumMemberDecl>(decl);
 	}
 	int64 DeclRefExpr::EvaluateConstexpr() const
 	{

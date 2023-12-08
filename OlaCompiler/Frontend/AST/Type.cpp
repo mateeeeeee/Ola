@@ -57,9 +57,7 @@ namespace ola
 
 	bool ArrayType::IsAssignableFrom(Type const& other) const
 	{
-		if (!isa<ArrayType>(other)) return false;
-		ArrayType const& other_array_type = type_cast<ArrayType>(other);
-		return base_type->IsSameAs(other_array_type.base_type);
+		return IsSameAs(other);
 	}
 	bool ArrayType::IsSameAs(Type const& other) const
 	{

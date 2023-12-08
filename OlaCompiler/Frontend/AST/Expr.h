@@ -352,7 +352,7 @@ namespace ola
 
 		FuncType const& GetCalleeType() const
 		{
-			OLA_ASSERT(GetCallee()->GetType()->GetKind() == TypeKind::Function);
+			OLA_ASSERT(isa<FuncType>(GetCallee()->GetType()));
 			return type_cast<FuncType>(GetCallee()->GetType());
 		}
 

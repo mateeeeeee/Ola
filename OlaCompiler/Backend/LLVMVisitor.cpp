@@ -1142,7 +1142,7 @@ namespace ola
 		Expr const* class_expr = member_expr.GetClassExpr();
 		Decl const* member_decl = member_expr.GetMemberDecl();
 		class_expr->Accept(*this);
-		if (member_decl->GetDeclKind() == DeclKind::Field)
+		if (isa<FieldDecl>(member_decl))
 		{
 			FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
 			llvm::Value* field_value = nullptr;
@@ -1178,7 +1178,7 @@ namespace ola
 			}
 			llvm_value_map[&member_expr] = field_value;
 		}
-		else if (member_decl->GetDeclKind() == DeclKind::Method)
+		else if (isa<MethodDecl>(member_decl))
 		{
 			MethodDecl const* field_decl = cast<MethodDecl>(member_decl);
 			OLA_ASSERT(false);
@@ -1189,11 +1189,11 @@ namespace ola
 	void LLVMVisitor::Visit(MemberCallExpr const& member_call_expr, uint32)
 	{
 		Expr const* expr = member_call_expr.GetCallee();
-		OLA_ASSERT(expr->GetExprKind() == ExprKind::Member);
+		OLA_ASSERT(isa<MemberExpr>(expr));
 		MemberExpr const* member_expr = cast<MemberExpr>(expr);
 
 		Decl const* decl = member_expr->GetMemberDecl();
-		OLA_ASSERT(decl->GetDeclKind() == DeclKind::Method);
+		OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 		std::string name(class_decl->GetName());
