@@ -225,6 +225,8 @@ namespace ola
 		}
 		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
 		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
+		void SetVTableIndex(uint32 i) { vtable_index = i; }
+		uint32 GetVTableIndex() const { return vtable_index; }
 
 		virtual bool IsMember() const override { return true; }
 
@@ -235,6 +237,7 @@ namespace ola
 	private:
 		ClassDecl const* parent = nullptr;
 		MethodAttributes method_attrs = MethodAttribute_None;
+		uint32 vtable_index = -1;
 	};
 
 	class TagDecl : public Decl

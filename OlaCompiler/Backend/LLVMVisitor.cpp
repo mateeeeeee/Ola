@@ -197,6 +197,11 @@ namespace ola
 
 				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 				std::vector<llvm::Constant*> initializers;
+				if (class_decl->IsPolymorphic())
+				{
+					initializers.push_back(vtable_map[class_decl]);
+				}
+
 				ClassDecl const* curr_class_decl = class_decl;
 				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 				{
@@ -332,13 +337,20 @@ namespace ola
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					value_map[&var_decl] = struct_alloc;
 
+					bool const is_polymorphic = class_decl->IsPolymorphic();
+					if (is_polymorphic)
+					{
+						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, 0);
+						Store(vtable_map[class_decl], field_ptr);
+					}
+
 					ClassDecl const* curr_class_decl = class_decl;
 					while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 					{
 						UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
 						for (auto const& base_field : base_fields)
 						{
-							llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, base_field->GetFieldIndex());
+							llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, is_polymorphic + base_field->GetFieldIndex());
 							Store(value_map[base_field.get()], field_ptr);
 						}
 						curr_class_decl = base_class_decl;
@@ -346,7 +358,7 @@ namespace ola
 					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 					for (auto const& field : fields)
 					{
-						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, field->GetFieldIndex());
+						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, is_polymorphic + field->GetFieldIndex());
 						Store(value_map[field.get()], field_ptr);
 					}
 				}
@@ -1169,6 +1181,7 @@ namespace ola
 		if (isa<FieldDecl>(member_decl))
 		{
 			FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
+			uint32 field_index = field_decl->GetFieldIndex() + field_decl->GetParentDecl()->IsPolymorphic();
 			llvm::Value* field_value = nullptr;
 			if (!this_value)
 			{
@@ -1192,13 +1205,13 @@ namespace ola
 						else return nullptr;
 					};
 
-				field_value = builder.CreateStructGEP(GetStructType(class_expr->GetType()), struct_value, field_decl->GetFieldIndex());
+				field_value = builder.CreateStructGEP(GetStructType(class_expr->GetType()), struct_value, field_index);
 				value_map[&member_expr] = field_value;
 			}
 			else
 			{
 				FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
-				field_value = builder.CreateStructGEP(this_struct_type, this_value, field_decl->GetFieldIndex());
+				field_value = builder.CreateStructGEP(this_struct_type, this_value, field_index);
 			}
 			value_map[&member_expr] = field_value;
 		}
@@ -1420,12 +1433,10 @@ namespace ola
 
 			UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 			std::vector<llvm::Type*> llvm_member_types;
-
 			if (class_decl->IsPolymorphic())
 			{
-				//add ptr to vtable of class_decl
+				llvm_member_types.push_back(GetPointerType(void_type));
 			}
-
 			ClassDecl const* curr_class_decl = class_decl;
 			while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 			{

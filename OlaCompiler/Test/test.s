@@ -19,7 +19,27 @@
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx]
+	mov	rax, qword ptr [rcx + 16]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	pop	rcx
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"Base::GetZ";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Base::GetZ"                    # -- Begin function Base::GetZ
+	.p2align	4, 0x90
+"Base::GetZ":                           # @"Base::GetZ"
+.seh_proc "Base::GetZ"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx + 8]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -39,7 +59,27 @@
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 8]
+	mov	rax, qword ptr [rcx + 32]
+	mov	qword ptr [rsp], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	pop	rcx
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"Derived::GetY";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Derived::GetY"                 # -- Begin function Derived::GetY
+	.p2align	4, 0x90
+"Derived::GetY":                        # @"Derived::GetY"
+.seh_proc "Derived::GetY"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx + 24]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -56,19 +96,24 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	sub	rsp, 88
+	.seh_stackalloc 88
 	.seh_endprologue
-	mov	qword ptr [rsp + 48], 1
-	mov	qword ptr [rsp + 56], 2
-	lea	rax, [rsp + 48]
+	lea	rax, [rip + VTable_Derived]
 	mov	qword ptr [rsp + 40], rax
-	mov	rcx, qword ptr [rsp + 40]
-	call	"Base::GetX"
-	mov	qword ptr [rsp + 64], rax
+	mov	qword ptr [rsp + 48], 10
+	mov	qword ptr [rsp + 56], 123
+	mov	qword ptr [rsp + 64], 1000
+	mov	qword ptr [rsp + 72], 100
+	lea	rax, [rsp + 40]
+	mov	qword ptr [rsp + 32], rax
+	lea	rcx, [rsp + 40]
+	call	"Derived::GetX"
+	mov	rcx, rax
+	call	PrintInt
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 64]
-	add	rsp, 72
+	mov	rax, qword ptr [rsp + 80]
+	add	rsp, 88
 	ret
 	.seh_endproc
                                         # -- End function
@@ -76,11 +121,18 @@ main:                                   # @main
 	.p2align	3, 0x0                          # @VTable_Base
 VTable_Base:
 	.quad	"Base::GetX"
+	.quad	"Base::GetZ"
 
-	.p2align	3, 0x0                          # @VTable_Derived
+	.p2align	4, 0x0                          # @VTable_Derived
 VTable_Derived:
 	.quad	"Derived::GetX"
+	.quad	"Base::GetZ"
+	.quad	"Derived::GetY"
 
 	.addrsig
+	.addrsig_sym PrintInt
 	.addrsig_sym "Base::GetX"
+	.addrsig_sym "Base::GetZ"
 	.addrsig_sym "Derived::GetX"
+	.addrsig_sym "Derived::GetY"
+	.addrsig_sym VTable_Derived

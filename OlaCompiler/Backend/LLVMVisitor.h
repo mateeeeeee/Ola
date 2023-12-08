@@ -34,7 +34,7 @@ namespace ola
 			}
 		};
 		using LLVMValueMap  = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
-		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*>;
+		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*, VoidPointerHash>;
 
 	private:
 		LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module);

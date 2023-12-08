@@ -1,22 +1,26 @@
-import std.assert;
+import std.io;
 
 class Base 
 {
-    int x = 1;
+    int z = 10;
+    int x = 123;
 
     public int GetX() virtual const {return x;}
+    public int GetZ() virtual const {return z;}
 };
 
 class Derived extends Base
 {
-    int x = 2;
+    int y = 1000;
+    int x = 100;
+
     public int GetX() virtual const {return x;}
+    public int GetY() virtual const {return y;}
 };
 
 public int main() 
 {
     Derived d;
     ref Base b = d;
-    return b.GetX();
-    return 0;
+    PrintInt(d.GetX());
 }

@@ -77,6 +77,9 @@ namespace ola
 
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		uint32 offset = 0;
+
+		if (class_decl->IsPolymorphic()) offset += 8;
+
 		ClassDecl const* curr_base_class_decl = class_decl->GetBaseClass();
 		while (curr_base_class_decl)
 		{
@@ -96,7 +99,9 @@ namespace ola
 			offset += mem_type->GetSize();
 			if (GetAlign() < mem_type->GetAlign()) SetAlign(mem_type->GetAlign());
 		}
-		SetSize(GetAlign() ? AlignTo(offset, GetAlign()) : 0);
+		if (offset == 0) offset = 1;
+		if (GetAlign()) offset = AlignTo(offset, GetAlign());
+		SetSize(offset);
 	}
 	bool ClassType::IsAssignableFrom(Type const& other) const
 	{
