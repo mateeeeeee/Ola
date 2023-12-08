@@ -648,13 +648,13 @@ namespace ola
 		SourceLocation loc = current_token->GetLocation();
 		Expect(TokenKind::KW_switch);
 		UniqueExprPtr case_expr = ParseParenthesizedExpression();
-		CaseStmtPtrList case_stmts{};
+		std::vector<CaseStmt*> case_stmts{};
 		sema->ctx.case_callback_stack.push_back([&](CaseStmt* case_stmt) {case_stmts.push_back(case_stmt); });
 		sema->ctx.stmts_using_break_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
 		sema->ctx.stmts_using_break_count--;
 		sema->ctx.case_callback_stack.pop_back();
-		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), {});
+		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), std::move(case_stmts));
 	}
 
 	UniqueGotoStmtPtr Parser::ParseGotoStatement()

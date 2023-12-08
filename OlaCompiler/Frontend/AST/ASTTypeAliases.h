@@ -74,13 +74,5 @@ namespace ola
 	using UniqueDeclPtrList				  = std::vector<UniqueDeclPtr>;
 	using UniqueStmtPtrList				  = std::vector<UniqueStmtPtr>;
 	using UniqueExprPtrList				  = std::vector<UniqueExprPtr>;
-	using ExprPtrList					  = std::vector<Expr*>;
-	using DeclPtrList					  = std::vector<Decl*>;
-	using StmtPtrList					  = std::vector<Stmt*>;
-	using VariableDeclPtrList			  = std::vector<VarDecl*>;
-	using BreakStmtPtrList				  = std::vector<BreakStmt*>;
-	using ContinueStmtPtrList			  = std::vector<ContinueStmt*>;
 	using CaseStmtPtrList				  = std::vector<CaseStmt*>;
-	using LabelStmtPtrList				  = std::vector<LabelStmt*>;
-	using ConstLabelStmtPtrList			  = std::vector<LabelStmt const*>;
 }

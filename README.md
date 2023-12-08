@@ -38,8 +38,8 @@ Ola is a toy programming language with LLVM backend.
   * standard library
 
 ## Todo
-  * object oriented constructs (wip)
-      - virtual methods: `virtual`
+  * object oriented constructs 
+      - polymorphism using vtables: `virtual` (wip)
       - interfaces: `implements`
 
 ## Structure

@@ -56,14 +56,31 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	mov	qword ptr [rsp], 0
+	mov	qword ptr [rsp + 48], 1
+	mov	qword ptr [rsp + 56], 2
+	lea	rax, [rsp + 48]
+	mov	qword ptr [rsp + 40], rax
+	mov	rcx, qword ptr [rsp + 40]
+	call	"Base::GetX"
+	mov	qword ptr [rsp + 64], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	pop	rcx
+	mov	rax, qword ptr [rsp + 64]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
+	.section	.rdata,"dr"
+	.p2align	3, 0x0                          # @VTable_Base
+VTable_Base:
+	.quad	"Base::GetX"
+
+	.p2align	3, 0x0                          # @VTable_Derived
+VTable_Derived:
+	.quad	"Derived::GetX"
+
 	.addrsig
+	.addrsig_sym "Base::GetX"
+	.addrsig_sym "Derived::GetX"

@@ -450,7 +450,7 @@ namespace ola
 		return case_stmt;
 	}
 
-	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, CaseStmtPtrList&& case_stmts)
+	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, std::vector<CaseStmt*>&& case_stmts)
 	{
 		bool default_found = false;
 		std::unordered_map<int64, bool> case_value_found;

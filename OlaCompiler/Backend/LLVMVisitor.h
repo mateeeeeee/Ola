@@ -33,7 +33,8 @@ namespace ola
 				return reinterpret_cast<uint64>(ptr);
 			}
 		};
-		using LLVMValueMap = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
+		using LLVMValueMap  = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
+		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*>;
 
 	private:
 		LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module);
@@ -97,7 +98,8 @@ namespace ola
 		std::unique_ptr<llvm::DataLayout> data_layout;
 		llvm::IRBuilder<> builder;
 
-		LLVMValueMap llvm_value_map;
+		LLVMValueMap value_map;
+		LLVMVTableMap vtable_map;
 
 		llvm::Type* this_struct_type = nullptr;
 		llvm::Value* this_value = nullptr;

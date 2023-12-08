@@ -172,7 +172,7 @@ namespace ola
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
-		ConstLabelStmtPtrList GetLabels() const;
+		std::vector<LabelStmt const*> const& GetLabels() const;
 		FuncType const& GetFuncType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetType()));
@@ -190,7 +190,7 @@ namespace ola
 	protected:
 		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
-		mutable ConstLabelStmtPtrList labels;
+		mutable std::vector<LabelStmt const*> labels;
 		FuncAttributes func_attributes = FuncAttribute_None;
 
 	protected:
@@ -331,25 +331,6 @@ namespace ola
 		}
 		ClassDecl const* GetBaseClass() const { return base_class; }
 
-		bool IsDerivedFrom(ClassDecl const* base) const
-		{
-			ClassDecl const* curr_base_class = base_class;
-			while (curr_base_class)
-			{
-				if (curr_base_class == base) return true;
-				curr_base_class = curr_base_class->base_class;
-			}
-			return false;
-		}
-		bool IsPolymorphic() const
-		{
-			for (auto const& method : methods) if (method->IsVirtual()) return true;
-			return base_class ? base_class->IsPolymorphic() : false;
-		}
-		uint64 GetFieldCount() const
-		{
-			return base_class ? base_class->GetFieldCount() + fields.size() : fields.size();
-		}
 		Decl* FindMemberDecl(std::string_view name) const
 		{
 			for (uint32 i = 0; i < fields.size(); ++i)
@@ -368,6 +349,26 @@ namespace ola
 			}
 			return base_class ? base_class->FindMemberDecl(name) : nullptr;
 		}
+		uint64 GetFieldCount() const
+		{
+			return base_class ? base_class->GetFieldCount() + fields.size() : fields.size();
+		}
+		bool IsDerivedFrom(ClassDecl const* base) const
+		{
+			ClassDecl const* curr_base_class = base_class;
+			while (curr_base_class)
+			{
+				if (curr_base_class == base) return true;
+				curr_base_class = curr_base_class->base_class;
+			}
+			return false;
+		}
+		bool IsPolymorphic() const
+		{
+			for (auto const& method : methods) if (method->IsVirtual()) return true;
+			return base_class ? base_class->IsPolymorphic() : false;
+		}
+		std::vector<MethodDecl const*> GetVTable() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

@@ -15,8 +15,8 @@ class Derived extends Base
 
 public int main() 
 {
-    //Derived d;
-    //ref Base b = d;
-    //return b.GetX();
+    Derived d;
+    ref Base b = d;
+    return b.GetX();
     return 0;
 }
