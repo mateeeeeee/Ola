@@ -1,7 +1,7 @@
 <img align="left" src="OlaCompiler/olalogo.jpg" width="120px"/>
 
 # Ola
-Ola is a toy programming language with LLVM backend. 
+Ola is a toy object-oriented programming language with LLVM backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -12,6 +12,7 @@ Ola is a toy programming language with LLVM backend.
   * classes
 	- access modifiers: `public`, `private`
 	- single inheritance: `extends`
+	- polymorphism using vtables: `virtual`
 	- `this` and `super` keywords
   * reference type: `ref`
   * automatic type deduction: `auto`
@@ -39,7 +40,6 @@ Ola is a toy programming language with LLVM backend.
 
 ## Todo
   * object oriented constructs 
-      - polymorphism using vtables: `virtual` (wip)
       - interfaces: `implements`
 
 ## Structure

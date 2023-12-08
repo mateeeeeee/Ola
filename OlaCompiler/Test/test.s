@@ -19,7 +19,7 @@
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 16]
+	mov	rax, qword ptr [rcx + 8]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -27,19 +27,19 @@
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	"Base::GetZ";
+	.def	"Base::GetY";
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	"Base::GetZ"                    # -- Begin function Base::GetZ
+	.globl	"Base::GetY"                    # -- Begin function Base::GetY
 	.p2align	4, 0x90
-"Base::GetZ":                           # @"Base::GetZ"
-.seh_proc "Base::GetZ"
+"Base::GetY":                           # @"Base::GetY"
+.seh_proc "Base::GetY"
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 8]
+	mov	rax, qword ptr [rcx + 16]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -59,7 +59,7 @@
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 32]
+	mov	rax, qword ptr [rcx + 24]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -67,19 +67,19 @@
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	"Derived::GetY";
+	.def	"ExtDerived::GetY";
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	"Derived::GetY"                 # -- Begin function Derived::GetY
+	.globl	"ExtDerived::GetY"              # -- Begin function ExtDerived::GetY
 	.p2align	4, 0x90
-"Derived::GetY":                        # @"Derived::GetY"
-.seh_proc "Derived::GetY"
+"ExtDerived::GetY":                     # @"ExtDerived::GetY"
+.seh_proc "ExtDerived::GetY"
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 24]
+	mov	rax, qword ptr [rcx + 32]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -96,24 +96,33 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 88
-	.seh_stackalloc 88
+	sub	rsp, 104
+	.seh_stackalloc 104
 	.seh_endprologue
-	lea	rax, [rip + VTable_Derived]
-	mov	qword ptr [rsp + 40], rax
-	mov	qword ptr [rsp + 48], 10
-	mov	qword ptr [rsp + 56], 123
-	mov	qword ptr [rsp + 64], 1000
-	mov	qword ptr [rsp + 72], 100
-	lea	rax, [rsp + 40]
-	mov	qword ptr [rsp + 32], rax
-	mov	rcx, qword ptr [rsp + 32]
-	call	"Base::GetX"
-	mov	rcx, rax
-	call	PrintInt
+	lea	rax, [rip + VTable_ExtDerived]
+	mov	qword ptr [rsp + 56], rax
+	mov	qword ptr [rsp + 80], 100
+	mov	qword ptr [rsp + 64], 10
+	mov	qword ptr [rsp + 72], 20
+	mov	qword ptr [rsp + 88], 200
+	lea	rax, [rsp + 56]
+	mov	qword ptr [rsp + 48], rax
+	mov	rcx, qword ptr [rsp + 48]
+	mov	qword ptr [rsp + 40], rcx       # 8-byte Spill
+	mov	rax, qword ptr [rcx]
+	call	qword ptr [rax + 8]
+	cmp	rax, 200
+	sete	cl
+	call	Assert
+	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
+	mov	rax, qword ptr [rcx]
+	call	qword ptr [rax]
+	cmp	rax, 100
+	sete	cl
+	call	Assert
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 80]
-	add	rsp, 88
+	mov	rax, qword ptr [rsp + 96]
+	add	rsp, 104
 	ret
 	.seh_endproc
                                         # -- End function
@@ -121,18 +130,22 @@ main:                                   # @main
 	.p2align	3, 0x0                          # @VTable_Base
 VTable_Base:
 	.quad	"Base::GetX"
-	.quad	"Base::GetZ"
+	.quad	"Base::GetY"
 
-	.p2align	4, 0x0                          # @VTable_Derived
+	.p2align	3, 0x0                          # @VTable_Derived
 VTable_Derived:
 	.quad	"Derived::GetX"
-	.quad	"Base::GetZ"
-	.quad	"Derived::GetY"
+	.quad	"Base::GetY"
+
+	.p2align	3, 0x0                          # @VTable_ExtDerived
+VTable_ExtDerived:
+	.quad	"Derived::GetX"
+	.quad	"ExtDerived::GetY"
 
 	.addrsig
-	.addrsig_sym PrintInt
+	.addrsig_sym Assert
 	.addrsig_sym "Base::GetX"
-	.addrsig_sym "Base::GetZ"
+	.addrsig_sym "Base::GetY"
 	.addrsig_sym "Derived::GetX"
-	.addrsig_sym "Derived::GetY"
-	.addrsig_sym VTable_Derived
+	.addrsig_sym "ExtDerived::GetY"
+	.addrsig_sym VTable_ExtDerived

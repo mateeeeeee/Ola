@@ -31,14 +31,16 @@ namespace ola
 		QualType this_type;
 	};
 
-	std::vector<LabelStmt const*> const& FunctionDecl::GetLabels() const
+	void FunctionDecl::SetParamDecls(UniqueParamVarDeclPtrList&& param_decls)
 	{
-		OLA_ASSERT(body_stmt);
-		if (!labels.empty()) return labels;
-
+		param_declarations = std::move(param_decls);
+		for (auto& param_decl : param_declarations) param_decl->SetParentDecl(this);
+	}
+	void FunctionDecl::SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt)
+	{
+		body_stmt = std::move(_body_stmt);
 		LabelVisitor label_visitor(labels);
 		body_stmt->Accept(label_visitor, 0);
-		return labels;
 	}
 
 	void ClassDecl::SetFields(UniqueFieldDeclPtrList&& _fields)

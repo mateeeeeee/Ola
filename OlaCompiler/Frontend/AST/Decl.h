@@ -152,15 +152,8 @@ namespace ola
 	public:
 		FunctionDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Function, name, loc) {}
 
-		void SetParamDecls(UniqueParamVarDeclPtrList&& param_decls)
-		{
-			param_declarations = std::move(param_decls);
-			for (auto& param_decl : param_declarations) param_decl->SetParentDecl(this);
-		}
-		void SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt)
-		{
-			body_stmt = std::move(_body_stmt);
-		}
+		void SetParamDecls(UniqueParamVarDeclPtrList&& param_decls);
+		void SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt);
 		void SetFuncAttributes(FuncAttributes attrs)
 		{
 			func_attributes = attrs;
@@ -172,7 +165,11 @@ namespace ola
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
-		std::vector<LabelStmt const*> const& GetLabels() const;
+		std::vector<LabelStmt const*> const& GetLabels() const
+		{
+			return labels;
+		}
+
 		FuncType const& GetFuncType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetType()));
@@ -190,7 +187,7 @@ namespace ola
 	protected:
 		UniqueParamVarDeclPtrList param_declarations;
 		UniqueCompoundStmtPtr body_stmt;
-		mutable std::vector<LabelStmt const*> labels;
+		std::vector<LabelStmt const*> labels;
 		FuncAttributes func_attributes = FuncAttribute_None;
 
 	protected:
@@ -225,7 +222,7 @@ namespace ola
 		}
 		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
 		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
-		void SetVTableIndex(uint32 i) { vtable_index = i; }
+		void SetVTableIndex(uint32 i) const { vtable_index = i; }
 		uint32 GetVTableIndex() const { return vtable_index; }
 
 		virtual bool IsMember() const override { return true; }
@@ -237,7 +234,7 @@ namespace ola
 	private:
 		ClassDecl const* parent = nullptr;
 		MethodAttributes method_attrs = MethodAttribute_None;
-		uint32 vtable_index = -1;
+		mutable uint32 vtable_index = -1;
 	};
 
 	class TagDecl : public Decl

@@ -2,45 +2,18 @@
 source_filename = "test.ola"
 
 %Base = type { ptr, i64, i64 }
-%Derived = type { ptr, i64, i64, i64, i64 }
+%Derived = type { ptr, i64, i64, i64 }
+%ExtDerived = type { ptr, i64, i64, i64, i64 }
 
-@VTable_Base = internal constant [2 x ptr] [ptr @"Base::GetX", ptr @"Base::GetZ"]
-@VTable_Derived = internal constant [3 x ptr] [ptr @"Derived::GetX", ptr @"Base::GetZ", ptr @"Derived::GetY"]
+@VTable_Base = internal constant [2 x ptr] [ptr @"Base::GetX", ptr @"Base::GetY"]
+@VTable_Derived = internal constant [2 x ptr] [ptr @"Derived::GetX", ptr @"Base::GetY"]
+@VTable_ExtDerived = internal constant [2 x ptr] [ptr @"Derived::GetX", ptr @"ExtDerived::GetY"]
 
-declare void @PrintInt(i64)
+declare void @Assert(i1)
 
-declare void @PrintFloat(double)
-
-declare void @PrintChar(i8)
-
-declare void @PrintString(ptr)
-
-declare i64 @ReadInt()
-
-declare double @ReadFloat()
-
-declare i8 @ReadChar()
-
-declare void @ReadString(ptr, i64)
+declare void @AssertMsg(i1, ptr)
 
 define i64 @"Base::GetX"(ptr %this) {
-entry:
-  %0 = alloca i64, align 8
-  %1 = getelementptr inbounds %Base, ptr %this, i32 0, i32 2
-  %2 = load ptr, ptr %1, align 8
-  store ptr %2, ptr %0, align 8
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %0, align 4
-  ret i64 %3
-}
-
-define i64 @"Base::GetZ"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
   %1 = getelementptr inbounds %Base, ptr %this, i32 0, i32 1
@@ -57,10 +30,10 @@ exit:                                             ; preds = %return, %entry
   ret i64 %3
 }
 
-define i64 @"Derived::GetX"(ptr %this) {
+define i64 @"Base::GetY"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
-  %1 = getelementptr inbounds %Derived, ptr %this, i32 0, i32 4
+  %1 = getelementptr inbounds %Base, ptr %this, i32 0, i32 2
   %2 = load ptr, ptr %1, align 8
   store ptr %2, ptr %0, align 8
   br label %exit
@@ -74,7 +47,7 @@ exit:                                             ; preds = %return, %entry
   ret i64 %3
 }
 
-define i64 @"Derived::GetY"(ptr %this) {
+define i64 @"Derived::GetX"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
   %1 = getelementptr inbounds %Derived, ptr %this, i32 0, i32 3
@@ -91,29 +64,58 @@ exit:                                             ; preds = %return, %entry
   ret i64 %3
 }
 
+define i64 @"ExtDerived::GetY"(ptr %this) {
+entry:
+  %0 = alloca i64, align 8
+  %1 = getelementptr inbounds %ExtDerived, ptr %this, i32 0, i32 4
+  %2 = load ptr, ptr %1, align 8
+  store ptr %2, ptr %0, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %3 = load i64, ptr %0, align 4
+  ret i64 %3
+}
+
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca %Derived, align 8
-  %2 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 0
-  store ptr @VTable_Derived, ptr %2, align 8
-  %3 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 1
-  store i64 10, ptr %3, align 4
-  %4 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 2
-  store i64 123, ptr %4, align 4
-  %5 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 3
-  store i64 1000, ptr %5, align 4
-  %6 = getelementptr inbounds %Derived, ptr %1, i32 0, i32 4
-  store i64 100, ptr %6, align 4
-  %7 = load %Derived, ptr %1, align 8
+  %1 = alloca %ExtDerived, align 8
+  %2 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 0
+  store ptr @VTable_ExtDerived, ptr %2, align 8
+  %3 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 3
+  store i64 100, ptr %3, align 4
+  %4 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 1
+  store i64 10, ptr %4, align 4
+  %5 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 2
+  store i64 20, ptr %5, align 4
+  %6 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 4
+  store i64 200, ptr %6, align 4
+  %7 = load %ExtDerived, ptr %1, align 8
   %8 = alloca ptr, align 8
   store ptr %1, ptr %8, align 8
   %9 = load ptr, ptr %8, align 8
-  %10 = call i64 @"Base::GetX"(ptr %9)
-  call void @PrintInt(i64 %10)
+  %10 = getelementptr inbounds %Base, ptr %9, i32 0, i32 0
+  %11 = load ptr, ptr %10, align 8
+  %12 = getelementptr inbounds ptr, ptr %11, i32 1
+  %13 = load ptr, ptr %12, align 8
+  %14 = call i64 %13(ptr %9)
+  %15 = icmp eq i64 %14, 200
+  call void @Assert(i1 %15)
+  %16 = getelementptr inbounds %Base, ptr %9, i32 0, i32 0
+  %17 = load ptr, ptr %16, align 8
+  %18 = getelementptr inbounds ptr, ptr %17, i32 0
+  %19 = load ptr, ptr %18, align 8
+  %20 = call i64 %19(ptr %9)
+  %21 = icmp eq i64 %20, 100
+  call void @Assert(i1 %21)
   br label %exit
 
 exit:                                             ; preds = %entry
-  %11 = load i64, ptr %0, align 4
-  ret i64 %11
+  %22 = load i64, ptr %0, align 4
+  ret i64 %22
 }

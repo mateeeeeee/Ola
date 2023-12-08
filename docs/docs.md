@@ -399,6 +399,51 @@ public int main()
 }
 ```
 
+Polymorphism is supported using vtables, i.e. using `virtual` functions . 
+```
+import std.assert;
+
+class Base
+{
+    int x = 10;
+    int y = 20;
+    public int GetX() virtual
+    {
+        return x;
+    }
+    public int GetY() virtual
+    {
+        return y;
+    }
+};
+
+class Derived extends Base
+{
+     int x = 100;
+     public int GetX() virtual
+     {
+        return x;
+     }
+};
+
+class ExtDerived extends Derived
+{
+    int y = 200;
+    public int GetY() virtual
+    {
+        return y; 
+    }
+};
+
+public int main() 
+{
+    ExtDerived d;
+    ref Base b = d;
+    Assert(b.GetY() == 200);
+    Assert(b.GetX() == 100);
+}
+```
+
 ### Strings
 Strings are just arrays of chars. `string` is a built-in alias for `char[]`. 
 
