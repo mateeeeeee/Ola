@@ -7,19 +7,82 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	"Base::GetX";
+	.def	"S::Init";
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	"Base::GetX"                    # -- Begin function Base::GetX
+	.globl	"S::Init"                       # -- Begin function S::Init
 	.p2align	4, 0x90
-"Base::GetX":                           # @"Base::GetX"
-.seh_proc "Base::GetX"
+"S::Init":                              # @"S::Init"
+.seh_proc "S::Init"
+# %bb.0:                                # %entry
+	sub	rsp, 16
+	.seh_stackalloc 16
+	.seh_endprologue
+	mov	qword ptr [rsp + 8], rdx
+	mov	qword ptr [rsp], r8
+	mov	rax, qword ptr [rsp + 8]
+	mov	qword ptr [rcx], rax
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rcx + 8], rax
+# %bb.1:                                # %exit
+	add	rsp, 16
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::SetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::SetX"                       # -- Begin function S::SetX
+	.p2align	4, 0x90
+"S::SetX":                              # @"S::SetX"
+.seh_proc "S::SetX"
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 16]
+	mov	qword ptr [rsp], rdx
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rcx], rax
+# %bb.1:                                # %exit
+	pop	rax
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::SetY";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::SetY"                       # -- Begin function S::SetY
+	.p2align	4, 0x90
+"S::SetY":                              # @"S::SetY"
+.seh_proc "S::SetY"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	qword ptr [rsp], rdx
+	mov	rax, qword ptr [rsp]
+	mov	qword ptr [rcx + 8], rax
+# %bb.1:                                # %exit
+	pop	rax
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	"S::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"S::GetX"                       # -- Begin function S::GetX
+	.p2align	4, 0x90
+"S::GetX":                              # @"S::GetX"
+.seh_proc "S::GetX"
+# %bb.0:                                # %entry
+	push	rax
+	.seh_stackalloc 8
+	.seh_endprologue
+	mov	rax, qword ptr [rcx]
 	mov	qword ptr [rsp], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp]
@@ -27,14 +90,14 @@
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	"Base::GetZ";
+	.def	"S::GetY";
 	.scl	2;
 	.type	32;
 	.endef
-	.globl	"Base::GetZ"                    # -- Begin function Base::GetZ
+	.globl	"S::GetY"                       # -- Begin function S::GetY
 	.p2align	4, 0x90
-"Base::GetZ":                           # @"Base::GetZ"
-.seh_proc "Base::GetZ"
+"S::GetY":                              # @"S::GetY"
+.seh_proc "S::GetY"
 # %bb.0:                                # %entry
 	push	rax
 	.seh_stackalloc 8
@@ -47,43 +110,73 @@
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	"Derived::GetX";
-	.scl	2;
+	.def	StructByValue;
+	.scl	3;
 	.type	32;
 	.endef
-	.globl	"Derived::GetX"                 # -- Begin function Derived::GetX
-	.p2align	4, 0x90
-"Derived::GetX":                        # @"Derived::GetX"
-.seh_proc "Derived::GetX"
+	.p2align	4, 0x90                         # -- Begin function StructByValue
+StructByValue:                          # @StructByValue
+.seh_proc StructByValue
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 32]
-	mov	qword ptr [rsp], rax
+	mov	qword ptr [rsp + 40], rcx
+	mov	qword ptr [rsp + 48], rdx
+	lea	rcx, [rsp + 40]
+	mov	edx, 100
+	call	"S::SetX"
+	lea	rcx, [rsp + 40]
+	mov	edx, 100
+	call	"S::SetY"
+	lea	rcx, [rsp + 40]
+	call	"S::GetX"
+	cmp	rax, 100
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 40]
+	call	"S::GetY"
+	cmp	rax, 100
+	sete	cl
+	call	Assert
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	pop	rcx
+	nop
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	"Derived::GetY";
-	.scl	2;
+	.def	StructByRef;
+	.scl	3;
 	.type	32;
 	.endef
-	.globl	"Derived::GetY"                 # -- Begin function Derived::GetY
-	.p2align	4, 0x90
-"Derived::GetY":                        # @"Derived::GetY"
-.seh_proc "Derived::GetY"
+	.p2align	4, 0x90                         # -- Begin function StructByRef
+StructByRef:                            # @StructByRef
+.seh_proc StructByRef
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 56
+	.seh_stackalloc 56
 	.seh_endprologue
-	mov	rax, qword ptr [rcx + 24]
-	mov	qword ptr [rsp], rax
+	mov	qword ptr [rsp + 48], rcx
+	mov	rcx, qword ptr [rsp + 48]
+	mov	qword ptr [rsp + 40], rcx       # 8-byte Spill
+	mov	edx, 1000
+	call	"S::SetX"
+	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
+	mov	edx, 1000
+	call	"S::SetY"
+	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
+	call	"S::GetX"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
+	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
+	call	"S::GetY"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	pop	rcx
+	nop
+	add	rsp, 56
 	ret
 	.seh_endproc
                                         # -- End function
@@ -99,40 +192,102 @@ main:                                   # @main
 	sub	rsp, 88
 	.seh_stackalloc 88
 	.seh_endprologue
-	lea	rax, [rip + VTable_Derived]
+	mov	qword ptr [rsp + 64], 0
+	mov	qword ptr [rsp + 72], 0
+	lea	rcx, [rsp + 64]
+	mov	r8d, 10
+	mov	rdx, r8
+	call	"S::Init"
+	mov	rcx, qword ptr [rsp + 64]
+	mov	rdx, qword ptr [rsp + 72]
+	call	StructByValue
+	lea	rcx, [rsp + 64]
+	call	"S::GetX"
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 64]
+	call	"S::GetY"
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 64]
+	mov	qword ptr [rsp + 48], rax
+	mov	rax, qword ptr [rsp + 72]
+	mov	qword ptr [rsp + 56], rax
+	lea	rcx, [rsp + 64]
+	mov	edx, 25
+	call	"S::SetX"
+	lea	rcx, [rsp + 64]
+	mov	edx, 25
+	call	"S::SetY"
+	lea	rcx, [rsp + 48]
+	call	"S::GetX"
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 48]
+	call	"S::GetY"
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 64]
+	call	"S::GetX"
+	cmp	rax, 25
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 64]
+	call	"S::GetY"
+	cmp	rax, 25
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 64]
+	call	StructByRef
+	lea	rcx, [rsp + 64]
+	call	"S::GetX"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
+	lea	rcx, [rsp + 64]
+	call	"S::GetY"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
+	lea	rax, [rsp + 64]
 	mov	qword ptr [rsp + 40], rax
-	mov	qword ptr [rsp + 48], 10
-	mov	qword ptr [rsp + 56], 123
-	mov	qword ptr [rsp + 64], 1000
-	mov	qword ptr [rsp + 72], 100
-	lea	rax, [rsp + 40]
-	mov	qword ptr [rsp + 32], rax
-	lea	rcx, [rsp + 40]
-	call	"Derived::GetX"
-	mov	rcx, rax
-	call	PrintInt
+	mov	rcx, qword ptr [rsp + 40]
+	mov	qword ptr [rsp + 32], rcx       # 8-byte Spill
+	call	"S::GetX"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
+	mov	rcx, qword ptr [rsp + 32]       # 8-byte Reload
+	call	"S::GetY"
+	cmp	rax, 1000
+	sete	cl
+	call	Assert
+	mov	rcx, qword ptr [rsp + 32]       # 8-byte Reload
+	xor	eax, eax
+	mov	edx, eax
+	call	"S::SetX"
+	lea	rcx, [rsp + 64]
+	call	"S::GetX"
+	cmp	rax, 0
+	sete	cl
+	call	Assert
+	mov	qword ptr [rsp + 80], 0
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 80]
 	add	rsp, 88
 	ret
 	.seh_endproc
                                         # -- End function
-	.section	.rdata,"dr"
-	.p2align	3, 0x0                          # @VTable_Base
-VTable_Base:
-	.quad	"Base::GetX"
-	.quad	"Base::GetZ"
-
-	.p2align	4, 0x0                          # @VTable_Derived
-VTable_Derived:
-	.quad	"Derived::GetX"
-	.quad	"Base::GetZ"
-	.quad	"Derived::GetY"
-
 	.addrsig
-	.addrsig_sym PrintInt
-	.addrsig_sym "Base::GetX"
-	.addrsig_sym "Base::GetZ"
-	.addrsig_sym "Derived::GetX"
-	.addrsig_sym "Derived::GetY"
-	.addrsig_sym VTable_Derived
+	.addrsig_sym Assert
+	.addrsig_sym "S::Init"
+	.addrsig_sym "S::SetX"
+	.addrsig_sym "S::SetY"
+	.addrsig_sym "S::GetX"
+	.addrsig_sym "S::GetY"
+	.addrsig_sym StructByValue
+	.addrsig_sym StructByRef

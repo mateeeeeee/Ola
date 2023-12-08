@@ -421,11 +421,11 @@ namespace ola
 
 		if (class_decl.IsPolymorphic())
 		{
-			std::vector<MethodDecl const*> vtable = class_decl.GetVTable();
-			llvm::ArrayType* vtable_type = llvm::ArrayType::get(GetPointerType(char_type), vtable.size());
+			std::vector<MethodDecl const*> vtable_entries = class_decl.GetVTableEntries();
+			llvm::ArrayType* vtable_type = llvm::ArrayType::get(GetPointerType(char_type), vtable_entries.size());
 			std::vector<llvm::Constant*> vtable_function_ptrs;
 
-			for (MethodDecl const* method : vtable)
+			for (MethodDecl const* method : vtable_entries)
 			{
 				llvm::Value* method_value = value_map[method];
 				OLA_ASSERT(isa<llvm::Function>(method_value));
@@ -435,12 +435,12 @@ namespace ola
 
 			std::string vtable_name = "VTable_";
 			vtable_name += class_decl.GetName();
-			llvm::GlobalVariable* VTable = new llvm::GlobalVariable(
+			llvm::GlobalVariable* vtable = new llvm::GlobalVariable(
 				module, vtable_type, true, llvm::GlobalValue::InternalLinkage,
 				llvm::ConstantArray::get(vtable_type, vtable_function_ptrs),
 				vtable_name.c_str());
 
-			vtable_map[&class_decl] = VTable;
+			vtable_map[&class_decl] = vtable;
 		}
 	}
 
@@ -1178,41 +1178,12 @@ namespace ola
 		Expr const* class_expr = member_expr.GetClassExpr();
 		Decl const* member_decl = member_expr.GetMemberDecl();
 		class_expr->Accept(*this);
+		llvm::Value* struct_value = value_map[class_expr];
 		if (isa<FieldDecl>(member_decl))
 		{
 			FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
 			uint32 field_index = field_decl->GetFieldIndex() + field_decl->GetParentDecl()->IsPolymorphic();
-			llvm::Value* field_value = nullptr;
-			if (!this_value)
-			{
-				llvm::Value* struct_value = value_map[class_expr];
-
-				auto GetStructType = [this](QualType const& class_expr_type) -> llvm::Type*
-					{
-						if (IsClassType(class_expr_type))
-						{
-							return ConvertToLLVMType(class_expr_type);
-						}
-						else if (IsRefType(class_expr_type))
-						{
-							RefType const& ref_type = type_cast<RefType>(class_expr_type);
-							if (IsClassType(ref_type.GetReferredType()))
-							{
-								return ConvertToLLVMType(ref_type.GetReferredType());
-							}
-							else return nullptr;
-						}
-						else return nullptr;
-					};
-
-				field_value = builder.CreateStructGEP(GetStructType(class_expr->GetType()), struct_value, field_index);
-				value_map[&member_expr] = field_value;
-			}
-			else
-			{
-				FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
-				field_value = builder.CreateStructGEP(this_struct_type, this_value, field_index);
-			}
+			llvm::Value* field_value = builder.CreateStructGEP(GetStructType(class_expr->GetType()), struct_value, field_index);
 			value_map[&member_expr] = field_value;
 		}
 		else if (isa<MethodDecl>(member_decl))
@@ -1225,19 +1196,36 @@ namespace ola
 
 	void LLVMVisitor::Visit(MemberCallExpr const& member_call_expr, uint32)
 	{
-		Expr const* expr = member_call_expr.GetCallee();
-		OLA_ASSERT(isa<MemberExpr>(expr));
-		MemberExpr const* member_expr = cast<MemberExpr>(expr);
+		Expr const* callee_expr = member_call_expr.GetCallee();
+		OLA_ASSERT(isa<MemberExpr>(callee_expr));
+		MemberExpr const* member_expr = cast<MemberExpr>(callee_expr);
 
 		Decl const* decl = member_expr->GetMemberDecl();
 		OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
-		std::string name(class_decl->GetName());
-		name += "::";
-		name += member_call_expr.GetFunctionName();
 
-		llvm::Function* called_function = module.getFunction(name);
+		llvm::Function* called_function = nullptr;
+		if (false && method_decl->IsVirtual())
+		{
+			Expr const* class_expr = member_expr->GetClassExpr();
+			if (!value_map[class_expr]) class_expr->Accept(*this);
+			llvm::Value* struct_value = this_value ? this_value : value_map[class_expr];
+			OLA_ASSERT(struct_value);
+			llvm::Type* struct_type = this_struct_type ? this_struct_type : GetStructType(class_expr->GetType());
+			llvm::Value* vtable_ptr = builder.CreateStructGEP(struct_type, struct_value, 0);
+			OLA_ASSERT(isa<llvm::GlobalVariable>(vtable_ptr));
+			llvm::GlobalVariable* g_Vtable = cast<llvm::GlobalVariable>(vtable_ptr);
+			//llvm::Value* vtable_entry = builder.CreateGEP(vtable, builder.getInt32(index));
+			
+		}
+		else
+		{
+			std::string name(class_decl->GetName());
+			name += "::";
+			name += member_call_expr.GetFunctionName();
+			called_function = module.getFunction(name);
+		}
 		OLA_ASSERT(called_function);
 
 		std::vector<llvm::Value*> args;
@@ -1253,8 +1241,8 @@ namespace ola
 		}
 
 		member_expr->GetClassExpr()->Accept(*this);
-		llvm::Value* this_value = value_map[member_expr->GetClassExpr()];
-		args.push_back(this_value);
+		llvm::Value* this_ptr = value_map[member_expr->GetClassExpr()];
+		args.push_back(this_ptr);
 		for (auto const& arg_expr : member_call_expr.GetArgs())
 		{
 			arg_expr->Accept(*this);
@@ -1457,6 +1445,24 @@ namespace ola
 			OLA_UNREACHABLE();
 		}
 		return nullptr;
+	}
+
+	llvm::Type* LLVMVisitor::GetStructType(QualType const& class_expr_type)
+	{
+		if (IsClassType(class_expr_type))
+		{
+			return ConvertToLLVMType(class_expr_type);
+		}
+		else if (IsRefType(class_expr_type))
+		{
+			RefType const& ref_type = type_cast<RefType>(class_expr_type);
+			if (IsClassType(ref_type.GetReferredType()))
+			{
+				return ConvertToLLVMType(ref_type.GetReferredType());
+			}
+			else return nullptr;
+		}
+		else return nullptr;
 	}
 
 	llvm::Type* LLVMVisitor::GetPointerType(llvm::Type* type)

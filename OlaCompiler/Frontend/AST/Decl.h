@@ -310,23 +310,9 @@ namespace ola
 	public:
 		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
 
-		void SetFields(UniqueFieldDeclPtrList&& _fields)
-		{
-			fields = std::move(_fields);
-			uint64 field_index_offset = base_class ? base_class->GetFieldCount() : 0;
-			for (uint32 i = 0; i < fields.size(); ++i)
-			{
-				auto& field = fields[i];
-				field->SetParentDecl(this);
-				field->SetFieldIndex(field_index_offset + i);
-			}
-		}
+		void SetFields(UniqueFieldDeclPtrList&& _fields);
 		UniqueFieldDeclPtrList const& GetFields() const { return fields; }
-		void SetMethods(UniqueMethodDeclPtrList&& _methods)
-		{
-			methods = std::move(_methods);
-			for (auto& method : methods) method->SetParentDecl(this);
-		}
+		void SetMethods(UniqueMethodDeclPtrList&& _methods);
 		UniqueMethodDeclPtrList const& GetMethods() const { return methods; }
 		void SetBaseClass(ClassDecl const* _base_class) 
 		{ 
@@ -371,7 +357,7 @@ namespace ola
 			for (auto const& method : methods) if (method->IsVirtual()) return true;
 			return base_class ? base_class->IsPolymorphic() : false;
 		}
-		std::vector<MethodDecl const*> GetVTable() const;
+		std::vector<MethodDecl const*> GetVTableEntries() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

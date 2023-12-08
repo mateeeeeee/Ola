@@ -16,6 +16,20 @@ namespace ola
 	private:
 		std::vector<LabelStmt const*>& labels;
 	};
+	class ThisVisitor : public ASTVisitor
+	{
+	public:
+		explicit ThisVisitor(QualType const& this_type) : this_type(this_type) {}
+		virtual void Visit(ThisExpr const& this_expr, uint32) override
+		{
+			ThisExpr& mut_this_expr = const_cast<ThisExpr&>(this_expr);
+			if (this_expr.GetType().IsConst()) this_type.AddConst();
+			mut_this_expr.SetType(this_type);
+		}
+
+	private:
+		QualType this_type;
+	};
 
 	std::vector<LabelStmt const*> const& FunctionDecl::GetLabels() const
 	{
@@ -25,6 +39,56 @@ namespace ola
 		LabelVisitor label_visitor(labels);
 		body_stmt->Accept(label_visitor, 0);
 		return labels;
+	}
+
+	void ClassDecl::SetFields(UniqueFieldDeclPtrList&& _fields)
+	{
+		fields = std::move(_fields);
+		uint64 field_index_offset = base_class ? base_class->GetFieldCount() : 0;
+		for (uint32 i = 0; i < fields.size(); ++i)
+		{
+			auto& field = fields[i];
+			field->SetParentDecl(this);
+			field->SetFieldIndex(field_index_offset + i);
+		}
+	}
+	void ClassDecl::SetMethods(UniqueMethodDeclPtrList&& _methods)
+	{
+		methods = std::move(_methods);
+		ThisVisitor this_visitor(ClassType(this));
+		for (auto& method : methods)
+		{
+			method->SetParentDecl(this);
+			method->Accept(this_visitor, 0);
+		}
+	}
+	std::vector<MethodDecl const*> ClassDecl::GetVTableEntries() const
+	{
+		OLA_ASSERT(IsPolymorphic());
+
+		std::vector<MethodDecl const*> vtable_entries;
+		if (base_class)
+		{
+			std::vector<MethodDecl const*> base_vtable = base_class->GetVTableEntries();
+			vtable_entries.insert(vtable_entries.end(), base_vtable.begin(), base_vtable.end());
+		}
+
+		for (auto const& method : methods)
+		{
+			if (method->IsVirtual())
+			{
+				auto it = std::find_if(vtable_entries.begin(), vtable_entries.end(),
+					[&method](MethodDecl const* entry)
+					{
+						//for now compare names, later signatures
+						return entry->GetName() == method->GetName();
+					});
+
+				if (it != vtable_entries.end()) *it = method.get();
+				else vtable_entries.push_back(method.get());
+			}
+		}
+		return vtable_entries;
 	}
 
 	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const
@@ -69,36 +133,6 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
-
-	std::vector<MethodDecl const*> ClassDecl::GetVTable() const
-	{
-		OLA_ASSERT(IsPolymorphic());
-
-		std::vector<MethodDecl const*> vtable_entries;
-		if (base_class)
-		{
-			std::vector<MethodDecl const*> base_vtable = base_class->GetVTable();
-			vtable_entries.insert(vtable_entries.end(), base_vtable.begin(), base_vtable.end());
-		}
-
-		for (auto const& method : methods)
-		{
-			if (method->IsVirtual()) 
-			{
-				auto it = std::find_if(vtable_entries.begin(), vtable_entries.end(),
-					[&method](MethodDecl const* entry)
-					{
-						//for now compare names, later signatures
-						return entry->GetName() == method->GetName();
-					});
-
-				if (it != vtable_entries.end()) *it = method.get();
-				else vtable_entries.push_back(method.get()); 
-			}
-		}
-		return vtable_entries;
-	}
-
 	void ClassDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -126,7 +160,6 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
-
 	void MethodDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
