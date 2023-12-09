@@ -30,12 +30,15 @@ class ExtDerived extends Derived
     {
         return y; 
     }
+    public int GetX(int) virtual
+    {
+        return 100000;
+    }
 };
 
 public int main() 
 {
     ExtDerived d;
     ref Base b = d;
-    Assert(b.GetY() == 200);
-    Assert(b.GetX() == 100);
+    return b.GetX() + d.GetX(1);
 }

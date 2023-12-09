@@ -87,6 +87,26 @@
 	ret
 	.seh_endproc
                                         # -- End function
+	.def	"ExtDerived::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"ExtDerived::GetX"              # -- Begin function ExtDerived::GetX
+	.p2align	4, 0x90
+"ExtDerived::GetX":                     # @"ExtDerived::GetX"
+.seh_proc "ExtDerived::GetX"
+# %bb.0:                                # %entry
+	sub	rsp, 16
+	.seh_stackalloc 16
+	.seh_endprologue
+	mov	qword ptr [rsp + 8], rdx
+	mov	qword ptr [rsp], 100000
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp]
+	add	rsp, 16
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -108,18 +128,17 @@ main:                                   # @main
 	lea	rax, [rsp + 56]
 	mov	qword ptr [rsp + 48], rax
 	mov	rcx, qword ptr [rsp + 48]
-	mov	qword ptr [rsp + 40], rcx       # 8-byte Spill
-	mov	rax, qword ptr [rcx]
-	call	qword ptr [rax + 8]
-	cmp	rax, 200
-	sete	cl
-	call	Assert
-	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
 	mov	rax, qword ptr [rcx]
 	call	qword ptr [rax]
-	cmp	rax, 100
-	sete	cl
-	call	Assert
+	mov	qword ptr [rsp + 40], rax       # 8-byte Spill
+	mov	rax, qword ptr [rsp + 56]
+	lea	rcx, [rsp + 56]
+	mov	edx, 1
+	call	qword ptr [rax + 16]
+	mov	rcx, rax
+	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
+	add	rax, rcx
+	mov	qword ptr [rsp + 96], rax
 # %bb.1:                                # %exit
 	mov	rax, qword ptr [rsp + 96]
 	add	rsp, 104
@@ -137,15 +156,16 @@ VTable_Derived:
 	.quad	"Derived::GetX"
 	.quad	"Base::GetY"
 
-	.p2align	3, 0x0                          # @VTable_ExtDerived
+	.p2align	4, 0x0                          # @VTable_ExtDerived
 VTable_ExtDerived:
 	.quad	"Derived::GetX"
 	.quad	"ExtDerived::GetY"
+	.quad	"ExtDerived::GetX"
 
 	.addrsig
-	.addrsig_sym Assert
 	.addrsig_sym "Base::GetX"
 	.addrsig_sym "Base::GetY"
 	.addrsig_sym "Derived::GetX"
 	.addrsig_sym "ExtDerived::GetY"
+	.addrsig_sym "ExtDerived::GetX"
 	.addrsig_sym VTable_ExtDerived

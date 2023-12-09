@@ -82,8 +82,17 @@ namespace ola
 				auto it = std::find_if(vtable_entries.begin(), vtable_entries.end(),
 					[&method](MethodDecl const* entry)
 					{
-						//for now compare names, later signatures
-						return entry->GetName() == method->GetName();
+						if (entry->GetName() != method->GetName()) return false;
+
+						FuncType const& entry_type = entry->GetFuncType();
+						FuncType const& method_type = method->GetFuncType();
+						if (!entry_type.GetReturnType()->IsSameAs(method_type.GetReturnType())) return false;
+						if (entry_type.GetParamCount() != method_type.GetParamCount()) return false;
+						for (uint32 i = 0; i < entry_type.GetParamCount(); ++i)
+						{
+							if (!entry_type.GetParams()[i]->IsSameAs(method_type.GetParams()[i])) return false;
+						}
+						return true;
 					});
 
 				if (it != vtable_entries.end()) *it = method.get();
