@@ -386,7 +386,7 @@ namespace ola
 		else Expect(TokenKind::identifier);
 		
 		ClassDecl const* base_class = nullptr;
-		if (Consume(TokenKind::KW_extends))
+		if (Consume(TokenKind::colon))
 		{
 			std::string base_class_name = "";
 			if (current_token->Is(TokenKind::identifier))

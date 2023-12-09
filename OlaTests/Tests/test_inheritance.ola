@@ -7,14 +7,14 @@ class Base
     public int GetSum() const { return GetX(); }
 };
 
-class Derived extends Base
+class Derived : Base
 {
     int y = 2;
     public int GetY() const { return y; }
     public int GetSum() const { return GetY() + super.GetSum(); }
 };
 
-class ExtendedDerived extends Derived 
+class ExtendedDerived : Derived 
 {
     int z = 3;
     public int GetZ() const { return z; }

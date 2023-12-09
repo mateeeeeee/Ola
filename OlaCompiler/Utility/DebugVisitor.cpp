@@ -337,5 +337,4 @@ namespace ola
 	{
 		OLA_DEBUG("{}SuperExpr {}\n", GetIndentation(depth), super_expr.IsImplicit() ? "(implicit)" : "");
 	}
-
 }

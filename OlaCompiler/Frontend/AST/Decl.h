@@ -1,6 +1,6 @@
 #pragma once
 #include "ASTNode.h"
-#include "ASTTypeAliases.h"
+#include "ASTAliases.h"
 #include "Stmt.h"
 #include "Type.h"
 #include "Frontend/SourceLocation.h"
@@ -17,7 +17,8 @@ namespace ola
 		Enum,
 		EnumMember,
 		Alias,
-		Class
+		Class,
+		Interface
 	};
 	enum class DeclVisibility : uint8
 	{

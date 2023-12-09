@@ -1,5 +1,5 @@
 #pragma once
-#include "ASTForwardDeclarations.h"
+#include "ASTFwd.h"
 
 namespace ola
 {

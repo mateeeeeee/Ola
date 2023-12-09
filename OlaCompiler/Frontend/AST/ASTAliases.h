@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "ASTForwardDeclarations.h"
+#include "ASTFwd.h"
 
 namespace ola
 {

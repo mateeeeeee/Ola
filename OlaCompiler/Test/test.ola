@@ -14,7 +14,7 @@ class Base
     }
 };
 
-class Derived extends Base
+class Derived : Base
 {
      int x = 100;
      public int GetX() virtual
@@ -23,16 +23,16 @@ class Derived extends Base
      }
 };
 
-class ExtDerived extends Derived
+class ExtDerived : Derived
 {
     int y = 200;
     public int GetY() virtual
     {
         return y; 
     }
-    public int GetX(int) virtual
+    public int GetX(int) 
     {
-        return 100000;
+        return GetY() + super.GetY();
     }
 };
 
@@ -40,5 +40,5 @@ public int main()
 {
     ExtDerived d;
     ref Base b = d;
-    return b.GetX() + d.GetX(1);
+    return d.GetX(1);
 }

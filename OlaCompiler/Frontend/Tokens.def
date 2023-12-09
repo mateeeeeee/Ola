@@ -107,10 +107,8 @@ KEYWORD(import)
 KEYWORD(ref)
 KEYWORD(inline)
 KEYWORD(noinline)
-KEYWORD(extends)
 KEYWORD(super)
 KEYWORD(virtual)
-KEYWORD(implements)
 
 #undef KEYWORD
 #undef PUNCTUATOR

@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "Token.h"
-#include "AST/ASTTypeAliases.h"
+#include "AST/ASTAliases.h"
 
 namespace ola
 {

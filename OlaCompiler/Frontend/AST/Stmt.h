@@ -1,6 +1,6 @@
 #pragma once
 #include "ASTNode.h"
-#include "ASTTypeAliases.h"
+#include "ASTAliases.h"
 #include "Expr.h"
 #include "Type.h"
 #include "Frontend/SourceLocation.h"
