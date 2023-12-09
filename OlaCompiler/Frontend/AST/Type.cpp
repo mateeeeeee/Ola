@@ -50,7 +50,7 @@ namespace ola
 		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
-			return referred_type.IsNull() || referred_type->Is(TypeKind::Float);
+			return referred_type.IsNull() || isa<FloatType>(referred_type);
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}

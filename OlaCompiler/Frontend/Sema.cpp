@@ -25,13 +25,13 @@ namespace ola
 			diagnostics.Report(loc, missing_type_specifier);
 			return nullptr;
 		}
-		if (type->Is(TypeKind::Void))
+		if (isa<VoidType>(type))
 		{
 			diagnostics.Report(loc, void_invalid_context);
 			return nullptr;
 		}
 
-		if (IsRefType(type))
+		if (isa<RefType>(type))
 		{
 			RefType const& ref_type = type_cast<RefType>(type);
 			if (ref_type.GetReferredType().IsNull())
@@ -42,6 +42,15 @@ namespace ola
 			if (isa<ArrayType>(ref_type.GetReferredType()))
 			{
 				diagnostics.Report(loc, arrays_cannot_be_refs);
+				return nullptr;
+			}
+		}
+		if (isa<ClassType>(type))
+		{
+			ClassDecl const* class_decl = type_cast<ClassType>(type).GetClassDecl();
+			if (class_decl->IsAbstract())
+			{
+				diagnostics.Report(loc, variable_type_abstract, class_decl->GetName());
 				return nullptr;
 			}
 		}
@@ -74,7 +83,7 @@ namespace ola
 		OLA_ASSERT(func_type);
 		if (name == "main")
 		{
-			if (func_type->GetReturnType()->IsNot(TypeKind::Int) || !func_type->GetParams().empty())
+			if (!isa<IntType>(func_type->GetReturnType()) || !func_type->GetParams().empty())
 			{
 				diagnostics.Report(loc, invalid_main_function_declaration);
 				return nullptr;
@@ -105,7 +114,7 @@ namespace ola
 			ctx.gotos.clear();
 			ctx.labels.clear();
 
-			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
+			if (!ctx.return_stmt_encountered && !isa<VoidType>(func_type->GetReturnType()))
 			{
 				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
 			}
@@ -121,7 +130,7 @@ namespace ola
 											  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
 											  DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
 	{
-		bool is_const = (method_attrs & MethodAttribute_Const) == MethodAttribute_Const;
+		bool is_const = HasAttribute(method_attrs, MethodAttribute_Const);
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
@@ -130,17 +139,30 @@ namespace ola
 		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		OLA_ASSERT(func_type);
 
-		if (func_type->GetReturnType()->Is(TypeKind::Ref) && !func_type->GetReturnType().IsConst() && is_const)
+		if (isa<RefType>(func_type->GetReturnType()) && !func_type->GetReturnType().IsConst() && is_const)
 		{
 			diagnostics.Report(loc, const_methods_cannot_return_nonconst_refs);
 			return nullptr;
 		}
-		if ((func_attrs & FuncAttribute_Inline) && (func_attrs & FuncAttribute_NoInline))
+		if (HasAttribute(func_attrs, FuncAttribute_Inline) && HasAttribute(func_attrs, FuncAttribute_NoInline))
 		{
 			diagnostics.Report(loc, incompatible_function_attributes);
 			return nullptr;
 		}
-
+		if (HasAttribute(method_attrs, MethodAttribute_Pure))
+		{
+			if (!HasAttribute(method_attrs, MethodAttribute_Virtual))
+			{
+				diagnostics.Report(loc, pure_must_be_virtual);
+				return nullptr;
+			}
+			if (body_stmt != nullptr)
+			{
+				diagnostics.Report(loc, pure_method_cannot_have_body);
+				return nullptr;
+			}
+		}
+		
 		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
 		member_function_decl->SetType(type);
 		member_function_decl->SetVisibility(visibility);
@@ -161,7 +183,7 @@ namespace ola
 			ctx.gotos.clear();
 			ctx.labels.clear();
 
-			if (!ctx.return_stmt_encountered && func_type->GetReturnType()->IsNot(TypeKind::Void))
+			if (!ctx.return_stmt_encountered && !isa<VoidType>(func_type->GetReturnType()))
 			{
 				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
 				return nullptr;
@@ -269,6 +291,7 @@ namespace ola
 		class_decl->SetBaseClass(base_class);
 		class_decl->SetFields(std::move(member_variables));
 		class_decl->SetMethods(std::move(member_functions));
+		class_decl->BuildVTable();
 		ctx.tag_sym_table.Insert(class_decl.get());
 		return class_decl;
 	}
@@ -510,7 +533,7 @@ namespace ola
 		case UnaryExprKind::PreDecrement:
 		case UnaryExprKind::PostIncrement:
 		case UnaryExprKind::PostDecrement:
-			if (IsBoolType(operand->GetType()))
+			if (isa<BoolType>(operand->GetType()))
 			{
 				diagnostics.Report(loc, bool_forbidden_in_increment);
 				return nullptr;
@@ -536,7 +559,7 @@ namespace ola
 		case UnaryExprKind::BitNot:
 			break;
 		case UnaryExprKind::LogicalNot:
-			if (!IsBoolType(operand->GetType()))
+			if (!isa<BoolType>(operand->GetType()))
 			{
 				operand = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(operand));
 			}
@@ -591,8 +614,8 @@ namespace ola
 		case BinaryExprKind::Multiply:
 		case BinaryExprKind::Divide:
 		{
-			if (lhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function) ||
-				rhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function))
+			if (isoneof<VoidType, ArrayType, FuncType>(lhs_type) ||
+				isoneof<VoidType, ArrayType, FuncType>(rhs_type))
 			{
 				diagnostics.Report(loc, invalid_operands);
 				return nullptr;
@@ -618,16 +641,16 @@ namespace ola
 		break;
 		case BinaryExprKind::Modulo:
 		{
-			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			if (!isoneof<IntType, BoolType>(lhs_type) || !isoneof<IntType, BoolType>(rhs_type))
 			{
 				diagnostics.Report(loc, modulo_operands_not_integral);
 				return nullptr;
 			}
-			if (!IsIntegerType(lhs_type))
+			if (!isa<IntType>(lhs_type))
 			{
 				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
 			}
-			if (!IsIntegerType(rhs_type))
+			if (!isa<IntType>(rhs_type))
 			{
 				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
 			}
@@ -637,16 +660,16 @@ namespace ola
 		case BinaryExprKind::ShiftLeft:
 		case BinaryExprKind::ShiftRight:
 		{
-			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			if (!isoneof<IntType, BoolType>(lhs_type) || !isoneof<IntType, BoolType>(rhs_type))
 			{
 				diagnostics.Report(loc, shift_operands_not_integral);
 				return nullptr;
 			}
-			if (!IsIntegerType(lhs_type))
+			if (!isa<IntType>(lhs_type))
 			{
 				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
 			}
-			if (!IsIntegerType(rhs_type))
+			if (!isa<IntType>(rhs_type))
 			{
 				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
 			}
@@ -657,16 +680,16 @@ namespace ola
 		case BinaryExprKind::BitOr:
 		case BinaryExprKind::BitXor:
 		{
-			if (!IsIntegralType(lhs_type) || !IsIntegralType(rhs_type))
+			if (!isoneof<IntType, BoolType>(lhs_type) || !isoneof<IntType, BoolType>(rhs_type))
 			{
 				diagnostics.Report(loc, bitwise_operands_not_integral);
 				return nullptr;
 			}
-			if (!IsIntegerType(lhs_type))
+			if (!isa<IntType>(lhs_type))
 			{
 				lhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(lhs));
 			}
-			if (!IsIntegerType(rhs_type))
+			if (!isa<IntType>(rhs_type))
 			{
 				rhs = ActOnImplicitCastExpr(loc, builtin_types::Int, std::move(rhs));
 			}
@@ -676,11 +699,11 @@ namespace ola
 		case BinaryExprKind::LogicalAnd:
 		case BinaryExprKind::LogicalOr:
 		{
-			if (!IsBoolType(lhs_type))
+			if (!isa<BoolType>(lhs_type))
 			{
 				lhs = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(lhs));
 			}
-			if (!IsBoolType(rhs_type))
+			if (!isa<BoolType>(rhs_type))
 			{
 				rhs = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(rhs));
 			}
@@ -694,8 +717,8 @@ namespace ola
 		case BinaryExprKind::LessEqual:
 		case BinaryExprKind::GreaterEqual:
 		{
-			if (lhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function) ||
-				rhs_type->IsOneOf(TypeKind::Void, TypeKind::Array, TypeKind::Function))
+			if (isoneof<VoidType, ArrayType, FuncType>(lhs_type) ||
+				isoneof<VoidType, ArrayType, FuncType>(rhs_type))
 			{
 				diagnostics.Report(loc, invalid_operands);
 				return nullptr;
@@ -770,7 +793,7 @@ namespace ola
 			if (isa<FunctionDecl>(decl)) 
 			{
 				QualType const& func_expr_type = decl->GetType();
-				OLA_ASSERT(IsFunctionType(func_expr_type));
+				OLA_ASSERT(isa<FuncType>(func_expr_type));
 				FuncType const& func_type = type_cast<FuncType>(func_expr_type);
 				std::span<QualType const> param_types = func_type.GetParams();
 				if (args.size() != param_types.size())
@@ -785,7 +808,7 @@ namespace ola
 					UniqueExprPtr& arg = args[i];
 					QualType const& func_param_type = param_types[i];
 
-					if (IsRefType(func_param_type) && !arg->IsLValue())
+					if (isa<RefType>(func_param_type) && !arg->IsLValue())
 					{
 						diagnostics.Report(loc, ref_var_rvalue_bind);
 						return nullptr;
@@ -807,7 +830,7 @@ namespace ola
 				func_call_expr->SetType(func_type.GetReturnType());
 				func_call_expr->SetArgs(std::move(args));
 				func_call_expr->SetCallee(std::move(func_expr));
-				if (IsRefType(func_call_expr->GetType())) func_call_expr->SetLValue();
+				if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
 				return func_call_expr;
 			}
 			diagnostics.Report(loc, invalid_function_call);
@@ -848,7 +871,7 @@ namespace ola
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
 
-				if (IsRefType(func_param_type) && !arg->IsLValue())
+				if (isa<RefType>(func_param_type) && !arg->IsLValue())
 				{
 					diagnostics.Report(loc, ref_var_rvalue_bind);
 					return nullptr;
@@ -870,7 +893,7 @@ namespace ola
 			method_call_expr->SetType(method_type.GetReturnType());
 			method_call_expr->SetArgs(std::move(args));
 			method_call_expr->SetCallee(std::move(func_expr));
-			if (IsRefType(method_call_expr->GetType())) method_call_expr->SetLValue();
+			if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
 			return method_call_expr;
 		}
 		diagnostics.Report(loc, invalid_function_call);
@@ -884,7 +907,7 @@ namespace ola
 
 	UniqueConstantIntPtr Sema::ActOnLengthOperator(QualType const& type, SourceLocation const& loc)
 	{
-		if (!IsArrayType(type))
+		if (!isa<ArrayType>(type))
 		{
 			diagnostics.Report(loc, length_operand_not_array);
 			return nullptr;
@@ -1009,7 +1032,7 @@ namespace ola
 		QualType expr_type{};
 		if (!type.IsNull())
 		{
-			OLA_ASSERT(type->Is(TypeKind::Array));
+			OLA_ASSERT(isa<ArrayType>(type));
 			ArrayType const& array_type = type_cast<ArrayType>(type);
 			OLA_ASSERT(array_type.GetArraySize() > 0);
 			if (array_type.GetArraySize() < expr_list.size())
@@ -1045,12 +1068,12 @@ namespace ola
 
 	UniqueArrayAccessExprPtr Sema::ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr)
 	{
-		if (!IsArrayType(array_expr->GetType()))
+		if (!isa<ArrayType>(array_expr->GetType()))
 		{
 			diagnostics.Report(loc, subscripted_value_not_array);
 			return nullptr;
 		}
-		if (!IsIntegerType(index_expr->GetType()))
+		if (!isa<IntType>(index_expr->GetType()))
 		{
 			diagnostics.Report(loc, array_subscript_not_integer);
 			return nullptr;
@@ -1077,16 +1100,16 @@ namespace ola
 	UniqueMemberExprPtr Sema::ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier)
 	{
 		QualType const& class_expr_type = class_expr->GetType();
-		if (!IsClassType(class_expr_type))
+		if (!isa<ClassType>(class_expr_type))
 		{
-			if (!IsRefType(class_expr_type))
+			if (!isa<RefType>(class_expr_type))
 			{
 				diagnostics.Report(loc, invalid_member_access);
 				return nullptr;
 			}
 
 			RefType const& ref_type = type_cast<RefType>(class_expr_type);
-			if (!IsClassType(ref_type.GetReferredType()))
+			if (!isa<ClassType>(ref_type.GetReferredType()))
 			{
 				diagnostics.Report(loc, invalid_member_access);
 				return nullptr;
@@ -1137,8 +1160,8 @@ namespace ola
 		QualType const& cast_type = type;
 		QualType const& operand_type = expr->GetType();
 
-		if (IsArrayType(cast_type) || IsArrayType(operand_type)) diagnostics.Report(loc, invalid_cast);
-		if (IsVoidType(cast_type)) diagnostics.Report(loc, invalid_cast);
+		if (isa<ArrayType>(cast_type) || isa<ArrayType>(operand_type)) diagnostics.Report(loc, invalid_cast);
+		if (isa<VoidType>(cast_type)) diagnostics.Report(loc, invalid_cast);
 		if (!cast_type->IsAssignableFrom(operand_type)) diagnostics.Report(loc, invalid_cast);
 
 		UniqueImplicitCastExprPtr cast_expr = MakeUnique<ImplicitCastExpr>(loc, type);
@@ -1152,14 +1175,14 @@ namespace ola
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool has_type_specifier = !type.IsNull();
-		bool is_ref_type = has_type_specifier && IsRefType(type);
+		bool is_ref_type = has_type_specifier && isa<RefType>(type);
 		if (has_type_specifier && is_ref_type)
 		{
 			RefType const& ref_type = type_cast<RefType>(type);
 			has_type_specifier = !ref_type.GetReferredType().IsNull();
 		}
 		bool const init_expr_is_decl_ref = has_init && isa<DeclRefExpr>(init_expr.get());
-		bool const init_expr_const_ref = has_init && IsRefType(init_expr->GetType()) && init_expr->GetType().IsConst();
+		bool const init_expr_const_ref = has_init && isa<RefType>(init_expr->GetType()) && init_expr->GetType().IsConst();
 
 		if (ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -1190,7 +1213,7 @@ namespace ola
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
 		}
-		if (has_type_specifier && type->Is(TypeKind::Void))
+		if (has_type_specifier && isa<VoidType>(type))
 		{
 			diagnostics.Report(loc, void_invalid_context);
 			return nullptr;
@@ -1208,7 +1231,7 @@ namespace ola
 		}
 		var_decl->SetInitExpr(std::move(init_expr));
 
-		bool is_array = (has_type_specifier && IsArrayType(type)) || (has_init && IsArrayType(var_decl->GetInitExpr()->GetType()));
+		bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(var_decl->GetInitExpr()->GetType()));
 		if (is_array)
 		{
 			if (is_ref_type)
@@ -1220,7 +1243,7 @@ namespace ola
 			if (Expr const* array_init_expr = var_decl->GetInitExpr())
 			{
 				ArrayType const& init_expr_type = type_cast<ArrayType>(array_init_expr->GetType());
-				bool is_multidimensional_array = init_expr_type.GetBaseType()->Is(TypeKind::Array);
+				bool is_multidimensional_array = isa<ArrayType>(init_expr_type.GetBaseType());
 				if (is_multidimensional_array && init_expr_is_decl_ref)
 				{
 					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
@@ -1250,7 +1273,7 @@ namespace ola
 			else
 			{
 				ArrayType const& decl_type = type_cast<ArrayType>(type);
-				if (decl_type.GetBaseType()->Is(TypeKind::Array))
+				if (isa<ArrayType>(decl_type.GetBaseType()))
 				{
 					diagnostics.Report(loc, multidimensional_arrays_need_initializer);
 					return nullptr;
@@ -1273,7 +1296,7 @@ namespace ola
 		}
 
 		QualType const& var_type = var_decl->GetType();
-		if (IsRefType(var_type))
+		if (isa<RefType>(var_type))
 		{
 			if (!var_decl->GetInitExpr())
 			{
@@ -1287,7 +1310,15 @@ namespace ola
 			}
 			if (!var_type.IsConst() && init_expr_const_ref)
 			{
-				diagnostics.Report(loc, nonconst_ref_init_with_const_ref);
+				
+			}
+		}
+		if (isa<ClassType>(var_type))
+		{
+			ClassDecl const* class_decl = type_cast<ClassType>(var_type).GetClassDecl();
+			if (class_decl->IsAbstract())
+			{
+				diagnostics.Report(loc, variable_type_abstract, class_decl->GetName());
 				return nullptr;
 			}
 		}

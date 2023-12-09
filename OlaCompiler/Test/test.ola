@@ -2,43 +2,25 @@ import std.assert;
 
 class Base
 {
-    int x = 10;
-    int y = 20;
-    public int GetX() virtual
-    {
-        return x;
-    }
-    public int GetY() virtual
-    {
-        return y;
-    }
+    public int GetX() virtual pure;
 };
 
 class Derived : Base
 {
-     int x = 100;
+     int y = 100;
+     int x = 10;
+     public int GetY() virtual
+     {
+        return y;
+     }
      public int GetX() virtual
      {
         return x;
      }
 };
 
-class ExtDerived : Derived
-{
-    int y = 200;
-    public int GetY() virtual
-    {
-        return y; 
-    }
-    public int GetX(int) 
-    {
-        return GetY() + super.GetY();
-    }
-};
-
 public int main() 
 {
-    ExtDerived d;
-    ref Base b = d;
-    return d.GetX(1);
+    Derived d;
+    return d.GetX();
 }

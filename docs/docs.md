@@ -417,7 +417,7 @@ class Base
     }
 };
 
-class Derived extends Base
+class Derived : Base
 {
      int x = 100;
      public int GetX() virtual
@@ -426,7 +426,7 @@ class Derived extends Base
      }
 };
 
-class ExtDerived extends Derived
+class ExtDerived : Derived
 {
     int y = 200;
     public int GetY() virtual

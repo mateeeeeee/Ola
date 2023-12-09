@@ -64,27 +64,26 @@ namespace ola
 			method->Accept(this_visitor, 0);
 		}
 	}
-	std::vector<MethodDecl const*> ClassDecl::GetVTableEntries() const
+	void ClassDecl::BuildVTable()
 	{
-		OLA_ASSERT(IsPolymorphic());
-
-		std::vector<MethodDecl const*> vtable_entries;
+		polymorphic = IsPolymorphicImpl();
+		if (!polymorphic) return;
+		
 		if (base_class)
 		{
-			std::vector<MethodDecl const*> base_vtable = base_class->GetVTableEntries();
-			vtable_entries.reserve(base_vtable.size());
+			std::vector<MethodDecl const*> base_vtable = base_class->GetVTable();
+			vtable.reserve(base_vtable.size());
 			for (uint64 i = 0; i < base_vtable.size(); ++i)
 			{
-				base_vtable[i]->SetVTableIndex(vtable_entries.size());
-				vtable_entries.push_back(base_vtable[i]);
+				base_vtable[i]->SetVTableIndex(vtable.size());
+				vtable.push_back(base_vtable[i]);
 			}
 		}
-
 		for (auto const& method : methods)
 		{
 			if (method->IsVirtual())
 			{
-				auto it = std::find_if(vtable_entries.begin(), vtable_entries.end(),
+				auto it = std::find_if(vtable.begin(), vtable.end(),
 					[&method](MethodDecl const* entry)
 					{
 						if (entry->GetName() != method->GetName()) return false;
@@ -100,19 +99,37 @@ namespace ola
 						return true;
 					});
 
-				if (it != vtable_entries.end())
-				{	
+				if (it != vtable.end())
+				{
 					method->SetVTableIndex((*it)->GetVTableIndex());
 					*it = method.get();
 				}
 				else
 				{
-					method->SetVTableIndex(vtable_entries.size());
-					vtable_entries.push_back(method.get());
+					method->SetVTableIndex(vtable.size());
+					vtable.push_back(method.get());
 				}
 			}
 		}
-		return vtable_entries;
+
+		for (MethodDecl const* vtable_entry : vtable)
+		{
+			if (vtable_entry->IsPure())
+			{
+				abstract = true;
+				break;
+			}
+		}
+	}
+	std::vector<MethodDecl const*> const& ClassDecl::GetVTable() const
+	{
+		OLA_ASSERT(IsPolymorphic());
+		return vtable;
+	}
+	bool ClassDecl::IsPolymorphicImpl() const
+	{
+		for (auto const& method : methods) if (method->IsVirtual()) return true;
+		return base_class ? base_class->IsPolymorphic() : false;
 	}
 
 	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const

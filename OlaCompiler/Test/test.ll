@@ -86,7 +86,18 @@ entry:
   %1 = alloca i64, align 8
   store i64 %0, ptr %1, align 4
   %2 = alloca i64, align 8
-  store i64 100000, ptr %2, align 4
+  %3 = getelementptr inbounds %ExtDerived, ptr %this, i32 0, i32 0
+  %4 = load ptr, ptr %3, align 8
+  %5 = getelementptr inbounds ptr, ptr %4, i32 1
+  %6 = load ptr, ptr %5, align 8
+  %7 = call i64 %6(ptr %this)
+  %8 = getelementptr inbounds %Derived, ptr %this, i32 0, i32 0
+  %9 = load ptr, ptr %8, align 8
+  %10 = getelementptr inbounds ptr, ptr %9, i32 1
+  %11 = load ptr, ptr %10, align 8
+  %12 = call i64 %11(ptr %this)
+  %13 = add i64 %7, %12
+  store i64 %13, ptr %2, align 4
   br label %exit
 
 return:                                           ; No predecessors!
@@ -94,8 +105,8 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %2, align 4
-  ret i64 %3
+  %14 = load i64, ptr %2, align 4
+  ret i64 %14
 }
 
 define i64 @main() {
@@ -116,18 +127,12 @@ entry:
   %8 = alloca ptr, align 8
   store ptr %1, ptr %8, align 8
   %9 = load ptr, ptr %8, align 8
-  %10 = getelementptr inbounds %Base, ptr %9, i32 0, i32 0
+  %10 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 0
   %11 = load ptr, ptr %10, align 8
-  %12 = getelementptr inbounds ptr, ptr %11, i32 0
+  %12 = getelementptr inbounds ptr, ptr %11, i32 2
   %13 = load ptr, ptr %12, align 8
-  %14 = call i64 %13(ptr %9)
-  %15 = getelementptr inbounds %ExtDerived, ptr %1, i32 0, i32 0
-  %16 = load ptr, ptr %15, align 8
-  %17 = getelementptr inbounds ptr, ptr %16, i32 2
-  %18 = load ptr, ptr %17, align 8
-  %19 = call i64 %18(ptr %1, i64 1)
-  %20 = add i64 %14, %19
-  store i64 %20, ptr %0, align 4
+  %14 = call i64 %13(ptr %1, i64 1)
+  store i64 %14, ptr %0, align 4
   br label %exit
 
 return:                                           ; No predecessors!
@@ -135,6 +140,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %21 = load i64, ptr %0, align 4
-  ret i64 %21
+  %15 = load i64, ptr %0, align 4
+  ret i64 %15
 }

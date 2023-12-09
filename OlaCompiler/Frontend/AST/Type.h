@@ -71,27 +71,17 @@ namespace ola
 	{
 	public:
 		constexpr Type() {}
-
-		constexpr uint32 GetSize() const { return size; }
-		constexpr uint32 GetAlign() const { return align; }
 		constexpr void SetAlign(uint32 _align) { align = _align; }
 		constexpr void SetSize(uint32 _size) { size = _size; }
+		constexpr uint32 GetSize() const { return size; }
+		constexpr uint32 GetAlign() const { return align; }
+		TypeKind GetKind() const { return kind; }
 
 		virtual bool IsSameAs(Type const& t) const
 		{
 			return kind == t.kind;
 		}
 		virtual bool IsAssignableFrom(Type const&) const { return true; }
-
-		TypeKind GetKind() const { return kind; }
-		bool Is(TypeKind t) const { return kind == t; }
-		bool IsNot(TypeKind t) const { return kind != t; }
-		template <typename... Ts>
-		bool IsOneOf(TypeKind t1, Ts... ts) const
-		{
-			if constexpr (sizeof...(Ts) == 0) return Is(t1);
-			else return Is(t1) || IsOneOf(ts...);
-		}
 
 	private:
 		TypeKind kind = TypeKind::Invalid;
@@ -248,28 +238,6 @@ namespace ola
 	{
 		return isa<T>(t) ? static_cast<T const*>(&t) : nullptr;
 	}
-
-	template<TypeKind K>
-	inline bool IsType(Type const& type)
-	{
-		return type.Is(K);
-	}
-	template<TypeKind K, TypeKind... Ks>
-	inline bool IsTypeOneOf(Type const& type)
-	{
-		return type.IsOneOf(K, Ks...);
-	}
-
-	inline bool (*IsVoidType)(Type const& type) = IsType<TypeKind::Void>;
-	inline bool (*IsArrayType)(Type const& type) = IsType<TypeKind::Array>;
-	inline bool (*IsIntegerType)(Type const& type) = IsType<TypeKind::Int>;
-	inline bool (*IsBoolType)(Type const& type) = IsType<TypeKind::Bool>;
-	inline bool (*IsCharType)(Type const& type) = IsType<TypeKind::Char>;
-	inline bool (*IsFloatType)(Type const& type) = IsType<TypeKind::Float>;
-	inline bool (*IsFunctionType)(Type const& type) = IsType<TypeKind::Function>;
-	inline bool (*IsClassType)(Type const& type) = IsType<TypeKind::Class>;
-	inline bool (*IsIntegralType)(Type const& type) = IsTypeOneOf<TypeKind::Int, TypeKind::Bool>;
-	inline bool (*IsRefType)(Type const& type) = IsType<TypeKind::Ref>;
 
 	namespace builtin_types
 	{

@@ -206,7 +206,7 @@ namespace ola
 				if (!Consume(TokenKind::semicolon))
 				{
 					sema->ctx.current_func = &function_type;
-					sema->ctx.is_method_const = (method_attrs & MethodAttribute_Const) == MethodAttribute_Const;
+					sema->ctx.is_method_const = HasAttribute(method_attrs, MethodAttribute_Const);
 					function_body = ParseCompoundStatement();
 					sema->ctx.is_method_const = false;
 					sema->ctx.current_func = nullptr;
@@ -1153,7 +1153,7 @@ namespace ola
 		{
 			if (Consume(TokenKind::KW_inline))
 			{
-				if ((attrs & FuncAttribute_Inline) == 0)
+				if (!HasAttribute(attrs, FuncAttribute_Inline))
 				{
 					attrs |= FuncAttribute_Inline;
 				}
@@ -1165,7 +1165,7 @@ namespace ola
 			}
 			else if (Consume(TokenKind::KW_noinline))
 			{
-				if ((attrs & FuncAttribute_NoInline) == 0)
+				if (!HasAttribute(attrs, FuncAttribute_NoInline))
 				{
 					attrs |= FuncAttribute_NoInline;
 				}
@@ -1180,11 +1180,11 @@ namespace ola
 
 	void Parser::ParseMethodAttributes(uint8& attrs)
 	{
-		while (current_token->IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual))
+		while (current_token->IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual, TokenKind::KW_pure))
 		{
 			if (Consume(TokenKind::KW_const))
 			{
-				if ((attrs & MethodAttribute_Const) == 0)
+				if (!HasAttribute(attrs, MethodAttribute_Const))
 				{
 					attrs |= MethodAttribute_Const;
 				}
@@ -1196,9 +1196,21 @@ namespace ola
 			}
 			else if (Consume(TokenKind::KW_virtual))
 			{
-				if ((attrs & MethodAttribute_Virtual) == 0)
+				if (!HasAttribute(attrs, MethodAttribute_Virtual))
 				{
 					attrs |= MethodAttribute_Virtual;
+				}
+				else
+				{
+					Diag(method_attribute_repetition);
+					return;
+				}
+			}
+			else if (Consume(TokenKind::KW_pure))
+			{
+				if (!HasAttribute(attrs, MethodAttribute_Pure))
+				{
+					attrs |= MethodAttribute_Pure;
 				}
 				else
 				{
@@ -1260,7 +1272,7 @@ namespace ola
 
 		while (Consume(TokenKind::left_square))
 		{
-			if (type->Is(TypeKind::Void))
+			if (isa<VoidType>(type))
 			{
 				Diag(invalid_type_specifier);
 				return;

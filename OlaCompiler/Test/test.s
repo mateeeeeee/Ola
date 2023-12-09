@@ -96,14 +96,24 @@
 "ExtDerived::GetX":                     # @"ExtDerived::GetX"
 .seh_proc "ExtDerived::GetX"
 # %bb.0:                                # %entry
-	sub	rsp, 16
-	.seh_stackalloc 16
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	mov	qword ptr [rsp + 8], rdx
-	mov	qword ptr [rsp], 100000
+	mov	qword ptr [rsp + 40], rcx       # 8-byte Spill
+	mov	qword ptr [rsp + 64], rdx
+	mov	rax, qword ptr [rcx]
+	call	qword ptr [rax + 8]
+	mov	rcx, qword ptr [rsp + 40]       # 8-byte Reload
+	mov	qword ptr [rsp + 48], rax       # 8-byte Spill
+	mov	rax, qword ptr [rcx]
+	call	qword ptr [rax + 8]
+	mov	rcx, rax
+	mov	rax, qword ptr [rsp + 48]       # 8-byte Reload
+	add	rax, rcx
+	mov	qword ptr [rsp + 56], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp]
-	add	rsp, 16
+	mov	rax, qword ptr [rsp + 56]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
@@ -116,32 +126,25 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 104
-	.seh_stackalloc 104
+	sub	rsp, 88
+	.seh_stackalloc 88
 	.seh_endprologue
 	lea	rax, [rip + VTable_ExtDerived]
-	mov	qword ptr [rsp + 56], rax
-	mov	qword ptr [rsp + 80], 100
-	mov	qword ptr [rsp + 64], 10
-	mov	qword ptr [rsp + 72], 20
-	mov	qword ptr [rsp + 88], 200
-	lea	rax, [rsp + 56]
-	mov	qword ptr [rsp + 48], rax
-	mov	rcx, qword ptr [rsp + 48]
-	mov	rax, qword ptr [rcx]
-	call	qword ptr [rax]
-	mov	qword ptr [rsp + 40], rax       # 8-byte Spill
-	mov	rax, qword ptr [rsp + 56]
-	lea	rcx, [rsp + 56]
+	mov	qword ptr [rsp + 40], rax
+	mov	qword ptr [rsp + 64], 100
+	mov	qword ptr [rsp + 48], 10
+	mov	qword ptr [rsp + 56], 20
+	mov	qword ptr [rsp + 72], 200
+	lea	rax, [rsp + 40]
+	mov	qword ptr [rsp + 32], rax
+	mov	rax, qword ptr [rsp + 40]
+	lea	rcx, [rsp + 40]
 	mov	edx, 1
 	call	qword ptr [rax + 16]
-	mov	rcx, rax
-	mov	rax, qword ptr [rsp + 40]       # 8-byte Reload
-	add	rax, rcx
-	mov	qword ptr [rsp + 96], rax
+	mov	qword ptr [rsp + 80], rax
 # %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 96]
-	add	rsp, 104
+	mov	rax, qword ptr [rsp + 80]
+	add	rsp, 88
 	ret
 	.seh_endproc
                                         # -- End function

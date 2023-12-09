@@ -79,4 +79,7 @@ DIAG(method_attribute_repetition, error, "Cannot specify the same method attribu
 DIAG(expected_base_class_name, error, "Expected base class name!")
 DIAG(base_specifier_not_class, error, "Base specifier must name a class")
 DIAG(super_used_in_wrong_context, error, "Cannot call super without a base class")
+DIAG(pure_must_be_virtual, error, "Cannot declare method pure without virtual")
+DIAG(pure_method_cannot_have_body, error, "Pure method cannot have body")
+DIAG(variable_type_abstract, error, "variable type {} is an abstract class")
 #undef DIAG

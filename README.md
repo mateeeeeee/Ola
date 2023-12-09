@@ -11,7 +11,7 @@ Ola is a toy object-oriented programming language with LLVM backend.
 ## Features
   * classes
 	- access modifiers: `public`, `private`
-	- single inheritance: `extends`
+	- single inheritance: `:`
 	- polymorphism using vtables: `virtual`
 	- `this` and `super` keywords
   * reference type: `ref`
@@ -40,7 +40,7 @@ Ola is a toy object-oriented programming language with LLVM backend.
 
 ## Todo
   * object oriented constructs 
-      - interfaces: `implements`
+      - pure virtuals: `pure`
 
 ## Structure
 Ola consists of three parts: 

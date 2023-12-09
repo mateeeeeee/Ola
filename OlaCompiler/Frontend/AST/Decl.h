@@ -139,6 +139,11 @@ namespace ola
 		uint32 index = -1;
 	};
 
+	inline bool HasAttribute(uint8 attrs, uint8 attr)
+	{
+		return (attrs & attr) == attr;
+	}
+
 	enum FuncAttribute : uint8
 	{
 		FuncAttribute_None = 0x00,
@@ -161,7 +166,7 @@ namespace ola
 		}
 		bool HasFuncAttribute(FuncAttribute attr) const
 		{
-			return (func_attributes & attr) == attr;
+			return HasAttribute(func_attributes, attr);
 		}
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
@@ -199,9 +204,11 @@ namespace ola
 	{
 		MethodAttribute_None = 0x00,
 		MethodAttribute_Const = 0x01,
-		MethodAttribute_Virtual = 0x02
+		MethodAttribute_Virtual = 0x02,
+		MethodAttribute_Pure = 0x04
 	};
 	using MethodAttributes = uint8;
+
 	class MethodDecl final : public FunctionDecl
 	{
 	public:
@@ -219,10 +226,12 @@ namespace ola
 		}
 		bool HasMethodAttribute(MethodAttribute attr) const
 		{
-			return (method_attrs & attr) == attr;
+			return HasAttribute(method_attrs, attr);
 		}
 		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
+		bool IsPure() const { return HasMethodAttribute(MethodAttribute_Pure); }
 		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
+
 		void SetVTableIndex(uint32 i) const { vtable_index = i; }
 		uint32 GetVTableIndex() const { return vtable_index; }
 
@@ -352,10 +361,14 @@ namespace ola
 		}
 		bool IsPolymorphic() const
 		{
-			for (auto const& method : methods) if (method->IsVirtual()) return true;
-			return base_class ? base_class->IsPolymorphic() : false;
+			return polymorphic;
 		}
-		std::vector<MethodDecl const*> GetVTableEntries() const;
+		bool IsAbstract() const
+		{
+			return abstract;
+		}
+		void BuildVTable();
+		std::vector<MethodDecl const*> const& GetVTable() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -366,8 +379,13 @@ namespace ola
 		ClassDecl const* base_class = nullptr;
 		UniqueFieldDeclPtrList fields;
 		UniqueMethodDeclPtrList methods;
-	};
+		std::vector<MethodDecl const*> vtable;
+		bool abstract = false;
+		bool polymorphic = false;
 
+	private:
+		bool IsPolymorphicImpl() const;
+	};
 
 	template <typename T> requires std::derived_from<T, Decl>
 	inline bool isa(Decl const* decl) { return T::ClassOf(decl); }

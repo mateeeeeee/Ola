@@ -109,6 +109,7 @@ KEYWORD(inline)
 KEYWORD(noinline)
 KEYWORD(super)
 KEYWORD(virtual)
+KEYWORD(pure)
 
 #undef KEYWORD
 #undef PUNCTUATOR
