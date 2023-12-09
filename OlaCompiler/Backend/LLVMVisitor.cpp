@@ -422,9 +422,12 @@ namespace ola
 			for (MethodDecl const* method : vtable)
 			{
 				llvm::Value* method_value = value_map[method];
-				OLA_ASSERT(isa<llvm::Function>(method_value));
-				llvm::Function* method_fn = cast<llvm::Function>(method_value);
-				vtable_function_ptrs.push_back(method_fn);
+				if (!method->IsPure())
+				{
+					llvm::Function* method_fn = cast<llvm::Function>(method_value);
+					vtable_function_ptrs.push_back(method_fn);
+				}
+				else vtable_function_ptrs.push_back(llvm::ConstantPointerNull::get(GetPointerType(void_type)));
 			}
 
 			std::string vtable_name = "VTable_";
@@ -1498,7 +1501,7 @@ namespace ola
 		else return nullptr;
 	}
 
-	llvm::Type* LLVMVisitor::GetPointerType(llvm::Type* type)
+	llvm::PointerType* LLVMVisitor::GetPointerType(llvm::Type* type)
 	{
 		return llvm::PointerType::get(type, 0);
 	}

@@ -12,6 +12,7 @@ namespace llvm
 	class DataLayout;
 	class Value;
 	class Type;
+	class PointerType;
 	class Function;
 	class IntegerType;
 	class AllocaInst;
@@ -126,7 +127,7 @@ namespace ola
 		llvm::Type* ConvertOlaType(QualType const&);
 		llvm::FunctionType* ConvertMethodType(FuncType const&, llvm::Type*);
 		llvm::Type* GetStructType(QualType const&);
-		llvm::Type* GetPointerType(llvm::Type*);
+		llvm::PointerType* GetPointerType(llvm::Type*);
 
 		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);

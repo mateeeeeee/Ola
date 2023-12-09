@@ -22,5 +22,6 @@ class Derived : Base
 public int main() 
 {
     Derived d;
-    return d.GetX();
+    ref Base b = d;
+    return b.GetX();
 }
