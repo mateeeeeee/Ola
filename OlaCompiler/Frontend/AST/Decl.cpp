@@ -72,7 +72,12 @@ namespace ola
 		if (base_class)
 		{
 			std::vector<MethodDecl const*> base_vtable = base_class->GetVTableEntries();
-			vtable_entries.insert(vtable_entries.end(), base_vtable.begin(), base_vtable.end());
+			vtable_entries.reserve(base_vtable.size());
+			for (uint64 i = 0; i < base_vtable.size(); ++i)
+			{
+				base_vtable[i]->SetVTableIndex(vtable_entries.size());
+				vtable_entries.push_back(base_vtable[i]);
+			}
 		}
 
 		for (auto const& method : methods)
@@ -95,8 +100,16 @@ namespace ola
 						return true;
 					});
 
-				if (it != vtable_entries.end()) *it = method.get();
-				else vtable_entries.push_back(method.get());
+				if (it != vtable_entries.end())
+				{	
+					method->SetVTableIndex((*it)->GetVTableIndex());
+					*it = method.get();
+				}
+				else
+				{
+					method->SetVTableIndex(vtable_entries.size());
+					vtable_entries.push_back(method.get());
+				}
 			}
 		}
 		return vtable_entries;

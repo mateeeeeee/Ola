@@ -421,7 +421,6 @@ namespace ola
 
 			for (MethodDecl const* method : vtable_entries)
 			{
-				method->SetVTableIndex((uint32)vtable_function_ptrs.size());
 				llvm::Value* method_value = value_map[method];
 				OLA_ASSERT(isa<llvm::Function>(method_value));
 				llvm::Function* method_fn = cast<llvm::Function>(method_value);
