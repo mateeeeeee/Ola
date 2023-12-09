@@ -64,9 +64,7 @@ namespace ola
 		}
 
 		if (!function_decl.HasDefinition()) return;
-
-		if(function_decl.HasFuncAttribute(FuncAttribute_Inline)) llvm_function->addFnAttr(llvm::Attribute::AlwaysInline);
-		else if(function_decl.HasFuncAttribute(FuncAttribute_NoInline)) llvm_function->addFnAttr(llvm::Attribute::NoInline);
+		
 		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
 
@@ -103,14 +101,10 @@ namespace ola
 			++param_arg;
 		}
 
-		if (!method_decl.HasDefinition())
+		if (method_decl.HasDefinition())
 		{
-			this_value = nullptr;
-			this_struct_type = nullptr;
-			return;
+			VisitFunctionDeclCommon(method_decl, llvm_function);
 		}
-
-		VisitFunctionDeclCommon(method_decl, llvm_function);
 		this_value = nullptr;
 		this_struct_type = nullptr;
 	}
@@ -267,7 +261,7 @@ namespace ola
 						builder.CreateStore(ptr, alloc);
 						value_map[&var_decl] = alloc;
 					}
-					else if (isoneof<CallExpr, MemberCallExpr>(init_expr))
+					else if (isoneof<CallExpr, MethodCallExpr>(init_expr))
 					{
 						OLA_ASSERT(isa<ArrayType>(init_expr->GetType()));
 						llvm::AllocaInst* alloc = builder.CreateAlloca(GetPointerType(llvm_element_type), nullptr);
@@ -427,7 +421,7 @@ namespace ola
 					llvm::Function* method_fn = cast<llvm::Function>(method_value);
 					vtable_function_ptrs.push_back(method_fn);
 				}
-				else vtable_function_ptrs.push_back(llvm::ConstantPointerNull::get(GetPointerType(void_type)));
+				else vtable_function_ptrs.push_back(llvm::Constant::getNullValue(GetPointerType(void_type)));
 			}
 
 			std::string vtable_name = "VTable_";
@@ -1190,7 +1184,7 @@ namespace ola
 		else OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(MemberCallExpr const& member_call_expr, uint32)
+	void LLVMVisitor::Visit(MethodCallExpr const& member_call_expr, uint32)
 	{
 		Expr const* callee_expr = member_call_expr.GetCallee();
 		OLA_ASSERT(isa<MemberExpr>(callee_expr));
@@ -1203,7 +1197,7 @@ namespace ola
 
 		Expr const* class_expr = member_expr->GetClassExpr();
 		class_expr->Accept(*this);
-		if (method_decl->IsVirtual())
+		if (!isa<SuperExpr>(class_expr) && method_decl->IsVirtual())
 		{
 			llvm::Value* struct_value = value_map[class_expr];
 			llvm::Type*  struct_type = GetStructType(class_expr->GetType());
@@ -1284,6 +1278,9 @@ namespace ola
 
 	void LLVMVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
 	{
+		if (func_decl.IsInline()) func->addFnAttr(llvm::Attribute::AlwaysInline);
+		else if (func_decl.IsNoInline()) func->addFnAttr(llvm::Attribute::NoInline);
+
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", func);
 		builder.SetInsertPoint(entry_block);
 

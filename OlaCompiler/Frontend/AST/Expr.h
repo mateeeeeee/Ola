@@ -456,10 +456,10 @@ namespace ola
 		Decl const* decl;
 	};
 
-	class MemberCallExpr final : public CallExpr
+	class MethodCallExpr final : public CallExpr
 	{
 	public:
-		MemberCallExpr(SourceLocation const& loc, std::string_view function_name)
+		MethodCallExpr(SourceLocation const& loc, std::string_view function_name)
 			: CallExpr(ExprKind::MemberCall, loc, function_name) {}
 
 		virtual void Accept(ASTVisitor&, uint32) const override;

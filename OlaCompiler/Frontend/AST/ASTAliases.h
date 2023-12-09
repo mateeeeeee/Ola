@@ -61,7 +61,7 @@ namespace ola
 	using UniqueInitializerListExprPtr = UniquePtr<InitializerListExpr>;
 	using UniqueArrayAccessExprPtr	= UniquePtr<ArrayAccessExpr>;
 	using UniqueMemberExprPtr		= UniquePtr<MemberExpr>;
-	using UniqueMemberCallExprPtr	= UniquePtr<MemberCallExpr>;
+	using UniqueMethodCallExprPtr	= UniquePtr<MethodCallExpr>;
 	using UniqueThisExprPtr			= UniquePtr<ThisExpr>;
 	using UniqueSuperExprPtr		= UniquePtr<SuperExpr>;
 

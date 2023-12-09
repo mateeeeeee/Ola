@@ -323,7 +323,7 @@ namespace ola
 		OLA_DEBUG("{}MemberAccessExpr\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(MemberCallExpr const&, uint32 depth)
+	void DebugVisitor::Visit(MethodCallExpr const&, uint32 depth)
 	{
 		OLA_DEBUG("{}MemberCallExpr\n", GetIndentation(depth));
 	}

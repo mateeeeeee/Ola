@@ -889,7 +889,7 @@ namespace ola
 			}
 
 			std::string_view func_name = decl->GetName();
-			UniqueMemberCallExprPtr method_call_expr = MakeUnique<MemberCallExpr>(loc, func_name);
+			UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, func_name);
 			method_call_expr->SetType(method_type.GetReturnType());
 			method_call_expr->SetArgs(std::move(args));
 			method_call_expr->SetCallee(std::move(func_expr));

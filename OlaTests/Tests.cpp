@@ -134,6 +134,11 @@ TEST(Classes, Inheritance)
 	EXPECT_EQ(OLA(-i test_inheritance), 0);
 }
 
+TEST(Classes, Polymorphism)
+{
+	EXPECT_EQ(OLA(-i test_polymorphism), 0);
+}
+
 
 
 

@@ -168,6 +168,8 @@ namespace ola
 		{
 			return HasAttribute(func_attributes, attr);
 		}
+		bool IsInline() const { return HasFuncAttribute(FuncAttribute_Inline); }
+		bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }

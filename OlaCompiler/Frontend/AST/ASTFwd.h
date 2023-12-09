@@ -50,7 +50,7 @@ namespace ola
 	class InitializerListExpr;
 	class ArrayAccessExpr;
 	class MemberExpr;
-	class MemberCallExpr;
+	class MethodCallExpr;
 	class ThisExpr;
 	class SuperExpr;
 
