@@ -149,11 +149,24 @@ namespace ola
 			diagnostics.Report(loc, incompatible_function_attributes);
 			return nullptr;
 		}
+		if (HasAttribute(method_attrs, MethodAttribute_Final))
+		{
+			if (!HasAttribute(method_attrs, MethodAttribute_Virtual))
+			{
+				diagnostics.Report(loc, final_must_be_virtual);
+				return nullptr;
+			}
+		}
 		if (HasAttribute(method_attrs, MethodAttribute_Pure))
 		{
 			if (!HasAttribute(method_attrs, MethodAttribute_Virtual))
 			{
 				diagnostics.Report(loc, pure_must_be_virtual);
+				return nullptr;
+			}
+			if (HasAttribute(method_attrs, MethodAttribute_Final))
+			{
+				diagnostics.Report(loc, pure_cannot_be_final);
 				return nullptr;
 			}
 			if (body_stmt != nullptr)
@@ -262,6 +275,11 @@ namespace ola
 			{
 				if (ClassDecl* base_class_decl = dyn_cast<ClassDecl>(base_tag_decl))
 				{
+					if (base_class_decl->IsFinal())
+					{
+						diagnostics.Report(loc, base_final_error, base_class_decl->GetName());
+						return nullptr;
+					}
 					return base_class_decl;
 				}
 				else
@@ -279,7 +297,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions)
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, bool final)
 	{
 		if (ctx.tag_sym_table.LookUpCurrentScope(name))
 		{
@@ -291,7 +309,15 @@ namespace ola
 		class_decl->SetBaseClass(base_class);
 		class_decl->SetFields(std::move(member_variables));
 		class_decl->SetMethods(std::move(member_functions));
-		class_decl->BuildVTable();
+		class_decl->SetFinal(final);
+
+		MethodDecl const* error_decl = nullptr;
+		BuildVTableResult build_result = class_decl->BuildVTable(error_decl);
+		if (build_result == BuildVTableResult::Error_OverrideFinal)
+		{
+			diagnostics.Report(error_decl->GetLocation(), cannot_override_final_function, error_decl->GetName());
+			return nullptr;
+		}
 		ctx.tag_sym_table.Insert(class_decl.get());
 		return class_decl;
 	}

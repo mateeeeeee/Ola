@@ -207,7 +207,8 @@ namespace ola
 		MethodAttribute_None = 0x00,
 		MethodAttribute_Const = 0x01,
 		MethodAttribute_Virtual = 0x02,
-		MethodAttribute_Pure = 0x04
+		MethodAttribute_Pure = 0x04,
+		MethodAttribute_Final = 0x08,
 	};
 	using MethodAttributes = uint8;
 
@@ -232,6 +233,7 @@ namespace ola
 		}
 		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
 		bool IsPure() const { return HasMethodAttribute(MethodAttribute_Pure); }
+		bool IsFinal() const { return HasMethodAttribute(MethodAttribute_Final); }
 		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
 
 		void SetVTableIndex(uint32 i) const { vtable_index = i; }
@@ -314,6 +316,11 @@ namespace ola
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Alias; }
 	};
 
+	enum class BuildVTableResult
+	{
+		Success = 0,
+		Error_OverrideFinal = 1
+	};
 	class ClassDecl : public TagDecl
 	{
 	public:
@@ -369,7 +376,10 @@ namespace ola
 		{
 			return abstract;
 		}
-		void BuildVTable();
+		bool IsFinal() const { return final; }
+		void SetFinal(bool _final) { final = _final; }
+
+		BuildVTableResult BuildVTable(MethodDecl const*& error_decl);
 		std::vector<MethodDecl const*> const& GetVTable() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -384,6 +394,7 @@ namespace ola
 		std::vector<MethodDecl const*> vtable;
 		bool abstract = false;
 		bool polymorphic = false;
+		bool final = false;
 
 	private:
 		bool IsPolymorphicImpl() const;

@@ -385,6 +385,7 @@ namespace ola
 		}
 		else Expect(TokenKind::identifier);
 		
+		bool const final = Consume(TokenKind::KW_final);
 		ClassDecl const* base_class = nullptr;
 		if (Consume(TokenKind::colon))
 		{
@@ -439,7 +440,7 @@ namespace ola
 			ParseClassMembers(false);
 			sema->ctx.current_base_class = nullptr;
 		}
-		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions));
+		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions), final);
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()
@@ -1149,7 +1150,7 @@ namespace ola
 
 	void Parser::ParseFunctionAttributes(uint8& attrs)
 	{
-		while (current_token->IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline))
+		while (current_token->IsFunctionAttribute())
 		{
 			if (Consume(TokenKind::KW_inline))
 			{
@@ -1180,7 +1181,7 @@ namespace ola
 
 	void Parser::ParseMethodAttributes(uint8& attrs)
 	{
-		while (current_token->IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual, TokenKind::KW_pure))
+		while (current_token->IsMethodAttribute())
 		{
 			if (Consume(TokenKind::KW_const))
 			{
@@ -1211,6 +1212,18 @@ namespace ola
 				if (!HasAttribute(attrs, MethodAttribute_Pure))
 				{
 					attrs |= MethodAttribute_Pure;
+				}
+				else
+				{
+					Diag(method_attribute_repetition);
+					return;
+				}
+			}
+			else if (Consume(TokenKind::KW_final))
+			{
+				if (!HasAttribute(attrs, MethodAttribute_Final))
+				{
+					attrs |= MethodAttribute_Final;
 				}
 				else
 				{

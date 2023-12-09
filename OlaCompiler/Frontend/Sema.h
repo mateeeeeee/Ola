@@ -73,7 +73,7 @@ namespace ola
 
 		ClassDecl const* ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc);
 		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc,
-										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions);
+										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, bool final);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);

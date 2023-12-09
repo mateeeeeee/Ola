@@ -64,10 +64,10 @@ namespace ola
 			method->Accept(this_visitor, 0);
 		}
 	}
-	void ClassDecl::BuildVTable()
+	BuildVTableResult ClassDecl::BuildVTable(MethodDecl const*& error_decl)
 	{
 		polymorphic = IsPolymorphicImpl();
-		if (!polymorphic) return;
+		if (!polymorphic) return BuildVTableResult::Success;
 		
 		if (base_class)
 		{
@@ -101,6 +101,11 @@ namespace ola
 
 				if (it != vtable.end())
 				{
+					if ((*it)->IsFinal())
+					{
+						error_decl = method.get();
+						return BuildVTableResult::Error_OverrideFinal;
+					}
 					method->SetVTableIndex((*it)->GetVTableIndex());
 					*it = method.get();
 				}
@@ -111,7 +116,6 @@ namespace ola
 				}
 			}
 		}
-
 		for (MethodDecl const* vtable_entry : vtable)
 		{
 			if (vtable_entry->IsPure())
@@ -120,6 +124,8 @@ namespace ola
 				break;
 			}
 		}
+
+		return BuildVTableResult::Success;
 	}
 	std::vector<MethodDecl const*> const& ClassDecl::GetVTable() const
 	{

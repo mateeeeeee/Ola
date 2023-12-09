@@ -65,6 +65,14 @@ namespace ola
 		{
 			return IsOneOf(TokenKind::KW_private, TokenKind::KW_public);
 		}
+		bool IsFunctionAttribute() const
+		{
+			return IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline);
+		}
+		bool IsMethodAttribute() const
+		{
+			return IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual, TokenKind::KW_pure, TokenKind::KW_final);
+		}
 
 		void SetFlag(TokenFlag flag)
 		{
