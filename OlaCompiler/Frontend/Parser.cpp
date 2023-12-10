@@ -249,8 +249,7 @@ namespace ola
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
 			{
-				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
-					init_expr = ParseInitializerListExpression();
+				if (current_token->Is(TokenKind::left_brace)) init_expr = ParseInitializerListExpression();
 				else init_expr = ParseAssignmentExpression();
 			}
 
@@ -282,8 +281,7 @@ namespace ola
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
 			{
-				if (IsCurrentTokenTypename() || current_token->Is(TokenKind::left_brace))
-					init_expr = ParseInitializerListExpression();
+				if (current_token->Is(TokenKind::left_brace)) init_expr = ParseInitializerListExpression();
 				else init_expr = ParseAssignmentExpression();
 			}
 			if (first_pass)
@@ -593,7 +591,21 @@ namespace ola
 		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 		SourceLocation loc = current_token->GetLocation();
 
-		UniqueVarDeclPtr var_decl = ParseParamVariableDeclaration(); //function param decl doesn't parse for init expr
+		UniqueVarDeclPtr var_decl;
+		{
+			QualType variable_type{};
+			ParseTypeQualifier(variable_type);
+			ParseTypeSpecifier(variable_type);
+			SourceLocation const& loc = current_token->GetLocation();
+			std::string_view name = "";
+			if (current_token->Is(TokenKind::identifier))
+			{
+				name = current_token->GetData();
+				++current_token;
+			}
+			else Diag(expected_identifier);
+			var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::None);
+		}
 		Expect(TokenKind::colon);
 		UniqueExprPtr array_expr = ParseIdentifier();
 		Expect(TokenKind::right_round);
@@ -1012,7 +1024,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueConstantIntPtr Parser::ParseSizeofExpression()
+	UniqueIntLiteralPtr Parser::ParseSizeofExpression()
 	{
 		Expect(TokenKind::KW_sizeof);
 		Expect(TokenKind::left_round);
@@ -1035,7 +1047,7 @@ namespace ola
 		return sema->ActOnConstantInt(type->GetSize(), loc);
 	}
 
-	UniqueConstantIntPtr Parser::ParseLengthExpression()
+	UniqueIntLiteralPtr Parser::ParseLengthExpression()
 	{
 		Expect(TokenKind::KW_length);
 		Expect(TokenKind::left_round);
@@ -1046,7 +1058,7 @@ namespace ola
 		return sema->ActOnLengthOperator(type, loc);
 	}
 
-	UniqueConstantIntPtr Parser::ParseConstantInt()
+	UniqueIntLiteralPtr Parser::ParseConstantInt()
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::int_number));
 		std::string_view string_number = current_token->GetData();
@@ -1056,7 +1068,7 @@ namespace ola
 		return sema->ActOnConstantInt(value, loc);
 	}
 
-	UniqueConstantCharPtr Parser::ParseConstantChar()
+	UniqueCharLiteralPtr Parser::ParseConstantChar()
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::char_literal));
 		std::string_view char_string = current_token->GetData();
@@ -1065,7 +1077,7 @@ namespace ola
 		return sema->ActOnConstantChar(char_string, loc);
 	}
 
-	UniqueConstantStringPtr Parser::ParseConstantString()
+	UniqueStringLiteralPtr Parser::ParseConstantString()
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::string_literal));
 		std::string_view str = current_token->GetData();
@@ -1074,7 +1086,7 @@ namespace ola
 		return sema->ActOnConstantString(str, loc);
 	}
 
-	UniqueConstantBoolPtr Parser::ParseConstantBool()
+	UniqueBoolLiteralPtr Parser::ParseConstantBool()
 	{
 		OLA_ASSERT(current_token->IsOneOf(TokenKind::KW_true, TokenKind::KW_false));
 		bool value = false;
@@ -1085,7 +1097,7 @@ namespace ola
 		return sema->ActOnConstantBool(value, loc);
 	}
 
-	UniqueConstantFloatPtr Parser::ParseConstantFloat()
+	UniqueFloatLiteralPtr Parser::ParseConstantFloat()
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::float_number));
 		std::string_view string_number = current_token->GetData();
@@ -1131,8 +1143,6 @@ namespace ola
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
 	{
 		SourceLocation loc = current_token->GetLocation();
-		QualType type{};
-		if(IsCurrentTokenTypename()) ParseTypeSpecifier(type, true, false);
 		Expect(TokenKind::left_brace);
 		UniqueExprPtrList expr_list;
 		if (!Consume(TokenKind::right_brace))
@@ -1145,7 +1155,7 @@ namespace ola
 				Expect(TokenKind::comma);
 			}
 		}
-		return sema->ActOnInitializerListExpr(loc, type, std::move(expr_list));
+		return sema->ActOnInitializerListExpr(loc, std::move(expr_list));
 	}
 
 	void Parser::ParseFunctionAttributes(uint8& attrs)
@@ -1239,7 +1249,7 @@ namespace ola
 		if (Consume(TokenKind::KW_const)) type.AddConst();
 	}
 
-	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_required, bool allow_ref)
+	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_forbidden, bool allow_ref)
 	{
 		bool is_ref = false;
 		if(allow_ref) is_ref = Consume(TokenKind::KW_ref);
@@ -1291,31 +1301,40 @@ namespace ola
 				return;
 			}
 
-			if (array_size_required)
-			{
-				UniqueExprPtr array_size_expr = ParseConditionalExpression();
-				if (!array_size_expr->IsConstexpr())
-				{
-					Diag(array_size_not_constexpr);
-					return;
-				}
-				int64 array_size = array_size_expr->EvaluateConstexpr();
-				if(array_size <= 0)
-				{
-					Diag(array_size_not_positive);
-					return;
-				}
-				Expect(TokenKind::right_square);
-				ArrayType array_type(type, array_size);
-				type.SetType(array_type);
-				type.RemoveConst();
-			}
-			else
+			if (array_size_forbidden)
 			{
 				Expect(TokenKind::right_square);
 				ArrayType array_type(type);
 				type.SetType(array_type);
 				type.RemoveConst();
+			}
+			else
+			{
+				if (Consume(TokenKind::right_square))
+				{
+					ArrayType array_type(type);
+					type.SetType(array_type);
+					type.RemoveConst();
+				}
+				else
+				{
+					UniqueExprPtr array_size_expr = ParseConditionalExpression();
+					if (!array_size_expr->IsConstexpr())
+					{
+						Diag(array_size_not_constexpr);
+						return;
+					}
+					int64 array_size = array_size_expr->EvaluateConstexpr();
+					if (array_size <= 0)
+					{
+						Diag(array_size_not_positive);
+						return;
+					}
+					Expect(TokenKind::right_square);
+					ArrayType array_type(type, array_size);
+					type.SetType(array_type);
+					type.RemoveConst();
+				}
 			}
 		}
 

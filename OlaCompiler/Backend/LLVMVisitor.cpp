@@ -140,7 +140,7 @@ namespace ola
 						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
 						value_map[&var_decl] = global_array;
 					}
-					else if (ConstantString const* string = dyn_cast<ConstantString>(init_expr))
+					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
 					{
 						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
 
@@ -235,7 +235,7 @@ namespace ola
 						}
 						value_map[&var_decl] = alloc;
 					}
-					else if (ConstantString const* string = dyn_cast<ConstantString>(init_expr))
+					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
 					{
 						llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 						std::string_view str = string->GetString();
@@ -531,7 +531,6 @@ namespace ola
 		llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(context, "for.cond", function, exit_block);
 		llvm::BasicBlock* iter_block = llvm::BasicBlock::Create(context, "for.iter", function, exit_block);
 		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "for.end", function, exit_block);
-
 
 		if (init_stmt) init_stmt->Accept(*this);
 		builder.CreateBr(cond_block);
@@ -951,19 +950,19 @@ namespace ola
 		value_map[&decl_ref] = value;
 	}
 
-	void LLVMVisitor::Visit(ConstantInt const& int_constant, uint32)
+	void LLVMVisitor::Visit(IntLiteral const& int_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, int_constant.GetValue());
 		value_map[&int_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ConstantChar const& char_constant, uint32)
+	void LLVMVisitor::Visit(CharLiteral const& char_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(char_type, char_constant.GetChar(), true);
 		value_map[&char_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ConstantString const& string_constant, uint32)
+	void LLVMVisitor::Visit(StringLiteral const& string_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
 		
@@ -975,13 +974,13 @@ namespace ola
 		value_map[&string_constant] = global_string;
 	}
 
-	void LLVMVisitor::Visit(ConstantBool const& bool_constant, uint32)
+	void LLVMVisitor::Visit(BoolLiteral const& bool_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(bool_type, bool_constant.GetValue());
 		value_map[&bool_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ConstantFloat const& float_constant, uint32)
+	void LLVMVisitor::Visit(FloatLiteral const& float_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantFP::get(float_type, float_constant.GetValue());
 		value_map[&float_constant] = constant;

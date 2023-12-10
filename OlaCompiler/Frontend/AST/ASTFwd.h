@@ -40,11 +40,11 @@ namespace ola
 	class TernaryExpr;
 	class IdentifierExpr;
 	class DeclRefExpr;
-	class ConstantInt;
-	class ConstantChar;
-	class ConstantString;
-	class ConstantBool;
-	class ConstantFloat;
+	class IntLiteral;
+	class CharLiteral;
+	class StringLiteral;
+	class BoolLiteral;
+	class FloatLiteral;
 	class ImplicitCastExpr;
 	class CallExpr;
 	class InitializerListExpr;

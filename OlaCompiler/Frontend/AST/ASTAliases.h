@@ -51,11 +51,11 @@ namespace ola
 	using UniqueTernaryExprPtr		= UniquePtr<TernaryExpr>;
 	using UniqueIdentifierExprPtr	= UniquePtr<IdentifierExpr>;
 	using UniqueDeclRefExprPtr		= UniquePtr<DeclRefExpr>;
-	using UniqueConstantIntPtr		= UniquePtr<ConstantInt>;
-	using UniqueConstantCharPtr		= UniquePtr<ConstantChar>;
-	using UniqueConstantStringPtr	= UniquePtr<ConstantString>;
-	using UniqueConstantBoolPtr		= UniquePtr<ConstantBool>;
-	using UniqueConstantFloatPtr	= UniquePtr<ConstantFloat>;
+	using UniqueIntLiteralPtr		= UniquePtr<IntLiteral>;
+	using UniqueCharLiteralPtr		= UniquePtr<CharLiteral>;
+	using UniqueStringLiteralPtr	= UniquePtr<StringLiteral>;
+	using UniqueBoolLiteralPtr		= UniquePtr<BoolLiteral>;
+	using UniqueFloatLiteralPtr		= UniquePtr<FloatLiteral>;
 	using UniqueImplicitCastExprPtr	= UniquePtr<ImplicitCastExpr>;
 	using UniqueCallExprPtr			= UniquePtr<CallExpr>;
 	using UniqueInitializerListExprPtr = UniquePtr<InitializerListExpr>;

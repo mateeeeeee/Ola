@@ -273,27 +273,27 @@ namespace ola
 		OLA_DEBUG("{}DeclRefExpr\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ConstantInt const&, uint32 depth)
+	void DebugVisitor::Visit(IntLiteral const&, uint32 depth)
 	{
 		OLA_DEBUG("{}ConstantInt\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ConstantChar const&, uint32 depth)
+	void DebugVisitor::Visit(CharLiteral const&, uint32 depth)
 	{
 		OLA_DEBUG("{}ConstantChar\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ConstantString const&, uint32 depth)
+	void DebugVisitor::Visit(StringLiteral const&, uint32 depth)
 	{
 		OLA_DEBUG("{}ConstantString\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ConstantBool const&, uint32 depth)
+	void DebugVisitor::Visit(BoolLiteral const&, uint32 depth)
 	{
 		OLA_DEBUG("{}ConstantBool\n", GetIndentation(depth));
 	}
 
-	void DebugVisitor::Visit(ConstantFloat const&, uint32 depth)
+	void DebugVisitor::Visit(FloatLiteral const&, uint32 depth)
 	{
 		OLA_DEBUG("{}ConstantFloat\n", GetIndentation(depth));
 	}

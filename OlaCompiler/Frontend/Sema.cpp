@@ -440,7 +440,6 @@ namespace ola
 			}
 		}
 		else var_decl->SetType(array_type->GetBaseType());
-		OLA_ASSERT(var_decl->GetInitExpr() == nullptr);
 		var_decl->SetInitExpr(ActOnArrayAccessExpr(loc, std::move(array_identifier), MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc)));
 
 		UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
@@ -451,7 +450,7 @@ namespace ola
 		}
 		else
 		{
-			UniqueStmtPtrList stmts = {};
+			UniqueStmtPtrList stmts{};
 			stmts.push_back(std::move(array_access_stmt));
 			stmts.push_back(std::move(body_stmt));
 			body_stmt = ActOnCompoundStmt(std::move(stmts));
@@ -926,12 +925,12 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueConstantIntPtr Sema::ActOnConstantInt(int64 value, SourceLocation const& loc)
+	UniqueIntLiteralPtr Sema::ActOnConstantInt(int64 value, SourceLocation const& loc)
 	{
-		return MakeUnique<ConstantInt>(value, loc);
+		return MakeUnique<IntLiteral>(value, loc);
 	}
 
-	UniqueConstantIntPtr Sema::ActOnLengthOperator(QualType const& type, SourceLocation const& loc)
+	UniqueIntLiteralPtr Sema::ActOnLengthOperator(QualType const& type, SourceLocation const& loc)
 	{
 		if (!isa<ArrayType>(type))
 		{
@@ -947,29 +946,29 @@ namespace ola
 		return ActOnConstantInt(array_type.GetArraySize(), loc);
 	}
 
-	UniqueConstantCharPtr Sema::ActOnConstantChar(std::string_view str, SourceLocation const& loc)
+	UniqueCharLiteralPtr Sema::ActOnConstantChar(std::string_view str, SourceLocation const& loc)
 	{
 		if (str.size() != 1)
 		{
 			diagnostics.Report(loc, invalid_char_literal);
 			return nullptr;
 		}
-		return MakeUnique<ConstantChar>(str[0], loc);
+		return MakeUnique<CharLiteral>(str[0], loc);
 	}
 
-	UniqueConstantStringPtr Sema::ActOnConstantString(std::string_view str, SourceLocation const& loc)
+	UniqueStringLiteralPtr Sema::ActOnConstantString(std::string_view str, SourceLocation const& loc)
 	{
-		return MakeUnique<ConstantString>(str, loc);
+		return MakeUnique<StringLiteral>(str, loc);
 	}
 
-	UniqueConstantBoolPtr Sema::ActOnConstantBool(bool value, SourceLocation const& loc)
+	UniqueBoolLiteralPtr Sema::ActOnConstantBool(bool value, SourceLocation const& loc)
 	{
-		return MakeUnique<ConstantBool>(value, loc);
+		return MakeUnique<BoolLiteral>(value, loc);
 	}
 
-	UniqueConstantFloatPtr Sema::ActOnConstantFloat(double value, SourceLocation const& loc)
+	UniqueFloatLiteralPtr Sema::ActOnConstantFloat(double value, SourceLocation const& loc)
 	{
-		return MakeUnique<ConstantFloat>(value, loc);
+		return MakeUnique<FloatLiteral>(value, loc);
 	}
 
 	UniqueExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
@@ -1047,35 +1046,12 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& expr_list)
+	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list)
 	{
-		if(type.IsNull() && expr_list.empty())
-		{
-			diagnostics.Report(loc, invalid_init_list_expression);
-			return nullptr;
-		}
-
 		QualType expr_type{};
-		if (!type.IsNull())
-		{
-			OLA_ASSERT(isa<ArrayType>(type));
-			ArrayType const& array_type = type_cast<ArrayType>(type);
-			OLA_ASSERT(array_type.GetArraySize() > 0);
-			if (array_type.GetArraySize() < expr_list.size())
-			{
-				diagnostics.Report(loc, array_size_not_positive);
-				return nullptr;
-			}
-			QualType const& base_type = array_type.GetBaseType();
-			expr_type = base_type;
-		}
-		else
-		{
-			expr_type = expr_list.front()->GetType();
-			QualType base_type(expr_type);
-			ArrayType arr_type(base_type, expr_list.size());
-			const_cast<QualType&>(type).SetType(arr_type);
-		}
+		expr_type = expr_list.front()->GetType();
+		QualType base_type(expr_type);
+		ArrayType arr_type(base_type, expr_list.size());
 
 		for (auto const& expr : expr_list)
 		{
@@ -1085,9 +1061,8 @@ namespace ola
 				return nullptr;
 			}
 		}
-
 		UniqueInitializerListExprPtr init_list_expr = MakeUnique<InitializerListExpr>(loc);
-		init_list_expr->SetType(type);
+		init_list_expr->SetType(arr_type);
 		init_list_expr->SetInitList(std::move(expr_list));
 		return init_list_expr;
 	}
@@ -1255,9 +1230,8 @@ namespace ola
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
 			return nullptr;
 		}
-		var_decl->SetInitExpr(std::move(init_expr));
 
-		bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(var_decl->GetInitExpr()->GetType()));
+		bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(init_expr->GetType()));
 		if (is_array)
 		{
 			if (is_ref_type)
@@ -1265,18 +1239,16 @@ namespace ola
 				diagnostics.Report(loc, arrays_cannot_be_refs);
 				return nullptr;
 			}
-
-			if (Expr const* array_init_expr = var_decl->GetInitExpr())
+			if (Expr* array_init_expr = init_expr.get())
 			{
 				ArrayType const& init_expr_type = type_cast<ArrayType>(array_init_expr->GetType());
+
 				bool is_multidimensional_array = isa<ArrayType>(init_expr_type.GetBaseType());
 				if (is_multidimensional_array && init_expr_is_decl_ref)
 				{
 					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
 					return nullptr;
 				}
-
-				QualType base_type{};
 				if (has_type_specifier && !is_multidimensional_array)
 				{
 					ArrayType const& decl_type = type_cast<ArrayType>(type);
@@ -1285,33 +1257,60 @@ namespace ola
 						diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
 						return nullptr;
 					}
-					base_type = decl_type.GetBaseType();
+				}
+
+				if (has_type_specifier && isoneof<InitializerListExpr, StringLiteral>(array_init_expr))
+				{
+					ArrayType arr_type = type_cast<ArrayType>(type);
+					uint64 const arr_type_size = arr_type.GetArraySize();
+					uint64 const init_arr_size = init_expr_type.GetArraySize();
+					if (arr_type_size && arr_type_size < init_arr_size)
+					{
+						diagnostics.Report(loc, invalid_init_list_expression);
+						return nullptr;
+					}
+					else if (arr_type_size > init_arr_size)
+					{
+						array_init_expr->SetType(type);
+					}
+				}
+
+				if (!has_type_specifier)
+				{
+					QualType base_type = init_expr_type.GetBaseType();
+					if (type.IsConst()) base_type.AddConst();
+					if (init_expr_is_decl_ref)
+					{
+						QualType var_type(ArrayType(base_type, 0));
+						var_decl->SetType(var_type);
+					}
+					else
+					{
+						QualType var_type(ArrayType(base_type, init_expr_type.GetArraySize()));
+						var_decl->SetType(var_type);
+					}
 				}
 				else
 				{
-					base_type = init_expr_type.GetBaseType();
+					ArrayType arr_type = type_cast<ArrayType>(type);
+					if (arr_type.GetArraySize() == 0)
+					{
+						QualType base_type = arr_type.GetBaseType();
+						if (type.IsConst()) base_type.AddConst();
+						QualType var_type(ArrayType(base_type, init_expr_type.GetArraySize()));
+						var_decl->SetType(var_type);
+					}
+					else
+					{
+						var_decl->SetType(type);
+					}
 				}
-				if (type.IsConst()) base_type.AddConst();
-				uint64 array_size = init_expr_is_decl_ref ? 0 : init_expr_type.GetArraySize();
-				QualType var_type(ArrayType(base_type, array_size));
-				var_decl->SetType(var_type);
 			}
-			else
-			{
-				ArrayType const& decl_type = type_cast<ArrayType>(type);
-				if (isa<ArrayType>(decl_type.GetBaseType()))
-				{
-					diagnostics.Report(loc, multidimensional_arrays_need_initializer);
-					return nullptr;
-				}
-				QualType var_type(ArrayType(decl_type.GetBaseType(), 0));
-				var_decl->SetType(var_type);
-			}
-
+			else var_decl->SetType(type);
 		}
 		else if ((has_init && !has_type_specifier))
 		{
-			QualType var_type(var_decl->GetInitExpr()->GetType());
+			QualType var_type(init_expr->GetType());
 			if (is_ref_type) var_type = RefType(var_type);	
 			if (type.IsConst()) var_type.AddConst();
 			var_decl->SetType(var_type);
@@ -1320,6 +1319,7 @@ namespace ola
 		{
 			var_decl->SetType(type);
 		}
+		var_decl->SetInitExpr(std::move(init_expr));
 
 		QualType const& var_type = var_decl->GetType();
 		if (isa<RefType>(var_type))
@@ -1336,7 +1336,8 @@ namespace ola
 			}
 			if (!var_type.IsConst() && init_expr_const_ref)
 			{
-				
+				diagnostics.Report(loc, nonconst_ref_init_with_const_ref);
+				return nullptr;
 			}
 		}
 		if (isa<ClassType>(var_type))

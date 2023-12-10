@@ -212,10 +212,10 @@ namespace ola
 		Decl* decl;
 	};
 
-	class ConstantInt final : public Expr
+	class IntLiteral final : public Expr
 	{
 	public:
-		ConstantInt(int64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value)
+		IntLiteral(int64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value)
 		{
 			SetType(builtin_types::Int);
 		}
@@ -232,10 +232,10 @@ namespace ola
 		int64 value;
 	};
 
-	class ConstantChar final : public Expr
+	class CharLiteral final : public Expr
 	{
 	public:
-		ConstantChar(char c, SourceLocation const& loc) : Expr(ExprKind::CharLiteral, loc), c(c)
+		CharLiteral(char c, SourceLocation const& loc) : Expr(ExprKind::CharLiteral, loc), c(c)
 		{
 			SetValueCategory(ExprValueCategory::RValue);
 			SetType(builtin_types::Char);
@@ -252,10 +252,10 @@ namespace ola
 		char c;
 	};
 
-	class ConstantString final : public Expr
+	class StringLiteral final : public Expr
 	{
 	public:
-		ConstantString(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str)
+		StringLiteral(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str)
 		{
 			SetValueCategory(ExprValueCategory::RValue);
 			SetType(QualType(ArrayType(builtin_types::Char, (uint32)str.size() + 1), Qualifier_Const));
@@ -272,10 +272,10 @@ namespace ola
 		std::string str;
 	};
 
-	class ConstantBool final : public Expr
+	class BoolLiteral final : public Expr
 	{
 	public:
-		ConstantBool(bool value, SourceLocation const& loc) : Expr(ExprKind::BoolLiteral, loc), value(value)
+		BoolLiteral(bool value, SourceLocation const& loc) : Expr(ExprKind::BoolLiteral, loc), value(value)
 		{
 			SetType(builtin_types::Bool);
 		}
@@ -291,10 +291,10 @@ namespace ola
 		bool value;
 	};
 
-	class ConstantFloat final : public Expr
+	class FloatLiteral final : public Expr
 	{
 	public:
-		ConstantFloat(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value)
+		FloatLiteral(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value)
 		{
 			SetType(builtin_types::Float);
 		}

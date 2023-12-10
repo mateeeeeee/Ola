@@ -52,13 +52,13 @@ public int main()
     // Test function call with booleans
     Assert(LogicalAnd(true, false) == false);
 
-    int[] mixArr = int[2]{10, 20};
+    int[2] mixArr = {10, 20};
     float mixResult = MixParams(1, 2.5, true, mixArr, length(mixArr));
     Assert(mixResult == 34.5);
 
-    int[] arr1 = {1,2};
-    int[] arr2 = {3,4};
-    int[] arr3 = int[length(arr1) + length(arr2)]{};
+    int[2] arr1 = {1,2};
+    int[2] arr2 = {3,4};
+    int[length(arr1) + length(arr2)] arr3;
     ConcatArrays(arr1, length(arr1), arr2, length(arr2), arr3);
     Assert(arr3[0] == 1);
     Assert(arr3[1] == 2);

@@ -51,23 +51,23 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantInt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void IntLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantChar::Accept(ASTVisitor& visitor, uint32 depth) const
+	void CharLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantString::Accept(ASTVisitor& visitor, uint32 depth) const
+	void StringLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantBool::Accept(ASTVisitor& visitor, uint32 depth) const
+	void BoolLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ConstantFloat::Accept(ASTVisitor& visitor, uint32 depth) const
+	void FloatLiteral::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
@@ -144,23 +144,23 @@ namespace ola
 		visitor.Visit(*this, 0);
 	}
 
-	void ConstantInt::Accept(ASTVisitor& visitor) const
+	void IntLiteral::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ConstantChar::Accept(ASTVisitor& visitor) const
+	void CharLiteral::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ConstantString::Accept(ASTVisitor& visitor) const
+	void StringLiteral::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ConstantBool::Accept(ASTVisitor& visitor) const
+	void BoolLiteral::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ConstantFloat::Accept(ASTVisitor& visitor) const
+	void FloatLiteral::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

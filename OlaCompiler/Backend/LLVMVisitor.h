@@ -80,11 +80,11 @@ namespace ola
 		virtual void Visit(TernaryExpr const&, uint32) override;
 		virtual void Visit(IdentifierExpr const&, uint32) override;
 		virtual void Visit(DeclRefExpr const&, uint32) override;
-		virtual void Visit(ConstantInt const&, uint32) override;
-		virtual void Visit(ConstantChar const&, uint32) override;
-		virtual void Visit(ConstantString const&, uint32) override;
-		virtual void Visit(ConstantBool const&, uint32) override;
-		virtual void Visit(ConstantFloat const&, uint32) override;
+		virtual void Visit(IntLiteral const&, uint32) override;
+		virtual void Visit(CharLiteral const&, uint32) override;
+		virtual void Visit(StringLiteral const&, uint32) override;
+		virtual void Visit(BoolLiteral const&, uint32) override;
+		virtual void Visit(FloatLiteral const&, uint32) override;
 		virtual void Visit(ImplicitCastExpr const&, uint32) override;
 		virtual void Visit(CallExpr const&, uint32) override;
 		virtual void Visit(InitializerListExpr const&, uint32) override;

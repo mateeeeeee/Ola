@@ -16,9 +16,9 @@ private int sumOfArray(int[] arr, int size)
 }
 
 auto GlobalArray1 = {1,1,1};
-auto GlobalArray2 = int[5]{1,2,3};
-int[] GlobalArray3 = int[3]{10,20,30};
-int[][] Global2dArray = { {1,2}, {3,4}}; 
+int[5] GlobalArray2 = {1,2,3};
+int[3] GlobalArray3 = {10,20,30};
+int[2][2] Global2dArray = { {1,2}, {3,4}}; 
 
 public int main()
 {
@@ -26,12 +26,12 @@ public int main()
 	Assert(sizeof(GlobalArray2) == 40);
 	Assert(GlobalArray3[0] == 10);
 
-	int[] LocalArray1 = int[10]{1,2};
+	int[10] LocalArray1 = {1,2};
 	Assert(sizeof(LocalArray1) == 80);
 	Assert(LocalArray1[6] == 0);
 	Assert(sumOfArray(LocalArray1, length(LocalArray1)) == 3);
 
-	int[] LocalArray2 = {-5,0,5};
+	int[3] LocalArray2 = {-5,0,5};
 	Assert(LocalArray2[1] == 0);
 	Assert(length(LocalArray2) == 3);
 
@@ -46,7 +46,7 @@ public int main()
 
 	int sum2d = 0;
 	int globalSum2d = 0;
-	int[][] int2d = int[2][2]{ {1,2}, {3,4}}; 
+	int[2][2] int2d = { {1,2}, {3,4}}; 
 	for(int i = 0; i < 2; ++i)
 	{
 		for(int j = 0; j < 2; ++j)
@@ -57,6 +57,6 @@ public int main()
 	}
 	Assert(sum2d == 10);  
 	Assert(globalSum2d == 10);  
-
+	
 	return 0;
 }

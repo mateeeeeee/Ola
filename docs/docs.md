@@ -125,9 +125,9 @@ public int main()
 ```
 import std.assert;
 
-var arr1 = {1,2,3}; //arr1 is of type int[3] 
+auto arr1 = {1,2,3}; 	//arr1 is of type int[3] 
 int[] arr2 = {1,2,3,4}; //arr2 is of type int[4] 
-int[] arr3 = int[7]{1,2,3,4}; //arr2 is of type int[7] and initialized with {1,2,3,4,0,0,0} 
+int[7] arr3 = {1,2,3,4}; //arr2 is of type int[7] and initialized with {1,2,3,4,0,0,0} 
 
 private void modifyArray(int[] arr)
 {
@@ -139,7 +139,7 @@ public int main()
     Assert(length(arr1) == 3);
     Assert(sizeof(arr2) == 32); // 4*sizeof(int) = 32
     Assert(arr3[6] == 0);
-    var arr4 = int[3]{1,2,3};
+    auto arr4 = {1,2,3};
 
 	int b = arr4[2]; 
     Assert(b == 3);
@@ -147,9 +147,7 @@ public int main()
     int d = 10;
     const int c = arr4[10]; //compiler error, index out of bounds
     const int c = arr4[d];  //not a compiler error since d is not constexpr (runtime error)
-
     modifyArray(arr4);
-
     return arr4[0]; //returns 10
 }
 ```
@@ -215,7 +213,7 @@ import std.io;
 
 public int main()
 {
-    var a = int[6]{1,2,3};
+    auto a = int[6]{1,2,3};
     a[0] = 10;
     foreach(int e : a)
     {

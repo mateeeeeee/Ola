@@ -23,9 +23,9 @@ void TestSizeofExpressions()
 // Test sizeof with arrays
 void TestSizeofArrays()
 {
-    int[] intArray = int[5]{};
-    float[] floatArray = float[10]{};
-    bool[] boolArray = bool[3]{};
+    int[5] intArray;
+    float[10] floatArray;
+    bool[3] boolArray;
 
     Assert(sizeof(intArray) == 40);  // 8 bytes per int * 5 ints
     Assert(sizeof(floatArray) == 80);  // 8 bytes per float * 10 floats

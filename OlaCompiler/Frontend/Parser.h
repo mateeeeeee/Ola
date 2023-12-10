@@ -97,13 +97,13 @@ namespace ola
 		OLA_NODISCARD UniqueExprPtr ParseUnaryExpression();
 		OLA_NODISCARD UniqueExprPtr ParsePostFixExpression();
 		OLA_NODISCARD UniqueExprPtr ParsePrimaryExpression();
-		OLA_NODISCARD UniqueConstantIntPtr ParseSizeofExpression();
-		OLA_NODISCARD UniqueConstantIntPtr ParseLengthExpression();
-		OLA_NODISCARD UniqueConstantIntPtr ParseConstantInt();
-		OLA_NODISCARD UniqueConstantCharPtr ParseConstantChar();
-		OLA_NODISCARD UniqueConstantStringPtr ParseConstantString();
-		OLA_NODISCARD UniqueConstantBoolPtr ParseConstantBool();
-		OLA_NODISCARD UniqueConstantFloatPtr ParseConstantFloat();
+		OLA_NODISCARD UniqueIntLiteralPtr ParseSizeofExpression();
+		OLA_NODISCARD UniqueIntLiteralPtr ParseLengthExpression();
+		OLA_NODISCARD UniqueIntLiteralPtr ParseConstantInt();
+		OLA_NODISCARD UniqueCharLiteralPtr ParseConstantChar();
+		OLA_NODISCARD UniqueStringLiteralPtr ParseConstantString();
+		OLA_NODISCARD UniqueBoolLiteralPtr ParseConstantBool();
+		OLA_NODISCARD UniqueFloatLiteralPtr ParseConstantFloat();
 		OLA_NODISCARD UniqueExprPtr ParseIdentifier();
 		OLA_NODISCARD UniqueThisExprPtr ParseThisExpression();
 		OLA_NODISCARD UniqueSuperExprPtr ParseSuperExpression();
@@ -113,7 +113,7 @@ namespace ola
 		void ParseFunctionAttributes(uint8& attrs);
 		void ParseMethodAttributes(uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
-		void ParseTypeSpecifier(QualType& type, bool array_size_required = false, bool allow_ref = true);
+		void ParseTypeSpecifier(QualType& type, bool array_size_forbidden = false, bool allow_ref = true);
 
 		bool IsFunctionDeclaration();
 		bool IsCurrentTokenTypename();

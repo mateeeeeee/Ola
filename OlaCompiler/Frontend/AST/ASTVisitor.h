@@ -46,11 +46,11 @@ namespace ola
 		virtual void Visit(TernaryExpr const&, uint32) {}
 		virtual void Visit(IdentifierExpr const&, uint32) {}
 		virtual void Visit(DeclRefExpr const&, uint32) {}
-		virtual void Visit(ConstantInt const&, uint32) {}
-		virtual void Visit(ConstantChar const&, uint32) {}
-		virtual void Visit(ConstantString const&, uint32) {}
-		virtual void Visit(ConstantBool const&, uint32) {}
-		virtual void Visit(ConstantFloat const&, uint32) {}
+		virtual void Visit(IntLiteral const&, uint32) {}
+		virtual void Visit(CharLiteral const&, uint32) {}
+		virtual void Visit(StringLiteral const&, uint32) {}
+		virtual void Visit(BoolLiteral const&, uint32) {}
+		virtual void Visit(FloatLiteral const&, uint32) {}
 		virtual void Visit(ImplicitCastExpr const&, uint32) {}
 		virtual void Visit(CallExpr const&, uint32) {}
 		virtual void Visit(InitializerListExpr const&, uint32) {}

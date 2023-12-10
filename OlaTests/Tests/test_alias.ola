@@ -5,7 +5,7 @@ alias MyInt = int;
 public int main()
 {
 	MyInt myInt = 1;
-	alias MyIntArray = int[];
+	alias MyIntArray = int[3];
 	MyIntArray myIntArray = {myInt, myInt, myInt};
 
 	return 0;
