@@ -5,6 +5,11 @@ private void modifyArray(int[] arr)
 	arr[0] = 100;
 }
 
+private void modifyArrayCopy(int[3] arr)
+{
+	arr[0] = 100;
+}
+
 private int sumOfArray(int[] arr, int size)
 {
 	int sum = 0;
@@ -36,6 +41,9 @@ public int main()
 	Assert(length(LocalArray2) == 3);
 
 	int[] LocalArray3 = LocalArray2;
+	modifyArrayCopy(LocalArray2);
+	Assert(LocalArray2[0] == -5);
+	Assert(LocalArray3[0] == -5);
 	modifyArray(LocalArray2);
 	Assert(LocalArray2[0] == 100);
 	Assert(LocalArray3[0] == 100);

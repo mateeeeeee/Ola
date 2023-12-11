@@ -5,58 +5,17 @@ private void modifyArray(int[] arr)
 	arr[0] = 100;
 }
 
-private int sumOfArray(int[] arr, int size)
+private void modifyArray2(int[3] arr)
 {
-	int sum = 0;
-	for(int i = 0; i < size; ++i)
-	{
-		sum += arr[i];
-	}
-	return sum;
+	arr[0] = 100;
 }
-
-auto GlobalArray1 = {1,1,1};
-int[5] GlobalArray2 = {1,2,3};
-int[3] GlobalArray3 = {10,20,30};
-int[2][2] Global2dArray = { {1,2}, {3,4}}; 
 
 public int main()
 {
-	Assert(length(GlobalArray1) == 3);
-	Assert(sizeof(GlobalArray2) == 40);
-	Assert(GlobalArray3[0] == 10);
-
-	int[10] LocalArray1 = {1,2};
-	Assert(sizeof(LocalArray1) == 80);
-	Assert(LocalArray1[6] == 0);
-	Assert(sumOfArray(LocalArray1, length(LocalArray1)) == 3);
-
-	int[3] LocalArray2 = {-5,0,5};
-	Assert(LocalArray2[1] == 0);
-	Assert(length(LocalArray2) == 3);
-
-	int[] LocalArray3 = LocalArray2;
-	modifyArray(LocalArray2);
-	Assert(LocalArray2[0] == 100);
-	Assert(LocalArray3[0] == 100);
-
-	LocalArray3[0] = 1000;
-	Assert(LocalArray2[0] == 1000);
-	Assert(LocalArray3[0] == 1000);
-
-	int sum2d = 0;
-	int globalSum2d = 0;
-	int[2][2] int2d = { {1,2}, {3,4}}; 
-	for(int i = 0; i < 2; ++i)
-	{
-		for(int j = 0; j < 2; ++j)
-		{
-			sum2d += int2d[i][j];
-			globalSum2d += Global2dArray[i][j];
-		}
-	}
-	Assert(sum2d == 10);  
-	Assert(globalSum2d == 10);  
-	
+	int[] arr = {1,2,3};
+	modifyArray2(arr);
+	Assert(arr[0] == 1);
+	modifyArray(arr);
+	Assert(arr[0] == 100);
 	return 0;
 }

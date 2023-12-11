@@ -1085,10 +1085,9 @@ namespace ola
 			arg_expr->Accept(*this);
 			llvm::Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
-
 			llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
 			if (arg_type->isPointerTy()) args.push_back(arg_value);
-			else args.push_back(Load(arg_type, arg_value));
+			else args.push_back(Load(arg_type, arg_value, true));
 			
 			arg_index++;
 		}
@@ -1511,22 +1510,11 @@ namespace ola
 		return Load(llvm_type, ptr);
 	}
 
-	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
+	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr, bool func_arg_load)
 	{
-		//#todo: refactor this
 		if (IsPointer(ptr->getType()))
 		{
-			if (isa<llvm::AllocaInst>(ptr))
-			{
-				llvm::AllocaInst* alloc = cast<llvm::AllocaInst>(ptr);
-				if (alloc->getAllocatedType()->isArrayTy())
-				{
-					llvm::ConstantInt* zero = builder.getInt64(0);
-					llvm::ArrayType* array_type = cast<llvm::ArrayType>(alloc->getAllocatedType());
-					return builder.CreateInBoundsGEP(array_type, ptr, { zero, zero });
-				}
-			}
-			else if (IsPointer(llvm_type) && isa<llvm::GlobalVariable>(ptr))
+			if (IsPointer(llvm_type) && isa<llvm::GlobalVariable>(ptr))
 			{
 				return ptr;
 			}

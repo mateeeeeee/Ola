@@ -26,48 +26,23 @@ modifyArray:                            # @modifyArray
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	sumOfArray;
+	.def	modifyArray2;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function sumOfArray
-sumOfArray:                             # @sumOfArray
-.seh_proc sumOfArray
+	.p2align	4, 0x90                         # -- Begin function modifyArray2
+modifyArray2:                           # @modifyArray2
+.seh_proc modifyArray2
 # %bb.0:                                # %entry
-	sub	rsp, 40
-	.seh_stackalloc 40
+	sub	rsp, 24
+	.seh_stackalloc 24
 	.seh_endprologue
-	mov	qword ptr [rsp + 32], rcx
-	mov	qword ptr [rsp + 24], rdx
-	mov	qword ptr [rsp + 8], 0
-	mov	qword ptr [rsp], 0
-	jmp	.LBB1_2
-.LBB1_1:                                # %for.body
-                                        #   in Loop: Header=BB1_2 Depth=1
-	mov	rdx, qword ptr [rsp]
-	mov	rcx, qword ptr [rsp + 32]
-	mov	rax, qword ptr [rsp + 8]
-	add	rax, qword ptr [rcx + 8*rdx]
-	mov	qword ptr [rsp + 8], rax
-	jmp	.LBB1_3
-.LBB1_2:                                # %for.cond
-                                        # =>This Inner Loop Header: Depth=1
-	mov	rax, qword ptr [rsp]
-	cmp	rax, qword ptr [rsp + 24]
-	jl	.LBB1_1
-	jmp	.LBB1_4
-.LBB1_3:                                # %for.iter
-                                        #   in Loop: Header=BB1_2 Depth=1
-	mov	rax, qword ptr [rsp]
-	add	rax, 1
-	mov	qword ptr [rsp], rax
-	jmp	.LBB1_2
-.LBB1_4:                                # %for.end
-	mov	rax, qword ptr [rsp + 8]
-	mov	qword ptr [rsp + 16], rax
-# %bb.5:                                # %exit
-	mov	rax, qword ptr [rsp + 16]
-	add	rsp, 40
+	mov	qword ptr [rsp], rcx
+	mov	qword ptr [rsp + 8], rdx
+	mov	qword ptr [rsp + 16], r8
+	mov	qword ptr [rsp], 100
+# %bb.1:                                # %exit
+	add	rsp, 24
 	ret
 	.seh_endproc
                                         # -- End function
@@ -80,216 +55,32 @@ sumOfArray:                             # @sumOfArray
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	push	rbp
-	.seh_pushreg rbp
-	sub	rsp, 192
-	.seh_stackalloc 192
-	lea	rbp, [rsp + 128]
-	.seh_setframe rbp, 128
+	sub	rsp, 72
+	.seh_stackalloc 72
 	.seh_endprologue
-	sub	rsp, 32
-	mov	cl, 1
-	mov	byte ptr [rbp - 113], cl        # 1-byte Spill
-	call	Assert
-	mov	cl, byte ptr [rbp - 113]        # 1-byte Reload
-	call	Assert
-	add	rsp, 32
-	mov	rax, qword ptr [rip + GlobalArray3]
-	sub	rax, 10
+	mov	qword ptr [rsp + 40], 1
+	mov	qword ptr [rsp + 48], 2
+	mov	qword ptr [rsp + 56], 3
+	mov	r8, qword ptr [rsp + 56]
+	mov	rcx, qword ptr [rsp + 40]
+	mov	rdx, qword ptr [rsp + 48]
+	call	modifyArray2
+	cmp	qword ptr [rsp + 40], 1
 	sete	cl
-	sub	rsp, 32
 	call	Assert
-	mov	cl, byte ptr [rbp - 113]        # 1-byte Reload
-	add	rsp, 32
-	mov	qword ptr [rbp - 24], 1
-	mov	qword ptr [rbp - 16], 2
-	mov	qword ptr [rbp - 8], 0
-	mov	qword ptr [rbp], 0
-	mov	qword ptr [rbp + 8], 0
-	mov	qword ptr [rbp + 16], 0
-	mov	qword ptr [rbp + 24], 0
-	mov	qword ptr [rbp + 32], 0
-	mov	qword ptr [rbp + 40], 0
-	mov	qword ptr [rbp + 48], 0
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	rax, qword ptr [rbp + 24]
-	test	rax, rax
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	lea	rcx, [rbp - 24]
-	mov	edx, 10
-	call	sumOfArray
-	add	rsp, 32
-	sub	rax, 3
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	qword ptr [rbp - 48], -5
-	mov	qword ptr [rbp - 40], 0
-	mov	qword ptr [rbp - 32], 5
-	mov	rax, qword ptr [rbp - 40]
-	test	rax, rax
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	mov	cl, byte ptr [rbp - 113]        # 1-byte Reload
-	call	Assert
-	add	rsp, 32
-	lea	rcx, [rbp - 48]
-	mov	qword ptr [rbp - 56], rcx
-	sub	rsp, 32
+	lea	rcx, [rsp + 40]
 	call	modifyArray
-	add	rsp, 32
-	mov	rax, qword ptr [rbp - 48]
-	sub	rax, 100
+	cmp	qword ptr [rsp + 40], 100
 	sete	cl
-	sub	rsp, 32
 	call	Assert
-	add	rsp, 32
-	mov	rax, qword ptr [rbp - 56]
-	mov	rax, qword ptr [rax]
-	sub	rax, 100
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	rax, qword ptr [rbp - 56]
-	mov	qword ptr [rax], 1000
-	mov	rax, qword ptr [rbp - 48]
-	sub	rax, 1000
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	rax, qword ptr [rbp - 56]
-	mov	rax, qword ptr [rax]
-	sub	rax, 1000
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	qword ptr [rbp - 64], 0
-	mov	qword ptr [rbp - 72], 0
-	mov	qword ptr [rbp - 96], 2
-	mov	qword ptr [rbp - 104], 1
-	mov	qword ptr [rbp - 80], 4
-	mov	qword ptr [rbp - 88], 3
-	mov	qword ptr [rbp - 112], 0
-	jmp	.LBB2_2
-.LBB2_1:                                # %for.body
-                                        #   in Loop: Header=BB2_2 Depth=1
-	mov	eax, 16
-	call	__chkstk
-	sub	rsp, rax
-	mov	rax, rsp
-	mov	qword ptr [rbp - 128], rax      # 8-byte Spill
-	mov	qword ptr [rax], 0
-	jmp	.LBB2_6
-.LBB2_2:                                # %for.cond
-                                        # =>This Loop Header: Depth=1
-                                        #     Child Loop BB2_6 Depth 2
-	cmp	qword ptr [rbp - 112], 2
-	jl	.LBB2_1
-	jmp	.LBB2_4
-.LBB2_3:                                # %for.iter
-                                        #   in Loop: Header=BB2_2 Depth=1
-	mov	rax, qword ptr [rbp - 112]
-	add	rax, 1
-	mov	qword ptr [rbp - 112], rax
-	jmp	.LBB2_2
-.LBB2_4:                                # %for.end
-	cmp	qword ptr [rbp - 64], 10
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	cmp	qword ptr [rbp - 72], 10
-	sete	cl
-	sub	rsp, 32
-	call	Assert
-	add	rsp, 32
-	mov	qword ptr [rbp + 56], 0
-	jmp	.LBB2_9
-.LBB2_5:                                # %for.body1
-                                        #   in Loop: Header=BB2_6 Depth=2
-	mov	rax, qword ptr [rbp - 128]      # 8-byte Reload
-	mov	rcx, qword ptr [rbp - 112]
-	lea	rdx, [rbp - 104]
-	shl	rcx, 4
-	add	rdx, rcx
-	mov	r8, qword ptr [rax]
-	mov	rcx, qword ptr [rbp - 64]
-	add	rcx, qword ptr [rdx + 8*r8]
-	mov	qword ptr [rbp - 64], rcx
-	mov	rdx, qword ptr [rbp - 112]
-	shl	rdx
-	lea	rcx, [rip + Global2dArray]
-	shl	rdx, 3
-	add	rcx, rdx
-	mov	rdx, qword ptr [rax]
-	mov	rax, qword ptr [rbp - 72]
-	add	rax, qword ptr [rcx + 8*rdx]
-	mov	qword ptr [rbp - 72], rax
-	jmp	.LBB2_7
-.LBB2_6:                                # %for.cond2
-                                        #   Parent Loop BB2_2 Depth=1
-                                        # =>  This Inner Loop Header: Depth=2
-	mov	rax, qword ptr [rbp - 128]      # 8-byte Reload
-	cmp	qword ptr [rax], 2
-	jl	.LBB2_5
-	jmp	.LBB2_8
-.LBB2_7:                                # %for.iter3
-                                        #   in Loop: Header=BB2_6 Depth=2
-	mov	rax, qword ptr [rbp - 128]      # 8-byte Reload
-	mov	rcx, qword ptr [rax]
-	add	rcx, 1
-	mov	qword ptr [rax], rcx
-	jmp	.LBB2_6
-.LBB2_8:                                # %for.end4
-                                        #   in Loop: Header=BB2_2 Depth=1
-	jmp	.LBB2_3
-.LBB2_9:                                # %exit
-	mov	rax, qword ptr [rbp + 56]
-	lea	rsp, [rbp + 64]
-	pop	rbp
+	mov	qword ptr [rsp + 64], 0
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp + 64]
+	add	rsp, 72
 	ret
 	.seh_endproc
                                         # -- End function
-	.data
-	.p2align	4, 0x0                          # @GlobalArray1
-GlobalArray1:
-	.quad	1                               # 0x1
-	.quad	1                               # 0x1
-	.quad	1                               # 0x1
-
-	.p2align	4, 0x0                          # @GlobalArray2
-GlobalArray2:
-	.quad	1                               # 0x1
-	.quad	2                               # 0x2
-	.quad	3                               # 0x3
-	.quad	0                               # 0x0
-	.quad	0                               # 0x0
-
-	.p2align	4, 0x0                          # @GlobalArray3
-GlobalArray3:
-	.quad	10                              # 0xa
-	.quad	20                              # 0x14
-	.quad	30                              # 0x1e
-
-	.p2align	4, 0x0                          # @Global2dArray
-Global2dArray:
-	.quad	1                               # 0x1
-	.quad	2                               # 0x2
-	.quad	3                               # 0x3
-	.quad	4                               # 0x4
-
 	.addrsig
 	.addrsig_sym Assert
 	.addrsig_sym modifyArray
-	.addrsig_sym sumOfArray
-	.addrsig_sym GlobalArray3
-	.addrsig_sym Global2dArray
+	.addrsig_sym modifyArray2
