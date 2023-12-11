@@ -7,45 +7,6 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	modifyArray;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function modifyArray
-modifyArray:                            # @modifyArray
-.seh_proc modifyArray
-# %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	mov	qword ptr [rsp], rcx
-	mov	rax, qword ptr [rsp]
-	mov	qword ptr [rax], 100
-# %bb.1:                                # %exit
-	pop	rax
-	ret
-	.seh_endproc
-                                        # -- End function
-	.def	modifyArray2;
-	.scl	3;
-	.type	32;
-	.endef
-	.p2align	4, 0x90                         # -- Begin function modifyArray2
-modifyArray2:                           # @modifyArray2
-.seh_proc modifyArray2
-# %bb.0:                                # %entry
-	sub	rsp, 24
-	.seh_stackalloc 24
-	.seh_endprologue
-	mov	qword ptr [rsp], rcx
-	mov	qword ptr [rsp + 8], rdx
-	mov	qword ptr [rsp + 16], r8
-	mov	qword ptr [rsp], 100
-# %bb.1:                                # %exit
-	add	rsp, 24
-	ret
-	.seh_endproc
-                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -55,32 +16,111 @@ modifyArray2:                           # @modifyArray2
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	sub	rsp, 72
-	.seh_stackalloc 72
+	push	rbp
+	.seh_pushreg rbp
+	sub	rsp, 64
+	.seh_stackalloc 64
+	lea	rbp, [rsp + 64]
+	.seh_setframe rbp, 64
 	.seh_endprologue
-	mov	qword ptr [rsp + 40], 1
-	mov	qword ptr [rsp + 48], 2
-	mov	qword ptr [rsp + 56], 3
-	mov	r8, qword ptr [rsp + 56]
-	mov	rcx, qword ptr [rsp + 40]
-	mov	rdx, qword ptr [rsp + 48]
-	call	modifyArray2
-	cmp	qword ptr [rsp + 40], 1
-	sete	cl
-	call	Assert
-	lea	rcx, [rsp + 40]
-	call	modifyArray
-	cmp	qword ptr [rsp + 40], 100
-	sete	cl
-	call	Assert
-	mov	qword ptr [rsp + 64], 0
-# %bb.1:                                # %exit
-	mov	rax, qword ptr [rsp + 64]
-	add	rsp, 72
+	mov	qword ptr [rbp - 16], 10
+	cmp	qword ptr [rbp - 16], 1
+	jne	.LBB0_2
+# %bb.1:                                # %if.then
+	xor	eax, eax
+	mov	ecx, eax
+	sub	rsp, 32
+	call	PrintInt
+	add	rsp, 32
+	jmp	.LBB0_3
+.LBB0_2:                                # %if.else
+	mov	eax, 16
+	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 32]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rbp - 56], rcx       # 8-byte Spill
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 64], rdx       # 8-byte Spill
+	mov	qword ptr [rcx], 0
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 56]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rbp - 40], rcx       # 8-byte Spill
+	mov	rdx, rcx
+	mov	qword ptr [rbp - 48], rdx       # 8-byte Spill
+	mov	qword ptr [rcx], 1
+	mov	rcx, qword ptr [rax]
+	sub	rsp, 32
+	call	PrintInt
+	mov	rax, qword ptr [rbp - 40]       # 8-byte Reload
+	add	rsp, 32
+	mov	rcx, qword ptr [rax]
+	sub	rsp, 32
+	call	PrintInt
+	mov	rax, qword ptr [rbp - 32]       # 8-byte Reload
+	add	rsp, 32
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, rsp
+	mov	qword ptr [rbp - 24], rax       # 8-byte Spill
+	mov	qword ptr [rax], 2
+	jmp	.LBB0_5
+.LBB0_3:                                # %if.end
+	mov	qword ptr [rbp - 8], 0
+	jmp	.LBB0_8
+.LBB0_4:                                # %for.body
+                                        #   in Loop: Header=BB0_5 Depth=1
+	mov	rcx, qword ptr [rbp - 48]       # 8-byte Reload
+	mov	rdx, qword ptr [rbp - 64]       # 8-byte Reload
+	mov	r8, qword ptr [rdx]
+	mov	rax, qword ptr [rcx]
+	add	r8, rax
+	mov	eax, 16
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, rsp
+	mov	qword ptr [rax], r8
+	mov	r8, qword ptr [rcx]
+	mov	qword ptr [rdx], r8
+	mov	rdx, qword ptr [rax]
+	mov	qword ptr [rcx], rdx
+	mov	rcx, qword ptr [rax]
+	sub	rsp, 32
+	call	PrintInt
+	add	rsp, 32
+	jmp	.LBB0_6
+.LBB0_5:                                # %for.cond
+                                        # =>This Inner Loop Header: Depth=1
+	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
+	mov	rax, qword ptr [rax]
+	cmp	rax, qword ptr [rbp - 16]
+	jl	.LBB0_4
+	jmp	.LBB0_7
+.LBB0_6:                                # %for.iter
+                                        #   in Loop: Header=BB0_5 Depth=1
+	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
+	mov	rcx, qword ptr [rax]
+	mov	eax, 16
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 24]       # 8-byte Reload
+	mov	rdx, rsp
+	mov	r8, qword ptr [rax]
+	mov	qword ptr [rdx], r8
+	add	rcx, 1
+	mov	qword ptr [rax], rcx
+	jmp	.LBB0_5
+.LBB0_7:                                # %for.end
+	jmp	.LBB0_3
+.LBB0_8:                                # %exit
+	mov	rax, qword ptr [rbp - 8]
+	mov	rsp, rbp
+	pop	rbp
 	ret
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym Assert
-	.addrsig_sym modifyArray
-	.addrsig_sym modifyArray2
+	.addrsig_sym PrintInt

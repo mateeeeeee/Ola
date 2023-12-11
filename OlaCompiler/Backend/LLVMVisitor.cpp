@@ -484,23 +484,27 @@ namespace ola
 		llvm::BasicBlock* then_block = llvm::BasicBlock::Create(context, "if.then", function, exit_block);
 		llvm::BasicBlock* else_block = llvm::BasicBlock::Create(context, "if.else", function, exit_block);
 		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "if.end", function, exit_block);
-
+		
 		cond_expr->Accept(*this);
 		llvm::Value* condition_value = value_map[cond_expr];
 		OLA_ASSERT(condition_value);
 		ConditionalBranch(condition_value, then_block, else_stmt ? else_block : end_block);
 
 		builder.SetInsertPoint(then_block);
+
+		end_blocks.push_back(end_block);
 		then_stmt->Accept(*this);
 		if(!then_block->getTerminator()) builder.CreateBr(end_block);
-
 		if (else_stmt)
 		{
 			builder.SetInsertPoint(else_block);
 			else_stmt->Accept(*this);
 			if (!else_block->getTerminator()) builder.CreateBr(end_block);
 		}
+		end_blocks.pop_back();
+
 		builder.SetInsertPoint(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void LLVMVisitor::Visit(BreakStmt const&, uint32)
@@ -550,11 +554,13 @@ namespace ola
 
 		builder.SetInsertPoint(body_block);
 
+		end_blocks.push_back(end_block);
 		continue_blocks.push_back(iter_block);
 		break_blocks.push_back(end_block);
 		body_stmt->Accept(*this);
 		break_blocks.pop_back();
 		continue_blocks.pop_back();
+		end_blocks.pop_back();
 
 		builder.CreateBr(iter_block);
 
@@ -563,6 +569,7 @@ namespace ola
 		builder.CreateBr(cond_block);
 
 		builder.SetInsertPoint(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void LLVMVisitor::Visit(WhileStmt const& while_stmt, uint32)
@@ -584,15 +591,18 @@ namespace ola
 
 		builder.SetInsertPoint(body_block);
 
+		end_blocks.push_back(end_block);
 		continue_blocks.push_back(cond_block);
 		break_blocks.push_back(end_block);
 		body_stmt->Accept(*this);
 		break_blocks.pop_back();
 		continue_blocks.pop_back();
+		end_blocks.pop_back();
 
 		builder.CreateBr(cond_block);
 
 		builder.SetInsertPoint(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void LLVMVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
@@ -608,11 +618,13 @@ namespace ola
 		builder.CreateBr(body_block);
 		builder.SetInsertPoint(body_block);
 
+		end_blocks.push_back(end_block);
 		continue_blocks.push_back(cond_block);
 		break_blocks.push_back(end_block);
 		body_stmt->Accept(*this);
 		break_blocks.pop_back();
 		continue_blocks.pop_back();
+		end_blocks.pop_back();
 
 		builder.CreateBr(cond_block);
 
@@ -623,6 +635,7 @@ namespace ola
 		ConditionalBranch(condition_value, body_block, end_block);
 
 		builder.SetInsertPoint(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void LLVMVisitor::Visit(CaseStmt const& case_stmt, uint32)
@@ -666,9 +679,11 @@ namespace ola
 		llvm::SwitchInst* switch_inst = builder.CreateSwitch(condition, default_block);
 
 		switch_instructions.push_back(switch_inst);
+		end_blocks.push_back(end_block);
 		break_blocks.push_back(end_block);
 		body_stmt->Accept(*this);
 		break_blocks.pop_back();
+		end_blocks.pop_back();
 		switch_instructions.pop_back();
 
 		std::vector<llvm::BasicBlock*> case_blocks;
@@ -684,6 +699,7 @@ namespace ola
 			}
 		}
 		builder.SetInsertPoint(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void LLVMVisitor::Visit(GotoStmt const& goto_stmt, uint32)
@@ -1321,11 +1337,13 @@ namespace ola
 		std::vector<llvm::BasicBlock*> empty_blocks{};
 		for (auto&& block : *func) if (block.empty()) empty_blocks.push_back(&block);
 
-		for (auto empty_block : empty_blocks)
+		for (llvm::BasicBlock* empty_block : empty_blocks)
 		{
 			builder.SetInsertPoint(empty_block);
 			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
-			builder.CreateBr(exit_block);
+			if (empty_block_successors.contains(empty_block))
+				 builder.CreateBr(empty_block_successors[empty_block]);
+			else builder.CreateBr(exit_block);
 		}
 
 		for (auto&& block : *func)

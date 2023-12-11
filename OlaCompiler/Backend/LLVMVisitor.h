@@ -37,7 +37,7 @@ namespace ola
 		};
 		using LLVMValueMap  = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
 		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*, VoidPointerHash>;
-
+		using LLVMEmptyBlockSuccessorMap = std::unordered_map<llvm::BasicBlock*, llvm::BasicBlock*, VoidPointerHash>;
 	private:
 		LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module);
 
@@ -111,7 +111,9 @@ namespace ola
 		std::vector<llvm::SwitchInst*> switch_instructions;
 		std::vector<llvm::BasicBlock*> continue_blocks;
 		std::vector<llvm::BasicBlock*> break_blocks;
+		std::vector<llvm::BasicBlock*> end_blocks;
 		std::unordered_map<std::string, llvm::BasicBlock*> label_blocks;
+		LLVMEmptyBlockSuccessorMap empty_block_successors;
 
 		llvm::Type* void_type			= nullptr;
 		llvm::Type* float_type			= nullptr;

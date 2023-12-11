@@ -1,21 +1,24 @@
-import std.assert;
-
-private void modifyArray(int[] arr)
-{
-	arr[0] = 100;
-}
-
-private void modifyArray2(int[3] arr)
-{
-	arr[0] = 100;
-}
+import std.io;
 
 public int main()
 {
-	int[] arr = {1,2,3};
-	modifyArray2(arr);
-	Assert(arr[0] == 1);
-	modifyArray(arr);
-	Assert(arr[0] == 100);
-	return 0;
-}
+    int num = 10;
+    if (num==1)
+    {
+        PrintInt(0);
+    }
+    else
+    {
+        int n1 = 0, n2 = 1;
+        PrintInt(n1);
+        PrintInt(n2);
+        for(int i = 2; i < num; i++)
+        {
+            int n3 = n1 + n2;
+            n1 = n2;
+            n2 = n3;
+            PrintInt(n3);
+        }
+    }  
+    return 0;
+}      
