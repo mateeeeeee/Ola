@@ -1103,7 +1103,7 @@ namespace ola
 			OLA_ASSERT(arg_value);
 			llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
 			if (arg_type->isPointerTy()) args.push_back(arg_value);
-			else args.push_back(Load(arg_type, arg_value, true));
+			else args.push_back(Load(arg_type, arg_value));
 			
 			arg_index++;
 		}
@@ -1528,7 +1528,7 @@ namespace ola
 		return Load(llvm_type, ptr);
 	}
 
-	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr, bool func_arg_load)
+	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
 		if (IsPointer(ptr->getType()))
 		{

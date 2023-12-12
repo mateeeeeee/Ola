@@ -132,7 +132,7 @@ namespace ola
 		llvm::PointerType* GetPointerType(llvm::Type*);
 
 		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
-		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*, bool func_arg_load = false);
+		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 
 		static bool IsPointer(llvm::Type*);
