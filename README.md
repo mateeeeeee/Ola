@@ -37,6 +37,12 @@ Ola is a toy object-oriented programming language with LLVM backend.
   * scopes
   * import statement
   * standard library
+  
+## Todo
+	* Custom backend
+		- Hybrid IR (CFG + Linear IR in SSA form)
+		- Optimizations
+		- x86-64 code generation
 
 ## Structure
 Ola consists of three parts: 
