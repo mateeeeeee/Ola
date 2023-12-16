@@ -14,5 +14,6 @@ int f(char[] c)
 public int main()
 {
     int g = f(5);
-    return g;
+    f("Mate");
+    return 0;
 }      

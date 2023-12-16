@@ -816,7 +816,7 @@ namespace ola
 			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
 			std::vector<Decl*>& possible_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
 
-			Decl const* match_decl = nullptr;
+			Decl* match_decl = nullptr;
 			FuncType const* match_func_type = nullptr;
 			for (Decl* decl : possible_decls)
 			{
@@ -861,7 +861,7 @@ namespace ola
 			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
 			func_call_expr->SetType(match_func_type->GetReturnType());
 			func_call_expr->SetArgs(std::move(args));
-			func_call_expr->SetCallee(std::move(func_expr));
+			func_call_expr->SetCallee(MakeUnique<DeclRefExpr>(match_decl, loc));
 			if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
 			return func_call_expr;
 
