@@ -45,11 +45,7 @@ namespace ola
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
 			std::string name(sym_name);
-			if (overload_sym_map.contains(name))
-			{
-				return overload_sym_map[name];
-			}
-			else return {};
+			return overload_sym_map[name];
 		}
 
 	private:
@@ -119,12 +115,11 @@ namespace ola
 			{
 				if (std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name); !syms.empty()) return syms;
 			}
-			return {};
+			return scopes.back().LookUp_Overload(sym_name);
 		}
 		std::vector<SymType*>& LookUpCurrentScope_Overload(std::string_view sym_name)
 		{
-			if (std::vector<SymType*>& syms = scopes.back().LookUp_Overload(sym_name); !syms.empty()) return syms;
-			return {};
+			return scopes.back().LookUp_Overload(sym_name);
 		}
 
 		bool IsGlobal() const { return scopes.size() == 1; }

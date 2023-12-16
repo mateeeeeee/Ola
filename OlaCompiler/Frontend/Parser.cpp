@@ -1113,7 +1113,7 @@ namespace ola
 		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnIdentifier(name, loc);
+		return sema->ActOnIdentifier(name, loc, current_token->Is(TokenKind::left_round));
 	}
 
 	UniqueThisExprPtr Parser::ParseThisExpression()

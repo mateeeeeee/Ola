@@ -45,7 +45,7 @@ namespace ola
 	}
 	void IdentifierExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
-		OLA_ASSERT(false);
+		visitor.Visit(*this, depth);
 	}
 	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -137,7 +137,7 @@ namespace ola
 	}
 	void IdentifierExpr::Accept(ASTVisitor& visitor) const
 	{
-		OLA_ASSERT(false);
+		visitor.Visit(*this, 0);
 	}
 	void DeclRefExpr::Accept(ASTVisitor& visitor) const
 	{

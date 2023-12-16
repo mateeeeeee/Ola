@@ -121,7 +121,7 @@ namespace ola
 			ctx.return_stmt_encountered = false;
 		}
 
-		bool result = ctx.decl_sym_table.Insert(function_decl.get());
+		bool result = ctx.decl_sym_table.Insert_Overload(function_decl.get());
 		OLA_ASSERT(result);
 		return function_decl;
 	}
@@ -811,53 +811,60 @@ namespace ola
 
 	UniqueCallExprPtr Sema::ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
-		if (isa<DeclRefExpr>(func_expr.get()))
+		if (isa<IdentifierExpr>(func_expr.get()))
 		{
-			DeclRefExpr const* decl_ref = cast<DeclRefExpr>(func_expr.get());
-			Decl const* decl = decl_ref->GetDecl();
-			if (isa<FunctionDecl>(decl)) 
+			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
+			std::vector<Decl*>& possible_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
+
+			Decl const* match_decl = nullptr;
+			FuncType const* match_func_type = nullptr;
+			for (Decl* decl : possible_decls)
 			{
-				QualType const& func_expr_type = decl->GetType();
-				OLA_ASSERT(isa<FuncType>(func_expr_type));
-				FuncType const& func_type = type_cast<FuncType>(func_expr_type);
-				std::span<QualType const> param_types = func_type.GetParams();
-				if (args.size() != param_types.size())
+				if (isa<FunctionDecl>(decl))
 				{
-					if (args.size() > param_types.size()) diagnostics.Report(loc, too_many_args_to_function_call);
-					else diagnostics.Report(loc, too_few_args_to_function_call);
-					return nullptr;
+					QualType const& func_expr_type = decl->GetType();
+					OLA_ASSERT(isa<FuncType>(func_expr_type));
+					FuncType const& func_type = type_cast<FuncType>(func_expr_type);
+					std::span<QualType const> param_types = func_type.GetParams();
+					if (args.size() != param_types.size()) continue;
+
+					for (uint64 i = 0; i < param_types.size(); ++i)
+					{
+						UniqueExprPtr& arg = args[i];
+						QualType const& func_param_type = param_types[i];
+
+						if (isa<RefType>(func_param_type) && !arg->IsLValue()) continue;
+						if (!func_param_type->IsAssignableFrom(arg->GetType())) continue;
+					}
+					for (uint64 i = 0; i < param_types.size(); ++i)
+					{
+						UniqueExprPtr& arg = args[i];
+						QualType const& func_param_type = param_types[i];
+						if (!func_param_type->IsSameAs(arg->GetType()))
+						{
+							arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+						}
+					}
+					match_decl = decl;
+					match_func_type = &func_type;
+					break;
 				}
-
-				for (uint64 i = 0; i < param_types.size(); ++i)
-				{
-					UniqueExprPtr& arg = args[i];
-					QualType const& func_param_type = param_types[i];
-
-					if (isa<RefType>(func_param_type) && !arg->IsLValue())
-					{
-						diagnostics.Report(loc, ref_var_rvalue_bind);
-						return nullptr;
-					}
-
-					if (!func_param_type->IsAssignableFrom(arg->GetType()))
-					{
-						diagnostics.Report(loc, incompatible_function_argument);
-						return nullptr;
-					}
-					else if (!func_param_type->IsSameAs(arg->GetType()))
-					{
-						arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
-					}
-				}
-
-				std::string_view func_name = decl->GetName();
-				UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
-				func_call_expr->SetType(func_type.GetReturnType());
-				func_call_expr->SetArgs(std::move(args));
-				func_call_expr->SetCallee(std::move(func_expr));
-				if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
-				return func_call_expr;
 			}
+
+			if (!match_decl)
+			{
+				diagnostics.Report(loc, matching_function_not_found);
+				return nullptr;
+			}
+
+			std::string_view func_name = match_decl->GetName();
+			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, func_name);
+			func_call_expr->SetType(match_func_type->GetReturnType());
+			func_call_expr->SetArgs(std::move(args));
+			func_call_expr->SetCallee(std::move(func_expr));
+			if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
+			return func_call_expr;
+
 			diagnostics.Report(loc, invalid_function_call);
 			return nullptr;
 		}
@@ -971,15 +978,20 @@ namespace ola
 		return MakeUnique<FloatLiteral>(value, loc);
 	}
 
-	UniqueExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc)
+	UniqueExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol)
 	{
-		if (Decl* decl = ctx.decl_sym_table.LookUp(name))
+		if (Decl* decl = ctx.decl_sym_table.LookUp(name); !overloaded_symbol && decl)
 		{
 			UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 			if (decl->IsMember()) return ActOnMemberExpr(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
 			else return decl_ref;
 		}
-		else if (ClassDecl const* base_class_decl = ctx.current_base_class)
+		else if (overloaded_symbol)
+		{
+			std::vector<Decl*>& decls = ctx.decl_sym_table.LookUp_Overload(name);
+			if(!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+		}
+		if (ClassDecl const* base_class_decl = ctx.current_base_class)
 		{
 			if (Decl* class_member_decl = base_class_decl->FindMemberDecl(name))
 			{

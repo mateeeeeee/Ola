@@ -61,6 +61,7 @@ DIAG(modulo_operands_not_integral, error, "Modulo operator are only defined for 
 DIAG(no_return_statement_found_in_non_void_function, warning, "No return statement found in a non-void function")
 DIAG(too_many_args_to_function_call, error, "Too many arguments to function call")
 DIAG(too_few_args_to_function_call, error, "Too few arguments to function call")
+DIAG(matching_function_not_found, error, "Could not find matching function")
 DIAG(incompatible_function_argument, error, "Incompatible function call argument")
 DIAG(invalid_operands, error, "Invalid operands")
 DIAG(invalid_member_access, error, "Invalid member access")

@@ -17,6 +17,7 @@ namespace ola
 		StringLiteral,
 		BoolLiteral,
 		CharLiteral,
+		Identifier,
 		DeclRef,
 		ImplicitCast,
 		InitializerList,
@@ -180,19 +181,25 @@ namespace ola
 	class IdentifierExpr : public Expr
 	{
 	public:
-		std::string_view GetName() const { return name; }
-
-	protected:
-		explicit IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
+		IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::Identifier, loc), name(name)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
+		std::string_view GetName() const { return name; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Identifier; }
 	private:
 		std::string name;
+
+	protected:
+		IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
+		{
+			OLA_ASSERT(kind == ExprKind::DeclRef);
+			SetValueCategory(ExprValueCategory::LValue);
+		}
 	};
 
 	class DeclRefExpr : public IdentifierExpr
