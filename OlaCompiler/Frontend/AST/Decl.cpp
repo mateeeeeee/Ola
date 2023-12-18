@@ -31,10 +31,10 @@ namespace ola
 		QualType this_type;
 	};
 
-	void FunctionDecl::SetParamDecls(UniqueParamVarDeclPtrList&& param_decls)
+	void FunctionDecl::SetParamDecls(UniqueParamVarDeclPtrList&& _param_decls)
 	{
-		param_declarations = std::move(param_decls);
-		for (auto& param_decl : param_declarations) param_decl->SetParentDecl(this);
+		param_decls = std::move(_param_decls);
+		for (auto& param_decl : param_decls) param_decl->SetParentDecl(this);
 	}
 	void FunctionDecl::SetBodyStmt(UniqueCompoundStmtPtr&& _body_stmt)
 	{
@@ -155,16 +155,61 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
+
+	std::string FunctionDecl::GetTypeMangledName(QualType const& type)
+	{
+		std::string type_mangled_name;
+		if (isa<IntType>(type))		   type_mangled_name += "__I";
+		else if (isa<FloatType>(type)) type_mangled_name += "__F";
+		else if (isa<CharType>(type))  type_mangled_name += "__C";
+		else if (isa<BoolType>(type))  type_mangled_name += "__B";
+		else if (isa<ArrayType>(type))
+		{
+			ArrayType const& arr_type = type_cast<ArrayType>(type);
+			type_mangled_name += GetTypeMangledName(arr_type.GetBaseType());
+			type_mangled_name += std::to_string(arr_type.GetArraySize());
+		}
+		else if (isa<RefType>(type))
+		{
+			RefType const& ref_type = type_cast<RefType>(type);
+			type_mangled_name += GetTypeMangledName(ref_type.GetReferredType());
+			type_mangled_name += "ref";
+		}
+		else if (isa<ClassType>(type))
+		{
+			ClassType const& class_type = type_cast<ClassType>(type);
+			type_mangled_name += "__";
+			type_mangled_name += class_type.GetClassDecl()->GetName();
+		}
+		else OLA_ASSERT(false);
+
+		return type_mangled_name;
+	}
+	std::string FunctionDecl::GetMangledName() const
+	{
+		std::string mangled_name(GetName());
+
+		if (NoMangling()) return mangled_name;
+
+		FuncType const& func_type = GetFuncType();
+		for (auto const& param : param_decls)
+		{
+			QualType const& param_type = param->GetType();
+			mangled_name += GetTypeMangledName(param_type);
+		}
+		return mangled_name;
+	}
+
 	void FunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
-		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
+		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
 	void MethodDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
-		for (auto&& param : param_declarations) param->Accept(visitor, depth + 1);
+		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
 	void EnumMemberDecl::Accept(ASTVisitor& visitor, uint32 depth) const

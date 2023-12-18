@@ -1,6 +1,8 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
+@__StringLiteral0 = internal constant [5 x i8] c"Mate\00"
+
 declare void @PrintInt(i64)
 
 declare void @PrintFloat(double)
@@ -17,7 +19,7 @@ declare i8 @ReadChar()
 
 declare void @ReadString(ptr, i64)
 
-define internal i64 @f(i64 %a) {
+define internal i64 @f__I(i64 %a) {
 entry:
   %0 = alloca i64, align 8
   store i64 %a, ptr %0, align 4
@@ -36,7 +38,7 @@ exit:                                             ; preds = %return, %entry
   ret i64 %4
 }
 
-define internal i64 @f.1(ptr %c) {
+define internal i64 @f__C0(ptr %c) {
 entry:
   %0 = alloca ptr, align 8
   store ptr %c, ptr %0, align 8
@@ -52,11 +54,12 @@ exit:                                             ; preds = %entry
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = call i64 @f(i64 5)
+  %1 = call i64 @f__I(i64 5)
   %2 = alloca i64, align 8
   store i64 %1, ptr %2, align 4
-  %3 = load ptr, ptr %2, align 8
-  store ptr %3, ptr %0, align 8
+  %3 = call i64 @f__C0(ptr @__StringLiteral0)
+  %4 = load ptr, ptr %2, align 8
+  store ptr %4, ptr %0, align 8
   br label %exit
 
 return:                                           ; No predecessors!
@@ -64,6 +67,6 @@ return:                                           ; No predecessors!
   br label %exit
 
 exit:                                             ; preds = %return, %entry
-  %4 = load i64, ptr %0, align 4
-  ret i64 %4
+  %5 = load i64, ptr %0, align 4
+  ret i64 %5
 }

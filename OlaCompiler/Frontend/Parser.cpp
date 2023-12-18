@@ -91,8 +91,10 @@ namespace ola
 		std::string_view name = "";
 		QualType function_type{};
 		UniqueParamVarDeclPtrList param_decls;
+		FuncAttributes attrs = FuncAttribute_None;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
@@ -112,7 +114,7 @@ namespace ola
 			function_type.SetType(FuncType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, FuncAttribute_None);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, attrs);
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
@@ -1186,6 +1188,18 @@ namespace ola
 					return;
 				}
 			}
+			else if (Consume(TokenKind::KW_nomangling))
+			{
+				if (!HasAttribute(attrs, FuncAttribute_NoMangling))
+				{
+					attrs |= FuncAttribute_NoMangling;
+				}
+				else
+				{
+					Diag(function_attribute_repetition);
+					return;
+				}
+			}
 		}
 	}
 
@@ -1358,6 +1372,11 @@ namespace ola
 			return true;
 		}
 		if (Consume(TokenKind::KW_noinline)) 
+		{
+			current_token = token;
+			return true;
+		}
+		if (Consume(TokenKind::KW_nomangling))
 		{
 			current_token = token;
 			return true;

@@ -1,6 +1,5 @@
 import std.io;
 
-
 int f(int a)
 {
     return a * 2;
@@ -11,9 +10,15 @@ int f(char[] c)
     PrintString(c);
 }
 
+float f(float b)
+{
+    return b * 2.0f;
+}
+
+
 public int main()
 {
     int g = f(5);
     f("Mate");
-    return 0;
+    return g;
 }      

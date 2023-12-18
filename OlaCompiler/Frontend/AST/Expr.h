@@ -343,8 +343,8 @@ namespace ola
 	class CallExpr : public Expr
 	{
 	public:
-		CallExpr(SourceLocation const& loc, std::string_view function_name)
-			: Expr(ExprKind::Call, loc), function_name(function_name) {}
+		CallExpr(SourceLocation const& loc, FunctionDecl const* func_decl)
+			: Expr(ExprKind::Call, loc), func_decl(func_decl) {}
 
 		void SetArgs(UniqueExprPtrList&& args)
 		{
@@ -363,20 +363,20 @@ namespace ola
 			return type_cast<FuncType>(GetCallee()->GetType());
 		}
 
-		std::string_view GetFunctionName() const { return function_name; }
+		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call; }
 	protected:
-		std::string function_name;
+		FunctionDecl const* func_decl;
 		UniqueExprPtr callee;
 		UniqueExprPtrList func_args;
 
 	protected:
-		CallExpr(ExprKind kind, SourceLocation const& loc, std::string_view function_name)
-			: Expr(kind, loc), function_name(function_name) {}
+		CallExpr(ExprKind kind, SourceLocation const& loc, FunctionDecl const* func_decl)
+			: Expr(kind, loc), func_decl(func_decl) {}
 	};
 
 	class InitializerListExpr final : public Expr
@@ -466,8 +466,7 @@ namespace ola
 	class MethodCallExpr final : public CallExpr
 	{
 	public:
-		MethodCallExpr(SourceLocation const& loc, std::string_view function_name)
-			: CallExpr(ExprKind::MemberCall, loc, function_name) {}
+		MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl);
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

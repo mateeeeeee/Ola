@@ -17,6 +17,9 @@ namespace ola
 		EnumMemberDecl* enum_member_decl = static_cast<EnumMemberDecl*>(decl);
 		return enum_member_decl->GetValue();
 	}
+	MethodCallExpr::MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl) 
+		: CallExpr(ExprKind::MemberCall, loc, method_decl) {}
+
 
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -101,6 +104,7 @@ namespace ola
 		visitor.Visit(*this, depth);
 		class_expr->Accept(visitor, depth + 1);
 	}
+
 	void MethodCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);

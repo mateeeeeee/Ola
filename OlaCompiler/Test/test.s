@@ -7,13 +7,13 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	f;
+	.def	f__I;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function f
-f:                                      # @f
-.seh_proc f
+	.p2align	4, 0x90                         # -- Begin function f__I
+f__I:                                   # @f__I
+.seh_proc f__I
 # %bb.0:                                # %entry
 	sub	rsp, 16
 	.seh_stackalloc 16
@@ -28,13 +28,13 @@ f:                                      # @f
 	ret
 	.seh_endproc
                                         # -- End function
-	.def	f.1;
+	.def	f__C0;
 	.scl	3;
 	.type	32;
 	.endef
-	.p2align	4, 0x90                         # -- Begin function f.1
-f.1:                                    # @f.1
-.seh_proc f.1
+	.p2align	4, 0x90                         # -- Begin function f__C0
+f__C0:                                  # @f__C0
+.seh_proc f__C0
 # %bb.0:                                # %entry
 	sub	rsp, 56
 	.seh_stackalloc 56
@@ -61,8 +61,10 @@ main:                                   # @main
 	.seh_stackalloc 56
 	.seh_endprologue
 	mov	ecx, 5
-	call	f
+	call	f__I
 	mov	qword ptr [rsp + 40], rax
+	lea	rcx, [rip + __StringLiteral0]
+	call	f__C0
 	mov	rax, qword ptr [rsp + 40]
 	mov	qword ptr [rsp + 48], rax
 # %bb.1:                                # %exit
@@ -71,6 +73,12 @@ main:                                   # @main
 	ret
 	.seh_endproc
                                         # -- End function
+	.section	.rdata,"dr"
+__StringLiteral0:                       # @__StringLiteral0
+	.asciz	"Mate"
+
 	.addrsig
 	.addrsig_sym PrintString
-	.addrsig_sym f
+	.addrsig_sym f__I
+	.addrsig_sym f__C0
+	.addrsig_sym __StringLiteral0

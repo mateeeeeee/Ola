@@ -40,6 +40,10 @@ namespace ola
 			{
 				return sym_map[name];
 			}
+			else if (overload_sym_map.contains(name))
+			{
+				return overload_sym_map[name][0];
+			}
 			else return nullptr;
 		}
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
