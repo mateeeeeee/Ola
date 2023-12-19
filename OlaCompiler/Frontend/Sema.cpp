@@ -1264,6 +1264,12 @@ namespace ola
 		MethodDecl const* match_decl = best_match_decls[0];
 		FuncType const* match_func_type = match_func_types[0];
 
+		if (!isoneof<ThisExpr, SuperExpr>(class_expr.get()) && match_decl->IsPrivate())
+		{
+			diagnostics.Report(loc, private_member_access);
+			return nullptr;
+		}
+
 		std::span<QualType const> param_types = match_func_type->GetParams();
 		for (uint64 i = 0; i < param_types.size(); ++i)
 		{
