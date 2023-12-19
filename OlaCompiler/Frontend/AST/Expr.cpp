@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	DeclRefExpr::DeclRefExpr(Decl* decl, SourceLocation const& loc) : IdentifierExpr(ExprKind::DeclRef, decl->GetName(), loc), decl(decl)
+	DeclRefExpr::DeclRefExpr(Decl const* decl, SourceLocation const& loc) : IdentifierExpr(ExprKind::DeclRef, decl->GetName(), loc), decl(decl)
 	{
 		SetType(decl->GetType());
 	}
@@ -14,7 +14,7 @@ namespace ola
 	}
 	int64 DeclRefExpr::EvaluateConstexpr() const
 	{
-		EnumMemberDecl* enum_member_decl = static_cast<EnumMemberDecl*>(decl);
+		EnumMemberDecl const* enum_member_decl = static_cast<EnumMemberDecl const*>(decl);
 		return enum_member_decl->GetValue();
 	}
 	MethodCallExpr::MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl) 

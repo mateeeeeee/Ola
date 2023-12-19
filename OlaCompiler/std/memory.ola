@@ -1,11 +1,11 @@
-extern nomanglingint[] AllocateInts(int count);
-extern nomanglingvoid FreeInts(int[] arr);
-	   
-extern nomanglingfloat[] AllocateFloats(int count);
-extern nomanglingvoid FreeFloats(float[] arr);
-	  
-extern nomanglingchar[] AllocateChars(int count);
-extern nomanglingvoid FreeChars(char[] arr);
-	   
-extern nomanglingbool[] AllocateBools(int count);
-extern nomanglingvoid FreeBools(bool[] arr);
+extern nomangling int[] AllocateInts(int count);
+extern nomangling void FreeInts(int[] arr);
+				  
+extern nomangling float[] AllocateFloats(int count);
+extern nomangling void FreeFloats(float[] arr);
+				  
+extern nomangling char[] AllocateChars(int count);
+extern nomangling void FreeChars(char[] arr);
+				  
+extern nomangling bool[] AllocateBools(int count);
+extern nomangling void FreeBools(bool[] arr);

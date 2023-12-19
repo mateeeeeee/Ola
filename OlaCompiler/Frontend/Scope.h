@@ -40,7 +40,7 @@ namespace ola
 			{
 				return sym_map[name];
 			}
-			else if (overload_sym_map.contains(name))
+			else if (overload_sym_map.contains(name) && !overload_sym_map[name].empty())
 			{
 				return overload_sym_map[name][0];
 			}
@@ -113,6 +113,15 @@ namespace ola
 			return nullptr;
 		}
 
+		std::vector<SymType*>& LookUpMember_Overload(std::string_view sym_name)
+		{
+			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
+			{
+				std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name);
+				for (SymType* sym : syms) if (sym->IsMember()) return syms;
+			}
+			return scopes.back().LookUp_Overload(sym_name);
+		}
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)

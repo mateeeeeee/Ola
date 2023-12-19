@@ -205,7 +205,7 @@ namespace ola
 	class DeclRefExpr : public IdentifierExpr
 	{
 	public:
-		DeclRefExpr(Decl* decl, SourceLocation const& loc);
+		DeclRefExpr(Decl const* decl, SourceLocation const& loc);
 
 		Decl const* GetDecl() const { return decl; }
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -216,7 +216,7 @@ namespace ola
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::DeclRef; }
 	private:
-		Decl* decl;
+		Decl const* decl;
 	};
 
 	class IntLiteral final : public Expr
@@ -356,13 +356,11 @@ namespace ola
 			callee = std::move(_callee);
 		}
 		Expr const* GetCallee() const { return callee.get(); }
-
 		FuncType const& GetCalleeType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetCallee()->GetType()));
 			return type_cast<FuncType>(GetCallee()->GetType());
 		}
-
 		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -389,16 +387,15 @@ namespace ola
 			init_list = std::move(_init_list);
 		}
 		UniqueExprPtrList const& GetInitList() const { return init_list; }
-
-		virtual void Accept(ASTVisitor&, uint32) const override;
-		virtual void Accept(ASTVisitor&) const override;
-
 		virtual bool IsConstexpr() const
 		{
 			bool is_constexpr = true;
 			for (auto const& init_elem : init_list) if (!init_elem->IsConstexpr()) return false;
 			return true;
 		}
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::InitializerList; }
 	private:

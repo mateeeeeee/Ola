@@ -992,9 +992,28 @@ namespace ola
 			{
 				++current_token;
 				sema->ctx.current_class_expr_stack.push_back(expr.get());
-				UniqueDeclRefExprPtr member_identifier = ParseMemberIdentifier();
+				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();
 				sema->ctx.current_class_expr_stack.pop_back();
-				expr = sema->ActOnMemberExpr(loc, std::move(expr), std::move(member_identifier));
+				if (current_token->Is(TokenKind::left_round))
+				{
+					++current_token;
+					UniqueExprPtrList args;
+					if (!Consume(TokenKind::right_round))
+					{
+						while (true)
+						{
+							UniqueExprPtr arg_expr = ParseAssignmentExpression();
+							args.push_back(std::move(arg_expr));
+							if (Consume(TokenKind::right_round)) break;
+							Expect(TokenKind::comma);
+						}
+					}
+					expr = sema->ActOnMethodCall(loc, std::move(expr), std::move(member_identifier), std::move(args));
+				}
+				else
+				{
+					expr = sema->ActOnFieldAccess(loc, std::move(expr), std::move(member_identifier));
+				}
 			}
 			break;
 			default:
@@ -1134,12 +1153,12 @@ namespace ola
 		return sema->ActOnSuperExpr(loc, false);
 	}
 
-	UniqueDeclRefExprPtr Parser::ParseMemberIdentifier()
+	UniqueIdentifierExprPtr Parser::ParseMemberIdentifier()
 	{
 		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		Expect(TokenKind::identifier);
-		return sema->ActOnMemberIdentifier(name, loc);
+		return sema->ActOnMemberIdentifier(name, loc, current_token->Is(TokenKind::left_round));
 	}
 
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
