@@ -102,11 +102,12 @@ namespace ola
 		UniqueStringLiteralPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
 		UniqueBoolLiteralPtr ActOnConstantBool(bool value, SourceLocation const& loc);
 		UniqueFloatLiteralPtr ActOnConstantFloat(double value, SourceLocation const& loc);
-		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc);
-		UniqueDeclRefExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc);
+		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
+		UniqueIdentifierExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
-		UniqueMemberExprPtr ActOnMemberExpr(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueDeclRefExprPtr&& member_identifier);
+		UniqueMemberExprPtr ActOnFieldAccess(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueIdentifierExprPtr&& field_name);
+		UniqueMethodCallExprPtr ActOnMethodCall(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueIdentifierExprPtr&& method_name, UniqueExprPtrList&& args);
 		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, bool implicit);
 		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, bool implicit);
 

@@ -91,8 +91,10 @@ namespace ola
 		std::string_view name = "";
 		QualType function_type{};
 		UniqueParamVarDeclPtrList param_decls;
+		FuncAttributes attrs = FuncAttribute_None;
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
@@ -112,7 +114,7 @@ namespace ola
 			function_type.SetType(FuncType(return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, FuncAttribute_None);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, attrs);
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
@@ -990,9 +992,28 @@ namespace ola
 			{
 				++current_token;
 				sema->ctx.current_class_expr_stack.push_back(expr.get());
-				UniqueDeclRefExprPtr member_identifier = ParseMemberIdentifier();
+				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();
 				sema->ctx.current_class_expr_stack.pop_back();
-				expr = sema->ActOnMemberExpr(loc, std::move(expr), std::move(member_identifier));
+				if (current_token->Is(TokenKind::left_round))
+				{
+					++current_token;
+					UniqueExprPtrList args;
+					if (!Consume(TokenKind::right_round))
+					{
+						while (true)
+						{
+							UniqueExprPtr arg_expr = ParseAssignmentExpression();
+							args.push_back(std::move(arg_expr));
+							if (Consume(TokenKind::right_round)) break;
+							Expect(TokenKind::comma);
+						}
+					}
+					expr = sema->ActOnMethodCall(loc, std::move(expr), std::move(member_identifier), std::move(args));
+				}
+				else
+				{
+					expr = sema->ActOnFieldAccess(loc, std::move(expr), std::move(member_identifier));
+				}
 			}
 			break;
 			default:
@@ -1113,7 +1134,7 @@ namespace ola
 		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnIdentifier(name, loc);
+		return sema->ActOnIdentifier(name, loc, current_token->Is(TokenKind::left_round));
 	}
 
 	UniqueThisExprPtr Parser::ParseThisExpression()
@@ -1132,12 +1153,12 @@ namespace ola
 		return sema->ActOnSuperExpr(loc, false);
 	}
 
-	UniqueDeclRefExprPtr Parser::ParseMemberIdentifier()
+	UniqueIdentifierExprPtr Parser::ParseMemberIdentifier()
 	{
 		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		Expect(TokenKind::identifier);
-		return sema->ActOnMemberIdentifier(name, loc);
+		return sema->ActOnMemberIdentifier(name, loc, current_token->Is(TokenKind::left_round));
 	}
 
 	UniqueInitializerListExprPtr Parser::ParseInitializerListExpression()
@@ -1179,6 +1200,18 @@ namespace ola
 				if (!HasAttribute(attrs, FuncAttribute_NoInline))
 				{
 					attrs |= FuncAttribute_NoInline;
+				}
+				else
+				{
+					Diag(function_attribute_repetition);
+					return;
+				}
+			}
+			else if (Consume(TokenKind::KW_nomangling))
+			{
+				if (!HasAttribute(attrs, FuncAttribute_NoMangling))
+				{
+					attrs |= FuncAttribute_NoMangling;
 				}
 				else
 				{
@@ -1358,6 +1391,11 @@ namespace ola
 			return true;
 		}
 		if (Consume(TokenKind::KW_noinline)) 
+		{
+			current_token = token;
+			return true;
+		}
+		if (Consume(TokenKind::KW_nomangling))
 		{
 			current_token = token;
 			return true;

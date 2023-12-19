@@ -122,7 +122,6 @@ namespace ola
 		llvm::IntegerType* char_type	= nullptr;
 
 	private:
-
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);

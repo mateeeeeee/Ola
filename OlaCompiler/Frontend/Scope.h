@@ -23,7 +23,14 @@ namespace ola
 		bool Insert(SymType* symbol)
 		{
 			if (sym_map.contains(symbol->GetName())) return false;
+			if (overload_sym_map.contains(symbol->GetName())) return false;
 			sym_map[symbol->GetName()] = symbol;
+			return true;
+		}
+		bool Insert_Overload(SymType* symbol)
+		{
+			if (sym_map.contains(symbol->GetName())) return false;
+			overload_sym_map[symbol->GetName()].push_back(symbol);
 			return true;
 		}
 		SymType* LookUp(std::string_view sym_name)
@@ -33,17 +40,21 @@ namespace ola
 			{
 				return sym_map[name];
 			}
+			else if (overload_sym_map.contains(name) && !overload_sym_map[name].empty())
+			{
+				return overload_sym_map[name][0];
+			}
 			else return nullptr;
 		}
-
-		bool Remove(std::string_view sym_name)
+		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
 			std::string name(sym_name);
-			return sym_map.erase(name) == 1;
+			return overload_sym_map[name];
 		}
 
 	private:
 		std::unordered_map<std::string_view, SymType*> sym_map;
+		std::unordered_map<std::string_view, std::vector<SymType*>> overload_sym_map;
 	};
 
 	template<typename T> requires Symbol<T>
@@ -69,6 +80,10 @@ namespace ola
 		bool Insert(SymType* symbol)
 		{
 			return scopes.back().Insert(symbol);
+		}
+		bool Insert_Overload(SymType* symbol)
+		{
+			return scopes.back().Insert_Overload(symbol);
 		}
 
 		SymType* LookUp(std::string const& sym_name)
@@ -98,13 +113,26 @@ namespace ola
 			return nullptr;
 		}
 
-		bool Remove(std::string_view sym_name)
+		std::vector<SymType*>& LookUpMember_Overload(std::string_view sym_name)
 		{
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
-				if (scope->Remove(sym_name)) return true;
+				std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name);
+				for (SymType* sym : syms) if (sym->IsMember()) return syms;
 			}
-			return false;
+			return scopes.back().LookUp_Overload(sym_name);
+		}
+		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
+		{
+			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
+			{
+				if (std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name); !syms.empty()) return syms;
+			}
+			return scopes.back().LookUp_Overload(sym_name);
+		}
+		std::vector<SymType*>& LookUpCurrentScope_Overload(std::string_view sym_name)
+		{
+			return scopes.back().LookUp_Overload(sym_name);
 		}
 
 		bool IsGlobal() const { return scopes.size() == 1; }

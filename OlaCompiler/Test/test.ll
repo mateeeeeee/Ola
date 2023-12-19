@@ -1,49 +1,244 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-declare void @PrintInt(i64)
+%D = type { i64, i64, i64 }
 
-declare void @PrintFloat(double)
+declare void @Assert(i1)
 
-declare void @PrintChar(i8)
+declare void @AssertMsg(i1, ptr)
 
-declare void @PrintString(ptr)
+define internal i64 @f__I(i64 %a) {
+entry:
+  %0 = alloca i64, align 8
+  store i64 %a, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 1, ptr %1, align 4
+  br label %exit
 
-declare i64 @ReadInt()
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
 
-declare double @ReadFloat()
+exit:                                             ; preds = %return, %entry
+  %2 = load i64, ptr %1, align 4
+  ret i64 %2
+}
 
-declare i8 @ReadChar()
+define internal i64 @f__F(double %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %b, ptr %0, align 8
+  %1 = alloca i64, align 8
+  store i64 -1, ptr %1, align 4
+  br label %exit
 
-declare void @ReadString(ptr, i64)
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %2 = load i64, ptr %1, align 4
+  ret i64 %2
+}
+
+define internal i64 @f__F__F(double %a, double %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %a, ptr %0, align 8
+  %1 = alloca double, align 8
+  store double %b, ptr %1, align 8
+  %2 = alloca i64, align 8
+  store i64 -1, ptr %2, align 4
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %3 = load i64, ptr %2, align 4
+  ret i64 %3
+}
+
+define internal i64 @f__F__I(double %a, i64 %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %a, ptr %0, align 8
+  %1 = alloca i64, align 8
+  store i64 %b, ptr %1, align 4
+  %2 = alloca i64, align 8
+  store i64 0, ptr %2, align 4
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %3 = load i64, ptr %2, align 4
+  ret i64 %3
+}
+
+define internal i64 @f__I__I(i64 %a, i64 %b) {
+entry:
+  %0 = alloca i64, align 8
+  store i64 %a, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 %b, ptr %1, align 4
+  %2 = alloca i64, align 8
+  store i64 1, ptr %2, align 4
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %3 = load i64, ptr %2, align 4
+  ret i64 %3
+}
+
+define i64 @"D::f__I"(ptr %this, i64 %a) {
+entry:
+  %0 = alloca i64, align 8
+  store i64 %a, ptr %0, align 4
+  %1 = alloca i64, align 8
+  %2 = getelementptr inbounds %D, ptr %this, i32 0, i32 0
+  %3 = load ptr, ptr %2, align 8
+  store ptr %3, ptr %1, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %4 = load i64, ptr %1, align 4
+  ret i64 %4
+}
+
+define i64 @"D::f__F"(ptr %this, double %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %b, ptr %0, align 8
+  %1 = alloca i64, align 8
+  %2 = getelementptr inbounds %D, ptr %this, i32 0, i32 2
+  %3 = load ptr, ptr %2, align 8
+  store ptr %3, ptr %1, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %4 = load i64, ptr %1, align 4
+  ret i64 %4
+}
+
+define i64 @"D::f__F__F"(ptr %this, double %a, double %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %a, ptr %0, align 8
+  %1 = alloca double, align 8
+  store double %b, ptr %1, align 8
+  %2 = alloca i64, align 8
+  %3 = getelementptr inbounds %D, ptr %this, i32 0, i32 2
+  %4 = load ptr, ptr %3, align 8
+  store ptr %4, ptr %2, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %5 = load i64, ptr %2, align 4
+  ret i64 %5
+}
+
+define i64 @"D::f__F__I"(ptr %this, double %a, i64 %b) {
+entry:
+  %0 = alloca double, align 8
+  store double %a, ptr %0, align 8
+  %1 = alloca i64, align 8
+  store i64 %b, ptr %1, align 4
+  %2 = alloca i64, align 8
+  %3 = getelementptr inbounds %D, ptr %this, i32 0, i32 1
+  %4 = load ptr, ptr %3, align 8
+  store ptr %4, ptr %2, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %5 = load i64, ptr %2, align 4
+  ret i64 %5
+}
+
+define i64 @"D::f__I__I"(ptr %this, i64 %a, i64 %b) {
+entry:
+  %0 = alloca i64, align 8
+  store i64 %a, ptr %0, align 4
+  %1 = alloca i64, align 8
+  store i64 %b, ptr %1, align 4
+  %2 = alloca i64, align 8
+  %3 = getelementptr inbounds %D, ptr %this, i32 0, i32 0
+  %4 = load ptr, ptr %3, align 8
+  store ptr %4, ptr %2, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %5 = load i64, ptr %2, align 4
+  ret i64 %5
+}
 
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  %1 = alloca i64, align 8
-  store i64 10, ptr %1, align 4
-  %2 = load i64, ptr %1, align 4
-  %3 = icmp eq i64 %2, 1
-  br i1 %3, label %if.then, label %if.else
-
-if.then:                                          ; preds = %entry
-  call void @PrintInt(i64 0)
-  br label %if.end
-
-if.else:                                          ; preds = %entry
-  %4 = alloca i64, align 8
-  store i64 0, ptr %4, align 4
-  %5 = alloca i64, align 8
-  store i64 1, ptr %5, align 4
-  %6 = load i64, ptr %4, align 4
-  call void @PrintInt(i64 %6)
-  %7 = load i64, ptr %5, align 4
-  call void @PrintInt(i64 %7)
-  %8 = alloca i64, align 8
-  store i64 2, ptr %8, align 4
-  br label %for.cond
-
-if.end:                                           ; preds = %for.end, %if.then
+  %1 = call i64 @f__I(i64 1)
+  %2 = icmp sgt i64 %1, 0
+  call void @Assert(i1 %2)
+  %3 = call i64 @f__F(double 1.000000e+00)
+  %4 = icmp slt i64 %3, 0
+  call void @Assert(i1 %4)
+  %5 = call i64 @f__F__F(double 1.000000e+00, double 1.000000e+00)
+  %6 = icmp slt i64 %5, 0
+  call void @Assert(i1 %6)
+  %7 = call i64 @f__F__I(double 1.000000e+00, i64 1)
+  %8 = icmp eq i64 %7, 0
+  call void @Assert(i1 %8)
+  %9 = call i64 @f__I__I(i64 1, i64 1)
+  %10 = icmp sgt i64 %9, 0
+  call void @Assert(i1 %10)
+  %11 = alloca %D, align 8
+  %12 = getelementptr inbounds %D, ptr %11, i32 0, i32 0
+  store i64 1, ptr %12, align 4
+  %13 = getelementptr inbounds %D, ptr %11, i32 0, i32 1
+  store i64 0, ptr %13, align 4
+  %14 = getelementptr inbounds %D, ptr %11, i32 0, i32 2
+  store i64 -1, ptr %14, align 4
+  %15 = call i64 @"D::f__I"(ptr %11, i64 1)
+  %16 = icmp sgt i64 %15, 0
+  call void @Assert(i1 %16)
+  %17 = call i64 @"D::f__F"(ptr %11, double 1.000000e+00)
+  %18 = icmp slt i64 %17, 0
+  call void @Assert(i1 %18)
+  %19 = call i64 @"D::f__F__F"(ptr %11, double 1.000000e+00, double 1.000000e+00)
+  %20 = icmp slt i64 %19, 0
+  call void @Assert(i1 %20)
+  %21 = call i64 @"D::f__F__I"(ptr %11, double 1.000000e+00, i64 1)
+  %22 = icmp eq i64 %21, 0
+  call void @Assert(i1 %22)
+  %23 = call i64 @"D::f__I__I"(ptr %11, i64 1, i64 1)
+  %24 = icmp sgt i64 %23, 0
+  call void @Assert(i1 %24)
   store i64 0, ptr %0, align 4
   br label %exit
 
@@ -51,44 +246,7 @@ return:                                           ; No predecessors!
   %nop = alloca i1, align 1
   br label %exit
 
-for.body:                                         ; preds = %for.cond
-  %9 = load i64, ptr %4, align 4
-  %10 = load i64, ptr %5, align 4
-  %11 = add i64 %9, %10
-  %12 = alloca i64, align 8
-  store i64 %11, ptr %12, align 4
-  %13 = load i64, ptr %4, align 4
-  %14 = load i64, ptr %5, align 4
-  %15 = load ptr, ptr %5, align 8
-  store ptr %15, ptr %4, align 8
-  %16 = load i64, ptr %5, align 4
-  %17 = load i64, ptr %12, align 4
-  %18 = load ptr, ptr %12, align 8
-  store ptr %18, ptr %5, align 8
-  %19 = load i64, ptr %12, align 4
-  call void @PrintInt(i64 %19)
-  br label %for.iter
-
-for.cond:                                         ; preds = %for.iter, %if.else
-  %20 = load i64, ptr %8, align 4
-  %21 = load i64, ptr %1, align 4
-  %22 = icmp slt i64 %20, %21
-  br i1 %22, label %for.body, label %for.end
-
-for.iter:                                         ; preds = %for.body
-  %23 = load i64, ptr %8, align 4
-  %24 = alloca ptr, align 8
-  %25 = load ptr, ptr %8, align 8
-  store ptr %25, ptr %24, align 8
-  %26 = add i64 %23, 1
-  store i64 %26, ptr %8, align 4
-  br label %for.cond
-
-for.end:                                          ; preds = %for.cond
-  %nop1 = alloca i1, align 1
-  br label %if.end
-
-exit:                                             ; preds = %return, %if.end
-  %27 = load i64, ptr %0, align 4
-  ret i64 %27
+exit:                                             ; preds = %return, %entry
+  %25 = load i64, ptr %0, align 4
+  ret i64 %25
 }

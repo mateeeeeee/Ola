@@ -42,9 +42,9 @@ namespace ola
 		{
 			visibility = _visibility;
 		}
-		bool IsPublic() const { return visibility == DeclVisibility::Public; }
+		bool IsPublic()  const { return  visibility == DeclVisibility::Public; }
 		bool IsPrivate() const { return visibility == DeclVisibility::Private; }
-		bool IsExtern() const { return visibility == DeclVisibility::Extern; }
+		bool IsExtern()  const { return  visibility == DeclVisibility::Extern; }
 
 		virtual bool IsTag() const { return false; }
 		virtual bool IsMember() const { return false; }
@@ -148,13 +148,16 @@ namespace ola
 	{
 		FuncAttribute_None = 0x00,
 		FuncAttribute_NoInline = 0x01,
-		FuncAttribute_Inline = 0x02
+		FuncAttribute_Inline = 0x02,
+		FuncAttribute_NoMangling = 0x04
 	};
 	using FuncAttributes = uint8;
 
 	class FunctionDecl : public Decl
 	{
 		friend class LabelVisitor;
+		static std::string GetTypeMangledName(QualType const&);
+
 	public:
 		FunctionDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Function, name, loc) {}
 
@@ -168,10 +171,11 @@ namespace ola
 		{
 			return HasAttribute(func_attributes, attr);
 		}
-		bool IsInline() const { return HasFuncAttribute(FuncAttribute_Inline); }
+		bool IsInline()   const { return HasFuncAttribute(FuncAttribute_Inline); }
 		bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
+		bool NoMangling() const { return HasFuncAttribute(FuncAttribute_NoMangling); }
 
-		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_declarations; }
+		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_decls; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
 		std::vector<LabelStmt const*> const& GetLabels() const
 		{
@@ -187,16 +191,18 @@ namespace ola
 		{
 			return body_stmt != nullptr;
 		}
+		std::string GetMangledName() const;
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Function; }
+
 	protected:
-		UniqueParamVarDeclPtrList param_declarations;
+		UniqueParamVarDeclPtrList param_decls;
 		UniqueCompoundStmtPtr body_stmt;
-		std::vector<LabelStmt const*> labels;
 		FuncAttributes func_attributes = FuncAttribute_None;
+		std::vector<LabelStmt const*> labels;
 
 	protected:
 		FunctionDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
@@ -336,7 +342,20 @@ namespace ola
 		}
 		ClassDecl const* GetBaseClass() const { return base_class; }
 
-		Decl* FindMemberDecl(std::string_view name) const
+		std::vector<MethodDecl const*> FindMethodDecls(std::string_view name) const
+		{
+			std::vector<MethodDecl const*> found_decls;
+			for (uint32 i = 0; i < methods.size(); ++i)
+			{
+				if (methods[i]->GetName().compare(name) == 0)
+				{
+					found_decls.push_back(methods[i].get());
+				}
+			}
+			if (found_decls.empty()) return base_class ? base_class->FindMethodDecls(name) : std::vector<MethodDecl const*>{};
+			else return found_decls;
+		}
+		FieldDecl* FindFieldDecl(std::string_view name) const
 		{
 			for (uint32 i = 0; i < fields.size(); ++i)
 			{
@@ -345,14 +364,7 @@ namespace ola
 					return fields[i].get();
 				}
 			}
-			for (uint32 i = 0; i < methods.size(); ++i)
-			{
-				if (methods[i]->GetName().compare(name) == 0)
-				{
-					return methods[i].get();
-				}
-			}
-			return base_class ? base_class->FindMemberDecl(name) : nullptr;
+			return base_class ? base_class->FindFieldDecl(name) : nullptr;
 		}
 		uint64 GetFieldCount() const
 		{

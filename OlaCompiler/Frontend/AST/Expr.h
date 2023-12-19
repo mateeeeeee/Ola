@@ -17,6 +17,7 @@ namespace ola
 		StringLiteral,
 		BoolLiteral,
 		CharLiteral,
+		Identifier,
 		DeclRef,
 		ImplicitCast,
 		InitializerList,
@@ -180,25 +181,31 @@ namespace ola
 	class IdentifierExpr : public Expr
 	{
 	public:
-		std::string_view GetName() const { return name; }
-
-	protected:
-		explicit IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
+		IdentifierExpr(std::string_view name, SourceLocation const& loc) : Expr(ExprKind::Identifier, loc), name(name)
 		{
 			SetValueCategory(ExprValueCategory::LValue);
 		}
+		std::string_view GetName() const { return name; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Identifier; }
 	private:
 		std::string name;
+
+	protected:
+		IdentifierExpr(ExprKind kind, std::string_view name, SourceLocation const& loc) : Expr(kind, loc), name(name)
+		{
+			OLA_ASSERT(kind == ExprKind::DeclRef);
+			SetValueCategory(ExprValueCategory::LValue);
+		}
 	};
 
 	class DeclRefExpr : public IdentifierExpr
 	{
 	public:
-		DeclRefExpr(Decl* decl, SourceLocation const& loc);
+		DeclRefExpr(Decl const* decl, SourceLocation const& loc);
 
 		Decl const* GetDecl() const { return decl; }
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -209,7 +216,7 @@ namespace ola
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::DeclRef; }
 	private:
-		Decl* decl;
+		Decl const* decl;
 	};
 
 	class IntLiteral final : public Expr
@@ -336,8 +343,8 @@ namespace ola
 	class CallExpr : public Expr
 	{
 	public:
-		CallExpr(SourceLocation const& loc, std::string_view function_name)
-			: Expr(ExprKind::Call, loc), function_name(function_name) {}
+		CallExpr(SourceLocation const& loc, FunctionDecl const* func_decl)
+			: Expr(ExprKind::Call, loc), func_decl(func_decl) {}
 
 		void SetArgs(UniqueExprPtrList&& args)
 		{
@@ -349,27 +356,25 @@ namespace ola
 			callee = std::move(_callee);
 		}
 		Expr const* GetCallee() const { return callee.get(); }
-
 		FuncType const& GetCalleeType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetCallee()->GetType()));
 			return type_cast<FuncType>(GetCallee()->GetType());
 		}
-
-		std::string_view GetFunctionName() const { return function_name; }
+		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call; }
 	protected:
-		std::string function_name;
+		FunctionDecl const* func_decl;
 		UniqueExprPtr callee;
 		UniqueExprPtrList func_args;
 
 	protected:
-		CallExpr(ExprKind kind, SourceLocation const& loc, std::string_view function_name)
-			: Expr(kind, loc), function_name(function_name) {}
+		CallExpr(ExprKind kind, SourceLocation const& loc, FunctionDecl const* func_decl)
+			: Expr(kind, loc), func_decl(func_decl) {}
 	};
 
 	class InitializerListExpr final : public Expr
@@ -382,16 +387,15 @@ namespace ola
 			init_list = std::move(_init_list);
 		}
 		UniqueExprPtrList const& GetInitList() const { return init_list; }
-
-		virtual void Accept(ASTVisitor&, uint32) const override;
-		virtual void Accept(ASTVisitor&) const override;
-
 		virtual bool IsConstexpr() const
 		{
 			bool is_constexpr = true;
 			for (auto const& init_elem : init_list) if (!init_elem->IsConstexpr()) return false;
 			return true;
 		}
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::InitializerList; }
 	private:
@@ -459,8 +463,7 @@ namespace ola
 	class MethodCallExpr final : public CallExpr
 	{
 	public:
-		MethodCallExpr(SourceLocation const& loc, std::string_view function_name)
-			: CallExpr(ExprKind::MemberCall, loc, function_name) {}
+		MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl);
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

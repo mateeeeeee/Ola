@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	DeclRefExpr::DeclRefExpr(Decl* decl, SourceLocation const& loc) : IdentifierExpr(ExprKind::DeclRef, decl->GetName(), loc), decl(decl)
+	DeclRefExpr::DeclRefExpr(Decl const* decl, SourceLocation const& loc) : IdentifierExpr(ExprKind::DeclRef, decl->GetName(), loc), decl(decl)
 	{
 		SetType(decl->GetType());
 	}
@@ -14,9 +14,12 @@ namespace ola
 	}
 	int64 DeclRefExpr::EvaluateConstexpr() const
 	{
-		EnumMemberDecl* enum_member_decl = static_cast<EnumMemberDecl*>(decl);
+		EnumMemberDecl const* enum_member_decl = static_cast<EnumMemberDecl const*>(decl);
 		return enum_member_decl->GetValue();
 	}
+	MethodCallExpr::MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl) 
+		: CallExpr(ExprKind::MemberCall, loc, method_decl) {}
+
 
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -45,7 +48,7 @@ namespace ola
 	}
 	void IdentifierExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
-		OLA_ASSERT(false);
+		visitor.Visit(*this, depth);
 	}
 	void DeclRefExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
@@ -101,6 +104,7 @@ namespace ola
 		visitor.Visit(*this, depth);
 		class_expr->Accept(visitor, depth + 1);
 	}
+
 	void MethodCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -137,7 +141,7 @@ namespace ola
 	}
 	void IdentifierExpr::Accept(ASTVisitor& visitor) const
 	{
-		OLA_ASSERT(false);
+		visitor.Visit(*this, 0);
 	}
 	void DeclRefExpr::Accept(ASTVisitor& visitor) const
 	{

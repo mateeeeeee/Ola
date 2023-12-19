@@ -46,7 +46,7 @@ namespace ola
 		FuncType const& type = function_decl.GetFuncType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertOlaType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetName(), module);
+		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetMangledName(), module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
 		if (isa<ClassType>(type.GetReturnType()))
@@ -76,7 +76,7 @@ namespace ola
 		llvm::FunctionType* llvm_function_type = ConvertMethodType(function_type, class_type);
 
 		llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
-		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetName();
+		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetMangledName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
@@ -1083,7 +1083,7 @@ namespace ola
 
 	void LLVMVisitor::Visit(CallExpr const& call_expr, uint32)
 	{
-		llvm::Function* called_function = module.getFunction(call_expr.GetFunctionName());
+		llvm::Function* called_function = module.getFunction(call_expr.GetFunctionDecl()->GetMangledName());
 		OLA_ASSERT(called_function);
 
 		std::vector<llvm::Value*> args;
@@ -1226,7 +1226,7 @@ namespace ola
 			std::vector<llvm::Value*> args;
 			uint32 arg_index = 0;
 			bool return_struct = IsStruct(function_type->getReturnType());
-			llvm::AllocaInst* return_alloc = nullptr;
+			llvm::AllocaInst* return_alloc = nullptr; 
 			if (return_struct)
 			{
 				return_alloc = builder.CreateAlloca(function_type->getParamType(arg_index));
@@ -1251,7 +1251,7 @@ namespace ola
 		{
 			std::string name(class_decl->GetName());
 			name += "::";
-			name += member_call_expr.GetFunctionName();
+			name += member_call_expr.GetFunctionDecl()->GetMangledName();
 			llvm::Function* called_function = module.getFunction(name);
 
 			std::vector<llvm::Value*> args;

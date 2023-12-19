@@ -118,6 +118,10 @@ TEST(Function, Calls)
 	EXPECT_EQ(OLA(-i test_functioncalls), 0);
 }
 
+TEST(Function, Overloading)
+{
+	EXPECT_EQ(OLA(-i test_overloading), 0);
+}
 
 TEST(Misc, Strings)
 {

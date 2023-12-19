@@ -27,7 +27,8 @@ Ola is a toy object-oriented programming language with LLVM backend.
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
   * enums
   * functions 
-	- attributes: `inline` and `noinline`
+    - overloading
+	- attributes: `inline`, `noinline`, `nomangling` (equivalent to C++'s `extern "C"`)
   * arrays
   * `sizeof`, `length` operators
   * `alias`
@@ -39,8 +40,7 @@ Ola is a toy object-oriented programming language with LLVM backend.
   * standard library
   
 ## Todo
-* Function overloading
-	- Constructors
+* Constructors
 * Custom backend
 	- Hybrid IR (CFG + Linear IR in SSA form)
 	- Optimizations
