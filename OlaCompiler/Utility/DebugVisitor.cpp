@@ -133,6 +133,11 @@ namespace ola
 		OLA_DEBUG("{}FunctionDecl\n", GetIndentation(depth));
 	}
 
+	void DebugVisitor::Visit(ConstructorDecl const&, uint32 depth)
+	{
+		OLA_DEBUG("{}ConstructorDecl\n", GetIndentation(depth));
+	}
+
 	void DebugVisitor::Visit(MethodDecl const&, uint32 depth)
 	{
 		OLA_DEBUG("{}MemberFunctionDecl\n", GetIndentation(depth));
@@ -337,4 +342,6 @@ namespace ola
 	{
 		OLA_DEBUG("{}SuperExpr {}\n", GetIndentation(depth), super_expr.IsImplicit() ? "(implicit)" : "");
 	}
+
+
 }

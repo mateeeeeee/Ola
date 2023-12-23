@@ -19,6 +19,7 @@ namespace ola
 	using UniqueDeclPtr				  = UniquePtr<Decl>;
 	using UniqueFunctionDeclPtr		  = UniquePtr<FunctionDecl>;
 	using UniqueMethodDeclPtr		  = UniquePtr<MethodDecl>;
+	using UniqueConstructorDeclPtr	  = UniquePtr<ConstructorDecl>;
 	using UniqueVarDeclPtr			  = UniquePtr<VarDecl>;
 	using UniqueParamVarDeclPtr		  = UniquePtr<ParamVarDecl>;
 	using UniqueFieldDeclPtr		  = UniquePtr<FieldDecl>;

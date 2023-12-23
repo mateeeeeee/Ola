@@ -413,31 +413,36 @@ namespace ola
 		{
 			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
-			sema->ctx.current_base_class = base_class;
-			TokenPtr start_token = current_token;
 
-			auto ParseClassMembers = [&](bool first_pass)
-				{
-					Expect(TokenKind::left_brace);
-					while (!Consume(TokenKind::right_brace))
+			sema->ctx.current_base_class = base_class;
+			sema->ctx.current_class_name = class_name;
+			{
+				auto ParseClassMembers = [&](bool first_pass)
 					{
-						bool is_function_declaration = IsFunctionDeclaration();
-						if (is_function_declaration)
+						Expect(TokenKind::left_brace);
+						while (!Consume(TokenKind::right_brace))
 						{
-							UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
-							if(!first_pass) member_functions.push_back(std::move(member_function));
+							bool is_function_declaration = IsFunctionDeclaration();
+							if (is_function_declaration)
+							{
+								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
+								if (!first_pass) member_functions.push_back(std::move(member_function));
+							}
+							else
+							{
+								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
+								if (first_pass) for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
+							}
 						}
-						else 
-						{
-							UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
-							if (first_pass) for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
-						}
-					}
-					Expect(TokenKind::semicolon);
-				};
-			ParseClassMembers(true);
-			current_token = start_token;
-			ParseClassMembers(false);
+						Expect(TokenKind::semicolon);
+					};
+
+				TokenPtr start_token = current_token;
+				ParseClassMembers(true);
+				current_token = start_token;
+				ParseClassMembers(false);
+			}
+			sema->ctx.current_class_name = "";
 			sema->ctx.current_base_class = nullptr;
 		}
 		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions), final);

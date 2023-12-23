@@ -14,6 +14,7 @@ namespace ola
 		Field,
 		Function,
 		Method,
+		Constructor,
 		Enum,
 		EnumMember,
 		Alias,
@@ -218,7 +219,7 @@ namespace ola
 	};
 	using MethodAttributes = uint8;
 
-	class MethodDecl final : public FunctionDecl
+	class MethodDecl : public FunctionDecl
 	{
 	public:
 		MethodDecl(std::string_view name, SourceLocation const& loc) : FunctionDecl(DeclKind::Method, name, loc) {}
@@ -244,7 +245,7 @@ namespace ola
 
 		void SetVTableIndex(uint32 i) const { vtable_index = i; }
 		uint32 GetVTableIndex() const { return vtable_index; }
-
+		virtual bool IsConstructor() const { return false; }
 		virtual bool IsMember() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -255,6 +256,23 @@ namespace ola
 		ClassDecl const* parent = nullptr;
 		MethodAttributes method_attrs = MethodAttribute_None;
 		mutable uint32 vtable_index = -1;
+
+	protected:
+		MethodDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : FunctionDecl(kind, name, loc) {}
+
+	};
+
+	class ConstructorDecl final : public MethodDecl
+	{
+	public:
+		ConstructorDecl(std::string_view name, SourceLocation const& loc) : MethodDecl(DeclKind::Constructor, name, loc) {}
+
+		virtual bool IsConstructor() const { return true; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Constructor; }
 	};
 
 	class TagDecl : public Decl

@@ -8,6 +8,7 @@ namespace ola
 	class Decl;
 	class FunctionDecl;
 	class MethodDecl;
+	class ConstructorDecl;
 	class VarDecl;
 	class ParamVarDecl;
 	class FieldDecl;

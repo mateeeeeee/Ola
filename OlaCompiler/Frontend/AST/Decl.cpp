@@ -273,5 +273,15 @@ namespace ola
 		visitor.Visit(*this, 0);
 	}
 
+	void ConstructorDecl::Accept(ASTVisitor& visitor, uint32) const
+	{
+
+	}
+
+	void ConstructorDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+
 }
 

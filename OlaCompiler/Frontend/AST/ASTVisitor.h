@@ -14,6 +14,7 @@ namespace ola
 		virtual void Visit(Decl const&, uint32) {}
 		virtual void Visit(FunctionDecl const&, uint32) {}
 		virtual void Visit(MethodDecl const&, uint32) {}
+		virtual void Visit(ConstructorDecl const&, uint32) {}
 		virtual void Visit(VarDecl const&, uint32) {}
 		virtual void Visit(ParamVarDecl const&, uint32) {}
 		virtual void Visit(FieldDecl const&, uint32) {}

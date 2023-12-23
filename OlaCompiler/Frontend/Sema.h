@@ -38,6 +38,7 @@ namespace ola
 			bool is_method_const = false;
 			class QualType const* current_func = nullptr;
 			ClassDecl const* current_base_class = nullptr;
+			std::string current_class_name;
 			bool return_stmt_encountered = false;
 
 			uint32 stmts_using_break_count = 0; 

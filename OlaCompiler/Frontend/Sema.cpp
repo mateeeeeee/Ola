@@ -123,6 +123,12 @@ namespace ola
 											  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
 											  DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
 	{
+		if (name == ctx.current_class_name)
+		{
+			diagnostics.Report(loc, constructor_return_type_error);
+			return nullptr;
+		}
+
 		bool is_const = HasAttribute(method_attrs, MethodAttribute_Const);
 		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		OLA_ASSERT(func_type);
