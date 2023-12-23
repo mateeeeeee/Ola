@@ -343,5 +343,9 @@ namespace ola
 		OLA_DEBUG("{}SuperExpr {}\n", GetIndentation(depth), super_expr.IsImplicit() ? "(implicit)" : "");
 	}
 
+	void DebugVisitor::Visit(ConstructorExpr const&, uint32 depth)
+	{
+		OLA_DEBUG("{}ConstructorExpr\n", GetIndentation(depth));
+	}
 
 }

@@ -54,6 +54,7 @@ namespace ola
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
 		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(bool first_pass);
+		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(bool first_pass);
 		OLA_NODISCARD UniqueParamVarDeclPtr ParseParamVariableDeclaration();
 		OLA_NODISCARD UniqueVarDeclPtrList ParseVariableDeclaration(DeclVisibility visibility);
 		OLA_NODISCARD UniqueFieldDeclPtrList ParseFieldDeclaration(bool first_pass);

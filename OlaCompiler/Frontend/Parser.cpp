@@ -218,6 +218,55 @@ namespace ola
 		return first_pass ? nullptr : sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
 	}
 
+	UniqueConstructorDeclPtr Parser::ParseConstructorDefinition(bool first_pass)
+	{
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = "";
+		QualType function_type{};
+		UniqueParamVarDeclPtrList param_decls;
+		UniqueCompoundStmtPtr constructor_body;
+		{
+			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			SourceLocation const& loc = current_token->GetLocation();
+			name = current_token->GetData(); ++current_token;
+			Expect(TokenKind::left_round);
+			std::vector<QualType> param_types{};
+			while (!Consume(TokenKind::right_round))
+			{
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				param_types.emplace_back(param_decl->GetType());
+				param_decls.push_back(std::move(param_decl));
+			}
+			function_type.SetType(FuncType(builtin_types::Void, param_types));
+			if (first_pass)
+			{
+				if (Consume(TokenKind::semicolon)) return nullptr;
+
+				int32 brace_count = 0;
+				Expect(TokenKind::left_brace); ++brace_count;
+				while (brace_count != 0)
+				{
+					if (Consume(TokenKind::left_brace))  ++brace_count;
+					else if (Consume(TokenKind::right_brace)) --brace_count;
+					else current_token++;
+				}
+			}
+			else
+			{
+				if (!Consume(TokenKind::semicolon))
+				{
+					sema->ctx.current_func = &function_type;
+					constructor_body = ParseCompoundStatement();
+					sema->ctx.current_func = nullptr;
+				}
+			}
+		}
+		return first_pass ? nullptr : sema->ActOnConstructorDecl(name, loc, function_type, std::move(param_decls), std::move(constructor_body));
+	}
+
 	UniqueParamVarDeclPtr Parser::ParseParamVariableDeclaration()
 	{
 		QualType variable_type{};
@@ -253,6 +302,21 @@ namespace ola
 			{
 				if (current_token->Is(TokenKind::left_brace)) init_expr = ParseInitializerListExpression();
 				else init_expr = ParseAssignmentExpression();
+			}
+			else if (Consume(TokenKind::left_round))
+			{
+				UniqueExprPtrList args;
+				if (!Consume(TokenKind::right_round))
+				{
+					while (true)
+					{
+						UniqueExprPtr arg_expr = ParseAssignmentExpression();
+						args.push_back(std::move(arg_expr));
+						if (Consume(TokenKind::right_round)) break;
+						Expect(TokenKind::comma);
+					}
+				}
+				init_expr = sema->ActOnConstructorExpr(loc, variable_type, std::move(args));
 			}
 
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
@@ -422,6 +486,13 @@ namespace ola
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
+							if (current_token->Is(TokenKind::identifier))
+							{
+								UniqueConstructorDeclPtr constructor = ParseConstructorDefinition(first_pass);
+								if (!first_pass) member_functions.push_back(std::move(constructor));
+								continue;
+							}
+
 							bool is_function_declaration = IsFunctionDeclaration();
 							if (is_function_declaration)
 							{

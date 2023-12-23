@@ -67,6 +67,8 @@ namespace ola
 		UniqueMethodDeclPtr ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs);
+		UniqueConstructorDeclPtr ActOnConstructorDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
+													  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
@@ -111,6 +113,7 @@ namespace ola
 		UniqueMethodCallExprPtr ActOnMethodCall(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueIdentifierExprPtr&& method_name, UniqueExprPtrList&& args);
 		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, bool implicit);
 		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, bool implicit);
+		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
 
 	private:
 		Diagnostics& diagnostics;

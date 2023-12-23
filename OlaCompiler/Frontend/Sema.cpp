@@ -7,8 +7,8 @@ namespace ola
 	Sema::Sema(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
-	UniqueVarDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
-												  UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	UniqueVarDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
+		UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		return ActOnVariableDeclCommon<VarDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
@@ -69,8 +69,8 @@ namespace ola
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
-												  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-												  DeclVisibility visibility, FuncAttributes attributes)
+		UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
+		DeclVisibility visibility, FuncAttributes attributes)
 	{
 		FuncType const* func_type = dyn_type_cast<FuncType>(type);
 		OLA_ASSERT(func_type);
@@ -119,9 +119,9 @@ namespace ola
 		return function_decl;
 	}
 
-	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
-											  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt, 
-											  DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
+	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
+		UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
+		DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
 	{
 		if (name == ctx.current_class_name)
 		{
@@ -169,14 +169,14 @@ namespace ola
 				return nullptr;
 			}
 		}
-		
+
 		UniqueMethodDeclPtr member_function_decl = MakeUnique<MethodDecl>(name, loc);
 		member_function_decl->SetType(type);
 		member_function_decl->SetVisibility(visibility);
 		member_function_decl->SetFuncAttributes(func_attrs);
 		member_function_decl->SetMethodAttributes(method_attrs);
 		member_function_decl->SetParamDecls(std::move(param_decls));
-		if(body_stmt)
+		if (body_stmt)
 		{
 			member_function_decl->SetBodyStmt(std::move(body_stmt));
 			for (std::string const& goto_label : ctx.gotos)
@@ -202,6 +202,40 @@ namespace ola
 		return member_function_decl;
 	}
 
+	UniqueConstructorDeclPtr Sema::ActOnConstructorDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt)
+	{
+		if (name != ctx.current_class_name)
+		{
+			diagnostics.Report(loc, missing_method_return_type_error);
+			return nullptr;
+		}
+
+		FuncType const* func_type = dyn_type_cast<FuncType>(type);
+		OLA_ASSERT(func_type);
+
+		UniqueConstructorDeclPtr constructor_decl = MakeUnique<ConstructorDecl>(name, loc);
+		constructor_decl->SetType(type);
+		constructor_decl->SetVisibility(DeclVisibility::Public);
+		constructor_decl->SetParamDecls(std::move(param_decls));
+		if (body_stmt)
+		{
+			constructor_decl->SetBodyStmt(std::move(body_stmt));
+			for (std::string const& goto_label : ctx.gotos)
+			{
+				if (!ctx.labels.contains(goto_label))
+				{
+					diagnostics.Report(loc, undeclared_label, goto_label);
+					return nullptr;
+				}
+			}
+			ctx.gotos.clear();
+			ctx.labels.clear();
+		}
+
+		bool result = ctx.decl_sym_table.Insert_Overload(constructor_decl.get());
+		return constructor_decl;
+	}
+
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
 	{
 		if (!name.empty() && ctx.tag_sym_table.LookUpCurrentScope(name))
@@ -217,7 +251,7 @@ namespace ola
 
 	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr)
 	{
-		if (!enum_value_expr->IsConstexpr()) 
+		if (!enum_value_expr->IsConstexpr())
 		{
 			diagnostics.Report(loc, enumerator_value_not_constexpr, name);
 			return nullptr;
@@ -371,13 +405,13 @@ namespace ola
 	}
 
 	UniqueBreakStmtPtr Sema::ActOnBreakStmt(SourceLocation const& loc)
-	{	
+	{
 		if (ctx.stmts_using_break_count == 0)
 		{
 			diagnostics.Report(loc, stray_break);
 			return nullptr;
 		}
-		
+
 		UniqueBreakStmtPtr break_stmt = MakeUnique<BreakStmt>();
 		return break_stmt;
 	}
@@ -417,7 +451,7 @@ namespace ola
 		static uint64 foreach_id = 0;
 		std::string foreach_index_name = "__foreach_index" + std::to_string(foreach_id++);
 		UniqueVarDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, builtin_types::Int, ActOnConstantInt(0, loc), DeclVisibility::None);
-		
+
 		UniqueIdentifierExprPtr foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
 		UniqueExprPtr cond_expr = ActOnBinaryExpr(BinaryExprKind::Less, loc, std::move(foreach_index_identifier), ActOnConstantInt(array_type->GetArraySize(), loc));
 		foreach_index_identifier = MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc);
@@ -786,7 +820,7 @@ namespace ola
 			diagnostics.Report(loc, used_nonboolean_type);
 			return nullptr;
 		}
-		else if(!cond_expr->GetType()->IsSameAs(builtin_types::Bool))
+		else if (!cond_expr->GetType()->IsSameAs(builtin_types::Bool))
 		{
 			cond_expr = ActOnImplicitCastExpr(loc, builtin_types::Bool, std::move(cond_expr));
 		}
@@ -808,12 +842,11 @@ namespace ola
 		if (isa<IdentifierExpr>(func_expr.get()))
 		{
 			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
-			std::vector<Decl*>& possible_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
+			std::vector<Decl*>& candidate_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
 
-			std::vector<FunctionDecl*> best_match_decls{};
-			std::vector<FuncType const*> match_func_types{};
+			std::vector<FunctionDecl*> match_decls{};
 			uint32 match_conversions_needed = UINT32_MAX;
-			for (Decl* decl : possible_decls)
+			for (Decl* decl : candidate_decls)
 			{
 				if (isoneof<FunctionDecl, MethodDecl>(decl))
 				{
@@ -833,7 +866,7 @@ namespace ola
 							incompatible_arg = true;
 							break;
 						}
-						if (!func_param_type->IsAssignableFrom(arg->GetType())) 
+						if (!func_param_type->IsAssignableFrom(arg->GetType()))
 						{
 							incompatible_arg = true;
 							break;
@@ -854,35 +887,32 @@ namespace ola
 
 					if (match_conversions_needed == current_conversions_needed)
 					{
-						best_match_decls.push_back(func_decl);
-						match_func_types.push_back(&func_type);
+						match_decls.push_back(func_decl);
 					}
 					else if (current_conversions_needed < match_conversions_needed)
 					{
 						match_conversions_needed = current_conversions_needed;
-						best_match_decls.clear();
-						match_func_types.clear();
-						best_match_decls.push_back(func_decl);
-						match_func_types.push_back(&func_type);
+						match_decls.clear();
+						match_decls.push_back(func_decl);
 					}
 				}
 			}
 
-			if (best_match_decls.empty())
+			if (match_decls.empty())
 			{
 				diagnostics.Report(loc, matching_function_not_found);
 				return nullptr;
 			}
-			if (best_match_decls.size() > 1)
+			if (match_decls.size() > 1)
 			{
 				diagnostics.Report(loc, matching_function_ambiguous);
 				return nullptr;
 			}
 
-			FunctionDecl* match_decl = best_match_decls[0];
-			FuncType const* match_func_type = match_func_types[0];
+			FunctionDecl* match_decl = match_decls[0];
+			FuncType const& match_func_type = match_decl->GetFuncType();
 
-			std::span<QualType const> param_types = match_func_type->GetParams();
+			std::span<QualType const> param_types = match_func_type.GetParams();
 			for (uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
@@ -898,19 +928,19 @@ namespace ola
 				UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
 				member_expr->SetClassExpr(ActOnThisExpr(loc, true));
 				member_expr->SetMemberDecl(cast<MethodDecl>(match_decl));
-				member_expr->SetType(*match_func_type);
+				member_expr->SetType(match_func_type);
 
 				UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, cast<MethodDecl>(match_decl));
-				method_call_expr->SetType(match_func_type->GetReturnType());
+				method_call_expr->SetType(match_func_type.GetReturnType());
 				method_call_expr->SetArgs(std::move(args));
 				method_call_expr->SetCallee(std::move(member_expr));
 				if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
 				return method_call_expr;
-			}	
+			}
 			else
 			{
 				UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, match_decl);
-				func_call_expr->SetType(match_func_type->GetReturnType());
+				func_call_expr->SetType(match_func_type.GetReturnType());
 				func_call_expr->SetArgs(std::move(args));
 				func_call_expr->SetCallee(MakeUnique<DeclRefExpr>(match_decl, loc));
 				if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
@@ -1010,7 +1040,7 @@ namespace ola
 			{
 				QualType const& class_expr_type = current_class_expr->GetType();
 				ClassType const* class_type = nullptr;
-				if (isa<ClassType>(class_expr_type)) 
+				if (isa<ClassType>(class_expr_type))
 				{
 					class_type = &type_cast<ClassType>(class_expr_type);
 				}
@@ -1032,7 +1062,7 @@ namespace ola
 				if (overloaded_symbol)
 				{
 					std::vector<MethodDecl const*> method_decls = class_decl->FindMethodDecls(name);
-					if(!method_decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+					if (!method_decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
 				}
 				else
 				{
@@ -1048,7 +1078,7 @@ namespace ola
 				if (overloaded_symbol)
 				{
 					std::vector<Decl*> decls = ctx.decl_sym_table.LookUpMember_Overload(name);
-					if(!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+					if (!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
 				}
 				else
 				{
@@ -1160,7 +1190,7 @@ namespace ola
 			diagnostics.Report(loc, private_member_access);
 			return nullptr;
 		}
-		
+
 		bool const class_type_is_const = class_expr->GetType().IsConst();
 		QualType expr_type = field_name->GetType();
 		if (class_type_is_const) expr_type.AddConst();
@@ -1201,11 +1231,10 @@ namespace ola
 		}
 		OLA_ASSERT(class_decl);
 
-		std::vector<MethodDecl const*> possible_decls = class_decl->FindMethodDecls(member_identifier->GetName());
-		std::vector<MethodDecl const*> best_match_decls{};
-		std::vector<FuncType const*> match_func_types{};
+		std::vector<MethodDecl const*> candidate_decls = class_decl->FindMethodDecls(member_identifier->GetName());
+		std::vector<MethodDecl const*> match_decls{};
 		uint32 match_conversions_needed = UINT32_MAX;
-		for (MethodDecl const* method_decl : possible_decls)
+		for (MethodDecl const* method_decl : candidate_decls)
 		{
 			FuncType const& func_type = method_decl->GetFuncType();
 			std::span<QualType const> param_types = func_type.GetParams();
@@ -1243,40 +1272,36 @@ namespace ola
 
 			if (match_conversions_needed == current_conversions_needed)
 			{
-				best_match_decls.push_back(method_decl);
-				match_func_types.push_back(&func_type);
+				match_decls.push_back(method_decl);
 			}
 			else if (current_conversions_needed < match_conversions_needed)
 			{
 				match_conversions_needed = current_conversions_needed;
-				best_match_decls.clear();
-				match_func_types.clear();
-				best_match_decls.push_back(method_decl);
-				match_func_types.push_back(&func_type);
+				match_decls.clear();
+				match_decls.push_back(method_decl);
 			}
 		}
 
-		if (best_match_decls.empty())
+		if (match_decls.empty())
 		{
 			diagnostics.Report(loc, matching_function_not_found);
 			return nullptr;
 		}
-		if (best_match_decls.size() > 1)
+		if (match_decls.size() > 1)
 		{
 			diagnostics.Report(loc, matching_function_ambiguous);
 			return nullptr;
 		}
 
-		MethodDecl const* match_decl = best_match_decls[0];
-		FuncType const* match_func_type = match_func_types[0];
-
+		MethodDecl const* match_decl = match_decls[0];
+		FuncType const& match_decl_type = match_decl->GetFuncType();
 		if (!isoneof<ThisExpr, SuperExpr>(class_expr.get()) && match_decl->IsPrivate())
 		{
 			diagnostics.Report(loc, private_member_access);
 			return nullptr;
 		}
 
-		std::span<QualType const> param_types = match_func_type->GetParams();
+		std::span<QualType const> param_types = match_decl_type.GetParams();
 		for (uint64 i = 0; i < param_types.size(); ++i)
 		{
 			UniqueExprPtr& arg = args[i];
@@ -1297,35 +1322,13 @@ namespace ola
 			}
 		}
 
-		for (uint64 i = 0; i < param_types.size(); ++i)
-		{
-			UniqueExprPtr& arg = args[i];
-			QualType const& func_param_type = param_types[i];
-
-			if (isa<RefType>(func_param_type) && !arg->IsLValue())
-			{
-				diagnostics.Report(loc, ref_var_rvalue_bind);
-				return nullptr;
-			}
-
-			if (!func_param_type->IsAssignableFrom(arg->GetType()))
-			{
-				diagnostics.Report(loc, incompatible_function_argument);
-				return nullptr;
-			}
-			else if (!func_param_type->IsSameAs(arg->GetType()))
-			{
-				arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
-			}
-		}
-
 		UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
 		member_expr->SetClassExpr(std::move(class_expr));
 		member_expr->SetMemberDecl(match_decl);
-		member_expr->SetType(*match_func_type);
+		member_expr->SetType(match_decl_type);
 
 		UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, match_decl);
-		method_call_expr->SetType(match_func_type->GetReturnType());
+		method_call_expr->SetType(match_decl_type.GetReturnType());
 		method_call_expr->SetArgs(std::move(args));
 		method_call_expr->SetCallee(std::move(member_expr));
 		if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
@@ -1353,6 +1356,93 @@ namespace ola
 		QualType super_type(ClassType(ctx.current_base_class), ctx.is_method_const ? Qualifier_Const : Qualifier_None);
 		super_expr->SetType(super_type);
 		return super_expr;
+	}
+
+	UniqueConstructorExprPtr Sema::ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args)
+	{
+		if (!isa<ClassType>(type))
+		{
+			diagnostics.Report(loc, ctor_init_on_non_class_variable);
+			return nullptr;
+		}
+		ClassDecl const* class_decl = type_cast<ClassType>(type).GetClassDecl();
+		std::vector<ConstructorDecl const*> candidate_ctors = class_decl->FindConstructors();
+		std::vector<ConstructorDecl const*> match_ctors{};
+		uint32 match_conversions_needed = UINT32_MAX;
+
+		for (ConstructorDecl const* ctor : candidate_ctors)
+		{
+			FuncType const& func_type = ctor->GetFuncType();
+			std::span<QualType const> param_types = func_type.GetParams();
+			if (args.size() != param_types.size()) continue;
+
+			bool incompatible_arg = false;
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (isa<RefType>(func_param_type) && !arg->IsLValue())
+				{
+					incompatible_arg = true;
+					break;
+				}
+				if (!func_param_type->IsAssignableFrom(arg->GetType()))
+				{
+					incompatible_arg = true;
+					break;
+				}
+			}
+			if (incompatible_arg) continue;
+
+			uint32 current_conversions_needed = 0;
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (!func_param_type->IsSameAs(arg->GetType()))
+				{
+					++current_conversions_needed;
+				}
+			}
+			if (match_conversions_needed == current_conversions_needed)
+			{
+				match_ctors.push_back(ctor);
+			}
+			else if (current_conversions_needed < match_conversions_needed)
+			{
+				match_conversions_needed = current_conversions_needed;
+				match_ctors.clear();
+				match_ctors.push_back(ctor);
+			}
+		}
+
+		if (match_ctors.empty())
+		{
+			diagnostics.Report(loc, matching_ctor_not_found);
+			return nullptr;
+		}
+		if (match_ctors.size() > 1)
+		{
+			diagnostics.Report(loc, matching_ctor_ambiguous);
+			return nullptr;
+		}
+
+		ConstructorDecl const* match_ctor = match_ctors[0];
+		std::span<QualType const> param_types = match_ctor->GetFuncType().GetParams();
+		for (uint64 i = 0; i < param_types.size(); ++i)
+		{
+			UniqueExprPtr& arg = args[i];
+			QualType const& func_param_type = param_types[i];
+			if (!func_param_type->IsSameAs(arg->GetType()))
+			{
+				arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+			}
+		}
+
+		UniqueConstructorExprPtr ctor_expr = MakeUnique<ConstructorExpr>(loc, match_ctor);
+		ctor_expr->SetType(type);
+		ctor_expr->SetArgs(std::move(args));
+		return ctor_expr;
 	}
 
 	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)
@@ -1510,7 +1600,7 @@ namespace ola
 		else if ((has_init && !has_type_specifier))
 		{
 			QualType var_type(init_expr->GetType());
-			if (is_ref_type) var_type = RefType(var_type);	
+			if (is_ref_type) var_type = RefType(var_type);
 			if (type.IsConst()) var_type.AddConst();
 			var_decl->SetType(var_type);
 		}

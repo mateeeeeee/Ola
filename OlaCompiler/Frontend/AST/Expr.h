@@ -21,6 +21,7 @@ namespace ola
 		DeclRef,
 		ImplicitCast,
 		InitializerList,
+		Ctor,
 		ArrayAccess,
 		Member,
 		MemberCall,
@@ -509,6 +510,27 @@ namespace ola
 		bool implicit = false;
 	};
 
+	class ConstructorExpr final : public Expr
+	{
+	public:
+		ConstructorExpr(SourceLocation const& loc, ConstructorDecl const* ctor_decl) : Expr(ExprKind::Ctor, loc), ctor_decl(ctor_decl) {}
+
+		void SetArgs(UniqueExprPtrList&& args)
+		{
+			ctor_args = std::move(args);
+		}
+		UniqueExprPtrList const& GetArgs() const { return ctor_args; }
+
+		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Ctor; }
+
+	private:
+		ConstructorDecl const* ctor_decl;
+		UniqueExprPtrList ctor_args;
+
+	};
 
 	template <typename T> requires std::derived_from<T, Expr>
 	inline bool isa(Expr const* expr) { return T::ClassOf(expr); }

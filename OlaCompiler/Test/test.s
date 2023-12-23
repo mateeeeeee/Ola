@@ -7,26 +7,6 @@
 .set @feat.00, 0
 	.intel_syntax noprefix
 	.file	"test.ola"
-	.def	"D::D__I";
-	.scl	2;
-	.type	32;
-	.endef
-	.globl	"D::D__I"                       # -- Begin function D::D__I
-	.p2align	4, 0x90
-"D::D__I":                              # @"D::D__I"
-.seh_proc "D::D__I"
-# %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
-	.seh_endprologue
-	mov	qword ptr [rsp], rdx
-	mov	rax, qword ptr [rsp]
-	mov	qword ptr [rcx], rax
-# %bb.1:                                # %exit
-	pop	rax
-	ret
-	.seh_endproc
-                                        # -- End function
 	.def	"D::X";
 	.scl	2;
 	.type	32;
@@ -61,9 +41,6 @@ main:                                   # @main
 	.seh_endprologue
 	mov	qword ptr [rsp + 40], 0
 	lea	rcx, [rsp + 40]
-	mov	edx, 5
-	call	"D::D__I"
-	lea	rcx, [rsp + 40]
 	call	"D::X"
 	mov	qword ptr [rsp + 48], rax
 # %bb.1:                                # %exit
@@ -73,5 +50,4 @@ main:                                   # @main
 	.seh_endproc
                                         # -- End function
 	.addrsig
-	.addrsig_sym "D::D__I"
 	.addrsig_sym "D::X"

@@ -89,4 +89,8 @@ DIAG(variable_type_abstract, error, "variable type '{}' is an abstract class")
 DIAG(base_final_error, error, "base '{}' is marked 'final'")
 DIAG(cannot_override_final_function, error, "declaration of '{}' overrides a 'final' function")
 DIAG(constructor_return_type_error, error, "Constructor cannot have a return type")
+DIAG(missing_method_return_type_error, error, "Missing return type specifier for a method declaration")
+DIAG(ctor_init_on_non_class_variable, error, "Ctor initialization on non-class variable")
+DIAG(matching_ctor_not_found, error, "Matching constructor not found")
+DIAG(matching_ctor_ambiguous, error, "Matching constructor ambiguous")
 #undef DIAG

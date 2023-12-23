@@ -7,21 +7,6 @@ declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
 
-define void @"D::D__I"(ptr %this, i64 %x) {
-entry:
-  %0 = alloca i64, align 8
-  store i64 %x, ptr %0, align 4
-  %1 = getelementptr inbounds %D, ptr %this, i32 0, i32 0
-  %2 = load i64, ptr %1, align 4
-  %3 = load i64, ptr %0, align 4
-  %4 = load ptr, ptr %0, align 8
-  store ptr %4, ptr %1, align 8
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
-}
-
 define i64 @"D::X"(ptr %this) {
 entry:
   %0 = alloca i64, align 8
@@ -45,7 +30,6 @@ entry:
   %1 = alloca %D, align 8
   %2 = getelementptr inbounds %D, ptr %1, i32 0, i32 0
   store i64 0, ptr %2, align 4
-  call void @"D::D__I"(ptr %1, i64 5)
   %3 = call i64 @"D::X"(ptr %1)
   store i64 %3, ptr %0, align 4
   br label %exit

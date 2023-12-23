@@ -60,5 +60,6 @@ namespace ola
 		virtual void Visit(MethodCallExpr const&, uint32) {}
 		virtual void Visit(ThisExpr const&, uint32) {}
 		virtual void Visit(SuperExpr const&, uint32) {}
+		virtual void Visit(ConstructorExpr const&, uint32) {}
 	};
 }

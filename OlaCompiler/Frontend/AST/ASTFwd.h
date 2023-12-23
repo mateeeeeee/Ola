@@ -54,6 +54,7 @@ namespace ola
 	class MethodCallExpr;
 	class ThisExpr;
 	class SuperExpr;
+	class ConstructorExpr;
 
 	struct AST;
 }

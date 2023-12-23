@@ -2,18 +2,16 @@ import std.Assert;
 
 class D
 {
-	public void D(int x)
+	D(int x)
 	{
 		this.x = x;
 	}
 	public int X() const {return x;}
-
-	private int x;
+	private int x = 0;
 };
 
 public int main() 
 {
-   D d; d.D(5);
-
+   D d(5);
    return d.X();
 }

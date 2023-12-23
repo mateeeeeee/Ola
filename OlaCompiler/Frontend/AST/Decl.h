@@ -360,30 +360,10 @@ namespace ola
 		}
 		ClassDecl const* GetBaseClass() const { return base_class; }
 
-		std::vector<MethodDecl const*> FindMethodDecls(std::string_view name) const
-		{
-			std::vector<MethodDecl const*> found_decls;
-			for (uint32 i = 0; i < methods.size(); ++i)
-			{
-				if (methods[i]->GetName().compare(name) == 0)
-				{
-					found_decls.push_back(methods[i].get());
-				}
-			}
-			if (found_decls.empty()) return base_class ? base_class->FindMethodDecls(name) : std::vector<MethodDecl const*>{};
-			else return found_decls;
-		}
-		FieldDecl* FindFieldDecl(std::string_view name) const
-		{
-			for (uint32 i = 0; i < fields.size(); ++i)
-			{
-				if (fields[i]->GetName().compare(name) == 0)
-				{
-					return fields[i].get();
-				}
-			}
-			return base_class ? base_class->FindFieldDecl(name) : nullptr;
-		}
+		std::vector<ConstructorDecl const*> FindConstructors() const;
+		std::vector<MethodDecl const*> FindMethodDecls(std::string_view name) const;
+		FieldDecl* FindFieldDecl(std::string_view name) const;
+
 		uint64 GetFieldCount() const
 		{
 			return base_class ? base_class->GetFieldCount() + fields.size() : fields.size();

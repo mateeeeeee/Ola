@@ -104,7 +104,6 @@ namespace ola
 		visitor.Visit(*this, depth);
 		class_expr->Accept(visitor, depth + 1);
 	}
-
 	void MethodCallExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -118,6 +117,11 @@ namespace ola
 	void SuperExpr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
+	}
+	void ConstructorExpr::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto const& arg : ctor_args) arg->Accept(visitor, depth + 1);
 	}
 
 	void Expr::Accept(ASTVisitor& visitor) const
@@ -201,4 +205,9 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
+	void ConstructorExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+
 }

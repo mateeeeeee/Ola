@@ -64,6 +64,43 @@ namespace ola
 			method->Accept(this_visitor, 0);
 		}
 	}
+	std::vector<ConstructorDecl const*> ClassDecl::FindConstructors() const
+	{
+		std::vector<ConstructorDecl const*> found_decls;
+		for (uint32 i = 0; i < methods.size(); ++i)
+		{
+			if (methods[i]->IsConstructor())
+			{
+				found_decls.push_back(cast<ConstructorDecl>(methods[i].get()));
+			}
+		}
+		return found_decls;
+	}
+	std::vector<MethodDecl const*> ClassDecl::FindMethodDecls(std::string_view name) const
+	{
+		std::vector<MethodDecl const*> found_decls;
+		for (uint32 i = 0; i < methods.size(); ++i)
+		{
+			if (methods[i]->GetName().compare(name) == 0)
+			{
+				found_decls.push_back(methods[i].get());
+			}
+		}
+		if (found_decls.empty()) return base_class ? base_class->FindMethodDecls(name) : std::vector<MethodDecl const*>{};
+		else return found_decls;
+	}
+	FieldDecl* ClassDecl::FindFieldDecl(std::string_view name) const
+	{
+		for (uint32 i = 0; i < fields.size(); ++i)
+		{
+			if (fields[i]->GetName().compare(name) == 0)
+			{
+				return fields[i].get();
+			}
+		}
+		return base_class ? base_class->FindFieldDecl(name) : nullptr;
+	}
+
 	BuildVTableResult ClassDecl::BuildVTable(MethodDecl const*& error_decl)
 	{
 		polymorphic = IsPolymorphicImpl();
@@ -137,25 +174,6 @@ namespace ola
 		for (auto const& method : methods) if (method->IsVirtual()) return true;
 		return base_class ? base_class->IsPolymorphic() : false;
 	}
-
-	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		OLA_ASSERT(false);
-	}
-	void VarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-		if (init_expr) init_expr->Accept(visitor, depth + 1);
-	}
-	void ParamVarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-	}
-	void FieldDecl::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-	}
-
 	std::string FunctionDecl::GetTypeMangledName(QualType const& type)
 	{
 		std::string type_mangled_name;
@@ -200,6 +218,23 @@ namespace ola
 		return mangled_name;
 	}
 
+	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		OLA_ASSERT(false);
+	}
+	void VarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		if (init_expr) init_expr->Accept(visitor, depth + 1);
+	}
+	void ParamVarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void FieldDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 	void FunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
@@ -230,6 +265,12 @@ namespace ola
 		visitor.Visit(*this, depth);
 		for (auto const& field : fields) field->Accept(visitor, depth + 1);
 		for (auto const& method : methods) method->Accept(visitor, depth + 1);
+	}
+	void ConstructorDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
+		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
 
 	void Decl::Accept(ASTVisitor& visitor) const
@@ -272,12 +313,6 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
-
-	void ConstructorDecl::Accept(ASTVisitor& visitor, uint32) const
-	{
-
-	}
-
 	void ConstructorDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
