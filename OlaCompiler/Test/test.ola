@@ -6,6 +6,10 @@ class D
 	{
 		this.x = x;
 	}
+	D(int x, int y)
+	{
+		this.x = x * y;
+	}
 	public int X() const {return x;}
 	private int x = 0;
 };
@@ -13,5 +17,6 @@ class D
 public int main() 
 {
    D d(5);
-   return d.X();
+   D d2(2,3);
+   return d2.X();
 }

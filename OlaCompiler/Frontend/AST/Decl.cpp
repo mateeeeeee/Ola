@@ -313,10 +313,6 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
-	void ConstructorDecl::Accept(ASTVisitor& visitor) const
-	{
-		visitor.Visit(*this, 0);
-	}
 
 }
 

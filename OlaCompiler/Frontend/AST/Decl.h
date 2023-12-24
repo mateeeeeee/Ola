@@ -270,7 +270,6 @@ namespace ola
 		virtual bool IsConstructor() const { return true; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
-		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Constructor; }
 	};

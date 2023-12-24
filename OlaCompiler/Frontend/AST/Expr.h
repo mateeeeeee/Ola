@@ -520,6 +520,7 @@ namespace ola
 			ctor_args = std::move(args);
 		}
 		UniqueExprPtrList const& GetArgs() const { return ctor_args; }
+		ConstructorDecl const* GetCtorDecl() const { return ctor_decl; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;

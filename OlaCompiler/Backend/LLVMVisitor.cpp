@@ -208,7 +208,7 @@ namespace ola
 		}
 		else
 		{
-			if (Expr const* init_expr = var_decl.GetInitExpr())
+			if (Expr const* init_expr = var_decl.GetInitExpr(); init_expr && !isa<ConstructorExpr>(init_expr))
 			{
 				init_expr->Accept(*this);
 				if (is_array)
@@ -348,6 +348,27 @@ namespace ola
 					{
 						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, is_polymorphic + field->GetFieldIndex());
 						Store(value_map[field.get()], field_ptr);
+					}
+
+					if (init_expr && isa<ConstructorExpr>(init_expr))
+					{
+						ConstructorExpr const* ctor_expr = cast<ConstructorExpr>(init_expr);
+						std::string name(class_decl->GetName());
+						name += "::";
+						name += ctor_expr->GetCtorDecl()->GetMangledName();
+						llvm::Function* called_ctor = module.getFunction(name);
+
+						std::vector<llvm::Value*> args;
+						uint32 arg_index = 0;
+						args.push_back(struct_alloc);
+						for (auto const& arg_expr : ctor_expr->GetArgs())
+						{
+							arg_expr->Accept(*this);
+							llvm::Value* arg_value = value_map[arg_expr.get()];
+							OLA_ASSERT(arg_value);
+							args.push_back(Load(called_ctor->getArg(arg_index++)->getType(), arg_value));
+						}
+						llvm::Value* call_result = builder.CreateCall(called_ctor, args);
 					}
 				}
 				else
