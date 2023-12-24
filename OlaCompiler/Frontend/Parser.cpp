@@ -259,7 +259,9 @@ namespace ola
 				if (!Consume(TokenKind::semicolon))
 				{
 					sema->ctx.current_func = &function_type;
+					sema->ctx.is_constructor = true;
 					constructor_body = ParseCompoundStatement();
+					sema->ctx.is_constructor = false;
 					sema->ctx.current_func = nullptr;
 				}
 			}

@@ -952,6 +952,25 @@ namespace ola
 				return func_call_expr;
 			}
 		}
+		else if (isa<ThisExpr>(func_expr.get()))
+		{
+
+		}
+		else if (isa<SuperExpr>(func_expr.get()))
+		{
+			if (!ctx.is_constructor)
+			{
+				diagnostics.Report(loc, base_ctor_call_outside_ctor);
+				return nullptr;
+			}
+			if (!ctx.current_base_class)
+			{
+				diagnostics.Report(loc, base_ctor_call_without_base_class);
+				return nullptr;
+			}
+
+			ctx.current_base_class->FindConstructors();
+		}
 		diagnostics.Report(loc, invalid_function_call);
 		return nullptr;
 	}
@@ -1465,8 +1484,8 @@ namespace ola
 		return cast_expr;
 	}
 
-	template<typename Decl> requires std::is_base_of_v<VarDecl, Decl>
-	UniquePtr<Decl> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	template<typename DeclType> requires std::is_base_of_v<VarDecl, DeclType>
+	UniquePtr<DeclType> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
 		bool const has_init = (init_expr != nullptr);
 		bool has_type_specifier = !type.IsNull();
@@ -1514,7 +1533,7 @@ namespace ola
 			return nullptr;
 		}
 
-		UniquePtr<Decl> var_decl = MakeUnique<Decl>(name, loc);
+		UniquePtr<DeclType> var_decl = MakeUnique<DeclType>(name, loc);
 		var_decl->SetGlobal(ctx.decl_sym_table.IsGlobal());
 		var_decl->SetVisibility(visibility);
 		OLA_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
@@ -1646,6 +1665,60 @@ namespace ola
 
 		ctx.decl_sym_table.Insert(var_decl.get());
 		return var_decl;
+	}
+
+
+	template<typename DeclType> requires std::is_base_of_v<ola::FunctionDecl, DeclType>
+	std::vector<DeclType const*> Sema::ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList&& args)
+	{
+		std::vector<DeclType const*> match_decls{};
+		uint32 match_conversions_needed = UINT32_MAX;
+		for (DeclType const* decl : candidate_decls)
+		{
+			FuncType const& func_type = decl->GetFuncType();
+			std::span<QualType const> param_types = func_type.GetParams();
+			if (args.size() != param_types.size()) continue;
+
+			bool incompatible_arg = false;
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (isa<RefType>(func_param_type) && !arg->IsLValue())
+				{
+					incompatible_arg = true;
+					break;
+				}
+				if (!func_param_type->IsAssignableFrom(arg->GetType()))
+				{
+					incompatible_arg = true;
+					break;
+				}
+			}
+			if (incompatible_arg) continue;
+
+			uint32 current_conversions_needed = 0;
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (!func_param_type->IsSameAs(arg->GetType()))
+				{
+					++current_conversions_needed;
+				}
+			}
+			if (match_conversions_needed == current_conversions_needed)
+			{
+				match_decls.push_back(decl);
+			}
+			else if (current_conversions_needed < match_conversions_needed)
+			{
+				match_conversions_needed = current_conversions_needed;
+				match_decls.clear();
+				match_decls.push_back(decl);
+			}
+		}
+		return match_decls;
 	}
 }
 

@@ -1,16 +1,31 @@
 import std.Assert;
 
-class D
+class B
 {
-	D(int x)
+	B(int x)
 	{
 		this.x = x;
 	}
-	D(int x, int y)
+	B(int x, int y)
 	{
 		this.x = x * y;
 	}
 	public int x = 0;
+};
+
+class D : B
+{
+	D(int x)
+	{
+		super(x);
+		this.y = x;
+	}
+	D(int x, int y)
+	{
+		super(x,y);
+		this.y = x * y;
+	}
+	public int y = 0;
 };
 
 
@@ -18,8 +33,8 @@ public int main()
 {
    D d1(5);
    D d2(2,3);
-   Assert(d1.x == 5);
-   Assert(d2.x == 6);
+   Assert(d1.y == 5);
+   Assert(d2.y == 6);
 
    return 0;
 }

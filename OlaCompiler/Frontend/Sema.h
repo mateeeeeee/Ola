@@ -36,9 +36,11 @@ namespace ola
 
 			std::vector<Expr const*> current_class_expr_stack;
 			bool is_method_const = false;
-			class QualType const* current_func = nullptr;
+			bool is_constructor = false;
 			ClassDecl const* current_base_class = nullptr;
 			std::string current_class_name;
+
+			class QualType const* current_func  = nullptr;
 			bool return_stmt_encountered = false;
 
 			uint32 stmts_using_break_count = 0; 
@@ -122,8 +124,12 @@ namespace ola
 	private:
 		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
 
-		template<typename Decl> requires std::is_base_of_v<VarDecl, Decl>
-		UniquePtr<Decl> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		template<typename DeclType> requires std::is_base_of_v<VarDecl, DeclType>
+		UniquePtr<DeclType> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+
+		template<typename DeclType> requires std::is_base_of_v<FunctionDecl, DeclType>
+		std::vector<DeclType const*> ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList&& args);
 	};
+
 
 }
