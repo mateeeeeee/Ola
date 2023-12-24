@@ -143,6 +143,11 @@ TEST(Classes, Polymorphism)
 	EXPECT_EQ(OLA(-i test_polymorphism), 0);
 }
 
+TEST(Classes, Constructors)
+{
+	EXPECT_EQ(OLA(-i test_constructors), 0);
+}
+
 
 
 

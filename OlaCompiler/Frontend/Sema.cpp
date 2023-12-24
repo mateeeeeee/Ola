@@ -143,6 +143,11 @@ namespace ola
 			diagnostics.Report(loc, incompatible_function_attributes);
 			return nullptr;
 		}
+		if (HasAttribute(func_attrs, FuncAttribute_NoMangling))
+		{
+			diagnostics.Report(loc, method_cannot_be_nomangling);
+			return nullptr;
+		}
 		if (HasAttribute(method_attrs, MethodAttribute_Final))
 		{
 			if (!HasAttribute(method_attrs, MethodAttribute_Virtual))
