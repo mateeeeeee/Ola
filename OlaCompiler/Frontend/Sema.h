@@ -128,7 +128,7 @@ namespace ola
 		UniquePtr<DeclType> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
 
 		template<typename DeclType> requires std::is_base_of_v<FunctionDecl, DeclType>
-		std::vector<DeclType const*> ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList&& args);
+		std::vector<DeclType const*> ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList& args);
 	};
 
 

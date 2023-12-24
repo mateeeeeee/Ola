@@ -847,62 +847,13 @@ namespace ola
 		if (isa<IdentifierExpr>(func_expr.get()))
 		{
 			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
-			std::vector<Decl*>& candidate_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
-
-			std::vector<FunctionDecl*> match_decls{};
-			uint32 match_conversions_needed = UINT32_MAX;
-			for (Decl* decl : candidate_decls)
+			std::vector<Decl*>& found_decls = ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
+			std::vector<FunctionDecl const*> candidate_decls{};
+			for (Decl* decl : found_decls)
 			{
-				if (isoneof<FunctionDecl, MethodDecl>(decl))
-				{
-					FunctionDecl* func_decl = cast<FunctionDecl>(decl);
-					FuncType const& func_type = func_decl->GetFuncType();
-					std::span<QualType const> param_types = func_type.GetParams();
-					if (args.size() != param_types.size()) continue;
-
-					bool incompatible_arg = false;
-					for (uint64 i = 0; i < param_types.size(); ++i)
-					{
-						UniqueExprPtr& arg = args[i];
-						QualType const& func_param_type = param_types[i];
-
-						if (isa<RefType>(func_param_type) && !arg->IsLValue())
-						{
-							incompatible_arg = true;
-							break;
-						}
-						if (!func_param_type->IsAssignableFrom(arg->GetType()))
-						{
-							incompatible_arg = true;
-							break;
-						}
-					}
-					if (incompatible_arg) continue;
-
-					uint32 current_conversions_needed = 0;
-					for (uint64 i = 0; i < param_types.size(); ++i)
-					{
-						UniqueExprPtr& arg = args[i];
-						QualType const& func_param_type = param_types[i];
-						if (!func_param_type->IsSameAs(arg->GetType()))
-						{
-							++current_conversions_needed;
-						}
-					}
-
-					if (match_conversions_needed == current_conversions_needed)
-					{
-						match_decls.push_back(func_decl);
-					}
-					else if (current_conversions_needed < match_conversions_needed)
-					{
-						match_conversions_needed = current_conversions_needed;
-						match_decls.clear();
-						match_decls.push_back(func_decl);
-					}
-				}
+				if (isoneof<FunctionDecl, MethodDecl>(decl)) candidate_decls.push_back(cast<FunctionDecl>(decl));
 			}
-
+			std::vector<FunctionDecl const*> match_decls = ResolveCall(candidate_decls, args);
 			if (match_decls.empty())
 			{
 				diagnostics.Report(loc, matching_function_not_found);
@@ -914,7 +865,7 @@ namespace ola
 				return nullptr;
 			}
 
-			FunctionDecl* match_decl = match_decls[0];
+			FunctionDecl const* match_decl = match_decls[0];
 			FuncType const& match_func_type = match_decl->GetFuncType();
 
 			std::span<QualType const> param_types = match_func_type.GetParams();
@@ -968,8 +919,45 @@ namespace ola
 				diagnostics.Report(loc, base_ctor_call_without_base_class);
 				return nullptr;
 			}
+			std::vector<ConstructorDecl const*> candidate_decls = ctx.current_base_class->FindConstructors();
+			std::vector<ConstructorDecl const*> match_decls = ResolveCall(candidate_decls, args);
 
-			ctx.current_base_class->FindConstructors();
+			if (match_decls.empty())
+			{
+				diagnostics.Report(loc, matching_ctor_not_found);
+				return nullptr;
+			}
+			if (match_decls.size() > 1)
+			{
+				diagnostics.Report(loc, matching_ctor_ambiguous);
+				return nullptr;
+			}
+
+			ConstructorDecl const* match_decl = match_decls[0];
+			FuncType const& match_func_type = match_decl->GetFuncType();
+
+			std::span<QualType const> param_types = match_func_type.GetParams();
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (!func_param_type->IsSameAs(arg->GetType()))
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+				}
+			}
+
+			UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
+			member_expr->SetClassExpr(std::move(func_expr));
+			member_expr->SetMemberDecl(match_decl);
+			member_expr->SetType(match_func_type);
+
+			UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, match_decl);
+			method_call_expr->SetType(match_func_type.GetReturnType());
+			method_call_expr->SetArgs(std::move(args));
+			method_call_expr->SetCallee(std::move(member_expr));
+			if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+			return method_call_expr;
 		}
 		diagnostics.Report(loc, invalid_function_call);
 		return nullptr;
@@ -1256,56 +1244,7 @@ namespace ola
 		OLA_ASSERT(class_decl);
 
 		std::vector<MethodDecl const*> candidate_decls = class_decl->FindMethodDecls(member_identifier->GetName());
-		std::vector<MethodDecl const*> match_decls{};
-		uint32 match_conversions_needed = UINT32_MAX;
-		for (MethodDecl const* method_decl : candidate_decls)
-		{
-			FuncType const& func_type = method_decl->GetFuncType();
-			std::span<QualType const> param_types = func_type.GetParams();
-			if (args.size() != param_types.size()) continue;
-
-			bool incompatible_arg = false;
-			for (uint64 i = 0; i < param_types.size(); ++i)
-			{
-				UniqueExprPtr& arg = args[i];
-				QualType const& func_param_type = param_types[i];
-
-				if (isa<RefType>(func_param_type) && !arg->IsLValue())
-				{
-					incompatible_arg = true;
-					break;
-				}
-				if (!func_param_type->IsAssignableFrom(arg->GetType()))
-				{
-					incompatible_arg = true;
-					break;
-				}
-			}
-			if (incompatible_arg) continue;
-
-			uint32 current_conversions_needed = 0;
-			for (uint64 i = 0; i < param_types.size(); ++i)
-			{
-				UniqueExprPtr& arg = args[i];
-				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsSameAs(arg->GetType()))
-				{
-					++current_conversions_needed;
-				}
-			}
-
-			if (match_conversions_needed == current_conversions_needed)
-			{
-				match_decls.push_back(method_decl);
-			}
-			else if (current_conversions_needed < match_conversions_needed)
-			{
-				match_conversions_needed = current_conversions_needed;
-				match_decls.clear();
-				match_decls.push_back(method_decl);
-			}
-		}
-
+		std::vector<MethodDecl const*> match_decls = ResolveCall(candidate_decls, args);
 		if (match_decls.empty())
 		{
 			diagnostics.Report(loc, matching_function_not_found);
@@ -1391,55 +1330,7 @@ namespace ola
 		}
 		ClassDecl const* class_decl = type_cast<ClassType>(type).GetClassDecl();
 		std::vector<ConstructorDecl const*> candidate_ctors = class_decl->FindConstructors();
-		std::vector<ConstructorDecl const*> match_ctors{};
-		uint32 match_conversions_needed = UINT32_MAX;
-
-		for (ConstructorDecl const* ctor : candidate_ctors)
-		{
-			FuncType const& func_type = ctor->GetFuncType();
-			std::span<QualType const> param_types = func_type.GetParams();
-			if (args.size() != param_types.size()) continue;
-
-			bool incompatible_arg = false;
-			for (uint64 i = 0; i < param_types.size(); ++i)
-			{
-				UniqueExprPtr& arg = args[i];
-				QualType const& func_param_type = param_types[i];
-				if (isa<RefType>(func_param_type) && !arg->IsLValue())
-				{
-					incompatible_arg = true;
-					break;
-				}
-				if (!func_param_type->IsAssignableFrom(arg->GetType()))
-				{
-					incompatible_arg = true;
-					break;
-				}
-			}
-			if (incompatible_arg) continue;
-
-			uint32 current_conversions_needed = 0;
-			for (uint64 i = 0; i < param_types.size(); ++i)
-			{
-				UniqueExprPtr& arg = args[i];
-				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsSameAs(arg->GetType()))
-				{
-					++current_conversions_needed;
-				}
-			}
-			if (match_conversions_needed == current_conversions_needed)
-			{
-				match_ctors.push_back(ctor);
-			}
-			else if (current_conversions_needed < match_conversions_needed)
-			{
-				match_conversions_needed = current_conversions_needed;
-				match_ctors.clear();
-				match_ctors.push_back(ctor);
-			}
-		}
-
+		std::vector<ConstructorDecl const*> match_ctors = ResolveCall(candidate_ctors, args);
 		if (match_ctors.empty())
 		{
 			diagnostics.Report(loc, matching_ctor_not_found);
@@ -1462,7 +1353,6 @@ namespace ola
 				arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 			}
 		}
-
 		UniqueConstructorExprPtr ctor_expr = MakeUnique<ConstructorExpr>(loc, match_ctor);
 		ctor_expr->SetType(type);
 		ctor_expr->SetArgs(std::move(args));
@@ -1667,9 +1557,8 @@ namespace ola
 		return var_decl;
 	}
 
-
-	template<typename DeclType> requires std::is_base_of_v<ola::FunctionDecl, DeclType>
-	std::vector<DeclType const*> Sema::ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList&& args)
+	template<typename DeclType> requires std::is_base_of_v<FunctionDecl, DeclType>
+	std::vector<DeclType const*> Sema::ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList& args)
 	{
 		std::vector<DeclType const*> match_decls{};
 		uint32 match_conversions_needed = UINT32_MAX;

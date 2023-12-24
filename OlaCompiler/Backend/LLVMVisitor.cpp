@@ -1226,7 +1226,7 @@ namespace ola
 		MemberExpr const* member_expr = cast<MemberExpr>(callee_expr);
 
 		Decl const* decl = member_expr->GetMemberDecl();
-		OLA_ASSERT(isa<MethodDecl>(decl));
+		//OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 
@@ -1288,6 +1288,7 @@ namespace ola
 
 			llvm::Value* this_ptr = value_map[class_expr];
 			args.push_back(this_ptr);
+			++arg_index;
 			for (auto const& arg_expr : member_call_expr.GetArgs())
 			{
 				arg_expr->Accept(*this);
