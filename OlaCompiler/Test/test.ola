@@ -1,14 +1,11 @@
-import std.Assert;
+import std.assert;
+import std.io;
 
 class B
 {
 	B(int y)
 	{
 		this.y = y;
-	}
-	B(int x, int y)
-	{
-		this.y = x * y;
 	}
 	public int y = 0;
 };
@@ -21,8 +18,9 @@ class D : B
 		this.x = x;
 	}
 	D(int x, int y)
-	{	super(x * 2,y * 2);
-		this.x = x * y;
+	{	
+		this(x);
+		this.x *= y;
 	}
 	public int x = 0;
 };
@@ -30,11 +28,12 @@ class D : B
 public int main() 
 {
    D d1(5);
-   D d2(2,3);
    Assert(d1.x == 5);
    Assert(d1.y == 10);
+
+   D d2(2,3);
    Assert(d2.x == 6);
-   Assert(d2.y == 24);
+   Assert(d2.y == 4);
 
    return 0;
 }

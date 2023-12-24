@@ -905,7 +905,58 @@ namespace ola
 		}
 		else if (isa<ThisExpr>(func_expr.get()))
 		{
+			if (!ctx.is_constructor)
+			{
+				//diagnostics.Report(loc, base_ctor_call_outside_ctor);
+				return nullptr;
+			}
+			if (ctx.current_class_name.empty())
+			{
+				//diagnostics.Report(loc, base_ctor_call_without_base_class);
+				return nullptr;
+			}
 
+			std::vector<Decl*> decls = ctx.decl_sym_table.LookUpMember_Overload(ctx.current_class_name);
+			std::vector<ConstructorDecl const*> candidate_decls;
+			for(Decl* decl : decls) if (isa<ConstructorDecl>(decl)) candidate_decls.push_back(cast<ConstructorDecl>(decl));
+			std::vector<ConstructorDecl const*> match_decls = ResolveCall(candidate_decls, args);
+
+			if (match_decls.empty())
+			{
+				diagnostics.Report(loc, matching_ctor_not_found);
+				return nullptr;
+			}
+			if (match_decls.size() > 1)
+			{
+				diagnostics.Report(loc, matching_ctor_ambiguous);
+				return nullptr;
+			}
+
+			ConstructorDecl const* match_decl = match_decls[0];
+			FuncType const& match_func_type = match_decl->GetFuncType();
+
+			std::span<QualType const> param_types = match_func_type.GetParams();
+			for (uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (!func_param_type->IsSameAs(arg->GetType()))
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+				}
+			}
+
+			UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
+			member_expr->SetClassExpr(std::move(func_expr));
+			member_expr->SetMemberDecl(match_decl);
+			member_expr->SetType(match_func_type);
+
+			UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, match_decl);
+			method_call_expr->SetType(match_func_type.GetReturnType());
+			method_call_expr->SetArgs(std::move(args));
+			method_call_expr->SetCallee(std::move(member_expr));
+			if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+			return method_call_expr;
 		}
 		else if (isa<SuperExpr>(func_expr.get()))
 		{
