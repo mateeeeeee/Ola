@@ -907,12 +907,12 @@ namespace ola
 		{
 			if (!ctx.is_constructor)
 			{
-				//diagnostics.Report(loc, base_ctor_call_outside_ctor);
+				diagnostics.Report(loc, ctor_call_outside_ctor);
 				return nullptr;
 			}
 			if (ctx.current_class_name.empty())
 			{
-				//diagnostics.Report(loc, base_ctor_call_without_base_class);
+				diagnostics.Report(loc, ctor_call_without_class);
 				return nullptr;
 			}
 

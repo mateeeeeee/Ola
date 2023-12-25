@@ -25,6 +25,11 @@ class D : B
 	public int x = 0;
 };
 
+void Test(D d)
+{
+	PrintInt(d.x);
+}
+
 public int main() 
 {
    D d1(5);
@@ -35,5 +40,6 @@ public int main()
    Assert(d2.x == 6);
    Assert(d2.y == 4);
 
+   Test(D(5));
    return 0;
 }
