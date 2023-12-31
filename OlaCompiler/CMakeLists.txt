@@ -20,6 +20,8 @@ set(FRONTEND_FILES
   Frontend/Diagnostics.cpp
   Frontend/Diagnostics.def
   Frontend/Diagnostics.h
+  Frontend/Context.h
+  Frontend/Context.cpp
   Frontend/ImportProcessor.cpp
   Frontend/ImportProcessor.h
   Frontend/Lexer.cpp
