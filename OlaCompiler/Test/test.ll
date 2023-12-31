@@ -78,6 +78,19 @@ exit:                                             ; preds = %entry
   ret void
 }
 
+define internal void @Test__D(%D %d) {
+entry:
+  %0 = alloca %D, align 8
+  store %D %d, ptr %0, align 4
+  %1 = getelementptr inbounds %D, ptr %0, i32 0, i32 1
+  %2 = load i64, ptr %1, align 4
+  call void @PrintInt(i64 %2)
+  br label %exit
+
+exit:                                             ; preds = %entry
+  ret void
+}
+
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8

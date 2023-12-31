@@ -24,9 +24,9 @@ namespace ola
 	class QualType;
 	class FuncType;
 
-	class LLVMVisitor : public ASTVisitor
+	class LLVMIRVisitor : public ASTVisitor
 	{
-		friend class LLVMIRGenerator;
+		friend class LLVMIRGen;
 
 		struct VoidPointerHash
 		{
@@ -39,7 +39,7 @@ namespace ola
 		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*, VoidPointerHash>;
 		using LLVMEmptyBlockSuccessorMap = std::unordered_map<llvm::BasicBlock*, llvm::BasicBlock*, VoidPointerHash>;
 	private:
-		LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module);
+		LLVMIRVisitor(llvm::LLVMContext& context, llvm::Module& module);
 
 		void VisitAST(AST const* ast);
 		virtual void Visit(ASTNode const&, uint32) override;

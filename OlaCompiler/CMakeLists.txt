@@ -55,12 +55,20 @@ set(FRONTEND_FILES
 
 
 set(BACKEND_FILES
-  Backend/LLVMVisitor.h
-  Backend/LLVMVisitor.cpp
-  Backend/LLVMOptimizer.h
-  Backend/LLVMOptimizer.cpp
-  Backend/LLVMIRGenerator.h
-  Backend/LLVMIRGenerator.cpp
+  Backend/LLVM/LLVMIRGen.h
+  Backend/LLVM/LLVMIRGen.cpp
+  Backend/LLVM/LLVMIRVisitor.h
+  Backend/LLVM/LLVMIRVisitor.cpp
+  Backend/LLVM/LLVMOptimizer.h
+  Backend/LLVM/LLVMOptimizer.cpp
+  Backend/LLVM/LLVMCodeGen.h
+  Backend/LLVM/LLVMCodeGen.cpp
+  Backend/Custom/IRGen.h
+  Backend/Custom/IRGen.cpp
+  Backend/Custom/IRVisitor.h
+  Backend/Custom/IRVisitor.cpp
+  Backend/Custom/IR.h
+  Backend/Custom/IRType.h
 )
 
 set(COMPILER_FILES

@@ -78,6 +78,27 @@
 	ret
 	.seh_endproc
                                         # -- End function
+	.def	Test__D;
+	.scl	3;
+	.type	32;
+	.endef
+	.p2align	4, 0x90                         # -- Begin function Test__D
+Test__D:                                # @Test__D
+.seh_proc Test__D
+# %bb.0:                                # %entry
+	sub	rsp, 56
+	.seh_stackalloc 56
+	.seh_endprologue
+	mov	qword ptr [rsp + 40], rcx
+	mov	qword ptr [rsp + 48], rdx
+	mov	rcx, qword ptr [rsp + 48]
+	call	PrintInt
+# %bb.1:                                # %exit
+	nop
+	add	rsp, 56
+	ret
+	.seh_endproc
+                                        # -- End function
 	.def	main;
 	.scl	2;
 	.type	32;
@@ -122,6 +143,7 @@ main:                                   # @main
                                         # -- End function
 	.addrsig
 	.addrsig_sym Assert
+	.addrsig_sym PrintInt
 	.addrsig_sym "B::B__I"
 	.addrsig_sym "D::D__I"
 	.addrsig_sym "D::D__I__I"

@@ -8,13 +8,13 @@
 namespace ola
 {
 	struct AST;
-	class LLVMVisitor;
+	class LLVMIRVisitor;
 
-	class LLVMIRGenerator
+	class LLVMIRGen
 	{
 	public:
-		explicit LLVMIRGenerator(std::string_view file_name);
-		~LLVMIRGenerator();
+		explicit LLVMIRGen(std::string_view file_name);
+		~LLVMIRGen();
 
 		void Generate(AST const* ast);
 		void Optimize(OptimizationLevel);

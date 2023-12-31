@@ -40,6 +40,5 @@ public int main()
    Assert(d2.x == 6);
    Assert(d2.y == 4);
 
-   Test(D(5));
    return 0;
 }

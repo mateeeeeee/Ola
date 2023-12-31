@@ -1,18 +1,24 @@
 #include <filesystem>
 #include <format>
+
 #include "Compiler.h"
+
 #include "Frontend/Diagnostics.h"
 #include "Frontend/SourceBuffer.h"
 #include "Frontend/Lexer.h"
 #include "Frontend/ImportProcessor.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
-#include "Backend/LLVMIRGenerator.h"
+
+#include "Backend/LLVM/LLVMIRGen.h"
+#include "Backend/LLVM/LLVMCodeGen.h"
+
 #include "Utility/DebugVisitor.h"
+#include "autogen/OlaConfig.h"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
-#include "autogen/OlaConfig.h"
 
 namespace fs = std::filesystem;
 
@@ -48,7 +54,7 @@ namespace ola
 			return OptimizationLevel::O0;
 		}
 
-		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, bool ast_dump, OptimizationLevel opt_level)
+		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, bool ast_dump, OptimizationLevel opt_level)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -64,10 +70,13 @@ namespace ola
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator(source_file);
-			llvm_ir_generator.Generate(ast);
-			llvm_ir_generator.Optimize(opt_level);
-			llvm_ir_generator.PrintIR(ir_file);
+			LLVMIRGen llvm_ir_gen(source_file);
+			llvm_ir_gen.Generate(ast);
+			llvm_ir_gen.Optimize(opt_level);
+			llvm_ir_gen.PrintIR(ir_file);
+
+			LLVMCodeGen llvm_code_gen(ir_file);
+			llvm_code_gen.Generate(assembly_file);
 		}
 	}
 
@@ -82,7 +91,6 @@ namespace ola
 		fs::path cur_path = fs::current_path();
 		fs::current_path(input.input_directory);
 
-		std::vector<std::string> assembly_files(input.sources.size());
 		std::vector<std::string> object_files(input.sources.size());
 		std::string output_file = input.output_file; output_file += ".exe";
 		for (uint64 i = 0; i < input.sources.size(); ++i)
@@ -90,20 +98,14 @@ namespace ola
 			std::string file_name = fs::path(input.sources[i]).stem().string();
 			std::string file_ext = fs::path(input.sources[i]).extension().string();
 
-			std::string ir_file = file_name + ".ll";
 			std::string source_file = input.sources[i]; source_file += ".ola";
+			std::string ir_file = file_name + ".ll";
+			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(source_file, ir_file, ast_dump, opt_level);
+			CompileTranslationUnit(source_file, ir_file, assembly_file, ast_dump, opt_level);
 
-			std::string assembly_file = file_name + ".s";  
 			std::string object_file = file_name + ".obj";  
-
 			object_files[i] = object_file;
-			assembly_files[i] = assembly_file;
-
-			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
-			system(compile_cmd.c_str());
-
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
 			system(assembly_cmd.c_str());
 		}
@@ -149,13 +151,14 @@ namespace ola
 			AST const* ast = parser.GetAST();
 			if (debug) DebugVisitor debug_ast(ast);
 
-			LLVMIRGenerator llvm_ir_generator("tmp.wv");
+			LLVMIRGen llvm_ir_generator("tmp.ola");
 			llvm_ir_generator.Generate(ast);
 			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
 			llvm_ir_generator.PrintIR(ir_file.string());
+
+			LLVMCodeGen llvm_code_gen(ir_file.string());
+			llvm_code_gen.Generate(assembly_file.string());
 		}
-		std::string compile_cmd = std::format("clang -S {} -o {}", ir_file.string(), assembly_file.string());
-		system(compile_cmd.c_str());
 
 		std::string assembly_cmd = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
 		system(assembly_cmd.c_str());

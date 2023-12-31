@@ -1,4 +1,4 @@
-#include "LLVMVisitor.h"
+#include "LLVMIRVisitor.h"
 #include "Frontend/AST/AST.h"
 #include "Frontend/AST/Decl.h"
 #include "Frontend/AST/Stmt.h"
@@ -10,7 +10,7 @@
 
 namespace ola
 {
-	LLVMVisitor::LLVMVisitor(llvm::LLVMContext& context, llvm::Module& module)
+	LLVMIRVisitor::LLVMIRVisitor(llvm::LLVMContext& context, llvm::Module& module)
 		: context(context), module(module), builder(context)
 	{
 		data_layout = std::make_unique<llvm::DataLayout>(&module);
@@ -21,27 +21,27 @@ namespace ola
 		float_type = llvm::Type::getDoubleTy(context);
 	}
 
-	void LLVMVisitor::VisitAST(AST const* ast)
+	void LLVMIRVisitor::VisitAST(AST const* ast)
 	{
 		ast->translation_unit->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(ASTNode const&, uint32)
+	void LLVMIRVisitor::Visit(ASTNode const&, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(TranslationUnit const& translation_unit, uint32)
+	void LLVMIRVisitor::Visit(TranslationUnit const& translation_unit, uint32)
 	{
 		for (auto&& decl : translation_unit.GetDecls()) decl->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(Decl const&, uint32)
+	void LLVMIRVisitor::Visit(Decl const&, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(FunctionDecl const& function_decl, uint32)
+	void LLVMIRVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
 		FuncType const& type = function_decl.GetFuncType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertOlaType(type));
@@ -68,7 +68,7 @@ namespace ola
 		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
 
-	void LLVMVisitor::Visit(MethodDecl const& method_decl, uint32)
+	void LLVMIRVisitor::Visit(MethodDecl const& method_decl, uint32)
 	{
 		ClassDecl const* class_decl = method_decl.GetParentDecl();
 		llvm::Type* class_type = ConvertOlaType(ClassType(class_decl));
@@ -109,7 +109,7 @@ namespace ola
 		this_struct_type = nullptr;
 	}
 
-	void LLVMVisitor::Visit(VarDecl const& var_decl, uint32)
+	void LLVMIRVisitor::Visit(VarDecl const& var_decl, uint32)
 	{
 		QualType const& var_type = var_decl.GetType();
 		llvm::Type* llvm_type = ConvertOlaType(var_type);
@@ -380,7 +380,7 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(FieldDecl const& member_var, uint32)
+	void LLVMIRVisitor::Visit(FieldDecl const& member_var, uint32)
 	{
 		QualType const& var_type = member_var.GetType();
 		llvm::Type* llvm_type = ConvertOlaType(var_type);
@@ -398,32 +398,32 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(ParamVarDecl const& param_var, uint32)
+	void LLVMIRVisitor::Visit(ParamVarDecl const& param_var, uint32)
 	{
 	}
 
-	void LLVMVisitor::Visit(TagDecl const&, uint32)
+	void LLVMIRVisitor::Visit(TagDecl const&, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(EnumDecl const& enum_decl, uint32)
+	void LLVMIRVisitor::Visit(EnumDecl const& enum_decl, uint32)
 	{
 		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(EnumMemberDecl const& enum_member, uint32)
+	void LLVMIRVisitor::Visit(EnumMemberDecl const& enum_member, uint32)
 	{
 		llvm::ConstantInt* constant = builder.getInt64(enum_member.GetValue()); 
 		value_map[&enum_member] = constant;
 	}
 
-	void LLVMVisitor::Visit(AliasDecl const&, uint32)
+	void LLVMIRVisitor::Visit(AliasDecl const&, uint32)
 	{
 		//alias declaration doesn't generate any code
 	}
 
-	void LLVMVisitor::Visit(ClassDecl const& class_decl, uint32)
+	void LLVMIRVisitor::Visit(ClassDecl const& class_decl, uint32)
 	{
 		for (auto& field  : class_decl.GetFields()) field->Accept(*this);
 		for (auto& method : class_decl.GetMethods()) method->Accept(*this);
@@ -455,29 +455,29 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(Stmt const& stmt, uint32)
+	void LLVMIRVisitor::Visit(Stmt const& stmt, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(CompoundStmt const& compound_stmt, uint32)
+	void LLVMIRVisitor::Visit(CompoundStmt const& compound_stmt, uint32)
 	{
 		for (auto const& stmt : compound_stmt.GetStmts()) stmt->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(DeclStmt const& decl_stmt, uint32)
+	void LLVMIRVisitor::Visit(DeclStmt const& decl_stmt, uint32)
 	{
 		for(auto const& decl : decl_stmt.GetDecls())  decl->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(ExprStmt const& expr_stmt, uint32)
+	void LLVMIRVisitor::Visit(ExprStmt const& expr_stmt, uint32)
 	{
 		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
 	}
 
-	void LLVMVisitor::Visit(NullStmt const& null_stmt, uint32) {}
+	void LLVMIRVisitor::Visit(NullStmt const& null_stmt, uint32) {}
 
-	void LLVMVisitor::Visit(ReturnStmt const& return_stmt, uint32)
+	void LLVMIRVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
 		llvm::BasicBlock* current_block = builder.GetInsertBlock();
 		llvm::Function* current_function = current_block->getParent();
@@ -495,7 +495,7 @@ namespace ola
 		builder.SetInsertPoint(return_block);
 	}
 
-	void LLVMVisitor::Visit(IfStmt const& if_stmt, uint32)
+	void LLVMIRVisitor::Visit(IfStmt const& if_stmt, uint32)
 	{
 		Expr const* cond_expr = if_stmt.GetCondExpr();
 		Stmt const* then_stmt = if_stmt.GetThenStmt();
@@ -528,7 +528,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void LLVMVisitor::Visit(BreakStmt const&, uint32)
+	void LLVMIRVisitor::Visit(BreakStmt const&, uint32)
 	{
 		OLA_ASSERT(!break_blocks.empty());
 		builder.CreateBr(break_blocks.back());
@@ -536,7 +536,7 @@ namespace ola
 		builder.SetInsertPoint(break_block);
 	}
 
-	void LLVMVisitor::Visit(ContinueStmt const&, uint32)
+	void LLVMIRVisitor::Visit(ContinueStmt const&, uint32)
 	{
 		OLA_ASSERT(!continue_blocks.empty());
 		builder.CreateBr(continue_blocks.back());
@@ -544,7 +544,7 @@ namespace ola
 		builder.SetInsertPoint(continue_block);
 	}
 
-	void LLVMVisitor::Visit(ForStmt const& for_stmt, uint32)
+	void LLVMIRVisitor::Visit(ForStmt const& for_stmt, uint32)
 	{
 		Stmt const* init_stmt = for_stmt.GetInitStmt();
 		Expr const* cond_expr = for_stmt.GetCondExpr();
@@ -593,7 +593,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void LLVMVisitor::Visit(WhileStmt const& while_stmt, uint32)
+	void LLVMIRVisitor::Visit(WhileStmt const& while_stmt, uint32)
 	{
 		Expr const* cond_expr = while_stmt.GetCondExpr();
 		Stmt const* body_stmt = while_stmt.GetBodyStmt();
@@ -626,7 +626,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void LLVMVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
+	void LLVMIRVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
 	{
 		Expr const* cond_expr = do_while_stmt.GetCondExpr();
 		Stmt const* body_stmt = do_while_stmt.GetBodyStmt();
@@ -659,7 +659,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void LLVMVisitor::Visit(CaseStmt const& case_stmt, uint32)
+	void LLVMIRVisitor::Visit(CaseStmt const& case_stmt, uint32)
 	{
 		OLA_ASSERT(!switch_instructions.empty());
 		llvm::SwitchInst* switch_inst = switch_instructions.back();
@@ -680,7 +680,7 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(SwitchStmt const& switch_stmt, uint32)
+	void LLVMIRVisitor::Visit(SwitchStmt const& switch_stmt, uint32)
 	{
 		Expr const* cond_expr = switch_stmt.GetCondExpr();
 		Stmt const* body_stmt = switch_stmt.GetBodyStmt();
@@ -723,7 +723,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void LLVMVisitor::Visit(GotoStmt const& goto_stmt, uint32)
+	void LLVMIRVisitor::Visit(GotoStmt const& goto_stmt, uint32)
 	{
 		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
 		builder.CreateBr(label_blocks[label_name]);
@@ -733,7 +733,7 @@ namespace ola
 		builder.SetInsertPoint(goto_block);
 	}
 
-	void LLVMVisitor::Visit(LabelStmt const& label_stmt, uint32)
+	void LLVMIRVisitor::Visit(LabelStmt const& label_stmt, uint32)
 	{
 		std::string block_name = "label."; block_name += label_stmt.GetName();
 		llvm::BasicBlock* label_block = label_blocks[block_name];
@@ -741,12 +741,12 @@ namespace ola
 		builder.SetInsertPoint(label_block);
 	}
 
-	void LLVMVisitor::Visit(Expr const&, uint32)
+	void LLVMIRVisitor::Visit(Expr const&, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(UnaryExpr const& unary_expr, uint32)
+	void LLVMIRVisitor::Visit(UnaryExpr const& unary_expr, uint32)
 	{
 		Expr const* operand_expr = unary_expr.GetOperand();
 		operand_expr->Accept(*this);
@@ -820,7 +820,7 @@ namespace ola
 		value_map[&unary_expr] = result;
 	}
 
-	void LLVMVisitor::Visit(BinaryExpr const& binary_expr, uint32)
+	void LLVMIRVisitor::Visit(BinaryExpr const& binary_expr, uint32)
 	{
 		Expr const* lhs_expr = binary_expr.GetLHS();
 		lhs_expr->Accept(*this);
@@ -949,7 +949,7 @@ namespace ola
 		value_map[&binary_expr] = result;
 	}
 
-	void LLVMVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
+	void LLVMIRVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
 	{
 		Expr const* cond_expr = ternary_expr.GetCondExpr();
 		Expr const* true_expr = ternary_expr.GetTrueExpr();
@@ -975,31 +975,31 @@ namespace ola
 		value_map[&ternary_expr] = builder.CreateSelect(condition_value, true_value, false_value);
 	}
 
-	void LLVMVisitor::Visit(IdentifierExpr const&, uint32)
+	void LLVMIRVisitor::Visit(IdentifierExpr const&, uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(DeclRefExpr const& decl_ref, uint32)
+	void LLVMIRVisitor::Visit(DeclRefExpr const& decl_ref, uint32)
 	{
 		llvm::Value* value = value_map[decl_ref.GetDecl()];
 		OLA_ASSERT(value);
 		value_map[&decl_ref] = value;
 	}
 
-	void LLVMVisitor::Visit(IntLiteral const& int_constant, uint32)
+	void LLVMIRVisitor::Visit(IntLiteral const& int_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, int_constant.GetValue());
 		value_map[&int_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(CharLiteral const& char_constant, uint32)
+	void LLVMIRVisitor::Visit(CharLiteral const& char_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(char_type, char_constant.GetChar(), true);
 		value_map[&char_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(StringLiteral const& string_constant, uint32)
+	void LLVMIRVisitor::Visit(StringLiteral const& string_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string_constant.GetString());
 		
@@ -1011,19 +1011,19 @@ namespace ola
 		value_map[&string_constant] = global_string;
 	}
 
-	void LLVMVisitor::Visit(BoolLiteral const& bool_constant, uint32)
+	void LLVMIRVisitor::Visit(BoolLiteral const& bool_constant, uint32)
 	{
 		llvm::ConstantInt* constant = llvm::ConstantInt::get(bool_type, bool_constant.GetValue());
 		value_map[&bool_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(FloatLiteral const& float_constant, uint32)
+	void LLVMIRVisitor::Visit(FloatLiteral const& float_constant, uint32)
 	{
 		llvm::Constant* constant = llvm::ConstantFP::get(float_type, float_constant.GetValue());
 		value_map[&float_constant] = constant;
 	}
 
-	void LLVMVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
+	void LLVMIRVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
 	{
 		Expr const* cast_operand_expr = cast_expr.GetOperand();
 		cast_operand_expr->Accept(*this);
@@ -1102,7 +1102,7 @@ namespace ola
 		else OLA_ASSERT(value_map[&cast_expr] != nullptr);
 	}
 
-	void LLVMVisitor::Visit(CallExpr const& call_expr, uint32)
+	void LLVMIRVisitor::Visit(CallExpr const& call_expr, uint32)
 	{
 		llvm::Function* called_function = module.getFunction(call_expr.GetFunctionDecl()->GetMangledName());
 		OLA_ASSERT(called_function);
@@ -1133,7 +1133,7 @@ namespace ola
 		value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
-	void LLVMVisitor::Visit(InitializerListExpr const& initializer_list, uint32)
+	void LLVMIRVisitor::Visit(InitializerListExpr const& initializer_list, uint32)
 	{
 		UniqueExprPtrList const& init_expr_list = initializer_list.GetInitList();
 		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
@@ -1155,7 +1155,7 @@ namespace ola
 		
 	}
 
-	void LLVMVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
+	void LLVMIRVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
 	{
 		Expr const* array_expr = array_access.GetArrayExpr();
 		Expr const* index_expr = array_access.GetIndexExpr();
@@ -1198,7 +1198,7 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(MemberExpr const& member_expr, uint32)
+	void LLVMIRVisitor::Visit(MemberExpr const& member_expr, uint32)
 	{
 		Expr const* class_expr = member_expr.GetClassExpr();
 		Decl const* member_decl = member_expr.GetMemberDecl();
@@ -1219,7 +1219,7 @@ namespace ola
 		else OLA_ASSERT(false);
 	}
 
-	void LLVMVisitor::Visit(MethodCallExpr const& member_call_expr, uint32)
+	void LLVMIRVisitor::Visit(MethodCallExpr const& member_call_expr, uint32)
 	{
 		Expr const* callee_expr = member_call_expr.GetCallee();
 		OLA_ASSERT(isa<MemberExpr>(callee_expr));
@@ -1302,17 +1302,17 @@ namespace ola
 		}
 	}
 
-	void LLVMVisitor::Visit(ThisExpr const& this_expr, uint32)
+	void LLVMIRVisitor::Visit(ThisExpr const& this_expr, uint32)
 	{
 		value_map[&this_expr] = this_value;
 	}
 
-	void LLVMVisitor::Visit(SuperExpr const& super_expr, uint32)
+	void LLVMIRVisitor::Visit(SuperExpr const& super_expr, uint32)
 	{
 		value_map[&super_expr] = this_value;
 	}
 
-	void LLVMVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
+	void LLVMIRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
 	{
 		if (func_decl.IsInline()) func->addFnAttr(llvm::Attribute::AlwaysInline);
 		else if (func_decl.IsNoInline()) func->addFnAttr(llvm::Attribute::NoInline);
@@ -1385,7 +1385,7 @@ namespace ola
 		value_map[&func_decl] = func;
 	}
 
-	void LLVMVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
+	void LLVMIRVisitor::ConditionalBranch(llvm::Value* condition_value, llvm::BasicBlock* true_block, llvm::BasicBlock* false_block)
 	{
 		if (IsPointer(condition_value->getType()))
 		{
@@ -1420,7 +1420,7 @@ namespace ola
 		else OLA_ASSERT(false);
 	}
 
-	llvm::Type* LLVMVisitor::ConvertOlaType(QualType const& type)
+	llvm::Type* LLVMIRVisitor::ConvertOlaType(QualType const& type)
 	{
 		switch (type->GetKind())
 		{
@@ -1499,7 +1499,7 @@ namespace ola
 		return nullptr;
 	}
 
-	llvm::FunctionType* LLVMVisitor::ConvertMethodType(FuncType const& type, llvm::Type* class_type)
+	llvm::FunctionType* LLVMIRVisitor::ConvertMethodType(FuncType const& type, llvm::Type* class_type)
 	{
 		std::span<QualType const> function_params = type.GetParams();
 
@@ -1518,7 +1518,7 @@ namespace ola
 		return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
 	}
 
-	llvm::Type* LLVMVisitor::GetStructType(QualType const& class_expr_type)
+	llvm::Type* LLVMIRVisitor::GetStructType(QualType const& class_expr_type)
 	{
 		if (isa<ClassType>(class_expr_type))
 		{
@@ -1536,12 +1536,12 @@ namespace ola
 		else return nullptr;
 	}
 
-	llvm::PointerType* LLVMVisitor::GetPointerType(llvm::Type* type)
+	llvm::PointerType* LLVMIRVisitor::GetPointerType(llvm::Type* type)
 	{
 		return llvm::PointerType::get(type, 0);
 	}
 
-	llvm::Value* LLVMVisitor::Load(QualType const& type, llvm::Value* ptr)
+	llvm::Value* LLVMIRVisitor::Load(QualType const& type, llvm::Value* ptr)
 	{
 		llvm::Type* llvm_type = nullptr;
 		if (RefType const* ref_type = dyn_type_cast<RefType>(type))
@@ -1550,7 +1550,7 @@ namespace ola
 		return Load(llvm_type, ptr);
 	}
 
-	llvm::Value* LLVMVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
+	llvm::Value* LLVMIRVisitor::Load(llvm::Type* llvm_type, llvm::Value* ptr)
 	{
 		if (IsPointer(ptr->getType()))
 		{
@@ -1563,39 +1563,39 @@ namespace ola
 		return ptr;
 	}
 
-	llvm::Value* LLVMVisitor::Store(llvm::Value* value, llvm::Value* ptr)
+	llvm::Value* LLVMIRVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!IsPointer(value->getType())) return builder.CreateStore(value, ptr);
 		llvm::Value* load = Load(value->getType(), value);
 		return builder.CreateStore(load, ptr);
 	}
 
-	bool LLVMVisitor::IsPointer(llvm::Type* type)
+	bool LLVMIRVisitor::IsPointer(llvm::Type* type)
 	{
 		return type->isPointerTy();
 	}
 
-	bool LLVMVisitor::IsBoolean(llvm::Type* type)
+	bool LLVMIRVisitor::IsBoolean(llvm::Type* type)
 	{
 		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
 	}
 
-	bool LLVMVisitor::IsInteger(llvm::Type* type)
+	bool LLVMIRVisitor::IsInteger(llvm::Type* type)
 	{
 		return type->isIntegerTy() && type->getIntegerBitWidth() == 64;
 	}
 
-	bool LLVMVisitor::IsFloat(llvm::Type* type)
+	bool LLVMIRVisitor::IsFloat(llvm::Type* type)
 	{
 		return type->isDoubleTy();
 	}
 
-	bool LLVMVisitor::IsStruct(llvm::Type* type)
+	bool LLVMIRVisitor::IsStruct(llvm::Type* type)
 	{
 		return type->isStructTy();
 	}
 
-	bool LLVMVisitor::IsRef(llvm::Type* type)
+	bool LLVMIRVisitor::IsRef(llvm::Type* type)
 	{
 		return type->isPointerTy();
 	}

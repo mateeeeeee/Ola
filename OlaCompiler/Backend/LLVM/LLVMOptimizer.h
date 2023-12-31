@@ -18,7 +18,7 @@ namespace ola
 
 	class LLVMOptimizer
 	{
-		friend class LLVMIRGenerator;
+		friend class LLVMIRGen;
 
 	private:
 		explicit LLVMOptimizer(llvm::Module& module);
