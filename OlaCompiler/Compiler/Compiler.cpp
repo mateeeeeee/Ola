@@ -3,6 +3,7 @@
 
 #include "Compiler.h"
 
+#include "Frontend/Context.h"
 #include "Frontend/Diagnostics.h"
 #include "Frontend/SourceBuffer.h"
 #include "Frontend/Lexer.h"
@@ -54,7 +55,7 @@ namespace ola
 			return OptimizationLevel::O0;
 		}
 
-		void CompileTranslationUnit(std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, bool ast_dump, OptimizationLevel opt_level)
+		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, bool ast_dump, OptimizationLevel opt_level)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -62,10 +63,10 @@ namespace ola
 			Lexer lex(diagnostics);
 			lex.Lex(src);
 
-			ImportProcessor import_processor(diagnostics);
+			ImportProcessor import_processor(&context, diagnostics);
 			import_processor.ProcessImports(lex.GetTokens());
 
-			Parser parser(diagnostics);
+			Parser parser(&context, diagnostics);
 			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
@@ -93,6 +94,8 @@ namespace ola
 
 		std::vector<std::string> object_files(input.sources.size());
 		std::string output_file = input.output_file; output_file += ".exe";
+
+		Context context{};
 		for (uint64 i = 0; i < input.sources.size(); ++i)
 		{
 			std::string file_name = fs::path(input.sources[i]).stem().string();
@@ -102,7 +105,7 @@ namespace ola
 			std::string ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(source_file, ir_file, assembly_file, ast_dump, opt_level);
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, ast_dump, opt_level);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
@@ -145,7 +148,8 @@ namespace ola
 			Lexer lex(diagnostics);
 			lex.Lex(src);
 
-			Parser parser(diagnostics);
+			Context context{};
+			Parser parser(&context, diagnostics);
 			parser.Parse(lex.GetTokens());
 
 			AST const* ast = parser.GetAST();

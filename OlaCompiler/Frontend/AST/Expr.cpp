@@ -20,7 +20,6 @@ namespace ola
 	MethodCallExpr::MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl) 
 		: CallExpr(ExprKind::MemberCall, loc, method_decl) {}
 
-
 	void Expr::Accept(ASTVisitor& visitor, uint32 depth) const
 	{
 		OLA_ASSERT(false);

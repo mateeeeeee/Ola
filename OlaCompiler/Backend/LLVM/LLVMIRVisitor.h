@@ -21,7 +21,7 @@ namespace llvm
 
 namespace ola
 {
-	class QualType;
+	class Type;
 	class FuncType;
 
 	class LLVMIRVisitor : public ASTVisitor
@@ -125,12 +125,13 @@ namespace ola
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
-		llvm::Type* ConvertOlaType(QualType const&);
-		llvm::FunctionType* ConvertMethodType(FuncType const&, llvm::Type*);
-		llvm::Type* GetStructType(QualType const&);
+		llvm::Type* ConvertOlaType(Type const*);
+		llvm::Type* ConvertClassDecl(ClassDecl const*);
+		llvm::FunctionType* ConvertMethodType(FuncType const*, llvm::Type*);
+		llvm::Type* GetStructType(Type const*);
 		llvm::PointerType* GetPointerType(llvm::Type*);
 
-		[[maybe_unused]] llvm::Value* Load(QualType const&, llvm::Value*);
+		[[maybe_unused]] llvm::Value* Load(Type const*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
 		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
 

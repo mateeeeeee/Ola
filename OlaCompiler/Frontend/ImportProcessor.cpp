@@ -16,7 +16,7 @@ namespace ola
 	char const* ImportProcessor::ola_extension = ".ola";
 	char const* ImportProcessor::ola_lib_path = OLA_COMPILER_PATH;
 
-	ImportProcessor::ImportProcessor(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
+	ImportProcessor::ImportProcessor(Context* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 
 	void ImportProcessor::ProcessImports(std::vector<Token>&& _tokens)
 	{
@@ -123,11 +123,11 @@ namespace ola
 		lex.Lex(import_src_buffer);
 		std::vector<Token> imported_tokens = lex.GetTokens();
 
-		ImportProcessor import_processor(diagnostics);
+		ImportProcessor import_processor(context, diagnostics);
 		import_processor.RemoveImports(std::move(imported_tokens));
 		imported_tokens = import_processor.GetProcessedTokens();
 
-		Parser parser(diagnostics);
+		Parser parser(context, diagnostics);
 		parser.ParseImported(imported_tokens);
 		AST const* ast = parser.GetAST();
 
@@ -154,8 +154,8 @@ namespace ola
 					tokens.emplace_back(TokenKind::KW_float); break;
 				case TypeKind::Array:
 				{
-					ArrayType const& arr_type = type_cast<ArrayType>(type);
-					TypeToTokens(arr_type.GetBaseType(), tokens);
+					ArrayType const* arr_type = cast<ArrayType>(type);
+					TypeToTokens(arr_type->GetBaseType(), tokens);
 					tokens.emplace_back(TokenKind::left_square);
 					tokens.emplace_back(TokenKind::right_square);
 				}
@@ -163,8 +163,8 @@ namespace ola
 				case TypeKind::Ref:
 				{
 					tokens.emplace_back(TokenKind::KW_ref); 
-					RefType const& ref_type = type_cast<RefType>(type);
-					TypeToTokens(ref_type.GetReferredType(), tokens);
+					RefType const* ref_type = cast<RefType>(type);
+					TypeToTokens(ref_type->GetReferredType(), tokens);
 				}
 				break;
 				case TypeKind::Function: 
@@ -182,13 +182,13 @@ namespace ola
 			if (FunctionDecl const* func_decl = dyn_cast<FunctionDecl>(decl))
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
-				FuncType const& func_type = func_decl->GetFuncType();
+				FuncType const* func_type = func_decl->GetFuncType();
 				if (func_decl->NoMangling()) import_tokens.emplace_back(TokenKind::KW_nomangling);
-				TypeToTokens(func_type.GetReturnType(), import_tokens);
+				TypeToTokens(func_type->GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
 				import_tokens.emplace_back(TokenKind::left_round);
-				std::span<QualType const> param_types = func_type.GetParams();
+				std::span<QualType const> param_types = func_type->GetParams();
 				for (auto const& param_type : param_types)
 				{
 					TypeToTokens(param_type, import_tokens);
@@ -253,12 +253,12 @@ namespace ola
 				{
 					if (method->IsPublic()) import_tokens.emplace_back(TokenKind::KW_public);
 					else import_tokens.emplace_back(TokenKind::KW_private);
-					FuncType const& func_type = method->GetFuncType();
-					TypeToTokens(func_type.GetReturnType(), import_tokens);
+					FuncType const* func_type = method->GetFuncType();
+					TypeToTokens(func_type->GetReturnType(), import_tokens);
 					Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 					tok.SetData(method->GetName());
 					import_tokens.emplace_back(TokenKind::left_round);
-					std::span<QualType const> param_types = func_type.GetParams();
+					std::span<QualType const> param_types = func_type->GetParams();
 					for (auto const& param_type : param_types)
 					{
 						TypeToTokens(param_type, import_tokens);

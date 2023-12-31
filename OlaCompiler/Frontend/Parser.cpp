@@ -6,14 +6,14 @@
 namespace ola
 {
 
-	Parser::Parser(Diagnostics& diagnostics) : diagnostics(diagnostics) {}
+	Parser::Parser(Context* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 	Parser::~Parser() = default;
 
 	void Parser::Parse(std::vector<Token>&& _tokens)
 	{
 		tokens = std::move(_tokens);
 		current_token = tokens.begin();
-		sema = MakeUnique<Sema>(diagnostics);
+		sema = MakeUnique<Sema>(context, diagnostics);
 		ast = MakeUnique<AST>();
 		AddBuiltinDecls(ast->translation_unit);
 		ParseTranslationUnit();
@@ -23,7 +23,7 @@ namespace ola
 	{
 		tokens = _tokens;
 		current_token = tokens.begin();
-		sema = MakeUnique<Sema>(diagnostics);
+		sema = MakeUnique<Sema>(context, diagnostics);
 		ast = MakeUnique<AST>();
 		ParseTranslationUnit();
 	}
@@ -39,7 +39,7 @@ namespace ola
 
 	void Parser::AddBuiltinDecls(UniqueTranslationUnitPtr& TU)
 	{
-		UniqueAliasDeclPtr string_alias = sema->ActOnAliasDecl("string", SourceLocation{}, ArrayType(builtin_types::Char, 0));
+		UniqueAliasDeclPtr string_alias = sema->ActOnAliasDecl("string", SourceLocation{}, ArrayType::Get(context, CharType::Get(context), 0));
 		TU->AddDecl(std::move(string_alias));
 	}
 
@@ -93,7 +93,7 @@ namespace ola
 		UniqueParamVarDeclPtrList param_decls;
 		FuncAttributes attrs = FuncAttribute_None;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeSpecifier(return_type);
@@ -111,7 +111,7 @@ namespace ola
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FuncType(return_type, param_types));
+			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, attrs);
@@ -126,7 +126,7 @@ namespace ola
 		UniqueCompoundStmtPtr function_body;
 		FuncAttributes attrs = FuncAttribute_None;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
@@ -146,11 +146,11 @@ namespace ola
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FuncType(return_type, param_types));
+			function_type.SetType(FuncType::Get(context, return_type, param_types));
 
-			sema->ctx.current_func = &function_type;
+			sema->sema_ctx.current_func = &function_type;
 			function_body = ParseCompoundStatement();
-			sema->ctx.current_func = nullptr;
+			sema->sema_ctx.current_func = nullptr;
 		}
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs);
 	}
@@ -169,7 +169,7 @@ namespace ola
 		FuncAttributes func_attrs = FuncAttribute_None;
 		MethodAttributes method_attrs = MethodAttribute_None;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(func_attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
@@ -188,7 +188,7 @@ namespace ola
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FuncType(return_type, param_types));
+			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			ParseMethodAttributes(method_attrs);
 			if (first_pass)
 			{
@@ -207,11 +207,11 @@ namespace ola
 			{
 				if (!Consume(TokenKind::semicolon))
 				{
-					sema->ctx.current_func = &function_type;
-					sema->ctx.is_method_const = HasAttribute(method_attrs, MethodAttribute_Const);
+					sema->sema_ctx.current_func = &function_type;
+					sema->sema_ctx.is_method_const = HasAttribute(method_attrs, MethodAttribute_Const);
 					function_body = ParseCompoundStatement();
-					sema->ctx.is_method_const = false;
-					sema->ctx.current_func = nullptr;
+					sema->sema_ctx.is_method_const = false;
+					sema->sema_ctx.current_func = nullptr;
 				}
 			}
 		}
@@ -226,7 +226,7 @@ namespace ola
 		UniqueParamVarDeclPtrList param_decls;
 		UniqueCompoundStmtPtr constructor_body;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
@@ -240,7 +240,7 @@ namespace ola
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
-			function_type.SetType(FuncType(builtin_types::Void, param_types));
+			function_type.SetType(FuncType::Get(context, VoidType::Get(context), param_types));
 			if (first_pass)
 			{
 				if (Consume(TokenKind::semicolon)) return nullptr;
@@ -258,11 +258,11 @@ namespace ola
 			{
 				if (!Consume(TokenKind::semicolon))
 				{
-					sema->ctx.current_func = &function_type;
-					sema->ctx.is_constructor = true;
+					sema->sema_ctx.current_func = &function_type;
+					sema->sema_ctx.is_constructor = true;
 					constructor_body = ParseCompoundStatement();
-					sema->ctx.is_constructor = false;
-					sema->ctx.current_func = nullptr;
+					sema->sema_ctx.is_constructor = false;
+					sema->sema_ctx.current_func = nullptr;
 				}
 			}
 		}
@@ -477,11 +477,11 @@ namespace ola
 		UniqueFieldDeclPtrList member_variables;
 		UniqueMethodDeclPtrList member_functions;
 		{
-			SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-			SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
 
-			sema->ctx.current_base_class = base_class;
-			sema->ctx.current_class_name = class_name;
+			sema->sema_ctx.current_base_class = base_class;
+			sema->sema_ctx.current_class_name = class_name;
 			{
 				auto ParseClassMembers = [&](bool first_pass)
 					{
@@ -515,8 +515,8 @@ namespace ola
 				current_token = start_token;
 				ParseClassMembers(false);
 			}
-			sema->ctx.current_class_name = "";
-			sema->ctx.current_base_class = nullptr;
+			sema->sema_ctx.current_class_name = "";
+			sema->sema_ctx.current_base_class = nullptr;
 		}
 		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions), final);
 	}
@@ -549,8 +549,8 @@ namespace ola
 
 	UniqueCompoundStmtPtr Parser::ParseCompoundStatement()
 	{
-		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
-		SYM_TABLE_GUARD(sema->ctx.tag_sym_table);
+		SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
+		SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
 		Expect(TokenKind::left_brace);
 		UniqueStmtPtrList stmts;
 		while (current_token->IsNot(TokenKind::right_brace))
@@ -630,7 +630,7 @@ namespace ola
 		Expect(TokenKind::KW_for);
 		Expect(TokenKind::left_round);
 
-		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+		SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 		UniqueStmtPtr init_stmt = nullptr;
 		if (current_token->IsTypename())
 		{
@@ -655,11 +655,11 @@ namespace ola
 			Expect(TokenKind::right_round);
 		}
 
-		sema->ctx.stmts_using_break_count++;
-		sema->ctx.stmts_using_continue_count++;
+		sema->sema_ctx.stmts_using_break_count++;
+		sema->sema_ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_continue_count--;
-		sema->ctx.stmts_using_break_count--;
+		sema->sema_ctx.stmts_using_continue_count--;
+		sema->sema_ctx.stmts_using_break_count--;
 
 		return sema->ActOnForStmt(std::move(init_stmt), std::move(cond_expr), std::move(iter_expr), std::move(body_stmt));
 	}
@@ -668,7 +668,7 @@ namespace ola
 	{
 		Expect(TokenKind::KW_foreach);
 		Expect(TokenKind::left_round);
-		SYM_TABLE_GUARD(sema->ctx.decl_sym_table);
+		SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 		SourceLocation loc = current_token->GetLocation();
 
 		UniqueVarDeclPtr var_decl;
@@ -690,11 +690,11 @@ namespace ola
 		UniqueExprPtr array_expr = ParseIdentifier();
 		Expect(TokenKind::right_round);
 		
-		sema->ctx.stmts_using_break_count++;
-		sema->ctx.stmts_using_continue_count++;
+		sema->sema_ctx.stmts_using_break_count++;
+		sema->sema_ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_continue_count--;
-		sema->ctx.stmts_using_break_count--;
+		sema->sema_ctx.stmts_using_continue_count--;
+		sema->sema_ctx.stmts_using_break_count--;
 		
 		return sema->ActOnForeachStmt(loc, std::move(var_decl), std::move(array_expr), std::move(body_stmt));
 		return nullptr;
@@ -704,22 +704,22 @@ namespace ola
 	{
 		Expect(TokenKind::KW_while);
 		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
-		sema->ctx.stmts_using_break_count++;
-		sema->ctx.stmts_using_continue_count++;
+		sema->sema_ctx.stmts_using_break_count++;
+		sema->sema_ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_continue_count--;
-		sema->ctx.stmts_using_break_count--;
+		sema->sema_ctx.stmts_using_continue_count--;
+		sema->sema_ctx.stmts_using_break_count--;
 		return sema->ActOnWhileStmt(std::move(cond_expr), std::move(body_stmt));
 	}
 
 	UniqueDoWhileStmtPtr Parser::ParseDoWhileStatement()
 	{
 		Expect(TokenKind::KW_do);
-		sema->ctx.stmts_using_break_count++;
-		sema->ctx.stmts_using_continue_count++;
+		sema->sema_ctx.stmts_using_break_count++;
+		sema->sema_ctx.stmts_using_continue_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_continue_count--;
-		sema->ctx.stmts_using_break_count--;
+		sema->sema_ctx.stmts_using_continue_count--;
+		sema->sema_ctx.stmts_using_break_count--;
 		Expect(TokenKind::KW_while);
 		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
 		Expect(TokenKind::semicolon);
@@ -742,11 +742,11 @@ namespace ola
 		Expect(TokenKind::KW_switch);
 		UniqueExprPtr case_expr = ParseParenthesizedExpression();
 		std::vector<CaseStmt*> case_stmts{};
-		sema->ctx.case_callback_stack.push_back([&](CaseStmt* case_stmt) {case_stmts.push_back(case_stmt); });
-		sema->ctx.stmts_using_break_count++;
+		sema->sema_ctx.case_callback_stack.push_back([&](CaseStmt* case_stmt) {case_stmts.push_back(case_stmt); });
+		sema->sema_ctx.stmts_using_break_count++;
 		UniqueStmtPtr body_stmt = ParseStatement();
-		sema->ctx.stmts_using_break_count--;
-		sema->ctx.case_callback_stack.pop_back();
+		sema->sema_ctx.stmts_using_break_count--;
+		sema->sema_ctx.case_callback_stack.pop_back();
 		return sema->ActOnSwitchStmt(loc, std::move(case_expr), std::move(body_stmt), std::move(case_stmts));
 	}
 
@@ -1069,9 +1069,9 @@ namespace ola
 			case TokenKind::period:
 			{
 				++current_token;
-				sema->ctx.current_class_expr_stack.push_back(expr.get());
+				sema->sema_ctx.current_class_expr_stack.push_back(expr.get());
 				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();
-				sema->ctx.current_class_expr_stack.pop_back();
+				sema->sema_ctx.current_class_expr_stack.pop_back();
 				if (current_token->Is(TokenKind::left_round))
 				{
 					++current_token;
@@ -1132,7 +1132,7 @@ namespace ola
 		QualType type{};
 		std::string_view identifier = current_token->GetData();
 		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_auto)
-		|| (current_token->Is(TokenKind::identifier) && sema->ctx.tag_sym_table.LookUp(identifier) != nullptr))
+		|| (current_token->Is(TokenKind::identifier) && sema->sema_ctx.tag_sym_table.LookUp(identifier) != nullptr))
 		{
 			ParseTypeQualifier(type);
 			ParseTypeSpecifier(type);
@@ -1143,7 +1143,7 @@ namespace ola
 			type = sizeof_expr->GetType();
 		}
 		Expect(TokenKind::right_round);
-		return sema->ActOnConstantInt(type->GetSize(), loc);
+		return sema->ActOnIntLiteral(type->GetSize(), loc);
 	}
 
 	UniqueIntLiteralPtr Parser::ParseLengthExpression()
@@ -1164,7 +1164,7 @@ namespace ola
 		int64 value = std::stoll(current_token->GetData().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnConstantInt(value, loc);
+		return sema->ActOnIntLiteral(value, loc);
 	}
 
 	UniqueCharLiteralPtr Parser::ParseConstantChar()
@@ -1173,7 +1173,7 @@ namespace ola
 		std::string_view char_string = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnConstantChar(char_string, loc);
+		return sema->ActOnCharLiteral(char_string, loc);
 	}
 
 	UniqueStringLiteralPtr Parser::ParseConstantString()
@@ -1182,7 +1182,7 @@ namespace ola
 		std::string_view str = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnConstantString(str, loc);
+		return sema->ActOnStringLiteral(str, loc);
 	}
 
 	UniqueBoolLiteralPtr Parser::ParseConstantBool()
@@ -1193,7 +1193,7 @@ namespace ola
 		else if (current_token->Is(TokenKind::KW_true)) value = true;
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnConstantBool(value, loc);
+		return sema->ActOnBoolLiteral(value, loc);
 	}
 
 	UniqueFloatLiteralPtr Parser::ParseConstantFloat()
@@ -1203,7 +1203,7 @@ namespace ola
 		double value = std::stod(current_token->GetData().data(), nullptr);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		return sema->ActOnConstantFloat(value, loc);
+		return sema->ActOnFloatLiteral(value, loc);
 	}
 
 	UniqueExprPtr Parser::ParseIdentifier()
@@ -1368,19 +1368,19 @@ namespace ola
 		switch (current_token->GetKind())
 		{
 		case TokenKind::KW_auto:   break;
-		case TokenKind::KW_void:  type.SetType(builtin_types::Void);  break;
-		case TokenKind::KW_bool:  type.SetType(builtin_types::Bool);  break;
-		case TokenKind::KW_char:  type.SetType(builtin_types::Char);  break;
-		case TokenKind::KW_int:   type.SetType(builtin_types::Int);   break;
-		case TokenKind::KW_float: type.SetType(builtin_types::Float); break;
+		case TokenKind::KW_void:  type.SetType(VoidType::Get(context));  break;
+		case TokenKind::KW_bool:  type.SetType(BoolType::Get(context));  break;
+		case TokenKind::KW_char:  type.SetType(CharType::Get(context));  break;
+		case TokenKind::KW_int:   type.SetType(IntType::Get(context));   break;
+		case TokenKind::KW_float: type.SetType(FloatType::Get(context)); break;
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetData();
-			if (TagDecl* tag_decl = sema->ctx.tag_sym_table.LookUp(identifier))
+			if (TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.LookUp(identifier))
 			{
 				if (isa<EnumDecl>(tag_decl))
 				{
-					type.SetType(builtin_types::Enum);
+					type.SetType(IntType::Get(context));
 				}
 				else if (isa<AliasDecl>(tag_decl))
 				{
@@ -1391,7 +1391,7 @@ namespace ola
 				else if (isa<ClassDecl>(tag_decl))
 				{
 					ClassDecl* class_decl = cast<ClassDecl>(tag_decl);
-					type.SetType(ClassType(class_decl));
+					type.SetType(ClassType::Get(context, class_decl));
 				}
 				else Diag(invalid_type_specifier);
 			}
@@ -1415,16 +1415,14 @@ namespace ola
 			if (array_size_forbidden)
 			{
 				Expect(TokenKind::right_square);
-				ArrayType array_type(type);
-				type.SetType(array_type);
+				type.SetType(ArrayType::Get(context, type));
 				type.RemoveConst();
 			}
 			else
 			{
 				if (Consume(TokenKind::right_square))
 				{
-					ArrayType array_type(type);
-					type.SetType(array_type);
+					type.SetType(ArrayType::Get(context, type));
 					type.RemoveConst();
 				}
 				else
@@ -1442,8 +1440,7 @@ namespace ola
 						return;
 					}
 					Expect(TokenKind::right_square);
-					ArrayType array_type(type, array_size);
-					type.SetType(array_type);
+					type.SetType(ArrayType::Get(context, type, array_size));
 					type.RemoveConst();
 				}
 			}
@@ -1453,8 +1450,7 @@ namespace ola
 		{
 			bool is_const = type.IsConst();
 			type.RemoveConst();
-			RefType ref_type(type);
-			type = QualType(ref_type, is_const ? Qualifier_Const : Qualifier_None);
+			type = QualType(RefType::Get(context, type), is_const ? Qualifier_Const : Qualifier_None);
 		}
 	}
 
@@ -1492,7 +1488,7 @@ namespace ola
 
 	bool Parser::IsCurrentTokenTypename()
 	{
-		return current_token->IsTypename() || sema->ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
+		return current_token->IsTypename() || sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
 	}
 
 	bool Parser::Consume(TokenKind k)

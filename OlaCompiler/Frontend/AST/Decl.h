@@ -183,10 +183,10 @@ namespace ola
 			return labels;
 		}
 
-		FuncType const& GetFuncType() const
+		FuncType const* GetFuncType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetType()));
-			return type_cast<FuncType>(GetType());
+			return cast<FuncType>(GetType());
 		}
 		bool HasDefinition() const
 		{
@@ -306,9 +306,7 @@ namespace ola
 	{
 	public:
 		EnumMemberDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::EnumMember, name, loc)
-		{
-			SetType(builtin_types::Enum);
-		}
+		{}
 
 		void SetValue(int64 _value)
 		{

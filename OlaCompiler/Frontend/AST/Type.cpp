@@ -1,33 +1,58 @@
 #include "Type.h"
 #include "AST.h"
+#include "Frontend/Context.h"
 
 namespace ola
 {
-
-	bool RefType::IsAssignableFrom(Type const& other) const
+	bool QualType::operator==(QualType const& o) const
 	{
-		return type->IsAssignableFrom(other) || IsSameAs(other);
+		return type->IsEqualTo(o.type) && qualifiers == o.qualifiers;
 	}
-	bool RefType::IsSameAs(Type const& other) const
+
+
+	bool RefType::IsAssignableFrom(Type const* other) const
+	{
+		return type->IsAssignableFrom(other) || IsEqualTo(other);
+	}
+	bool RefType::IsEqualTo(Type const* other) const
 	{
 		if (!isa<RefType>(other)) return false;
-		RefType const& other_ref_type = type_cast<RefType>(other);
-		return type->IsSameAs(other_ref_type.GetReferredType());
+		RefType const* other_ref_type = cast<RefType>(other);
+		return type->IsEqualTo(other_ref_type->GetReferredType());
+	}
+	RefType* RefType::Get(Context* ctx, QualType const& type)
+	{
+		for (auto const& ref_type : ctx->ref_types)
+		{
+			if (ref_type->GetReferredType()==(type)) return ref_type;
+		}
+		ctx->ref_types.push_back(new(ctx) RefType(type));
+		return ctx->ref_types.back();
 	}
 
-	bool VoidType::IsAssignableFrom(Type const& other) const
+	bool VoidType::IsAssignableFrom(Type const* other) const
 	{
 		return isa<VoidType>(other); 
 	}
 
-	bool BoolType::IsAssignableFrom(Type const& other) const
+	VoidType* VoidType::Get(Context* ctx)
+	{
+		return ctx->void_type;
+	}
+
+	bool BoolType::IsAssignableFrom(Type const* other) const
 	{
 		return isoneof<BoolType,IntType,FloatType>(other);
 	}
 
-	bool CharType::IsAssignableFrom(Type const& other) const
+	BoolType* BoolType::Get(Context* ctx)
 	{
-		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
+		return ctx->bool_type;
+	}
+
+	bool CharType::IsAssignableFrom(Type const* other) const
+	{
+		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
 			return referred_type.IsNull() || isa<CharType>(referred_type); 
@@ -35,9 +60,14 @@ namespace ola
 		else return isa<CharType>(other);
 	}
 
-	bool IntType::IsAssignableFrom(Type const& other) const
+	CharType* CharType::Get(Context* ctx)
 	{
-		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
+		return ctx->char_type;
+	}
+
+	bool IntType::IsAssignableFrom(Type const* other) const
+	{
+		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
 			return referred_type.IsNull() || isa<IntType>(referred_type);
@@ -45,9 +75,14 @@ namespace ola
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
 
-	bool FloatType::IsAssignableFrom(Type const& other) const
+	IntType* IntType::Get(Context* ctx)
 	{
-		if (RefType const* ref_other = dyn_type_cast<RefType>(other))
+		return ctx->int_type;
+	}
+
+	bool FloatType::IsAssignableFrom(Type const* other) const
+	{
+		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
 			return referred_type.IsNull() || isa<FloatType>(referred_type);
@@ -55,20 +90,52 @@ namespace ola
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
 
-	bool ArrayType::IsAssignableFrom(Type const& other) const
+	FloatType* FloatType::Get(Context* ctx)
 	{
-		return IsSameAs(other);
-	}
-	bool ArrayType::IsSameAs(Type const& other) const
-	{
-		if (!isa<ArrayType>(other)) return false;
-		ArrayType const& other_array_type = type_cast<ArrayType>(other);
-		return base_type->IsSameAs(other_array_type.base_type);
+		return ctx->float_type;
 	}
 
-	bool FuncType::IsAssignableFrom(Type const& other) const
+	bool ArrayType::IsAssignableFrom(Type const* other) const
+	{
+		return IsEqualTo(other);
+	}
+	bool ArrayType::IsEqualTo(Type const* other) const
+	{
+		if (!isa<ArrayType>(other)) return false;
+		ArrayType const* other_array_type = cast<ArrayType>(other);
+		return base_type->IsEqualTo(other_array_type->base_type);
+	}
+
+	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
+	{
+		for (auto const& array_type : ctx->array_types)
+		{
+			if (array_type->GetBaseType() == type && array_type->GetArraySize() == array_size) return array_type;
+		}
+		ctx->array_types.push_back(new(ctx) ArrayType(type, array_size));
+		return ctx->array_types.back();
+	}
+
+	bool FuncType::IsAssignableFrom(Type const* other) const
 	{
 		return false;
+	}
+
+	FuncType* FuncType::Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types /*= {}*/)
+	{
+		for (auto const& function_type : ctx->function_types)
+		{
+			if (function_type->GetReturnType() != return_type) continue;
+			if (function_type->GetParamCount() != param_types.size()) continue;
+			uint64 param_count = function_type->GetParamCount();
+			for (uint64 i = 0; i < param_count; ++i)
+			{
+				if (function_type->GetParamType(i) != param_types[i]) continue;
+			}
+			return function_type;
+		}
+		ctx->function_types.push_back(new(ctx) FuncType(return_type, param_types));
+		return ctx->function_types.back();
 	}
 
 	ClassType::ClassType(ClassDecl const* class_decl) : Type{ TypeKind::Class, 0, 0 }, class_decl(class_decl)
@@ -103,18 +170,18 @@ namespace ola
 		if (GetAlign()) offset = AlignTo(offset, GetAlign());
 		SetSize(offset);
 	}
-	bool ClassType::IsAssignableFrom(Type const& other) const
+	bool ClassType::IsAssignableFrom(Type const* other) const
 	{
-		if (!IsSameAs(other))
+		if (!IsEqualTo(other))
 		{
-			if (RefType const* ref_other = dyn_type_cast<RefType>(other))
+			if (RefType const* ref_other = dyn_cast<RefType>(other))
 			{
 				if (!isa<ClassType>(ref_other->GetReferredType())) return false;
 				QualType const& referred_type = ref_other->GetReferredType();
-				ClassType const& referred_class_type = type_cast<ClassType>(referred_type);
+				ClassType const* referred_class_type = cast<ClassType>(referred_type);
 				return IsAssignableFrom(referred_class_type);
 			}
-			else if (ClassType const* class_other = dyn_type_cast<ClassType>(other))
+			else if (ClassType const* class_other = dyn_cast<ClassType>(other))
 			{
 				return class_other->GetClassDecl()->IsDerivedFrom(class_decl);
 			}
@@ -123,11 +190,21 @@ namespace ola
 		return true;
 	}
 
-	bool ClassType::IsSameAs(Type const& other) const
+	bool ClassType::IsEqualTo(Type const* other) const
 	{
 		if (!isa<ClassType>(other)) return false;
-		ClassType const& class_type = type_cast<ClassType>(other);
-		return class_decl == class_type.GetClassDecl();
+		ClassType const* class_type = cast<ClassType>(other);
+		return class_decl == class_type->GetClassDecl();
+	}
+
+	ClassType* ClassType::Get(Context* ctx, ClassDecl const* class_decl)
+	{
+		for (auto const& class_type : ctx->class_types)
+		{
+			if (class_type->GetClassDecl() == class_decl) return class_type;
+		}
+		ctx->class_types.push_back(new(ctx) ClassType(class_decl));
+		return ctx->class_types.back();
 	}
 
 }

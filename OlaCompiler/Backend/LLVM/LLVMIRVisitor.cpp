@@ -43,13 +43,13 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		FuncType const& type = function_decl.GetFuncType();
+		FuncType const* type = function_decl.GetFuncType();
 		llvm::FunctionType* function_type = llvm::cast<llvm::FunctionType>(ConvertOlaType(type));
 		llvm::Function::LinkageTypes linkage = function_decl.IsPublic() || function_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
 		llvm::Function* llvm_function = llvm::Function::Create(function_type, linkage, function_decl.GetMangledName(), module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
-		if (isa<ClassType>(type.GetReturnType()))
+		if (isa<ClassType>(type->GetReturnType()))
 		{
 			llvm::Value* sret_value = &(*param_arg);
 			++param_arg;
@@ -71,16 +71,16 @@ namespace ola
 	void LLVMIRVisitor::Visit(MethodDecl const& method_decl, uint32)
 	{
 		ClassDecl const* class_decl = method_decl.GetParentDecl();
-		llvm::Type* class_type = ConvertOlaType(ClassType(class_decl));
-		FuncType const& function_type = method_decl.GetFuncType();
-		llvm::FunctionType* llvm_function_type = ConvertMethodType(function_type, class_type);
+		llvm::Type* llvm_class_type = ConvertClassDecl(class_decl);
+		FuncType const* function_type = method_decl.GetFuncType();
+		llvm::FunctionType* llvm_function_type = ConvertMethodType(function_type, llvm_class_type);
 
 		llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
 		std::string name(class_decl->GetName()); name += "::"; name += method_decl.GetMangledName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
-		if (isa<ClassType>(function_type.GetReturnType()))
+		if (isa<ClassType>(function_type->GetReturnType()))
 		{
 			llvm::Value* sret_value = &*param_arg;
 			++param_arg;
@@ -89,7 +89,7 @@ namespace ola
 		llvm::Value* llvm_param = &*param_arg;
 		llvm_param->setName("this");
 
-		this_struct_type = class_type;
+		this_struct_type = llvm_class_type;
 		this_value = llvm_param;
 
 		++param_arg;
@@ -128,8 +128,8 @@ namespace ola
 			{
 				if (is_array)
 				{
-					ArrayType const& array_type = type_cast<ArrayType>(var_type);
-					llvm::Type* llvm_element_type = ConvertOlaType(array_type.GetBaseType());
+					ArrayType const* array_type = cast<ArrayType>(var_type);
+					llvm::Type* llvm_element_type = ConvertOlaType(array_type->GetBaseType());
 
 					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
@@ -165,8 +165,8 @@ namespace ola
 			}
 			else if (is_class)
 			{
-				ClassType const& class_type = type_cast<ClassType>(var_type);
-				ClassDecl const* class_decl = class_type.GetClassDecl();
+				ClassType const* class_type = cast<ClassType>(var_type);
+				ClassDecl const* class_decl = class_type->GetClassDecl();
 
 				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 				std::vector<llvm::Constant*> initializers;
@@ -213,8 +213,8 @@ namespace ola
 				init_expr->Accept(*this);
 				if (is_array)
 				{
-					ArrayType const& array_type = type_cast<ArrayType>(var_type);
-					llvm::Type* llvm_element_type = ConvertOlaType(array_type.GetBaseType());
+					ArrayType const* array_type = cast<ArrayType>(var_type);
+					llvm::Type* llvm_element_type = ConvertOlaType(array_type->GetBaseType());
 					llvm::ConstantInt* zero = builder.getInt64(0); 
 					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
@@ -227,7 +227,7 @@ namespace ola
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
 							Store(value_map[init_list[i].get()], ptr);
 						}
-						for (uint64 i = init_list.size(); i < array_type.GetArraySize(); ++i)
+						for (uint64 i = init_list.size(); i < array_type->GetArraySize(); ++i)
 						{
 							llvm::ConstantInt* index = builder.getInt64(i);
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
@@ -271,7 +271,7 @@ namespace ola
 				}
 				else if (is_class)
 				{
-					ClassDecl const* class_decl = type_cast<ClassType>(var_type).GetClassDecl();
+					ClassDecl const* class_decl = cast<ClassType>(var_type)->GetClassDecl();
 
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm::TypeSize struct_size = data_layout->getTypeAllocSize(llvm_type);
@@ -319,8 +319,8 @@ namespace ola
 				if (is_class)
 				{
 					QualType const& var_type = var_decl.GetType();
-					ClassType const& class_type = type_cast<ClassType>(var_type);
-					ClassDecl const* class_decl = class_type.GetClassDecl();
+					ClassType const* class_type = cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type->GetClassDecl();
 
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					value_map[&var_decl] = struct_alloc;
@@ -1139,12 +1139,12 @@ namespace ola
 		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
 		if (initializer_list.IsConstexpr())
 		{
-			ArrayType const& array_type = type_cast<ArrayType>(initializer_list.GetType());
-			llvm::Type* llvm_element_type = ConvertOlaType(array_type.GetBaseType());
+			ArrayType const* array_type = cast<ArrayType>(initializer_list.GetType());
+			llvm::Type* llvm_element_type = ConvertOlaType(array_type->GetBaseType());
 			llvm::Type* llvm_array_type = ConvertOlaType(array_type);
 
-			std::vector<llvm::Constant*> array_init_list(array_type.GetArraySize());
-			for (uint64 i = 0; i < array_type.GetArraySize(); ++i)
+			std::vector<llvm::Constant*> array_init_list(array_type->GetArraySize());
+			for (uint64 i = 0; i < array_type->GetArraySize(); ++i)
 			{
 				if (i < init_expr_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(value_map[init_expr_list[i].get()]);
 				else array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
@@ -1187,10 +1187,10 @@ namespace ola
 		{
 			QualType const& array_expr_type = array_expr->GetType();
 			OLA_ASSERT(isa<ArrayType>(array_expr_type));
-			ArrayType const& array_type = type_cast<ArrayType>(array_expr_type);
-			if (isa<ArrayType>(array_type.GetBaseType()))
+			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
+			if (isa<ArrayType>(array_type->GetBaseType()))
 			{
-				uint32 array_size = array_type.GetArraySize();
+				uint32 array_size = array_type->GetArraySize();
 				index_value = builder.CreateMul(index_value, llvm::ConstantInt::get(int_type, array_size));
 			}
 			llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
@@ -1242,7 +1242,7 @@ namespace ola
 			llvm::Value* vtable_entry = builder.CreateInBoundsGEP(GetPointerType(void_type), vtable, vtable_index);
 
 			llvm::Value* func_ptr = builder.CreateLoad(GetPointerType(void_type), vtable_entry);
-			llvm::FunctionType* function_type = ConvertMethodType(method_decl->GetFuncType(), ConvertOlaType(ClassType(class_decl)));
+			llvm::FunctionType* function_type = ConvertMethodType(method_decl->GetFuncType(), ConvertClassDecl(class_decl));
 			
 			std::vector<llvm::Value*> args;
 			uint32 arg_index = 0;
@@ -1420,7 +1420,7 @@ namespace ola
 		else OLA_ASSERT(false);
 	}
 
-	llvm::Type* LLVMIRVisitor::ConvertOlaType(QualType const& type)
+	llvm::Type* LLVMIRVisitor::ConvertOlaType(Type const* type)
 	{
 		switch (type->GetKind())
 		{
@@ -1436,16 +1436,16 @@ namespace ola
 			return float_type;
 		case TypeKind::Array:
 		{
-			ArrayType const& array_type = type_cast<ArrayType>(type);
-			if (array_type.GetArraySize() > 0) return llvm::ArrayType::get(ConvertOlaType(array_type.GetBaseType()), array_type.GetArraySize());
-			else return GetPointerType(ConvertOlaType(array_type.GetBaseType()));
+			ArrayType const* array_type = cast<ArrayType>(type);
+			if (array_type->GetArraySize() > 0) return llvm::ArrayType::get(ConvertOlaType(array_type->GetBaseType()), array_type->GetArraySize());
+			else return GetPointerType(ConvertOlaType(array_type->GetBaseType()));
 		}
 		case TypeKind::Function:
 		{
-			FuncType const& function_type = type_cast<FuncType>(type);
-			std::span<QualType const> function_params = function_type.GetParams();
+			FuncType const* function_type = cast<FuncType>(type);
+			std::span<QualType const> function_params = function_type->GetParams();
 
-			llvm::Type* return_type = ConvertOlaType(function_type.GetReturnType());
+			llvm::Type* return_type = ConvertOlaType(function_type->GetReturnType());
 			bool return_type_struct = return_type->isStructTy();
 
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
@@ -1460,38 +1460,13 @@ namespace ola
 		}
 		case TypeKind::Class:
 		{
-			ClassType const& class_type = type_cast<ClassType>(type);
-			ClassDecl const* class_decl = class_type.GetClassDecl();
-			if (class_decl == nullptr) return nullptr;
-
-			using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*, VoidPointerHash>;
-			static LLVMStructTypeMap struct_type_map;
-
-			if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
-
-			llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
-
-			UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-			std::vector<llvm::Type*> llvm_member_types;
-			if (class_decl->IsPolymorphic())
-			{
-				llvm_member_types.push_back(GetPointerType(GetPointerType(void_type)));
-			}
-			ClassDecl const* curr_class_decl = class_decl;
-			while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
-			{
-				for (auto const& field : base_class_decl->GetFields()) llvm_member_types.push_back(ConvertOlaType(field->GetType()));
-				curr_class_decl = base_class_decl;
-			}
-			for (auto const& field : fields) llvm_member_types.push_back(ConvertOlaType(field->GetType()));
-			llvm_class_type->setBody(llvm_member_types, false);
-			struct_type_map[class_decl] = llvm_class_type;
-			return llvm_class_type;
+			OLA_ASSERT_MSG(false, "Use ConvertClassDecl!");
+			return nullptr;
 		}
 		case TypeKind::Ref:
 		{
-			RefType const& ref_type = type_cast<RefType>(type);
-			return llvm::PointerType::get(ConvertOlaType(ref_type.GetReferredType()), 0);
+			RefType const* ref_type = cast<RefType>(type);
+			return llvm::PointerType::get(ConvertOlaType(ref_type->GetReferredType()), 0);
 		}
 		default:
 			OLA_UNREACHABLE();
@@ -1499,11 +1474,38 @@ namespace ola
 		return nullptr;
 	}
 
-	llvm::FunctionType* LLVMIRVisitor::ConvertMethodType(FuncType const& type, llvm::Type* class_type)
+	llvm::Type* LLVMIRVisitor::ConvertClassDecl(ClassDecl const* class_decl)
 	{
-		std::span<QualType const> function_params = type.GetParams();
+		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*, VoidPointerHash>;
+		static LLVMStructTypeMap struct_type_map;
 
-		llvm::Type* return_type = ConvertOlaType(type.GetReturnType());
+		if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
+
+		llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
+
+		UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+		std::vector<llvm::Type*> llvm_member_types;
+		if (class_decl->IsPolymorphic())
+		{
+			llvm_member_types.push_back(GetPointerType(GetPointerType(void_type)));
+		}
+		ClassDecl const* curr_class_decl = class_decl;
+		while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+		{
+			for (auto const& field : base_class_decl->GetFields()) llvm_member_types.push_back(ConvertOlaType(field->GetType()));
+			curr_class_decl = base_class_decl;
+		}
+		for (auto const& field : fields) llvm_member_types.push_back(ConvertOlaType(field->GetType()));
+		llvm_class_type->setBody(llvm_member_types, false);
+		struct_type_map[class_decl] = llvm_class_type;
+		return llvm_class_type;
+	}
+
+	llvm::FunctionType* LLVMIRVisitor::ConvertMethodType(FuncType const* type, llvm::Type* class_type)
+	{
+		std::span<QualType const> function_params = type->GetParams();
+
+		llvm::Type* return_type = ConvertOlaType(type->GetReturnType());
 		bool return_type_struct = return_type->isStructTy();
 
 		std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
@@ -1518,7 +1520,7 @@ namespace ola
 		return llvm::FunctionType::get(return_type_struct ? void_type : return_type, param_types, false);
 	}
 
-	llvm::Type* LLVMIRVisitor::GetStructType(QualType const& class_expr_type)
+	llvm::Type* LLVMIRVisitor::GetStructType(Type const* class_expr_type)
 	{
 		if (isa<ClassType>(class_expr_type))
 		{
@@ -1526,10 +1528,10 @@ namespace ola
 		}
 		else if (isa<RefType>(class_expr_type))
 		{
-			RefType const& ref_type = type_cast<RefType>(class_expr_type);
-			if (isa<ClassType>(ref_type.GetReferredType()))
+			RefType const* ref_type = cast<RefType>(class_expr_type);
+			if (isa<ClassType>(ref_type->GetReferredType()))
 			{
-				return ConvertOlaType(ref_type.GetReferredType());
+				return ConvertOlaType(ref_type->GetReferredType());
 			}
 			else return nullptr;
 		}
@@ -1541,10 +1543,10 @@ namespace ola
 		return llvm::PointerType::get(type, 0);
 	}
 
-	llvm::Value* LLVMIRVisitor::Load(QualType const& type, llvm::Value* ptr)
+	llvm::Value* LLVMIRVisitor::Load(Type const* type, llvm::Value* ptr)
 	{
 		llvm::Type* llvm_type = nullptr;
-		if (RefType const* ref_type = dyn_type_cast<RefType>(type))
+		if (RefType const* ref_type = dyn_cast<RefType>(type))
 			 llvm_type = ConvertOlaType(ref_type->GetReferredType());
 		else llvm_type = ConvertOlaType(type);
 		return Load(llvm_type, ptr);

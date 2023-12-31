@@ -57,7 +57,7 @@ namespace ola
 	void ClassDecl::SetMethods(UniqueMethodDeclPtrList&& _methods)
 	{
 		methods = std::move(_methods);
-		ThisVisitor this_visitor(ClassType(this));
+		ThisVisitor this_visitor(GetType());
 		for (auto& method : methods)
 		{
 			method->SetParentDecl(this);
@@ -125,13 +125,13 @@ namespace ola
 					{
 						if (entry->GetName() != method->GetName()) return false;
 
-						FuncType const& entry_type = entry->GetFuncType();
-						FuncType const& method_type = method->GetFuncType();
-						if (!entry_type.GetReturnType()->IsSameAs(method_type.GetReturnType())) return false;
-						if (entry_type.GetParamCount() != method_type.GetParamCount()) return false;
-						for (uint32 i = 0; i < entry_type.GetParamCount(); ++i)
+						FuncType const* entry_type = entry->GetFuncType();
+						FuncType const* method_type = method->GetFuncType();
+						if (!entry_type->GetReturnType()->IsEqualTo(method_type->GetReturnType())) return false;
+						if (entry_type->GetParamCount() != method_type->GetParamCount()) return false;
+						for (uint32 i = 0; i < entry_type->GetParamCount(); ++i)
 						{
-							if (!entry_type.GetParams()[i]->IsSameAs(method_type.GetParams()[i])) return false;
+							if (!entry_type->GetParams()[i]->IsEqualTo(method_type->GetParams()[i])) return false;
 						}
 						return true;
 					});
@@ -183,21 +183,21 @@ namespace ola
 		else if (isa<BoolType>(type))  type_mangled_name += "__B";
 		else if (isa<ArrayType>(type))
 		{
-			ArrayType const& arr_type = type_cast<ArrayType>(type);
-			type_mangled_name += GetTypeMangledName(arr_type.GetBaseType());
-			type_mangled_name += std::to_string(arr_type.GetArraySize());
+			ArrayType const* arr_type = cast<ArrayType>(type);
+			type_mangled_name += GetTypeMangledName(arr_type->GetBaseType());
+			type_mangled_name += std::to_string(arr_type->GetArraySize());
 		}
 		else if (isa<RefType>(type))
 		{
-			RefType const& ref_type = type_cast<RefType>(type);
-			type_mangled_name += GetTypeMangledName(ref_type.GetReferredType());
+			RefType const* ref_type = cast<RefType>(type);
+			type_mangled_name += GetTypeMangledName(ref_type->GetReferredType());
 			type_mangled_name += "ref";
 		}
 		else if (isa<ClassType>(type))
 		{
-			ClassType const& class_type = type_cast<ClassType>(type);
+			ClassType const* class_type = cast<ClassType>(type);
 			type_mangled_name += "__";
-			type_mangled_name += class_type.GetClassDecl()->GetName();
+			type_mangled_name += class_type->GetClassDecl()->GetName();
 		}
 		else OLA_ASSERT(false);
 
@@ -206,10 +206,7 @@ namespace ola
 	std::string FunctionDecl::GetMangledName() const
 	{
 		std::string mangled_name(GetName());
-
 		if (NoMangling()) return mangled_name;
-
-		FuncType const& func_type = GetFuncType();
 		for (auto const& param : param_decls)
 		{
 			QualType const& param_type = param->GetType();

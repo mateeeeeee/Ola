@@ -223,9 +223,9 @@ namespace ola
 	class IntLiteral final : public Expr
 	{
 	public:
-		IntLiteral(int64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value)
+		IntLiteral(int64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value) 
 		{
-			SetType(builtin_types::Int);
+			SetValueCategory(ExprValueCategory::RValue);
 		}
 		int64 GetValue() const { return value; }
 
@@ -246,7 +246,6 @@ namespace ola
 		CharLiteral(char c, SourceLocation const& loc) : Expr(ExprKind::CharLiteral, loc), c(c)
 		{
 			SetValueCategory(ExprValueCategory::RValue);
-			SetType(builtin_types::Char);
 		}
 		char GetChar() const { return c; }
 
@@ -266,7 +265,6 @@ namespace ola
 		StringLiteral(std::string_view str, SourceLocation const& loc) : Expr(ExprKind::StringLiteral, loc), str(str)
 		{
 			SetValueCategory(ExprValueCategory::RValue);
-			SetType(QualType(ArrayType(builtin_types::Char, (uint32)str.size() + 1), Qualifier_Const));
 		}
 		std::string_view GetString() const { return str; }
 
@@ -283,9 +281,9 @@ namespace ola
 	class BoolLiteral final : public Expr
 	{
 	public:
-		BoolLiteral(bool value, SourceLocation const& loc) : Expr(ExprKind::BoolLiteral, loc), value(value)
+		BoolLiteral(bool value, SourceLocation const& loc) : Expr(ExprKind::BoolLiteral, loc), value(value) 
 		{
-			SetType(builtin_types::Bool);
+			SetValueCategory(ExprValueCategory::RValue);
 		}
 		bool GetValue() const { return value; }
 
@@ -302,10 +300,7 @@ namespace ola
 	class FloatLiteral final : public Expr
 	{
 	public:
-		FloatLiteral(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value)
-		{
-			SetType(builtin_types::Float);
-		}
+		FloatLiteral(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value) {}
 		double GetValue() const { return value; }
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
@@ -360,7 +355,7 @@ namespace ola
 		FuncType const& GetCalleeType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetCallee()->GetType()));
-			return type_cast<FuncType>(GetCallee()->GetType());
+			return *cast<FuncType>(GetCallee()->GetType());
 		}
 		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 

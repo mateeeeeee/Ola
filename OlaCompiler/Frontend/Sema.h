@@ -16,6 +16,7 @@ namespace ola
 
 	class Parser;
 	class Diagnostics;
+	class Context;
 	struct SourceLocation;
 
 	enum TagKind
@@ -29,7 +30,7 @@ namespace ola
 		friend class Parser;
 
 		using CaseStmtCallback = std::function<void(CaseStmt*)>;
-		struct Context
+		struct SemaContext
 		{
 			SymbolTable<Decl> decl_sym_table;
 			SymbolTable<TagDecl> tag_sym_table;
@@ -52,7 +53,7 @@ namespace ola
 		};
 
 	public:
-		explicit Sema(Diagnostics& diagnostics);
+		Sema(Context* context, Diagnostics& diagnostics);
 		OLA_NONCOPYABLE(Sema)
 		OLA_DEFAULT_MOVABLE(Sema)
 		~Sema();
@@ -101,12 +102,12 @@ namespace ola
 		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);
 		UniqueTernaryExprPtr ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr);
 		UniqueCallExprPtr ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
-		UniqueIntLiteralPtr ActOnConstantInt(int64 value, SourceLocation const& loc);
+		UniqueIntLiteralPtr ActOnIntLiteral(int64 value, SourceLocation const& loc);
 		UniqueIntLiteralPtr ActOnLengthOperator(QualType const& type, SourceLocation const& loc);
-		UniqueCharLiteralPtr ActOnConstantChar(std::string_view str, SourceLocation const& loc);
-		UniqueStringLiteralPtr ActOnConstantString(std::string_view str, SourceLocation const& loc);
-		UniqueBoolLiteralPtr ActOnConstantBool(bool value, SourceLocation const& loc);
-		UniqueFloatLiteralPtr ActOnConstantFloat(double value, SourceLocation const& loc);
+		UniqueCharLiteralPtr ActOnCharLiteral(std::string_view str, SourceLocation const& loc);
+		UniqueStringLiteralPtr ActOnStringLiteral(std::string_view str, SourceLocation const& loc);
+		UniqueBoolLiteralPtr ActOnBoolLiteral(bool value, SourceLocation const& loc);
+		UniqueFloatLiteralPtr ActOnFloatLiteral(double value, SourceLocation const& loc);
 		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
 		UniqueIdentifierExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list);
@@ -118,8 +119,9 @@ namespace ola
 		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
 
 	private:
+		Context* ctx;
 		Diagnostics& diagnostics;
-		Context ctx;
+		SemaContext sema_ctx;
 
 	private:
 		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
