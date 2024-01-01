@@ -137,6 +137,16 @@ namespace ola
 					incompatible = true;
 					break;
 				}
+
+				if (ArrayType const* arr_type1 = dyn_cast<ArrayType>(function_type->GetParamType(i)), * arr_type2 = dyn_cast<ArrayType>(param_types[i]); 
+					arr_type1 && arr_type2)
+				{
+					if (arr_type1->GetArraySize() != arr_type2->GetArraySize())
+					{
+						incompatible = true;
+						break;
+					}
+				}
 			}
 			if(!incompatible) return function_type;
 		}

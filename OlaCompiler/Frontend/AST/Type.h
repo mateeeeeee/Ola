@@ -23,8 +23,7 @@ namespace ola
 		friend class Type;
 	public:
 		explicit QualType(Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers) {}
-		template<typename _Ty> requires std::derived_from<_Ty, Type>
-		QualType(_Ty const* _type, Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers)
+		QualType(Type const* _type, Qualifiers qualifiers = Qualifier_None) : qualifiers(qualifiers)
 		{
 			type = _type;
 		}
@@ -38,11 +37,9 @@ namespace ola
 		const Type& operator* () const { return *type; }
 		operator Type const* ()  const { return type; }
 		Type const* operator->() const { return type; }
-
 		Type const* GetTypePtr() const { return type; }
 
-		template<typename _Ty> requires std::derived_from<_Ty, Type>
-		void SetType(_Ty const* _type)
+		void SetType(Type const* _type)
 		{
 			type = _type;
 		}

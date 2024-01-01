@@ -34,14 +34,15 @@ modifyArray__I0:                        # @modifyArray__I0
 modifyArrayCopy__I3:                    # @modifyArrayCopy__I3
 .seh_proc modifyArrayCopy__I3
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	sub	rsp, 24
+	.seh_stackalloc 24
 	.seh_endprologue
 	mov	qword ptr [rsp], rcx
-	mov	rax, qword ptr [rsp]
-	mov	qword ptr [rax], 100
+	mov	qword ptr [rsp + 8], rdx
+	mov	qword ptr [rsp + 16], r8
+	mov	qword ptr [rsp], 100
 # %bb.1:                                # %exit
-	pop	rax
+	add	rsp, 24
 	ret
 	.seh_endproc
                                         # -- End function
@@ -158,9 +159,12 @@ main:                                   # @main
 	mov	cl, byte ptr [rbp - 105]        # 1-byte Reload
 	call	Assert
 	add	rsp, 32
-	lea	rcx, [rbp - 32]
-	mov	qword ptr [rbp - 104], rcx      # 8-byte Spill
-	mov	qword ptr [rbp - 40], rcx
+	lea	rax, [rbp - 32]
+	mov	qword ptr [rbp - 104], rax      # 8-byte Spill
+	mov	qword ptr [rbp - 40], rax
+	mov	r8, qword ptr [rbp - 16]
+	mov	rcx, qword ptr [rbp - 32]
+	mov	rdx, qword ptr [rbp - 24]
 	sub	rsp, 32
 	call	modifyArrayCopy__I3
 	add	rsp, 32
@@ -179,8 +183,34 @@ main:                                   # @main
 	mov	rcx, qword ptr [rbp - 104]      # 8-byte Reload
 	call	modifyArray__I0
 	add	rsp, 32
+	mov	rax, qword ptr [rbp - 32]
+	sub	rax, 100
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	rax, qword ptr [rbp - 40]
+	mov	rax, qword ptr [rax]
+	sub	rax, 100
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
 	mov	rax, qword ptr [rbp - 40]
 	mov	qword ptr [rax], 1000
+	mov	rax, qword ptr [rbp - 32]
+	sub	rax, 1000
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	mov	rax, qword ptr [rbp - 40]
+	mov	rax, qword ptr [rax]
+	sub	rax, 1000
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
 	mov	qword ptr [rbp - 48], 0
 	mov	qword ptr [rbp - 56], 0
 	mov	qword ptr [rbp - 80], 2
@@ -211,6 +241,16 @@ main:                                   # @main
 	mov	qword ptr [rbp - 96], rax
 	jmp	.LBB3_2
 .LBB3_4:                                # %for.end
+	cmp	qword ptr [rbp - 48], 10
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
+	cmp	qword ptr [rbp - 56], 10
+	sete	cl
+	sub	rsp, 32
+	call	Assert
+	add	rsp, 32
 	mov	qword ptr [rbp + 72], 0
 	jmp	.LBB3_9
 .LBB3_5:                                # %for.body1

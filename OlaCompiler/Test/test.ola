@@ -45,12 +45,12 @@ public int main()
 	Assert(LocalArray2[0] == -5);
 	Assert(LocalArray3[0] == -5);
 	modifyArray(LocalArray2);
-	//Assert(LocalArray2[0] == 100);
-	//Assert(LocalArray3[0] == 100);
+	Assert(LocalArray2[0] == 100);
+	Assert(LocalArray3[0] == 100);
 
 	LocalArray3[0] = 1000;
-	//Assert(LocalArray2[0] == 1000);
-	//Assert(LocalArray3[0] == 1000);
+	Assert(LocalArray2[0] == 1000);
+	Assert(LocalArray3[0] == 1000);
 
 	int sum2d = 0;
 	int globalSum2d = 0;
@@ -63,8 +63,8 @@ public int main()
 			globalSum2d += Global2dArray[i][j];
 		}
 	}
-	//Assert(sum2d == 10);  
-	//Assert(globalSum2d == 10);  
+	Assert(sum2d == 10);  
+	Assert(globalSum2d == 10);  
 	
 	return 0;
 }

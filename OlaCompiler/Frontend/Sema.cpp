@@ -856,10 +856,6 @@ namespace ola
 				if (isoneof<FunctionDecl, MethodDecl>(decl)) candidate_decls.push_back(cast<FunctionDecl>(decl));
 			}
 
-			//if (func_identifier->GetName().compare("PassStringLiteral") == 0)
-			//{
-			//	int x = 5;
-			//}
 			std::vector<FunctionDecl const*> match_decls = ResolveCall(candidate_decls, args);
 			if (match_decls.empty())
 			{
