@@ -855,6 +855,11 @@ namespace ola
 			{
 				if (isoneof<FunctionDecl, MethodDecl>(decl)) candidate_decls.push_back(cast<FunctionDecl>(decl));
 			}
+
+			//if (func_identifier->GetName().compare("PassStringLiteral") == 0)
+			//{
+			//	int x = 5;
+			//}
 			std::vector<FunctionDecl const*> match_decls = ResolveCall(candidate_decls, args);
 			if (match_decls.empty())
 			{
@@ -1054,7 +1059,7 @@ namespace ola
 	UniqueStringLiteralPtr Sema::ActOnStringLiteral(std::string_view str, SourceLocation const& loc)
 	{
 		UniqueStringLiteralPtr string_literal = MakeUnique<StringLiteral>(str, loc);
-		string_literal->SetType(ArrayType::Get(ctx, QualType(CharType::Get(ctx), str.size() + 1), Qualifier_Const));
+		string_literal->SetType(ArrayType::Get(ctx, QualType(CharType::Get(ctx), Qualifier_Const), str.size() + 1));
 		return string_literal;
 	}
 

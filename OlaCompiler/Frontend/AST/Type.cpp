@@ -112,8 +112,9 @@ namespace ola
 		{
 			if (array_type->GetBaseType() == type && array_type->GetArraySize() == array_size) return array_type;
 		}
-		ctx->array_types.push_back(new(ctx) ArrayType(type, array_size));
-		return ctx->array_types.back();
+		ArrayType* new_type = new(ctx) ArrayType(type, array_size);
+		ctx->array_types.push_back(new_type);
+		return new_type;
 	}
 
 	bool FuncType::IsAssignableFrom(Type const* other) const
@@ -128,11 +129,16 @@ namespace ola
 			if (function_type->GetReturnType() != return_type) continue;
 			if (function_type->GetParamCount() != param_types.size()) continue;
 			uint64 param_count = function_type->GetParamCount();
+			bool incompatible = false;
 			for (uint64 i = 0; i < param_count; ++i)
 			{
-				if (function_type->GetParamType(i) != param_types[i]) continue;
+				if (function_type->GetParamType(i) != param_types[i])
+				{
+					incompatible = true;
+					break;
+				}
 			}
-			return function_type;
+			if(!incompatible) return function_type;
 		}
 		ctx->function_types.push_back(new(ctx) FuncType(return_type, param_types));
 		return ctx->function_types.back();

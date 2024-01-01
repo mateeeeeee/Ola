@@ -14,11 +14,11 @@ namespace ola
 		: context(context), module(module), builder(context)
 	{
 		data_layout = std::make_unique<llvm::DataLayout>(&module);
-		void_type = llvm::Type::getVoidTy(context);
-		bool_type = llvm::Type::getInt1Ty(context);
-		char_type = llvm::Type::getInt8Ty(context);
-		int_type = llvm::Type::getInt64Ty(context);
-		float_type = llvm::Type::getDoubleTy(context);
+		void_type	= llvm::Type::getVoidTy(context);
+		bool_type	= llvm::Type::getInt1Ty(context);
+		char_type	= llvm::Type::getInt8Ty(context);
+		int_type	= llvm::Type::getInt64Ty(context);
+		float_type	= llvm::Type::getDoubleTy(context);
 	}
 
 	void LLVMIRVisitor::VisitAST(AST const* ast)
@@ -1460,8 +1460,8 @@ namespace ola
 		}
 		case TypeKind::Class:
 		{
-			OLA_ASSERT_MSG(false, "Use ConvertClassDecl!");
-			return nullptr;
+			ClassType const* class_type = cast<ClassType>(type);
+			return ConvertClassDecl(class_type->GetClassDecl());
 		}
 		case TypeKind::Ref:
 		{

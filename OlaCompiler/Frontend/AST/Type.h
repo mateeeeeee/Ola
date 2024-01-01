@@ -82,6 +82,9 @@ namespace ola
 		constexpr uint32 GetAlign() const { return align; }
 		TypeKind GetKind() const { return kind; }
 
+		void* operator new(uint64) = delete;
+		void* operator new(uint64 sz, Context*) { return ::operator new(sz); }
+
 		virtual bool IsEqualTo(Type const* t) const
 		{
 			return kind == t->kind;

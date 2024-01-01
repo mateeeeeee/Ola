@@ -23,7 +23,7 @@ namespace ola
 		VoidType* void_type;
 		BoolType* bool_type;
 		CharType* char_type;
-		IntType*  int_type;
+		IntType*   int_type;
 		FloatType* float_type;
 
 		std::vector<ArrayType*> array_types;
