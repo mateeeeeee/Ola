@@ -1422,14 +1422,25 @@ namespace ola
 		return ctor_expr;
 	}
 
-	UniqueImplicitCastExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)
+	UniqueExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)
 	{
 		QualType const& cast_type = type;
 		QualType const& operand_type = expr->GetType();
 
-		if (isa<ArrayType>(cast_type) || isa<ArrayType>(operand_type)) diagnostics.Report(loc, invalid_cast);
-		if (isa<VoidType>(cast_type)) diagnostics.Report(loc, invalid_cast);
-		if (!cast_type->IsAssignableFrom(operand_type)) diagnostics.Report(loc, invalid_cast);
+		if (isa<ArrayType>(cast_type) || isa<ArrayType>(operand_type))
+		{
+			return expr;
+		}
+		if (isa<VoidType>(cast_type))
+		{
+			diagnostics.Report(loc, invalid_cast);
+			return nullptr;
+		}
+		if (!cast_type->IsAssignableFrom(operand_type))
+		{
+			diagnostics.Report(loc, invalid_cast);
+			return nullptr;
+		}
 
 		UniqueImplicitCastExprPtr cast_expr = MakeUnique<ImplicitCastExpr>(loc, type);
 		cast_expr->SetLValue(expr->IsLValue());

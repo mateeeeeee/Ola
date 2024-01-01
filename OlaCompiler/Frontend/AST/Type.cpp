@@ -97,13 +97,15 @@ namespace ola
 
 	bool ArrayType::IsAssignableFrom(Type const* other) const
 	{
-		return IsEqualTo(other);
+		if (!isa<ArrayType>(other)) return false;
+		ArrayType const* other_array_type = cast<ArrayType>(other);
+		return base_type->IsEqualTo(other_array_type->base_type);
 	}
 	bool ArrayType::IsEqualTo(Type const* other) const
 	{
 		if (!isa<ArrayType>(other)) return false;
 		ArrayType const* other_array_type = cast<ArrayType>(other);
-		return base_type->IsEqualTo(other_array_type->base_type);
+		return base_type->IsEqualTo(other_array_type->base_type) && array_size == other_array_type->array_size;
 	}
 
 	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
@@ -136,16 +138,6 @@ namespace ola
 				{
 					incompatible = true;
 					break;
-				}
-
-				if (ArrayType const* arr_type1 = dyn_cast<ArrayType>(function_type->GetParamType(i)), * arr_type2 = dyn_cast<ArrayType>(param_types[i]); 
-					arr_type1 && arr_type2)
-				{
-					if (arr_type1->GetArraySize() != arr_type2->GetArraySize())
-					{
-						incompatible = true;
-						break;
-					}
 				}
 			}
 			if(!incompatible) return function_type;

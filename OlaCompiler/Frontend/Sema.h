@@ -124,7 +124,7 @@ namespace ola
 		SemaContext sema_ctx;
 
 	private:
-		UniqueImplicitCastExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
+		UniqueExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
 
 		template<typename DeclType> requires std::is_base_of_v<VarDecl, DeclType>
 		UniquePtr<DeclType> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
