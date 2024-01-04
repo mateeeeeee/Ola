@@ -1,7 +1,6 @@
 #pragma once
 
-
-namespace ola
+namespace ola::ir
 {
 	class IRGen
 	{

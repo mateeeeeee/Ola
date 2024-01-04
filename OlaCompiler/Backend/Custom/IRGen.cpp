@@ -1,6 +1,6 @@
 #include "IRGen.h"
 
-namespace ola
+namespace ola::ir
 {
 
 }

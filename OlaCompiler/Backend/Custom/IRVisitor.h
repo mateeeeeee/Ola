@@ -1,7 +1,7 @@
 #pragma once
 #include "Frontend/AST/ASTVisitor.h"
 
-namespace ola
+namespace ola::ir
 {
 	class IRVisitor : public ASTVisitor
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include "IRType.h"
 
-namespace ola
+namespace ola::ir
 {
 	enum class ValueKind
 	{

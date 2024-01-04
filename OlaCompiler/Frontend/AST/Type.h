@@ -73,8 +73,6 @@ namespace ola
 	{
 	public:
 		constexpr Type() {}
-		constexpr void SetAlign(uint32 _align) { align = _align; }
-		constexpr void SetSize(uint32 _size) { size = _size; }
 		constexpr uint32 GetSize() const { return size; }
 		constexpr uint32 GetAlign() const { return align; }
 		TypeKind GetKind() const { return kind; }
@@ -94,8 +92,9 @@ namespace ola
 		uint32 align = 0;
 
 	protected:
-		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0)
-			: kind(kind), size(size), align(align) {}
+		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0) : kind(kind), size(size), align(align) {}
+		constexpr void SetAlign(uint32 _align) { align = _align; }
+		constexpr void SetSize(uint32 _size)   { size = _size; }
 	};
 
 	class RefType : public Type
