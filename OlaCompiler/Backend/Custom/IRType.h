@@ -10,6 +10,7 @@ namespace ola::ir
 	{
 		Unknown,
 		Void,
+		Pointer,
 		Integer,
 		Float,
 		Array,
@@ -67,6 +68,22 @@ namespace ola::ir
 
 	private:
 		VoidType() : IRType(IRTypeKind::Void, 1, 1) {}
+	};
+
+	class PointerType : public IRType
+	{
+		friend class IRContext;
+	public:
+		IRType* GetPointeeType() const { return pointee_type; }
+
+		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Pointer; }
+		static PointerType* Get(IRContext* ctx, IRType* pointee_type = nullptr);
+
+	private:
+		IRType* pointee_type;
+
+	private:
+		explicit PointerType(IRType* pointee_type) : IRType(IRTypeKind::Pointer, 8, 8), pointee_type(pointee_type) {}
 	};
 
 	class IntegerType : public IRType

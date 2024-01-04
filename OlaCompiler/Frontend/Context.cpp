@@ -26,5 +26,58 @@ namespace ola
 		delete void_type;
 	}
 
+	ArrayType* Context::GetArrayType(QualType const& type, uint32 array_size)
+	{
+		for (auto const& array_type : array_types)
+		{
+			if (array_type->GetBaseType() == type && array_type->GetArraySize() == array_size) return array_type;
+		}
+		ArrayType* new_type = new(this) ArrayType(type, array_size);
+		array_types.push_back(new_type);
+		return new_type;
+	}
+
+	RefType* Context::GetRefType(QualType const& type)
+	{
+		for (auto const& ref_type : ref_types)
+		{
+			if (ref_type->GetReferredType() == (type)) return ref_type;
+		}
+		ref_types.push_back(new(this) RefType(type));
+		return ref_types.back();
+	}
+
+	FuncType* Context::GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types)
+	{
+		for (auto const& function_type : function_types)
+		{
+			if (function_type->GetReturnType() != return_type) continue;
+			if (function_type->GetParamCount() != param_types.size()) continue;
+			uint64 param_count = function_type->GetParamCount();
+			bool incompatible = false;
+			for (uint64 i = 0; i < param_count; ++i)
+			{
+				if (function_type->GetParamType(i) != param_types[i])
+				{
+					incompatible = true;
+					break;
+				}
+			}
+			if (!incompatible) return function_type;
+		}
+		function_types.push_back(new(this) FuncType(return_type, param_types));
+		return function_types.back();
+	}
+
+	ClassType* Context::GetClassType(ClassDecl const* class_decl)
+	{
+		for (auto const& class_type : class_types)
+		{
+			if (class_type->GetClassDecl() == class_decl) return class_type;
+		}
+		class_types.push_back(new(this) ClassType(class_decl));
+		return class_types.back();
+	}
+
 }
 

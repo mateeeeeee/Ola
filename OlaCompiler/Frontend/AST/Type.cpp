@@ -9,7 +9,6 @@ namespace ola
 		return type->IsEqualTo(o.type) && qualifiers == o.qualifiers;
 	}
 
-
 	bool RefType::IsAssignableFrom(Type const* other) const
 	{
 		return type->IsAssignableFrom(other) || IsEqualTo(other);
@@ -22,32 +21,25 @@ namespace ola
 	}
 	RefType* RefType::Get(Context* ctx, QualType const& type)
 	{
-		for (auto const& ref_type : ctx->ref_types)
-		{
-			if (ref_type->GetReferredType()==(type)) return ref_type;
-		}
-		ctx->ref_types.push_back(new(ctx) RefType(type));
-		return ctx->ref_types.back();
+		return ctx->GetRefType(type);
 	}
 
 	bool VoidType::IsAssignableFrom(Type const* other) const
 	{
 		return isa<VoidType>(other); 
 	}
-
 	VoidType* VoidType::Get(Context* ctx)
 	{
-		return ctx->void_type;
+		return ctx->GetVoidType();
 	}
 
 	bool BoolType::IsAssignableFrom(Type const* other) const
 	{
 		return isoneof<BoolType,IntType,FloatType>(other);
 	}
-
 	BoolType* BoolType::Get(Context* ctx)
 	{
-		return ctx->bool_type;
+		return ctx->GetBoolType();
 	}
 
 	bool CharType::IsAssignableFrom(Type const* other) const
@@ -59,10 +51,9 @@ namespace ola
 		}
 		else return isa<CharType>(other);
 	}
-
 	CharType* CharType::Get(Context* ctx)
 	{
-		return ctx->char_type;
+		return ctx->GetCharType();
 	}
 
 	bool IntType::IsAssignableFrom(Type const* other) const
@@ -74,10 +65,9 @@ namespace ola
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
-
 	IntType* IntType::Get(Context* ctx)
 	{
-		return ctx->int_type;
+		return ctx->GetIntType();
 	}
 
 	bool FloatType::IsAssignableFrom(Type const* other) const
@@ -89,10 +79,9 @@ namespace ola
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
-
 	FloatType* FloatType::Get(Context* ctx)
 	{
-		return ctx->float_type;
+		return ctx->GetFloatType();
 	}
 
 	bool ArrayType::IsAssignableFrom(Type const* other) const
@@ -107,43 +96,18 @@ namespace ola
 		ArrayType const* other_array_type = cast<ArrayType>(other);
 		return base_type->IsEqualTo(other_array_type->base_type) && array_size == other_array_type->array_size;
 	}
-
 	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
 	{
-		for (auto const& array_type : ctx->array_types)
-		{
-			if (array_type->GetBaseType() == type && array_type->GetArraySize() == array_size) return array_type;
-		}
-		ArrayType* new_type = new(ctx) ArrayType(type, array_size);
-		ctx->array_types.push_back(new_type);
-		return new_type;
+		return ctx->GetArrayType(type, array_size);
 	}
 
 	bool FuncType::IsAssignableFrom(Type const* other) const
 	{
 		return false;
 	}
-
-	FuncType* FuncType::Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types /*= {}*/)
+	FuncType* FuncType::Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types)
 	{
-		for (auto const& function_type : ctx->function_types)
-		{
-			if (function_type->GetReturnType() != return_type) continue;
-			if (function_type->GetParamCount() != param_types.size()) continue;
-			uint64 param_count = function_type->GetParamCount();
-			bool incompatible = false;
-			for (uint64 i = 0; i < param_count; ++i)
-			{
-				if (function_type->GetParamType(i) != param_types[i])
-				{
-					incompatible = true;
-					break;
-				}
-			}
-			if(!incompatible) return function_type;
-		}
-		ctx->function_types.push_back(new(ctx) FuncType(return_type, param_types));
-		return ctx->function_types.back();
+		return ctx->GetFuncType(return_type, param_types);
 	}
 
 	ClassType::ClassType(ClassDecl const* class_decl) : Type{ TypeKind::Class, 0, 0 }, class_decl(class_decl)
@@ -197,22 +161,15 @@ namespace ola
 		}
 		return true;
 	}
-
 	bool ClassType::IsEqualTo(Type const* other) const
 	{
 		if (!isa<ClassType>(other)) return false;
 		ClassType const* class_type = cast<ClassType>(other);
 		return class_decl == class_type->GetClassDecl();
 	}
-
 	ClassType* ClassType::Get(Context* ctx, ClassDecl const* class_decl)
 	{
-		for (auto const& class_type : ctx->class_types)
-		{
-			if (class_type->GetClassDecl() == class_decl) return class_type;
-		}
-		ctx->class_types.push_back(new(ctx) ClassType(class_decl));
-		return ctx->class_types.back();
+		return ctx->GetClassType(class_decl);
 	}
 
 }

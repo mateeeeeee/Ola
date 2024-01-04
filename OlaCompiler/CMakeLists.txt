@@ -71,6 +71,8 @@ set(BACKEND_FILES
   Backend/Custom/IRVisitor.cpp
   Backend/Custom/IRType.h
   Backend/Custom/IRType.cpp
+  Backend/Custom/IRContext.h
+  Backend/Custom/IRContext.cpp
 )
 
 set(COMPILER_FILES

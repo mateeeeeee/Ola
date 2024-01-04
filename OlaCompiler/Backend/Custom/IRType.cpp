@@ -12,6 +12,11 @@ namespace ola::ir
 		return nullptr;
 	}
 
+	PointerType* PointerType::Get(IRContext* ctx, IRType* pointee_type)
+	{
+		return nullptr;
+	}
+
 	IntegerType* IntegerType::Get(IRContext* ctx, uint32 width)
 	{
 		return nullptr;
