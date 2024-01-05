@@ -53,7 +53,7 @@ namespace ola
 		{
 			if (function_type->GetReturnType() != return_type) continue;
 			if (function_type->GetParamCount() != param_types.size()) continue;
-			uint64 param_count = function_type->GetParamCount();
+			uint64 const param_count = function_type->GetParamCount();
 			bool incompatible = false;
 			for (uint64 i = 0; i < param_count; ++i)
 			{

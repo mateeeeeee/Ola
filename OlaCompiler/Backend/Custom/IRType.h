@@ -126,6 +126,11 @@ namespace ola::ir
 		friend class IRContext;
 	public:
 
+		IRType* GetReturnType() const { return return_type; }
+		std::vector<IRType*> const& GetParamTypes() const { return param_types; }
+		uint64 GetParamCount() const { return param_types.size(); }
+		IRType* GetParamType(uint32 i) const { return param_types[i]; }
+
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
 		static FunctionType* Get(IRContext* ctx, IRType* return_type, std::vector<IRType*> const& param_types);
 
@@ -143,14 +148,19 @@ namespace ola::ir
 		friend class IRContext;
 	public:
 
+		std::string_view GetName() const { return name; }
+		std::vector<IRType*> const& GetMemberTypes() const { return member_types; }
+		uint64 GetMemberCount() const { return member_types.size(); }
+		IRType* GetMemberType(uint32 i) const { return member_types[i]; }
+
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Struct; }
-		static StructType* Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& members);
+		static StructType* Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& member_types);
 
 	private:
 		std::string name;
-		std::vector<IRType*> members;
+		std::vector<IRType*> member_types;
 	private:
-		StructType(std::string_view name, std::vector<IRType*> const& members);
+		StructType(std::string_view name, std::vector<IRType*> const& member_types);
 	};
 
 	template <typename T> requires std::derived_from<T, IRType>

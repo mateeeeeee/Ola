@@ -37,6 +37,17 @@ namespace ola::ir
 		return nullptr;
 	}
 
+	PointerType* IRContext::GetPointerType(IRType* pointee_type)
+	{
+		for (auto const& pointer_type : pointer_types)
+		{
+			if (pointer_type->GetPointeeType() == pointee_type) return pointer_type;
+		}
+		PointerType* new_type = new(this) PointerType(pointee_type);
+		pointer_types.push_back(new_type);
+		return new_type;
+	}
+
 	ArrayType* IRContext::GetArrayType(IRType* base_type, uint32 array_size)
 	{
 		for (auto const& array_type : array_types)
@@ -46,6 +57,50 @@ namespace ola::ir
 		ArrayType* new_type = new(this) ArrayType(base_type, array_size);
 		array_types.push_back(new_type);
 		return new_type;
+	}
+
+	FunctionType* IRContext::GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types)
+	{
+		for (auto const& function_type : function_types)
+		{
+			if (function_type->GetReturnType() != ret_type) continue;
+			if (function_type->GetParamCount() != param_types.size()) continue;
+			uint64 const param_count = function_type->GetParamCount();
+			bool incompatible = false;
+			for (uint64 i = 0; i < param_count; ++i)
+			{
+				if (function_type->GetParamType(i) != param_types[i])
+				{
+					incompatible = true;
+					break;
+				}
+			}
+			if (!incompatible) return function_type;
+		}
+		function_types.push_back(new(this) FunctionType(ret_type, param_types));
+		return function_types.back();
+	}
+
+	StructType* IRContext::GetStructType(std::string_view name, std::vector<IRType*> const& member_types)
+	{
+		for (auto const& struct_type : struct_types)
+		{
+			if (struct_type->GetName() != name) continue;
+			if (struct_type->GetMemberCount() != member_types.size()) continue;
+			uint64 const member_count = struct_type->GetMemberCount();
+			bool incompatible = false;
+			for (uint64 i = 0; i < member_count; ++i)
+			{
+				if (struct_type->GetMemberType(i) != member_types[i])
+				{
+					incompatible = true;
+					break;
+				}
+			}
+			if (!incompatible) return struct_type;
+		}
+		struct_types.push_back(new(this) StructType(name, member_types));
+		return struct_types.back();
 	}
 
 }

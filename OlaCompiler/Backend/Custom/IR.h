@@ -64,7 +64,6 @@ namespace ola::ir
 	{
 	public:
 		Value(ValueKind kind, IRType* type) : kind(kind), type(type) {}
-
 		virtual ~Value() = default;
 
 		ValueKind GetKind() const { return kind; }

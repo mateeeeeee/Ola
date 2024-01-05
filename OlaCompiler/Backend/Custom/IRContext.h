@@ -23,8 +23,11 @@ namespace ola::ir
 		VoidType* GetVoidType()   const { return void_type; }
 		FloatType* GetFloatType() const { return float_type; }
 
-		IntegerType* GetIntegerType(uint32 width);
-		ArrayType* GetArrayType(IRType* base_type, uint32 array_size);
+		IntegerType*	GetIntegerType(uint32 width);
+		PointerType*	GetPointerType(IRType* pointee_type);
+		ArrayType*		GetArrayType(IRType* base_type, uint32 array_size);
+		FunctionType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
+		StructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
 
 	private:
 		VoidType*	 void_type;

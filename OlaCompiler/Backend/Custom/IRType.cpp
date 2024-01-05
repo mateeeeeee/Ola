@@ -10,7 +10,7 @@ namespace ola::ir
 
 	PointerType* PointerType::Get(IRContext* ctx, IRType* pointee_type)
 	{
-		return nullptr;
+		return ctx->GetPointerType(pointee_type);
 	}
 
 	IntegerType* IntegerType::Get(IRContext* ctx, uint32 width)
@@ -30,20 +30,20 @@ namespace ola::ir
 
 	FunctionType* FunctionType::Get(IRContext* ctx, IRType* return_type, std::vector<IRType*> const& param_types)
 	{
-		return nullptr;
+		return ctx->GetFunctionType(return_type, param_types);
 	}
 
-	StructType* StructType::Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& members)
+	StructType* StructType::Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& member_types)
 	{
-		return nullptr;
+		return ctx->GetStructType(name, member_types);
 	}
 
-	StructType::StructType(std::string_view name, std::vector<IRType*> const& members) : IRType(IRTypeKind::Struct, 0, 0), name(name)
+	StructType::StructType(std::string_view name, std::vector<IRType*> const& member_types) : IRType(IRTypeKind::Struct, 0, 0), name(name), member_types(member_types)
 	{
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		uint32 offset = 0;
 
-		for (IRType* member_type : this->members)
+		for (IRType* member_type : this->member_types)
 		{
 			offset = AlignTo(offset, member_type->GetAlign());
 			offset += member_type->GetSize();
