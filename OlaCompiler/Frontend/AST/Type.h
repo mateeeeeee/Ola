@@ -80,10 +80,6 @@ namespace ola
 		void* operator new(uint64) = delete;
 		void* operator new(uint64 sz, Context*) { return ::operator new(sz); }
 
-		virtual bool IsEqualTo(Type const* t) const
-		{
-			return kind == t->kind;
-		}
 		virtual bool IsAssignableFrom(Type const*) const { return true; }
 
 	private:
@@ -104,7 +100,6 @@ namespace ola
 		QualType const& GetReferredType() const { return type; }
 
 		virtual bool IsAssignableFrom(Type const*) const override;
-		virtual bool IsEqualTo(Type const*) const override;
 
 		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Ref; }
 		static RefType* Get(Context* ctx, QualType const& type);
@@ -181,7 +176,6 @@ namespace ola
 	public:
 
 		virtual bool IsAssignableFrom(Type const*) const override;
-		virtual bool IsEqualTo(Type const*) const override;
 
 		QualType const& GetBaseType() const { return base_type; }
 		uint32 GetArraySize() const { return array_size; }
@@ -226,7 +220,6 @@ namespace ola
 		friend class Context;
 	public:
 		virtual bool IsAssignableFrom(Type const*) const override;
-		virtual bool IsEqualTo(Type const*) const override;
 
 		ClassDecl const* GetClassDecl() const { return class_decl; }
 

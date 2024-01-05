@@ -6,18 +6,12 @@ namespace ola
 {
 	bool QualType::operator==(QualType const& o) const
 	{
-		return type->IsEqualTo(o.type) && qualifiers == o.qualifiers;
+		return type == o.type && qualifiers == o.qualifiers;
 	}
 
 	bool RefType::IsAssignableFrom(Type const* other) const
 	{
-		return type->IsAssignableFrom(other) || IsEqualTo(other);
-	}
-	bool RefType::IsEqualTo(Type const* other) const
-	{
-		if (!isa<RefType>(other)) return false;
-		RefType const* other_ref_type = cast<RefType>(other);
-		return type->IsEqualTo(other_ref_type->GetReferredType());
+		return this == other || type->IsAssignableFrom(other);
 	}
 	RefType* RefType::Get(Context* ctx, QualType const& type)
 	{
@@ -88,13 +82,7 @@ namespace ola
 	{
 		if (!isa<ArrayType>(other)) return false;
 		ArrayType const* other_array_type = cast<ArrayType>(other);
-		return base_type->IsEqualTo(other_array_type->base_type);
-	}
-	bool ArrayType::IsEqualTo(Type const* other) const
-	{
-		if (!isa<ArrayType>(other)) return false;
-		ArrayType const* other_array_type = cast<ArrayType>(other);
-		return base_type->IsEqualTo(other_array_type->base_type) && array_size == other_array_type->array_size;
+		return base_type.GetTypePtr() == other_array_type->base_type.GetTypePtr();
 	}
 	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
 	{
@@ -144,7 +132,7 @@ namespace ola
 	}
 	bool ClassType::IsAssignableFrom(Type const* other) const
 	{
-		if (!IsEqualTo(other))
+		if (this != other)
 		{
 			if (RefType const* ref_other = dyn_cast<RefType>(other))
 			{
@@ -161,16 +149,9 @@ namespace ola
 		}
 		return true;
 	}
-	bool ClassType::IsEqualTo(Type const* other) const
-	{
-		if (!isa<ClassType>(other)) return false;
-		ClassType const* class_type = cast<ClassType>(other);
-		return class_decl == class_type->GetClassDecl();
-	}
 	ClassType* ClassType::Get(Context* ctx, ClassDecl const* class_decl)
 	{
 		return ctx->GetClassType(class_decl);
 	}
-
 }
 

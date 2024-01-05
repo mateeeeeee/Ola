@@ -393,7 +393,7 @@ namespace ola
 			diagnostics.Report(loc, incompatible_return_stmt_type);
 			return nullptr;
 		}
-		else if (!return_type->IsEqualTo(ret_expr_type))
+		else if (return_type.GetTypePtr() != ret_expr_type.GetTypePtr())
 		{
 			UniqueExprPtr casted_ret_expr(expr_stmt->ReleaseExpr());
 			casted_ret_expr = ActOnImplicitCastExpr(loc, return_type, std::move(casted_ret_expr));
@@ -468,7 +468,7 @@ namespace ola
 		QualType var_type = var_decl->GetType();
 		if (!var_type.IsNull())
 		{
-			if (!var_type->IsEqualTo(array_type->GetBaseType()))
+			if (var_type.GetTypePtr() != array_type->GetBaseType().GetTypePtr())
 			{
 				diagnostics.Report(var_decl->GetLocation(), foreach_loop_type_mismatch);
 				return nullptr;
@@ -662,7 +662,7 @@ namespace ola
 				diagnostics.Report(loc, incompatible_initializer);
 				return nullptr;
 			}
-			else if (!lhs_type->IsEqualTo(rhs_type))
+			else if (lhs_type.GetTypePtr() != rhs_type.GetTypePtr())
 			{
 				rhs = ActOnImplicitCastExpr(loc, lhs_type, std::move(rhs));
 			}
@@ -827,13 +827,13 @@ namespace ola
 			diagnostics.Report(loc, used_nonboolean_type);
 			return nullptr;
 		}
-		else if (!cond_expr->GetType()->IsEqualTo(BoolType::Get(ctx)))
+		else if (cond_expr->GetType().GetTypePtr() != BoolType::Get(ctx))
 		{
 			cond_expr = ActOnImplicitCastExpr(loc, BoolType::Get(ctx), std::move(cond_expr));
 		}
 
 		QualType expr_type{};
-		if (true_type->IsEqualTo(false_type)) expr_type = true_type;
+		if (true_type.GetTypePtr() == false_type.GetTypePtr()) expr_type = true_type;
 		else diagnostics.Report(loc, ternary_expr_types_incompatible);
 
 		UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
@@ -876,7 +876,7 @@ namespace ola
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsEqualTo(arg->GetType()))
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 				{
 					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 				}
@@ -943,7 +943,7 @@ namespace ola
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsEqualTo(arg->GetType()))
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 				{
 					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 				}
@@ -995,7 +995,7 @@ namespace ola
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsEqualTo(arg->GetType()))
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 				{
 					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 				}
@@ -1193,7 +1193,7 @@ namespace ola
 
 		for (auto const& expr : expr_list)
 		{
-			if (!expr->GetType()->IsEqualTo(expr_type))
+			if (expr->GetType().GetTypePtr() != expr_type.GetTypePtr())
 			{
 				diagnostics.Report(loc, init_list_element_expressions_type_mismatch);
 				return nullptr;
@@ -1332,7 +1332,7 @@ namespace ola
 		{
 			UniqueExprPtr& arg = args[i];
 			QualType const& func_param_type = param_types[i];
-			if (!func_param_type->IsEqualTo(arg->GetType()))
+			if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 			{
 				arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 			}
@@ -1411,7 +1411,7 @@ namespace ola
 		{
 			UniqueExprPtr& arg = args[i];
 			QualType const& func_param_type = param_types[i];
-			if (!func_param_type->IsEqualTo(arg->GetType()))
+			if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 			{
 				arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
 			}
@@ -1475,7 +1475,7 @@ namespace ola
 				diagnostics.Report(loc, incompatible_initializer);
 				return nullptr;
 			}
-			else if (!type->IsEqualTo(init_expr->GetType()))
+			else if (type.GetTypePtr() != init_expr->GetType().GetTypePtr())
 			{
 				init_expr = ActOnImplicitCastExpr(loc, type, std::move(init_expr));
 			}
@@ -1662,7 +1662,7 @@ namespace ola
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
-				if (!func_param_type->IsEqualTo(arg->GetType()))
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
 				{
 					++current_conversions_needed;
 				}

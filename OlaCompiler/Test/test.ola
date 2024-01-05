@@ -1,70 +1,64 @@
 import std.assert;
 
-private void modifyArray(int[] arr)
+public class S
 {
-	arr[0] = 100;
-}
-
-private void modifyArrayCopy(int[3] arr)
-{
-	arr[0] = 100;
-}
-
-private int sumOfArray(int[] arr, int size)
-{
-	int sum = 0;
-	for(int i = 0; i < size; ++i)
+	public void Init(int x, int y)
 	{
-		sum += arr[i];
+		this.x = x;
+		this.y = y;
 	}
-	return sum;
+
+	public void SetX(int x) {this.x = x;}
+	public void SetY(int y) {this.y = y;}
+	
+	public int GetX() const {return x;}
+	public int GetY() const {return y;}
+
+	private int x = 0;
+	private int y = 0;
+};
+
+void StructByValue(S s)
+{
+	s.SetX(100);
+	s.SetY(100);
+	Assert(s.GetX() == 100);
+	Assert(s.GetY() == 100);
 }
 
-auto GlobalArray1 = {1,1,1};
-int[5] GlobalArray2 = {1,2,3};
-int[3] GlobalArray3 = {10,20,30};
-int[2][2] Global2dArray = { {1,2}, {3,4}}; 
+void StructByRef(ref S s)
+{
+	s.SetX(1000);
+	s.SetY(1000);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
+}
 
 public int main()
 {
-	Assert(length(GlobalArray1) == 3);
-	Assert(sizeof(GlobalArray2) == 40);
-	Assert(GlobalArray3[0] == 10);
+	S s; s.Init(10, 10);
+	StructByValue(s);
+	Assert(s.GetX() == 10);
+	Assert(s.GetY() == 10);
 
-	int[10] LocalArray1 = {1,2};
-	Assert(sizeof(LocalArray1) == 80);
-	Assert(LocalArray1[6] == 0);
-	Assert(sumOfArray(LocalArray1, length(LocalArray1)) == 3);
+	S s2 = s; //copy
+	s.SetX(25);
+	s.SetY(25);
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
+	Assert(s.GetX() == 25);
+	Assert(s.GetY() == 25);
 
-	int[3] LocalArray2 = {-5,0,5};
-	Assert(LocalArray2[1] == 0);
-	Assert(length(LocalArray2) == 3);
+	StructByRef(s);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
 
-	int[] LocalArray3 = LocalArray2;
-	modifyArrayCopy(LocalArray2);
-	Assert(LocalArray2[0] == -5);
-	Assert(LocalArray3[0] == -5);
-	modifyArray(LocalArray2);
-	Assert(LocalArray2[0] == 100);
-	Assert(LocalArray3[0] == 100);
+	ref S s3 = s;
+	Assert(s3.GetX() == 1000);
+	Assert(s3.GetY() == 1000);
 
-	LocalArray3[0] = 1000;
-	Assert(LocalArray2[0] == 1000);
-	Assert(LocalArray3[0] == 1000);
+	s3.SetX(0);
+	Assert(s.GetX() == 0);
 
-	int sum2d = 0;
-	int globalSum2d = 0;
-	int[2][2] int2d = { {1,2}, {3,4}}; 
-	for(int i = 0; i < 2; ++i)
-	{
-		for(int j = 0; j < 2; ++j)
-		{
-			sum2d += int2d[i][j];
-			globalSum2d += Global2dArray[i][j];
-		}
-	}
-	Assert(sum2d == 10);  
-	Assert(globalSum2d == 10);  
-	
 	return 0;
 }

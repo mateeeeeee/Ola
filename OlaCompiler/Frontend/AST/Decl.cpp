@@ -127,11 +127,11 @@ namespace ola
 
 						FuncType const* entry_type = entry->GetFuncType();
 						FuncType const* method_type = method->GetFuncType();
-						if (!entry_type->GetReturnType()->IsEqualTo(method_type->GetReturnType())) return false;
+						if (entry_type->GetReturnType() != method_type->GetReturnType()) return false;
 						if (entry_type->GetParamCount() != method_type->GetParamCount()) return false;
 						for (uint32 i = 0; i < entry_type->GetParamCount(); ++i)
 						{
-							if (!entry_type->GetParams()[i]->IsEqualTo(method_type->GetParams()[i])) return false;
+							if (entry_type->GetParams()[i] != method_type->GetParams()[i]) return false;
 						}
 						return true;
 					});
