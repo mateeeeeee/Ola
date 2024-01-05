@@ -10,7 +10,7 @@ namespace llvm
 	class Context;
 	class Module;
 	class DataLayout;
-	class Value;
+	class IRValue;
 	class Type;
 	class PointerType;
 	class Function;

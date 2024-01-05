@@ -136,7 +136,7 @@ namespace ola
 						OLA_ASSERT(init_list_expr->IsConstexpr());
 						init_list_expr->Accept(*this);
 						
-						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
 						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
 						value_map[&var_decl] = global_array;
 					}
@@ -144,7 +144,7 @@ namespace ola
 					{
 						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
 
-						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
 						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant, var_decl.GetName());
 						value_map[&var_decl] = global_string;
 					}
@@ -158,7 +158,7 @@ namespace ola
 					llvm::Constant* constant_init_value = llvm::dyn_cast<llvm::Constant>(init_value);
 					OLA_ASSERT(constant_init_value);
 
-					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
+					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
 					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_init_value, var_decl.GetName());
 					value_map[&var_decl] = global_var;
 				}
