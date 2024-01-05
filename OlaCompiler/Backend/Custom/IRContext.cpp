@@ -7,8 +7,8 @@ namespace ola::ir
 	IRContext::IRContext()
 	{
 		void_type = new(this) VoidType();
-		int_types[1] = new(this) IntegerType(1);
-		int_types[8] = new(this) IntegerType(8);
+		int1_type = new(this) IntegerType(1);
+		int8_type = new(this) IntegerType(8);
 		float_type = new(this) FloatType();
 	}
 
@@ -20,11 +20,32 @@ namespace ola::ir
 		for (FunctionType* function_type : function_types)	delete function_type;
 
 		delete float_type;
-		for (auto [width, int_type] : int_types)
-		{
-			delete int_type;
-		}
+		delete int1_type;
+		delete int8_type;
 		delete void_type;
+	}
+
+	IntegerType* IRContext::GetIntegerType(uint32 width)
+	{
+		switch (width)
+		{
+		case 1:
+		case 8:
+		default:
+			OLA_ASSERT_MSG(false, "Invalid integer type width!");
+		}
+		return nullptr;
+	}
+
+	ArrayType* IRContext::GetArrayType(IRType* base_type, uint32 array_size)
+	{
+		for (auto const& array_type : array_types)
+		{
+			if (array_type->GetBaseType() == base_type && array_type->GetArraySize() == array_size) return array_type;
+		}
+		ArrayType* new_type = new(this) ArrayType(base_type, array_size);
+		array_types.push_back(new_type);
+		return new_type;
 	}
 
 }

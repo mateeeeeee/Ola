@@ -23,11 +23,11 @@ namespace ola
 		Context();
 		~Context();
 
-		VoidType*  GetVoidType() const  { return void_type;  }
-		BoolType*  GetBoolType() const  { return bool_type;  }
-		CharType*  GetCharType() const  { return char_type;  }
-		IntType*   GetIntType()  const  { return int_type;   }
-		FloatType* GetFloatType() const { return float_type; }
+		VoidType*  GetVoidType()  const  { return void_type;  }
+		BoolType*  GetBoolType()  const  { return bool_type;  }
+		CharType*  GetCharType()  const  { return char_type;  }
+		IntType*   GetIntType()   const  { return int_type;   }
+		FloatType* GetFloatType() const  { return float_type; }
 
 		ArrayType* GetArrayType(QualType const& type, uint32 array_size);
 		RefType* GetRefType(QualType const& type);

@@ -1,15 +1,11 @@
 #include "IRType.h"
+#include "IRContext.h"
 
 namespace ola::ir
 {
-	UnknownType* UnknownType::Get(IRContext* ctx)
-	{
-		return nullptr;
-	}
-
 	VoidType* VoidType::Get(IRContext* ctx)
 	{
-		return nullptr;
+		return ctx->GetVoidType();
 	}
 
 	PointerType* PointerType::Get(IRContext* ctx, IRType* pointee_type)
@@ -19,17 +15,17 @@ namespace ola::ir
 
 	IntegerType* IntegerType::Get(IRContext* ctx, uint32 width)
 	{
-		return nullptr;
+		return ctx->GetIntegerType(width);
 	}
 
 	FloatType* FloatType::Get(IRContext* ctx)
 	{
-		return nullptr;
+		return ctx->GetFloatType();
 	}
 
 	ArrayType* ArrayType::Get(IRContext* ctx, IRType* base_type, uint32 array_size)
 	{
-		return nullptr;
+		return ctx->GetArrayType(base_type, array_size);
 	}
 
 	FunctionType* FunctionType::Get(IRContext* ctx, IRType* return_type, std::vector<IRType*> const& param_types)

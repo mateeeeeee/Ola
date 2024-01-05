@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
 
 namespace ola::ir
 {
+	class IRType;
 	class UnknownType;
 	class VoidType;
 	class PointerType;
@@ -20,17 +20,22 @@ namespace ola::ir
 		IRContext();
 		~IRContext();
 
-	public:
+		VoidType* GetVoidType()   const { return void_type; }
+		FloatType* GetFloatType() const { return float_type; }
+
+		IntegerType* GetIntegerType(uint32 width);
+		ArrayType* GetArrayType(IRType* base_type, uint32 array_size);
 
 	private:
 		VoidType*	 void_type;
-		FloatType*	 float_type;
-		std::unordered_map<uint32, IntegerType*> int_types;
+		IntegerType* int1_type;
+		IntegerType* int8_type;
+		FloatType*   float_type;
 
 		std::vector<ArrayType*>		array_types;
-		std::vector<StructType*>	struct_types;
 		std::vector<PointerType*>   pointer_types;
 		std::vector<FunctionType*>	function_types;
+		std::vector<StructType*>	struct_types;
 	};
 }
 

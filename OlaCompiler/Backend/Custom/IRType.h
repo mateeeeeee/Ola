@@ -8,7 +8,6 @@ namespace ola::ir
 
 	enum class IRTypeKind 
 	{
-		Unknown,
 		Void,
 		Pointer,
 		Integer,
@@ -46,17 +45,6 @@ namespace ola::ir
 
 		void SetAlign(uint32 _align) { align = _align; }
 		void SetSize(uint32 _size) { size = _size; }
-	};
-
-	class UnknownType : public IRType
-	{
-		friend class IRContext;
-	public:
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Unknown; }
-		static UnknownType* Get(IRContext* ctx);
-
-	private:
-		UnknownType() : IRType(IRTypeKind::Unknown, 0, 0) {}
 	};
 
 	class VoidType : public IRType
@@ -117,6 +105,7 @@ namespace ola::ir
 
 	class ArrayType : IRType
 	{
+		friend class IRContext;
 	public:
 		IRType* GetBaseType() const { return base_type; }
 		uint32 GetArraySize() const { return array_size; }
