@@ -25,7 +25,7 @@ namespace ola
 		Ctor,
 		ArrayAccess,
 		Member,
-		MemberCall,
+		MethodCall,
 		This,
 		Super
 	};
@@ -71,6 +71,8 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Expr const* expr) { return true; }
+
 	protected:
 		ExprKind const kind;
 		SourceLocation loc;
@@ -82,7 +84,7 @@ namespace ola
 		void SetValueCategory(ExprValueCategory _value_category) { value_category = _value_category; }
 	};
 
-	class UnaryExpr : public Expr
+	class UnaryExpr final : public Expr
 	{
 	public:
 		UnaryExpr(UnaryExprKind op, SourceLocation const& loc) : Expr(ExprKind::Unary, loc), op(op), operand(nullptr) {}
@@ -102,7 +104,7 @@ namespace ola
 		UniqueExprPtr operand;
 	};
 
-	class BinaryExpr : public Expr
+	class BinaryExpr final : public Expr
 	{
 	public:
 		BinaryExpr(BinaryExprKind op, SourceLocation const& loc) : Expr(ExprKind::Binary, loc), op(op) {}
@@ -156,7 +158,7 @@ namespace ola
 		BinaryExprKind op;
 	};
 
-	class TernaryExpr : public Expr
+	class TernaryExpr final : public Expr
 	{
 	public:
 		explicit TernaryExpr(SourceLocation const& loc) : Expr(ExprKind::Ternary, loc)
@@ -192,7 +194,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Identifier; }
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Identifier || expr->GetExprKind() == ExprKind::DeclRef; }
 	private:
 		std::string name;
 
@@ -204,7 +206,7 @@ namespace ola
 		}
 	};
 
-	class DeclRefExpr : public IdentifierExpr
+	class DeclRefExpr final : public IdentifierExpr
 	{
 	public:
 		DeclRefExpr(Decl const* decl, SourceLocation const& loc);
@@ -314,7 +316,7 @@ namespace ola
 		double value;
 	};
 
-	class ImplicitCastExpr : public Expr
+	class ImplicitCastExpr final : public Expr
 	{
 	public:
 		ImplicitCastExpr(SourceLocation const& loc, QualType const& qtype) : Expr(ExprKind::ImplicitCast, loc), operand(nullptr)
@@ -363,7 +365,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call; }
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call || expr->GetExprKind() == ExprKind::MethodCall; }
 	protected:
 		FunctionDecl const* func_decl;
 		UniqueExprPtr callee;
@@ -465,7 +467,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::MemberCall; }
+		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::MethodCall; }
 	};
 
 	class ThisExpr final : public Expr

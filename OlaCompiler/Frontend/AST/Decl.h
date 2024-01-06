@@ -19,8 +19,7 @@ namespace ola
 		Enum,
 		EnumMember,
 		Alias,
-		Class,
-		Interface
+		Class
 	};
 	enum class DeclVisibility : uint8
 	{
@@ -54,6 +53,8 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Decl const* decl) { return true; }
+
 	private:
 		DeclKind const decl_kind;
 		std::string name;
@@ -86,7 +87,17 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Var; }
+		static bool ClassOf(Decl const* decl) 
+		{ 
+			switch (decl->GetDeclKind())
+			{
+			case DeclKind::Var:
+			case DeclKind::ParamVar:
+			case DeclKind::Field:
+				return true;
+			}
+			return false;
+		}
 	private:
 		UniqueExprPtr init_expr = nullptr;
 		bool is_global = false;
@@ -198,7 +209,17 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Function; }
+		static bool ClassOf(Decl const* decl) 
+		{ 
+			switch (decl->GetDeclKind())
+			{
+			case DeclKind::Function:
+			case DeclKind::Method:
+			case DeclKind::Constructor:
+				return true;
+			}
+			return false;
+		}
 
 	protected:
 		UniqueParamVarDeclPtrList param_decls;
@@ -252,7 +273,17 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Method; }
+		static bool ClassOf(Decl const* decl)
+		{
+			switch (decl->GetDeclKind())
+			{
+			case DeclKind::Method:
+			case DeclKind::Constructor:
+				return true;
+			}
+			return false;
+		}
+
 	private:
 		ClassDecl const* parent = nullptr;
 		MethodAttributes method_attrs = MethodAttribute_None;
@@ -280,11 +311,23 @@ namespace ola
 	public:
 		virtual bool IsTag() const override { return true; }
 
+		static bool ClassOf(Decl const* decl)
+		{
+			switch (decl->GetDeclKind())
+			{
+			case DeclKind::Alias:
+			case DeclKind::Class:
+			case DeclKind::Enum:
+				return true;
+			}
+			return false;
+		}
+
 	protected:
 		TagDecl(DeclKind decl_kind, std::string_view name, SourceLocation const& loc) : Decl(decl_kind, name, loc) {}
 	};
 
-	class EnumDecl : public TagDecl
+	class EnumDecl final : public TagDecl
 	{
 	public:
 		EnumDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Enum, name, loc) {}
@@ -299,11 +342,12 @@ namespace ola
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Enum; }
+
 	private:
 		UniqueEnumMemberDeclPtrList enum_members;
 	};
 
-	class EnumMemberDecl : public Decl
+	class EnumMemberDecl final : public Decl
 	{
 	public:
 		EnumMemberDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::EnumMember, name, loc)
@@ -323,7 +367,7 @@ namespace ola
 		int64 value = 0;
 	};
 
-	class AliasDecl : public TagDecl
+	class AliasDecl final : public TagDecl
 	{
 	public:
 		AliasDecl(std::string_view name, SourceLocation const& loc, QualType const& aliased_type) : TagDecl(DeclKind::Alias, name, loc)
@@ -343,7 +387,7 @@ namespace ola
 		Success = 0,
 		Error_OverrideFinal = 1
 	};
-	class ClassDecl : public TagDecl
+	class ClassDecl final : public TagDecl
 	{
 	public:
 		ClassDecl(std::string_view name, SourceLocation const& loc) : TagDecl(DeclKind::Class, name, loc) {}
@@ -392,6 +436,7 @@ namespace ola
 
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
+
 
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
 

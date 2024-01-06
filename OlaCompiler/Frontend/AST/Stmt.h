@@ -35,6 +35,11 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
+		static bool ClassOf(Stmt const* stmt)
+		{
+			return true;
+		}
+
 	protected:
 		StmtKind const kind;
 
@@ -100,7 +105,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Expr; }
+		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Expr || stmt->GetStmtKind() == StmtKind::Null; }
 	private:
 		UniqueExprPtr expr;
 	};
