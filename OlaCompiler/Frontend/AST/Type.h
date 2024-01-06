@@ -4,7 +4,9 @@
 #include <vector>
 #include <memory>
 #include <span>
+#include "Compiler/RTTI.h"
 #include "Utility/Enums.h"
+
 
 namespace ola
 {
@@ -233,34 +235,34 @@ namespace ola
 	};
 
 
-	template <typename T> requires std::derived_from<T, Type>
-	inline bool isa(Type const* type) { return T::ClassOf(type); }
-
-	template <typename T, typename... Ts> requires (std::derived_from<T, Type> && ... && std::derived_from<Ts, Type>)
-		inline bool isoneof(Type const* type)
-	{ 
-		return (T::ClassOf(type) || ... || Ts::ClassOf(type));
+	template<typename T> requires std::derived_from<T, Type>
+	inline bool isa(QualType const& qtype)
+	{
+		return isa<T>(qtype.GetTypePtr());
 	}
 
-	template<typename T> requires std::derived_from<T, Type>
-	inline T* cast(Type* t)
-	{
-		return static_cast<T*>(t);
-	}
-	template<typename T> requires std::derived_from<T, Type>
-	inline T const* cast(Type const* t)
-	{
-		return static_cast<T const*>(t);
-	}
+	template <typename... Ts> requires (std::derived_from<Ts, Type> && ...)
+	inline bool isoneof(QualType const& qtype) { return (bool(isa<Ts>(qtype)) || ...); }
 
 	template<typename T> requires std::derived_from<T, Type>
-	inline T* dyn_cast(Type* t)
+	inline auto cast(QualType& qtype)
 	{
-		return isa<T>(t) ? static_cast<T*>(t) : nullptr;
+		return cast<T>(qtype.GetTypePtr());
 	}
 	template<typename T> requires std::derived_from<T, Type>
-	inline T const* dyn_cast(Type const* t)
+	inline auto cast(QualType const& qtype)
 	{
-		return isa<T>(t) ? static_cast<T const*>(t) : nullptr;
+		return cast<T>(qtype.GetTypePtr());
 	}
+	template<typename T> requires std::derived_from<T, Type>
+	inline auto dyn_cast(QualType& qtype)
+	{
+		return dyn_cast<T>(qtype.GetTypePtr());
+	}
+	template<typename T> requires std::derived_from<T, Type>
+	inline auto dyn_cast(QualType const& qtype)
+	{
+		return dyn_cast<T>(qtype.GetTypePtr());
+	}
+
 }

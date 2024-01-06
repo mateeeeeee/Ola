@@ -79,6 +79,7 @@ set(BACKEND_FILES
 set(COMPILER_FILES
   Compiler/Compiler.h
   Compiler/Compiler.cpp
+  Compiler/RTTI.h
 )
 
 set(TEST_FILES

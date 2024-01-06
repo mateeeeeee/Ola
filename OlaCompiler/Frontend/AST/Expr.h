@@ -3,6 +3,7 @@
 #include "ASTAliases.h"
 #include "Type.h"
 #include "Frontend/SourceLocation.h"
+#include "Compiler/RTTI.h"
 
 namespace ola
 {
@@ -352,10 +353,10 @@ namespace ola
 			callee = std::move(_callee);
 		}
 		Expr const* GetCallee() const { return callee.get(); }
-		FuncType const& GetCalleeType() const
+		FuncType const* GetCalleeType() const
 		{
 			OLA_ASSERT(isa<FuncType>(GetCallee()->GetType()));
-			return *cast<FuncType>(GetCallee()->GetType());
+			return cast<FuncType>(GetCallee()->GetType());
 		}
 		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 
@@ -525,37 +526,5 @@ namespace ola
 	private:
 		ConstructorDecl const* ctor_decl;
 		UniqueExprPtrList ctor_args;
-
 	};
-
-	template <typename T> requires std::derived_from<T, Expr>
-	inline bool isa(Expr const* expr) { return T::ClassOf(expr); }
-
-	template <typename T, typename... Ts> requires (std::derived_from<T, Expr> && ... && std::derived_from<Ts, Expr>)
-	inline bool isoneof(Expr const* expr)
-	{
-		return (T::ClassOf(expr) || ... || Ts::ClassOf(expr));
-	}
-
-	template<typename T> requires std::derived_from<T, Expr>
-	inline T* cast(Expr* expr)
-	{
-		return static_cast<T*>(expr);
-	}
-	template<typename T> requires std::derived_from<T, Expr>
-	inline T const* cast(Expr const* expr)
-	{
-		return static_cast<T const*>(expr);
-	}
-
-	template<typename T> requires std::derived_from<T, Expr>
-	inline T* dyn_cast(Expr* expr)
-	{
-		return isa<T>(expr) ? static_cast<T*>(expr) : nullptr;
-	}
-	template<typename T> requires std::derived_from<T, Expr>
-	inline T const* dyn_cast(Expr const* expr)
-	{
-		return isa<T>(expr) ? static_cast<T const*>(expr) : nullptr;
-	}
 }

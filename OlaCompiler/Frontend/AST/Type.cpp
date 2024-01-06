@@ -41,7 +41,7 @@ namespace ola
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
-			return referred_type.IsNull() || isa<CharType>(referred_type); 
+			return referred_type.IsNull() || isa<CharType>(referred_type.GetTypePtr());
 		}
 		else return isa<CharType>(other);
 	}
@@ -55,7 +55,7 @@ namespace ola
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
-			return referred_type.IsNull() || isa<IntType>(referred_type);
+			return referred_type.IsNull() || isa<IntType>(referred_type.GetTypePtr());
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
@@ -69,7 +69,7 @@ namespace ola
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
 			QualType const& referred_type = ref_other->GetReferredType();
-			return referred_type.IsNull() || isa<FloatType>(referred_type);
+			return referred_type.IsNull() || isa<FloatType>(referred_type.GetTypePtr());
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
@@ -136,9 +136,9 @@ namespace ola
 		{
 			if (RefType const* ref_other = dyn_cast<RefType>(other))
 			{
-				if (!isa<ClassType>(ref_other->GetReferredType())) return false;
+				if (!isa<ClassType>(ref_other->GetReferredType().GetTypePtr())) return false;
 				QualType const& referred_type = ref_other->GetReferredType();
-				ClassType const* referred_class_type = cast<ClassType>(referred_type);
+				ClassType const* referred_class_type = cast<ClassType>(referred_type.GetTypePtr());
 				return IsAssignableFrom(referred_class_type);
 			}
 			else if (ClassType const* class_other = dyn_cast<ClassType>(other))

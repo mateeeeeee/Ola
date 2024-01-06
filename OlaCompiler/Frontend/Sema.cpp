@@ -33,7 +33,7 @@ namespace ola
 
 		if (isa<RefType>(type))
 		{
-			RefType const* ref_type = cast<RefType>(type);
+			RefType const* ref_type = cast<RefType>(type.GetTypePtr());
 			if (ref_type->GetReferredType().IsNull())
 			{
 				diagnostics.Report(loc, missing_type_specifier);

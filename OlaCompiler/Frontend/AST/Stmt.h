@@ -4,6 +4,7 @@
 #include "Expr.h"
 #include "Type.h"
 #include "Frontend/SourceLocation.h"
+#include "Compiler/RTTI.h"
 
 namespace ola
 {
@@ -346,35 +347,4 @@ namespace ola
 	private:
 		std::string label_name;
 	};
-
-	template <typename T> requires std::derived_from<T, Stmt>
-	inline bool isa(Stmt const* stmt) { return T::ClassOf(stmt); }
-
-	template <typename T, typename... Ts> requires (std::derived_from<T, Stmt> && ... && std::derived_from<Ts, Stmt>)
-	inline bool isoneof(Stmt const* stmt)
-	{
-		return (T::ClassOf(stmt) || ... || Ts::ClassOf(stmt));
-	}
-
-	template<typename T> requires std::derived_from<T, Stmt>
-	inline T* cast(Stmt* stmt)
-	{
-		return static_cast<T*>(stmt);
-	}
-	template<typename T> requires std::derived_from<T, Stmt>
-	inline T const* cast(Stmt const* stmt)
-	{
-		return static_cast<T const*>(stmt);
-	}
-
-	template<typename T> requires std::derived_from<T, Stmt>
-	inline T* dyn_cast(Stmt* stmt)
-	{
-		return isa<T>(stmt) ? static_cast<T*>(stmt) : nullptr;
-	}
-	template<typename T> requires std::derived_from<T, Stmt>
-	inline T const* dyn_cast(Stmt const* stmt)
-	{
-		return isa<T>(stmt) ? static_cast<T const*>(stmt) : nullptr;
-	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "IRType.h"
+#include "Compiler/RTTI.h"
 
 namespace ola::ir
 {
@@ -122,6 +123,49 @@ namespace ola::ir
 		GlobalLinkage linkage;
 		IRValue* init_value;
 		IRType* alloc_type;
+	};
+
+	class BasicBlock;
+	class Inst : public UsedValue
+	{
+		friend class BasicBlock;
+	public:
+		Inst(IRValueKind kind, IRType* type) : UsedValue(kind, type), parent(nullptr){}
+
+		BasicBlock* GetParent() const { return parent; }
+
+	private:
+		BasicBlock* parent;
+	};
+
+	class IRFunction;
+	class BasicBlock : public UsedValue
+	{
+	public:
+		explicit BasicBlock(std::string_view name = "") : UsedValue(IRValueKind::Block), name(name)
+		{
+		}
+
+		auto begin() const { return inst_list.begin(); }
+		auto end()   const { return inst_list.end();   }
+
+		void SetFunction(IRFunction* _parent) { parent = _parent; }
+		IRFunction* GetParent() const { return parent; }
+
+		uint64 GetIndex() const { return -1; }
+
+	private:
+		std::string name;
+		IRFunction* parent{};
+		std::vector<Inst*> inst_list;
+	};
+
+	class IRFunction : public UsedValue
+	{
+	public:
+
+
+	private:
 	};
 
 	template <typename V> requires std::derived_from<V, IRValue>

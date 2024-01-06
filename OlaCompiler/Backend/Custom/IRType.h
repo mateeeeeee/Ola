@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "Compiler/RTTI.h"
 
 namespace ola::ir
 {
@@ -162,35 +163,4 @@ namespace ola::ir
 	private:
 		StructType(std::string_view name, std::vector<IRType*> const& member_types);
 	};
-
-	template <typename T> requires std::derived_from<T, IRType>
-	inline bool isa(IRType const* type) { return T::ClassOf(type); }
-
-	template <typename T, typename... Ts> requires (std::derived_from<T, IRType> && ... && std::derived_from<Ts, IRType>)
-	inline bool isoneof(IRType const* type)
-	{
-		return (T::ClassOf(type) || ... || Ts::ClassOf(type));
-	}
-
-	template<typename T> requires std::derived_from<T, IRType>
-	inline T* cast(IRType* t)
-	{
-		return static_cast<T*>(t);
-	}
-	template<typename T> requires std::derived_from<T, IRType>
-	inline T const* cast(IRType const* t)
-	{
-		return static_cast<T const*>(t);
-	}
-
-	template<typename T> requires std::derived_from<T, IRType>
-	inline T* dyn_cast(IRType* t)
-	{
-		return isa<T>(t) ? static_cast<T*>(t) : nullptr;
-	}
-	template<typename T> requires std::derived_from<T, IRType>
-	inline T const* dyn_cast(IRType const* t)
-	{
-		return isa<T>(t) ? static_cast<T const*>(t) : nullptr;
-	}
 }

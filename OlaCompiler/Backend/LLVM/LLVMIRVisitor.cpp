@@ -111,7 +111,8 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(VarDecl const& var_decl, uint32)
 	{
-		QualType const& var_type = var_decl.GetType();
+		Type const* var_type = var_decl.GetType().GetTypePtr();
+		bool const is_const  = var_decl.GetType().IsConst();
 		llvm::Type* llvm_type = ConvertOlaType(var_type);
 		bool const is_array = isa<ArrayType>(var_type); 
 		bool const is_class = isa<ClassType>(var_type); 
@@ -121,7 +122,7 @@ namespace ola
 		{
 			if (var_decl.IsExtern())
 			{
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, is_const, llvm::GlobalValue::ExternalLinkage, nullptr, var_decl.GetName());
 				value_map[&var_decl] = global_var;
 			}
 			else if(Expr const* init_expr = var_decl.GetInitExpr())
@@ -137,7 +138,7 @@ namespace ola
 						init_list_expr->Accept(*this);
 						
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
-						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
+						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
 						value_map[&var_decl] = global_array;
 					}
 					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
@@ -145,7 +146,7 @@ namespace ola
 						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
 
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
-						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant, var_decl.GetName());
+						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, constant, var_decl.GetName());
 						value_map[&var_decl] = global_string;
 					}
 					else OLA_ASSERT(false);
@@ -159,7 +160,7 @@ namespace ola
 					OLA_ASSERT(constant_init_value);
 
 					llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
-					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_init_value, var_decl.GetName());
+					llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, constant_init_value, var_decl.GetName());
 					value_map[&var_decl] = global_var;
 				}
 			}
@@ -202,7 +203,7 @@ namespace ola
 			{
 				llvm::Constant* constant_init_value = llvm::Constant::getNullValue(llvm_type);
 				llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::Function::ExternalLinkage : llvm::Function::InternalLinkage;
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, var_type.IsConst(), linkage, constant_init_value, var_decl.GetName());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, constant_init_value, var_decl.GetName());
 				value_map[&var_decl] = global_var;
 			}
 		}
@@ -319,7 +320,7 @@ namespace ola
 				if (is_class)
 				{
 					QualType const& var_type = var_decl.GetType();
-					ClassType const* class_type = cast<ClassType>(var_type);
+					ClassType const* class_type = cast<ClassType>(var_type.GetTypePtr());
 					ClassDecl const* class_decl = class_type->GetClassDecl();
 
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
@@ -389,7 +390,7 @@ namespace ola
 		{
 			init_expr->Accept(*this);
 			llvm::Value* init_value = value_map[init_expr];
-			OLA_ASSERT(isa<llvm::Constant>(init_value));
+			OLA_ASSERT(llvm::isa<llvm::Constant>(init_value));
 			value_map[&member_var] = cast<llvm::Constant>(init_value);
 		}
 		else
@@ -1109,7 +1110,7 @@ namespace ola
 
 		std::vector<llvm::Value*> args;
 		uint32 arg_index = 0;
-		bool return_struct = isa<ClassType>(call_expr.GetCalleeType().GetReturnType());
+		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
 		llvm::AllocaInst* return_alloc = nullptr;
 		if (return_struct)
 		{
@@ -1185,7 +1186,7 @@ namespace ola
 		}
 		else 
 		{
-			QualType const& array_expr_type = array_expr->GetType();
+			Type const* array_expr_type = array_expr->GetType();
 			OLA_ASSERT(isa<ArrayType>(array_expr_type));
 			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
 			if (isa<ArrayType>(array_type->GetBaseType()))
@@ -1226,7 +1227,7 @@ namespace ola
 		MemberExpr const* member_expr = cast<MemberExpr>(callee_expr);
 
 		Decl const* decl = member_expr->GetMemberDecl();
-		//OLA_ASSERT(isa<MethodDecl>(decl));
+		OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
 
@@ -1277,7 +1278,7 @@ namespace ola
 
 			std::vector<llvm::Value*> args;
 			uint32 arg_index = 0;
-			bool return_struct = isa<ClassType>(member_call_expr.GetCalleeType().GetReturnType());
+			bool return_struct = isa<ClassType>(member_call_expr.GetCalleeType()->GetReturnType());
 			llvm::AllocaInst* return_alloc = nullptr;
 			if (return_struct)
 			{
@@ -1389,12 +1390,12 @@ namespace ola
 	{
 		if (IsPointer(condition_value->getType()))
 		{
-			if (isa<llvm::AllocaInst>(condition_value))
+			if (llvm::isa<llvm::AllocaInst>(condition_value))
 			{
 				llvm::AllocaInst* alloca_inst = cast<llvm::AllocaInst>(condition_value);
 				condition_value = builder.CreateLoad(alloca_inst->getAllocatedType(), condition_value);
 			}
-			else if (isa<llvm::GlobalVariable>(condition_value))
+			else if (llvm::isa<llvm::GlobalVariable>(condition_value))
 			{
 				llvm::GlobalVariable* global_var_alloc = cast<llvm::GlobalVariable>(condition_value);
 				condition_value = builder.CreateLoad(global_var_alloc->getValueType(), condition_value);
@@ -1556,7 +1557,7 @@ namespace ola
 	{
 		if (IsPointer(ptr->getType()))
 		{
-			if (IsPointer(llvm_type) && isa<llvm::GlobalVariable>(ptr))
+			if (IsPointer(llvm_type) && llvm::isa<llvm::GlobalVariable>(ptr))
 			{
 				return ptr;
 			}
