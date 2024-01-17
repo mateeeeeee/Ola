@@ -3,7 +3,7 @@
 #include <string>
 #include "Compiler/RTTI.h"
 
-namespace ola::ir
+namespace ola
 {
 	class IRContext;
 

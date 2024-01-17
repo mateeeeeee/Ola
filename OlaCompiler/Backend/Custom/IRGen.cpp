@@ -1,7 +1,7 @@
 #include "IRGen.h"
 #include "IRVisitor.h"
 
-namespace ola::ir
+namespace ola
 {
 	IRGen::IRGen(std::string_view filename) : context(), module(context, filename)
 	{

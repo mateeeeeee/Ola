@@ -2,7 +2,7 @@
 #include "IRContext.h"
 #include "IRModule.h"
 
-namespace ola::ir
+namespace ola
 {
 	struct AST;
 

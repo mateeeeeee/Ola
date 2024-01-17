@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace ola::ir
+namespace ola
 {
 	class IRContext;
 	class IRFunction;

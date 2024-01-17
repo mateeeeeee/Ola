@@ -1,6 +1,6 @@
 #include "IRVisitor.h"
 
-namespace ola::ir
+namespace ola
 {
 
 	IRVisitor::IRVisitor(IRContext& context, IRModule& module) : context(context), module(module)

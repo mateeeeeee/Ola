@@ -1,7 +1,7 @@
 #pragma once
 #include "Frontend/AST/ASTVisitor.h"
 
-namespace ola::ir
+namespace ola
 {
 	struct AST;
 	class IRContext;

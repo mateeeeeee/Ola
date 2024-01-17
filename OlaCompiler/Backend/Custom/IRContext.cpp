@@ -1,7 +1,7 @@
 #include "IRContext.h"
 #include "IRType.h"
 
-namespace ola::ir
+namespace ola
 {
 
 	IRContext::IRContext()

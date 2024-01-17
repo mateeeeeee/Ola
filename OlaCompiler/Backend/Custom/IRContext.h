@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-namespace ola::ir
+namespace ola
 {
 	class IRType;
 	class UnknownType;

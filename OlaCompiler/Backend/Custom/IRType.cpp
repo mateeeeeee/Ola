@@ -1,7 +1,7 @@
 #include "IRType.h"
 #include "IRContext.h"
 
-namespace ola::ir
+namespace ola
 {
 	VoidType* VoidType::Get(IRContext* ctx)
 	{
