@@ -64,16 +64,6 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/LLVMCodeGen.h
   Backend/LLVM/LLVMCodeGen.cpp
-  Backend/Custom/IRValue.h
-  Backend/Custom/IRGen.h
-  Backend/Custom/IRGen.cpp
-  Backend/Custom/IRVisitor.h
-  Backend/Custom/IRVisitor.cpp
-  Backend/Custom/IRType.h
-  Backend/Custom/IRType.cpp
-  Backend/Custom/IRContext.h
-  Backend/Custom/IRContext.cpp
-  Backend/Custom/IRModule.h
 )
 
 set(COMPILER_FILES
