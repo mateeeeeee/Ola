@@ -35,6 +35,14 @@ namespace ola
 		void* operator new(uint64) = delete;
 		void* operator new(uint64 sz, IRContext*) { return ::operator new(sz); }
 
+		bool IsVoidType() const { return kind == IRTypeKind::Void; }
+		bool IsStructType() const { return kind == IRTypeKind::Struct; }
+		bool IsPointerType() const { return kind == IRTypeKind::Pointer; }
+		bool IsIntegerType() const { return kind == IRTypeKind::Integer; }
+		bool IsFloatType() const { return kind == IRTypeKind::Float; }
+		bool IsArrayType() const { return kind == IRTypeKind::Array; }
+		bool IsFunctionType() const { return kind == IRTypeKind::Function; }
+
 	private:
 		IRTypeKind kind;
 		uint32 align;
