@@ -13,6 +13,7 @@ set(UTILITY_FILES
   Utility/DebugVisitor.h
   Utility/DebugVisitor.cpp
   Utility/Enums.h
+  Utility/IntrusiveList.h
 )
 
 
@@ -64,7 +65,8 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/LLVMCodeGen.h
   Backend/LLVM/LLVMCodeGen.cpp
-  Backend/Custom/Value.h
+  Backend/Custom/IR.h
+  Backend/Custom/IR.cpp
   Backend/Custom/IRType.h
   Backend/Custom/IRType.cpp
   Backend/Custom/IRGen.h
@@ -74,6 +76,7 @@ set(BACKEND_FILES
   Backend/Custom/IRContext.h
   Backend/Custom/IRContext.cpp
   Backend/Custom/IRModule.h
+  Backend/Custom/IRModule.cpp
 )
 
 set(COMPILER_FILES

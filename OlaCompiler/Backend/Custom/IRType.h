@@ -43,6 +43,7 @@ namespace ola
 		bool IsArrayType() const { return kind == IRTypeKind::Array; }
 		bool IsFunctionType() const { return kind == IRTypeKind::Function; }
 
+		static bool ClassOf(IRType const* T) { return false; }
 	private:
 		IRTypeKind kind;
 		uint32 align;

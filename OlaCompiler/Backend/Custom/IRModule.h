@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <vector>
+#include "Utility/IntrusiveList.h"
 
 namespace ola
 {
@@ -21,28 +21,21 @@ namespace ola
 			return module_id;
 		}
 
-		void AddGlobalVar(GlobalVariable* gvar)
-		{
-			global_vars.push_back(gvar);
-		}
-		void AddFunction(IRFunction* func)
-		{
-			functions.push_back(func);
-		}
+		void AddVariable(GlobalVariable* gvar);
+		void RemoveVariable(GlobalVariable* gvar);
+		void AddFunction(IRFunction* func);
+		void RemoveFunction(IRFunction* func);
 
-		std::vector<GlobalVariable*> const& GetData() const { return global_vars; }
-		std::vector<IRFunction*>     const& GetCode() const { return functions; }
+		IList<GlobalVariable> const& GetVariableList() const;
+		IList<IRFunction>     const& GetFunctionList() const;
 
-		void PrintIR(std::string_view filename)
-		{
-
-		}
+		void PrintIR(std::string_view filename);
 
 	private:
 		IRContext& context;
 		std::string module_id;
-		std::vector<GlobalVariable*> global_vars;
-		std::vector<IRFunction*> functions;
+		IList<GlobalVariable> variables;
+		IList<IRFunction> functions;
 	};
 
 }
