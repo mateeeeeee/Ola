@@ -10,6 +10,7 @@ namespace ola
 		int1_type = new(this) IntegerType(1);
 		int8_type = new(this) IntegerType(8);
 		float_type = new(this) FloatType();
+		label_type = new(this) LabelType;
 	}
 
 	IRContext::~IRContext()
@@ -19,6 +20,7 @@ namespace ola
 		for (PointerType* ref_type : pointer_types)			delete ref_type;
 		for (FunctionType* function_type : function_types)	delete function_type;
 
+		delete label_type;
 		delete float_type;
 		delete int1_type;
 		delete int8_type;

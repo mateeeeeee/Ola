@@ -1,0 +1,13 @@
+#pragma once
+
+
+#ifndef HANDLE_VALUE
+#define HANDLE_VALUE(X)
+#endif
+
+HANDLE_VALUE(BasicBlock)
+HANDLE_VALUE(Function)
+HANDLE_VALUE(GlobalVariable)
+
+#undef VALUE
+

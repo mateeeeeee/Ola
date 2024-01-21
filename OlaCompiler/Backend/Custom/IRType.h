@@ -15,7 +15,8 @@ namespace ola
 		Float,
 		Array,
 		Function,
-		Struct
+		Struct,
+		Label
 	};
 
 	class IRType
@@ -42,8 +43,10 @@ namespace ola
 		bool IsFloatType() const { return kind == IRTypeKind::Float; }
 		bool IsArrayType() const { return kind == IRTypeKind::Array; }
 		bool IsFunctionType() const { return kind == IRTypeKind::Function; }
+		bool IsLabelType() const { return kind == IRTypeKind::Label; }
 
 		static bool ClassOf(IRType const* T) { return false; }
+
 	private:
 		IRTypeKind kind;
 		uint32 align;
@@ -171,5 +174,16 @@ namespace ola
 		std::vector<IRType*> member_types;
 	private:
 		StructType(std::string_view name, std::vector<IRType*> const& member_types);
+	};
+
+	class LabelType : IRType
+	{
+		friend class IRContext;
+	public:
+		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Label; }
+		static LabelType* Get(IRContext* ctx);
+
+	private:
+		LabelType() : IRType(IRTypeKind::Label, 0, 0) {}
 	};
 }

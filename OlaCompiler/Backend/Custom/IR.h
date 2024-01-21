@@ -3,7 +3,6 @@
 #include <unordered_set>
 #include <span>
 #include "IRType.h"
-#include "Compiler/RTTI.h"
 #include "Utility/IntrusiveList.h"
 
 namespace ola
@@ -14,64 +13,14 @@ namespace ola
 	class IRModule;
 	class Instruction;
 	class IRFunction;
+	class BasicBlock;
 
 	enum class ValueKind : uint32
 	{
-		IntegerConstant,
-		FloatConstant,
-		BasicBlock,
-		Function,
-		GlobalVariable,
-		Parameter,
-		Argument,
-		Alloca,
-		Call,
-		GetElementPtr,
-		GetMemberPtr,
-		Load,
-		Store,
-		Phi,
-		Branch,
-		CondBranch,
-		Switch,
-		Select,
-		Return,
-		Unreachable,
-		ZExt,
-		SExt,
-		Trunc,
-		Bitcast,
-		Neg,
-		Copy,
-		Compl,
-		Add,
-		FAdd,
-		Sub,
-		FSub,
-		Mul,
-		FMul,
-		Div,
-		FDiv,
-		Rem,
-		Shl,
-		Sar,
-		Shr,
-		And,
-		Or,
-		Xor,
-		Eq,
-		FEq,
-		Ne,
-		FNe,
-		Lt,
-		FLt,
-		Le,
-		FLe,
-		Gt,
-		FGt,
-		Ge,
-		FGe
+	#define HANDLE_VALUE(Name) Name,
+	#include "Value.def"
 	};
+
 	class Value
 	{
 	public:
@@ -91,6 +40,7 @@ namespace ola
 		void AddUse(Use* u) { uses.InsertAtEnd(u); }
 		void RemoveUse(Use* u) { uses.Remove(u); }
 		void ReplaceAllUseWith(Value* v);
+		uint64 GetUseCount() const;
 
 		void* operator new(uint64) = delete;
 		void* operator new(uint64 sz, IRModule&) { return ::operator new(sz); }
@@ -133,7 +83,111 @@ namespace ola
 		Instruction* user;
 	};
 
-	class BasicBlock : public Value 
+
+	enum class Linkage
+	{
+		Unknown,
+		Internal,
+		External
+	};
+
+	enum IRFuncAttribute : uint8
+	{
+		IRFuncAttribute_None = 0x00,
+		IRFuncAttribute_NoInline = 0x01,
+		IRFuncAttribute_Inline = 0x02
+	};
+	using IRFuncAttributes = uint8;
+
+	class IRFunction : public Value, public IListNode<IRFunction>
+	{
+		friend class IRModule;
+	public:
+
+		IRFunction(IRType* func_type, Linkage linkage, std::string_view name = "", IRModule* module = nullptr)
+			: Value(ValueKind::Function, func_type), module(module)
+		{
+			SetName(name);
+		}
+		OLA_NONCOPYABLE(IRFunction)
+		~IRFunction() {}
+
+		uint64 GetInstructionCount() const
+		{
+			uint64 instruction_count = 0;
+			//while(block_list.head)
+			//for (auto const& BB : block_list) instruction_count += BB->Size();
+			return instruction_count;
+		}
+		FunctionType* GetFunctionType() const;
+		IRType* GetReturnType() const
+		{
+			return GetFunctionType()->GetReturnType();
+		}
+		IRType* GetArgType(uint32 i) const
+		{
+			return GetFunctionType()->GetParamType(i);
+		}
+		uint64  GetArgCount() const
+		{
+			return GetFunctionType()->GetParamCount();
+		}
+
+		void SetFuncAttribute(IRFuncAttribute attr)
+		{
+			attributes |= attr;
+		}
+		bool HasFuncAttribute(IRFuncAttribute attr) const
+		{
+			return (attributes & attr) == attr;
+		}
+		bool IsInline()   const { return HasFuncAttribute(IRFuncAttribute_Inline); }
+		bool IsNoInline() const { return HasFuncAttribute(IRFuncAttribute_NoInline); }
+
+		void RemoveFromParent();
+
+		BasicBlock const* GetEntryBlock() const 
+		{
+			return nullptr;
+			//if (block_list.empty()) return nullptr;
+			//return block_list.front();
+		}
+		BasicBlock* GetEntryBlock()
+		{
+			return const_cast<BasicBlock*>(static_cast<const IRFunction*>(this)->GetEntryBlock());
+		}
+
+		void Insert(BasicBlock* bb)
+		{
+			block_list.InsertAtEnd(bb);
+		}
+		void InsertBefore(BasicBlock* bb, BasicBlock* before)
+		{
+			block_list.InsertBefore(bb, before);
+		}
+
+		static bool ClassOf(Value const* V)
+		{
+			return V->GetKind() == ValueKind::Function;
+		}
+
+	private:
+		IList<BasicBlock> block_list;
+		Linkage linkage = Linkage::Unknown;
+		IRFuncAttributes attributes = IRFuncAttribute_None;
+		IRModule* module = nullptr;
+	};
+
+	class GlobalVariable : public Value, public IListNode<GlobalVariable>
+	{
+	public:
+		GlobalVariable(IRType* type) : Value(ValueKind::GlobalVariable, type) {}
+
+	private:
+	};
+
+
+	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 	public:
 		BasicBlock(std::string_view name = "",
@@ -144,24 +198,24 @@ namespace ola
 			if (parent) InsertInto(parent, insert_before);
 			else OLA_ASSERT_MSG(!insert_before, "Cannot insert block before another block with no function!");
 		}
+
 		OLA_NONCOPYABLE(BasicBlock)
 		~BasicBlock() {}
-
 
 		IRFunction const* GetParent() const { return parent; }
 		IRFunction* GetParent() { return parent; }
 
 		const Instruction* GetTerminator() const;
-		Instruction* getTerminator() 
+		Instruction* GetTerminator()
 		{
 			return const_cast<Instruction*>(static_cast<const BasicBlock*>(this)->GetTerminator());
 		}
 
-		bool hasNPredecessors(uint32 N) const
+		bool HasNPredecessors(uint32 N) const
 		{
 			return predecessors.size() == N;
 		}
-		bool hasNPredecessorsOrMore(uint32 N) const
+		bool HasNPredecessorsOrMore(uint32 N) const
 		{
 			return predecessors.size() >= N;
 		}
@@ -191,7 +245,7 @@ namespace ola
 		std::unordered_set<BasicBlock*> predecessors;
 		std::unordered_set<BasicBlock*> successors;
 
-	private:  
+	private:
 
 		void SetParent(IRFunction* _parent)
 		{
@@ -199,101 +253,6 @@ namespace ola
 		}
 
 		void InsertInto(IRFunction* parent, BasicBlock* insert_before = nullptr);
-	};
-
-	enum class Linkage
-	{
-		Unknown,
-		Internal,
-		External
-	};
-
-	class GlobalVariable : public Value, public IListNode<GlobalVariable>
-	{
-	public:
-		GlobalVariable(IRType* type) : Value(ValueKind::GlobalVariable, type) {}
-
-	private:
-	};
-
-	enum IRFuncAttribute : uint8
-	{
-		IRFuncAttribute_None = 0x00,
-		IRFuncAttribute_NoInline = 0x01,
-		IRFuncAttribute_Inline = 0x02
-	};
-	using IRFuncAttributes = uint8;
-
-	class IRFunction : public Value, public IListNode<IRFunction>
-	{
-		friend class IRModule;
-	public:
-
-		IRFunction(IRType* func_type, Linkage linkage, std::string_view name = "", IRModule* module = nullptr) 
-			: Value(ValueKind::Function, func_type), module(module)
-		{
-			SetName(name);
-		}
-		~IRFunction() {}
-
-		uint64 GetInstructionCount() const
-		{
-			uint64 instruction_count = 0;
-			for (auto const& BB : block_list) instruction_count += BB->Size();
-			return instruction_count;
-		}
-
-		FunctionType* GetFunctionType() const
-		{
-			return nullptr; // cast<FunctionType>(GetType());
-		}
-		IRType* GetReturnType() const
-		{
-			return GetFunctionType()->GetReturnType();
-		}
-		IRType* GetParamType(uint32 arg_index) const
-		{
-			return GetFunctionType()->GetParamType(arg_index);
-		}
-		uint64 GetParamCount() const
-		{
-			return GetFunctionType()->GetParamCount();
-		}
-
-		void RemoveFromParent();
-
-		void SetFuncAttribute(IRFuncAttribute attr)
-		{
-			attributes |= attr;
-		}
-		bool HasFuncAttribute(IRFuncAttribute attr) const
-		{
-			return (attributes & attr) == attr;
-		}
-		bool IsInline()   const { return HasFuncAttribute(IRFuncAttribute_Inline); }
-		bool IsNoInline() const { return HasFuncAttribute(IRFuncAttribute_NoInline); }
-
-		auto begin() { return block_list.begin(); }
-		auto begin() const { return block_list.begin(); }
-		auto end() { return block_list.end(); }
-		auto end() const { return block_list.end(); }
-		auto rbegin() { return block_list.rbegin(); }
-		auto rbegin() const { return block_list.rbegin(); }
-		auto rend() { return block_list.rend(); }
-		auto rend() const { return block_list.rend(); }
-
-		uint64	Size() const { return block_list.size(); }
-		bool    Empty() const { return block_list.empty(); }
-
-		static bool ClassOf(Value const* V)
-		{
-			return V->GetKind() == ValueKind::Function;
-		}
-	private:
-		std::vector<BasicBlock*> block_list;
-		Linkage linkage = Linkage::Unknown;
-		IRFuncAttributes attributes = IRFuncAttribute_None;
-		IRModule* module = nullptr;
 	};
 
 	class Instruction : public Value, public IListNode<Instruction>

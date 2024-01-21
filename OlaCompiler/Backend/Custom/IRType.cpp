@@ -54,5 +54,10 @@ namespace ola
 		SetSize(offset);
 	}
 
+	LabelType* LabelType::Get(IRContext* ctx)
+	{
+		return ctx->GetLabelType();
+	}
+
 }
 

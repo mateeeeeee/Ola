@@ -6,9 +6,14 @@ namespace ola
 	class IntrusiveList;
 
 	template <typename T>
+	class IntrusiveListIterator;
+
+	template <typename T>
 	class IntrusiveListNode
 	{
 		friend class IntrusiveList<T>;
+		friend class IntrusiveListIterator<T>;
+
 	protected:
 		IntrusiveListNode() = default;
 
@@ -20,9 +25,43 @@ namespace ola
 	template<typename T>
 	using IListNode = IntrusiveListNode<T>;
 
-	template <typename T> //requires std::is_base_of_v<IListNode<T>, T>
-	struct IntrusiveList 
+
+	template <typename T>
+	class IntrusiveListIterator 
 	{
+	public:
+		IntrusiveListIterator(T* node) : current(node) {}
+
+		T* operator->() const { return current; }
+		T& operator*() const { return *current; }
+
+		IntrusiveListIterator<T>& operator++() 
+		{
+			current = current->next;
+			return *this;
+		}
+
+		IntrusiveListIterator<T> operator++(int) 
+		{
+			IntrusiveListIterator<T> temp = *this;
+			++(*this);
+			return temp;
+		}
+
+		bool operator!=(const IntrusiveListIterator<T>& other) const 
+		{
+			return current != other.current;
+		}
+
+	private:
+		T* current;
+	};
+
+	template <typename T> //requires std::is_base_of_v<IListNode<T>, T>
+	class IntrusiveList 
+	{
+	public:
+
 		IntrusiveList() { head = tail = nullptr; }
 
 		void InsertBefore(T* new_node, T* insert_before) 
@@ -105,6 +144,16 @@ namespace ola
 			}
 		}
 
+		IntrusiveListIterator<T> begin() const
+		{
+			return IntrusiveListIterator<T>(head);
+		}
+		IntrusiveListIterator<T> end() const
+		{
+			return IntrusiveListIterator<T>(nullptr);
+		}
+
+	private:
 		T* head;
 		T* tail;
 	};

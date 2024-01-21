@@ -13,6 +13,7 @@ namespace ola
 	class ArrayType;
 	class StructType;
 	class FunctionType;
+	class LabelType;
 
 	class IRContext
 	{
@@ -23,6 +24,7 @@ namespace ola
 
 		VoidType* GetVoidType()   const { return void_type; }
 		FloatType* GetFloatType() const { return float_type; }
+		LabelType* GetLabelType() const { return label_type; }
 
 		IntegerType*	GetIntegerType(uint32 width);
 		PointerType*	GetPointerType(IRType* pointee_type);
@@ -35,6 +37,7 @@ namespace ola
 		IntegerType* int1_type;
 		IntegerType* int8_type;
 		FloatType*   float_type;
+		LabelType*   label_type;
 
 		std::vector<ArrayType*>		array_types;
 		std::vector<PointerType*>   pointer_types;
