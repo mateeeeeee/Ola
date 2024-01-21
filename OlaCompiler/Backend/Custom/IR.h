@@ -7,12 +7,11 @@
 
 namespace ola
 {
-
+	class IRModule;
+	class IRFunction;
 	class Value;
 	class Use;
-	class IRModule;
 	class Instruction;
-	class IRFunction;
 	class BasicBlock;
 
 	enum class ValueKind : uint32
@@ -63,7 +62,7 @@ namespace ola
 	public:
 		Use(Instruction* u, Value* v) : value(v), user(u)
 		{
-			if (v) v->AddUse(this);
+			if (value) value->AddUse(this);
 		}
 		OLA_NONCOPYABLE(Use)
 		~Use() 
@@ -79,10 +78,9 @@ namespace ola
 		}
 
 	private:
-		Value* value;
 		Instruction* user;
+		Value* value;
 	};
-
 
 	enum class Linkage
 	{
@@ -91,17 +89,17 @@ namespace ola
 		External
 	};
 
-	enum IRFuncAttribute : uint8
-	{
-		IRFuncAttribute_None = 0x00,
-		IRFuncAttribute_NoInline = 0x01,
-		IRFuncAttribute_Inline = 0x02
-	};
-	using IRFuncAttributes = uint8;
-
 	class IRFunction : public Value, public IListNode<IRFunction>
 	{
 		friend class IRModule;
+	public:
+		enum Attribute : uint8
+		{
+			Attribute_None = 0x00,
+			Attribute_NoInline = 0x01,
+			Attribute_ForceInline = 0x02
+		};
+		using Attributes = uint8;
 	public:
 
 		IRFunction(IRType* func_type, Linkage linkage, std::string_view name = "", IRModule* module = nullptr)
@@ -112,13 +110,7 @@ namespace ola
 		OLA_NONCOPYABLE(IRFunction)
 		~IRFunction() {}
 
-		uint64 GetInstructionCount() const
-		{
-			uint64 instruction_count = 0;
-			//while(block_list.head)
-			//for (auto const& BB : block_list) instruction_count += BB->Size();
-			return instruction_count;
-		}
+		uint64 GetInstructionCount() const;
 		FunctionType* GetFunctionType() const;
 		IRType* GetReturnType() const
 		{
@@ -133,24 +125,12 @@ namespace ola
 			return GetFunctionType()->GetParamCount();
 		}
 
-		void SetFuncAttribute(IRFuncAttribute attr)
-		{
-			attributes |= attr;
-		}
-		bool HasFuncAttribute(IRFuncAttribute attr) const
-		{
-			return (attributes & attr) == attr;
-		}
-		bool IsInline()   const { return HasFuncAttribute(IRFuncAttribute_Inline); }
-		bool IsNoInline() const { return HasFuncAttribute(IRFuncAttribute_NoInline); }
-
 		void RemoveFromParent();
 
 		BasicBlock const* GetEntryBlock() const 
 		{
-			return nullptr;
-			//if (block_list.empty()) return nullptr;
-			//return block_list.front();
+			if (block_list.empty()) return nullptr; 
+			return &block_list.front();
 		}
 		BasicBlock* GetEntryBlock()
 		{
@@ -166,6 +146,33 @@ namespace ola
 			block_list.InsertBefore(bb, before);
 		}
 
+		void SetFuncAttribute(Attribute attr)
+		{
+			attributes |= attr;
+		}
+		bool HasFuncAttribute(Attribute attr) const
+		{
+			return (attributes & attr) == attr;
+		}
+		bool IsInline()   const { return HasFuncAttribute(Attribute_ForceInline); }
+		bool IsNoInline() const { return HasFuncAttribute(Attribute_NoInline); }
+
+		auto begin() { return block_list.begin(); }
+		auto begin() const { return block_list.begin(); }
+		auto end() { return block_list.end(); }
+		auto end() const { return block_list.end(); }
+		auto rbegin() { return block_list.rbegin(); }
+		auto rbegin() const { return block_list.rbegin(); }
+		auto rend() { return block_list.rend(); }
+		auto rend() const { return block_list.rend(); }
+		BasicBlock& front() { return *begin(); }
+		BasicBlock const& front() const { return *begin(); }
+		BasicBlock& back() { return *rbegin(); }
+		BasicBlock const& back() const { return *rbegin(); }
+
+		uint64	Size() const { return block_list.size(); }
+		bool    Empty() const { return block_list.empty(); }
+
 		static bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Function;
@@ -174,7 +181,7 @@ namespace ola
 	private:
 		IList<BasicBlock> block_list;
 		Linkage linkage = Linkage::Unknown;
-		IRFuncAttributes attributes = IRFuncAttribute_None;
+		Attributes attributes = Attribute_None;
 		IRModule* module = nullptr;
 	};
 
@@ -228,6 +235,10 @@ namespace ola
 		auto rbegin() const { return inst_list.rbegin(); }
 		auto rend() { return inst_list.rend(); }
 		auto rend() const { return inst_list.rend(); }
+		Instruction& front() { return *begin(); }
+		Instruction const& front() const { return *begin(); }
+		Instruction& back() { return *rbegin(); }
+		Instruction const& back() const { return *rbegin(); }
 
 		uint64	Size() const { return inst_list.size(); }
 		bool    Empty() const { return inst_list.empty(); }
@@ -239,19 +250,17 @@ namespace ola
 
 	private:
 		IRFunction* parent;
-		std::vector<Instruction*> inst_list;
+		IList<Instruction> inst_list;
 
 		uint32 block_index = -1;
 		std::unordered_set<BasicBlock*> predecessors;
 		std::unordered_set<BasicBlock*> successors;
 
 	private:
-
 		void SetParent(IRFunction* _parent)
 		{
 			parent = _parent;
 		}
-
 		void InsertInto(IRFunction* parent, BasicBlock* insert_before = nullptr);
 	};
 

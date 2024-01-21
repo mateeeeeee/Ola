@@ -7,38 +7,36 @@ namespace ola
 
 	void Value::ReplaceAllUseWith(Value* v)
 	{
-		//while (uses.head) uses.head->Set(v);
+		for (auto& use : uses) use.Set(v);
 	}
 
 	uint64 Value::GetUseCount() const
 	{
-		uint64 use_count = 0;
-		//while (uses.head) ++use_count;
-		return use_count;
+		return uses.size();
 	}
 
-	const Instruction* BasicBlock::GetTerminator() const
+	Instruction const* BasicBlock::GetTerminator() const
 	{
-		if (inst_list.empty() || !inst_list.back()->IsTerminator())
-			return nullptr;
-		return inst_list.back();
+		if (inst_list.empty() || !inst_list.end()->IsTerminator()) return nullptr;
+		return &inst_list.back();
 	}
 
 	void BasicBlock::InsertInto(IRFunction* parent, BasicBlock* insert_before)
 	{
-		if (insert_before)
-		{
-			parent->InsertBefore(this, insert_before);
-		}
-		else
-		{
-			parent->Insert(this);
-		}
+		if (insert_before) parent->InsertBefore(this, insert_before);
+		else parent->Insert(this);
 	}
 
 	IRFunction const* Instruction::GetFunction() const
 	{
 		return GetParent()->GetParent();
+	}
+
+	uint64 IRFunction::GetInstructionCount() const
+	{
+		uint64 instruction_count = 0;
+		for (auto const& bb : block_list) instruction_count += bb.Size();
+		return instruction_count;
 	}
 
 	FunctionType* IRFunction::GetFunctionType() const

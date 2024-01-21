@@ -2,68 +2,87 @@
 
 namespace ola
 {
-	template <typename T>
-	class IntrusiveList;
+	template <bool _Test, class _Ty1, class _Ty2>
+	struct Conditional
+	{
+		using type = _Ty1;
+	};
+	template <class _Ty1, class _Ty2>
+	struct Conditional<false, _Ty1, _Ty2>
+	{
+		using type = _Ty2;
+	};
+	template <bool _Test, class _Ty1, class _Ty2>
+	using ConditionalType = typename Conditional<_Test, _Ty1, _Ty2>::type;
 
-	template <typename T>
+
+	template <typename>
+	class IntrusiveList;
+	template <typename T, bool IsConst, bool IsReverse>
 	class IntrusiveListIterator;
 
 	template <typename T>
 	class IntrusiveListNode
 	{
-		friend class IntrusiveList<T>;
-		friend class IntrusiveListIterator<T>;
+		friend IntrusiveList<T>;
+		friend IntrusiveListIterator<T, false, false>;
+		friend IntrusiveListIterator<T, true, false>;
+		friend IntrusiveListIterator<T, false, true>;
+		friend IntrusiveListIterator<T, true, true>;
 
 	protected:
-		IntrusiveListNode() = default;
+		IntrusiveListNode() : prev(nullptr), next(nullptr) {}
 
-	protected:
+		T* GetNext() const { return next; }
+		T* GetPrev() const { return prev; }
+
+	private:
 		T* prev;
 		T* next;
 	};
-
 	template<typename T>
 	using IListNode = IntrusiveListNode<T>;
 
-
-	template <typename T>
-	class IntrusiveListIterator 
+	template <typename T, bool IsConst = false, bool IsReverse = false>
+	class IntrusiveListIterator
 	{
 	public:
-		IntrusiveListIterator(T* node) : current(node) {}
+		using NodeType = ConditionalType<IsConst, const T, T>;
 
-		T* operator->() const { return current; }
-		T& operator*() const { return *current; }
+		IntrusiveListIterator(NodeType* node) : current(node) {}
 
-		IntrusiveListIterator<T>& operator++() 
+		NodeType* operator->() const { return current;  }
+		NodeType& operator*() const  { return *current; }
+
+		IntrusiveListIterator<T, IsConst, IsReverse>& operator++()
 		{
-			current = current->next;
+			current = IsReverse ? current->GetPrev() : current->GetNext();
 			return *this;
 		}
-
-		IntrusiveListIterator<T> operator++(int) 
+		IntrusiveListIterator<T, IsConst, IsReverse> operator++(int) 
 		{
-			IntrusiveListIterator<T> temp = *this;
+			IntrusiveListIterator<T, IsConst, IsReverse> temp = *this;
 			++(*this);
 			return temp;
 		}
 
-		bool operator!=(const IntrusiveListIterator<T>& other) const 
+		bool operator!=(IntrusiveListIterator<T, IsConst, IsReverse> const& other) const 
 		{
 			return current != other.current;
 		}
 
 	private:
-		T* current;
+		NodeType* current;
 	};
+	template<typename T, bool IsConst = false, bool IsReverse = false>
+	using IListIterator = IntrusiveListIterator<T, IsConst, IsReverse>;
 
-	template <typename T> //requires std::is_base_of_v<IListNode<T>, T>
+	template <typename T> 
 	class IntrusiveList 
 	{
 	public:
 
 		IntrusiveList() { head = tail = nullptr; }
-
 		void InsertBefore(T* new_node, T* insert_before) 
 		{
 			new_node->prev = insert_before->prev;
@@ -144,13 +163,31 @@ namespace ola
 			}
 		}
 
-		IntrusiveListIterator<T> begin() const
+		using iterator = IListIterator<T>;
+		using const_iterator = IListIterator<T, true>;
+		using reverse_iterator = IListIterator<T, false, true>;
+		using const_reverse_iterator = IListIterator<T, true, true>;
+
+		iterator begin() { return iterator(head); }
+		const_iterator begin() const { return const_iterator(head); }
+		iterator end() { return iterator(nullptr); }
+		const_iterator end() const { return const_iterator(nullptr); }
+		reverse_iterator rbegin() { return reverse_iterator(tail); }
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(tail); }
+		reverse_iterator rend() { return reverse_iterator(nullptr); }
+		const_reverse_iterator rend() const { return const_reverse_iterator(nullptr); }
+
+		T& front() { return *begin(); }
+		T const& front() const { return *begin(); }
+		T& back() { return *rbegin(); }
+		T const& back() const { return *rbegin(); }
+
+		bool empty() const { return head == nullptr; }
+		uint64 size() const 
 		{
-			return IntrusiveListIterator<T>(head);
-		}
-		IntrusiveListIterator<T> end() const
-		{
-			return IntrusiveListIterator<T>(nullptr);
+			uint64 count = 0;
+			for (const auto& node : *this) ++count;
+			return count;
 		}
 
 	private:
