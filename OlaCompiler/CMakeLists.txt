@@ -77,6 +77,7 @@ set(BACKEND_FILES
   Backend/Custom/IRContext.cpp
   Backend/Custom/IRModule.h
   Backend/Custom/IRModule.cpp
+  Backend/Custom/Values.def
 )
 
 set(COMPILER_FILES

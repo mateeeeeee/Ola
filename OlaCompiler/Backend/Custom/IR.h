@@ -17,7 +17,7 @@ namespace ola
 	enum class ValueKind : uint32
 	{
 	#define HANDLE_VALUE(Name) Name,
-	#include "Value.def"
+	#include "Values.def"
 	};
 
 	class Value
@@ -102,13 +102,9 @@ namespace ola
 		using Attributes = uint8;
 	public:
 
-		IRFunction(IRType* func_type, Linkage linkage, std::string_view name = "", IRModule* module = nullptr)
-			: Value(ValueKind::Function, func_type), module(module)
-		{
-			SetName(name);
-		}
+		IRFunction(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name = "");
 		OLA_NONCOPYABLE(IRFunction)
-		~IRFunction() {}
+		~IRFunction();
 
 		uint64 GetInstructionCount() const;
 		FunctionType* GetFunctionType() const;
@@ -179,20 +175,33 @@ namespace ola
 		}
 
 	private:
+		IRModule& module;
 		IList<BasicBlock> block_list;
 		Linkage linkage = Linkage::Unknown;
 		Attributes attributes = Attribute_None;
-		IRModule* module = nullptr;
 	};
 
 	class GlobalVariable : public Value, public IListNode<GlobalVariable>
 	{
 	public:
-		GlobalVariable(IRType* type) : Value(ValueKind::GlobalVariable, type) {}
+		GlobalVariable(IRModule& module, PointerType* type, std::string_view name, Linkage linkage, Value* init);
+		OLA_NONCOPYABLE(GlobalVariable)
+		~GlobalVariable();
+
+		IRType* GetAllocatedType() const { return allocated_type; }
+		Value* GetInitValue() const { return init; }
+		std::string_view GetName() const { return name; }
+		Linkage GetLinkage() const { return linkage; }
+
+		static bool ClassOf(Value const* V) { return V->GetKind() >= ValueKind::GlobalVariable; }
 
 	private:
+		IRModule& module;
+		std::string name;
+		Linkage linkage;
+		Value* init;
+		IRType* allocated_type;
 	};
-
 
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
@@ -209,14 +218,20 @@ namespace ola
 		OLA_NONCOPYABLE(BasicBlock)
 		~BasicBlock() {}
 
+		void SetParent(IRFunction* _parent)
+		{
+			InsertInto(parent, nullptr);
+		}
 		IRFunction const* GetParent() const { return parent; }
 		IRFunction* GetParent() { return parent; }
 
-		const Instruction* GetTerminator() const;
+		Instruction const* GetTerminator() const;
 		Instruction* GetTerminator()
 		{
 			return const_cast<Instruction*>(static_cast<const BasicBlock*>(this)->GetTerminator());
 		}
+
+		uint32 GetID() const { return block_index; }
 
 		bool HasNPredecessors(uint32 N) const
 		{
@@ -226,6 +241,17 @@ namespace ola
 		{
 			return predecessors.size() >= N;
 		}
+		bool HasPredecessor(BasicBlock* bb) const
+		{
+			for (auto& predecessor : predecessors)
+			{
+				if (bb == predecessor) return true;
+			}
+			return false;
+		}
+		uint32 GetPredecessorCount() const { return (uint32)predecessors.size(); }
+		uint32 GetSucessorCount() const { return (uint32)successors.size(); }
+
 
 		auto begin() { return inst_list.begin(); }
 		auto begin() const { return inst_list.begin(); }
@@ -257,17 +283,12 @@ namespace ola
 		std::unordered_set<BasicBlock*> successors;
 
 	private:
-		void SetParent(IRFunction* _parent)
-		{
-			parent = _parent;
-		}
 		void InsertInto(IRFunction* parent, BasicBlock* insert_before = nullptr);
 	};
 
 	class Instruction : public Value, public IListNode<Instruction>
 	{
 	public:
-
 		BasicBlock const* GetParent() const { return parent; }
 		BasicBlock* GetParent() { return parent; }
 

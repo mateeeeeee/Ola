@@ -9,10 +9,47 @@ namespace ola
 	{
 		for (auto& use : uses) use.Set(v);
 	}
-
 	uint64 Value::GetUseCount() const
 	{
 		return uses.size();
+	}
+
+	IRFunction::IRFunction(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name /*= ""*/) : Value(ValueKind::Function, func_type), module(module)
+	{
+		SetName(name);
+		module.AddFunction(this);
+	}
+	IRFunction::~IRFunction()
+	{
+		RemoveFromParent();
+	}
+	void IRFunction::RemoveFromParent()
+	{
+		module.RemoveFunction(this);
+	}
+	uint64 IRFunction::GetInstructionCount() const
+	{
+		uint64 instruction_count = 0;
+		for (auto const& bb : block_list) instruction_count += bb.Size();
+		return instruction_count;
+	}
+	IRFunction const* Instruction::GetFunction() const
+	{
+		return GetParent()->GetParent();
+	}
+	FunctionType* IRFunction::GetFunctionType() const
+	{
+		return nullptr; // cast<FunctionType>(GetType());
+	}
+
+	GlobalVariable::GlobalVariable(IRModule& module, PointerType* type, std::string_view name, Linkage linkage, Value* init) : Value(ValueKind::GlobalVariable, type), module(module),
+		name(name), linkage(linkage), init(init), allocated_type(type->GetPointeeType())
+	{
+		module.AddVariable(this);
+	}
+	GlobalVariable::~GlobalVariable()
+	{
+		module.RemoveVariable(this);
 	}
 
 	Instruction const* BasicBlock::GetTerminator() const
@@ -25,29 +62,6 @@ namespace ola
 	{
 		if (insert_before) parent->InsertBefore(this, insert_before);
 		else parent->Insert(this);
-	}
-
-	IRFunction const* Instruction::GetFunction() const
-	{
-		return GetParent()->GetParent();
-	}
-
-	uint64 IRFunction::GetInstructionCount() const
-	{
-		uint64 instruction_count = 0;
-		for (auto const& bb : block_list) instruction_count += bb.Size();
-		return instruction_count;
-	}
-
-	FunctionType* IRFunction::GetFunctionType() const
-	{
-		return nullptr; // cast<FunctionType>(GetType());
-	}
-
-	void IRFunction::RemoveFromParent()
-	{
-		OLA_ASSERT(module);
-		module->RemoveFunction(this);
 	}
 
 }
