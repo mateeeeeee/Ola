@@ -28,6 +28,7 @@ namespace ola
 
 		ValueKind GetKind() const { return kind; }
 		IRType* GetType() const { return type; }
+		IRContext& GetContext() const { return type->GetContext(); }
 
 		bool HasName() const { return !name.empty(); }
 		std::string_view GetName() const { return name; }
@@ -106,6 +107,7 @@ namespace ola
 		OLA_NONCOPYABLE(IRFunction)
 		~IRFunction();
 
+		IRModule& GetModule() const { return module; }
 		uint64 GetInstructionCount() const;
 		FunctionType* GetFunctionType() const;
 		IRType* GetReturnType() const
@@ -153,6 +155,9 @@ namespace ola
 		bool IsInline()   const { return HasFuncAttribute(Attribute_ForceInline); }
 		bool IsNoInline() const { return HasFuncAttribute(Attribute_NoInline); }
 
+		uint64	Size() const { return block_list.size(); }
+		bool    Empty() const { return block_list.empty(); }
+
 		auto begin() { return block_list.begin(); }
 		auto begin() const { return block_list.begin(); }
 		auto end() { return block_list.end(); }
@@ -165,9 +170,6 @@ namespace ola
 		BasicBlock const& front() const { return *begin(); }
 		BasicBlock& back() { return *rbegin(); }
 		BasicBlock const& back() const { return *rbegin(); }
-
-		uint64	Size() const { return block_list.size(); }
-		bool    Empty() const { return block_list.empty(); }
 
 		static bool ClassOf(Value const* V)
 		{
@@ -188,6 +190,7 @@ namespace ola
 		OLA_NONCOPYABLE(GlobalVariable)
 		~GlobalVariable();
 
+		IRModule& GetModule() const { return module; }
 		IRType* GetAllocatedType() const { return allocated_type; }
 		Value* GetInitValue() const { return init; }
 		std::string_view GetName() const { return name; }
@@ -205,10 +208,12 @@ namespace ola
 
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
+		friend class IRBuilder;
+
 	public:
-		BasicBlock(std::string_view name = "",
+		BasicBlock(IRContext& ctx, std::string_view name = "",
 			IRFunction* parent = nullptr,
-			BasicBlock* insert_before = nullptr) : Value(ValueKind::BasicBlock), parent(parent)
+			BasicBlock* insert_before = nullptr) : Value(ValueKind::BasicBlock, LabelType::Get(ctx)), parent(parent)
 		{
 			SetName(name);
 			if (parent) InsertInto(parent, insert_before);
@@ -225,6 +230,8 @@ namespace ola
 		IRFunction const* GetParent() const { return parent; }
 		IRFunction* GetParent() { return parent; }
 
+		IList<Instruction>& GetInstructions() { return inst_list; }
+		IList<Instruction> const& GetInstructions() const { return inst_list; }
 		Instruction const* GetTerminator() const;
 		Instruction* GetTerminator()
 		{
@@ -251,7 +258,6 @@ namespace ola
 		}
 		uint32 GetPredecessorCount() const { return (uint32)predecessors.size(); }
 		uint32 GetSucessorCount() const { return (uint32)successors.size(); }
-
 
 		auto begin() { return inst_list.begin(); }
 		auto begin() const { return inst_list.begin(); }
@@ -295,6 +301,39 @@ namespace ola
 		IRFunction const* GetFunction() const;
 		IRFunction* GetFunction() { return const_cast<IRFunction*>(static_cast<const Instruction*>(this)->GetFunction());}
 
+		IRModule& GetModule() const { return GetFunction()->GetModule(); }
+
+		void RemoveFromParent()
+		{
+			GetParent()->GetInstructions().Remove(this);
+		}
+
+		void InsertBefore(Instruction* position)
+		{
+			position->GetParent()->GetInstructions().InsertBefore(this, position);
+			SetParent(position->GetParent());
+		}
+		void InsertAfter(Instruction* position)
+		{
+			position->GetParent()->GetInstructions().InsertAfter(this, position);
+			SetParent(position->GetParent());
+		}
+		void InsertBefore(BasicBlock& bb, Instruction* position)
+		{
+			bb.GetInstructions().InsertBefore(this, position);
+			SetParent(&bb);
+		}
+		void InsertAfter(BasicBlock& bb, Instruction* position)
+		{
+			bb.GetInstructions().InsertAfter(this, position);
+			SetParent(&bb);
+		}
+		void Insert(BasicBlock& bb)
+		{
+			bb.GetInstructions().InsertAtEnd(this);
+			SetParent(&bb);
+		}
+
 		bool IsTerminator() const { return false; }
 		bool IsUnaryOp()	const { return false; }
 		bool IsBinaryOp()	const { return false; }
@@ -320,6 +359,14 @@ namespace ola
 
 	private:
 		BasicBlock* parent;
+
+	private:
+
+		void SetParent(BasicBlock* bb)
+		{
+			if (parent) parent->GetInstructions().Remove(this);
+			parent = bb;
+		}
 	};
 }
 

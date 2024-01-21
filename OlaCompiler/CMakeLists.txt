@@ -67,6 +67,8 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMCodeGen.cpp
   Backend/Custom/IR.h
   Backend/Custom/IR.cpp
+  Backend/Custom/IRBuilder.h
+  Backend/Custom/IRBuilder.cpp
   Backend/Custom/IRType.h
   Backend/Custom/IRType.cpp
   Backend/Custom/IRGen.h

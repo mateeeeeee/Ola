@@ -6,11 +6,11 @@ namespace ola
 
 	IRContext::IRContext()
 	{
-		void_type = new(this) VoidType();
-		int1_type = new(this) IntegerType(1);
-		int8_type = new(this) IntegerType(8);
-		float_type = new(this) FloatType();
-		label_type = new(this) LabelType;
+		void_type = new(this) VoidType(*this);
+		int1_type = new(this) IntegerType(*this, 1);
+		int8_type = new(this) IntegerType(*this, 8);
+		float_type = new(this) FloatType(*this);
+		label_type = new(this) LabelType(*this);
 	}
 
 	IRContext::~IRContext()
@@ -45,7 +45,7 @@ namespace ola
 		{
 			if (pointer_type->GetPointeeType() == pointee_type) return pointer_type;
 		}
-		PointerType* new_type = new(this) PointerType(pointee_type);
+		PointerType* new_type = new(this) PointerType(*this, pointee_type);
 		pointer_types.push_back(new_type);
 		return new_type;
 	}
@@ -56,7 +56,7 @@ namespace ola
 		{
 			if (array_type->GetBaseType() == base_type && array_type->GetArraySize() == array_size) return array_type;
 		}
-		ArrayType* new_type = new(this) ArrayType(base_type, array_size);
+		ArrayType* new_type = new(this) ArrayType(*this, base_type, array_size);
 		array_types.push_back(new_type);
 		return new_type;
 	}
@@ -79,7 +79,7 @@ namespace ola
 			}
 			if (!incompatible) return function_type;
 		}
-		function_types.push_back(new(this) FunctionType(ret_type, param_types));
+		function_types.push_back(new(this) FunctionType(*this, ret_type, param_types));
 		return function_types.back();
 	}
 
@@ -101,7 +101,7 @@ namespace ola
 			}
 			if (!incompatible) return struct_type;
 		}
-		struct_types.push_back(new(this) StructType(name, member_types));
+		struct_types.push_back(new(this) StructType(*this, name, member_types));
 		return struct_types.back();
 	}
 

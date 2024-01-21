@@ -3,42 +3,42 @@
 
 namespace ola
 {
-	VoidType* VoidType::Get(IRContext* ctx)
+	VoidType* VoidType::Get(IRContext& ctx)
 	{
-		return ctx->GetVoidType();
+		return ctx.GetVoidType();
 	}
 
-	PointerType* PointerType::Get(IRContext* ctx, IRType* pointee_type)
+	PointerType* PointerType::Get(IRContext& ctx, IRType* pointee_type)
 	{
-		return ctx->GetPointerType(pointee_type);
+		return ctx.GetPointerType(pointee_type);
 	}
 
-	IntegerType* IntegerType::Get(IRContext* ctx, uint32 width)
+	IntegerType* IntegerType::Get(IRContext& ctx, uint32 width)
 	{
-		return ctx->GetIntegerType(width);
+		return ctx.GetIntegerType(width);
 	}
 
-	FloatType* FloatType::Get(IRContext* ctx)
+	FloatType* FloatType::Get(IRContext& ctx)
 	{
-		return ctx->GetFloatType();
+		return ctx.GetFloatType();
 	}
 
-	ArrayType* ArrayType::Get(IRContext* ctx, IRType* base_type, uint32 array_size)
+	ArrayType* ArrayType::Get(IRContext& ctx, IRType* base_type, uint32 array_size)
 	{
-		return ctx->GetArrayType(base_type, array_size);
+		return ctx.GetArrayType(base_type, array_size);
 	}
 
-	FunctionType* FunctionType::Get(IRContext* ctx, IRType* return_type, std::vector<IRType*> const& param_types)
+	FunctionType* FunctionType::Get(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types)
 	{
-		return ctx->GetFunctionType(return_type, param_types);
+		return ctx.GetFunctionType(return_type, param_types);
 	}
 
-	StructType* StructType::Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& member_types)
+	StructType* StructType::Get(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types)
 	{
-		return ctx->GetStructType(name, member_types);
+		return ctx.GetStructType(name, member_types);
 	}
 
-	StructType::StructType(std::string_view name, std::vector<IRType*> const& member_types) : IRType(IRTypeKind::Struct, 0, 0), name(name), member_types(member_types)
+	StructType::StructType(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types) : IRType(ctx, IRTypeKind::Struct, 0, 0), name(name), member_types(member_types)
 	{
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		uint32 offset = 0;
@@ -54,9 +54,9 @@ namespace ola
 		SetSize(offset);
 	}
 
-	LabelType* LabelType::Get(IRContext* ctx)
+	LabelType* LabelType::Get(IRContext& ctx)
 	{
-		return ctx->GetLabelType();
+		return ctx.GetLabelType();
 	}
 
 }

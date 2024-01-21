@@ -32,6 +32,7 @@ namespace ola
 		{
 			return size;
 		}
+		IRContext& GetContext() const { return ctx; }
 
 		void* operator new(uint64) = delete;
 		void* operator new(uint64 sz, IRContext*) { return ::operator new(sz); }
@@ -51,10 +52,11 @@ namespace ola
 		IRTypeKind kind;
 		uint32 align;
 		uint32 size;
+		IRContext& ctx;
 
 	protected:
-		explicit IRType(IRTypeKind kind) : kind(kind), align(), size() {}
-		IRType(IRTypeKind kind, uint32 align, uint32 size) : kind(kind), align(align), size(size) {}
+		IRType(IRContext& ctx, IRTypeKind kind)   : ctx(ctx), kind(kind), align(), size() {}
+		IRType(IRContext& ctx, IRTypeKind kind, uint32 align, uint32 size) : ctx(ctx), kind(kind), align(align), size(size) {}
 
 		void SetAlign(uint32 _align) { align = _align; }
 		void SetSize(uint32 _size) { size = _size; }
@@ -65,10 +67,10 @@ namespace ola
 		friend class IRContext;
 	public:
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Void; }
-		static VoidType* Get(IRContext* ctx);
+		static VoidType* Get(IRContext& ctx);
 
 	private:
-		VoidType() : IRType(IRTypeKind::Void, 1, 1) {}
+		explicit VoidType(IRContext& ctx) : IRType(ctx, IRTypeKind::Void, 1, 1) {}
 	};
 
 	class PointerType : public IRType
@@ -78,13 +80,13 @@ namespace ola
 		IRType* GetPointeeType() const { return pointee_type; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Pointer; }
-		static PointerType* Get(IRContext* ctx, IRType* pointee_type = nullptr);
+		static PointerType* Get(IRContext& ctx, IRType* pointee_type = nullptr);
 
 	private:
 		IRType* pointee_type;
 
 	private:
-		explicit PointerType(IRType* pointee_type) : IRType(IRTypeKind::Pointer, 8, 8), pointee_type(pointee_type) {}
+		PointerType(IRContext& ctx, IRType* pointee_type) : IRType(ctx, IRTypeKind::Pointer, 8, 8), pointee_type(pointee_type) {}
 	};
 
 	class IntegerType : public IRType
@@ -95,13 +97,13 @@ namespace ola
 		uint32 GetWidth() const { return width; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Integer; }
-		static IntegerType* Get(IRContext* ctx, uint32 width);
+		static IntegerType* Get(IRContext& ctx, uint32 width);
 
 	private:
 		uint32 width; 
 
 	private:
-		explicit IntegerType(uint32 width) : IRType(IRTypeKind::Integer, width, width), width(width) {}
+		explicit IntegerType(IRContext& ctx, uint32 width) : IRType(ctx, IRTypeKind::Integer, width, width), width(width) {}
 	};
 
 	class FloatType : public IRType
@@ -110,13 +112,13 @@ namespace ola
 	public:
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Float; }
-		static FloatType* Get(IRContext* ctx);
+		static FloatType* Get(IRContext& ctx);
 
 	private:
-		FloatType() : IRType(IRTypeKind::Float, 8, 8) {}
+		explicit FloatType(IRContext& ctx) : IRType(ctx, IRTypeKind::Float, 8, 8) {}
 	};
 
-	class ArrayType : IRType
+	class ArrayType : public IRType
 	{
 		friend class IRContext;
 	public:
@@ -124,17 +126,17 @@ namespace ola
 		uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
-		static ArrayType* Get(IRContext* ctx, IRType* base_type, uint32 array_size);
+		static ArrayType* Get(IRContext& ctx, IRType* base_type, uint32 array_size);
 
 	private:
 		IRType* base_type;
 		uint32 array_size;
 
 	private:
-		ArrayType(IRType* base_type, uint32 array_size) : IRType(IRTypeKind::Array, base_type->GetAlign(), base_type->GetSize() * array_size), base_type(base_type), array_size(array_size) {}
+		ArrayType(IRContext& ctx, IRType* base_type, uint32 array_size) : IRType(ctx, IRTypeKind::Array, base_type->GetAlign(), base_type->GetSize() * array_size), base_type(base_type), array_size(array_size) {}
 	};
 
-	class FunctionType : IRType
+	class FunctionType : public IRType
 	{
 		friend class IRContext;
 	public:
@@ -145,18 +147,18 @@ namespace ola
 		IRType* GetParamType(uint32 i) const { return param_types[i]; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
-		static FunctionType* Get(IRContext* ctx, IRType* return_type, std::vector<IRType*> const& param_types);
+		static FunctionType* Get(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types);
 
 	private:
 		IRType* return_type;
 		std::vector<IRType*> param_types;
 
 	private:
-		FunctionType(IRType* return_type, std::vector<IRType*> const& param_types) 
-			: IRType(IRTypeKind::Function, 8, 8), return_type(return_type), param_types(param_types) {}
+		FunctionType(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types)
+			: IRType(ctx, IRTypeKind::Function, 8, 8), return_type(return_type), param_types(param_types) {}
 	};
 
-	class StructType : IRType
+	class StructType : public IRType
 	{
 		friend class IRContext;
 	public:
@@ -167,23 +169,23 @@ namespace ola
 		IRType* GetMemberType(uint32 i) const { return member_types[i]; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Struct; }
-		static StructType* Get(IRContext* ctx, std::string_view name, std::vector<IRType*> const& member_types);
+		static StructType* Get(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types);
 
 	private:
 		std::string name;
 		std::vector<IRType*> member_types;
 	private:
-		StructType(std::string_view name, std::vector<IRType*> const& member_types);
+		StructType(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types);
 	};
 
-	class LabelType : IRType
+	class LabelType : public IRType
 	{
 		friend class IRContext;
 	public:
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Label; }
-		static LabelType* Get(IRContext* ctx);
+		static LabelType* Get(IRContext& ctx);
 
 	private:
-		LabelType() : IRType(IRTypeKind::Label, 0, 0) {}
+		explicit LabelType(IRContext& ctx) : IRType(ctx, IRTypeKind::Label, 0, 0) {}
 	};
 }
