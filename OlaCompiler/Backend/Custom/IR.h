@@ -190,7 +190,7 @@ namespace ola
 		template <uint32 Idx, typename U> 
 		static Use& OpFrom(U const* that)
 		{
-			return that->operands[Idx];
+			return *that->operands[Idx];
 		}
 		template <uint32 Idx>
 		Use& Op() 
