@@ -9,10 +9,6 @@ namespace ola
 	{
 		for (auto& use : uses) use.Set(v);
 	}
-	uint64 Value::GetUseCount() const
-	{
-		return uses.Size();
-	}
 
 	Function::Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name) : Value(ValueKind::Function, func_type), module(module)
 	{

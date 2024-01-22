@@ -1,15 +1,16 @@
 ﻿#pragma once
 #include <vector>
 #include <unordered_set>
-#include <span>
 #include "IRType.h"
 #include "Utility/IntrusiveList.h"
+#include "Utility/IteratorRange.h"
 
 namespace ola
 {
 	class IRModule;
 	class Value;
 	class Use;
+	class User;
 	class Function;
 	class BasicBlock;
 	class Instruction;
@@ -38,10 +39,24 @@ namespace ola
 			name = _name;
 		}
 
+		auto UseBegin() { return uses.begin(); }
+		auto UseBegin() const { return uses.begin(); }
+		auto UseEnd() { return uses.end(); }
+		auto UseEnd() const { return uses.end(); }
+		auto UseRBegin() { return uses.rbegin(); }
+		auto UseRBegin() const { return uses.rbegin(); }
+		auto UseREnd() { return uses.rend(); }
+		auto UseREnd() const { return uses.rend(); }
+		bool UseEmpty() const { return UseBegin() == UseEnd(); }
+		uint64 UseSize() const { return uses.Size(); }
+
 		void AddUse(Use* u) { uses.PushBack(u); }
 		void RemoveUse(Use* u) { uses.Remove(u); }
 		void ReplaceAllUseWith(Value* v);
-		uint64 GetUseCount() const;
+
+		bool HasOneUse() const { return UseSize() == 1; }
+		bool hasNUses(uint32 N) const { return UseSize() == N; }
+		bool hasNUsesOrMore(unsigned N) const { return UseSize() >= N; }
 
 		void* operator new(uint64) = delete;
 		void* operator new(uint64 sz, IRModule&) { return ::operator new(sz); }
@@ -59,29 +74,134 @@ namespace ola
 	class Use : public IListNode<Use>
 	{
 		friend Value;
-		friend Instruction;
+		friend User;
 
 	public:
-		Use(Instruction* u, Value* v) : value(v), user(u)
+		Use(User* u, Value* v) : value(v), user(u)
 		{
 			if (value) value->AddUse(this);
 		}
-		OLA_NONCOPYABLE(Use)
-		~Use() 
+		Use const& operator=(Use const& rhs)
+		{
+			Set(rhs.value);
+			return *this;
+		}
+		~Use()
 		{
 			if (value) value->RemoveUse(this);
 		}
 
-		void Set(Value* v) 
+		operator Value* () const { return value; }
+		Value* Get() const { return value; }
+		void Set(Value* v)
 		{
 			if (value) value->RemoveUse(this);
 			value = v;
 			if (v) v->AddUse(this);
 		}
 
+		Value* operator=(Value* rhs)
+		{
+			Set(rhs);
+			return rhs;
+		}
+		Value* operator->() { return value; }
+		Value const* operator->() const { return value; }
+
 	private:
-		Instruction* user;
+		User* user;
 		Value* value;
+	};
+
+	class User : public Value
+	{
+	public:
+
+		Use *const* GetOperandList() const
+		{
+			return operands.data();
+		}
+		Use** GetOperandList()
+		{
+			return const_cast<Use**>(static_cast<const User*>(this)->GetOperandList());
+		}
+		uint32 GetNumOperands() const { return (uint32)operands.size(); }
+
+		Value* GetOperand(uint32 i) const 
+		{
+			return *GetOperandList()[i];
+		}
+		void SetOperand(uint32 i, Value* val) 
+		{
+			*GetOperandList()[i] = val;
+		}
+
+		Use const& GetOperandUse(uint32 i) const
+		{
+			return *GetOperandList()[i];
+		}
+		Use& GetOperandUse(uint32 i)
+		{
+			return *GetOperandList()[i];
+		}
+
+		using OpIterator = Use**;
+		using ConstOpIterator = Use *const*;
+		using OpRange = IteratorRange<OpIterator>;
+		using ConstOpRange = IteratorRange<ConstOpIterator>;
+
+		OpIterator      OpBegin()	 	 { return GetOperandList(); }
+		ConstOpIterator OpBegin()  const { return GetOperandList(); }
+		OpIterator      OpEnd()			 { return GetOperandList() + GetNumOperands(); }
+		ConstOpIterator OpEnd()    const { return GetOperandList() + GetNumOperands(); }
+		OpRange			Operands() 		 { return OpRange(OpBegin(), OpEnd()); }
+		ConstOpRange	Operands() const { return ConstOpRange(OpBegin(), OpEnd()); }
+
+		void DropAllReferences() 
+		{
+			for (Use* U : Operands()) U->Set(nullptr);
+		}
+
+		bool ReplaceUsesOfWith(Value* from, Value* to)
+		{
+			bool changed = false;
+			if (from == to) return changed;  
+			for (uint32 i = 0, N = GetNumOperands(); i != N; ++i)
+			{
+				if (GetOperand(i) == from)
+				{
+					SetOperand(i, to);
+					changed = true;
+				}
+			}
+			return changed;
+		}
+
+	private:
+		std::vector<Use*> operands;
+
+	protected:
+
+		User(ValueKind kind, IRType* type, uint32 num_operands) : Value(kind, type)
+		{
+			operands.resize(num_operands);
+		}
+
+		template <uint32 Idx, typename U> 
+		static Use& OpFrom(U const* that)
+		{
+			return that->operands[Idx];
+		}
+		template <uint32 Idx>
+		Use& Op() 
+		{
+			return OpFrom<Idx>(this);
+		}
+		template <uint32 Idx>
+		Use const& Op() const 
+		{
+			return OpFrom<Idx>(this);
+		}
 	};
 
 	enum class Linkage
@@ -295,7 +415,7 @@ namespace ola
 		void InsertInto(Function* parent, BasicBlock* insert_before = nullptr);
 	};
 
-	class Instruction : public Value, public IListNode<Instruction>
+	class Instruction : public User, public IListNode<Instruction>
 	{
 	public:
 
@@ -362,11 +482,11 @@ namespace ola
 		}
 
 	protected:
-		Instruction(ValueKind kind, IRType* type, BasicBlock* parent = nullptr) : Value(kind, type), parent(parent)
+		Instruction(ValueKind kind, IRType* type, uint32 num_operands, BasicBlock* parent = nullptr) : User(kind, type, num_operands), parent(parent)
 		{
 			if (parent) Insert(parent);
 		}
-		Instruction(ValueKind kind, IRType* type, Instruction* position) : Value(kind, type), parent(position->GetParent())
+		Instruction(ValueKind kind, IRType* type, uint32 num_operands, Instruction* position) : User(kind, type, num_operands), parent(position->GetParent())
 		{
 			if (parent) Insert(position);
 		}
@@ -375,7 +495,6 @@ namespace ola
 		BasicBlock* parent;
 
 	private:
-
 		void SetParent(BasicBlock* bb)
 		{
 			if (parent) parent->GetInstructions().Remove(this);
@@ -397,11 +516,25 @@ namespace ola
 		Argument(IRType* type, uint32 index) : Value(ValueKind::Argument, type), index(index) {}
 	};
 
-	class AllocaInst : public Instruction
+	class UnaryInstruction : public Instruction
+	{
+	public:
+
+
+	private:
+
+	protected:
+		UnaryInstruction(ValueKind kind, IRType* type) : Instruction(kind, type, 1)
+		{
+
+		}
+	};
+
+	class AllocaInst : public UnaryInstruction
 	{
 		friend Instruction;
 	public:
-		explicit AllocaInst(PointerType* type) : Instruction(ValueKind::Alloca, type), allocated_type(type->GetPointeeType()) {}
+		explicit AllocaInst(PointerType* type) : UnaryInstruction(ValueKind::Alloca, type), allocated_type(type->GetPointeeType()) {}
 		IRType* GetAllocatedType() { return allocated_type; }
 		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Alloca; }
 
