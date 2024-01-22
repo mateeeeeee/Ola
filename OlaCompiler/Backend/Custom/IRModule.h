@@ -5,7 +5,7 @@
 namespace ola
 {
 	class IRContext;
-	class IRFunction;
+	class Function;
 	class GlobalVariable;
 
 	class IRModule
@@ -23,11 +23,11 @@ namespace ola
 
 		void AddVariable(GlobalVariable* gvar);
 		void RemoveVariable(GlobalVariable* gvar);
-		void AddFunction(IRFunction* func);
-		void RemoveFunction(IRFunction* func);
+		void AddFunction(Function* func);
+		void RemoveFunction(Function* func);
 
 		IList<GlobalVariable> const& GetVariableList() const;
-		IList<IRFunction>     const& GetFunctionList() const;
+		IList<Function>     const& GetFunctionList() const;
 
 		void PrintIR(std::string_view filename);
 
@@ -35,7 +35,7 @@ namespace ola
 		IRContext& context;
 		std::string module_id;
 		IList<GlobalVariable> variables;
-		IList<IRFunction> functions;
+		IList<Function> functions;
 	};
 
 }

@@ -14,32 +14,40 @@ namespace ola
 		return uses.Size();
 	}
 
-	IRFunction::IRFunction(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name /*= ""*/) : Value(ValueKind::Function, func_type), module(module)
+	Function::Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name) : Value(ValueKind::Function, func_type), module(module)
 	{
 		SetName(name);
+
+		FunctionType* function_type = GetFunctionType();
+		arguments.resize(function_type->GetParamCount());
+		for (uint32 i = 0; i < arguments.size(); ++i)
+		{
+			arguments[i] = new (module) Argument(function_type->GetParamType(i), i);
+		}
 		module.AddFunction(this);
 	}
-	IRFunction::~IRFunction()
+	Function::~Function()
 	{
+		for (uint32 i = 0; i < arguments.size(); ++i) delete arguments[i];
 		RemoveFromParent();
 	}
-	void IRFunction::RemoveFromParent()
+	void Function::RemoveFromParent()
 	{
 		module.RemoveFunction(this);
 	}
-	uint64 IRFunction::GetInstructionCount() const
+	uint64 Function::GetInstructionCount() const
 	{
 		uint64 instruction_count = 0;
 		for (auto const& bb : block_list) instruction_count += bb.Size();
 		return instruction_count;
 	}
-	IRFunction const* Instruction::GetFunction() const
+	Function const* Instruction::GetFunction() const
 	{
 		return GetParent()->GetParent();
 	}
-	FunctionType* IRFunction::GetFunctionType() const
+	FunctionType* Function::GetFunctionType() const
 	{
-		return nullptr; // cast<FunctionType>(GetType());
+		return cast<FunctionType>(GetType());
 	}
 
 	GlobalVariable::GlobalVariable(IRModule& module, PointerType* type, std::string_view name, Linkage linkage, Value* init) : Value(ValueKind::GlobalVariable, type), module(module),
@@ -58,7 +66,7 @@ namespace ola
 		return &inst_list.Back();
 	}
 
-	void BasicBlock::InsertInto(IRFunction* parent, BasicBlock* insert_before)
+	void BasicBlock::InsertInto(Function* parent, BasicBlock* insert_before)
 	{
 		if (insert_before) parent->InsertBefore(this, insert_before);
 		else parent->Insert(this);

@@ -7,8 +7,9 @@
 
 HANDLE_VALUE(BasicBlock)
 HANDLE_VALUE(Function)
-HANDLE_VALUE(Argument)
 HANDLE_VALUE(GlobalVariable)
+HANDLE_VALUE(Argument)
+
 
 #undef VALUE
 

@@ -15,12 +15,12 @@ namespace ola
 		variables.Remove(gvar);
 	}
 
-	void IRModule::AddFunction(IRFunction* func)
+	void IRModule::AddFunction(Function* func)
 	{
 		functions.PushBack(func);
 	}
 
-	void IRModule::RemoveFunction(IRFunction* func)
+	void IRModule::RemoveFunction(Function* func)
 	{
 		functions.Remove(func);
 	}
@@ -30,7 +30,7 @@ namespace ola
 		return variables;
 	}
 
-	IList<IRFunction> const& IRModule::GetFunctionList() const
+	IList<Function> const& IRModule::GetFunctionList() const
 	{
 		return functions;
 	}

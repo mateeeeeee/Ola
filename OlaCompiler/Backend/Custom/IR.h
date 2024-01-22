@@ -8,11 +8,12 @@
 namespace ola
 {
 	class IRModule;
-	class IRFunction;
 	class Value;
 	class Use;
-	class Instruction;
+	class Function;
 	class BasicBlock;
+	class Instruction;
+	class Argument;
 
 	enum class ValueKind : uint32
 	{
@@ -90,7 +91,7 @@ namespace ola
 		External
 	};
 
-	class IRFunction : public Value, public IListNode<IRFunction>
+	class Function : public Value, public IListNode<Function>
 	{
 		friend class IRModule;
 	public:
@@ -103,9 +104,9 @@ namespace ola
 		using Attributes = uint8;
 	public:
 
-		IRFunction(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name = "");
-		OLA_NONCOPYABLE(IRFunction)
-		~IRFunction();
+		Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name = "");
+		OLA_NONCOPYABLE(Function)
+		~Function();
 
 		IRModule& GetModule() const { return module; }
 		uint64 GetInstructionCount() const;
@@ -114,13 +115,18 @@ namespace ola
 		{
 			return GetFunctionType()->GetReturnType();
 		}
+		uint64 GetArgCount() const
+		{
+			return GetFunctionType()->GetParamCount();
+		}
 		IRType* GetArgType(uint32 i) const
 		{
 			return GetFunctionType()->GetParamType(i);
 		}
-		uint64  GetArgCount() const
+		Argument* GetArg(uint32 i) const 
 		{
-			return GetFunctionType()->GetParamCount();
+			OLA_ASSERT_MSG(i < arguments.size(), "Parameter index out of bounds");
+			return arguments[i];
 		}
 
 		void RemoveFromParent();
@@ -132,7 +138,7 @@ namespace ola
 		}
 		BasicBlock* GetEntryBlock()
 		{
-			return const_cast<BasicBlock*>(static_cast<const IRFunction*>(this)->GetEntryBlock());
+			return const_cast<BasicBlock*>(static_cast<const Function*>(this)->GetEntryBlock());
 		}
 
 		void Insert(BasicBlock* bb)
@@ -181,6 +187,7 @@ namespace ola
 		IList<BasicBlock> block_list;
 		Linkage linkage = Linkage::Unknown;
 		Attributes attributes = Attribute_None;
+		std::vector<Argument*> arguments;
 	};
 
 	class GlobalVariable : public Value, public IListNode<GlobalVariable>
@@ -209,13 +216,10 @@ namespace ola
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 		friend class IRBuilder;
-	public:
-		using iterator = IList<Instruction>::iterator;
-		using const_iterator = IList<Instruction>::const_iterator;
 
 	public:
 		BasicBlock(IRContext& ctx, std::string_view name = "",
-			IRFunction* parent = nullptr,
+			Function* parent = nullptr,
 			BasicBlock* insert_before = nullptr) : Value(ValueKind::BasicBlock, LabelType::Get(ctx)), parent(parent)
 		{
 			SetName(name);
@@ -226,12 +230,12 @@ namespace ola
 		OLA_NONCOPYABLE(BasicBlock)
 		~BasicBlock() {}
 
-		void SetParent(IRFunction* _parent)
+		void SetParent(Function* _parent)
 		{
 			InsertInto(parent, nullptr);
 		}
-		IRFunction const* GetParent() const { return parent; }
-		IRFunction* GetParent() { return parent; }
+		Function const* GetParent() const { return parent; }
+		Function* GetParent() { return parent; }
 
 		IList<Instruction>& GetInstructions() { return inst_list; }
 		IList<Instruction> const& GetInstructions() const { return inst_list; }
@@ -280,7 +284,7 @@ namespace ola
 		}
 
 	private:
-		IRFunction* parent;
+		Function* parent;
 		IList<Instruction> inst_list;
 
 		uint32 block_index = -1;
@@ -288,23 +292,28 @@ namespace ola
 		std::unordered_set<BasicBlock*> successors;
 
 	private:
-		void InsertInto(IRFunction* parent, BasicBlock* insert_before = nullptr);
+		void InsertInto(Function* parent, BasicBlock* insert_before = nullptr);
 	};
 
 	class Instruction : public Value, public IListNode<Instruction>
 	{
 	public:
+
+		OLA_NONCOPYABLE(Instruction)
+		~Instruction()
+		{
+			RemoveFromParent();
+		}
+
 		BasicBlock const* GetParent() const { return parent; }
 		BasicBlock* GetParent() { return parent; }
-
-		IRFunction const* GetFunction() const;
-		IRFunction* GetFunction() { return const_cast<IRFunction*>(static_cast<const Instruction*>(this)->GetFunction());}
-
+		Function const* GetFunction() const;
+		Function* GetFunction() { return const_cast<Function*>(static_cast<const Instruction*>(this)->GetFunction());}
 		IRModule& GetModule() const { return GetFunction()->GetModule(); }
 
 		void RemoveFromParent()
 		{
-			GetParent()->GetInstructions().Remove(this);
+			if (parent) parent->GetInstructions().Remove(this);
 		}
 
 		void Insert(Instruction* position)
@@ -351,9 +360,13 @@ namespace ola
 		}
 
 	protected:
-		Instruction(ValueKind kind, IRType* type) : Value(kind, type)
+		Instruction(ValueKind kind, IRType* type, BasicBlock* parent = nullptr) : Value(kind, type), parent(parent)
 		{
-
+			if (parent) Insert(parent);
+		}
+		Instruction(ValueKind kind, IRType* type, Instruction* position) : Value(kind, type), parent(position->GetParent())
+		{
+			if (parent) Insert(position);
 		}
 
 	private:
@@ -366,6 +379,20 @@ namespace ola
 			if (parent) parent->GetInstructions().Remove(this);
 			parent = bb;
 		}
+	};
+
+	class Argument : public Value
+	{
+		friend Function;
+	public:
+		uint32  GetIndex() const { return index; }
+		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
+
+	private:
+		uint32 index;
+
+	private:
+		Argument(IRType* type, uint32 index) : Value(ValueKind::Argument, type), index(index) {}
 	};
 }
 
