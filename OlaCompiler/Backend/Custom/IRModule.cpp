@@ -7,7 +7,7 @@ namespace ola
 
 	void IRModule::AddVariable(GlobalVariable* gvar)
 	{
-		variables.InsertAtEnd(gvar);
+		variables.PushBack(gvar);
 	}
 
 	void IRModule::RemoveVariable(GlobalVariable* gvar)
@@ -17,7 +17,7 @@ namespace ola
 
 	void IRModule::AddFunction(IRFunction* func)
 	{
-		functions.InsertAtEnd(func);
+		functions.PushBack(func);
 	}
 
 	void IRModule::RemoveFunction(IRFunction* func)

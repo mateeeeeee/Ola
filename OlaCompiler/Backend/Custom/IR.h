@@ -37,7 +37,7 @@ namespace ola
 			name = _name;
 		}
 
-		void AddUse(Use* u) { uses.InsertAtEnd(u); }
+		void AddUse(Use* u) { uses.PushBack(u); }
 		void RemoveUse(Use* u) { uses.Remove(u); }
 		void ReplaceAllUseWith(Value* v);
 		uint64 GetUseCount() const;
@@ -127,8 +127,8 @@ namespace ola
 
 		BasicBlock const* GetEntryBlock() const 
 		{
-			if (block_list.empty()) return nullptr; 
-			return &block_list.front();
+			if (block_list.Empty()) return nullptr; 
+			return &block_list.Front();
 		}
 		BasicBlock* GetEntryBlock()
 		{
@@ -137,11 +137,11 @@ namespace ola
 
 		void Insert(BasicBlock* bb)
 		{
-			block_list.InsertAtEnd(bb);
+			block_list.PushBack(bb);
 		}
 		void InsertBefore(BasicBlock* bb, BasicBlock* before)
 		{
-			block_list.InsertBefore(bb, before);
+			block_list.Insert(before, bb);
 		}
 
 		void SetFuncAttribute(Attribute attr)
@@ -155,8 +155,8 @@ namespace ola
 		bool IsInline()   const { return HasFuncAttribute(Attribute_ForceInline); }
 		bool IsNoInline() const { return HasFuncAttribute(Attribute_NoInline); }
 
-		uint64	Size() const { return block_list.size(); }
-		bool    Empty() const { return block_list.empty(); }
+		uint64	Size() const { return block_list.Size(); }
+		bool    Empty() const { return block_list.Empty(); }
 
 		auto begin() { return block_list.begin(); }
 		auto begin() const { return block_list.begin(); }
@@ -209,6 +209,9 @@ namespace ola
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 		friend class IRBuilder;
+	public:
+		using iterator = IList<Instruction>::iterator;
+		using const_iterator = IList<Instruction>::const_iterator;
 
 	public:
 		BasicBlock(IRContext& ctx, std::string_view name = "",
@@ -267,13 +270,9 @@ namespace ola
 		auto rbegin() const { return inst_list.rbegin(); }
 		auto rend() { return inst_list.rend(); }
 		auto rend() const { return inst_list.rend(); }
-		Instruction& front() { return *begin(); }
-		Instruction const& front() const { return *begin(); }
-		Instruction& back() { return *rbegin(); }
-		Instruction const& back() const { return *rbegin(); }
 
-		uint64	Size() const { return inst_list.size(); }
-		bool    Empty() const { return inst_list.empty(); }
+		uint64	Size() const { return inst_list.Size(); }
+		bool    Empty() const { return inst_list.Empty(); }
 
 		static bool ClassOf(Value const* V)
 		{
@@ -310,27 +309,27 @@ namespace ola
 
 		void InsertBefore(Instruction* position)
 		{
-			position->GetParent()->GetInstructions().InsertBefore(this, position);
+			position->GetParent()->GetInstructions().Insert(position, this);
 			SetParent(position->GetParent());
 		}
 		void InsertAfter(Instruction* position)
 		{
-			position->GetParent()->GetInstructions().InsertAfter(this, position);
+			position->GetParent()->GetInstructions().InsertAfter(position, this);
 			SetParent(position->GetParent());
 		}
 		void InsertBefore(BasicBlock& bb, Instruction* position)
 		{
-			bb.GetInstructions().InsertBefore(this, position);
+			bb.GetInstructions().Insert(position, this);
 			SetParent(&bb);
 		}
 		void InsertAfter(BasicBlock& bb, Instruction* position)
 		{
-			bb.GetInstructions().InsertAfter(this, position);
+			bb.GetInstructions().InsertAfter(position, this);
 			SetParent(&bb);
 		}
 		void Insert(BasicBlock& bb)
 		{
-			bb.GetInstructions().InsertAtEnd(this);
+			bb.GetInstructions().PushBack(this);
 			SetParent(&bb);
 		}
 

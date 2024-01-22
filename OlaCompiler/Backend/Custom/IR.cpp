@@ -11,7 +11,7 @@ namespace ola
 	}
 	uint64 Value::GetUseCount() const
 	{
-		return uses.size();
+		return uses.Size();
 	}
 
 	IRFunction::IRFunction(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name /*= ""*/) : Value(ValueKind::Function, func_type), module(module)
@@ -54,8 +54,8 @@ namespace ola
 
 	Instruction const* BasicBlock::GetTerminator() const
 	{
-		if (inst_list.empty() || !inst_list.end()->IsTerminator()) return nullptr;
-		return &inst_list.back();
+		if (inst_list.Empty() || !inst_list.end()->IsTerminator()) return nullptr;
+		return &inst_list.Back();
 	}
 
 	void BasicBlock::InsertInto(IRFunction* parent, BasicBlock* insert_before)
