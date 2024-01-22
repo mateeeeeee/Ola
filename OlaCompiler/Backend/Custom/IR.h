@@ -307,7 +307,7 @@ namespace ola
 			GetParent()->GetInstructions().Remove(this);
 		}
 
-		void InsertBefore(Instruction* position)
+		void Insert(Instruction* position)
 		{
 			position->GetParent()->GetInstructions().Insert(position, this);
 			SetParent(position->GetParent());
@@ -317,20 +317,20 @@ namespace ola
 			position->GetParent()->GetInstructions().InsertAfter(position, this);
 			SetParent(position->GetParent());
 		}
-		void InsertBefore(BasicBlock& bb, Instruction* position)
+		void Insert(BasicBlock* bb, Instruction* position)
 		{
-			bb.GetInstructions().Insert(position, this);
-			SetParent(&bb);
+			bb->GetInstructions().Insert(position, this);
+			SetParent(bb);
 		}
-		void InsertAfter(BasicBlock& bb, Instruction* position)
+		void InsertAfter(BasicBlock* bb, Instruction* position)
 		{
-			bb.GetInstructions().InsertAfter(position, this);
-			SetParent(&bb);
+			bb->GetInstructions().InsertAfter(position, this);
+			SetParent(bb);
 		}
-		void Insert(BasicBlock& bb)
+		void Insert(BasicBlock* bb)
 		{
-			bb.GetInstructions().PushBack(this);
-			SetParent(&bb);
+			bb->GetInstructions().PushBack(this);
+			SetParent(bb);
 		}
 
 		bool IsTerminator() const { return false; }

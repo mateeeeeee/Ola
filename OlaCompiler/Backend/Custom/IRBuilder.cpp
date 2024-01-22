@@ -34,7 +34,7 @@ namespace ola
 
 	void IRBuilder::Insert(Instruction* instruction)
 	{
-		insert_block->GetInstructions().Insert(instruction, insert_point);
+		instruction->Insert(insert_block, insert_point);
 	}
 
 	void IRBuilder::Insert(Value* V)
@@ -44,7 +44,7 @@ namespace ola
 
 	void IRBuilder::InsertAfter(Instruction* instruction)
 	{
-		insert_block->GetInstructions().InsertAfter(instruction, insert_point);
+		instruction->InsertAfter(insert_block, insert_point);
 	}
 
 	void IRBuilder::InsertAfter(Value* V)
