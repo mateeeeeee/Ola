@@ -353,6 +353,8 @@ namespace ola
 		{
 			switch (V->GetKind())
 			{
+			case ValueKind::Alloca:
+				return true;
 			default:
 				return false;
 			}
@@ -393,6 +395,18 @@ namespace ola
 
 	private:
 		Argument(IRType* type, uint32 index) : Value(ValueKind::Argument, type), index(index) {}
+	};
+
+	class AllocaInst : public Instruction
+	{
+		friend Instruction;
+	public:
+		explicit AllocaInst(PointerType* type) : Instruction(ValueKind::Alloca, type), allocated_type(type->GetPointeeType()) {}
+		IRType* GetAllocatedType() { return allocated_type; }
+		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Alloca; }
+
+	private:
+		IRType* allocated_type;
 	};
 }
 
