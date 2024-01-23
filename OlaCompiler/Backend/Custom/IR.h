@@ -77,7 +77,7 @@ namespace ola
 		friend User;
 
 	public:
-		Use(User* u, Value* v) : value(v), user(u)
+		Use(User* u, Value* v = nullptr) : value(v), user(u)
 		{
 			if (value) value->AddUse(this);
 		}
@@ -116,7 +116,10 @@ namespace ola
 	class User : public Value
 	{
 	public:
-
+		~User()
+		{
+			for (Use* op : operands) delete op;
+		}
 		Use *const* GetOperandList() const
 		{
 			return operands.data();
@@ -185,6 +188,7 @@ namespace ola
 		User(ValueKind kind, IRType* type, uint32 num_operands) : Value(kind, type)
 		{
 			operands.resize(num_operands);
+			for (Use* op : operands) op = new Use(this);
 		}
 
 		template <uint32 Idx, typename U> 
@@ -474,6 +478,7 @@ namespace ola
 			switch (V->GetKind())
 			{
 			case ValueKind::Alloca:
+			case ValueKind::Call:
 				return true;
 			default:
 				return false;
@@ -486,9 +491,9 @@ namespace ola
 		{
 			if (parent) Insert(parent);
 		}
-		Instruction(ValueKind kind, IRType* type, uint32 num_operands, Instruction* position) : User(kind, type, num_operands), parent(position->GetParent())
+		Instruction(ValueKind kind, IRType* type, uint32 num_operands, Instruction* position) : User(kind, type, num_operands), parent(nullptr)
 		{
-			if (parent) Insert(position);
+			if (position) Insert(position);
 		}
 
 	private:
@@ -520,26 +525,88 @@ namespace ola
 	{
 	public:
 
-
-	private:
+		static bool ClassOf(Value const* V)
+		{
+			switch (V->GetKind())
+			{
+			case ValueKind::Alloca:
+			case ValueKind::Call:
+				return true;
+			default:
+				return false;
+			}
+			return false;
+		}
 
 	protected:
-		UnaryInstruction(ValueKind kind, IRType* type) : Instruction(kind, type, 1)
+		UnaryInstruction(ValueKind kind, IRType* type, Value* op, Instruction* position) : Instruction(kind, type, 1, position)
 		{
+			Op<0>() = op;
+		}
+		UnaryInstruction(ValueKind kind, IRType* type, Value* op, BasicBlock* bb = nullptr) : Instruction(kind, type, 1, bb)
+		{
+			Op<0>() = op;
+		}
+	};
 
+	class BinaryInstruction : public Instruction
+	{
+	public:
+
+		static bool ClassOf(Value const* V)
+		{
+			switch (V->GetKind())
+			{
+			default:
+				return false;
+			}
+			return false;
+		}
+
+	protected:
+		BinaryInstruction(ValueKind kind, IRType* type) : Instruction(kind, type, 2)
+		{
 		}
 	};
 
 	class AllocaInst : public UnaryInstruction
 	{
-		friend Instruction;
 	public:
-		explicit AllocaInst(PointerType* type) : UnaryInstruction(ValueKind::Alloca, type), allocated_type(type->GetPointeeType()) {}
-		IRType* GetAllocatedType() { return allocated_type; }
+		explicit AllocaInst(IRType* type, Value* array_size = nullptr) 
+			: UnaryInstruction(ValueKind::Alloca, PointerType::Get(type), array_size), array_size(array_size) {}
+
+		AllocaInst(IRType* type, Value* array_size, Instruction* insert_before)
+			: UnaryInstruction(ValueKind::Alloca, PointerType::Get(type), array_size, insert_before), allocated_type(type), array_size(array_size) {}
+		AllocaInst(IRType* type, Value* array_size, BasicBlock* insert_at_end)
+			: UnaryInstruction(ValueKind::Alloca, PointerType::Get(type), array_size, insert_at_end), allocated_type(type), array_size(array_size) {}
+		AllocaInst(IRType* type, Instruction* insert_before)
+			: AllocaInst(type, nullptr, insert_before) {}
+		AllocaInst(IRType* type, BasicBlock* insert_at_end)
+			: AllocaInst(type, nullptr, insert_at_end) {}
+
+
+		bool IsArrayAllocation() const
+		{
+			return array_size != nullptr;
+		}
+		PointerType* GetPtrType() const
+		{
+			return cast<PointerType>(GetType());
+		}
+		IRType* GetAllocatedType() const { return allocated_type; }
+
+		Value const* GetArraySize() const { return array_size; }
+		Value* GetArraySize() { return array_size; }
+
 		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Alloca; }
 
 	private:
 		IRType* allocated_type;
+		Value*  array_size;
+	};
+
+	class CallInst : public UnaryInstruction
+	{
 	};
 }
 

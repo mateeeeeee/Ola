@@ -8,7 +8,12 @@ namespace ola
 		return ctx.GetVoidType();
 	}
 
-	PointerType* PointerType::Get(IRContext& ctx, IRType* pointee_type)
+	PointerType* PointerType::Get(IRType* pointee_type)
+	{
+		return pointee_type->GetContext().GetPointerType(pointee_type);
+	}
+
+	PointerType* PointerType::Get(IRContext& ctx, IRType* pointee_type /*= nullptr*/)
 	{
 		return ctx.GetPointerType(pointee_type);
 	}
@@ -28,9 +33,19 @@ namespace ola
 		return ctx.GetArrayType(base_type, array_size);
 	}
 
+	ArrayType* ArrayType::Get(IRType* base_type, uint32 array_size)
+	{
+		return base_type->GetContext().GetArrayType(base_type, array_size);
+	}
+
 	FunctionType* FunctionType::Get(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types)
 	{
 		return ctx.GetFunctionType(return_type, param_types);
+	}
+
+	FunctionType* FunctionType::Get(IRType* return_type, std::vector<IRType*> const& param_types)
+	{
+		return return_type->GetContext().GetFunctionType(return_type, param_types);
 	}
 
 	StructType* StructType::Get(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types)

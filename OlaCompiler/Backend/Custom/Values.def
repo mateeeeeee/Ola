@@ -10,6 +10,7 @@ HANDLE_VALUE(Function)
 HANDLE_VALUE(GlobalVariable)
 HANDLE_VALUE(Argument)
 HANDLE_VALUE(Alloca)
+HANDLE_VALUE(Call)
 
 
 #undef VALUE

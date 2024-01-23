@@ -80,6 +80,7 @@ namespace ola
 		IRType* GetPointeeType() const { return pointee_type; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Pointer; }
+		static PointerType* Get(IRType* pointee_type = nullptr);
 		static PointerType* Get(IRContext& ctx, IRType* pointee_type = nullptr);
 
 	private:
@@ -126,6 +127,7 @@ namespace ola
 		uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
+		static ArrayType* Get(IRType* base_type, uint32 array_size);
 		static ArrayType* Get(IRContext& ctx, IRType* base_type, uint32 array_size);
 
 	private:
@@ -147,6 +149,7 @@ namespace ola
 		IRType* GetParamType(uint32 i) const { return param_types[i]; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
+		static FunctionType* Get(IRType* return_type, std::vector<IRType*> const& param_types);
 		static FunctionType* Get(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types);
 
 	private:
