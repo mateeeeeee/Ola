@@ -6,7 +6,7 @@ namespace ola
 {
 	Instruction const* BasicBlock::GetTerminator() const
 	{
-		if (inst_list.Empty() || !inst_list.end()->IsTerminator()) return nullptr;
+		if (inst_list.Empty() || !inst_list.Back().IsTerminator()) return nullptr;
 		return &inst_list.Back();
 	}
 
