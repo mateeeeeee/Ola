@@ -1,15 +1,9 @@
-#include "IR.h"
-#include "IRModule.h"
-#include "Compiler/RTTI.h"
+#include "GlobalValue.h"
+#include "BasicBlock.h"
+#include "Backend/Custom/IRModule.h"
 
 namespace ola
 {
-
-	void Value::ReplaceAllUseWith(Value* v)
-	{
-		for (auto& use : uses) use.Set(v);
-	}
-
 	Function::Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name) : Value(ValueKind::Function, func_type), module(module)
 	{
 		SetName(name);
@@ -37,10 +31,7 @@ namespace ola
 		for (auto const& bb : block_list) instruction_count += bb.Size();
 		return instruction_count;
 	}
-	Function const* Instruction::GetFunction() const
-	{
-		return GetParent()->GetParent();
-	}
+
 	FunctionType* Function::GetFunctionType() const
 	{
 		return cast<FunctionType>(GetType());
@@ -54,18 +45,6 @@ namespace ola
 	GlobalVariable::~GlobalVariable()
 	{
 		module.RemoveVariable(this);
-	}
-
-	Instruction const* BasicBlock::GetTerminator() const
-	{
-		if (inst_list.Empty() || !inst_list.end()->IsTerminator()) return nullptr;
-		return &inst_list.Back();
-	}
-
-	void BasicBlock::InsertInto(Function* parent, BasicBlock* insert_before)
-	{
-		if (insert_before) parent->InsertBefore(this, insert_before);
-		else parent->Insert(this);
 	}
 
 }
