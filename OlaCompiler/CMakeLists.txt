@@ -13,6 +13,7 @@ set(UTILITY_FILES
   Utility/DebugVisitor.h
   Utility/DebugVisitor.cpp
   Utility/Enums.h
+  Utility/IntrusiveList.h
 )
 
 
@@ -64,6 +65,36 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/LLVMCodeGen.h
   Backend/LLVM/LLVMCodeGen.cpp
+  Backend/Custom/IR.h
+  Backend/Custom/IRBuilder.h
+  Backend/Custom/IRBuilder.cpp
+  Backend/Custom/IRType.h
+  Backend/Custom/IRType.cpp
+  Backend/Custom/IRGen.h
+  Backend/Custom/IRGen.cpp
+  Backend/Custom/IRVisitor.h
+  Backend/Custom/IRVisitor.cpp
+  Backend/Custom/IRContext.h
+  Backend/Custom/IRContext.cpp
+  Backend/Custom/IRModule.h
+  Backend/Custom/IRModule.cpp
+  Backend/Custom/IR/Values.def
+  Backend/Custom/IR/IRFwd.h
+  Backend/Custom/IR/Value.h
+  Backend/Custom/IR/Value.cpp
+  Backend/Custom/IR/Use.h
+  Backend/Custom/IR/User.h
+  Backend/Custom/IR/User.cpp
+  Backend/Custom/IR/Instruction.h
+  Backend/Custom/IR/Instruction.cpp
+  Backend/Custom/IR/GlobalValue.h
+  Backend/Custom/IR/GlobalValue.cpp
+  Backend/Custom/IR/BasicBlock.h
+  Backend/Custom/IR/BasicBlock.cpp
+  Backend/Custom/IR/UnaryInstruction.h
+  Backend/Custom/IR/UnaryInstruction.cpp
+  Backend/Custom/IR/BinaryInstruction.h
+  Backend/Custom/IR/BinaryInstruction.cpp
 )
 
 set(COMPILER_FILES

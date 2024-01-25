@@ -1,0 +1,33 @@
+#pragma once
+
+
+#ifndef HANDLE_VALUE
+#define HANDLE_VALUE(X)
+#endif
+
+
+HANDLE_VALUE(BasicBlock)
+HANDLE_VALUE(Function)
+HANDLE_VALUE(GlobalVariable)
+HANDLE_VALUE(Argument)
+
+HANDLE_VALUE(Instruction)
+
+HANDLE_VALUE(Neg)
+HANDLE_VALUE(Not)
+
+HANDLE_VALUE(Add)
+HANDLE_VALUE(Sub)
+
+HANDLE_VALUE(Zext)
+HANDLE_VALUE(Sext)
+
+HANDLE_VALUE(Alloca)
+HANDLE_VALUE(Load)
+HANDLE_VALUE(Store)
+
+HANDLE_VALUE(Cmp)
+
+
+#undef VALUE
+
