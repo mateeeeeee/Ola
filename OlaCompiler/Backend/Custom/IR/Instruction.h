@@ -32,7 +32,7 @@ namespace ola
 		bool IsBinaryOp()	const;
 		bool IsModulo()		const { return false; }
 		bool IsShift()		const { return false; }
-		bool IsCast()		const { return false; }
+		bool IsCast()		const;
 
 		static bool ClassOf(Value const* V)
 		{
@@ -57,17 +57,30 @@ namespace ola
 	};
 
 
-	template<typename OpcodeType, ValueKind FirstValueKind>
+	template<typename Derived> 
 	class OpcodeConverter
 	{
 	protected:
-		static OpcodeType ValueKindToOpcode(ValueKind kind)
+		static auto ValueKindToOpcode(ValueKind kind)
 		{
+			using OpcodeType = typename Derived::OpcodeType;
+			static constexpr ValueKind FirstValueKind = Derived::FirstValueKind;
 			return (OpcodeType)(kind - FirstValueKind);
 		}
-		static ValueKind OpcodeToValueKind(OpcodeType opcode)
+		static ValueKind OpcodeToValueKind(auto opcode)
 		{
+			using OpcodeType = typename Derived::OpcodeType;
+			static_assert(std::is_same_v<std::remove_cvref_t<decltype(opcode)>, OpcodeType>, "Opcode type mismatch");
+			static constexpr ValueKind FirstValueKind = Derived::FirstValueKind;
 			return (ValueKind)(opcode + FirstValueKind);
 		}
+
+	public:
+		auto GetOpcode() const { return ValueKindToOpcode(static_cast<Derived const*>(this)->GetKind()); }
 	};
+
+#define OPCODE_CONVERTER_IMPL(_ClassName, _OpcodeType, _FirstValueKind) \
+	friend class OpcodeConverter<_ClassName>; \
+	static constexpr ValueKind FirstValueKind = _FirstValueKind; \
+	using OpcodeType = _OpcodeType;
 }

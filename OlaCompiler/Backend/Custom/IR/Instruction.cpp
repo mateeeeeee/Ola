@@ -52,6 +52,12 @@ namespace ola
 		return kind >= ValueKind_Add && kind <= ValueKind_Sub;
 	}
 
+	bool Instruction::IsCast() const
+	{
+		ValueKind kind = GetKind();
+		return kind >= ValueKind_Zext && kind <= ValueKind_Sext;
+	}
+
 	void Instruction::InsertAfter(BasicBlock* bb, Instruction* position)
 	{
 		bb->GetInstructions().InsertAfter(position, this);

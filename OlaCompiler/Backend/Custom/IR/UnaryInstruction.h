@@ -27,18 +27,9 @@ namespace ola
 		Unary_Not
 	};
 
-
-	class UnaryOperator : public UnaryInstruction
+	class UnaryOperator : public UnaryInstruction, public OpcodeConverter<UnaryOperator>
 	{
-		static UnaryOpcode ValueKindToOpcode(ValueKind kind)
-		{
-			return (UnaryOpcode)(kind - ValueKind_Neg);
-		}
-		static ValueKind OpcodeToValueKind(UnaryOpcode opcode)
-		{
-			return (ValueKind)(opcode + ValueKind_Neg);
-		}
-
+		OPCODE_CONVERTER_IMPL(UnaryOperator, UnaryOpcode, ValueKind_Neg)
 	public:
 
 		UnaryOperator(UnaryOpcode opcode, IRType* type, Value* op, Instruction* position) 
@@ -56,26 +47,36 @@ namespace ola
 		}
 	};
 
-	//enum CastOpcode
-	//{
-	//	Cast_Zext,
-	//	Cast_Sext,
-	//};
-	//
-	//
-	//class CastInst : public UnaryInstruction
-	//{
-	//public:
-	//	CastInst(
-	//		CastOpcode opcode,    ///< The opcode of the cast instruction
-	//		Value* S,                ///< The value to be casted (operand 0)
-	//		Type* Ty,          ///< The type to which cast should be made
-	//		const Twine& Name = "", ///< Name for the instruction
-	//		Instruction* InsertBefore = nullptr ///< Place to insert the instruction
-	//	);
-	//
-	//private:
-	//};
+	enum CastOpcode
+	{
+		Cast_Zext,
+		Cast_Sext,
+	};
+	
+	
+	class CastInst : public UnaryInstruction, public OpcodeConverter<CastInst>
+	{
+		OPCODE_CONVERTER_IMPL(CastInst, CastOpcode, ValueKind_Zext)
+	public:
+		CastInst(CastOpcode opcode, IRType* type, Value* op, Instruction* position) 
+			: UnaryInstruction(OpcodeToValueKind(opcode), type, op, position)
+		{}
+
+		CastInst(CastOpcode opcode, IRType* type, Value* op, BasicBlock* bb = nullptr)
+			: UnaryInstruction(OpcodeToValueKind(opcode), type, op, bb)
+		{}
+
+
+		IRType* GetSrcType() const { return GetOperand(0)->GetType(); }
+		IRType* GetDestType() const { return GetType(); }
+
+		static bool ClassOf(Value const* V)
+		{
+			return isa<Instruction>(V) && cast<Instruction>(V)->IsCast();
+		}
+	
+	private:
+	};
 
 
 	class AllocaInst : public UnaryInstruction

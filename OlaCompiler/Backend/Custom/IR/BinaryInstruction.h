@@ -22,23 +22,15 @@ namespace ola
 	};
 
 
-	enum  BinaryOpcode
+	enum BinaryOpcode
 	{
 		Binary_Add,
 		Binary_Sub
 	};
 
-	class BinaryOperator : public BinaryInstruction
+	class BinaryOperator : public BinaryInstruction, public OpcodeConverter<BinaryOperator>
 	{
-		static BinaryOpcode ValueKindToOpcode(ValueKind kind)
-		{
-			return (BinaryOpcode)(kind - ValueKind_Add);
-		}
-		static ValueKind OpcodeToValueKind(BinaryOpcode opcode)
-		{
-			return (ValueKind)(opcode + ValueKind_Add);
-		}
-
+		OPCODE_CONVERTER_IMPL(BinaryOperator, BinaryOpcode, ValueKind_Add)
 	public:
 
 		BinaryOperator(BinaryOpcode opcode, IRType* type, Value* op1, Value* op2, Instruction* position) : BinaryInstruction(OpcodeToValueKind(opcode), type, op1, op2, position)
@@ -58,12 +50,10 @@ namespace ola
 			OLA_ASSERT(op1->GetType() == op2->GetType());
 		}
 
-		BinaryOpcode GetOpcode() const { return ValueKindToOpcode(GetKind()); }
 
 		static bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && cast<Instruction>(V)->IsBinaryOp();
 		}
-	private:
 	};
 }
