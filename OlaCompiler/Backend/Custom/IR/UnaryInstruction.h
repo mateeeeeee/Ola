@@ -78,6 +78,21 @@ namespace ola
 	private:
 	};
 
+	class LoadInst : public UnaryInstruction 
+	{
+	public:
+		LoadInst(IRType* type, Value* ptr, Instruction* position) : UnaryInstruction(ValueKind_Load, type, ptr, position) {}
+		LoadInst(IRType* type, Value* ptr, BasicBlock* bb = nullptr) : UnaryInstruction(ValueKind_Load, type, ptr, bb) {}
+
+		Value* GetPointerOperand() { return GetOperand(0); }
+		Value const* GetPointerOperand() const { return GetOperand(0); }
+		IRType* getPointerOperandType() const { return GetPointerOperand()->GetType(); }
+
+		static bool ClassOf(Value const* V)
+		{
+			return V->GetKind() == ValueKind_Load;
+		}
+	};
 
 	class AllocaInst : public UnaryInstruction
 	{
@@ -108,7 +123,7 @@ namespace ola
 		Value const* GetArraySize() const { return GetOperand(0); }
 		Value* GetArraySize() { return GetOperand(0); }
 
-		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind_Alloca; }
+		static bool ClassOf(Value const* V) { return V->GetKind() == ValueKind_Alloca; }
 
 	private:
 		IRType* allocated_type;
