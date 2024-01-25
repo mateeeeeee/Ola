@@ -13,4 +13,8 @@ namespace ola
 	class Function;
 	class GlobalVariable;
 	class Argument;
+	class UnaryInstruction;
+	class UnaryOperator;
+	class BinaryInstruction;
+	class BinaryOperator;
 }

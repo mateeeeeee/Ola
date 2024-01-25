@@ -108,7 +108,7 @@ namespace ola
 
 		static bool ClassOf(Value const* V)
 		{
-			return V->GetKind() == ValueKind::Function;
+			return V->GetKind() == ValueKind_Function;
 		}
 
 	private:
@@ -124,13 +124,13 @@ namespace ola
 		friend Function;
 	public:
 		uint32  GetIndex() const { return index; }
-		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
+		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind_Argument; }
 
 	private:
 		uint32 index;
 
 	private:
-		Argument(IRType* type, uint32 index) : Value(ValueKind::Argument, type), index(index) {}
+		Argument(IRType* type, uint32 index) : Value(ValueKind_Argument, type), index(index) {}
 	};
 
 
@@ -147,7 +147,7 @@ namespace ola
 		std::string_view GetName() const { return name; }
 		Linkage GetLinkage() const { return linkage; }
 
-		static bool ClassOf(Value const* V) { return V->GetKind() == ValueKind::GlobalVariable; }
+		static bool ClassOf(Value const* V) { return V->GetKind() == ValueKind_GlobalVariable; }
 
 	private:
 		IRModule& module;

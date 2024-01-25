@@ -5,9 +5,9 @@
 
 namespace ola
 {
-	enum class ValueKind : uint32
+	enum ValueKind : uint32
 	{
-	#define HANDLE_VALUE(Name) Name,
+	#define HANDLE_VALUE(Name) ValueKind_##Name,
 	#include "Values.def"
 	};
 
@@ -15,7 +15,7 @@ namespace ola
 	{
 	public:
 		OLA_NONCOPYABLE(Value)
-			virtual ~Value() = default;
+		virtual ~Value() = default;
 
 		ValueKind GetKind() const { return kind; }
 		IRType* GetType() const { return type; }

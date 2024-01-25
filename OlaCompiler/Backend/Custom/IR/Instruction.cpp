@@ -1,6 +1,8 @@
 #include "Instruction.h"
 #include "GlobalValue.h"
 #include "BasicBlock.h"
+#include "UnaryInstruction.h"
+#include "BinaryInstruction.h"
 
 namespace ola
 {
@@ -36,6 +38,18 @@ namespace ola
 	{
 		position->GetParent()->GetInstructions().Insert(position, this);
 		SetParent(position->GetParent());
+	}
+
+	bool Instruction::IsUnaryOp() const
+	{
+		ValueKind kind = GetKind();
+		return kind >= ValueKind_Neg && kind <= ValueKind_Not;
+	}
+
+	bool Instruction::IsBinaryOp() const
+	{
+		ValueKind kind = GetKind();
+		return kind >= ValueKind_Add && kind <= ValueKind_Sub;
 	}
 
 	void Instruction::InsertAfter(BasicBlock* bb, Instruction* position)

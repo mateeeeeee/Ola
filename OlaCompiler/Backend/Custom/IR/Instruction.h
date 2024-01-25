@@ -28,22 +28,15 @@ namespace ola
 		void Insert(BasicBlock* bb);
 
 		bool IsTerminator() const { return false; }
-		bool IsUnaryOp()	const { return false; }
-		bool IsBinaryOp()	const { return false; }
+		bool IsUnaryOp()	const;
+		bool IsBinaryOp()	const;
 		bool IsModulo()		const { return false; }
 		bool IsShift()		const { return false; }
 		bool IsCast()		const { return false; }
 
 		static bool ClassOf(Value const* V)
 		{
-			switch (V->GetKind())
-			{
-			case ValueKind::Alloca:
-				return true;
-			default:
-				return false;
-			}
-			return false;
+			return V->GetKind() >= ValueKind_Instruction;
 		}
 
 	protected:
@@ -63,4 +56,18 @@ namespace ola
 		void SetParent(BasicBlock* bb);
 	};
 
+
+	template<typename OpcodeType, ValueKind FirstValueKind>
+	class OpcodeConverter
+	{
+	protected:
+		static OpcodeType ValueKindToOpcode(ValueKind kind)
+		{
+			return (OpcodeType)(kind - FirstValueKind);
+		}
+		static ValueKind OpcodeToValueKind(OpcodeType opcode)
+		{
+			return (ValueKind)(opcode + FirstValueKind);
+		}
+	};
 }

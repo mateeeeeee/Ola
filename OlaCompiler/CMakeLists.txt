@@ -93,6 +93,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/BasicBlock.cpp
   Backend/Custom/IR/UnaryInstruction.h
   Backend/Custom/IR/UnaryInstruction.cpp
+  Backend/Custom/IR/BinaryInstruction.h
+  Backend/Custom/IR/BinaryInstruction.cpp
 )
 
 set(COMPILER_FILES
