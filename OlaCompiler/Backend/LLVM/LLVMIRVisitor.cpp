@@ -51,13 +51,13 @@ namespace ola
 		llvm::Argument* param_arg = llvm_function->arg_begin();
 		if (isa<ClassType>(type->GetReturnType()))
 		{
-			llvm::Value* sret_value = &(*param_arg);
+			llvm::Value* sret_value = param_arg;
 			++param_arg;
 			return_value = sret_value;
 		}
 		for (auto& param : function_decl.GetParamDecls())
 		{
-			llvm::Value* llvm_param = &*param_arg;
+			llvm::Value* llvm_param = param_arg;
 			llvm_param->setName(param->GetName());
 			value_map[param.get()] = llvm_param;
 			++param_arg;

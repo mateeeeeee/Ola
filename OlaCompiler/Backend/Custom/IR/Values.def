@@ -28,6 +28,8 @@ HANDLE_VALUE(Store)
 
 HANDLE_VALUE(Cmp)
 
+//todo: Constant, GetElementPtrInst, CallInst, SelectInst, PHIInst, ReturnInst, BranchInst, SwitchInst, cast instructions
+
 
 #undef VALUE
 
