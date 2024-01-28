@@ -42,11 +42,15 @@ namespace ola
 	protected:
 		User(ValueKind kind, IRType* type, uint32 num_operands);
 
+
+		void ResizeOperands(uint32 op_count);
+
 		template <uint32 Idx, typename U>
 		static Use& OpFrom(U const* that)
 		{
 			return *that->operands[Idx];
 		}
+
 		template <uint32 Idx>
 		Use& Op()
 		{

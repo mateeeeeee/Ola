@@ -12,6 +12,12 @@ HANDLE_VALUE(GlobalVariable)
 HANDLE_VALUE(Argument)
 
 HANDLE_VALUE(Instruction)
+HANDLE_VALUE(Call)
+HANDLE_VALUE(Select)
+HANDLE_VALUE(Return)
+HANDLE_VALUE(Branch)
+HANDLE_VALUE(Phi)
+HANDLE_VALUE(Switch)
 
 HANDLE_VALUE(Neg)
 HANDLE_VALUE(Not)
@@ -25,10 +31,9 @@ HANDLE_VALUE(Sext)
 HANDLE_VALUE(Alloca)
 HANDLE_VALUE(Load)
 HANDLE_VALUE(Store)
-
 HANDLE_VALUE(Cmp)
 
-//todo: Constant, GetElementPtrInst, CallInst, SelectInst, PHIInst, ReturnInst, BranchInst, SwitchInst, cast instructions
+//todo: Constant, GetElementPtrInst
 
 
 #undef VALUE
