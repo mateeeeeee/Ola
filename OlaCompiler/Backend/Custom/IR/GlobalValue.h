@@ -3,6 +3,8 @@
 
 namespace ola
 {
+
+
 	enum class Linkage
 	{
 		Unknown,
@@ -10,17 +12,37 @@ namespace ola
 		External
 	};
 
-
 	class GlobalValue : public Value
 	{
-		friend class IRModule;
 	public:
+		OLA_NONCOPYABLE(GlobalValue)
+			~GlobalValue() = default;
 
+		Linkage GetLinkage() const { return linkage; }
+		void SetLinkage(Linkage _linkage)
+		{
+			linkage = _linkage;
+		}
+		IRModule& GetModule() const { return module; }
+		IRType* GetValueType() const { return value_type; }
 
-	private:
+		static bool ClassOf(Value const* V)
+		{
+			return  V->GetKind() == ValueKind_Function ||
+				V->GetKind() == ValueKind_GlobalVariable;
+		}
+
+	protected:
+		IRModule& module;
+		Linkage linkage = Linkage::Unknown;
+		IRType* value_type;
+
+	protected:
+		GlobalValue(ValueKind kind, IRType* type, IRModule& module, Linkage linkage = Linkage::Unknown) : Value(kind, PointerType::Get(type)), module(module), linkage(linkage), value_type(type)
+		{}
 	};
 
-	class Function : public Value, public IListNode<Function>
+	class Function : public GlobalValue, public IListNode<Function>
 	{
 		friend class IRModule;
 	public:
@@ -33,11 +55,10 @@ namespace ola
 		using Attributes = uint8;
 	public:
 
-		Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name = "");
+		Function(FunctionType* type, IRModule& module, Linkage linkage, std::string_view name = "");
 		OLA_NONCOPYABLE(Function)
-		~Function();
+			~Function();
 
-		IRModule& GetModule() const { return module; }
 		uint64 GetInstructionCount() const;
 		FunctionType* GetFunctionType() const;
 		IRType* GetReturnType() const
@@ -112,9 +133,7 @@ namespace ola
 		}
 
 	private:
-		IRModule& module;
 		IList<BasicBlock> block_list;
-		Linkage linkage = Linkage::Unknown;
 		Attributes attributes = Attribute_None;
 		std::vector<Argument*> arguments;
 	};
@@ -133,28 +152,21 @@ namespace ola
 		Argument(IRType* type, uint32 index) : Value(ValueKind_Argument, type), index(index) {}
 	};
 
-
-	class GlobalVariable : public Value, public IListNode<GlobalVariable>
+	class GlobalVariable : public GlobalValue, public IListNode<GlobalVariable>
 	{
 	public:
-		GlobalVariable(IRModule& module, PointerType* type, std::string_view name, Linkage linkage, Value* init);
+		GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name);
 		OLA_NONCOPYABLE(GlobalVariable)
-		~GlobalVariable();
+			~GlobalVariable();
 
-		IRModule& GetModule() const { return module; }
-		IRType* GetAllocatedType() const { return allocated_type; }
 		Value* GetInitValue() const { return init; }
 		std::string_view GetName() const { return name; }
-		Linkage GetLinkage() const { return linkage; }
 
 		static bool ClassOf(Value const* V) { return V->GetKind() == ValueKind_GlobalVariable; }
 
 	private:
-		IRModule& module;
 		std::string name;
-		Linkage linkage;
 		Value* init;
-		IRType* allocated_type;
 	};
 
 }

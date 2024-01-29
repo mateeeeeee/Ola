@@ -87,6 +87,7 @@ set(BACKEND_FILES
   Backend/Custom/IR/User.cpp
   Backend/Custom/IR/Instruction.h
   Backend/Custom/IR/Instruction.cpp
+  Backend/Custom/IR/Constant.h
   Backend/Custom/IR/GlobalValue.h
   Backend/Custom/IR/GlobalValue.cpp
   Backend/Custom/IR/BasicBlock.h

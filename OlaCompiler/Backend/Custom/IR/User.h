@@ -42,7 +42,6 @@ namespace ola
 	protected:
 		User(ValueKind kind, IRType* type, uint32 num_operands);
 
-
 		void ResizeOperands(uint32 op_count);
 
 		template <uint32 Idx, typename U>

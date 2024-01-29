@@ -36,7 +36,7 @@ namespace ola
 
 		static bool ClassOf(Value const* V)
 		{
-			return V->GetKind() >= ValueKind_Instruction;
+			return V->GetKind() >= ValueKind_Call;
 		}
 
 	protected:

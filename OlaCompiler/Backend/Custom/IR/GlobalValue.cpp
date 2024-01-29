@@ -4,7 +4,8 @@
 
 namespace ola
 {
-	Function::Function(IRModule& module, IRType* func_type, Linkage linkage, std::string_view name) : Value(ValueKind_Function, func_type), module(module)
+	Function::Function(FunctionType* func_type, IRModule& module, Linkage linkage, std::string_view name)
+		: GlobalValue(ValueKind_Function, func_type, module, linkage)
 	{
 		SetName(name);
 
@@ -37,8 +38,8 @@ namespace ola
 		return cast<FunctionType>(GetType());
 	}
 
-	GlobalVariable::GlobalVariable(IRModule& module, PointerType* type, std::string_view name, Linkage linkage, Value* init) : Value(ValueKind_GlobalVariable, type), module(module),
-		name(name), linkage(linkage), init(init), allocated_type(type->GetPointeeType())
+	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name)
+		: GlobalValue(ValueKind_GlobalVariable, type, module, linkage), name(name), init(init)
 	{
 		module.AddVariable(this);
 	}
@@ -46,6 +47,4 @@ namespace ola
 	{
 		module.RemoveVariable(this);
 	}
-
 }
-

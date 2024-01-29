@@ -5,13 +5,9 @@
 #define HANDLE_VALUE(X)
 #endif
 
-
 HANDLE_VALUE(BasicBlock)
-HANDLE_VALUE(Function)
-HANDLE_VALUE(GlobalVariable)
-HANDLE_VALUE(Argument)
 
-HANDLE_VALUE(Instruction)
+//Instructions
 HANDLE_VALUE(Call)
 HANDLE_VALUE(Select)
 HANDLE_VALUE(Return)
@@ -33,7 +29,25 @@ HANDLE_VALUE(Load)
 HANDLE_VALUE(Store)
 HANDLE_VALUE(Cmp)
 
-//todo: Constant, GetElementPtrInst
+//Constants
+HANDLE_VALUE(Function)
+HANDLE_VALUE(GlobalVariable)
+
+HANDLE_VALUE(ConstantInt)
+HANDLE_VALUE(ConstantFloat)
+HANDLE_VALUE(ConstantString)
+HANDLE_VALUE(ConstantPointerNull)
+
+HANDLE_VALUE(ConstantArray)
+HANDLE_VALUE(ConstantStruct)
+
+HANDLE_VALUE(Undef)
+HANDLE_VALUE(Poison)
+
+
+HANDLE_VALUE(Argument)
+
+//todo: GetElementPtrInst
 
 
 #undef VALUE
