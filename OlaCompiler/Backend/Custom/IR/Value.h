@@ -47,9 +47,6 @@ namespace ola
 		bool hasNUses(uint32 N) const { return UseSize() == N; }
 		bool hasNUsesOrMore(unsigned N) const { return UseSize() >= N; }
 
-		void* operator new(uint64) = delete;
-		void* operator new(uint64 sz, IRModule&) { return ::operator new(sz); }
-
 	protected:
 		Value(ValueKind kind, IRType* type = nullptr) : kind(kind), type(type) {}
 

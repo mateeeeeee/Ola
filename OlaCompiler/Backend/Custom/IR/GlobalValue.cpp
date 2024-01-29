@@ -13,7 +13,7 @@ namespace ola
 		arguments.resize(function_type->GetParamCount());
 		for (uint32 i = 0; i < arguments.size(); ++i)
 		{
-			arguments[i] = new (module) Argument(function_type->GetParamType(i), i);
+			arguments[i] = new Argument(function_type->GetParamType(i), i);
 		}
 		module.AddFunction(this);
 	}

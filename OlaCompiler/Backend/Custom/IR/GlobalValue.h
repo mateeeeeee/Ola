@@ -155,7 +155,7 @@ namespace ola
 	class GlobalVariable : public GlobalValue, public IListNode<GlobalVariable>
 	{
 	public:
-		GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name);
+		GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name = "");
 		OLA_NONCOPYABLE(GlobalVariable)
 			~GlobalVariable();
 

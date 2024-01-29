@@ -1,5 +1,6 @@
 #include "IRContext.h"
 #include "IRType.h"
+#include "IR.h"
 
 namespace ola
 {
@@ -11,15 +12,22 @@ namespace ola
 		int8_type = new(this) IntegerType(*this, 8);
 		float_type = new(this) FloatType(*this);
 		label_type = new(this) LabelType(*this);
+
+		true_value = new ConstantInt(int1_type, true);
+		false_value = new ConstantInt(int1_type, false);
 	}
 
 	IRContext::~IRContext()
 	{
+		for (auto [k, v] : constant_strings) delete v;
+
 		for (ArrayType* array_type : array_types)			delete array_type;
 		for (StructType* struct_type : struct_types)		delete struct_type;
 		for (PointerType* ref_type : pointer_types)			delete ref_type;
 		for (FunctionType* function_type : function_types)	delete function_type;
 
+		delete false_value;
+		delete true_value;
 		delete label_type;
 		delete float_type;
 		delete int1_type;
@@ -31,8 +39,8 @@ namespace ola
 	{
 		switch (width)
 		{
-		case 1:
-		case 8:
+		case 1: return int1_type;
+		case 8: return int8_type;
 		default:
 			OLA_ASSERT_MSG(false, "Invalid integer type width!");
 		}
@@ -103,6 +111,27 @@ namespace ola
 		}
 		struct_types.push_back(new(this) StructType(*this, name, member_types));
 		return struct_types.back();
+	}
+
+	ConstantString* IRContext::GetConstantString(std::string_view str)
+	{
+		if (constant_strings.contains(str)) return constant_strings[str];
+		constant_strings[str] = new ConstantString(*this, str);
+		return constant_strings[str];
+	}
+
+	ConstantInt* IRContext::GetConstantInt64(int64 value)
+	{
+		if (constant_ints64.contains(value)) return constant_ints64[value];
+		constant_ints64[value] = new ConstantInt(int8_type, value);
+		return constant_ints64[value];
+	}
+
+	ConstantInt* IRContext::GetConstantInt8(int8 value)
+	{
+		if (constant_ints8.contains(value)) return constant_ints8[value];
+		constant_ints8[value] = new ConstantInt(int1_type, value);
+		return constant_ints8[value];
 	}
 
 }

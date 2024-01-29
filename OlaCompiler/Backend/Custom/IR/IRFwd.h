@@ -17,4 +17,9 @@ namespace ola
 	class UnaryOperator;
 	class BinaryInstruction;
 	class BinaryOperator;
+	class ConstantInt;
+	class ConstantString;
+	class ConstantFloat;
+	class ConstantArray;
+	class ConstantStruct;
 }
