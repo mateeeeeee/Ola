@@ -14,6 +14,8 @@ set(UTILITY_FILES
   Utility/DebugVisitor.cpp
   Utility/Enums.h
   Utility/IntrusiveList.h
+  Utility/IteratorRange.h
+  Utility/IteratorFacade.h
 )
 
 

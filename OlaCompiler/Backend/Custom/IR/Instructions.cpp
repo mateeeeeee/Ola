@@ -55,13 +55,13 @@ namespace ola
 		SetOperand(idx, successor);
 	}
 
-	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, unsigned NumCases, Instruction* InsertBefore) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertBefore)
+	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, Instruction* InsertBefore) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertBefore)
 	{
 		Op<0>() = Value;
 		Op<1>() = Default;
 	}
 
-	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, unsigned NumCases, BasicBlock* InsertAtEnd) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertAtEnd)
+	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, BasicBlock* InsertAtEnd) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertAtEnd)
 	{
 		Op<0>() = Value;
 		Op<1>() = Default;

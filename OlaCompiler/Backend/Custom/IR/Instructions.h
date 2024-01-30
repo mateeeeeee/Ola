@@ -1,5 +1,7 @@
 #include "Instruction.h"
 #include "Use.h"
+#include "Constant.h"
+#include "Utility/IteratorFacade.h"
 
 namespace ola
 {
@@ -14,12 +16,12 @@ namespace ola
 		}
 	public:
 
-		CallInst(FunctionType* type, Value* called_func, std::vector<Value*> const& args, BasicBlock* bb = nullptr)
+		CallInst(FunctionType* type, Value* called_func, std::span<Value*> args, BasicBlock* bb = nullptr)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(args.size()), bb), func_type(type)
 		{
 			Initialize(called_func, args);
 		}
-		CallInst(FunctionType* type, Value* called_func, std::vector<Value*> const& args, Instruction* position)
+		CallInst(FunctionType* type, Value* called_func, std::span<Value*> args, Instruction* position)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(args.size()), position), func_type(type)
 		{
 			Initialize(called_func, args);
@@ -84,7 +86,7 @@ namespace ola
 		FunctionType* func_type;
 
 	private:
-		void Initialize(Value* called_func, std::vector<Value*> const& args = {})
+		void Initialize(Value* called_func, std::span<Value*> args = {})
 		{
 			OLA_ASSERT_MSG(GetNumOperands() == args.size() + 1, "Wrong number of arguments!");
 			OLA_ASSERT_MSG(args.size() == func_type->GetParamCount(), "Calling a function with bad signature!");
@@ -207,7 +209,7 @@ namespace ola
 	class PHIInst : public Instruction
 	{
 	public:
-		explicit PHIInst(IRType* type, unsigned num_reserved_values,
+		explicit PHIInst(IRType* type, uint32 num_reserved_values,
 			Instruction* position)
 			: Instruction(ValueKind_Phi, type, 0, position),
 			reserved_space(num_reserved_values)
@@ -231,8 +233,8 @@ namespace ola
 	{
 	public:
 
-		SwitchInst(Value* Value, BasicBlock* Default, unsigned NumCases, Instruction* InsertBefore);
-		SwitchInst(Value* Value, BasicBlock* Default, unsigned NumCases, BasicBlock* InsertAtEnd);
+		SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, Instruction* InsertBefore);
+		SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, BasicBlock* InsertAtEnd);
 
 		Value* GetCondition() const { return GetOperand(0); }
 		void SetCondition(Value* V) { SetOperand(0, V); }
@@ -247,6 +249,142 @@ namespace ola
 		uint32 GetNumSuccessors() const { return GetNumOperands() / 2; }
 		BasicBlock* GetSuccessor(uint32 idx) const;
 		void SetSuccessor(uint32 idx, BasicBlock* successor);
+
+		template <typename CaseHandleT>
+		class CaseIteratorImpl;
+		template <typename SwitchInstT, typename ConstantIntT, typename BasicBlockT>
+		class CaseHandleImpl 
+		{
+			friend class SwitchInst::CaseIteratorImpl<CaseHandleImpl<SwitchInstT, ConstantIntT, BasicBlockT>>;
+
+		protected:
+			using SwitchInstType = SwitchInstT;
+
+			SwitchInstT* SI;
+			uint32 Index;
+
+			CaseHandleImpl() = default;
+			CaseHandleImpl(SwitchInstT* SI, uint32 Index = -1) : SI(SI), Index(Index) {}
+
+		public:
+			bool operator==(CaseHandleImpl const& RHS) const
+			{
+				OLA_ASSERT_MSG(SI == RHS.SI, "Incompatible operators.");
+				return Index == RHS.Index;
+			}
+
+			ConstantIntT* GetCaseValue() const
+			{
+				OLA_ASSERT_MSG(Index < SI->GetNumCases(), "Index out the number of cases.");
+				return reinterpret_cast<ConstantIntT*>(SI->GetOperand(2 + Index * 2));
+			}
+			BasicBlockT* GetCaseSuccessor() const 
+			{
+				OLA_ASSERT_MSG(Index < SI->GetNumCases(), "Index out the number of cases.");
+				return SI->GetSuccessor(GetSuccessorIndex());
+			}
+			uint32 GetCaseIndex() const { return Index; }
+			uint32 GetSuccessorIndex() const 
+			{
+				OLA_ASSERT_MSG(Index < SI->GetNumCases(), "Index out the number of cases.");
+				return Index + 1;
+			}
+		};
+		using ConstCaseHandle = CaseHandleImpl<SwitchInst const, ConstantInt const, BasicBlock const>;
+
+		class CaseHandle : public CaseHandleImpl<SwitchInst, ConstantInt, BasicBlock>
+		{
+			friend class SwitchInst::CaseIteratorImpl<CaseHandle>;
+
+		public:
+			CaseHandle(SwitchInst* SI, uint32 Index) : CaseHandleImpl(SI, Index) {}
+			void SetValue(ConstantInt* V) const
+			{
+				OLA_ASSERT_MSG(Index < SI->GetNumCases(), "Index out the number of cases.");
+				SI->SetOperand(2 + Index * 2, V);
+			}
+			void SetSuccessor(BasicBlock* S) const
+			{
+				SI->SetSuccessor(GetSuccessorIndex(), S);
+			}
+		};
+		template <typename CaseHandleT>
+		class CaseIteratorImpl : public IteratorFacade<CaseIteratorImpl<CaseHandleT>, std::random_access_iterator_tag, const CaseHandleT>
+		{
+			using SwitchInstT = typename CaseHandleT::SwitchInstType;
+
+		public:
+			CaseIteratorImpl() = default;
+			CaseIteratorImpl(SwitchInstT* SI, uint32 CaseNum = -1) : Case(SI, CaseNum) {}
+
+			static CaseIteratorImpl FromSuccessorIndex(SwitchInstT* SI, uint32 SuccessorIndex) 
+			{
+				OLA_ASSERT_MSG(SuccessorIndex < SI->getNumSuccessors(), "Successor index # out of range!");
+				return SuccessorIndex != 0 ? CaseIteratorImpl(SI, SuccessorIndex - 1) : CaseIteratorImpl(SI);
+			}
+
+			operator CaseIteratorImpl<ConstCaseHandle>() const 
+			{
+				return CaseIteratorImpl<ConstCaseHandle>(Case.SI, Case.Index);
+			}
+
+			CaseIteratorImpl& operator+=(int64 N) 
+			{
+				OLA_ASSERT_MSG(Case.Index + N >= 0 && Case.Index + N <= Case.SI->GetNumCases(), "Case.Index out the number of cases.");
+				Case.Index += N;
+				return *this;
+			}
+			CaseIteratorImpl& operator-=(int64 N)
+			{
+				OLA_ASSERT_MSG(Case.Index - N >= 0 && Case.Index - N <= Case.SI->GetNumCases(), "Case.Index out the number of cases.");
+				Case.Index += N;
+				return *this;
+			}
+			ptrdiff_t operator-(const CaseIteratorImpl& RHS) const {
+				assert(Case.SI == RHS.Case.SI && "Incompatible operators.");
+				return Case.Index - RHS.Case.Index;
+			}
+			bool operator==(const CaseIteratorImpl& RHS) const {
+				return Case == RHS.Case;
+			}
+			bool operator<(const CaseIteratorImpl& RHS) const {
+				assert(Case.SI == RHS.Case.SI && "Incompatible operators.");
+				return Case.Index < RHS.Case.Index;
+			}
+			const CaseHandleT& operator*() const { return Case; }
+
+		private:
+			CaseHandleT Case;
+		};
+
+		using CaseIt = CaseIteratorImpl<CaseHandle>;
+		using ConstCaseIt = CaseIteratorImpl<ConstCaseHandle>;
+
+		CaseIt CaseBegin() { return CaseIt(this, 0); }
+		ConstCaseIt CaseBegin() const { return ConstCaseIt(this, 0); }
+		CaseIt CaseEnd() { return CaseIt(this, GetNumCases()); }
+		ConstCaseIt CaseEnd() const { return ConstCaseIt(this, GetNumCases()); }
+		IteratorRange<CaseIt> Cases() { return MakeRange(CaseBegin(), CaseEnd()); }
+		IteratorRange<ConstCaseIt> Cases() const { return MakeRange(CaseBegin(), CaseEnd()); }
+
+		CaseIt CaseDefault() { return CaseIt(this); }
+		ConstCaseIt CaseDefault() const { return ConstCaseIt(this); }
+
+		CaseIt FindCaseValue(ConstantInt const* C)
+		{
+			return CaseIt(this, const_cast<const SwitchInst*>(this)->FindCaseValue(C)->GetCaseIndex());
+		}
+		ConstCaseIt FindCaseValue(ConstantInt const* C) const
+		{
+			for (auto case_it = CaseBegin(); case_it != CaseEnd(); ++case_it)
+			{
+				if (case_it->GetCaseValue()->GetValue() == C->GetValue())
+				{
+					return case_it;
+				}
+			}
+			return CaseDefault();
+		}
 
 		static bool ClassOf(Value const* V)
 		{
@@ -264,26 +402,17 @@ namespace ola
 	class GetElementPtrInst : public Instruction
 	{
 	public:
-		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, Instruction* InsertBefore)
-			: Instruction(ValueKind_GEP, PointeeType, IdxList.size() + 1, InsertBefore)
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::span<Value*> IdxList, Instruction* InsertBefore)
+			: Instruction(ValueKind_GEP, Ptr->GetType(), IdxList.size() + 1, InsertBefore),
+			  src_element_type(PointeeType), result_element_type(GetIndexedType(PointeeType, IdxList))
 		{
 			Initialize(Ptr, IdxList);
 		}
-		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, BasicBlock* InsertAtEnd = nullptr)
-			: Instruction(ValueKind_GEP, PointeeType, IdxList.size() + 1, InsertAtEnd)
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::span<Value*> IdxList, BasicBlock* InsertAtEnd = nullptr)
+			: Instruction(ValueKind_GEP, PointeeType, IdxList.size() + 1, InsertAtEnd),
+			  src_element_type(PointeeType), result_element_type(GetIndexedType(PointeeType, IdxList))
 		{
 			Initialize(Ptr, IdxList);
-		}
-
-		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, bool in_bounds, Instruction* InsertBefore)
-			: GetElementPtrInst(PointeeType, Ptr, IdxList, InsertBefore)
-		{
-			SetInBounds(in_bounds);
-		}
-		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, bool in_bounds, BasicBlock* InsertAtEnd = nullptr)
-			: GetElementPtrInst(PointeeType, Ptr, IdxList, InsertAtEnd)
-		{
-			SetInBounds(in_bounds);
 		}
 
 		void SetSourceElementType(IRType* ty) { src_element_type = ty; }
@@ -307,9 +436,6 @@ namespace ola
 		uint32 GetNumIndices() const {  return GetNumOperands() - 1; }
 		bool HasIndices() const { return GetNumIndices() > 0; }
 
-		void SetInBounds(bool _in_bounds = true) { in_bounds = _in_bounds; }
-		bool IsInBounds() const { return in_bounds; }
-
 		OpIterator       IdxBegin() { return OpBegin() + 1; }
 		ConstOpIterator  IdxBegin() const { return OpBegin() + 1; }
 		OpIterator       IdxEnd() { return OpEnd(); }
@@ -323,14 +449,6 @@ namespace ola
 			return MakeRange(IdxBegin(), IdxEnd());
 		}
 
-		static IRType* getTypeAtIndex(IRType* ty, Value* idx)
-		{
-			return nullptr;
-		}
-		static IRType* getTypeAtIndex(IRType* ty, uint64 idx)
-		{
-			return nullptr;
-		}
 		static bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind_GEP;
@@ -339,15 +457,56 @@ namespace ola
 	private:
 		IRType* src_element_type = nullptr;
 		IRType* result_element_type = nullptr;
-		bool    in_bounds = false;
+
 	private:
-		void Initialize(Value* Ptr, std::vector<Value*> const& IdxList)
+		void Initialize(Value* Ptr, std::span<Value*> IdxList)
 		{
 			Op<0>() = Ptr;
 			for (uint32 i = 0; i <= IdxList.size(); ++i)
 			{
 				SetOperand(i + 1, IdxList[i]);
 			}
+		}
+
+	private:
+		static IRType* GetTypeAtIndex(IRType* Ty, Value* Idx)
+		{
+			ConstantInt* IdxInt = dyn_cast<ConstantInt>(Idx);
+			if (!IdxInt) return nullptr;
+			return GetTypeAtIndex(Ty, IdxInt);
+		}
+		static IRType* GetTypeAtIndex(IRType* Ty, uint64 IdxValue)
+		{
+			if (auto* Struct = dyn_cast<StructType>(Ty))
+			{
+				if (Struct->GetMemberCount() >= IdxValue) return nullptr;
+				return Struct->GetMemberType(IdxValue);
+			}
+			if (auto* Array = dyn_cast<ArrayType>(Ty)) return Array->GetBaseType();
+			return nullptr;
+		}
+		template <typename IndexTy>
+		static IRType* GetIndexedTypeInternal(IRType* Ty, std::span<IndexTy> IdxList)
+		{
+			if (IdxList.empty()) return Ty;
+			for (uint32 i = 1; i < IdxList.size(); ++i)
+			{
+				Ty = GetTypeAtIndex(Ty, IdxList[i]);
+				if (!Ty) return Ty;
+			}
+			return Ty;
+		}
+		static IRType* GetIndexedType(IRType* Ty, std::span<Value*> IdxList)
+		{
+			return GetIndexedTypeInternal(Ty, IdxList);
+		}
+		static IRType* GetIndexedType(IRType* Ty, std::span<Constant*> IdxList)
+		{
+			return GetIndexedTypeInternal(Ty, IdxList);
+		}
+		static IRType* GetIndexedType(IRType* Ty, std::span<uint64> IdxList)
+		{
+			return GetIndexedTypeInternal(Ty, IdxList);
 		}
 	};
 }

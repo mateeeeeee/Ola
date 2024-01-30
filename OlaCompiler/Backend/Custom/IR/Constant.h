@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include "Value.h"
 #include "User.h"
 
@@ -109,7 +110,7 @@ namespace ola
 		}
 
 	protected:
-		ConstantAggregate(ValueKind kind, IRType* type, std::vector<Constant*> const& values)
+		ConstantAggregate(ValueKind kind, IRType* type, std::span<Constant*> values)
 			: Constant(kind, type, values.size())
 		{
 			for (uint32 i = 0; i <= values.size(); ++i)
@@ -130,13 +131,13 @@ namespace ola
 	class ConstantArray final : public ConstantAggregate 
 	{
 	public:
-		ConstantArray(ArrayType* type, std::vector<Constant*> const& values)
+		ConstantArray(ArrayType* type, std::span<Constant*> values)
 			: ConstantAggregate(ValueKind_ConstantArray, type, values)
 		{}
 
 		template<typename... Cs> requires (std::is_base_of_v<Constant, Cs> && ...)
 		ConstantArray(ArrayType* type, Cs*... constants) 
-			: ConstantArray(type, std::vector<Constant*>{constants...})
+			: ConstantArray(type, std::span<Constant*>{constants...})
 		{}
 
 		ArrayType* GetArrayType() const 
@@ -154,12 +155,12 @@ namespace ola
 	{
 	public:
 
-		ConstantStruct(StructType* type, std::vector<Constant*> const& values)
+		ConstantStruct(StructType* type, std::span<Constant*> values)
 			: ConstantAggregate(ValueKind_ConstantStruct, type, values)
 		{}
 
 		template<typename... Cs> requires (std::is_base_of_v<Constant, Cs> && ...)
-		ConstantStruct(StructType* type, Cs*... constants) : ConstantStruct(type, std::vector<Constant*>{constants...})
+		ConstantStruct(StructType* type, Cs*... constants) : ConstantStruct(type, std::span<Constant*>{constants...})
 		{}
 
 		StructType* GetStructType() const

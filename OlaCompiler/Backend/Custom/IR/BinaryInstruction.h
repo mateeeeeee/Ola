@@ -98,12 +98,12 @@ namespace ola
 	{
 	public:
 		CmpInst(CmpPredicate predicate, Value* lhs, Value* rhs, Instruction* position)
-			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, position)
+			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, position), predicate(predicate)
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
 		CmpInst(CmpPredicate predicate, Value* lhs, Value* rhs, BasicBlock* bb = nullptr)
-			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, bb)
+			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, bb), predicate(predicate)
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
