@@ -248,15 +248,106 @@ namespace ola
 		BasicBlock* GetSuccessor(uint32 idx) const;
 		void SetSuccessor(uint32 idx, BasicBlock* successor);
 
-		static bool ClassOf(const Value* V) 
+		static bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind_Switch;
 		}
+
 	private:
 		void Initialize(Value* Value, BasicBlock* Default, unsigned NumReserved)
 		{
 
 		}
 
+	};
+
+	class GetElementPtrInst : public Instruction
+	{
+	public:
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, Instruction* InsertBefore)
+			: Instruction(ValueKind_GEP, PointeeType, IdxList.size() + 1, InsertBefore)
+		{
+			Initialize(Ptr, IdxList);
+		}
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, BasicBlock* InsertAtEnd = nullptr)
+			: Instruction(ValueKind_GEP, PointeeType, IdxList.size() + 1, InsertAtEnd)
+		{
+			Initialize(Ptr, IdxList);
+		}
+
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, bool in_bounds, Instruction* InsertBefore)
+			: GetElementPtrInst(PointeeType, Ptr, IdxList, InsertBefore)
+		{
+			SetInBounds(in_bounds);
+		}
+		GetElementPtrInst(IRType* PointeeType, Value* Ptr, std::vector<Value*> const& IdxList, bool in_bounds, BasicBlock* InsertAtEnd = nullptr)
+			: GetElementPtrInst(PointeeType, Ptr, IdxList, InsertAtEnd)
+		{
+			SetInBounds(in_bounds);
+		}
+
+		void SetSourceElementType(IRType* ty) { src_element_type = ty; }
+		void SetResultElementType(IRType* ty) { result_element_type = ty; }
+		IRType* GetSourceElementType() const { return src_element_type; }
+		IRType* GetResultElementType() const { return result_element_type; }
+
+		Value* GetPointerOperand() 
+		{
+			return GetOperand(0);
+		}
+		Value const* GetPointerOperand() const
+		{
+			return GetOperand(0);
+		}
+		IRType* GetPointerOperandType() const 
+		{
+			return GetPointerOperand()->GetType();
+		}
+
+		uint32 GetNumIndices() const {  return GetNumOperands() - 1; }
+		bool HasIndices() const { return GetNumIndices() > 0; }
+
+		void SetInBounds(bool _in_bounds = true) { in_bounds = _in_bounds; }
+		bool IsInBounds() const { return in_bounds; }
+
+		OpIterator       IdxBegin() { return OpBegin() + 1; }
+		ConstOpIterator  IdxBegin() const { return OpBegin() + 1; }
+		OpIterator       IdxEnd() { return OpEnd(); }
+		ConstOpIterator  IdxEnd()   const { return OpEnd(); }
+		IteratorRange<OpIterator> Indices()
+		{
+			return MakeRange(IdxBegin(), IdxEnd());
+		}
+		IteratorRange<ConstOpIterator> Indices()  const 
+		{
+			return MakeRange(IdxBegin(), IdxEnd());
+		}
+
+		static IRType* getTypeAtIndex(IRType* ty, Value* idx)
+		{
+			return nullptr;
+		}
+		static IRType* getTypeAtIndex(IRType* ty, uint64 idx)
+		{
+			return nullptr;
+		}
+		static bool ClassOf(Value const* V)
+		{
+			return V->GetKind() == ValueKind_GEP;
+		}
+
+	private:
+		IRType* src_element_type = nullptr;
+		IRType* result_element_type = nullptr;
+		bool    in_bounds = false;
+	private:
+		void Initialize(Value* Ptr, std::vector<Value*> const& IdxList)
+		{
+			Op<0>() = Ptr;
+			for (uint32 i = 0; i <= IdxList.size(); ++i)
+			{
+				SetOperand(i + 1, IdxList[i]);
+			}
+		}
 	};
 }
