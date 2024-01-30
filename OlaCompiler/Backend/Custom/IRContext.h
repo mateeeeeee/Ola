@@ -7,14 +7,14 @@ namespace ola
 {
 	class IRType;
 	class UnknownType;
-	class VoidType;
-	class PointerType;
-	class IntegerType;
-	class FloatType;
-	class ArrayType;
-	class StructType;
-	class FunctionType;
-	class LabelType;
+	class IRVoidType;
+	class IRPtrType;
+	class IRIntType;
+	class IRFloatType;
+	class IRArrayType;
+	class IRStructType;
+	class IRFuncType;
+	class IRLabelType;
 
 	class ConstantString;
 	class ConstantInt;
@@ -27,15 +27,15 @@ namespace ola
 		IRContext();
 		~IRContext();
 
-		VoidType* GetVoidType()   const { return void_type; }
-		FloatType* GetFloatType() const { return float_type; }
-		LabelType* GetLabelType() const { return label_type; }
+		IRVoidType* GetVoidType()   const { return void_type; }
+		IRFloatType* GetFloatType() const { return float_type; }
+		IRLabelType* GetLabelType() const { return label_type; }
 
-		IntegerType*	GetIntegerType(uint32 width);
-		PointerType*	GetPointerType(IRType* pointee_type);
-		ArrayType*		GetArrayType(IRType* base_type, uint32 array_size);
-		FunctionType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
-		StructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
+		IRIntType*	GetIntegerType(uint32 width);
+		IRPtrType*	GetPointerType(IRType* pointee_type);
+		IRArrayType*		GetArrayType(IRType* base_type, uint32 array_size);
+		IRFuncType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
+		IRStructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
 
 		ConstantString* GetConstantString(std::string_view str);
 		ConstantInt* GetConstantInt64(int64 value);
@@ -44,16 +44,16 @@ namespace ola
 		ConstantInt* GetFalseValue() const { return false_value; }
 
 	private:
-		VoidType*	 void_type;
-		IntegerType* int1_type;
-		IntegerType* int8_type;
-		FloatType*   float_type;
-		LabelType*   label_type;
+		IRVoidType*	 void_type;
+		IRIntType* int1_type;
+		IRIntType* int8_type;
+		IRFloatType*   float_type;
+		IRLabelType*   label_type;
 
-		std::vector<ArrayType*>		array_types;
-		std::vector<PointerType*>   pointer_types;
-		std::vector<FunctionType*>	function_types;
-		std::vector<StructType*>	struct_types;
+		std::vector<IRArrayType*>		array_types;
+		std::vector<IRPtrType*>   pointer_types;
+		std::vector<IRFuncType*>	function_types;
+		std::vector<IRStructType*>	struct_types;
 
 		ConstantInt* true_value;
 		ConstantInt* false_value;

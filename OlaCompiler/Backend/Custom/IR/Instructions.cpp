@@ -17,26 +17,26 @@ namespace ola
 		return GetParent()->GetParent();
 	}
 
-	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* bb) : Instruction(ValueKind_Branch, VoidType::Get(if_true->GetContext()), 1, bb)
+	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* bb) : Instruction(ValueKind_Branch, IRVoidType::Get(if_true->GetContext()), 1, bb)
 	{
 		OLA_ASSERT(if_true);
 		Op<0>() = if_true;
 		Assert();
 	}
-	BranchInst::BranchInst(BasicBlock* if_true, Instruction* position) : Instruction(ValueKind_Branch, VoidType::Get(if_true->GetContext()), 1, position)
+	BranchInst::BranchInst(BasicBlock* if_true, Instruction* position) : Instruction(ValueKind_Branch, IRVoidType::Get(if_true->GetContext()), 1, position)
 	{
 		OLA_ASSERT(if_true);
 		Op<0>() = if_true;
 		Assert();
 	}
-	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* if_false, Value* cond, BasicBlock* bb) : Instruction(ValueKind_Branch, VoidType::Get(if_true->GetContext()), 3, bb)
+	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* if_false, Value* cond, BasicBlock* bb) : Instruction(ValueKind_Branch, IRVoidType::Get(if_true->GetContext()), 3, bb)
 	{
 		Op<0>() = if_true;
 		Op<1>() = if_false;
 		Op<2>() = cond;
 		Assert();
 	}
-	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* if_false, Value* cond, Instruction* position) : Instruction(ValueKind_Branch, VoidType::Get(if_true->GetContext()), 3, position)
+	BranchInst::BranchInst(BasicBlock* if_true, BasicBlock* if_false, Value* cond, Instruction* position) : Instruction(ValueKind_Branch, IRVoidType::Get(if_true->GetContext()), 3, position)
 	{
 		Op<0>() = if_true;
 		Op<1>() = if_false;
@@ -55,13 +55,13 @@ namespace ola
 		SetOperand(idx, successor);
 	}
 
-	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, Instruction* InsertBefore) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertBefore)
+	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, Instruction* InsertBefore) : Instruction(ValueKind_Switch, IRVoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertBefore)
 	{
 		Op<0>() = Value;
 		Op<1>() = Default;
 	}
 
-	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, BasicBlock* InsertAtEnd) : Instruction(ValueKind_Switch, VoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertAtEnd)
+	SwitchInst::SwitchInst(Value* Value, BasicBlock* Default, uint32 NumCases, BasicBlock* InsertAtEnd) : Instruction(ValueKind_Switch, IRVoidType::Get(Value->GetContext()), 2 + NumCases * 2, InsertAtEnd)
 	{
 		Op<0>() = Value;
 		Op<1>() = Default;

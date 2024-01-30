@@ -4,12 +4,12 @@
 
 namespace ola
 {
-	Function::Function(FunctionType* func_type, IRModule& module, Linkage linkage, std::string_view name)
+	Function::Function(IRFuncType* func_type, IRModule& module, Linkage linkage, std::string_view name)
 		: GlobalValue(ValueKind_Function, func_type, module, linkage)
 	{
 		SetName(name);
 
-		FunctionType* function_type = GetFunctionType();
+		IRFuncType* function_type = GetFunctionType();
 		arguments.resize(function_type->GetParamCount());
 		for (uint32 i = 0; i < arguments.size(); ++i)
 		{
@@ -33,9 +33,9 @@ namespace ola
 		return instruction_count;
 	}
 
-	FunctionType* Function::GetFunctionType() const
+	IRFuncType* Function::GetFunctionType() const
 	{
-		return cast<FunctionType>(GetType());
+		return cast<IRFuncType>(GetType());
 	}
 
 	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name)

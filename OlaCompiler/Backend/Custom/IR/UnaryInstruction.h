@@ -98,12 +98,12 @@ namespace ola
 	{
 	public:
 		explicit AllocaInst(IRType* type, Value* array_size = nullptr)
-			: UnaryInstruction(ValueKind_Alloca, PointerType::Get(type), array_size), allocated_type(type) {}
+			: UnaryInstruction(ValueKind_Alloca, IRPtrType::Get(type), array_size), allocated_type(type) {}
 
 		AllocaInst(IRType* type, Value* array_size, Instruction* insert_before)
-			: UnaryInstruction(ValueKind_Alloca, PointerType::Get(type), array_size, insert_before), allocated_type(type) {}
+			: UnaryInstruction(ValueKind_Alloca, IRPtrType::Get(type), array_size, insert_before), allocated_type(type) {}
 		AllocaInst(IRType* type, Value* array_size, BasicBlock* insert_at_end)
-			: UnaryInstruction(ValueKind_Alloca, PointerType::Get(type), array_size, insert_at_end), allocated_type(type) {}
+			: UnaryInstruction(ValueKind_Alloca, IRPtrType::Get(type), array_size, insert_at_end), allocated_type(type) {}
 		AllocaInst(IRType* type, Instruction* insert_before)
 			: AllocaInst(type, nullptr, insert_before) {}
 		AllocaInst(IRType* type, BasicBlock* insert_at_end)
@@ -114,9 +114,9 @@ namespace ola
 			return false;
 		}
 
-		PointerType* GetPtrType() const
+		IRPtrType* GetPtrType() const
 		{
-			return cast<PointerType>(GetType());
+			return cast<IRPtrType>(GetType());
 		}
 		IRType* GetAllocatedType() const { return allocated_type; }
 

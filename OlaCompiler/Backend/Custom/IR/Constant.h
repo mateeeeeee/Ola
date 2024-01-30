@@ -46,13 +46,13 @@ namespace ola
 	class ConstantInt final : public ConstantData 
 	{
 	public:
-		ConstantInt(IntegerType* type, int64 V) : ConstantData(ValueKind_ConstantInt, type), value(V), bitwidth(type->GetWidth() * 8)
+		ConstantInt(IRIntType* type, int64 V) : ConstantData(ValueKind_ConstantInt, type), value(V), bitwidth(type->GetWidth() * 8)
 		{}
 		~ConstantInt() = default;
 
-		IntegerType* GetIntegerType() const
+		IRIntType* GetIntegerType() const
 		{
-			return cast<IntegerType>(GetType());
+			return cast<IRIntType>(GetType());
 		}
 		int64 GetValue() const { return value; }
 		uint32 GetBitWidth() const { return bitwidth; }
@@ -70,7 +70,7 @@ namespace ola
 	class ConstantFloat final : public ConstantData 
 	{
 	public:
-		ConstantFloat(FloatType* type, double V) : ConstantData(ValueKind_ConstantFloat, type), value(V) {}
+		ConstantFloat(IRFloatType* type, double V) : ConstantData(ValueKind_ConstantFloat, type), value(V) {}
 		~ConstantFloat() = default;
 
 		double GetValue() const { return value; }
@@ -86,7 +86,7 @@ namespace ola
 	class ConstantString final : public ConstantData
 	{
 	public:
-		ConstantString(IRContext& C, std::string_view str) : ConstantData(ValueKind_ConstantFloat, ArrayType::Get(IntegerType::Get(C, 1), str.size() + 1)), value(str) {}
+		ConstantString(IRContext& C, std::string_view str) : ConstantData(ValueKind_ConstantFloat, IRArrayType::Get(IRIntType::Get(C, 1), str.size() + 1)), value(str) {}
 		~ConstantString() = default;
 
 		std::string_view GetValue() const { return value; }
@@ -115,11 +115,11 @@ namespace ola
 		{
 			for (uint32 i = 0; i <= values.size(); ++i)
 			{
-				if (StructType* ST = dyn_cast<StructType>(type))
+				if (IRStructType* ST = dyn_cast<IRStructType>(type))
 				{
 					OLA_ASSERT_MSG(ST->GetMemberType(i) == values[i]->GetType(), "Calling a function with a bad signature!");
 				}
-				else if (ArrayType* AT = dyn_cast<ArrayType>(type))
+				else if (IRArrayType* AT = dyn_cast<IRArrayType>(type))
 				{
 					OLA_ASSERT_MSG(AT->GetBaseType() == values[i]->GetType(), "Calling a function with a bad signature!");
 				}
@@ -131,18 +131,18 @@ namespace ola
 	class ConstantArray final : public ConstantAggregate 
 	{
 	public:
-		ConstantArray(ArrayType* type, std::span<Constant*> values)
+		ConstantArray(IRArrayType* type, std::span<Constant*> values)
 			: ConstantAggregate(ValueKind_ConstantArray, type, values)
 		{}
 
 		template<typename... Cs> requires (std::is_base_of_v<Constant, Cs> && ...)
-		ConstantArray(ArrayType* type, Cs*... constants) 
+		ConstantArray(IRArrayType* type, Cs*... constants) 
 			: ConstantArray(type, std::span<Constant*>{constants...})
 		{}
 
-		ArrayType* GetArrayType() const 
+		IRArrayType* GetArrayType() const 
 		{
-			return cast<ArrayType>(GetType());
+			return cast<IRArrayType>(GetType());
 		}
 
 		static bool ClassOf(const Value* V) 
@@ -155,17 +155,17 @@ namespace ola
 	{
 	public:
 
-		ConstantStruct(StructType* type, std::span<Constant*> values)
+		ConstantStruct(IRStructType* type, std::span<Constant*> values)
 			: ConstantAggregate(ValueKind_ConstantStruct, type, values)
 		{}
 
 		template<typename... Cs> requires (std::is_base_of_v<Constant, Cs> && ...)
-		ConstantStruct(StructType* type, Cs*... constants) : ConstantStruct(type, std::span<Constant*>{constants...})
+		ConstantStruct(IRStructType* type, Cs*... constants) : ConstantStruct(type, std::span<Constant*>{constants...})
 		{}
 
-		StructType* GetStructType() const
+		IRStructType* GetStructType() const
 		{
-			return cast<StructType>(GetType());
+			return cast<IRStructType>(GetType());
 		}
 
 		static bool ClassOf(const Value* V)
@@ -177,11 +177,11 @@ namespace ola
 	class ConstantPointerNull final : public ConstantData 
 	{
 	public:
-		explicit ConstantPointerNull(PointerType* type) : ConstantData(ValueKind_ConstantPointerNull, type) {}
+		explicit ConstantPointerNull(IRPtrType* type) : ConstantData(ValueKind_ConstantPointerNull, type) {}
 
-		PointerType* GetPointerType() const 
+		IRPtrType* GetPointerType() const 
 		{
-			return cast<PointerType>(GetType());
+			return cast<IRPtrType>(GetType());
 		}
 
 		static bool ClassOf(Value const* V) 

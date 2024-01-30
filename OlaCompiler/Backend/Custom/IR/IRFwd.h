@@ -22,4 +22,5 @@ namespace ola
 	class ConstantFloat;
 	class ConstantArray;
 	class ConstantStruct;
+	class SwitchInst;
 }

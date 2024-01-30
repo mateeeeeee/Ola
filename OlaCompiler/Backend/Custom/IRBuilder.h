@@ -5,10 +5,10 @@
 namespace ola
 {
 	class IRType;
-	class IntegerType;
-	class FloatType;
-	class VoidType;
-	class PointerType;
+	class IRIntType;
+	class IRFloatType;
+	class IRVoidType;
+	class IRPtrType;
 
 	class IRBuilder
 	{
@@ -43,11 +43,11 @@ namespace ola
 		ConstantInt* GetTrueValue()  const;
 		ConstantInt* GetFalseValue() const;
 
-		IntegerType* GetInt8Type() const;
-		IntegerType* GetInt64Type() const;
-		FloatType* GetFloatType() const;
-		VoidType* GetVoidType() const;
-		PointerType* GetPtrType(IRType* type);
+		IRIntType* GetInt8Type() const;
+		IRIntType* GetInt64Type() const;
+		IRFloatType* GetFloatType() const;
+		IRVoidType* GetVoidType() const;
+		IRPtrType* GetPtrType(IRType* type);
 
 	private:
 		IRContext& ctx;

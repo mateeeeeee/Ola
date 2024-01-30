@@ -38,7 +38,7 @@ namespace ola
 		IRType* value_type;
 
 	protected:
-		GlobalValue(ValueKind kind, IRType* type, IRModule& module, Linkage linkage = Linkage::Unknown) : Value(kind, PointerType::Get(type)), module(module), linkage(linkage), value_type(type)
+		GlobalValue(ValueKind kind, IRType* type, IRModule& module, Linkage linkage = Linkage::Unknown) : Value(kind, IRPtrType::Get(type)), module(module), linkage(linkage), value_type(type)
 		{}
 	};
 
@@ -55,12 +55,12 @@ namespace ola
 		using Attributes = uint8;
 	public:
 
-		Function(FunctionType* type, IRModule& module, Linkage linkage, std::string_view name = "");
+		Function(IRFuncType* type, IRModule& module, Linkage linkage, std::string_view name = "");
 		OLA_NONCOPYABLE(Function)
 			~Function();
 
 		uint64 GetInstructionCount() const;
-		FunctionType* GetFunctionType() const;
+		IRFuncType* GetFunctionType() const;
 		IRType* GetReturnType() const
 		{
 			return GetFunctionType()->GetReturnType();

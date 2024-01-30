@@ -7,11 +7,11 @@ namespace ola
 
 	IRContext::IRContext()
 	{
-		void_type = new(this) VoidType(*this);
-		int1_type = new(this) IntegerType(*this, 1);
-		int8_type = new(this) IntegerType(*this, 8);
-		float_type = new(this) FloatType(*this);
-		label_type = new(this) LabelType(*this);
+		void_type = new(this) IRVoidType(*this);
+		int1_type = new(this) IRIntType(*this, 1);
+		int8_type = new(this) IRIntType(*this, 8);
+		float_type = new(this) IRFloatType(*this);
+		label_type = new(this) IRLabelType(*this);
 
 		true_value = new ConstantInt(int1_type, true);
 		false_value = new ConstantInt(int1_type, false);
@@ -21,10 +21,10 @@ namespace ola
 	{
 		for (auto [k, v] : constant_strings) delete v;
 
-		for (ArrayType* array_type : array_types)			delete array_type;
-		for (StructType* struct_type : struct_types)		delete struct_type;
-		for (PointerType* ref_type : pointer_types)			delete ref_type;
-		for (FunctionType* function_type : function_types)	delete function_type;
+		for (IRArrayType* array_type : array_types)			delete array_type;
+		for (IRStructType* struct_type : struct_types)		delete struct_type;
+		for (IRPtrType* ref_type : pointer_types)			delete ref_type;
+		for (IRFuncType* function_type : function_types)	delete function_type;
 
 		delete false_value;
 		delete true_value;
@@ -35,7 +35,7 @@ namespace ola
 		delete void_type;
 	}
 
-	IntegerType* IRContext::GetIntegerType(uint32 width)
+	IRIntType* IRContext::GetIntegerType(uint32 width)
 	{
 		switch (width)
 		{
@@ -47,29 +47,29 @@ namespace ola
 		return nullptr;
 	}
 
-	PointerType* IRContext::GetPointerType(IRType* pointee_type)
+	IRPtrType* IRContext::GetPointerType(IRType* pointee_type)
 	{
 		for (auto const& pointer_type : pointer_types)
 		{
 			if (pointer_type->GetPointeeType() == pointee_type) return pointer_type;
 		}
-		PointerType* new_type = new(this) PointerType(*this, pointee_type);
+		IRPtrType* new_type = new(this) IRPtrType(*this, pointee_type);
 		pointer_types.push_back(new_type);
 		return new_type;
 	}
 
-	ArrayType* IRContext::GetArrayType(IRType* base_type, uint32 array_size)
+	IRArrayType* IRContext::GetArrayType(IRType* base_type, uint32 array_size)
 	{
 		for (auto const& array_type : array_types)
 		{
 			if (array_type->GetBaseType() == base_type && array_type->GetArraySize() == array_size) return array_type;
 		}
-		ArrayType* new_type = new(this) ArrayType(*this, base_type, array_size);
+		IRArrayType* new_type = new(this) IRArrayType(*this, base_type, array_size);
 		array_types.push_back(new_type);
 		return new_type;
 	}
 
-	FunctionType* IRContext::GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types)
+	IRFuncType* IRContext::GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types)
 	{
 		for (auto const& function_type : function_types)
 		{
@@ -87,11 +87,11 @@ namespace ola
 			}
 			if (!incompatible) return function_type;
 		}
-		function_types.push_back(new(this) FunctionType(*this, ret_type, param_types));
+		function_types.push_back(new(this) IRFuncType(*this, ret_type, param_types));
 		return function_types.back();
 	}
 
-	StructType* IRContext::GetStructType(std::string_view name, std::vector<IRType*> const& member_types)
+	IRStructType* IRContext::GetStructType(std::string_view name, std::vector<IRType*> const& member_types)
 	{
 		for (auto const& struct_type : struct_types)
 		{
@@ -109,7 +109,7 @@ namespace ola
 			}
 			if (!incompatible) return struct_type;
 		}
-		struct_types.push_back(new(this) StructType(*this, name, member_types));
+		struct_types.push_back(new(this) IRStructType(*this, name, member_types));
 		return struct_types.back();
 	}
 

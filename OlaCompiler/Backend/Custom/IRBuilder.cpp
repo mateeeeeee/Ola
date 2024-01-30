@@ -81,27 +81,27 @@ namespace ola
 		return ctx.GetFalseValue();
 	}
 
-	IntegerType* IRBuilder::GetInt8Type() const
+	IRIntType* IRBuilder::GetInt8Type() const
 	{
 		return ctx.GetIntegerType(1);
 	}
 
-	IntegerType* IRBuilder::GetInt64Type() const
+	IRIntType* IRBuilder::GetInt64Type() const
 	{
 		return ctx.GetIntegerType(8);
 	}
 
-	FloatType* IRBuilder::GetFloatType() const
+	IRFloatType* IRBuilder::GetFloatType() const
 	{
 		return ctx.GetFloatType();
 	}
 
-	VoidType* IRBuilder::GetVoidType() const
+	IRVoidType* IRBuilder::GetVoidType() const
 	{
 		return ctx.GetVoidType();
 	}
 
-	PointerType* IRBuilder::GetPtrType(IRType* type)
+	IRPtrType* IRBuilder::GetPtrType(IRType* type)
 	{
 		return ctx.GetPointerType(type);
 	}

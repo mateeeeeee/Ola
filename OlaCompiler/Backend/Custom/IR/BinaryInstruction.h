@@ -58,8 +58,8 @@ namespace ola
 	class StoreInst : public BinaryInstruction
 	{
 	public:
-		StoreInst(Value* val, Value* address, Instruction* position) : BinaryInstruction(ValueKind_Store, VoidType::Get(val->GetContext()), val, address, position) {}
-		StoreInst(Value* val, Value* address, BasicBlock* bb = nullptr) : BinaryInstruction(ValueKind_Store, VoidType::Get(val->GetContext()), val, address) {}
+		StoreInst(Value* val, Value* address, Instruction* position) : BinaryInstruction(ValueKind_Store, IRVoidType::Get(val->GetContext()), val, address, position) {}
+		StoreInst(Value* val, Value* address, BasicBlock* bb = nullptr) : BinaryInstruction(ValueKind_Store, IRVoidType::Get(val->GetContext()), val, address) {}
 
 		Value* GetValueOperand() { return GetOperand(0); }
 		Value const* GetValueOperand() const { return GetOperand(0); }
@@ -98,12 +98,12 @@ namespace ola
 	{
 	public:
 		CmpInst(CmpPredicate predicate, Value* lhs, Value* rhs, Instruction* position)
-			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, position), predicate(predicate)
+			: BinaryInstruction(ValueKind_Cmp, IRIntType::Get(lhs->GetContext(), 1), lhs, rhs, position), predicate(predicate)
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
 		CmpInst(CmpPredicate predicate, Value* lhs, Value* rhs, BasicBlock* bb = nullptr)
-			: BinaryInstruction(ValueKind_Cmp, IntegerType::Get(lhs->GetContext(), 1), lhs, rhs, bb), predicate(predicate)
+			: BinaryInstruction(ValueKind_Cmp, IRIntType::Get(lhs->GetContext(), 1), lhs, rhs, bb), predicate(predicate)
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}

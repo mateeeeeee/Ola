@@ -16,28 +16,28 @@ namespace ola
 		}
 	public:
 
-		CallInst(FunctionType* type, Value* called_func, std::span<Value*> args, BasicBlock* bb = nullptr)
+		CallInst(IRFuncType* type, Value* called_func, std::span<Value*> args, BasicBlock* bb = nullptr)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(args.size()), bb), func_type(type)
 		{
 			Initialize(called_func, args);
 		}
-		CallInst(FunctionType* type, Value* called_func, std::span<Value*> args, Instruction* position)
+		CallInst(IRFuncType* type, Value* called_func, std::span<Value*> args, Instruction* position)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(args.size()), position), func_type(type)
 		{
 			Initialize(called_func, args);
 		}
-		CallInst(FunctionType* type, Value* called_func, BasicBlock* bb = nullptr)
+		CallInst(IRFuncType* type, Value* called_func, BasicBlock* bb = nullptr)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(0), bb), func_type(type)
 		{
 			Initialize(called_func, {});
 		}
-		CallInst(FunctionType* type, Value* called_func, Instruction* position)
+		CallInst(IRFuncType* type, Value* called_func, Instruction* position)
 			: Instruction(ValueKind_Call, type->GetReturnType(), ComputeNumOperands(0), position), func_type(type)
 		{
 			Initialize(called_func, {});
 		}
 
-		FunctionType* GetFunctionType() const { return func_type; }
+		IRFuncType* GetFunctionType() const { return func_type; }
 
  		auto ArgBegin() { return OpBegin(); }
 		auto ArgBegin() const { return OpBegin(); }
@@ -83,7 +83,7 @@ namespace ola
 			return I->GetKind() == ValueKind_Call;
 		}
 	private:
-		FunctionType* func_type;
+		IRFuncType* func_type;
 
 	private:
 		void Initialize(Value* called_func, std::span<Value*> args = {})
@@ -117,7 +117,7 @@ namespace ola
 		void Init(Value* C, Value* S1, Value* S2) 
 		{
 			OLA_ASSERT_MSG(S1->GetType() == S2->GetType(), "Invalid operands for select");
-			OLA_ASSERT_MSG(C->GetType() == IntegerType::Get(GetContext(), 1), "Invalid operands for select");
+			OLA_ASSERT_MSG(C->GetType() == IRIntType::Get(GetContext(), 1), "Invalid operands for select");
 			Op<0>() = C;
 			Op<1>() = S1;
 			Op<2>() = S2;
@@ -145,12 +145,12 @@ namespace ola
 	public:
 
 		ReturnInst(IRContext& C, Value* ret_value, Instruction* position)
-			: Instruction(ValueKind_Return, VoidType::Get(C), !!ret_value, position)
+			: Instruction(ValueKind_Return, IRVoidType::Get(C), !!ret_value, position)
 		{
 			if (ret_value) Op<0>() = ret_value;
 		}
 		ReturnInst(IRContext& C, Value* ret_value = nullptr, BasicBlock* bb = nullptr)
-			: Instruction(ValueKind_Return, VoidType::Get(C), !!ret_value, bb)
+			: Instruction(ValueKind_Return, IRVoidType::Get(C), !!ret_value, bb)
 		{
 			if (ret_value) Op<0>() = ret_value;
 		}
@@ -202,7 +202,7 @@ namespace ola
 
 		void Assert()
 		{
-			if (IsConditional()) OLA_ASSERT_MSG(GetCondition()->GetType() == IntegerType::Get(GetContext(), 1), "May only branch on boolean predicates!");
+			if (IsConditional()) OLA_ASSERT_MSG(GetCondition()->GetType() == IRIntType::Get(GetContext(), 1), "May only branch on boolean predicates!");
 		}
 	};
 
@@ -477,12 +477,12 @@ namespace ola
 		}
 		static IRType* GetTypeAtIndex(IRType* Ty, uint64 IdxValue)
 		{
-			if (auto* Struct = dyn_cast<StructType>(Ty))
+			if (auto* Struct = dyn_cast<IRStructType>(Ty))
 			{
 				if (Struct->GetMemberCount() >= IdxValue) return nullptr;
 				return Struct->GetMemberType(IdxValue);
 			}
-			if (auto* Array = dyn_cast<ArrayType>(Ty)) return Array->GetBaseType();
+			if (auto* Array = dyn_cast<IRArrayType>(Ty)) return Array->GetBaseType();
 			return nullptr;
 		}
 		template <typename IndexTy>

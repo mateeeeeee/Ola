@@ -9,7 +9,7 @@ namespace ola
 		friend class IRBuilder;
 
 	public:
-		BasicBlock(IRContext& ctx, std::string_view name = "", Function* parent = nullptr, BasicBlock* insert_before = nullptr) : Value(ValueKind_BasicBlock, LabelType::Get(ctx)), parent(parent)
+		BasicBlock(IRContext& ctx, std::string_view name = "", Function* parent = nullptr, BasicBlock* insert_before = nullptr) : Value(ValueKind_BasicBlock, IRLabelType::Get(ctx)), parent(parent)
 		{
 			SetName(name);
 			if (parent) InsertInto(parent, insert_before);
