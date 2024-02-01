@@ -67,39 +67,44 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/LLVMCodeGen.h
   Backend/LLVM/LLVMCodeGen.cpp
-  Backend/Custom/IR.h
-  Backend/Custom/IRBuilder.h
-  Backend/Custom/IRBuilder.cpp
-  Backend/Custom/IRType.h
-  Backend/Custom/IRType.cpp
-  Backend/Custom/IRGen.h
-  Backend/Custom/IRGen.cpp
-  Backend/Custom/IRVisitor.h
-  Backend/Custom/IRVisitor.cpp
-  Backend/Custom/IRContext.h
-  Backend/Custom/IRContext.cpp
-  Backend/Custom/IRModule.h
-  Backend/Custom/IRModule.cpp
-  Backend/Custom/IR/Values.def
-  Backend/Custom/IR/IRFwd.h
-  Backend/Custom/IR/Value.h
-  Backend/Custom/IR/Value.cpp
-  Backend/Custom/IR/Use.h
-  Backend/Custom/IR/User.h
-  Backend/Custom/IR/User.cpp
-  Backend/Custom/IR/Instruction.h
-  Backend/Custom/IR/Instruction.cpp
-  Backend/Custom/IR/Constant.h
-  Backend/Custom/IR/GlobalValue.h
-  Backend/Custom/IR/GlobalValue.cpp
-  Backend/Custom/IR/BasicBlock.h
-  Backend/Custom/IR/BasicBlock.cpp
-  Backend/Custom/IR/UnaryInstruction.h
-  Backend/Custom/IR/UnaryInstruction.cpp
-  Backend/Custom/IR/BinaryInstruction.h
-  Backend/Custom/IR/BinaryInstruction.cpp
-  Backend/Custom/IR/Instructions.h
-  Backend/Custom/IR/Instructions.cpp
+  Backend/Custom/IR/IR.h
+  Backend/Custom/IR/IRBuilder.h
+  Backend/Custom/IR/IRBuilder.cpp
+  Backend/Custom/IR/IRType.h
+  Backend/Custom/IR/IRType.cpp
+  Backend/Custom/IR/IRGen.h
+  Backend/Custom/IR/IRGen.cpp
+  Backend/Custom/IR/IRVisitor.h
+  Backend/Custom/IR/IRVisitor.cpp
+  Backend/Custom/IR/IRContext.h
+  Backend/Custom/IR/IRContext.cpp
+  Backend/Custom/IR/IRModule.h
+  Backend/Custom/IR/IRModule.cpp
+  Backend/Custom/IR/Values/Values.def
+  Backend/Custom/IR/Values/IRFwd.h
+  Backend/Custom/IR/Values/Value.h
+  Backend/Custom/IR/Values/Value.cpp
+  Backend/Custom/IR/Values/Use.h
+  Backend/Custom/IR/Values/User.h
+  Backend/Custom/IR/Values/User.cpp
+  Backend/Custom/IR/Values/Instruction.h
+  Backend/Custom/IR/Values/Instruction.cpp
+  Backend/Custom/IR/Values/Constant.h
+  Backend/Custom/IR/Values/GlobalValue.h
+  Backend/Custom/IR/Values/GlobalValue.cpp
+  Backend/Custom/IR/Values/BasicBlock.h
+  Backend/Custom/IR/Values/BasicBlock.cpp
+  Backend/Custom/IR/Values/UnaryInstruction.h
+  Backend/Custom/IR/Values/UnaryInstruction.cpp
+  Backend/Custom/IR/Values/BinaryInstruction.h
+  Backend/Custom/IR/Values/BinaryInstruction.cpp
+  Backend/Custom/IR/Values/Instructions.h
+  Backend/Custom/IR/Values/Instructions.cpp
+  Backend/Custom/Codegen/MachineModule.h
+  Backend/Custom/Codegen/MachineCodeGen.h
+  Backend/Custom/Codegen/MachineCodeGen.cpp
+  Backend/Custom/Codegen/MIR/MIR.h
+  Backend/Custom/Codegen/MIR/MIRFwd.h
 )
 
 set(COMPILER_FILES

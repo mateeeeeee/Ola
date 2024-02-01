@@ -1,6 +1,6 @@
 #pragma once
 #include "IRFwd.h"
-#include "Backend/Custom/IRType.h"
+#include "Backend/Custom/IR/IRType.h"
 #include "Utility/IntrusiveList.h"
 
 namespace ola

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "IR/IRFwd.h"
+#include "Values/IRFwd.h"
 
 namespace ola
 {

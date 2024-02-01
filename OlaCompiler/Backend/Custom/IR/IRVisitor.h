@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include "IR/IRFwd.h"
+#include "Values/IRFwd.h"
 #include "Frontend/AST/ASTVisitor.h"
 
 namespace ola
@@ -11,6 +11,7 @@ namespace ola
 	class IRContext;
 	class IRBuilder;
 	class IRType;
+	class IRIntType;
 
 	class IRVisitor : public ASTVisitor
 	{

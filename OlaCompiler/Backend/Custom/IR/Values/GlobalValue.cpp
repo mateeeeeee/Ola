@@ -1,6 +1,6 @@
 #include "GlobalValue.h"
 #include "BasicBlock.h"
-#include "Backend/Custom/IRModule.h"
+#include "Backend/Custom/IR/IRModule.h"
 
 namespace ola
 {

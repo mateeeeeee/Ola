@@ -15,6 +15,8 @@ namespace ola
 		void Generate(AST const* ast);
 		void PrintIR(std::string_view output_file);
 
+		IRModule& GetModule() { return module; }
+
 	private:
 		IRContext context;
 		IRModule  module;
