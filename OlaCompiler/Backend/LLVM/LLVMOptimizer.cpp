@@ -1,4 +1,5 @@
 #include "LLVMOptimizer.h"
+#include "Passes/TestPass.h"
 #include "llvm/Pass.h" 
 #include "llvm/IR/LegacyPassManager.h" 
 #include "llvm/Transforms/Scalar.h"
@@ -17,6 +18,7 @@ namespace ola
 	void LLVMOptimizer::Optimize(OptimizationLevel level)
 	{
 		llvm::legacy::PassManager pass_manager;
+
 		switch (level)
 		{
 		case OptimizationLevel::O3:
