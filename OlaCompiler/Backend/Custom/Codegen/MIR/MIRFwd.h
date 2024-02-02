@@ -2,8 +2,8 @@
 
 namespace ola
 {
-	struct MInstruction;
-	struct MFunction;
-	struct MBasicBlock;
-	struct MGlobalVariable;
+	struct MachineOperand;
+	struct MachineInst;
+	struct MachineFunction;
+	struct MachineBasicBlock;
 }

@@ -19,7 +19,7 @@ namespace ola
 		Iterator begin_iterator, end_iterator;
 	};
 
-	template <class T> 
+	template <typename T>
 	IteratorRange<T> MakeRange(T x, T y)
 	{
 		return IteratorRange<T>(std::move(x), std::move(y));

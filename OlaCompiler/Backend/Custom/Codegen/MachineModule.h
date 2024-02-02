@@ -20,7 +20,5 @@ namespace ola
 
 	private:
 		IRModule& ir_module;
-		std::vector<MFunction*> functions;
-		std::vector<MGlobalVariable*> global_variables;
 	};
 }
