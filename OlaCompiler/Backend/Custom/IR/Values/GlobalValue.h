@@ -1,6 +1,7 @@
 #pragma once
 #include "Value.h"
 
+
 namespace ola
 {
 
@@ -91,14 +92,8 @@ namespace ola
 			return const_cast<BasicBlock*>(static_cast<const Function*>(this)->GetEntryBlock());
 		}
 
-		void Insert(BasicBlock* bb)
-		{
-			block_list.PushBack(bb);
-		}
-		void InsertBefore(BasicBlock* bb, BasicBlock* before)
-		{
-			block_list.Insert(before, bb);
-		}
+		void Insert(BasicBlock* bb);
+		void InsertBefore(BasicBlock* bb, BasicBlock* before);
 
 		void SetFuncAttribute(Attribute attr)
 		{
@@ -111,7 +106,7 @@ namespace ola
 		bool IsInline()   const { return HasFuncAttribute(Attribute_ForceInline); }
 		bool IsNoInline() const { return HasFuncAttribute(Attribute_NoInline); }
 
-		uint64	Size() const { return block_list.Size(); }
+		uint64	Size() const;
 		bool    Empty() const { return block_list.Empty(); }
 
 		auto begin() { return block_list.begin(); }

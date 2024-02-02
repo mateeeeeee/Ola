@@ -108,8 +108,11 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIR/MIRFwd.h
   Backend/Custom/Codegen/MIR/MachineOperand.h
   Backend/Custom/Codegen/MIR/MachineInst.h
+  Backend/Custom/Codegen/MIR/MachineInst.cpp
   Backend/Custom/Codegen/MIR/MachineBasicBlock.h
+  Backend/Custom/Codegen/MIR/MachineBasicBlock.cpp
   Backend/Custom/Codegen/MIR/MachineFunction.h
+  Backend/Custom/Codegen/MIR/MachineFunction.cpp
 )
 
 set(COMPILER_FILES

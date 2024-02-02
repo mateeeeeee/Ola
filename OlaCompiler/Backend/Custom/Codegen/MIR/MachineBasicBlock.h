@@ -37,7 +37,7 @@ namespace ola
 		uint32 GetNumber() const { return number; }
 		void SetNumber(uint32 N) { number = N; }
 
-		uint32 Size() const { return (uint32)instructions.Size(); }
+		uint32 Size() const;
 		bool  Empty() const { return instructions.Empty(); }
 
 		MachineInst& Front() { return instructions.Front(); }

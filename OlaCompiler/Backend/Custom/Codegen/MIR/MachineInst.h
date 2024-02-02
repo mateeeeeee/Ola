@@ -15,47 +15,28 @@ namespace ola
 		Jump
 	};
 
-	class MachineInst : IListNode<MachineInst>
+	class MachineInst : public IListNode<MachineInst>
 	{
 		friend class MachineFunction;
 		friend class MachineBasicBlock;
 
 	public:
-		explicit MachineInst(MachineOpCode opcode) : opcode(opcode)
-		{
-
-		}
+		explicit MachineInst(MachineOpCode opcode);
 		OLA_NONCOPYABLE(MachineInst)
-		~MachineInst() {}
+		~MachineInst();
 
 		MachineBasicBlock const* GetParent() const { return parent; }
 		MachineBasicBlock* GetParent() { return parent; }
 
-		MachineFunction const* GetMFunction() const
-		{
-			return nullptr;
-		}
-		MachineFunction* GetMFunction() 
-		{
-			return const_cast<MachineFunction*>(static_cast<const MachineInst*>(this)->GetMFunction());
-		}
+		MachineFunction const* GetFunction() const;
+		MachineFunction* GetFunction();
 
 		MachineOpCode GetOpCode() const { return opcode; }
-		uint32 GetOpCount() const { return operands.size(); }
+		uint32 GetOpCount() const;
 
-		MachineOperand const& GetOperand(uint32 i) const 
-		{
-			return operands[i];
-		}
-		MachineOperand& GetOperand(uint32 i) 
-		{
-			return operands[i];
-		}
-
-		void AddOperand(MachineOperand const& op)
-		{
-			operands.push_back(op);
-		}
+		MachineOperand const& GetOperand(uint32 i) const;
+		MachineOperand& GetOperand(uint32 i);
+		void AddOperand(MachineOperand const& op);
 
 		auto OperandsBegin() { return operands.begin(); }
 		auto OperandsEnd() { return operands.end(); }

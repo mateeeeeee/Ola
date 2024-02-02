@@ -26,13 +26,24 @@ namespace ola
 	{
 		module.RemoveFunction(this);
 	}
+	void Function::Insert(BasicBlock* bb)
+	{
+		block_list.PushBack(bb);
+	}
+	void Function::InsertBefore(BasicBlock* bb, BasicBlock* before)
+	{
+		block_list.Insert(before, bb);
+	}
+	uint64 Function::Size() const
+	{
+		return block_list.Size();
+	}
 	uint64 Function::GetInstructionCount() const
 	{
 		uint64 instruction_count = 0;
 		for (auto const& bb : block_list) instruction_count += bb.Size();
 		return instruction_count;
 	}
-
 	IRFuncType* Function::GetFunctionType() const
 	{
 		return cast<IRFuncType>(GetType());
