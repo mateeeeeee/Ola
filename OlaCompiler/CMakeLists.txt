@@ -102,10 +102,12 @@ set(BACKEND_FILES
   Backend/Custom/IR/Values/Instructions.h
   Backend/Custom/IR/Values/Instructions.cpp
   Backend/Custom/Codegen/MachineModule.h
+  Backend/Custom/Codegen/MachineModule.cpp
   Backend/Custom/Codegen/MachineCodeGen.h
   Backend/Custom/Codegen/MachineCodeGen.cpp
   Backend/Custom/Codegen/MIR/MIR.h
   Backend/Custom/Codegen/MIR/MIRFwd.h
+  Backend/Custom/Codegen/MIR/MachineArch.h
   Backend/Custom/Codegen/MIR/MachineOperand.h
   Backend/Custom/Codegen/MIR/MachineInst.h
   Backend/Custom/Codegen/MIR/MachineInst.cpp

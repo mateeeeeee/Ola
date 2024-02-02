@@ -25,11 +25,9 @@ namespace ola
 	void MachineCodeGen::Generate(std::string_view output_file)
 	{
 		OLA_ASSERT(mach_module != nullptr);
+		mach_module->Emit();
 		std::ofstream output_stream(output_file.data());
-		mach_module->Emit([&](char const* str) 
-			{
-				output_stream << str;
-			});
+		mach_module->Print(output_stream);
 	}
 
 }

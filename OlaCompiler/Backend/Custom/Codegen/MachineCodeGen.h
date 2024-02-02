@@ -1,18 +1,13 @@
 #pragma once
 #include <memory>
 #include <string>
+#include "MIR/MachineArch.h"
 
 namespace ola
 {
 	class IRModule;
 	class MachineModule;
 
-	enum class MachineArch
-	{
-		x86,
-		x64,
-		Unknown
-	};
 	class MachineCodeGen
 	{
 	public:
@@ -23,5 +18,6 @@ namespace ola
 
 	private:
 		std::unique_ptr<MachineModule> mach_module;
+		MachineResult result;
 	};
 }

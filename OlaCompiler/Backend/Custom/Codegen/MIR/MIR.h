@@ -1,10 +1,6 @@
 #pragma once
-#include <vector>
-#include <string>
-#include "Backend/Custom/IR/Values/IRFwd.h"
-#include "Utility/IntrusiveList.h"
 
-namespace ola
-{
-
-}
+#include "MachineFunction.h"
+#include "MachineBasicBlock.h"
+#include "MachineInst.h"
+#include "MachineOperand.h"
