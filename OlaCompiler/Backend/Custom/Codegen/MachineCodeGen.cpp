@@ -1,6 +1,7 @@
 #include <fstream>
 #include "MachineCodeGen.h"
 #include "MachineModule.h"
+#include "x64/x64MachineModule.h"
 
 namespace ola
 {
@@ -9,7 +10,7 @@ namespace ola
 	{
 		switch (arch)
 		{
-		case MachineArch::x64:
+		case MachineArch::x64: mach_module = std::make_unique<x64MachineModule>(module); break;
 		case MachineArch::x86:
 		case MachineArch::Unknown:
 		default:
