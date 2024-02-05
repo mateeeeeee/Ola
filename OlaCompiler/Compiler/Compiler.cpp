@@ -16,6 +16,7 @@
 #include "Backend/Custom/Codegen/MachineCodeGen.h"
 
 #include "Utility/DebugVisitor.h"
+#include "Utility/Managed.h"
 #include "autogen/OlaConfig.h"
 
 #include "spdlog/spdlog.h"
@@ -89,6 +90,7 @@ namespace ola
 				ir_gen.PrintIR(ir_file);
 				MachineCodeGen machine_codegen(MachineArch::x64, ir_gen.GetModule());
 				machine_codegen.Generate(assembly_file);
+				ManagedRegistry::Cleanup();
 			}
 		}
 	}

@@ -12,17 +12,16 @@ namespace ola
 		friend class Managed;
 		using CleanupFn = void(*)();
 	public:
-		static void CleanupAll() 
+		static void Register(CleanupFn cleanup_fn)
+		{
+			cleanup_functions.push_back(cleanup_fn);
+		}
+		static void Cleanup() 
 		{
 			for (CleanupFn cleanup_fn : cleanup_functions) cleanup_fn();
 		}
 	private:
 		inline static std::vector<CleanupFn> cleanup_functions = {};
-	private:
-		static void Register(CleanupFn cleanup_fn)
-		{
-			cleanup_functions.push_back(cleanup_fn);
-		}
 	};
 
 	template<typename T>
@@ -33,7 +32,7 @@ namespace ola
 		template<typename... Args> requires std::is_constructible_v<T, Args...>
 		static T* Create(Args&&... args)
 		{
-			managed_objects.push_back(new T(std::forward<Args>(args...)));
+			managed_objects.push_back(new T(std::forward<Args>(args)...));
 			return managed_objects.back();
 		}
 
@@ -47,9 +46,9 @@ namespace ola
 		inline static std::vector<T*> managed_objects = {};
 
 	private:
-		void* operator new(uint64 sz)
+		void* operator new(uint64 size)
 		{
-			return new T(sz);
+			return ::operator new(size);
 		}
 	};
 
@@ -60,7 +59,7 @@ namespace ola
 		{ \
             T##Cleanup() \
 			{ \
-                ManagedRegistry::Register(Managed<T>::Delete();); \
+                ManagedRegistry::Register(Managed<T>::Destroy); \
             } \
         } T##CleanupInstance; \
     }

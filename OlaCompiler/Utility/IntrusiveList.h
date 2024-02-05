@@ -209,7 +209,6 @@ namespace ola
 			{
 				pointer front_node = head;
 				PopFront();
-				delete front_node;
 			}
 		}
 
