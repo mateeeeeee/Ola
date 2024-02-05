@@ -2,6 +2,7 @@
 #include "IRFwd.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Utility/IntrusiveList.h"
+#include "Utility/Managed.h"
 
 namespace ola
 {
@@ -11,7 +12,7 @@ namespace ola
 	#include "Values.def"
 	};
 
-	class Value
+	class Value : public Managed<Value>
 	{
 	public:
 		OLA_NONCOPYABLE(Value)
@@ -56,5 +57,5 @@ namespace ola
 		std::string name;
 		IList<Use> uses;
 	};
-
+	MANAGED_CLEANUP_FOR(Value)
 }

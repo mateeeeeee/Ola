@@ -36,6 +36,14 @@ namespace ola
 			return managed_objects.back();
 		}
 
+		template<typename U, typename... Args>
+		static U* Create(Args&&... args)
+		{
+			U* obj = new U(std::forward<Args>(args)...);
+			managed_objects.push_back(obj);
+			return obj;
+		}
+
 		static void Destroy()
 		{
 			for (T* obj : managed_objects) delete obj;
@@ -52,7 +60,8 @@ namespace ola
 		}
 	};
 
-#define REGISTER_CLEANUP_FOR(T) \
+#define CREATE_MANAGED(C, ...) C::Create<C>(__VA_ARGS__)
+#define MANAGED_CLEANUP_FOR(T) \
     namespace  \
 	{ \
         struct T##Cleanup \
