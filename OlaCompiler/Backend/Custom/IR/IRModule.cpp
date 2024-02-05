@@ -5,6 +5,14 @@
 namespace ola
 {
 
+	IRModule::IRModule(IRContext& context, std::string_view module_id) : context(context), module_id(module_id)
+	{
+	}
+
+	IRModule::~IRModule()
+	{
+	}
+
 	void IRModule::AddVariable(GlobalVariable* gvar)
 	{
 		variables.PushBack(gvar);

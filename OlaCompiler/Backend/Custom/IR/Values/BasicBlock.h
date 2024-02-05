@@ -1,5 +1,7 @@
 #pragma once
 #include "Value.h"
+#include "Instruction.h"
+#include "Utility/IteratorRange.h"
 
 namespace ola
 {
@@ -47,6 +49,19 @@ namespace ola
 		uint64	Size() const;
 		bool    Empty() const { return inst_list.Empty(); }
 
+		auto Predecessors() { return MakeRange(predecessors.begin(), predecessors.end()); }
+		auto Predecessors() const { return MakeRange(predecessors.begin(), predecessors.end()); }
+		void AddPredecessor(BasicBlock* predecessor)
+		{
+			predecessors.push_back(predecessor);
+		}
+		auto Successors() { return MakeRange(successors.begin(), successors.end()); }
+		auto Successors() const { return MakeRange(successors.begin(), successors.end()); }
+		void AddSuccessor(BasicBlock* successor)
+		{
+			successors.push_back(successor);
+		}
+
 		static bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind_BasicBlock;
@@ -56,6 +71,9 @@ namespace ola
 		Function* parent;
 		IList<Instruction> inst_list;
 		uint32 block_index = -1;
+
+		std::vector<BasicBlock*> predecessors;
+		std::vector<BasicBlock*> successors;
 
 	private:
 		void InsertInto(Function* parent, BasicBlock* insert_before = nullptr);

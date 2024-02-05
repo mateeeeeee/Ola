@@ -11,13 +11,9 @@ namespace ola
 	{
 		friend class MachineFunction;
 	public:
-		MachineBasicBlock() = default;
-		MachineBasicBlock(MachineFunction& mf, const BasicBlock* bb)
-			: bb(bb), number(-1), parent(&mf)
-		{
-		}
-		~MachineBasicBlock() = default;
-
+		MachineBasicBlock();
+		MachineBasicBlock(MachineFunction& mf, const BasicBlock* bb);
+		~MachineBasicBlock();
 
 		BasicBlock const* GetBasicBlock() const { return bb; }
 		MachineFunction const* GetParent() const { return parent; }
@@ -54,14 +50,21 @@ namespace ola
 		auto rend() { return instructions.rend(); }
 		auto rend() const { return instructions.rend(); }
 
-		//add predecessor/successor stuff
+		void AddPredecessor(MachineBasicBlock* p)
+		{
+			predecessors.push_back(p);
+		}
+		void AddSuccessor(MachineBasicBlock* s)
+		{
+			successors.push_back(s);
+		}
 
 	private:
-		uint32 number;
-		BasicBlock const* bb;
-		MachineFunction* parent;
+		uint32 number = -1;
+		BasicBlock const* bb = nullptr;
+		MachineFunction* parent = nullptr;
 		IList<MachineInst> instructions;
-		std::vector<MachineBasicBlock*> Predecessors;
-		std::vector<MachineBasicBlock*> Successors;
+		std::vector<MachineBasicBlock*> predecessors;
+		std::vector<MachineBasicBlock*> successors;
 	};
 }

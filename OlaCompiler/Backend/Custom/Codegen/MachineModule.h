@@ -13,7 +13,7 @@ namespace ola
 	class MachineModule
 	{
 	public:
-		~MachineModule() {}
+		~MachineModule();
 
 		virtual void Emit() = 0;
 		virtual void Print(std::ofstream& of);

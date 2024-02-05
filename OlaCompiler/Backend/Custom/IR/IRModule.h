@@ -11,9 +11,9 @@ namespace ola
 	class IRModule
 	{
 	public:
-		IRModule(IRContext& context, std::string_view module_id) : context(context), module_id(module_id) {}
+		IRModule(IRContext& context, std::string_view module_id);
 		OLA_NONCOPYABLE_NONMOVABLE(IRModule)
-		~IRModule() {}
+		~IRModule();
 
 		IRContext& GetContext() const { return context; }
 		std::string_view GetModuleId() const

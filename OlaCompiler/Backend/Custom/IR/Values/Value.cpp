@@ -5,6 +5,12 @@
 namespace ola
 {
 
+	Value::Value(ValueKind kind, IRType* type) : kind(kind), type(type)
+	{
+
+	}
+	Value::~Value() = default;
+
 	uint64 Value::UseSize() const
 	{
 		return uses.Size();
@@ -24,5 +30,6 @@ namespace ola
 	{
 		for (auto& use : uses) use.Set(v);
 	}
+
 
 }

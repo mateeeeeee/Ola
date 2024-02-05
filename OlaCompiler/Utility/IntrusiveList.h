@@ -69,6 +69,15 @@ namespace ola
 		reference operator*() { return *current; }
 		const_reference operator*() const { return *current; }
 
+		operator pointer()
+		{
+			return current;
+		}
+		operator const_pointer() const
+		{
+			return current;
+		}
+
 		auto& operator++()
 		{
 			current = IsReverse ? current->GetPrev() : current->GetNext();
@@ -114,7 +123,7 @@ namespace ola
 
 	public:
 		IntrusiveList() : head(nullptr), tail(nullptr) {}
-		~IntrusiveList() { head = tail = nullptr; }
+		~IntrusiveList() { Clear();  head = tail = nullptr; }
 
 		void PushFront(pointer val) { Insert(val, head); }
 		void PushBack(pointer val)
@@ -182,6 +191,23 @@ namespace ola
 			}
 			node->prev = node->next = nullptr;
 		}
+
+		void Erase(pointer node)
+		{
+			Remove(node);
+			delete node;
+		}
+
+		void Clear()
+		{
+			while (!Empty())
+			{
+				pointer front_node = head;
+				PopFront();
+				delete front_node;
+			}
+		}
+
 
 		size_type Size() const
 		{

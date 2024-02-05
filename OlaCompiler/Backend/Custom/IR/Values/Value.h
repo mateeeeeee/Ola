@@ -15,7 +15,7 @@ namespace ola
 	{
 	public:
 		OLA_NONCOPYABLE(Value)
-		virtual ~Value() = default;
+		virtual ~Value();
 
 		ValueKind GetKind() const { return kind; }
 		IRType* GetType() const { return type; }
@@ -48,7 +48,7 @@ namespace ola
 		bool hasNUsesOrMore(unsigned N) const { return UseSize() >= N; }
 
 	protected:
-		Value(ValueKind kind, IRType* type = nullptr) : kind(kind), type(type) {}
+		Value(ValueKind kind, IRType* type = nullptr);
 
 	private:
 		ValueKind kind;

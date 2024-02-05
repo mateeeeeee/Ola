@@ -3,21 +3,16 @@
 
 namespace ola
 {
+
 	class IRModule;
 	class x64MachineModule : public MachineModule
 	{
 	public:
-		explicit x64MachineModule(IRModule& ir_module) : MachineModule(ir_module)
-		{
-			EmitLn<MachineSegment::Text>(".text");
-			EmitLn<MachineSegment::Data>(".data");
-			EmitLn<MachineSegment::Const>(".rodata");
-			EmitLn<MachineSegment::BSS>(".bss");
-		}
+		explicit x64MachineModule(IRModule& ir_module);
 
-		virtual void Emit() override
-		{
+		virtual void Emit() override;
 
-		}
+	private:
+		void EmitGlobalVariables();
 	};
 }

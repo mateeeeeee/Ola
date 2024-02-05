@@ -12,6 +12,8 @@
 #include "Frontend/Sema.h"
 
 #include "Backend/LLVM/LLVMIRGen.h"
+#include "Backend/Custom/IR/IRGen.h"
+#include "Backend/Custom/Codegen/MachineCodeGen.h"
 
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
@@ -54,7 +56,7 @@ namespace ola
 			return OptimizationLevel::O0;
 		}
 
-		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, bool ast_dump, OptimizationLevel opt_level)
+		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, bool use_llvm, bool ast_dump)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -70,13 +72,24 @@ namespace ola
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
 
-			LLVMIRGen llvm_ir_gen(source_file);
-			llvm_ir_gen.Generate(ast);
-			llvm_ir_gen.Optimize(opt_level);
-			llvm_ir_gen.PrintIR(ir_file);
+			if (use_llvm)
+			{
+				LLVMIRGen llvm_ir_gen(source_file);
+				llvm_ir_gen.Generate(ast);
+				llvm_ir_gen.Optimize(opt_level);
+				llvm_ir_gen.PrintIR(ir_file);
 
-			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
-			system(compile_cmd.c_str());
+				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
+				system(compile_cmd.c_str());
+			}
+			else
+			{
+				IRGen ir_gen(source_file);
+				ir_gen.Generate(ast);
+				ir_gen.PrintIR(ir_file);
+				MachineCodeGen machine_codegen(MachineArch::x64, ir_gen.GetModule());
+				machine_codegen.Generate(assembly_file);
+			}
 		}
 	}
 
@@ -86,7 +99,6 @@ namespace ola
 		bool const ast_dump = input.flags & CompilerFlag_DumpAST;
 		bool const use_llvm = !(input.flags & CompilerFlag_NoLLVM);
 		OptimizationLevel opt_level = GetOptimizationLevelFromFlags(input.flags);
-		OLA_ASSERT_MSG(use_llvm, "Only LLVM is supported for code generation");
 
 		fs::path cur_path = fs::current_path();
 		fs::current_path(input.input_directory);
@@ -104,7 +116,7 @@ namespace ola
 			std::string ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, ast_dump, opt_level);
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, use_llvm, ast_dump);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;

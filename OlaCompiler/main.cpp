@@ -11,6 +11,7 @@ int main(int argc, char** argv)
 	CLI::App cli_parser{ "Ola compiler" };
 	CLI::Option* ast_dump = cli_parser.add_flag("--astdump", "Dump AST to output/log");
 	CLI::Option* test_debug = cli_parser.add_flag("--testdebug", "Print debug information during tests");
+	CLI::Option* no_llvm = cli_parser.add_flag("--nollvm", "Use custom backend instead of LLVM one");
 	CLI::Option* test = cli_parser.add_flag("--test", "used for running g-tests");
 	CLI::Option* Od = cli_parser.add_flag("--Od", "No optimizations");
 	CLI::Option* O0 = cli_parser.add_flag("--O0", "No optimizations");
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
 
 			ola::CompilerInput compiler_input{};
 			compiler_input.flags = test_debug_flag ? ola::CompilerFlag_DumpAST | ola::CompilerFlag_O0 : ola::CompilerFlag_O3;
+			if (*no_llvm) compiler_input.flags |= ola::CompilerFlag_NoLLVM;
 			compiler_input.input_directory = directory;
 			compiler_input.sources = input_files;
 			compiler_input.output_file = output_file;
@@ -76,6 +78,7 @@ int main(int argc, char** argv)
 	if (*O3) optimization_flag = ola::CompilerFlag_O3;
 
 	compiler_flags |= optimization_flag;
+	if (*no_llvm) compiler_flags |= ola::CompilerFlag_NoLLVM;
 
 	ola::CompilerInput compiler_input{};
 	compiler_input.flags = compiler_flags;
