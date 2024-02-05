@@ -12,7 +12,6 @@
 #include "Frontend/Sema.h"
 
 #include "Backend/LLVM/LLVMIRGen.h"
-#include "Backend/LLVM/LLVMCodeGen.h"
 
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
@@ -38,9 +37,9 @@ namespace ola
 			console_sink->set_level(spdlog::level::trace);
 			console_sink->set_pattern("[%^%l%$] %v");
 
-			std::shared_ptr<spdlog::logger> lu_logger = std::make_shared<spdlog::logger>(std::string("ola logger"), spdlog::sinks_init_list{ console_sink });
-			lu_logger->set_level(spdlog::level::trace);
-			spdlog::set_default_logger(lu_logger);
+			std::shared_ptr<spdlog::logger> ola_logger = std::make_shared<spdlog::logger>(std::string("ola logger"), spdlog::sinks_init_list{ console_sink });
+			ola_logger->set_level(spdlog::level::trace);
+			spdlog::set_default_logger(ola_logger);
 		}
 		void AddBuiltins(SourceBuffer& src)
 		{
@@ -76,8 +75,8 @@ namespace ola
 			llvm_ir_gen.Optimize(opt_level);
 			llvm_ir_gen.PrintIR(ir_file);
 
-			LLVMCodeGen llvm_code_gen(ir_file);
-			llvm_code_gen.Generate(assembly_file);
+			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
+			system(compile_cmd.c_str());
 		}
 	}
 
@@ -160,8 +159,8 @@ namespace ola
 			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
 			llvm_ir_generator.PrintIR(ir_file.string());
 
-			LLVMCodeGen llvm_code_gen(ir_file.string());
-			llvm_code_gen.Generate(assembly_file.string());
+			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file.string(), assembly_file.string());
+			system(compile_cmd.c_str());
 		}
 
 		std::string assembly_cmd = std::format("clang {} -o {}", assembly_file.string(), output_file.string());

@@ -2,6 +2,7 @@
 #include "MachineModule.h"
 #include "MIR/MIR.h"
 #include "Backend/Custom/IR/IRModule.h"
+#include "Backend/Custom/IR/Values/GlobalValue.h"
 
 namespace ola
 {
@@ -16,6 +17,10 @@ namespace ola
 
 	MachineModule::MachineModule(IRModule& ir_module) : global_variables(ir_module.GetVariableList())
 	{
+		for (auto const& ir_function : ir_module.GetFunctionList())
+		{
+			functions.PushBack(new MachineFunction(ir_function, functions.Size()));
+		}
 	}
 
 	void MachineModule::Print(std::ofstream& of)

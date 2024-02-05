@@ -7,15 +7,14 @@
 namespace ola
 {
 	class Function;
-	class MachineFunction
+	class MachineFunction : public IListNode<MachineFunction>
 	{
 	public:
-		MachineFunction(Function& func, uint32 number) : func(func), function_number(number)
+		MachineFunction(Function const& func, uint32 number) : func(func), function_number(number)
 		{
 		}
 		~MachineFunction();
 
-		Function& GetFunction() { return func; }
 		Function const& GetFunction() const { return func; }
 
 		std::string_view GetName() const;
@@ -53,7 +52,7 @@ namespace ola
 
 	private:
 		uint32 function_number;
-		Function& func;
+		Function const& func;
 		IList<MachineBasicBlock> basic_blocks;
 		std::vector<MachineBasicBlock*> mbb_numbering;
 
