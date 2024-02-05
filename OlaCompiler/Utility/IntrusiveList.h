@@ -30,11 +30,14 @@ namespace ola
 		friend IntrusiveListIterator<T, false, true>;
 		friend IntrusiveListIterator<T, true, true>;
 
-	protected:
+	public:
 		IntrusiveListNode() : prev(nullptr), next(nullptr) {}
 
-		T* GetNext() const { return next; }
-		T* GetPrev() const { return prev; }
+		T* GetNext() { return next; }
+		T* GetPrev() { return prev; }
+
+		T const* GetNext() const { return next; }
+		T const* GetPrev() const { return prev; }
 
 	private:
 		T* prev;
@@ -152,7 +155,7 @@ namespace ola
 		reference Back() { return *rbegin(); }
 		const_reference Back() const { return *rbegin(); }
 
-		void Insert(pointer new_node, pointer insert_before)
+		pointer Insert(pointer new_node, pointer insert_before)
 		{
 			pointer insert_point = insert_before ? insert_before->prev : tail;
 
@@ -164,11 +167,13 @@ namespace ola
 
 			if (new_node->next) new_node->next->prev = new_node;
 			else tail = new_node;
+
+			return new_node;
 		}
 
-		void InsertAfter(pointer new_node, pointer insert_after)
+		pointer InsertAfter(pointer new_node, pointer insert_after)
 		{
-			Insert(new_node, insert_after->next);
+			return Insert(new_node, insert_after->next);
 		}
 
 		void Remove(pointer node)

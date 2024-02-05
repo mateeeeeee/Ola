@@ -8,4 +8,7 @@
 #include "Values/GlobalValue.h"
 #include "Values/BasicBlock.h"
 #include "Values/UnaryInstruction.h"
+#include "Values/BinaryInstruction.h"
+#include "Values/Instructions.h"
+
 

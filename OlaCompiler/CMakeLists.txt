@@ -16,6 +16,7 @@ set(UTILITY_FILES
   Utility/IntrusiveList.h
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
+  Utility/Managed.h
 )
 
 
@@ -114,6 +115,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIR/MachineFunction.h
   Backend/Custom/Codegen/MIR/MachineFunction.cpp
   Backend/Custom/Codegen/x86-64/x64MachineModule.h
+  Backend/Custom/Codegen/x86-64/x64MachineModule.cpp
 )
 
 set(COMPILER_FILES

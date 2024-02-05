@@ -32,10 +32,10 @@ namespace ola
 			insert_point = nullptr;
 		}
 
-		void Insert(Instruction* instruction);
-		void Insert(Value* value);
-		void InsertAfter(Instruction* instruction);
-		void InsertAfter(Value* value);
+		Instruction* Insert(Instruction* instruction);
+		Value* Insert(Value* value);
+		Instruction* InsertAfter(Instruction* instruction);
+		Value* InsertAfter(Value* value);
 
 		GlobalVariable* CreateGlobalString(std::string_view str, IRModule* module = nullptr);
 		ConstantInt* GetConstantInt64(int64 value) const;
@@ -49,9 +49,19 @@ namespace ola
 		IRVoidType* GetVoidType() const;
 		IRPtrType* GetPtrType(IRType* type);
 
+		BranchInst* CreateBranch(BasicBlock* destination);
+		StoreInst* CreateStore(Value* val, Value* ptr);
+		LoadInst* CreateLoad(IRType* type, Value* ptr);
+
 	private:
 		IRContext& ctx;
 		BasicBlock*  insert_block;
 		Instruction* insert_point;
+
+	private:
+		template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
+		InstTy* Insert(InstTy* inst);
 	};
+
+
 }

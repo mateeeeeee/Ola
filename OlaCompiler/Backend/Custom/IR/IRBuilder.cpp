@@ -33,24 +33,26 @@ namespace ola
 		insert_point = nullptr;
 	}
 
-	void IRBuilder::Insert(Instruction* instruction)
+	Instruction* IRBuilder::Insert(Instruction* instruction)
 	{
-		instruction->Insert(insert_block, insert_point);
+		return insert_block->GetInstructions().Insert(instruction, insert_point);
 	}
 
-	void IRBuilder::Insert(Value* V)
+	Value* IRBuilder::Insert(Value* V)
 	{
 		if (Instruction* I = dyn_cast<Instruction>(V)) return Insert(I);
+		return nullptr;
 	}
 
-	void IRBuilder::InsertAfter(Instruction* instruction)
+	Instruction* IRBuilder::InsertAfter(Instruction* instruction)
 	{
-		instruction->InsertAfter(insert_block, insert_point);
+		return insert_block->GetInstructions().InsertAfter(instruction, insert_point);
 	}
 
-	void IRBuilder::InsertAfter(Value* V)
+	Value* IRBuilder::InsertAfter(Value* V)
 	{
-		if (Instruction* I = dyn_cast<Instruction>(V)) return InsertAfter(I);
+		if (Instruction* I = dyn_cast<Instruction>(V)) InsertAfter(I);
+		return nullptr;
 	}
 
 	GlobalVariable* IRBuilder::CreateGlobalString(std::string_view str, IRModule* module)
@@ -107,5 +109,26 @@ namespace ola
 		return ctx.GetPointerType(type);
 	}
 
+	BranchInst* IRBuilder::CreateBranch(BasicBlock* destination)
+	{
+		return Insert(new BranchInst(destination));
+	}
+
+	StoreInst* IRBuilder::CreateStore(Value* val, Value* ptr)
+	{
+		return Insert(new StoreInst(val, ptr));
+	}
+
+	LoadInst* IRBuilder::CreateLoad(IRType* type, Value* ptr)
+	{
+		return Insert(new LoadInst(type, ptr));
+	}
+
+	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
+	InstTy* IRBuilder::Insert(InstTy* inst)
+	{
+		Insert((Instruction*)inst);
+		return inst;
+	}
 }
 

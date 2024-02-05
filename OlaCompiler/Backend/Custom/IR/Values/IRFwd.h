@@ -9,6 +9,9 @@ namespace ola
 	class Use;
 	class User;
 	class Instruction;
+	class StoreInst;
+	class LoadInst;
+	class BranchInst;
 	class BasicBlock;
 	class Function;
 	class GlobalVariable;

@@ -1,7 +1,9 @@
 #include "IRVisitor.h"
 #include "IRBuilder.h"
 #include "IRModule.h"
+#include "IRContext.h"
 #include "IRType.h"
+#include "IR.h"
 #include "Frontend/AST/AST.h"
 #include "Frontend/AST/Decl.h"
 #include "Frontend/AST/Stmt.h"
@@ -120,9 +122,28 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(ReturnStmt const&, uint32)
+	void IRVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
-
+		BasicBlock* current_block = builder->GetInsertBlock();
+		Function* current_function = current_block->GetParent();
+		if (Expr const* return_expr = return_stmt.GetExprStmt()->GetExpr())
+		{
+			return_expr->Accept(*this);
+			Value* return_expr_value = value_map[return_expr];
+			OLA_ASSERT(return_expr_value);
+			if (current_function->GetReturnType()->IsPointerType())
+			{
+				builder->CreateStore(return_expr_value, return_value);
+			}
+			else
+			{
+				Value* load = builder->CreateLoad(return_expr_value->GetType(), return_expr_value);
+				builder->CreateStore(load, return_value);
+			}
+		}
+		builder->CreateBranch(exit_block);
+		BasicBlock* return_block = new BasicBlock(context, "return", current_function, current_block->GetNext());
+		builder->SetInsertPoint(return_block);
 	}
 
 	void IRVisitor::Visit(IfStmt const&, uint32)
@@ -205,14 +226,16 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(IntLiteral const&, uint32)
+	void IRVisitor::Visit(IntLiteral const& int_constant, uint32)
 	{
-
+		ConstantInt* constant = context.GetConstantInt64(int_constant.GetValue()); 
+		value_map[&int_constant] = constant;
 	}
 
-	void IRVisitor::Visit(CharLiteral const&, uint32)
+	void IRVisitor::Visit(CharLiteral const& char_constant, uint32)
 	{
-
+		ConstantInt* constant = context.GetConstantInt8(char_constant.GetChar());
+		value_map[&char_constant] = constant;
 	}
 
 	void IRVisitor::Visit(StringLiteral const&, uint32)

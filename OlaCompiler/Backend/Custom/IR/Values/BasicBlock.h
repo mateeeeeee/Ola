@@ -5,7 +5,6 @@
 
 namespace ola
 {
-
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 		friend class IRBuilder;
@@ -78,5 +77,4 @@ namespace ola
 	private:
 		void InsertInto(Function* parent, BasicBlock* insert_before = nullptr);
 	};
-
 }
