@@ -150,10 +150,11 @@ namespace ola
 	class GlobalVariable : public GlobalValue, public IListNode<GlobalVariable>
 	{
 	public:
-		GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name = "");
+		GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, bool is_const, std::string_view name = "");
 		OLA_NONCOPYABLE(GlobalVariable)
-			~GlobalVariable();
+		~GlobalVariable();
 
+		bool IsConst() const { return is_const; }
 		Value* GetInitValue() const { return init; }
 		std::string_view GetName() const { return name; }
 
@@ -162,6 +163,7 @@ namespace ola
 	private:
 		std::string name;
 		Value* init;
+		bool is_const;
 	};
 
 }

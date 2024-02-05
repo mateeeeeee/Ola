@@ -34,6 +34,16 @@ namespace ola
 		MachineOpCode GetOpCode() const { return opcode; }
 		uint32 GetOpCount() const;
 
+		template<uint32 i>
+		MachineOperand& Op()
+		{
+			return operands[i];
+		}
+		template<uint32 i>
+		MachineOperand const& Op() const
+		{
+			return operands[i];
+		}
 		MachineOperand const& GetOperand(uint32 i) const;
 		MachineOperand& GetOperand(uint32 i);
 		void AddOperand(MachineOperand const& op);

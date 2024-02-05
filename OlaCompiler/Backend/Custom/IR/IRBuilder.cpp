@@ -57,7 +57,8 @@ namespace ola
 	{
 		if (!module) module = &insert_block->GetParent()->GetModule();
 		ConstantString* string_constant = new ConstantString(ctx, str);
-		GlobalVariable* GV = new GlobalVariable(string_constant->GetType(), *module, Linkage::Internal,string_constant);
+		//todo create unique name
+		GlobalVariable* GV = new GlobalVariable(string_constant->GetType(), *module, Linkage::Internal, string_constant, true);
 		return GV;
 	}
 

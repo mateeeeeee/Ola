@@ -49,8 +49,8 @@ namespace ola
 		return cast<IRFuncType>(GetType());
 	}
 
-	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, std::string_view name)
-		: GlobalValue(ValueKind_GlobalVariable, type, module, linkage), name(name), init(init)
+	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, bool is_const, std::string_view name)
+		: GlobalValue(ValueKind_GlobalVariable, type, module, linkage), name(name), init(init), is_const(is_const)
 	{
 		module.AddVariable(this);
 	}
