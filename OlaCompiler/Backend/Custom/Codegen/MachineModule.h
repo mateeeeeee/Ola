@@ -27,7 +27,7 @@ namespace ola
 		explicit MachineModule(IRModule& ir_module);
 
 		template<MachineSegment segment, typename... Ts>
-		void Emit(std::string_view fmt, Ts&&... args)
+		void EmitLn(std::string_view fmt, Ts&&... args)
 		{
 			std::string output = std::vformat(fmt, std::make_format_args(std::forward<Ts>(args)...));
 			output += "\n";

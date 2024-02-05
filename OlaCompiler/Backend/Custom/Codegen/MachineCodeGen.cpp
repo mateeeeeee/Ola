@@ -1,7 +1,7 @@
 #include <fstream>
 #include "MachineCodeGen.h"
 #include "MachineModule.h"
-#include "x64/x64MachineModule.h"
+#include "x86-64/x64MachineModule.h"
 
 namespace ola
 {
