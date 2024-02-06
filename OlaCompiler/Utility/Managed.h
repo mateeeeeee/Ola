@@ -29,14 +29,17 @@ namespace ola
 	{
 	public:
 
-		template<typename... Args> requires std::is_constructible_v<T, Args...>
+		template<typename... Args> requires std::is_constructible_v<T, Args...> 
+										 && std::is_base_of_v<Managed<T>, T>
 		static T* Create(Args&&... args)
 		{
 			managed_objects.push_back(new T(std::forward<Args>(args)...));
 			return managed_objects.back();
 		}
 
-		template<typename U, typename... Args>
+		template<typename U, typename... Args> requires std::is_constructible_v<U, Args...> 
+													 && std::is_base_of_v<T, U> 
+													 && std::is_base_of_v<Managed<T>, T>
 		static U* Create(Args&&... args)
 		{
 			U* obj = new U(std::forward<Args>(args)...);
@@ -60,8 +63,15 @@ namespace ola
 		}
 	};
 
-#define CREATE_MANAGED(C, ...) C::Create<C>(__VA_ARGS__)
-#define MANAGED_CLEANUP_FOR(T) \
+	template <typename U, typename... Args> requires std::is_constructible_v<U, Args...>
+	inline U* Create(Args&&... args)
+	{
+		return U::template Create<U>(std::forward<Args>(args)...);
+	}
+
+
+	#define CREATE_MANAGED(C, ...) C::Create<C>(__VA_ARGS__)
+	#define MANAGED_CLEANUP_FOR(T) \
     namespace  \
 	{ \
         struct T##Cleanup \

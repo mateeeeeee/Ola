@@ -142,7 +142,7 @@ namespace ola
 			}
 		}
 		builder->CreateBranch(exit_block);
-		BasicBlock* return_block = CREATE_MANAGED(BasicBlock, context, "return", current_function, current_block->GetNext());
+		BasicBlock* return_block = Create<BasicBlock>(context, "return", current_function, current_block->GetNext());
 		builder->SetInsertPoint(return_block);
 	}
 

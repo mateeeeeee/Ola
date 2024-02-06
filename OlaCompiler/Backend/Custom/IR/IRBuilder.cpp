@@ -58,9 +58,9 @@ namespace ola
 	GlobalVariable* IRBuilder::CreateGlobalString(std::string_view str, IRModule* module)
 	{
 		if (!module) module = &insert_block->GetParent()->GetModule();
-		ConstantString* string_constant = CREATE_MANAGED(ConstantString, ctx, str);
+		ConstantString* string_constant = Create<ConstantString>(ctx, str);
 		//todo create unique name
-		GlobalVariable* GV = CREATE_MANAGED(GlobalVariable, string_constant->GetType(), *module, Linkage::Internal, string_constant, true);
+		GlobalVariable* GV = Create<GlobalVariable>(string_constant->GetType(), *module, Linkage::Internal, string_constant, true);
 		return GV;
 	}
 
@@ -111,17 +111,17 @@ namespace ola
 
 	BranchInst* IRBuilder::CreateBranch(BasicBlock* destination)
 	{
-		return Insert(CREATE_MANAGED(BranchInst, destination));
+		return Insert(Create<BranchInst>(destination));
 	}
 
 	StoreInst* IRBuilder::CreateStore(Value* val, Value* ptr)
 	{
-		return Insert(CREATE_MANAGED(StoreInst, val, ptr));
+		return Insert(Create<StoreInst>(val, ptr));
 	}
 
 	LoadInst* IRBuilder::CreateLoad(IRType* type, Value* ptr)
 	{
-		return Insert(CREATE_MANAGED(LoadInst, type, ptr));
+		return Insert(Create<LoadInst>(type, ptr));
 	}
 
 	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
