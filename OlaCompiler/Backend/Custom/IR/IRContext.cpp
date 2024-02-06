@@ -13,21 +13,17 @@ namespace ola
 		float_type = new(this) IRFloatType(*this);
 		label_type = new(this) IRLabelType(*this);
 
-		true_value = new ConstantInt(int1_type, true);
-		false_value = new ConstantInt(int1_type, false);
+		true_value = CREATE_MANAGED(ConstantInt, int1_type, true);
+		false_value = CREATE_MANAGED(ConstantInt, int1_type, false);
 	}
 
 	IRContext::~IRContext()
 	{
-		for (auto [k, v] : constant_strings) delete v;
-
 		for (IRArrayType* array_type : array_types)			delete array_type;
 		for (IRStructType* struct_type : struct_types)		delete struct_type;
 		for (IRPtrType* ref_type : pointer_types)			delete ref_type;
 		for (IRFuncType* function_type : function_types)	delete function_type;
 
-		delete false_value;
-		delete true_value;
 		delete label_type;
 		delete float_type;
 		delete int1_type;
@@ -116,21 +112,21 @@ namespace ola
 	ConstantString* IRContext::GetConstantString(std::string_view str)
 	{
 		if (constant_strings.contains(str)) return constant_strings[str];
-		constant_strings[str] = new ConstantString(*this, str);
+		constant_strings[str] = CREATE_MANAGED(ConstantString, *this, str);
 		return constant_strings[str];
 	}
 
 	ConstantInt* IRContext::GetConstantInt64(int64 value)
 	{
 		if (constant_ints64.contains(value)) return constant_ints64[value];
-		constant_ints64[value] = new ConstantInt(int8_type, value);
+		constant_ints64[value] = CREATE_MANAGED(ConstantInt, int8_type, value);
 		return constant_ints64[value];
 	}
 
 	ConstantInt* IRContext::GetConstantInt8(int8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
-		constant_ints8[value] = new ConstantInt(int1_type, value);
+		constant_ints8[value] = CREATE_MANAGED(ConstantInt, int1_type, value);
 		return constant_ints8[value];
 	}
 

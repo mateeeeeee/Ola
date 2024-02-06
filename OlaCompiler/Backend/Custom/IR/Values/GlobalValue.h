@@ -137,14 +137,12 @@ namespace ola
 	{
 		friend Function;
 	public:
+		Argument(IRType* type, uint32 index) : Value(ValueKind_Argument, type), index(index) {}
 		uint32  GetIndex() const { return index; }
 		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind_Argument; }
 
 	private:
 		uint32 index;
-
-	private:
-		Argument(IRType* type, uint32 index) : Value(ValueKind_Argument, type), index(index) {}
 	};
 
 	class GlobalVariable : public GlobalValue, public IListNode<GlobalVariable>
