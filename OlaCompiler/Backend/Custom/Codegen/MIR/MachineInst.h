@@ -12,7 +12,8 @@ namespace ola
 		Subtract,
 		Load,
 		Store,
-		Jump
+		Jump,
+		Return
 	};
 
 	class MachineInst : public IListNode<MachineInst>

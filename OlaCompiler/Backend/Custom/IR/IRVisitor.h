@@ -125,5 +125,9 @@ namespace ola
 		IRFuncType* ConvertMethodType(FuncType const*, IRType*);
 		IRType* GetStructType(Type const*);
 		IRPtrType* GetPointerType(IRType*);
+
+		[[maybe_unused]] Value* Load(Type const*, Value*);
+		[[maybe_unused]] Value* Load(IRType*, Value*);
+		[[maybe_unused]] Value* Store(Value*, Value*);
 	};
 }

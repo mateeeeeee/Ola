@@ -155,6 +155,7 @@ namespace ola
 			if (ret_value) Op<0>() = ret_value;
 		}
 
+		bool IsVoid() const { return GetReturnValue() == nullptr; }
 		Value* GetReturnValue() const 
 		{
 			return GetNumOperands() > 0 ? GetOperand(0) : nullptr;

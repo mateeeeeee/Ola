@@ -10,8 +10,11 @@ namespace ola
 	{
 		template<typename T>
 		friend class Managed;
+
 		using CleanupFn = void(*)();
+
 	public:
+
 		static void Register(CleanupFn cleanup_fn)
 		{
 			cleanup_functions.push_back(cleanup_fn);
@@ -19,7 +22,9 @@ namespace ola
 		static void Cleanup() 
 		{
 			for (CleanupFn cleanup_fn : cleanup_functions) cleanup_fn();
+			cleanup_functions.clear();
 		}
+
 	private:
 		inline static std::vector<CleanupFn> cleanup_functions = {};
 	};

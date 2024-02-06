@@ -52,9 +52,9 @@ namespace ola
 		FuncType const* type = function_decl.GetFuncType();
 		IRFuncType* function_type = cast<IRFuncType>(ConvertToIRType(type));
 		Linkage linkage = function_decl.IsPublic() || function_decl.IsExtern() ? Linkage::External : Linkage::Internal;
-		Function* llvm_function = Create<Function>(function_type, module, linkage, function_decl.GetMangledName());
+		Function* ir_function = Create<Function>(function_type, module, linkage, function_decl.GetMangledName());
 
-		Argument* param_arg = llvm_function->GetArg(0);
+		Argument* param_arg = ir_function->GetArg(0);
 		if (isa<ClassType>(type->GetReturnType()))
 		{
 			Value* sret_value = param_arg;
@@ -70,6 +70,7 @@ namespace ola
 		}
 		if (!function_decl.HasDefinition()) return;
 
+		VisitFunctionDeclCommon(function_decl, ir_function);
 	}
 
 	void IRVisitor::Visit(MethodDecl const&, uint32)
@@ -157,8 +158,7 @@ namespace ola
 			}
 			else
 			{
-				Value* load = builder->CreateLoad(return_expr_value->GetType(), return_expr_value);
-				builder->CreateStore(load, return_value);
+				Store(return_expr_value, return_value);
 			}
 		}
 		builder->CreateBranch(exit_block);
@@ -353,7 +353,7 @@ namespace ola
 		builder->SetInsertPoint(exit_block);
 		if (!func->GetReturnType()->IsVoidType())
 		{
-			//builder->CreateRet(Load(func->GetReturnType(), return_value));
+			builder->CreateRet(Load(func->GetReturnType(), return_value));
 		}
 		else builder->CreateRetVoid();
 
@@ -461,6 +461,35 @@ namespace ola
 	IRPtrType* IRVisitor::GetPointerType(IRType* type)
 	{
 		return IRPtrType::Get(context, type);
+	}
+
+	Value* IRVisitor::Load(Type const* type, Value* ptr)
+	{
+		IRType* ir_type = nullptr;
+		if (RefType const* ref_type = dyn_cast<RefType>(type))
+			ir_type = ConvertToIRType(ref_type->GetReferredType());
+		else ir_type = ConvertToIRType(type);
+		return Load(ir_type, ptr);
+	}
+
+	Value* IRVisitor::Load(IRType* ir_type, Value* ptr)
+	{
+		if (ptr->GetType()->IsPointerType())
+		{
+			if (ir_type->IsPointerType() && isa<GlobalVariable>(ptr))
+			{
+				return ptr;
+			}
+			return builder->CreateLoad(ir_type, ptr);
+		}
+		return ptr;
+	}
+
+	Value* IRVisitor::Store(Value* value, Value* ptr)
+	{
+		if (!value->GetType()->IsPointerType()) return builder->CreateStore(value, ptr);
+		Value* load = Load(value->GetType(), value);
+		return builder->CreateStore(load, ptr);
 	}
 
 }

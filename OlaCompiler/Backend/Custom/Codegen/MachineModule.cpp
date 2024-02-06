@@ -3,12 +3,24 @@
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/Values/GlobalValue.h"
 #include "Backend/Custom/IR/Values/BasicBlock.h"
+#include "Backend/Custom/IR/Values/Instructions.h"
 #include "MachineModule.h"
 #include "MIR/MIR.h"
 
 
 namespace ola
 {
+	struct VoidPointerHash
+	{
+		uint64 operator()(void const* ptr) const
+		{
+			return reinterpret_cast<uint64>(ptr);
+		}
+	};
+
+	template<typename V>
+	using VoidPointerMap = std::unordered_map<void const*, V, VoidPointerHash>;
+
 	void operator<<(std::ostream& os, MachineResult const& res)
 	{
 		os << res.no_segment << "\n";
@@ -40,19 +52,38 @@ namespace ola
 				for (auto& bb_succ : bb.Successors()) machine_bb->AddSuccessor(bb_map[bb_succ]);
 			}
 
+			struct VirtualRegisterAllocator
+			{
+				MachineOperand Allocate(Value* val)
+				{
+					if (value_reg_map.contains(val)) return value_reg_map[val];
+					MachineOperand virtual_reg(MO_Register);
+					virtual_reg.SetReg(current_index++);
+					return virtual_reg;
+				}
+			private:
+				uint32 current_index = 0;
+				VoidPointerMap<MachineOperand> value_reg_map;
+			} virtual_register_allocator;
+
 			for (auto const& bb : ir_function)
 			{
 				for (auto inst_iterator = bb.begin(); inst_iterator != bb.end(); ++inst_iterator)
 				{
 					Instruction const* inst = inst_iterator;
-					//if (dyn_cast<BinaryInstruction>(inst))
-					//{
-					//
-					//}
-					//else
-					//{
-					//
-					//}
+					if (ReturnInst const* ret_inst = dyn_cast<ReturnInst>(inst))
+					{
+						MachineInst* ret = new MachineInst(MachineOpCode::Return);
+						if (!ret_inst->IsVoid())
+						{
+							MachineOperand ret_operand = virtual_register_allocator.Allocate(ret_inst->GetReturnValue());
+							ret->AddOperand(ret_operand);
+						}
+					}
+					else
+					{
+					
+					}
 				}
 			}
 		}

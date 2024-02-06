@@ -14,6 +14,8 @@ namespace ola
 	{
 		friend class MachineInst;
 	public:
+		MachineOperand() = default;
+		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
 		explicit MachineOperand(MachineOperandKind kind) : kind(kind), address(0) {}
 
 		MachineOperandKind GetKind() const { return kind; }
@@ -85,4 +87,5 @@ namespace ola
 			uint64 address;
 		};
 	};
+
 }
