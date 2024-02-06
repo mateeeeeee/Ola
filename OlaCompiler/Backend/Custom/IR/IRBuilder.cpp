@@ -124,6 +124,21 @@ namespace ola
 		return Insert(Create<LoadInst>(type, ptr));
 	}
 
+	AllocaInst* IRBuilder::CreateAlloca(IRType* type, Value* array_size)
+	{
+		return Insert(Create<AllocaInst>(type, array_size));
+	}
+
+	ReturnInst* IRBuilder::CreateRetVoid()
+	{
+		return Insert(Create<ReturnInst>(ctx));
+	}
+
+	ReturnInst* IRBuilder::CreateRet(Value* V)
+	{
+		return Insert(Create<ReturnInst>(ctx, V));
+	}
+
 	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
 	InstTy* IRBuilder::Insert(InstTy* inst)
 	{

@@ -50,12 +50,37 @@ namespace ola
 
 		auto Predecessors() { return MakeRange(predecessors.begin(), predecessors.end()); }
 		auto Predecessors() const { return MakeRange(predecessors.begin(), predecessors.end()); }
+		bool HasNPredecessors(uint32 N) const
+		{
+			return PredecessorCount() == N;
+		}
+		bool HasNPredecessorsOrMore(uint32 N) const
+		{
+			return PredecessorCount() >= N;
+		}
+		uint32 PredecessorCount() const
+		{
+			return predecessors.size();
+		}
 		void AddPredecessor(BasicBlock* predecessor)
 		{
 			predecessors.push_back(predecessor);
 		}
+
 		auto Successors() { return MakeRange(successors.begin(), successors.end()); }
 		auto Successors() const { return MakeRange(successors.begin(), successors.end()); }
+		bool HasNSuccessors(uint32 N) const
+		{
+			return SuccessorsCount() == N;
+		}
+		bool HasNSuccessorsOrMore(uint32 N) const
+		{
+			return SuccessorsCount() >= N;
+		}
+		uint32 SuccessorsCount() const
+		{
+			return successors.size();
+		}
 		void AddSuccessor(BasicBlock* successor)
 		{
 			successors.push_back(successor);

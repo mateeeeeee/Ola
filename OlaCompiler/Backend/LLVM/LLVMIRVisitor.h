@@ -125,7 +125,7 @@ namespace ola
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
-		llvm::Type* ConvertOlaType(Type const*);
+		llvm::Type* ConvertToIRType(Type const*);
 		llvm::Type* ConvertClassDecl(ClassDecl const*);
 		llvm::FunctionType* ConvertMethodType(FuncType const*, llvm::Type*);
 		llvm::Type* GetStructType(Type const*);

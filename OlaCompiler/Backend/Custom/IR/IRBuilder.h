@@ -52,6 +52,12 @@ namespace ola
 		BranchInst* CreateBranch(BasicBlock* destination);
 		StoreInst* CreateStore(Value* val, Value* ptr);
 		LoadInst* CreateLoad(IRType* type, Value* ptr);
+		AllocaInst* CreateAlloca(IRType* type, Value* array_size);
+
+		ReturnInst* CreateRetVoid();
+
+		/// Create a 'ret <val>' instruction.
+		ReturnInst* CreateRet(Value* V);
 
 	private:
 		IRContext& ctx;

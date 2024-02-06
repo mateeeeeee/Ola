@@ -12,6 +12,11 @@ namespace ola
 	class IRBuilder;
 	class IRType;
 	class IRIntType;
+	class IRPtrType;
+	class IRFuncType;
+	class Function;
+	class Type;
+	class FuncType;
 
 	class IRVisitor : public ASTVisitor
 	{
@@ -111,5 +116,14 @@ namespace ola
 		IRIntType* int_type = nullptr;
 		IRIntType* bool_type = nullptr;
 		IRIntType* char_type = nullptr;
+
+	private:
+		void VisitFunctionDeclCommon(FunctionDecl const& decl, Function* func);
+
+		IRType* ConvertToIRType(Type const*);
+		IRType* ConvertClassDecl(ClassDecl const*);
+		IRFuncType* ConvertMethodType(FuncType const*, IRType*);
+		IRType* GetStructType(Type const*);
+		IRPtrType* GetPointerType(IRType*);
 	};
 }

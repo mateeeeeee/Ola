@@ -45,7 +45,7 @@ namespace ola
 	}
 	IRFuncType* Function::GetFunctionType() const
 	{
-		return cast<IRFuncType>(GetType());
+		return cast<IRFuncType>(GetValueType());
 	}
 
 	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, bool is_const, std::string_view name)

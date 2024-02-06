@@ -47,8 +47,28 @@ namespace ola
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(FunctionDecl const&, uint32)
+	void IRVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
+		FuncType const* type = function_decl.GetFuncType();
+		IRFuncType* function_type = cast<IRFuncType>(ConvertToIRType(type));
+		Linkage linkage = function_decl.IsPublic() || function_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+		Function* llvm_function = Create<Function>(function_type, module, linkage, function_decl.GetMangledName());
+
+		Argument* param_arg = llvm_function->GetArg(0);
+		if (isa<ClassType>(type->GetReturnType()))
+		{
+			Value* sret_value = param_arg;
+			++param_arg;
+			return_value = sret_value;
+		}
+		for (auto& param : function_decl.GetParamDecls())
+		{
+			Value* llvm_param = param_arg;
+			llvm_param->SetName(param->GetName());
+			value_map[param.get()] = llvm_param;
+			++param_arg;
+		}
+		if (!function_decl.HasDefinition()) return;
 
 	}
 
@@ -291,6 +311,156 @@ namespace ola
 	void IRVisitor::Visit(SuperExpr const&, uint32)
 	{
 
+	}
+
+	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)
+	{
+		if (func_decl.IsInline()) func->SetFuncAttribute(Function::Attribute_ForceInline);
+		else if (func_decl.IsNoInline()) func->SetFuncAttribute(Function::Attribute_NoInline);
+
+		BasicBlock* entry_block = Create<BasicBlock>(context, "entry", func);
+		builder->SetInsertPoint(entry_block);
+
+		for (auto& param : func_decl.GetParamDecls())
+		{
+			Value* arg_value = value_map[param.get()];
+			AllocaInst* arg_alloc = builder->CreateAlloca(arg_value->GetType(), nullptr);
+			builder->CreateStore(arg_value, arg_alloc);
+			if (isa<RefType>(param->GetType()))
+			{
+				Value* arg_ref = builder->CreateLoad(arg_value->GetType(), arg_alloc);
+				value_map[param.get()] = arg_ref;
+			}
+			else
+			{
+				value_map[param.get()] = arg_alloc;
+			}
+		}
+
+		if (!func->GetReturnType()->IsVoidType()) return_value = builder->CreateAlloca(func->GetReturnType(), nullptr);
+		exit_block = Create<BasicBlock>(context, "exit", func);
+
+		auto const& labels = func_decl.GetLabels();
+		for (LabelStmt const* label : labels)
+		{
+			std::string block_name = "label."; block_name += label->GetName();
+			BasicBlock* label_block = Create<BasicBlock>(context, block_name, func, exit_block);
+			label_blocks[block_name] = label_block;
+		}
+
+		func_decl.GetBodyStmt()->Accept(*this);
+
+		builder->SetInsertPoint(exit_block);
+		if (!func->GetReturnType()->IsVoidType())
+		{
+			//builder->CreateRet(Load(func->GetReturnType(), return_value));
+		}
+		else builder->CreateRetVoid();
+
+		std::vector<BasicBlock*> unreachable_blocks{};
+		for (auto&& block : *func) if (block.HasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
+
+		std::vector<BasicBlock*> empty_blocks{};
+		for (auto&& block : *func) if (block.Empty()) empty_blocks.push_back(&block);
+
+		for (BasicBlock* empty_block : empty_blocks)
+		{
+			builder->SetInsertPoint(empty_block);
+			builder->CreateAlloca(IRIntType::Get(context, 1), nullptr);
+			if (empty_block_successors.contains(empty_block))
+				builder->CreateBranch(empty_block_successors[empty_block]);
+			else builder->CreateBranch(exit_block);
+		}
+
+		for (auto&& block : *func)
+		{
+			if (block.GetTerminator() == nullptr)
+			{
+				builder->SetInsertPoint(&block);
+				builder->CreateBranch(exit_block);
+			}
+		}
+
+		label_blocks.clear();
+
+		exit_block = nullptr;
+		return_value = nullptr;
+
+		value_map[&func_decl] = func;
+	}
+
+	IRType* IRVisitor::ConvertToIRType(Type const* type)
+	{
+		switch (type->GetKind())
+		{
+		case TypeKind::Void:
+			return void_type;
+		case TypeKind::Bool:
+			return bool_type;
+		case TypeKind::Char:
+			return char_type;
+		case TypeKind::Int:
+			return int_type;
+		case TypeKind::Float:
+			return float_type;
+		case TypeKind::Array:
+		{
+			ArrayType const* array_type = cast<ArrayType>(type);
+			if (array_type->GetArraySize() > 0) return IRArrayType::Get(ConvertToIRType(array_type->GetBaseType()), array_type->GetArraySize());
+			else return GetPointerType(ConvertToIRType(array_type->GetBaseType()));
+		}
+		case TypeKind::Function:
+		{
+			FuncType const* function_type = cast<FuncType>(type);
+			std::span<QualType const> function_params = function_type->GetParams();
+
+			IRType* return_type = ConvertToIRType(function_type->GetReturnType());
+			bool return_type_struct = return_type->IsStructType();
+
+			std::vector<IRType*> param_types; param_types.reserve(function_params.size());
+			if (return_type_struct) param_types.push_back(GetPointerType(return_type));
+
+			for (auto const& func_param_type : function_params)
+			{
+				IRType* param_type = ConvertToIRType(func_param_type);
+				param_types.push_back(param_type);
+			}
+			return IRFuncType::Get(return_type_struct ? void_type : return_type, param_types);
+		}
+		case TypeKind::Class:
+		{
+			ClassType const* class_type = cast<ClassType>(type);
+			return ConvertClassDecl(class_type->GetClassDecl());
+		}
+		case TypeKind::Ref:
+		{
+			RefType const* ref_type = cast<RefType>(type);
+			return GetPointerType(ConvertToIRType(ref_type->GetReferredType()));
+		}
+		default:
+			OLA_UNREACHABLE();
+		}
+		return nullptr;
+	}
+
+	IRType* IRVisitor::ConvertClassDecl(ClassDecl const*)
+	{
+		return nullptr;
+	}
+
+	IRFuncType* IRVisitor::ConvertMethodType(FuncType const*, IRType*)
+	{
+		return nullptr;
+	}
+
+	IRType* IRVisitor::GetStructType(Type const*)
+	{
+		return nullptr;
+	}
+
+	IRPtrType* IRVisitor::GetPointerType(IRType* type)
+	{
+		return IRPtrType::Get(context, type);
 	}
 
 }

@@ -66,20 +66,7 @@ namespace ola
 		{
 			return GetFunctionType()->GetReturnType();
 		}
-		uint64 GetArgCount() const
-		{
-			return GetFunctionType()->GetParamCount();
-		}
-		IRType* GetArgType(uint32 i) const
-		{
-			return GetFunctionType()->GetParamType(i);
-		}
-		Argument* GetArg(uint32 i) const
-		{
-			OLA_ASSERT_MSG(i < arguments.size(), "Parameter index out of bounds");
-			return arguments[i];
-		}
-
+		
 		void RemoveFromParent();
 
 		BasicBlock const* GetEntryBlock() const
@@ -121,6 +108,20 @@ namespace ola
 		BasicBlock const& front() const { return *begin(); }
 		BasicBlock& back() { return *rbegin(); }
 		BasicBlock const& back() const { return *rbegin(); }
+
+
+		IRType* GetArgType(uint32 i) const
+		{
+			return GetFunctionType()->GetParamType(i);
+		}
+		Argument* GetArg(uint32 i) const
+		{
+			return i < arguments.size() ? arguments[i] : nullptr;
+		}
+		uint64 GetArgCount() const
+		{
+			return GetFunctionType()->GetParamCount();
+		}
 
 		static bool ClassOf(Value const* V)
 		{

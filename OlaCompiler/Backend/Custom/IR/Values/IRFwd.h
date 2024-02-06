@@ -11,7 +11,9 @@ namespace ola
 	class Instruction;
 	class StoreInst;
 	class LoadInst;
+	class AllocaInst;
 	class BranchInst;
+	class ReturnInst;
 	class BasicBlock;
 	class Function;
 	class GlobalVariable;
