@@ -17,6 +17,7 @@ set(UTILITY_FILES
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
   Utility/Managed.h
+  Utility/ConstexprString.h
 )
 
 
@@ -116,6 +117,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIR/MachineFunction.cpp
   Backend/Custom/Codegen/x86-64/x64MachineModule.h
   Backend/Custom/Codegen/x86-64/x64MachineModule.cpp
+  Backend/Custom/Codegen/x86-64/x86_64.h
 )
 
 set(COMPILER_FILES
