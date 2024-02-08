@@ -76,9 +76,26 @@ namespace ola
 						MachineInst* ret = new MachineInst(MachineOpCode::Return);
 						if (!ret_inst->IsVoid())
 						{
-							MachineOperand ret_operand = virtual_register_allocator.Allocate(ret_inst->GetReturnValue());
-							ret->AddOperand(ret_operand);
+							Value* ret_value = ret_inst->GetReturnValue();
+							if (ConstantInt* constant_int = dyn_cast<ConstantInt>(ret_value))
+							{
+								MachineOperand ret_operand(MO_IntImmediate);
+								ret_operand.SetImm(constant_int->GetValue());
+								ret->AddOperand(ret_operand);
+							}
+							else if (ConstantFloat* constant_float = dyn_cast<ConstantFloat>(ret_value))
+							{
+								MachineOperand ret_operand(MO_FPImmediate);
+								ret_operand.SetFPImm(constant_float->GetValue());
+								ret->AddOperand(ret_operand);
+							}
+							else
+							{
+								//MachineOperand ret_operand = virtual_register_allocator.Allocate(ret_inst->GetReturnValue());
+							}
+							
 						}
+						bb_map[&bb]->GetInstructions().PushBack(ret);
 					}
 					else
 					{

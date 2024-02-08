@@ -6,7 +6,7 @@ namespace ola
 
 	User::~User()
 	{
-		for (Use* op : operands) delete op;
+		for (Use*& op : operands) delete op;
 	}
 
 	Use** User::GetOperandList()
@@ -67,15 +67,15 @@ namespace ola
 	User::User(ValueKind kind, IRType* type, uint32 num_operands) : Value(kind, type)
 	{
 		operands.resize(num_operands);
-		for (Use* op : operands) op = new Use(this);
+		for (Use*& op : operands) op = new Use(this);
 	}
 
 	void User::ResizeOperands(uint32 op_count)
 	{
-		for (Use* op : operands) delete op;
+		for (Use*& op : operands) delete op;
 		operands.clear();
 		operands.resize(op_count);
-		for (Use* op : operands) op = new Use(this);
+		for (Use*& op : operands) op = new Use(this);
 	}
 
 }

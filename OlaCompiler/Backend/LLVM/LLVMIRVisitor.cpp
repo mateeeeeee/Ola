@@ -489,7 +489,7 @@ namespace ola
 			OLA_ASSERT(return_expr_value);
 
 			if (current_function->getReturnType()->isPointerTy()) builder.CreateStore(return_expr_value, return_value);
-			else value_map[&return_stmt] = Store(return_expr_value, return_value);
+			else return_value = return_expr_value;
 		}
 		builder.CreateBr(exit_block);
 		llvm::BasicBlock* return_block = llvm::BasicBlock::Create(context, "return", current_function, current_block->getNextNode());

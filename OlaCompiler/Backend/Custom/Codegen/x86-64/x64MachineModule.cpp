@@ -1,4 +1,5 @@
 #include "x64MachineModule.h"
+#include "../MIR/MIR.h"
 #include "Backend/Custom/IR/IR.h"
 
 namespace ola
@@ -7,25 +8,30 @@ namespace ola
 
 	x64MachineModule::x64MachineModule(IRModule& ir_module) : MachineModule(ir_module)
 	{
+	}
+
+	void x64MachineModule::Emit()
+	{
 		EmitLn<None>(".intel_syntax noprefix");
 		EmitLn<Text>(".section .text");
 		EmitLn<Data>(".section .data");
 		EmitLn<Const>(".section .rodata");
 		EmitLn<BSS>(".section .bss");
-
 		EmitGlobalVariables();
-	}
 
-	void x64MachineModule::Emit()
-	{
-		EmitLn<Text>(".globl main");
-		EmitLn<Text>("main:");
-		EmitLn<Text>("push    rbp");
-		EmitLn<Text>("mov     rbp, rsp");
-		EmitLn<Text>("mov     dword ptr[rbp - 4], 0");
-		EmitLn<Text>("mov eax, 0");
-		EmitLn<Text>("pop rbp");
-		EmitLn<Text>("ret");
+		for (auto& machine_function : functions)
+		{
+			EmitFunction(machine_function);
+		}
+
+		//EmitLn<Text>(".globl main");
+		//EmitLn<Text>("main:");
+		//EmitLn<Text>("push    rbp");
+		//EmitLn<Text>("mov     rbp, rsp");
+		//EmitLn<Text>("mov     dword ptr[rbp - 4], 0");
+		//EmitLn<Text>("mov eax, 0");
+		//EmitLn<Text>("pop rbp");
+		//EmitLn<Text>("ret");
 	}
 
 	void x64MachineModule::EmitGlobalVariables()
@@ -66,6 +72,33 @@ namespace ola
 				//.globl externalVar
 				//.lcomm externalVar, 8
 			}
+		}
+	}
+
+	void x64MachineModule::EmitFunction(MachineFunction& mf)
+	{
+		if (mf.GetFunction().GetLinkage() == Linkage::External) EmitLn<Text>(".globl {}", mf.GetName());
+		EmitLn<Text>("{}:", mf.GetName());
+
+		for (MachineBasicBlock& mbb : mf) EmitBasicBlock(mbb);
+	}
+
+	void x64MachineModule::EmitBasicBlock(MachineBasicBlock& mbb)
+	{
+		for (MachineInst& minst : mbb) EmitInstruction(minst);
+	}
+
+	void x64MachineModule::EmitInstruction(MachineInst& minst)
+	{
+		if (minst.GetOpCode() == MachineOpCode::Return)
+		{
+			if (minst.GetOpCount() > 0)
+			{
+				int64 ret_value = minst.Op<0>().GetImm();
+				EmitLn<Text>("mov rax, {}", ret_value);
+
+			}
+			EmitLn<Text>("ret");
 		}
 	}
 

@@ -3,8 +3,9 @@
 
 namespace ola
 {
+	class MachineBasicBlock;
+	class MachineInst;
 
-	class IRModule;
 	class x64MachineModule : public MachineModule
 	{
 	public:
@@ -14,5 +15,8 @@ namespace ola
 
 	private:
 		void EmitGlobalVariables();
+		void EmitFunction(MachineFunction&);
+		void EmitBasicBlock(MachineBasicBlock&);
+		void EmitInstruction(MachineInst&);
 	};
 }

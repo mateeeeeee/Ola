@@ -152,13 +152,14 @@ namespace ola
 			return_expr->Accept(*this);
 			Value* return_expr_value = value_map[return_expr];
 			OLA_ASSERT(return_expr_value);
+
 			if (current_function->GetReturnType()->IsPointerType())
 			{
 				builder->CreateStore(return_expr_value, return_value);
 			}
 			else
 			{
-				Store(return_expr_value, return_value);
+				return_value = return_expr_value;
 			}
 		}
 		builder->CreateBranch(exit_block);
@@ -353,7 +354,7 @@ namespace ola
 		builder->SetInsertPoint(exit_block);
 		if (!func->GetReturnType()->IsVoidType())
 		{
-			builder->CreateRet(Load(func->GetReturnType(), return_value));
+			builder->CreateRet(return_value);
 		}
 		else builder->CreateRetVoid();
 

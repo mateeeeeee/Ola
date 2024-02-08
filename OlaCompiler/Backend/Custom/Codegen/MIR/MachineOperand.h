@@ -1,4 +1,5 @@
 #pragma once
+#include <bit>
 #include "MIRFwd.h"
 
 namespace ola
@@ -46,12 +47,12 @@ namespace ola
 		double GetFPImm() const
 		{
 			OLA_ASSERT(IsFPImmediate());
-			return fp_imm;
+			return std::bit_cast<double>(fp_imm);
 		}
 		void SetFPImm(double v)
 		{
 			OLA_ASSERT(IsFPImmediate());
-			fp_imm = v;
+			fp_imm = std::bit_cast<uint64>(v);
 		}
 
 		uint32 GetReg() const
@@ -83,7 +84,7 @@ namespace ola
 		{
 			uint32 reg;
 			int64  int_imm;
-			double fp_imm;
+			uint64 fp_imm;
 			uint64 address;
 		};
 	};

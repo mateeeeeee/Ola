@@ -19,6 +19,8 @@ namespace ola
 		MachineFunction const* GetParent() const { return parent; }
 		MachineFunction* GetParent() { return parent; }
 
+		IList<MachineInst>& GetInstructions() { return instructions; }
+		IList<MachineInst> const& GetInstructions() const { return instructions; }
 
 		std::string_view GetName() const 
 		{

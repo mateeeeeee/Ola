@@ -9,6 +9,7 @@ namespace ola
 {
 	class IRModule;
 	class GlobalVariable;
+	class MachineFunction;
 
 	class MachineModule
 	{
