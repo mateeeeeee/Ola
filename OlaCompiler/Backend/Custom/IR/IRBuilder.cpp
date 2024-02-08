@@ -139,6 +139,16 @@ namespace ola
 		return Insert(Create<ReturnInst>(ctx, V));
 	}
 
+	UnaryOperator* IRBuilder::CreateUnaryOp(UnaryOpcode opcode, Value* op)
+	{
+		return Insert(Create<UnaryOperator>(opcode, op));
+	}
+
+	BinaryOperator* IRBuilder::CreateBinaryOp(BinaryOpcode opcode, Value* op1, Value* op2)
+	{
+		return Insert(Create<BinaryOperator>(opcode, op1, op2));
+	}
+
 	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
 	InstTy* IRBuilder::Insert(InstTy* inst)
 	{

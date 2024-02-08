@@ -21,7 +21,7 @@ namespace ola
 		BinaryInstruction(ValueKind kind, IRType* type, Value* op1, Value* op2, BasicBlock* bb = nullptr);
 	};
 
-	enum BinaryOpcode
+	enum BinaryOpcode : uint8
 	{
 		Binary_Add,
 		Binary_Sub

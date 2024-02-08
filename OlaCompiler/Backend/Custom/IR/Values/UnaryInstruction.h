@@ -21,7 +21,7 @@ namespace ola
 		UnaryInstruction(ValueKind kind, IRType* type, Value* op, BasicBlock* bb = nullptr);
 	};
 
-	enum UnaryOpcode
+	enum UnaryOpcode : uint8
 	{
 		Unary_Neg,
 		Unary_Not

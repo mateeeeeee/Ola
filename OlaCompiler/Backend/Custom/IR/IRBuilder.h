@@ -53,11 +53,11 @@ namespace ola
 		StoreInst* CreateStore(Value* val, Value* ptr);
 		LoadInst* CreateLoad(IRType* type, Value* ptr);
 		AllocaInst* CreateAlloca(IRType* type, Value* array_size);
-
 		ReturnInst* CreateRetVoid();
-
-		/// Create a 'ret <val>' instruction.
 		ReturnInst* CreateRet(Value* V);
+
+		UnaryOperator* CreateUnaryOp(UnaryOpcode opcode, Value* op);
+		BinaryOperator* CreateBinaryOp(BinaryOpcode opcode, Value* op1, Value* op2);
 
 	private:
 		IRContext& ctx;

@@ -1,5 +1,6 @@
 #pragma once
 #include <bit>
+#include <string>
 #include "MIRFwd.h"
 
 namespace ola
@@ -9,30 +10,39 @@ namespace ola
 		MO_Register,
 		MO_IntImmediate,
 		MO_FPImmediate,
-		MO_MemoryRef
+		MO_MemoryRef, 
+		MO_FrameIndex,
+		MO_GlobalVariable
 	};
+
+	struct MemoryRef
+	{
+		uint32 base_reg = -1;
+		int64 offset = 0;
+		uint32 index_reg = -1;
+		int32 scale;
+	};
+
 	class MachineOperand
 	{
 		friend class MachineInst;
+
 	public:
-		MachineOperand() = default;
+		MachineOperand() : memory() {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
-		explicit MachineOperand(MachineOperandKind kind) : kind(kind), address(0) {}
+		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory() {}
 
 		MachineOperandKind GetKind() const { return kind; }
 
 		MachineInst* GetParent() { return parent; }
 		MachineInst const* GetParent() const { return parent; }
 
-		uint32 GetOperandIdx() const
-		{
-			return -1;
-		}
-
 		bool IsReg() const { return kind == MO_Register; }
 		bool IsFPImmediate() const { return kind == MO_FPImmediate; }
 		bool IsIntImmediate() const { return kind == MO_IntImmediate; }
 		bool IsMemoryRef() const { return kind == MO_MemoryRef; }
+		bool IsFrameIndex() const { return kind == MO_FrameIndex; }
+		bool IsGlobalVariable() const { return kind == MO_GlobalVariable; }
 
 		int64 GetImm() const 
 		{
@@ -66,16 +76,25 @@ namespace ola
 			reg = r;
 		}
 
-		uint64 GetAddress() const
+		MemoryRef GetMemoryRef() const
 		{
 			OLA_ASSERT(IsMemoryRef());
-			return address;
+			return memory;
 		}
-		void SetAddress(uint64 addr)
+		void SetMemoryRef(uint32 base_reg, int64 offset, uint32 index_reg = -1, int32 scale = 1)
 		{
 			OLA_ASSERT(IsMemoryRef());
-			address = addr;
+			memory.base_reg = base_reg;
+			memory.offset = offset;
+			memory.index_reg = index_reg;
+			memory.scale = scale;
 		}
+
+		void SetGlobalVariable(std::string_view name)
+		{
+			global_variable_name = name;
+		}
+		std::string_view GetGlobalVariable() const { return global_variable_name; }
 
 	private:
 		MachineOperandKind kind;
@@ -85,8 +104,9 @@ namespace ola
 			uint32 reg;
 			int64  int_imm;
 			uint64 fp_imm;
-			uint64 address;
+			MemoryRef memory;
 		};
+		std::string global_variable_name;
 	};
 
 }

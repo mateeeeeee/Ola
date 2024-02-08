@@ -28,4 +28,7 @@ namespace ola
 	class ConstantArray;
 	class ConstantStruct;
 	class SwitchInst;
+
+	enum UnaryOpcode : uint8;
+	enum BinaryOpcode : uint8;
 }
