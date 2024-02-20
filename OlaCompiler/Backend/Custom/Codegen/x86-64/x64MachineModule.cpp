@@ -96,8 +96,21 @@ namespace ola
 		{
 			if (minst.GetOpCount() > 0)
 			{
-				int64 ret_value = minst.Op<0>().GetImm();
-				EmitLn<Text>("mov {}, {}", ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register), ret_value);
+
+				IRType* ret_type = minst.GetFunction()->GetFunction().GetReturnType();
+				if (ret_type->IsFloatType())
+				{
+					double ret_value = minst.Op<0>().GetFPImm();
+					static uint32 i = 0;
+					std::string float_literal_label = "__return" + std::to_string(i++);
+					EmitLn<Const>("{} dq {}", float_literal_label, ret_value);
+					EmitLn<Text>("movss {}, [{}]", ToString(x86_64_CallInfo::MicrosoftX64ABI.fp_return_register), float_literal_label);
+				}
+				else if (ret_type->IsIntegerType())
+				{
+					int64 ret_value = minst.Op<0>().GetImm();
+					EmitLn<Text>("mov {}, {}", ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register), ret_value);
+				}
 
 			}
 			EmitLn<Text>("ret");
