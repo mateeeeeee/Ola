@@ -13,7 +13,8 @@ namespace ola
 		XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15
 	};
 
-	struct x86_64_CallInfo {
+	namespace x86_64_CallInfo 
+	{
 		struct UnixSystemVABI 
 		{
 			x86_64_Register arg_registers[6] = { x86_64_Register::RDI, x86_64_Register::RSI, x86_64_Register::RDX, x86_64_Register::RCX, x86_64_Register::R8, x86_64_Register::R9 };
@@ -46,8 +47,9 @@ namespace ola
 		case 32: return ConstexprStringValue<'e', r, 'x'>;
 		case 16: return ConstexprStringValue<r, 'x'>;
 		case 8: return ConstexprStringValue<r, 'l'>;
-		default: OLA_ASSERT(false);
 		}
+		OLA_UNREACHABLE();
+		return "";
 	}
 	template <uint32 r>
 	constexpr auto ExtendedGPR(uint32 size) 
@@ -58,8 +60,9 @@ namespace ola
 		case 32: return ConstexprStringValue<'r', '0' + r, 'd'>;
 		case 16: return ConstexprStringValue<'r', '0' + r, 'w'>;
 		case 8:  return ConstexprStringValue<'r', '0' + r, 'b'>;
-		default: OLA_ASSERT(false);
 		}
+		OLA_UNREACHABLE();
+		return "";
 	}
 	template <char c1, char c2>
 	constexpr auto Special(uint32 size)
@@ -69,12 +72,12 @@ namespace ola
 		case 64: return ConstexprStringValue<'r', c1, c2>;
 		case 32: return ConstexprStringValue<'e', c1, c2>;
 		case 16: return ConstexprStringValue<c1, c2>;
-		case 8: return  ConstexprStringValue<< c1, c2, 'l'>;
-		default: OLA_ASSERT(false);
+		case 8: return  ConstexprStringValue< c1, c2, 'l'>;
 		}
+		OLA_UNREACHABLE();
+		return "";
 	}
-
-	constexpr auto ToString(x86_64_Register reg, uint32 size)
+	constexpr auto ToString(x86_64_Register reg, uint32 size = 64)
 	{
 		using enum x86_64_Register;
 		if (size == 0) size = 64;
@@ -99,8 +102,8 @@ namespace ola
 		case RIP: return Special<'i', 'p'>(size);
 		}
 		OLA_UNREACHABLE();
+		return "";
 	}
-
 	constexpr auto ToString(x86_64_FPRegister reg)
 	{
 		switch (reg) 

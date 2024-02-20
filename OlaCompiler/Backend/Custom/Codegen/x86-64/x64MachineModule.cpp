@@ -1,6 +1,8 @@
 #include "x64MachineModule.h"
-#include "../MIR/MIR.h"
+#include "x86_64.h"
 #include "Backend/Custom/IR/IR.h"
+#include "Backend/Custom/Codegen/MIR/MIR.h"
+
 
 namespace ola
 {
@@ -95,7 +97,7 @@ namespace ola
 			if (minst.GetOpCount() > 0)
 			{
 				int64 ret_value = minst.Op<0>().GetImm();
-				EmitLn<Text>("mov rax, {}", ret_value);
+				EmitLn<Text>("mov {}, {}", ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register), ret_value);
 
 			}
 			EmitLn<Text>("ret");
