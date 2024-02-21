@@ -41,6 +41,7 @@ namespace ola
 			for (auto const& bb : ir_function)
 			{
 				MachineBasicBlock* machine_bb = new MachineBasicBlock(mf, &bb);
+
 				mf.PushBack(machine_bb);
 				bb_map[&bb] = machine_bb;
 			}
@@ -95,7 +96,7 @@ namespace ola
 							}
 							
 						}
-						bb_map[&bb]->GetInstructions().PushBack(ret);
+						bb_map[&bb]->Insert(ret);
 					}
 					else
 					{

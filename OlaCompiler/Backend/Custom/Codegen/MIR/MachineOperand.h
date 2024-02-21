@@ -28,7 +28,7 @@ namespace ola
 		friend class MachineInst;
 
 	public:
-		MachineOperand() : memory() {}
+		MachineOperand() : memory(), kind(MO_Register) {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
 		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory() {}
 
@@ -96,6 +96,17 @@ namespace ola
 		}
 		std::string_view GetGlobalVariable() const { return global_variable_name; }
 
+		void SetFrameOffset(int32 _frame_offset)
+		{
+			OLA_ASSERT(IsFrameIndex());
+			frame_offset = _frame_offset;
+		}
+		int32 GetFrameOffset() const 
+		{ 
+			OLA_ASSERT(IsFrameIndex());
+			return frame_offset; 
+		}
+
 	private:
 		MachineOperandKind kind;
 		MachineInst* parent = nullptr;
@@ -105,6 +116,7 @@ namespace ola
 			int64  int_imm;
 			uint64 fp_imm;
 			MemoryRef memory;
+			int32 frame_offset;
 		};
 		std::string global_variable_name;
 	};

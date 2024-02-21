@@ -5,7 +5,7 @@
 namespace ola
 {
 
-	MachineInst::MachineInst(MachineOpCode opcode) : opcode(opcode)
+	MachineInst::MachineInst(MachineOpCode opcode) : opcode(opcode), parent(nullptr)
 	{
 
 	}

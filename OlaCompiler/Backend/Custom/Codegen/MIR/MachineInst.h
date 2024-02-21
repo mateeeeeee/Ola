@@ -16,16 +16,24 @@ namespace ola
 		Return
 	};
 
+	class MachineBasicBlock;
+	class MachineFunction;
+
 	class MachineInst : public IListNode<MachineInst>
 	{
-		friend class MachineFunction;
-		friend class MachineBasicBlock;
+		friend MachineFunction;
+		friend MachineBasicBlock;
 
 	public:
 		explicit MachineInst(MachineOpCode opcode);
+		MachineInst(MachineOpCode opcode, MachineBasicBlock* _parent) : MachineInst(opcode) 
+		{
+			parent = _parent;
+		}
 		OLA_NONCOPYABLE(MachineInst)
 		~MachineInst();
 
+		void SetParent(MachineBasicBlock* _parent) { parent = _parent; }
 		MachineBasicBlock const* GetParent() const { return parent; }
 		MachineBasicBlock* GetParent() { return parent; }
 
@@ -66,8 +74,5 @@ namespace ola
 		MachineBasicBlock* parent;
 		std::vector<MachineOperand> operands;
 		MachineOpCode opcode;
-
-	private:
-		void SetParent(MachineBasicBlock* P) { parent = P; }
 	};
 }

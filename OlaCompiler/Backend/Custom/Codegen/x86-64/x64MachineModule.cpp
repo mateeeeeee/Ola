@@ -1,7 +1,7 @@
-#include "x64MachineModule.h"
-#include "x86_64.h"
 #include "Backend/Custom/IR/IR.h"
 #include "Backend/Custom/Codegen/MIR/MIR.h"
+#include "x64MachineModule.h"
+#include "x86_64.h"
 
 
 namespace ola
@@ -96,8 +96,9 @@ namespace ola
 		{
 			if (minst.GetOpCount() > 0)
 			{
-
-				IRType* ret_type = minst.GetFunction()->GetFunction().GetReturnType();
+				auto* MBB = minst.GetParent();
+				auto* mf = MBB->GetParent();
+				IRType* ret_type = mf->GetFunction().GetReturnType();
 				if (ret_type->IsFloatType())
 				{
 					double ret_value = minst.Op<0>().GetFPImm();

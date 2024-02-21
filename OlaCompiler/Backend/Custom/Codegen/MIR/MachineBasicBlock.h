@@ -19,6 +19,9 @@ namespace ola
 		MachineFunction const* GetParent() const { return parent; }
 		MachineFunction* GetParent() { return parent; }
 
+		void Insert(MachineInst* minst, MachineInst* insert_before);
+		void Insert(MachineInst* minst);
+
 		IList<MachineInst>& GetInstructions() { return instructions; }
 		IList<MachineInst> const& GetInstructions() const { return instructions; }
 

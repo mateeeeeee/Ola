@@ -11,6 +11,18 @@ namespace ola
 	MachineBasicBlock::MachineBasicBlock() = default;
 	MachineBasicBlock::~MachineBasicBlock() = default;
 
+	void MachineBasicBlock::Insert(MachineInst* minst, MachineInst* insert_before)
+	{
+		instructions.Insert(minst, insert_before);
+		minst->SetParent(this);
+	}
+
+	void MachineBasicBlock::Insert(MachineInst* minst)
+	{
+		instructions.PushBack(minst);
+		minst->SetParent(this);
+	}
+
 	uint32 MachineBasicBlock::Size() const
 	{
 		return (uint32)instructions.Size();

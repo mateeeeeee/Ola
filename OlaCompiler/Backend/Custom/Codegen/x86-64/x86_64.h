@@ -127,6 +127,8 @@ namespace ola
 		default: 
 			OLA_UNREACHABLE();
 		}
+
+		return "";
 	}
 
 	enum class x64ConditionCode
