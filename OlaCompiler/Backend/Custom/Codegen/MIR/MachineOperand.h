@@ -34,6 +34,7 @@ namespace ola
 
 		MachineOperandKind GetKind() const { return kind; }
 
+		void SetParent(MachineInst* _parent) { parent = _parent; }
 		MachineInst* GetParent() { return parent; }
 		MachineInst const* GetParent() const { return parent; }
 
@@ -107,6 +108,22 @@ namespace ola
 			return frame_offset; 
 		}
 
+		void SetDef(bool _is_def)
+		{
+			OLA_ASSERT(IsReg());
+			is_def = _is_def;
+		}
+		void SetUse(bool _is_use)
+		{
+			SetDef(!_is_use);
+		}
+		bool IsDef() const { return is_def; }
+		bool IsUse() const 
+		{
+			OLA_ASSERT(IsReg());
+			return !is_def;
+		}
+
 	private:
 		MachineOperandKind kind;
 		MachineInst* parent = nullptr;
@@ -119,6 +136,8 @@ namespace ola
 			int32 frame_offset;
 		};
 		std::string global_variable_name;
+
+		bool is_def = false;
 	};
 
 }
