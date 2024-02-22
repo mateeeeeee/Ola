@@ -1,11 +1,10 @@
 #pragma once
-#include "Value.h"
-
+#include "Constant.h"
 
 namespace ola
 {
 
-
+	//Constant(ValueKind kind, IRType* ty, uint32 num_ops) : User(kind, ty, num_ops) {}
 	enum class Linkage
 	{
 		Unknown,
@@ -13,7 +12,7 @@ namespace ola
 		External
 	};
 
-	class GlobalValue : public Value
+	class GlobalValue : public Constant
 	{
 	public:
 		OLA_NONCOPYABLE(GlobalValue)
@@ -39,7 +38,7 @@ namespace ola
 		IRType* value_type;
 
 	protected:
-		GlobalValue(ValueKind kind, IRType* type, IRModule& module, Linkage linkage = Linkage::Unknown) : Value(kind, IRPtrType::Get(type)), module(module), linkage(linkage), value_type(type)
+		GlobalValue(ValueKind kind, IRType* type, IRModule& module, uint32 num_ops, Linkage linkage = Linkage::Unknown) : Constant(kind, IRPtrType::Get(type), num_ops), module(module), linkage(linkage), value_type(type)
 		{}
 	};
 

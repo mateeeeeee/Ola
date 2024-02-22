@@ -1,11 +1,12 @@
 #include "GlobalValue.h"
 #include "BasicBlock.h"
 #include "Backend/Custom/IR/IRModule.h"
+#include "Backend/Custom/IR/Values/Constant.h"
 
 namespace ola
 {
 	Function::Function(IRFuncType* func_type, IRModule& module, Linkage linkage, std::string_view name)
-		: GlobalValue(ValueKind_Function, func_type, module, linkage)
+		: GlobalValue(ValueKind_Function, func_type, module, 0, linkage)
 	{
 		SetName(name);
 
@@ -49,9 +50,10 @@ namespace ola
 	}
 
 	GlobalVariable::GlobalVariable(IRType* type, IRModule& module, Linkage linkage, Value* init, bool is_const, std::string_view name)
-		: GlobalValue(ValueKind_GlobalVariable, type, module, linkage), name(name), init(init), is_const(is_const)
+		: GlobalValue(ValueKind_GlobalVariable, type, module, init != nullptr, linkage), name(name), init(init), is_const(is_const)
 	{
 		module.AddVariable(this);
+		OLA_ASSERT_MSG(isa<Constant>(init), "Init value for global variables needs to be Constant!");
 	}
 	GlobalVariable::~GlobalVariable()
 	{

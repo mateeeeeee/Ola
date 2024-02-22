@@ -88,9 +88,105 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(VarDecl const&, uint32)
+	void IRVisitor::Visit(VarDecl const& var_decl, uint32)
 	{
+		Type const* var_type = var_decl.GetType().GetTypePtr();
+		bool const is_const = var_decl.GetType().IsConst();
+		IRType* ir_type = ConvertToIRType(var_type);
+		bool const is_array = isa<ArrayType>(var_type);
+		bool const is_class = isa<ClassType>(var_type);
+		bool const is_ref = isa<RefType>(var_type);
 
+		if (var_decl.IsGlobal())
+		{
+			if (var_decl.IsExtern())
+			{
+				GlobalVariable* global_var = Create<GlobalVariable>(ir_type, module, Linkage::External, nullptr, is_const, var_decl.GetName());
+				value_map[&var_decl] = global_var;
+			}
+			else if (Expr const* init_expr = var_decl.GetInitExpr())
+			{
+				if (is_array)
+				{
+					ArrayType const* array_type = cast<ArrayType>(var_type);
+					IRType* ir_element_type = ConvertToIRType(array_type->GetBaseType());
+
+					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
+					{
+						OLA_ASSERT(init_list_expr->IsConstexpr());
+						init_list_expr->Accept(*this);
+
+						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+						GlobalVariable* global_array = Create<GlobalVariable>(ir_type, module, linkage, cast<Constant>(value_map[init_list_expr]), is_const, var_decl.GetName());
+						value_map[&var_decl] = global_array;
+					}
+					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
+					{
+						ConstantString* constant = context.GetConstantString(string->GetString());
+						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+						GlobalVariable* global_string = Create<GlobalVariable>(ir_type, module, linkage, constant, is_const, var_decl.GetName());
+						value_map[&var_decl] = global_string;
+					}
+					else OLA_ASSERT(false);
+				}
+				else
+				{
+					OLA_ASSERT(init_expr->IsConstexpr());
+					init_expr->Accept(*this);
+					Value* init_value = value_map[init_expr];
+					Constant* constant_init_value = dyn_cast<Constant>(init_value);
+					OLA_ASSERT(constant_init_value);
+
+					Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+					GlobalVariable* global_var = Create<GlobalVariable>(ir_type, module, linkage, constant_init_value, is_const, var_decl.GetName());
+					value_map[&var_decl] = global_var;
+				}
+			}
+			else if (is_class)
+			{
+				ClassType const* class_type = cast<ClassType>(var_type);
+				ClassDecl const* class_decl = class_type->GetClassDecl();
+
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				std::vector<Constant*> initializers;
+				if (class_decl->IsPolymorphic())
+				{
+					initializers.push_back(vtable_map[class_decl]);
+				}
+
+				ClassDecl const* curr_class_decl = class_decl;
+				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+				{
+					for (auto const& base_field : base_class_decl->GetFields())
+					{
+						initializers.push_back(cast<Constant>(value_map[base_field.get()]));
+					}
+					curr_class_decl = base_class_decl;
+				}
+				for (uint64 i = 0; i < fields.size(); ++i)
+				{
+					initializers.push_back(cast<Constant>(value_map[fields[i].get()]));
+				}
+
+				OLA_ASSERT_MSG(false, "todo");
+				//IRStructType* llvm_struct_type = cast<IRStructType>(ir_type);
+				//GlobalVariable* global_var = new llvm::GlobalVariable(module, ir_type, false, llvm::GlobalValue::ExternalLinkage,
+				//	ConstantStruct::get(llvm_struct_type, initializers), var_decl.GetName());
+				//value_map[&var_decl] = global_var;
+			}
+			else if (is_ref)
+			{
+				OLA_ASSERT_MSG(false, "todo");
+			}
+			else
+			{
+				Constant* constant_init_value = Constant::GetNullValue(ir_type);
+				Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+
+				GlobalVariable* global_var = Create<GlobalVariable>(ir_type, module, linkage, constant_init_value, is_const, var_decl.GetName());
+				value_map[&var_decl] = global_var;
+			}
+		}
 	}
 
 	void IRVisitor::Visit(TagDecl const&, uint32)
