@@ -21,9 +21,9 @@ namespace ola
 		EmitLn<BSS>(".section .bss");
 		EmitGlobalVariables();
 
-		for (auto& machine_function : functions)
+		for (auto& MF : functions)
 		{
-			EmitFunction(machine_function);
+			EmitFunction(MF);
 		}
 
 		//EmitLn<Text>(".globl main");
@@ -77,31 +77,31 @@ namespace ola
 		}
 	}
 
-	void x64MachineModule::EmitFunction(MachineFunction& mf)
+	void x64MachineModule::EmitFunction(MachineFunction& MF)
 	{
-		if (mf.GetFunction().GetLinkage() == Linkage::External) EmitLn<Text>(".globl {}", mf.GetName());
-		EmitLn<Text>("{}:", mf.GetName());
+		if (MF.GetFunction().GetLinkage() == Linkage::External) EmitLn<Text>(".globl {}", MF.GetName());
+		EmitLn<Text>("{}:", MF.GetName());
 
-		for (MachineBasicBlock& mbb : mf) EmitBasicBlock(mbb);
+		for (MachineBasicBlock& MBB : MF) EmitBasicBlock(MBB);
 	}
 
-	void x64MachineModule::EmitBasicBlock(MachineBasicBlock& mbb)
+	void x64MachineModule::EmitBasicBlock(MachineBasicBlock& MBB)
 	{
-		for (MachineInst& minst : mbb) EmitInstruction(minst);
+		for (MachineInst& MI : MBB) EmitInstruction(MI);
 	}
 
-	void x64MachineModule::EmitInstruction(MachineInst& minst)
+	void x64MachineModule::EmitInstruction(MachineInst& MI)
 	{
-		if (minst.GetOpCode() == MachineOpCode::Return)
+		if (MI.GetOpCode() == MachineOpCode::Return)
 		{
-			if (minst.GetOpCount() > 0)
+			if (MI.GetNumOperands() > 0)
 			{
-				auto* MBB = minst.GetParent();
-				auto* mf = MBB->GetParent();
-				IRType* ret_type = mf->GetFunction().GetReturnType();
+				auto* MBB = MI.GetParent();
+				auto* MF = MBB->GetParent();
+				IRType* ret_type = MF->GetFunction().GetReturnType();
 				if (ret_type->IsFloatType())
 				{
-					double ret_value = minst.Op<0>().GetFPImm();
+					double ret_value = MI.Op<0>().GetFPImm();
 					static uint32 i = 0;
 					std::string float_literal_label = "__return" + std::to_string(i++);
 					EmitLn<Const>("{} dq {}", float_literal_label, ret_value);
@@ -109,7 +109,7 @@ namespace ola
 				}
 				else if (ret_type->IsIntegerType())
 				{
-					int64 ret_value = minst.Op<0>().GetImm();
+					int64 ret_value = MI.Op<0>().GetImm();
 					EmitLn<Text>("mov {}, {}", ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register), ret_value);
 				}
 

@@ -13,12 +13,16 @@ namespace ola
 
 	void MachineBasicBlock::Insert(MachineInst* minst, MachineInst* insert_before)
 	{
+		uint32 idx = insert_before->GetInstrNumber();
+		minst->SetInstrNumber(idx);
 		instructions.Insert(minst, insert_before);
 		minst->SetParent(this);
+		insert_before->SetInstrNumber(idx + 1);
 	}
 
 	void MachineBasicBlock::Insert(MachineInst* minst)
 	{
+		minst->SetInstrNumber(instructions.Size());
 		instructions.PushBack(minst);
 		minst->SetParent(this);
 	}

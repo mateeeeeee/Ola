@@ -33,6 +33,8 @@ namespace ola
 		OLA_NONCOPYABLE(MachineInst)
 		~MachineInst();
 
+		void SetInstrNumber(uint32 _instr_number) { instr_number = _instr_number; }
+		uint32 GetInstrNumber() const { return instr_number; }
 		void SetParent(MachineBasicBlock* _parent) { parent = _parent; }
 		MachineBasicBlock const* GetParent() const { return parent; }
 		MachineBasicBlock* GetParent() { return parent; }
@@ -41,7 +43,7 @@ namespace ola
 		MachineFunction* GetFunction();
 
 		MachineOpCode GetOpCode() const { return opcode; }
-		uint32 GetOpCount() const;
+		uint32 GetNumOperands() const;
 
 		template<uint32 i>
 		MachineOperand& Op()
@@ -72,6 +74,7 @@ namespace ola
 
 	private:
 		MachineBasicBlock* parent;
+		uint32 instr_number = -1;
 		std::vector<MachineOperand> operands;
 		MachineOpCode opcode;
 	};

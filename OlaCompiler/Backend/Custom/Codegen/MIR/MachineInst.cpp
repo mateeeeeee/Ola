@@ -25,7 +25,7 @@ namespace ola
 		return parent->GetParent();
 	}
 
-	uint32 MachineInst::GetOpCount() const
+	uint32 MachineInst::GetNumOperands() const
 	{
 		return operands.size();
 	}

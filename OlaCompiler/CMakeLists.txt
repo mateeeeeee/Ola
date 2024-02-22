@@ -106,7 +106,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineCodeGen.h
   Backend/Custom/Codegen/MachineCodeGen.cpp
   Backend/Custom/Codegen/LivenessAnalysis.h
-  Backend/Custom/Codegen/RegisterAllocator.h
+  Backend/Custom/Codegen/LivenessAnalysis.cpp
+  Backend/Custom/Codegen/LinearScanRegisterAllocator.h
   Backend/Custom/Codegen/MIR/MIR.h
   Backend/Custom/Codegen/MIR/MIRFwd.h
   Backend/Custom/Codegen/MIR/MachineArch.h
