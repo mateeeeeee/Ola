@@ -24,7 +24,19 @@ namespace ola
 	enum BinaryOpcode : uint8
 	{
 		Binary_Add,
-		Binary_Sub
+		Binary_FAdd,
+		Binary_Sub,
+		Binary_FSub,
+		Binary_Mul,
+		Binary_FMul,
+		Binary_Div,
+		Binary_FDiv,
+		Binary_Rem,
+		Binary_Shl,
+		Binary_Shr,
+		Binary_And,
+		Binary_Or,
+		Binary_Xor
 	};
 
 	class BinaryOperator : public BinaryInstruction, public OpcodeConverter<BinaryOperator>

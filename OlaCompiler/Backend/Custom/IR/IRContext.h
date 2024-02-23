@@ -37,9 +37,9 @@ namespace ola
 		IRFuncType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
 		IRStructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
 
-		ConstantString* GetConstantString(std::string_view str);
-		ConstantInt* GetConstantInt64(int64 value);
-		ConstantInt* GetConstantInt8(int8 value);
+		ConstantString* GetString(std::string_view str);
+		ConstantInt* GetInt64(int64 value);
+		ConstantInt* GetInt8(int8 value);
 		ConstantInt* GetTrueValue()  const { return true_value; }
 		ConstantInt* GetFalseValue() const { return false_value; }
 

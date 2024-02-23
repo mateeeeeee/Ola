@@ -46,8 +46,11 @@ namespace ola
 	class ConstantInt final : public ConstantData 
 	{
 	public:
-		ConstantInt(IRIntType* type, int64 V) : ConstantData(ValueKind_ConstantInt, type), value(V), bitwidth(type->GetWidth() * 8)
-		{}
+		ConstantInt(IRType* type, int64 V) : ConstantData(ValueKind_ConstantInt, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
+		{
+			OLA_ASSERT(isa<IRIntType>(type));
+		}
+		ConstantInt(IRIntType* type, int64 V) : ConstantData(ValueKind_ConstantInt, type), value(V), bitwidth(type->GetWidth() * 8) {}
 		~ConstantInt() = default;
 
 		IRIntType* GetIntegerType() const
@@ -71,6 +74,7 @@ namespace ola
 	{
 	public:
 		ConstantFloat(IRFloatType* type, double V) : ConstantData(ValueKind_ConstantFloat, type), value(V) {}
+		ConstantFloat(IRContext& ctx, double  V);
 		~ConstantFloat() = default;
 
 		double GetValue() const { return value; }

@@ -12,6 +12,7 @@ namespace ola
 	class IRBuilder;
 	class IRType;
 	class IRIntType;
+	class IRFloatType;
 	class IRPtrType;
 	class IRFuncType;
 	class Function;
@@ -112,7 +113,7 @@ namespace ola
 		EmptyBlockSuccessorMap empty_block_successors;
 
 		IRType* void_type = nullptr;
-		IRType* float_type = nullptr;
+		IRFloatType* float_type = nullptr;
 		IRIntType* int_type = nullptr;
 		IRIntType* bool_type = nullptr;
 		IRIntType* char_type = nullptr;

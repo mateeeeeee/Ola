@@ -109,21 +109,21 @@ namespace ola
 		return struct_types.back();
 	}
 
-	ConstantString* IRContext::GetConstantString(std::string_view str)
+	ConstantString* IRContext::GetString(std::string_view str)
 	{
 		if (constant_strings.contains(str)) return constant_strings[str];
 		constant_strings[str] = Create<ConstantString>(*this, str);
 		return constant_strings[str];
 	}
 
-	ConstantInt* IRContext::GetConstantInt64(int64 value)
+	ConstantInt* IRContext::GetInt64(int64 value)
 	{
 		if (constant_ints64.contains(value)) return constant_ints64[value];
 		constant_ints64[value] = Create<ConstantInt>(int8_type, value);
 		return constant_ints64[value];
 	}
 
-	ConstantInt* IRContext::GetConstantInt8(int8 value)
+	ConstantInt* IRContext::GetInt8(int8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
 		constant_ints8[value] = Create<ConstantInt>(int1_type, value);

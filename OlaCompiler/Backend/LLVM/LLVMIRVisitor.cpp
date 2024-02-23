@@ -845,7 +845,6 @@ namespace ola
 		break;
 		case BinaryExprKind::Add:
 		{
-
 			result = is_float_expr ? builder.CreateFAdd(lhs, rhs) : builder.CreateAdd(lhs, rhs);
 		}
 		break;

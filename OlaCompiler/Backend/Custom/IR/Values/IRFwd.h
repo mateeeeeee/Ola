@@ -22,6 +22,7 @@ namespace ola
 	class UnaryOperator;
 	class BinaryInstruction;
 	class BinaryOperator;
+	class CmpInst;
 	class ConstantInt;
 	class ConstantString;
 	class ConstantFloat;
@@ -31,4 +32,5 @@ namespace ola
 
 	enum UnaryOpcode : uint8;
 	enum BinaryOpcode : uint8;
+	enum CmpPredicate : uint16;
 }

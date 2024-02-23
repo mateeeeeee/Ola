@@ -64,14 +64,14 @@ namespace ola
 		return GV;
 	}
 
-	ConstantInt* IRBuilder::GetConstantInt64(int64 value) const
+	ConstantInt* IRBuilder::GetInt64(int64 value) const
 	{
-		return ctx.GetConstantInt64(value);
+		return ctx.GetInt64(value);
 	}
 
-	ConstantInt* IRBuilder::GetConstantInt8(int8 value) const
+	ConstantInt* IRBuilder::GetInt8(int8 value) const
 	{
-		return ctx.GetConstantInt8(value);
+		return ctx.GetInt8(value);
 	}
 
 	ConstantInt* IRBuilder::GetTrueValue() const
@@ -147,6 +147,11 @@ namespace ola
 	BinaryOperator* IRBuilder::CreateBinaryOp(BinaryOpcode opcode, Value* op1, Value* op2)
 	{
 		return Insert(Create<BinaryOperator>(opcode, op1, op2));
+	}
+
+	CmpInst* IRBuilder::CreateCmp(CmpPredicate predicate, Value* lhs, Value* rhs)
+	{
+		return Insert(Create<CmpInst>(predicate, lhs, rhs));
 	}
 
 	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>

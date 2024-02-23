@@ -38,8 +38,8 @@ namespace ola
 		Value* InsertAfter(Value* value);
 
 		GlobalVariable* CreateGlobalString(std::string_view str, IRModule* module = nullptr);
-		ConstantInt* GetConstantInt64(int64 value) const;
-		ConstantInt* GetConstantInt8(int8 value) const;
+		ConstantInt* GetInt64(int64 value) const;
+		ConstantInt* GetInt8(int8 value) const;
 		ConstantInt* GetTrueValue()  const;
 		ConstantInt* GetFalseValue() const;
 
@@ -58,6 +58,8 @@ namespace ola
 
 		UnaryOperator* CreateUnaryOp(UnaryOpcode opcode, Value* op);
 		BinaryOperator* CreateBinaryOp(BinaryOpcode opcode, Value* op1, Value* op2);
+
+		CmpInst* CreateCmp(CmpPredicate predicate, Value* lhs, Value* rhs);
 
 	private:
 		IRContext& ctx;
