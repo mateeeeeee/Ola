@@ -4,6 +4,7 @@
 #include "Backend/Custom/IR/Values/GlobalValue.h"
 #include "Backend/Custom/IR/Values/BasicBlock.h"
 #include "Backend/Custom/IR/Values/Instructions.h"
+#include "Backend/Custom/IR/Values/BinaryInstruction.h"
 #include "MachineModule.h"
 #include "MIR/MIR.h"
 
@@ -98,9 +99,8 @@ namespace ola
 						}
 						bb_map[&bb]->Insert(ret);
 					}
-					else
+					else if (BinaryOperator const* binary_op = dyn_cast<BinaryOperator>(inst))
 					{
-					
 					}
 				}
 			}

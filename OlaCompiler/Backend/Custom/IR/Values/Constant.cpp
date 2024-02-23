@@ -6,8 +6,6 @@ namespace ola
 
 	ConstantFloat::ConstantFloat(IRContext& ctx, double V) : ConstantFloat(ctx.GetFloatType(), V)
 	{
-
 	}
-
 }
 

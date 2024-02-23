@@ -91,6 +91,7 @@ set(BACKEND_FILES
   Backend/Custom/IR/Values/Instruction.h
   Backend/Custom/IR/Values/Instruction.cpp
   Backend/Custom/IR/Values/Constant.h
+  Backend/Custom/IR/Values/Constant.cpp
   Backend/Custom/IR/Values/GlobalValue.h
   Backend/Custom/IR/Values/GlobalValue.cpp
   Backend/Custom/IR/Values/BasicBlock.h
@@ -105,9 +106,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineModule.cpp
   Backend/Custom/Codegen/MachineCodeGen.h
   Backend/Custom/Codegen/MachineCodeGen.cpp
-  Backend/Custom/Codegen/LivenessAnalysis.h
-  Backend/Custom/Codegen/LivenessAnalysis.cpp
-  Backend/Custom/Codegen/LinearScanRegisterAllocator.h
+  Backend/Custom/Codegen/RegisterAllocator.h
+  Backend/Custom/Codegen/RegisterAllocator.cpp
   Backend/Custom/Codegen/MIR/MIR.h
   Backend/Custom/Codegen/MIR/MIRFwd.h
   Backend/Custom/Codegen/MIR/MachineArch.h

@@ -74,6 +74,11 @@ namespace ola
 		void SetReg(uint32 r)
 		{
 			OLA_ASSERT(IsReg());
+			reg = r | (1u << 31);
+		}
+		void SetPhysicalReg(uint32 r)
+		{
+			OLA_ASSERT(IsReg());
 			reg = r;
 		}
 
@@ -123,6 +128,11 @@ namespace ola
 			OLA_ASSERT(IsReg());
 			return !is_def;
 		}
+		bool IsVirtual() const 
+		{ 
+			OLA_ASSERT(IsReg());
+			return (reg >> 31) & 1; 
+		}
 
 	private:
 		MachineOperandKind kind;
@@ -136,7 +146,6 @@ namespace ola
 			int32 frame_offset;
 		};
 		std::string global_variable_name;
-
 		bool is_def = false;
 	};
 

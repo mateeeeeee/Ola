@@ -37,7 +37,7 @@ namespace ola
 		Instruction* InsertAfter(Instruction* instruction);
 		Value* InsertAfter(Value* value);
 
-		GlobalVariable* CreateGlobalString(std::string_view str, IRModule* module = nullptr);
+		GlobalVariable* CreateString(std::string_view str, IRModule* module = nullptr);
 		ConstantInt* GetInt64(int64 value) const;
 		ConstantInt* GetInt8(int8 value) const;
 		ConstantInt* GetTrueValue()  const;

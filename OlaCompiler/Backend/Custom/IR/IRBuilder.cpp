@@ -55,7 +55,7 @@ namespace ola
 		return nullptr;
 	}
 
-	GlobalVariable* IRBuilder::CreateGlobalString(std::string_view str, IRModule* module)
+	GlobalVariable* IRBuilder::CreateString(std::string_view str, IRModule* module)
 	{
 		if (!module) module = &insert_block->GetParent()->GetModule();
 		ConstantString* string_constant = Create<ConstantString>(ctx, str);
