@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include <unordered_map>
 #include <vector>
+#include "Utility/VoidPointerMap.h"
 #include "Frontend/AST/ASTVisitor.h"
 #include "llvm/IR/IRBuilder.h"
 
@@ -28,15 +28,8 @@ namespace ola
 	{
 		friend class LLVMIRGen;
 
-		struct VoidPointerHash
-		{
-			uint64 operator()(void const* ptr) const
-			{
-				return reinterpret_cast<uint64>(ptr);
-			}
-		};
-		using LLVMValueMap  = std::unordered_map<void const*, llvm::Value*, VoidPointerHash>;
-		using LLVMVTableMap = std::unordered_map<void const*, llvm::GlobalVariable*, VoidPointerHash>;
+		using LLVMValueMap = VoidPointerMap<llvm::Value*>;
+		using LLVMVTableMap = VoidPointerMap<llvm::GlobalVariable*>;
 		using LLVMEmptyBlockSuccessorMap = std::unordered_map<llvm::BasicBlock*, llvm::BasicBlock*, VoidPointerHash>;
 	private:
 		LLVMIRVisitor(llvm::LLVMContext& context, llvm::Module& module);

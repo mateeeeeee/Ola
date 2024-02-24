@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include "Values/IRFwd.h"
+#include "Utility/VoidPointerMap.h"
 #include "Frontend/AST/ASTVisitor.h"
 
 namespace ola
@@ -23,15 +23,8 @@ namespace ola
 	{
 		friend class IRGen;
 
-		struct VoidPointerHash
-		{
-			uint64 operator()(void const* ptr) const
-			{
-				return reinterpret_cast<uint64>(ptr);
-			}
-		};
-		using ValueMap = std::unordered_map<void const*, Value*, VoidPointerHash>;
-		using VTableMap = std::unordered_map<void const*, GlobalVariable*, VoidPointerHash>;
+		using ValueMap = VoidPointerMap<Value*>;
+		using VTableMap = VoidPointerMap<GlobalVariable*>;
 		using EmptyBlockSuccessorMap = std::unordered_map<BasicBlock*, BasicBlock*, VoidPointerHash>;
 
 	public:

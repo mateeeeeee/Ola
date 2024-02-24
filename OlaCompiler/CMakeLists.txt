@@ -18,6 +18,7 @@ set(UTILITY_FILES
   Utility/IteratorFacade.h
   Utility/Managed.h
   Utility/ConstexprString.h
+  Utility/VoidPointerMap.h
 )
 
 

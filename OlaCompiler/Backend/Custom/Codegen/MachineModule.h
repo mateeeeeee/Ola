@@ -1,11 +1,11 @@
 #pragma once
 #include <format>
 #include <iosfwd>
-#include <unordered_map>
 #include "MIR/MIRFwd.h"
 #include "MIR/MachineArch.h"
 #include "MIR/MachineOperand.h"
 #include "Utility/IntrusiveList.h"
+#include "Utility/VoidPointerMap.h"
 
 namespace ola
 {
@@ -13,16 +13,6 @@ namespace ola
 	class Value;
 	class GlobalVariable;
 	class MachineFunction;
-
-	struct VoidPointerHash
-	{
-		uint64 operator()(void const* ptr) const
-		{
-			return reinterpret_cast<uint64>(ptr);
-		}
-	};
-	template<typename V>
-	using VoidPointerMap = std::unordered_map<void const*, V, VoidPointerHash>;
 
 	class MachineModule
 	{
