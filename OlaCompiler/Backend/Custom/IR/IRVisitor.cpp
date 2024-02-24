@@ -187,6 +187,22 @@ namespace ola
 				value_map[&var_decl] = global_var;
 			}
 		}
+		else
+		{
+			if (Expr const* init_expr = var_decl.GetInitExpr(); init_expr && !isa<ConstructorExpr>(init_expr))
+			{
+				init_expr->Accept(*this);
+				AllocaInst* alloc = builder->CreateAlloca(ir_type, nullptr);
+				Value* init_value = value_map[init_expr];
+				Store(init_value, alloc);
+				value_map[&var_decl] = alloc;
+			}
+			else
+			{
+				AllocaInst* alloc = builder->CreateAlloca(ir_type, nullptr);
+				value_map[&var_decl] = alloc;
+			}
+		}
 	}
 
 	void IRVisitor::Visit(TagDecl const&, uint32)

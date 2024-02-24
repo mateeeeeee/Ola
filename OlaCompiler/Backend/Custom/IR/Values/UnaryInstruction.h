@@ -111,7 +111,7 @@ namespace ola
 
 		bool IsArrayAllocation() const
 		{
-			return false;
+			return GetArraySize() != nullptr;
 		}
 
 		IRPtrType* GetPtrType() const
@@ -122,6 +122,8 @@ namespace ola
 
 		Value const* GetArraySize() const { return GetOperand(0); }
 		Value* GetArraySize() { return GetOperand(0); }
+
+
 
 		static bool ClassOf(Value const* V) { return V->GetKind() == ValueKind_Alloca; }
 

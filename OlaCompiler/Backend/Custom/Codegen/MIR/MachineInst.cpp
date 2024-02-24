@@ -39,11 +39,5 @@ namespace ola
 	{
 		return operands[i];
 	}
-
-	void MachineInst::AddOperand(MachineOperand const& op)
-	{
-		operands.push_back(op);
-	}
-
 }
 

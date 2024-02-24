@@ -31,6 +31,7 @@ namespace ola
 			x86_64_Register arg_registers[4] = { x86_64_Register::RCX, x86_64_Register::RDX, x86_64_Register::R8, x86_64_Register::R9 };
 			x86_64_Register return_register = x86_64_Register::RAX;
 			x86_64_Register callee_saved_registers[6] = { x86_64_Register::RBX, x86_64_Register::RSP, x86_64_Register::RBP, x86_64_Register::RDI, x86_64_Register::RSI, x86_64_Register::R12 };
+			x86_64_Register gp_registers[7] = { x86_64_Register::RBX, x86_64_Register::RDI, x86_64_Register::RSI, x86_64_Register::R12, x86_64_Register::R13, x86_64_Register::R14, x86_64_Register::R15 };
 
 			x86_64_FPRegister fp_arg_registers[4] = { x86_64_FPRegister::XMM0, x86_64_FPRegister::XMM1, x86_64_FPRegister::XMM2, x86_64_FPRegister::XMM3 };
 			x86_64_FPRegister fp_return_register = x86_64_FPRegister::XMM0;

@@ -109,12 +109,21 @@ namespace ola
 				}
 				else if (ret_type->IsIntegerType())
 				{
-					int64 ret_value = MI.Op<0>().GetImm();
-					EmitLn<Text>("mov {}, {}", ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register), ret_value);
+					char const* return_reg_name = ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register);
+					MachineOperand& MO = MI.Op<0>();
+					int64 ret_value = MO.GetImm();
+					EmitLn<Text>("mov {}, {}", return_reg_name, ret_value);
 				}
-
 			}
 			EmitLn<Text>("ret");
+		}
+		else if (MI.GetOpCode() == MachineOpCode::Alloca)
+		{
+			
+		}
+		else if (MI.GetOpCode() == MachineOpCode::Store)
+		{
+
 		}
 	}
 

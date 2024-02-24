@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "MIRFwd.h"
+#include "MachineOperand.h"
 #include "Utility/IntrusiveList.h"
 #include "Utility/IteratorRange.h"
 
@@ -13,7 +14,8 @@ namespace ola
 		Load,
 		Store,
 		Jump,
-		Return
+		Return,
+		Alloca
 	};
 
 	class MachineBasicBlock;
@@ -57,7 +59,10 @@ namespace ola
 		}
 		MachineOperand const& GetOperand(uint32 i) const;
 		MachineOperand& GetOperand(uint32 i);
-		void AddOperand(MachineOperand const& op);
+		void AddOperand(MachineOperand const& op)
+		{
+			operands.push_back(op);
+		}
 
 		auto OperandsBegin() { return operands.begin(); }
 		auto OperandsEnd() { return operands.end(); }

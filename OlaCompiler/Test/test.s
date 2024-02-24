@@ -9,6 +9,6 @@
 .section .text
 .globl main
 main:
-mov rax, 10
+mov rax, 15
 ret
 
