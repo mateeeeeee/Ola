@@ -42,7 +42,7 @@ namespace ola
 		bool IsFPImmediate() const { return kind == MO_FPImmediate; }
 		bool IsIntImmediate() const { return kind == MO_IntImmediate; }
 		bool IsMemoryRef() const { return kind == MO_MemoryRef; }
-		bool IsFrameIndex() const { return kind == MO_FrameIndex; }
+		bool IsFrameOffset() const { return kind == MO_FrameIndex; }
 		bool IsGlobalVariable() const { return kind == MO_GlobalVariable; }
 
 		int64 GetImm() const 
@@ -104,12 +104,12 @@ namespace ola
 
 		void SetFrameOffset(int32 _frame_offset)
 		{
-			OLA_ASSERT(IsFrameIndex());
+			OLA_ASSERT(IsFrameOffset());
 			frame_offset = _frame_offset;
 		}
 		int32 GetFrameOffset() const 
 		{ 
-			OLA_ASSERT(IsFrameIndex());
+			OLA_ASSERT(IsFrameOffset());
 			return frame_offset; 
 		}
 

@@ -1,5 +1,5 @@
 
 public int main() 
 {
-   return 15;
+   return 12;
 }

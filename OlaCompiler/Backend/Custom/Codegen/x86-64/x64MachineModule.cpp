@@ -25,15 +25,6 @@ namespace ola
 		{
 			EmitFunction(MF);
 		}
-
-		//EmitLn<Text>(".globl main");
-		//EmitLn<Text>("main:");
-		//EmitLn<Text>("push    rbp");
-		//EmitLn<Text>("mov     rbp, rsp");
-		//EmitLn<Text>("mov     dword ptr[rbp - 4], 0");
-		//EmitLn<Text>("mov eax, 0");
-		//EmitLn<Text>("pop rbp");
-		//EmitLn<Text>("ret");
 	}
 
 	void x64MachineModule::EmitGlobalVariables()
@@ -81,8 +72,19 @@ namespace ola
 	{
 		if (MF.GetFunction().GetLinkage() == Linkage::External) EmitLn<Text>(".globl {}", MF.GetName());
 		EmitLn<Text>("{}:", MF.GetName());
-
+		//EmitLn<Text>("push rbp");
+		//EmitLn<Text>("mov rbp, rsp");
+		//if (MF.GetStackSize() > 0)
+		//{
+		//	EmitLn<Text>("sub rsp, {}", MF.GetStackSize());
+		//	EmitLn<Text>("and rsp, -16");
+		//}
 		for (MachineBasicBlock& MBB : MF) EmitBasicBlock(MBB);
+
+		EmitLn<Text>("{}:", MF.GetEndLabel());
+		//EmitLn<Text>("mov rsp, rbp");
+		//EmitLn<Text>("pop rsp");
+		EmitLn<Text>("ret");
 	}
 
 	void x64MachineModule::EmitBasicBlock(MachineBasicBlock& MBB)
@@ -92,38 +94,66 @@ namespace ola
 
 	void x64MachineModule::EmitInstruction(MachineInst& MI)
 	{
-		if (MI.GetOpCode() == MachineOpCode::Return)
+		MachineOpCode opcode = MI.GetOpCode();
+		switch (opcode)
 		{
+		case MachineOpCode::Return:
+		{
+			auto* MBB = MI.GetParent();
+			auto* MF = MBB->GetParent();
 			if (MI.GetNumOperands() > 0)
 			{
-				auto* MBB = MI.GetParent();
-				auto* MF = MBB->GetParent();
 				IRType* ret_type = MF->GetFunction().GetReturnType();
-				if (ret_type->IsFloatType())
-				{
-					double ret_value = MI.Op<0>().GetFPImm();
-					static uint32 i = 0;
-					std::string float_literal_label = "__return" + std::to_string(i++);
-					EmitLn<Const>("{} dq {}", float_literal_label, ret_value);
-					EmitLn<Text>("movss {}, [{}]", ToString(x86_64_CallInfo::MicrosoftX64ABI.fp_return_register), float_literal_label);
-				}
-				else if (ret_type->IsIntegerType())
+				if (ret_type->IsIntegerType())
 				{
 					char const* return_reg_name = ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register);
-					MachineOperand& MO = MI.Op<0>();
-					int64 ret_value = MO.GetImm();
-					EmitLn<Text>("mov {}, {}", return_reg_name, ret_value);
+					MachineOperand const& MO = MI.Op<0>();
+					if (MO.IsIntImmediate())
+					{
+						int64 ret_value = MO.GetImm();
+						EmitLn<Text>("mov {}, {}", return_reg_name, ret_value);
+					}
+					else if (MO.IsFrameOffset())
+					{
+						std::string address_string;
+						if (MO.IsFrameOffset())
+						{
+							address_string = std::format("qword ptr [rbp - {}]", MO.GetFrameOffset());
+						}
+						EmitLn<Text>("mov {}, {}", return_reg_name, address_string);
+					}
 				}
-			}
-			EmitLn<Text>("ret");
-		}
-		else if (MI.GetOpCode() == MachineOpCode::Alloca)
-		{
-			
-		}
-		else if (MI.GetOpCode() == MachineOpCode::Store)
-		{
 
+				//else if (ret_type->IsFloatType())
+				//{
+				//	double ret_value = MI.Op<0>().GetFPImm();
+				//	static uint32 i = 0;
+				//	std::string float_literal_label = "__return" + std::to_string(i++);
+				//	EmitLn<Const>("{} dq {}", float_literal_label, ret_value);
+				//	EmitLn<Text>("movss {}, [{}]", ToString(x86_64_CallInfo::MicrosoftX64ABI.fp_return_register), float_literal_label);
+				//}
+			}
+			EmitLn<Text>("jmp {}", MF->GetEndLabel());
+		}
+		break;
+		case MachineOpCode::Store:
+		{
+			MachineOperand const& address = MI.Op<0>();
+			MachineOperand const& value = MI.Op<1>();
+
+			std::string value_string;
+			if (value.IsIntImmediate())
+			{
+				value_string = std::to_string(value.GetImm());
+			}
+			std::string address_string;
+			if (address.IsFrameOffset())
+			{
+				address_string = std::format("qword ptr [rbp - {}]", address.GetFrameOffset());
+			}
+			EmitLn<Text>("mov {}, {}", address_string, value_string);
+		}
+		break;
 		}
 	}
 

@@ -1,7 +1,6 @@
 #pragma once
 #include <format>
 #include <iosfwd>
-#include <memory>
 #include "MIR/MIRFwd.h"
 #include "MIR/MachineArch.h"
 #include "MIR/MachineOperand.h"
@@ -13,7 +12,6 @@ namespace ola
 	class Value;
 	class GlobalVariable;
 	class MachineFunction;
-	class VirtualRegisterAllocator;
 
 	class MachineModule
 	{
@@ -27,7 +25,6 @@ namespace ola
 		MachineResult result;
 		IList<MachineFunction> functions;
 		IList<GlobalVariable> const& global_variables;
-		std::unique_ptr<VirtualRegisterAllocator> virtual_reg_allocator;
 
 	protected:
 		explicit MachineModule(IRModule& ir_module);
@@ -44,7 +41,6 @@ namespace ola
 			else if constexpr (segment == MachineSegment::Text)	 result.text_segment += output;
 		}
 
-		MachineOperand FromValue(Value const* V);
 	};
 
 }

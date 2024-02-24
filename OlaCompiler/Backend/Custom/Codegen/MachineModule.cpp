@@ -35,6 +35,23 @@ namespace ola
 		uint32 current_index = 0;
 		VoidPointerMap<MachineOperand> value_reg_map;
 	};
+	struct MFStackAllocator
+	{
+		explicit MFStackAllocator(MachineFunction& MF) : MF(MF) {}
+
+		MachineOperand Allocate(AllocaInst const* alloc)
+		{
+			if (value_stack_alloc_map.contains(alloc)) return value_stack_alloc_map[alloc];
+			MachineOperand stack_alloc(MO_FrameIndex);
+			uint32 alloc_size = alloc->GetAllocatedType()->GetSize();
+			stack_alloc.SetFrameOffset(MF.AllocateStack(alloc_size));
+			value_stack_alloc_map[alloc] = stack_alloc;
+			return stack_alloc;
+		}
+
+		MachineFunction& MF;
+		VoidPointerMap<MachineOperand> value_stack_alloc_map;
+	};
 
 	void operator<<(std::ostream& os, MachineResult const& res)
 	{
@@ -47,8 +64,6 @@ namespace ola
 
 	MachineModule::MachineModule(IRModule& ir_module) : global_variables(ir_module.GetVariableList())
 	{
-		virtual_reg_allocator = std::make_unique<VirtualRegisterAllocator>();
-
 		for (auto const& ir_function : ir_module.GetFunctionList())
 		{
 			functions.PushBack(new MachineFunction(ir_function, functions.Size()));
@@ -62,7 +77,6 @@ namespace ola
 				MF.PushBack(MBB);
 				bb_map[&BB] = MBB;
 			}
-
 			for (auto const& BB : ir_function)
 			{
 				MachineBasicBlock* MBB = bb_map[&BB];
@@ -70,27 +84,54 @@ namespace ola
 				for (auto& bb_succ : BB.Successors()) MBB->AddSuccessor(bb_map[bb_succ]);
 			}
 
+			MFStackAllocator stack_allocator(MF);
+			VirtualRegisterAllocator virtual_reg_allocator;
+
+			auto OperandFromValue = [&](Value const* V) -> MachineOperand
+				{
+					if (ConstantInt const* constant_int = dyn_cast<ConstantInt>(V))
+					{
+						MachineOperand operand(MO_IntImmediate);
+						operand.SetImm(constant_int->GetValue());
+						return operand;
+					}
+					else if (ConstantFloat const* constant_float = dyn_cast<ConstantFloat>(V))
+					{
+						MachineOperand operand(MO_FPImmediate);
+						operand.SetFPImm(constant_float->GetValue());
+						return operand;
+					}
+					else if (AllocaInst const* alloc = dyn_cast<AllocaInst>(V))
+					{
+						return stack_allocator.Allocate(alloc);
+					}
+					else
+					{
+						return virtual_reg_allocator.Allocate(V);
+					}
+				};
+
 			for (auto const& BB : ir_function)
 			{
 				for (auto inst_iterator = BB.begin(); inst_iterator != BB.end(); ++inst_iterator)
 				{
+					MachineBasicBlock* MBB = bb_map[&BB];
 					Instruction const* inst = inst_iterator;
 					if (AllocaInst const* alloca_inst = dyn_cast<AllocaInst>(inst))
 					{
 						MachineInst* alloc = new MachineInst(MachineOpCode::Alloca);
 						MachineOperand alloc_size(MO_IntImmediate);
 						alloc_size.SetImm((int64)alloca_inst->GetAllocatedType()->GetSize());
-						alloc->AddOperand(alloc_size);
-
-						bb_map[&BB]->Insert(alloc);
+						alloc->AddOperand(stack_allocator.Allocate(alloca_inst));
+						MBB->Insert(alloc);
 					}
 					else if (StoreInst const* store_inst = dyn_cast<StoreInst>(inst))
 					{
 						MachineInst* store = new MachineInst(MachineOpCode::Store);
-						store->AddOperand(FromValue(store_inst->GetAddressOperand()));
-						store->AddOperand(FromValue(store_inst->GetValueOperand()));
+						store->AddOperand(OperandFromValue(store_inst->GetAddressOperand()));
+						store->AddOperand(OperandFromValue(store_inst->GetValueOperand()));
 
-						bb_map[&BB]->Insert(store);
+						MBB->Insert(store);
 					}
 					else if (ReturnInst const* ret_inst = dyn_cast<ReturnInst>(inst))
 					{
@@ -98,44 +139,16 @@ namespace ola
 						if (!ret_inst->IsVoid())
 						{
 							Value* ret_value = ret_inst->GetReturnValue();
-							ret->AddOperand(FromValue(ret_value));
+							ret->AddOperand(OperandFromValue(ret_value));
 						}
-						bb_map[&BB]->Insert(ret);
+						MBB->Insert(ret);
 					}
 				}
 			}
 		}
-
-		
 	}
 
-	MachineOperand MachineModule::FromValue(Value const* V)
-	{
-		if (ConstantInt const* constant_int = dyn_cast<ConstantInt>(V))
-		{
-			MachineOperand operand(MO_IntImmediate);
-			operand.SetImm(constant_int->GetValue());
-			return operand;
-		}
-		else if (ConstantFloat const* constant_float = dyn_cast<ConstantFloat>(V))
-		{
-			MachineOperand operand(MO_FPImmediate);
-			operand.SetFPImm(constant_float->GetValue());
-			return operand;
-		}
-		else if (AllocaInst const* alloc = dyn_cast<AllocaInst>(V))
-		{
-			MachineOperand operand(MO_FrameIndex);
-		}
-		else
-		{
-			return virtual_reg_allocator->Allocate(V);
-		}
-	}
-
-	MachineModule::~MachineModule()
-	{
-	}
+	MachineModule::~MachineModule() {}
 
 	void MachineModule::Print(std::ofstream& of)
 	{

@@ -50,11 +50,22 @@ namespace ola
 		}
 		void Remove(MachineBasicBlock* MBBI) { basic_blocks.Remove(MBBI); }
 
+		uint32 AllocateStack(uint32 size)
+		{
+			uint32 offset = stack_size;
+			stack_size += size;
+			return offset;
+		}
+		uint32 GetStackSize() const { return stack_size; }
+		std::string GetEndLabel() const { return std::string(GetName()) + "_End"; }
+
 	private:
 		uint32 function_number;
 		Function const& func;
 		IList<MachineBasicBlock> basic_blocks;
 		std::vector<MachineBasicBlock*> mbb_numbering;
+
+		uint32 stack_size = 0;
 
 	private:
 		uint32 NumberBlock(MachineBasicBlock* MBB)
