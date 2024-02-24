@@ -1,14 +1,12 @@
 #include <fstream>
-#include <unordered_map>
+#include "MachineModule.h"
+#include "MIR/MIR.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/Values/GlobalValue.h"
 #include "Backend/Custom/IR/Values/BasicBlock.h"
 #include "Backend/Custom/IR/Values/Instructions.h"
 #include "Backend/Custom/IR/Values/BinaryInstruction.h"
 #include "Backend/Custom/IR/Values/UnaryInstruction.h"
-#include "MachineModule.h"
-#include "MIR/MIR.h"
-
 
 namespace ola
 {
@@ -23,15 +21,6 @@ namespace ola
 		return MachineOpCode::Invalid;
 	}
 
-	struct VoidPointerHash
-	{
-		uint64 operator()(void const* ptr) const
-		{
-			return reinterpret_cast<uint64>(ptr);
-		}
-	};
-	template<typename V>
-	using VoidPointerMap = std::unordered_map<void const*, V, VoidPointerHash>;
 	struct VirtualRegisterAllocator
 	{
 		[[maybe_unused]] MachineOperand Allocate(Value const* val)
@@ -161,11 +150,6 @@ namespace ola
 						MachineInst* machine_binary_op = new MachineInst(ToMachineOpcode(binary_op->GetOpcode()));
 						machine_binary_op->AddOperand(OperandFromValue(binary_op->LHS()));
 						machine_binary_op->AddOperand(OperandFromValue(binary_op->RHS()));
-						if (!machine_binary_op->Op<0>().IsReg() && !machine_binary_op->Op<0>().IsReg())
-						{
-							virtual_reg_allocator.Allocate(binary_op);
-
-						}
 						MBB->Insert(machine_binary_op);
 					}
 				}

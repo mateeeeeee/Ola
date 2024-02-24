@@ -80,6 +80,7 @@ namespace ola
 			return MakeRange(OperandsBegin(), OperandsEnd());
 		}
 
+
 	private:
 		MachineBasicBlock* parent;
 		uint32 instr_number = -1;

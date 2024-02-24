@@ -15,6 +15,7 @@ sub rsp, 8
 and rsp, -16
 entry:
 mov qword ptr [rbp - 0], 17
+return:
 exit:
 mov rax, qword ptr [rbp - 0]
 mov rsp, rbp

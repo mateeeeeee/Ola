@@ -159,6 +159,10 @@ namespace ola
 			EmitLn<Text>("mov {}, {}", address_string, value_string);
 		}
 		break;
+		case MachineOpCode::Add:
+		{
+			
+		}
 		}
 	}
 
