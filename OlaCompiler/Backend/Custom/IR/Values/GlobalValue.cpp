@@ -32,7 +32,7 @@ namespace ola
 	}
 	void Function::InsertBefore(BasicBlock* bb, BasicBlock* before)
 	{
-		block_list.Insert(before, bb);
+		block_list.Insert(bb, before);
 	}
 	uint64 Function::Size() const
 	{

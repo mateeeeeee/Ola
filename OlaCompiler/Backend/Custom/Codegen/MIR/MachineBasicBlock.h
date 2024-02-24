@@ -25,15 +25,7 @@ namespace ola
 		IList<MachineInst>& GetInstructions() { return instructions; }
 		IList<MachineInst> const& GetInstructions() const { return instructions; }
 
-		std::string_view GetName() const 
-		{
-			//return bb ? bb->GetName() : "";
-			return "";
-		}
-		std::string GetFullName() const
-		{
-			return "";
-		}
+		std::string_view GetName() const;
 
 		uint32 GetNumber() const { return number; }
 		void SetNumber(uint32 N) { number = N; }

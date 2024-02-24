@@ -51,7 +51,7 @@ namespace ola
 		{
 			for (auto const& BB : ir_function)
 			{
-				ola_ir_stream << "BasicBlock:" << BB.GetName() << ":\n";
+				ola_ir_stream << "\nBB_" << BB.GetName() << ":\n";
 				for (auto inst_iterator = BB.begin(); inst_iterator != BB.end(); ++inst_iterator)
 				{
 					Instruction const* inst = inst_iterator;
@@ -67,9 +67,10 @@ namespace ola
 					{
 						ola_ir_stream << "ReturnInst\n";
 					}
-					else if (BranchInst const* ret_inst = dyn_cast<BranchInst>(inst))
+					else if (BranchInst const* branch = dyn_cast<BranchInst>(inst))
 					{
-						ola_ir_stream << "BranchInst\n";
+						auto BB = branch->GetIfTrueDestination();
+						ola_ir_stream << "BranchInst to:" << BB->GetName() << "\n";
 					}
 				}
 			}

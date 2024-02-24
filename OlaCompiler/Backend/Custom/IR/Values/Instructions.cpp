@@ -43,6 +43,18 @@ namespace ola
 		Op<2>() = cond;
 		Assert();
 	}
+
+	BasicBlock* BranchInst::GetIfTrueDestination() const
+	{
+		return cast<BasicBlock>((Value*)Op<0>());
+	}
+
+	BasicBlock* BranchInst::GetIfFalseDestination() const
+	{
+		OLA_ASSERT(IsConditional());
+		return cast<BasicBlock>((Value*)Op<1>());
+	}
+
 	BasicBlock* BranchInst::GetSuccessor(uint32 i) const
 	{
 		OLA_ASSERT_MSG(i < GetNumSuccessors(), "Successor # out of range for Branch!");

@@ -665,7 +665,7 @@ namespace ola
 			}
 		}
 
-		if (!func->GetReturnType()->IsVoidType()) return_value = builder->CreateAlloca(func->GetReturnType(), nullptr);
+		if (func->GetReturnType()->IsPointerType()) return_value = builder->CreateAlloca(func->GetReturnType(), nullptr);
 		exit_block = Create<BasicBlock>(context, "exit", func);
 
 		auto const& labels = func_decl.GetLabels();
@@ -694,7 +694,7 @@ namespace ola
 		for (BasicBlock* empty_block : empty_blocks)
 		{
 			builder->SetInsertPoint(empty_block);
-			builder->CreateAlloca(IRIntType::Get(context, 1), nullptr);
+			builder->CreateBinaryOp(Binary_Add, builder->GetInt8(0), builder->GetInt8(0));
 			if (empty_block_successors.contains(empty_block))
 				builder->CreateBranch(empty_block_successors[empty_block]);
 			else builder->CreateBranch(exit_block);

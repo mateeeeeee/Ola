@@ -81,7 +81,6 @@ namespace ola
 		}
 		for (MachineBasicBlock& MBB : MF) EmitBasicBlock(MBB);
 
-		EmitLn<Text>("{}:", MF.GetEndLabel());
 		EmitLn<Text>("mov rsp, rbp");
 		EmitLn<Text>("pop rbp");
 		EmitLn<Text>("ret");
@@ -89,6 +88,9 @@ namespace ola
 
 	void x64MachineModule::EmitBasicBlock(MachineBasicBlock& MBB)
 	{
+		if (MBB.Empty()) return;
+
+		EmitLn<Text>("{}:", MBB.GetName());
 		for (MachineInst& MI : MBB) EmitInstruction(MI);
 	}
 
@@ -106,7 +108,8 @@ namespace ola
 				IRType* ret_type = MF->GetFunction().GetReturnType();
 				if (ret_type->IsIntegerType())
 				{
-					char const* return_reg_name = ToString(x86_64_CallInfo::MicrosoftX64ABI.return_register);
+					char const* return_reg_name = ToString(x86_64::call_info::return_register);
+
 					MachineOperand const& MO = MI.Op<0>();
 					if (MO.IsIntImmediate())
 					{
@@ -123,7 +126,6 @@ namespace ola
 						EmitLn<Text>("mov {}, {}", return_reg_name, address_string);
 					}
 				}
-
 				//else if (ret_type->IsFloatType())
 				//{
 				//	double ret_value = MI.Op<0>().GetFPImm();
@@ -133,7 +135,6 @@ namespace ola
 				//	EmitLn<Text>("movss {}, [{}]", ToString(x86_64_CallInfo::MicrosoftX64ABI.fp_return_register), float_literal_label);
 				//}
 			}
-			EmitLn<Text>("jmp {}", MF->GetEndLabel());
 		}
 		break;
 		case MachineOpCode::Store:

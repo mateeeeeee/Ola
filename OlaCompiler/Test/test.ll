@@ -1,13 +1,11 @@
-BasicBlock:exit:
-ReturnInst
-BranchInst
-BasicBlock:return:
-AllocaInst
-BranchInst
-BranchInst
-BasicBlock:entry:
-AllocaInst
+
+BB_entry:
 AllocaInst
 StoreInst
-BranchInst
-BranchInst
+BranchInst to:exit
+
+BB_return:
+BranchInst to:exit
+
+BB_exit:
+ReturnInst

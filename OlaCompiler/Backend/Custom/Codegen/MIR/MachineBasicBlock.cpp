@@ -27,6 +27,11 @@ namespace ola
 		minst->SetParent(this);
 	}
 
+	std::string_view MachineBasicBlock::GetName() const
+	{
+		return bb ? bb->GetName() : "";
+	}
+
 	uint32 MachineBasicBlock::Size() const
 	{
 		return (uint32)instructions.Size();

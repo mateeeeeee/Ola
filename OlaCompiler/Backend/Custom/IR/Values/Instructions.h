@@ -179,6 +179,8 @@ namespace ola
 		bool IsUnconditional() const { return GetNumOperands() == 1; }
 		bool IsConditional()   const { return GetNumOperands() == 3; }
 
+		BasicBlock* GetIfTrueDestination() const;
+		BasicBlock* GetIfFalseDestination() const;
 		Value* GetCondition() const 
 		{
 			OLA_ASSERT(IsConditional());

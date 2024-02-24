@@ -40,6 +40,12 @@ namespace ola
 		SetParent(position->GetParent());
 	}
 
+	bool Instruction::IsTerminator() const
+	{
+		ValueKind kind = GetKind();
+		return kind >= ValueKind_Call && kind <= ValueKind_Switch;
+	}
+
 	bool Instruction::IsUnaryOp() const
 	{
 		ValueKind kind = GetKind();

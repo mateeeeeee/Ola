@@ -1336,7 +1336,7 @@ namespace ola
 			}
 		}
 
-		if (!func->getReturnType()->isVoidTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
+		if (func->getReturnType()->isPointerTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", func);
 
 		auto const& labels = func_decl.GetLabels();

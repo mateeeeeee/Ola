@@ -57,7 +57,6 @@ namespace ola
 			return offset;
 		}
 		uint32 GetStackSize() const { return stack_size; }
-		std::string GetEndLabel() const { return std::string(GetName()) + "_End"; }
 
 	private:
 		uint32 function_number;

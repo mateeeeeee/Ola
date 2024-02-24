@@ -131,14 +131,7 @@ namespace ola
 		void PushFront(pointer val) { Insert(val, head); }
 		void PushBack(pointer val)
 		{
-			if (Empty())
-			{
-				Insert(val, nullptr);
-			}
-			else
-			{
-				Insert(val, tail);
-			}
+			Insert(val, nullptr);
 		}
 		void PopFront()
 		{
@@ -160,7 +153,7 @@ namespace ola
 			pointer insert_point = insert_before ? insert_before->prev : tail;
 
 			new_node->prev = insert_point;
-			new_node->next = (insert_point) ? insert_point->next : head;
+			new_node->next = (insert_point) ? insert_point->next : nullptr;
 
 			if (insert_point) insert_point->next = new_node;
 			else head = new_node;
@@ -237,6 +230,7 @@ namespace ola
 	private:
 		pointer head;
 		pointer tail;
+
 	};
 
 	template<typename T>

@@ -27,7 +27,7 @@ namespace ola
 		void InsertAfter(BasicBlock* bb, Instruction* position);
 		void Insert(BasicBlock* bb);
 
-		bool IsTerminator() const { return false; }
+		bool IsTerminator() const;
 		bool IsUnaryOp()	const;
 		bool IsBinaryOp()	const;
 		bool IsModulo()		const { return false; }
