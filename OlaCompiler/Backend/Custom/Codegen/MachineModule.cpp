@@ -64,6 +64,8 @@ namespace ola
 
 	MachineModule::MachineModule(IRModule& ir_module) : global_variables(ir_module.GetVariableList())
 	{
+		ir_module.PrintIR("test.oll");
+
 		for (auto const& ir_function : ir_module.GetFunctionList())
 		{
 			functions.PushBack(new MachineFunction(ir_function, functions.Size()));

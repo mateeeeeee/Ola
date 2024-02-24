@@ -72,18 +72,18 @@ namespace ola
 	{
 		if (MF.GetFunction().GetLinkage() == Linkage::External) EmitLn<Text>(".globl {}", MF.GetName());
 		EmitLn<Text>("{}:", MF.GetName());
-		//EmitLn<Text>("push rbp");
-		//EmitLn<Text>("mov rbp, rsp");
-		//if (MF.GetStackSize() > 0)
-		//{
-		//	EmitLn<Text>("sub rsp, {}", MF.GetStackSize());
-		//	EmitLn<Text>("and rsp, -16");
-		//}
+		EmitLn<Text>("push rbp");
+		EmitLn<Text>("mov rbp, rsp");
+		if (MF.GetStackSize() > 0)
+		{
+			EmitLn<Text>("sub rsp, {}", MF.GetStackSize());
+			EmitLn<Text>("and rsp, -16");
+		}
 		for (MachineBasicBlock& MBB : MF) EmitBasicBlock(MBB);
 
 		EmitLn<Text>("{}:", MF.GetEndLabel());
-		//EmitLn<Text>("mov rsp, rbp");
-		//EmitLn<Text>("pop rsp");
+		EmitLn<Text>("mov rsp, rbp");
+		EmitLn<Text>("pop rbp");
 		EmitLn<Text>("ret");
 	}
 

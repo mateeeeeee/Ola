@@ -132,6 +132,8 @@ set(COMPILER_FILES
 set(TEST_FILES
 	Test/test.ola
 	Test/test.ll
+	Test/test.s
+	Test/test.oll
 	Test/Test2/test2.ola
 	Test/Test2/test2.ll
 )
