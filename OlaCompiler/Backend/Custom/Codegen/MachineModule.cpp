@@ -12,6 +12,17 @@
 
 namespace ola
 {
+
+	MachineOpCode ToMachineOpcode(BinaryOpcode op)
+	{
+		switch (op)
+		{
+		case Binary_Add: return MachineOpCode::Add;
+		case Binary_Sub: return MachineOpCode::Sub;
+		}
+		return MachineOpCode::Invalid;
+	}
+
 	struct VoidPointerHash
 	{
 		uint64 operator()(void const* ptr) const
@@ -23,7 +34,7 @@ namespace ola
 	using VoidPointerMap = std::unordered_map<void const*, V, VoidPointerHash>;
 	struct VirtualRegisterAllocator
 	{
-		MachineOperand Allocate(Value const* val)
+		[[maybe_unused]] MachineOperand Allocate(Value const* val)
 		{
 			if (value_reg_map.contains(val)) return value_reg_map[val];
 			MachineOperand virtual_reg(MO_Register);
@@ -144,6 +155,18 @@ namespace ola
 							ret->AddOperand(OperandFromValue(ret_value));
 						}
 						MBB->Insert(ret);
+					}
+					else if (BinaryOperator const* binary_op = dyn_cast<BinaryOperator>(inst))
+					{
+						MachineInst* machine_binary_op = new MachineInst(ToMachineOpcode(binary_op->GetOpcode()));
+						machine_binary_op->AddOperand(OperandFromValue(binary_op->LHS()));
+						machine_binary_op->AddOperand(OperandFromValue(binary_op->RHS()));
+						if (!machine_binary_op->Op<0>().IsReg() && !machine_binary_op->Op<0>().IsReg())
+						{
+							virtual_reg_allocator.Allocate(binary_op);
+
+						}
+						MBB->Insert(machine_binary_op);
 					}
 				}
 			}

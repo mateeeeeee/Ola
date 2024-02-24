@@ -7,15 +7,18 @@
 
 namespace ola
 {
-	enum class MachineOpCode
+	enum class MachineOpCode : uint16
 	{
-		Add,
-		Subtract,
+		Invalid,
 		Load,
 		Store,
 		Jump,
 		Return,
-		Alloca
+		Alloca,
+		Add,
+		Sub,
+		Mul,
+		Div
 	};
 
 	class MachineBasicBlock;

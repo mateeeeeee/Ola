@@ -147,6 +147,10 @@ namespace ola
 			{
 				value_string = std::to_string(value.GetImm());
 			}
+			else if (value.IsReg())
+			{
+
+			}
 			std::string address_string;
 			if (address.IsFrameOffset())
 			{

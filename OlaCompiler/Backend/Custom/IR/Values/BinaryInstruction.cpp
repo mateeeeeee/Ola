@@ -16,4 +16,23 @@ namespace ola
 		Op<1>() = op2;
 	}
 
+	Value* BinaryOperator::LHS() const
+	{
+		return Op<0>();
+	}
+
+	Value* BinaryOperator::RHS() const
+	{
+		return Op<1>();
+	}
+
+	Value* CmpInst::LHS() const
+	{
+		return Op<0>();
+	}
+	Value* CmpInst::RHS() const
+	{
+		return Op<1>();
+	}
+
 }

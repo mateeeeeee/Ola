@@ -61,6 +61,9 @@ namespace ola
 			OLA_ASSERT(op1->GetType() == op2->GetType());
 		}
 
+		Value* LHS() const;
+		Value* RHS() const;
+
 		static bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && cast<Instruction>(V)->IsBinaryOp();
@@ -119,6 +122,9 @@ namespace ola
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
+
+		Value* LHS() const;
+		Value* RHS() const;
 
 		CmpPredicate GetPredicate() const { return predicate; }
 
