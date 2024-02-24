@@ -108,7 +108,7 @@ namespace ola
 				IRType* ret_type = MF->GetFunction().GetReturnType();
 				if (ret_type->IsIntegerType())
 				{
-					char const* return_reg_name = ToString(x86_64::call_info::return_register);
+					char const* return_reg_name = ToString(x86_64::windows::return_register);
 
 					MachineOperand const& MO = MI.Op<0>();
 					if (MO.IsIntImmediate())
