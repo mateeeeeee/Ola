@@ -9,6 +9,7 @@ namespace ola
 	class Use;
 	class User;
 	class Instruction;
+	class NoopInstruction;
 	class StoreInst;
 	class LoadInst;
 	class AllocaInst;

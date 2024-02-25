@@ -28,6 +28,7 @@ namespace ola
 			if (value_reg_map.contains(val)) return value_reg_map[val];
 			MachineOperand virtual_reg(MO_Register);
 			virtual_reg.SetReg(current_index++);
+			value_reg_map[val] = virtual_reg;
 			return virtual_reg;
 		}
 
@@ -148,8 +149,14 @@ namespace ola
 					else if (BinaryOperator const* binary_op = dyn_cast<BinaryOperator>(inst))
 					{
 						MachineInst* machine_binary_op = new MachineInst(ToMachineOpcode(binary_op->GetOpcode()));
-						machine_binary_op->AddOperand(OperandFromValue(binary_op->LHS()));
-						machine_binary_op->AddOperand(OperandFromValue(binary_op->RHS()));
+						MachineOperand lhs_operand = OperandFromValue(binary_op->LHS());
+						MachineOperand rhs_operand = OperandFromValue(binary_op->RHS());
+						machine_binary_op->AddOperand(lhs_operand);
+						machine_binary_op->AddOperand(rhs_operand);
+
+						MachineOperand reg_operand = virtual_reg_allocator.Allocate(binary_op);
+						machine_binary_op->SetReg(reg_operand.GetReg());
+
 						MBB->Insert(machine_binary_op);
 					}
 				}

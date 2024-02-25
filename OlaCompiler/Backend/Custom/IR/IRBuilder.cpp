@@ -154,6 +154,11 @@ namespace ola
 		return Insert(Create<CmpInst>(predicate, lhs, rhs));
 	}
 
+	NoopInstruction* IRBuilder::CreateNoop()
+	{
+		return Insert(Create<NoopInstruction>());
+	}
+
 	template<typename InstTy> requires std::is_base_of_v<Instruction, InstTy>
 	InstTy* IRBuilder::Insert(InstTy* inst)
 	{

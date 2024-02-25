@@ -61,6 +61,8 @@ namespace ola
 
 		CmpInst* CreateCmp(CmpPredicate predicate, Value* lhs, Value* rhs);
 
+		NoopInstruction* CreateNoop();
+
 	private:
 		IRContext& ctx;
 		BasicBlock*  insert_block;

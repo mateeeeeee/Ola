@@ -18,5 +18,7 @@ namespace ola
 		void EmitFunction(MachineFunction&);
 		void EmitBasicBlock(MachineBasicBlock&);
 		void EmitInstruction(MachineInst&);
+
+		std::string GetOperandAsString(MachineOperand const&);
 	};
 }

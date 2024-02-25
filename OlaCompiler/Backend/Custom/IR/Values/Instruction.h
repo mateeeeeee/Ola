@@ -56,6 +56,11 @@ namespace ola
 		void SetParent(BasicBlock* bb);
 	};
 
+	class NoopInstruction : public Instruction
+	{
+	public:
+		NoopInstruction() : Instruction(ValueKind_Noop, nullptr, 0) {}
+	};
 
 	template<typename Derived> 
 	class OpcodeConverter

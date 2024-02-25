@@ -109,22 +109,10 @@ namespace ola
 				if (ret_type->IsIntegerType())
 				{
 					char const* return_reg_name = ToString(x86_64::windows::return_register);
-
 					MachineOperand const& MO = MI.Op<0>();
-					if (MO.IsIntImmediate())
-					{
-						int64 ret_value = MO.GetImm();
-						EmitLn<Text>("mov {}, {}", return_reg_name, ret_value);
-					}
-					else if (MO.IsFrameOffset())
-					{
-						std::string address_string;
-						if (MO.IsFrameOffset())
-						{
-							address_string = std::format("qword ptr [rbp - {}]", MO.GetFrameOffset());
-						}
-						EmitLn<Text>("mov {}, {}", return_reg_name, address_string);
-					}
+
+					std::string ret_value = GetOperandAsString(MO);
+					EmitLn<Text>("mov {}, {}", return_reg_name, ret_value);
 				}
 				//else if (ret_type->IsFloatType())
 				//{
@@ -141,29 +129,60 @@ namespace ola
 		{
 			MachineOperand const& address = MI.Op<0>();
 			MachineOperand const& value = MI.Op<1>();
-
-			std::string value_string;
-			if (value.IsIntImmediate())
-			{
-				value_string = std::to_string(value.GetImm());
-			}
-			else if (value.IsReg())
-			{
-
-			}
-			std::string address_string;
-			if (address.IsFrameOffset())
-			{
-				address_string = std::format("qword ptr [rbp - {}]", address.GetFrameOffset());
-			}
+			std::string value_string = GetOperandAsString(value);
+			std::string address_string = GetOperandAsString(address);
 			EmitLn<Text>("mov {}, {}", address_string, value_string);
 		}
 		break;
 		case MachineOpCode::Add:
 		{
-			
+			MachineOperand const& lhs = MI.Op<0>();
+			MachineOperand const& rhs = MI.Op<1>();
+
+			std::string lhs_string = GetOperandAsString(lhs);
+			std::string rhs_string = GetOperandAsString(rhs);
+
+			uint32 result_reg_idx = MI.GetReg(); result_reg_idx = result_reg_idx & ~(1u << 31);
+			x86_64::Register reg = x86_64::windows::callee_saved_registers[result_reg_idx];
+			std::string res_string = ToString(reg);
+
+			EmitLn<Text>("mov {}, {}", res_string, lhs_string);
+			EmitLn<Text>("add {}, {}", res_string, rhs_string);
 		}
+		break;
 		}
+	}
+
+	std::string x64MachineModule::GetOperandAsString(MachineOperand const& MO)
+	{
+		if (MO.IsIntImmediate())
+		{
+			return std::to_string(MO.GetImm());
+		}
+		else if (MO.IsFPImmediate())
+		{
+			return std::to_string(MO.GetFPImm());
+		}
+		else if (MO.IsReg())
+		{
+			uint32 reg_idx = MO.GetReg();
+			reg_idx = reg_idx & ~(1u << 31);
+			x86_64::Register reg = x86_64::windows::callee_saved_registers[reg_idx];
+			return ToString(reg);
+		}
+		else if (MO.IsMemoryRef())
+		{
+
+		}
+		else if (MO.IsFrameOffset())
+		{
+			return std::format("qword ptr [rbp - {}]", MO.GetFrameOffset());
+		}
+		else if (MO.IsGlobalVariable())
+		{
+
+		}
+		return "";
 	}
 
 }

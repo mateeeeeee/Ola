@@ -11,13 +11,15 @@
 main:
 push rbp
 mov rbp, rsp
-sub rsp, 8
+sub rsp, 16
 and rsp, -16
 entry:
-mov qword ptr [rbp - 0], 17
-return:
+mov qword ptr [rbp - 0], 13
+mov r13, 17
+add r13, r12
+mov qword ptr [rbp - 8], r13
 exit:
-mov rax, qword ptr [rbp - 0]
+mov rax, qword ptr [rbp - 8]
 mov rsp, rbp
 pop rbp
 ret

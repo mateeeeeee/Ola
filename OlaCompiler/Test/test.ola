@@ -1,6 +1,7 @@
 
 public int main() 
 {
-	int a = 17;
+	int b = 13;
+	int a = 17 + b;
     return a;
 }

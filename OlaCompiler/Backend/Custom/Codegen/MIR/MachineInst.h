@@ -80,11 +80,20 @@ namespace ola
 			return MakeRange(OperandsBegin(), OperandsEnd());
 		}
 
+		void SetReg(uint32 r)
+		{
+			reg = r;
+		}
+		uint32 GetReg() const
+		{
+			return reg;
+		}
 
 	private:
 		MachineBasicBlock* parent;
 		uint32 instr_number = -1;
 		std::vector<MachineOperand> operands;
 		MachineOpCode opcode;
+		uint32 reg = -1;
 	};
 }

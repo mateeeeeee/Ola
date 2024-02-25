@@ -694,7 +694,7 @@ namespace ola
 		for (BasicBlock* empty_block : empty_blocks)
 		{
 			builder->SetInsertPoint(empty_block);
-			builder->CreateBinaryOp(Binary_Add, builder->GetInt8(0), builder->GetInt8(0));
+			builder->CreateNoop();
 			if (empty_block_successors.contains(empty_block))
 				builder->CreateBranch(empty_block_successors[empty_block]);
 			else builder->CreateBranch(exit_block);

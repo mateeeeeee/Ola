@@ -8,6 +8,8 @@
 HANDLE_VALUE(BasicBlock)
 
 //Instructions
+HANDLE_VALUE(Noop)
+
 HANDLE_VALUE(Call)
 HANDLE_VALUE(Select)
 HANDLE_VALUE(Return)

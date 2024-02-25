@@ -50,14 +50,29 @@ namespace ola::x86_64
 		template <uint32 r>
 		constexpr auto ExtendedGPR(uint32 size)
 		{
-			switch (size)
+			if (r < 10)
 			{
-			case 64: return ConstexprStringValue<'r', '0' + r>;
-			case 32: return ConstexprStringValue<'r', '0' + r, 'd'>;
-			case 16: return ConstexprStringValue<'r', '0' + r, 'w'>;
-			case 8:  return ConstexprStringValue<'r', '0' + r, 'b'>;
+				switch (size)
+				{
+				case 64: return ConstexprStringValue<'r', '0' + r>;
+				case 32: return ConstexprStringValue<'r', '0' + r, 'd'>;
+				case 16: return ConstexprStringValue<'r', '0' + r, 'w'>;
+				case 8:  return ConstexprStringValue<'r', '0' + r, 'b'>;
+				}
+				OLA_UNREACHABLE();
 			}
-			OLA_UNREACHABLE();
+			else
+			{
+				constexpr uint32 q = r % 10;
+				switch (size)
+				{
+				case 64: return ConstexprStringValue<'r', '1', '0' + q>;
+				case 32: return ConstexprStringValue<'r', '1', '0' + q, 'd'>;
+				case 16: return ConstexprStringValue<'r', '1', '0' + q, 'w'>;
+				case 8:  return ConstexprStringValue<'r', '1', '0' + q, 'b'>;
+				}
+				OLA_UNREACHABLE();
+			}
 			return "";
 		}
 		template <char c1, char c2>
