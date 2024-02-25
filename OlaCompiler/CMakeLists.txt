@@ -4,8 +4,8 @@ find_package(LLVM 17.0 REQUIRED CONFIG)
 configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
 
 set(CORE_FILES
-  Core/CoreTypes.h
-  Core/Defines.h
+  Core/Types.h
+  Core/Macros.h
   Core/Logger.h
 )
 
@@ -275,9 +275,9 @@ set(DISABLED_WARNINGS
 target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
 
 if(MSVC)
-    add_definitions(/FI"Core/CoreTypes.h" /FI"Core/Defines.h")
+    add_definitions(/FI"Core/Types.h" /FI"Core/Macros.h")
 else()                                                   
-    add_definitions(-include Core/CoreTypes.h -include Core/Defines.h)
+    add_definitions(-include Core/Types.h -include Core/Macros.h)
 endif()
 
 install(TARGETS OlaCompiler DESTINATION bin)
