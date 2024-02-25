@@ -63,6 +63,10 @@ namespace ola
 					{
 						ola_ir_stream << "StoreInst\n";
 					}
+					else if (LoadInst const* load_inst = dyn_cast<LoadInst>(inst))
+					{
+						ola_ir_stream << "LoadInst\n";
+					}
 					else if (ReturnInst const* ret_inst = dyn_cast<ReturnInst>(inst))
 					{
 						ola_ir_stream << "ReturnInst\n";
@@ -71,6 +75,14 @@ namespace ola
 					{
 						auto BB = branch->GetIfTrueDestination();
 						ola_ir_stream << "BranchInst to:" << BB->GetName() << "\n";
+					}
+					else if (BinaryOperator const* binary_op = dyn_cast<BinaryOperator>(inst))
+					{
+						ola_ir_stream << "BinaryOperator" << "\n";
+					}
+					else if (UnaryOperator const* unary_op = dyn_cast<UnaryOperator>(inst))
+					{
+						ola_ir_stream << "UnaryOperator" << "\n";
 					}
 				}
 			}

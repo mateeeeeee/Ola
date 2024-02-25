@@ -135,19 +135,29 @@ namespace ola
 		}
 		break;
 		case MachineOpCode::Add:
+		BinaryOperatorCommon(MI, "add");
+		break;
+		case MachineOpCode::Sub:
+		BinaryOperatorCommon(MI, "sub");
+		break;
+		case MachineOpCode::Mul:
+		BinaryOperatorCommon(MI, "imul");
+		break;
+		case MachineOpCode::Div:
+		BinaryOperatorCommon(MI, "idiv");
+		break;
+		case MachineOpCode::Neg:
 		{
-			MachineOperand const& lhs = MI.Op<0>();
-			MachineOperand const& rhs = MI.Op<1>();
+			MachineOperand const& operand = MI.Op<0>();
 
-			std::string lhs_string = GetOperandAsString(lhs);
-			std::string rhs_string = GetOperandAsString(rhs);
+			std::string op_string = GetOperandAsString(operand);
 
 			uint32 result_reg_idx = MI.GetReg(); result_reg_idx = result_reg_idx & ~(1u << 31);
 			x86_64::Register reg = x86_64::windows::callee_saved_registers[result_reg_idx];
 			std::string res_string = ToString(reg);
 
-			EmitLn<Text>("mov {}, {}", res_string, lhs_string);
-			EmitLn<Text>("add {}, {}", res_string, rhs_string);
+			EmitLn<Text>("mov {}, {}", res_string, op_string);
+			EmitLn<Text>("neg {}", res_string);
 		}
 		break;
 		}
@@ -166,7 +176,7 @@ namespace ola
 		else if (MO.IsReg())
 		{
 			uint32 reg_idx = MO.GetReg();
-			reg_idx = reg_idx & ~(1u << 31);
+			reg_idx = reg_idx & ~(1u << 31); //temporary until register allocator is added
 			x86_64::Register reg = x86_64::windows::callee_saved_registers[reg_idx];
 			return ToString(reg);
 		}
@@ -184,6 +194,22 @@ namespace ola
 			return std::string(gvar_name);
 		}
 		return "";
+	}
+
+	void x64MachineModule::BinaryOperatorCommon(MachineInst& MI, char const* op)
+	{
+		MachineOperand const& lhs = MI.Op<0>();
+		MachineOperand const& rhs = MI.Op<1>();
+
+		std::string lhs_string = GetOperandAsString(lhs);
+		std::string rhs_string = GetOperandAsString(rhs);
+
+		uint32 result_reg_idx = MI.GetReg(); result_reg_idx = result_reg_idx & ~(1u << 31);
+		x86_64::Register reg = x86_64::windows::callee_saved_registers[result_reg_idx];
+		std::string res_string = ToString(reg);
+
+		EmitLn<Text>("mov {}, {}", res_string, lhs_string);
+		EmitLn<Text>("{} {}, {}", op, res_string, rhs_string);
 	}
 
 }

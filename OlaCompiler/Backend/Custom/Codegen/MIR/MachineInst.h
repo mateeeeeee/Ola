@@ -18,7 +18,8 @@ namespace ola
 		Add,
 		Sub,
 		Mul,
-		Div
+		Div,
+		Neg,
 	};
 
 	class MachineBasicBlock;

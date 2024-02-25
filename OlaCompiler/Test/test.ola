@@ -1,7 +1,7 @@
 
 public int main() 
 {
-	int b = 13;
-	int a = 17 + b;
+	int b = 14;
+	int a = b * 3;
     return a;
 }

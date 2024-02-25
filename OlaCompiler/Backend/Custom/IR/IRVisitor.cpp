@@ -387,12 +387,12 @@ namespace ola
 		break;
 		case UnaryExprKind::Minus:
 		{
-			builder->CreateUnaryOp(UnaryOpcode::Unary_Neg, operand);
+			result = builder->CreateUnaryOp(UnaryOpcode::Unary_Neg, operand);
 		}
 		break;
 		case UnaryExprKind::BitNot:
 		{
-			builder->CreateUnaryOp(UnaryOpcode::Unary_Not, operand);
+			result = builder->CreateUnaryOp(UnaryOpcode::Unary_Not, operand);
 		}
 		break;
 		case UnaryExprKind::LogicalNot:

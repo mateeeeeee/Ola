@@ -20,5 +20,7 @@ namespace ola
 		void EmitInstruction(MachineInst&);
 
 		std::string GetOperandAsString(MachineOperand const&);
+
+		void BinaryOperatorCommon(MachineInst& MI, char const* op);
 	};
 }

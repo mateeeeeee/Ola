@@ -18,6 +18,16 @@ namespace ola
 		{
 		case Binary_Add: return MachineOpCode::Add;
 		case Binary_Sub: return MachineOpCode::Sub;
+		case Binary_Mul: return MachineOpCode::Mul;
+		case Binary_Div: return MachineOpCode::Div;
+		}
+		return MachineOpCode::Invalid;
+	}
+	MachineOpCode ToMachineOpcode(UnaryOpcode op)
+	{
+		switch (op)
+		{
+		case Unary_Neg: return MachineOpCode::Neg;
 		}
 		return MachineOpCode::Invalid;
 	}
@@ -163,6 +173,17 @@ namespace ola
 						machine_binary_op->SetReg(reg_operand.GetReg());
 
 						MBB->Insert(machine_binary_op);
+					}
+					else if (UnaryOperator const* unary_op = dyn_cast<UnaryOperator>(inst))
+					{
+						MachineInst* machine_unary_op = new MachineInst(ToMachineOpcode(unary_op->GetOpcode()));
+						MachineOperand operand = OperandFromValue(unary_op->GetOperand(0));
+						machine_unary_op->AddOperand(operand);
+
+						MachineOperand reg_operand = virtual_reg_allocator.Allocate(unary_op);
+						machine_unary_op->SetReg(reg_operand.GetReg());
+
+						MBB->Insert(machine_unary_op);
 					}
 				}
 			}

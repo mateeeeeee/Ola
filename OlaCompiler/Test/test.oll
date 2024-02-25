@@ -2,6 +2,8 @@
 BB_entry:
 AllocaInst
 StoreInst
+LoadInst
+BinaryOperator
 AllocaInst
 StoreInst
 BranchInst to:exit

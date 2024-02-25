@@ -55,7 +55,7 @@ namespace ola
 	bool Instruction::IsBinaryOp() const
 	{
 		ValueKind kind = GetKind();
-		return kind >= ValueKind_Add && kind <= ValueKind_Sub;
+		return kind >= ValueKind_Add && kind <= ValueKind_Xor;
 	}
 
 	bool Instruction::IsCast() const
