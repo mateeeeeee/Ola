@@ -42,6 +42,7 @@ Ola is a toy object-oriented programming language with LLVM backend.
   
 ## Todo
 * Custom backend
+	- windows x86-64 (wip)
 
 ## Structure
 Ola consists of three parts: 

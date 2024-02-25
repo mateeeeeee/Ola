@@ -15,9 +15,9 @@ sub rsp, 16
 and rsp, -16
 entry:
 mov qword ptr [rbp - 0], 13
-mov r13, 17
-add r13, r12
-mov qword ptr [rbp - 8], r13
+mov r12, 17
+add r12, qword ptr [rbp - 0]
+mov qword ptr [rbp - 8], r12
 exit:
 mov rax, qword ptr [rbp - 8]
 mov rsp, rbp

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <functional>
 #include "MachineModule.h"
 #include "MIR/MIR.h"
 #include "Backend/Custom/IR/IRModule.h"
@@ -90,7 +91,7 @@ namespace ola
 			MFStackAllocator stack_allocator(MF);
 			VirtualRegisterAllocator virtual_reg_allocator;
 
-			auto OperandFromValue = [&](Value const* V) -> MachineOperand
+			std::function<MachineOperand(Value const*)> OperandFromValue = [&](Value const* V) -> MachineOperand
 				{
 					if (ConstantInt const* constant_int = dyn_cast<ConstantInt>(V))
 					{
@@ -107,6 +108,10 @@ namespace ola
 					else if (AllocaInst const* alloc = dyn_cast<AllocaInst>(V))
 					{
 						return stack_allocator.Allocate(alloc);
+					}
+					else if (LoadInst const* load = dyn_cast<LoadInst>(V))
+					{
+						return OperandFromValue(load->GetPointerOperand());
 					}
 					else
 					{

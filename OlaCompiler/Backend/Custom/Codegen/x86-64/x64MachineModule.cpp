@@ -172,7 +172,7 @@ namespace ola
 		}
 		else if (MO.IsMemoryRef())
 		{
-
+			MemoryRef mem_ref = MO.GetMemoryRef();
 		}
 		else if (MO.IsFrameOffset())
 		{
@@ -180,7 +180,8 @@ namespace ola
 		}
 		else if (MO.IsGlobalVariable())
 		{
-
+			std::string_view gvar_name = MO.GetGlobalVariable();
+			return std::string(gvar_name);
 		}
 		return "";
 	}
