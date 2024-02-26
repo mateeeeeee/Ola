@@ -5,7 +5,7 @@
 #include <memory>
 #include <span>
 #include "Compiler/RTTI.h"
-#include "Utility/Enums.h"
+#include "Utility/EnumOperators.h"
 
 
 namespace ola

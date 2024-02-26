@@ -2,7 +2,7 @@
 #include <string_view>
 #include "TokenKind.h"
 #include "SourceLocation.h"
-#include "Utility/Enums.h"
+#include "Utility/EnumOperators.h"
 
 namespace ola
 {

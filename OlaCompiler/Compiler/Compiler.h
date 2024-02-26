@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "Utility/Enums.h"
+#include "Utility/EnumOperators.h"
 
 namespace ola
 {

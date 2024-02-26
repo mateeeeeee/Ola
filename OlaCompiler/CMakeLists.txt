@@ -12,7 +12,7 @@ set(CORE_FILES
 set(UTILITY_FILES
   Utility/DebugVisitor.h
   Utility/DebugVisitor.cpp
-  Utility/Enums.h
+  Utility/EnumOperators.h
   Utility/IntrusiveList.h
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
