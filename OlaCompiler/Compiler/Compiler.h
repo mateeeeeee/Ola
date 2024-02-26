@@ -15,7 +15,11 @@ namespace ola
 		CompilerFlag_O3		 = 0x10,
 		CompilerFlag_NoLLVM  = 0x1000,
 	};
-	DEFINE_ENUM_BIT_OPERATORS(CompilerFlags);
+	template<>
+	struct EnumBitmaskOperators<CompilerFlags>
+	{
+		static constexpr bool enable = true;
+	};
 
 	enum class CompilerOutput
 	{

@@ -17,7 +17,11 @@ namespace ola
 		Qualifier_None = 0x0,
 		Qualifier_Const = 0x1
 	};
-	DEFINE_ENUM_BIT_OPERATORS(QualifierFlag);
+	template<>
+	struct EnumBitmaskOperators<QualifierFlag>
+	{
+		static constexpr bool enable = true;
+	};
 	using Qualifiers = uint8;
 
 	class QualType

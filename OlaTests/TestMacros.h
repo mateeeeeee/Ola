@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/Defines.h"
-#include "Core/CoreTypes.h"
+#include "Core/Macros.h"
+#include "Core/Types.h"
 #include "autogen/OlaConfig.h"
 #include "gtest/gtest.h"
 
