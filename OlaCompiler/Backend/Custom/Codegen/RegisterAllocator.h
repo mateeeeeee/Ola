@@ -9,6 +9,9 @@ namespace ola
 	struct TargetMachineDesc
 	{
 		uint32 physical_registers_count;
+		uint32 return_register_index;
+		uint32 argument_register_indices[6];
+		uint32 argument_register_count;
 	};
 
 	class RegisterAllocator
