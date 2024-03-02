@@ -28,9 +28,9 @@ namespace ola
 		friend class MachineInst;
 
 	public:
-		MachineOperand() : memory(), kind(MO_Register) {}
+		MachineOperand() : memory(), kind(MO_Register), operand_size(8) {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
-		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory() {}
+		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory(), operand_size(8) {}
 
 		MachineOperandKind GetKind() const { return kind; }
 
@@ -134,6 +134,9 @@ namespace ola
 			return (reg >> 31) & 1; 
 		}
 
+		void SetSize(uint32 size) { operand_size = size; }
+		uint32 GetSize() const    { return operand_size; }
+
 	private:
 		MachineOperandKind kind;
 		MachineInst* parent = nullptr;
@@ -146,6 +149,7 @@ namespace ola
 			int32 frame_offset;
 		};
 		std::string global_variable_name;
+		uint32 operand_size;
 		bool is_def = false;
 	};
 

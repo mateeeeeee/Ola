@@ -96,33 +96,33 @@ namespace ola
 			return -1;
 		}
 
-		void SpillAtInterval(std::vector<LiveInterval>& intervals, LiveInterval const& current_interval)
+		void SpillAtInterval(MachineFunction& MF, std::vector<LiveInterval>& live_intervals, std::unordered_map<uint32, uint32>& virt2stack, LiveInterval const& interval)
 		{
 			LiveInterval* spill = nullptr;
-			for (LiveInterval& interval : intervals)
+			for (LiveInterval& live_interval : live_intervals)
 			{
-				if (interval.EndIdx() <= current_interval.EndIdx())
+				if (live_interval.EndIdx() <= interval.EndIdx())
 				{
-					spill = &interval;
+					spill = &live_interval;
 				}
 				else break;
 			}
 
-			if (spill && spill->EndIdx() > current_interval.EndIdx())
+			if (spill && spill->EndIdx() > interval.EndIdx())
 			{
-				//spill->stack_offset = AllocateStackLocation();
-				intervals.erase(std::remove(intervals.begin(), intervals.end(), *spill), intervals.end());
-				intervals.push_back(current_interval);
-				std::sort(intervals.begin(), intervals.end(), [](LiveInterval const& a, LiveInterval const& b)
+				virt2stack[spill->Reg()] = MF.AllocateStack(8); 
+				live_intervals.erase(std::remove(live_intervals.begin(), live_intervals.end(), *spill), live_intervals.end());
+				live_intervals.push_back(interval);
+				std::sort(live_intervals.begin(), live_intervals.end(), [](LiveInterval const& a, LiveInterval const& b)
 					{
 					return a.EndIdx() < b.EndIdx();
 					});
 			}
-			else {
-				//current_interval.stack_offset = AllocateStackLocation();
+			else 
+			{
+				virt2stack[interval.Reg()] = MF.AllocateStack(8);
 			}
 		}
-
 	}
 
 	void LinearScanRegisterAllocator::AllocateRegisters(MachineFunction& MF)
@@ -130,13 +130,13 @@ namespace ola
 		std::vector<LiveInterval> live_intervals = LivenessAnalysis(MF);
 		std::vector<bool> registers_allocated(mach_desc.physical_registers_count, false);
 		std::unordered_map<uint32, uint32> virt2phys_map;
-		for (const LiveInterval& interval : live_intervals) 
+		std::unordered_map<uint32, uint32> virt2stack_map;
+		for (LiveInterval const& interval : live_intervals)
 		{
 			linear_scan_impl::ExpireOldIntervals(live_intervals, interval, registers_allocated);
-
 			if (std::count(registers_allocated.begin(), registers_allocated.end(), false) == 0) 
 			{
-				linear_scan_impl::SpillAtInterval(live_intervals, interval);
+				linear_scan_impl::SpillAtInterval(MF, live_intervals, virt2stack_map, interval);
 			}
 			else 
 			{
@@ -154,7 +154,14 @@ namespace ola
 				{
 					if (MO.IsReg() && MO.IsVirtual()) 
 					{
-						MO.SetReg(virt2phys_map[MO.GetReg()]);
+						if (virt2phys_map.contains(MO.GetReg()))
+						{
+							MO.SetReg(virt2phys_map[MO.GetReg()]);
+						}
+						else if (virt2stack_map.contains(MO.GetReg()))
+						{
+							MO.SetFrameOffset(virt2stack_map[MO.GetReg()]);
+						}
 					}
 				}
 			}
