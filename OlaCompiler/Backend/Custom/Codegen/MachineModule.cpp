@@ -34,12 +34,13 @@ namespace ola
 
 	struct VirtualRegisterAllocator
 	{
-		[[maybe_unused]] MachineOperand Allocate(Value const* val)
+		[[maybe_unused]] MachineOperand Allocate(Value const* V)
 		{
-			if (value_reg_map.contains(val)) return value_reg_map[val];
+			if (value_reg_map.contains(V)) return value_reg_map[V];
 			MachineOperand virtual_reg(MO_Register);
 			virtual_reg.SetReg(current_index++);
-			value_reg_map[val] = virtual_reg;
+			virtual_reg.SetSize(V->GetType()->GetSize());
+			value_reg_map[V] = virtual_reg;
 			return virtual_reg;
 		}
 
@@ -57,6 +58,7 @@ namespace ola
 			MachineOperand stack_alloc(MO_FrameIndex);
 			uint32 alloc_size = alloc->GetAllocatedType()->GetSize();
 			stack_alloc.SetFrameOffset(MF.AllocateStack(alloc_size));
+			stack_alloc.SetSize(alloc_size);
 			value_stack_alloc_map[alloc] = stack_alloc;
 			return stack_alloc;
 		}
@@ -107,12 +109,15 @@ namespace ola
 					{
 						MachineOperand operand(MO_IntImmediate);
 						operand.SetImm(constant_int->GetValue());
+						operand.SetSize(constant_int->GetIntegerType()->GetWidth());
+						constant_int->GetBitWidth();
 						return operand;
 					}
 					else if (ConstantFloat const* constant_float = dyn_cast<ConstantFloat>(V))
 					{
 						MachineOperand operand(MO_FPImmediate);
 						operand.SetFPImm(constant_float->GetValue());
+						operand.SetSize(constant_float->GetType()->GetSize());
 						return operand;
 					}
 					else if (AllocaInst const* alloc = dyn_cast<AllocaInst>(V))
@@ -128,7 +133,6 @@ namespace ola
 						return virtual_reg_allocator.Allocate(V);
 					}
 				};
-
 			for (auto const& BB : ir_function)
 			{
 				for (auto inst_iterator = BB.begin(); inst_iterator != BB.end(); ++inst_iterator)

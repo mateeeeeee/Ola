@@ -28,9 +28,9 @@ namespace ola
 		friend class MachineInst;
 
 	public:
-		MachineOperand() : memory(), kind(MO_Register), operand_size(8) {}
+		MachineOperand() : memory(), kind(MO_Register), operand_size() {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
-		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory(), operand_size(8) {}
+		explicit MachineOperand(MachineOperandKind kind) : kind(kind), memory(), operand_size() {}
 
 		MachineOperandKind GetKind() const { return kind; }
 
