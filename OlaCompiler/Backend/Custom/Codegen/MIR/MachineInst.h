@@ -10,6 +10,7 @@ namespace ola
 	enum class MachineOpCode : uint16
 	{
 		Invalid,
+		Mov,
 		Load,
 		Store,
 		Jump,
@@ -19,7 +20,7 @@ namespace ola
 		Sub,
 		Mul,
 		Div,
-		Neg,
+		Neg
 	};
 
 	class MachineBasicBlock;

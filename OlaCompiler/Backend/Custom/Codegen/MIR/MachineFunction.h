@@ -44,7 +44,7 @@ namespace ola
 
 		void PushBack(MachineBasicBlock* MBB) { basic_blocks.PushBack(MBB); }
 		void PushFront(MachineBasicBlock* MBB) { basic_blocks.PushFront(MBB); }
-		void insert(MachineBasicBlock* MBB, MachineBasicBlock* insert_before)
+		void Insert(MachineBasicBlock* MBB, MachineBasicBlock* insert_before)
 		{
 			basic_blocks.Insert(MBB, insert_before);
 		}

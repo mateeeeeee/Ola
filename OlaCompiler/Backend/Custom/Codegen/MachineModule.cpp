@@ -142,8 +142,6 @@ namespace ola
 					if (AllocaInst const* alloca_inst = dyn_cast<AllocaInst>(inst))
 					{
 						MachineInst* alloc = new MachineInst(MachineOpCode::Alloca);
-						MachineOperand alloc_size(MO_IntImmediate);
-						alloc_size.SetImm((int64)alloca_inst->GetAllocatedType()->GetSize());
 						alloc->AddOperand(stack_allocator.Allocate(alloca_inst));
 						MBB->Insert(alloc);
 					}
