@@ -12,8 +12,6 @@
 #include "Frontend/Sema.h"
 
 #include "Backend/LLVM/LLVMIRGen.h"
-#include "Backend/Custom/IR/IRGen.h"
-#include "Backend/Custom/Codegen/MachineCodeGen.h"
 
 #include "Utility/DebugVisitor.h"
 #include "Utility/Managed.h"
@@ -85,12 +83,7 @@ namespace ola
 			}
 			else
 			{
-				IRGen ir_gen(source_file);
-				ir_gen.Generate(ast);
-				ir_gen.PrintIR(ir_file);
-				MachineCodeGen machine_codegen(MachineArch::x64, ir_gen.GetModule());
-				machine_codegen.Generate(assembly_file);
-				ManagedRegistry::Cleanup();
+				OLA_ASSERT_MSG(false, "not implemented yet!");
 			}
 		}
 	}
