@@ -16,8 +16,6 @@ set(UTILITY_FILES
   Utility/IntrusiveList.h
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
-  Utility/Managed.h
-  Utility/ConstexprString.h
   Utility/VoidPointerMap.h
   Utility/Attribute.h
 )
