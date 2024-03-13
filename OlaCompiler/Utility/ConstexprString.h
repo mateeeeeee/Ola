@@ -10,5 +10,4 @@ namespace ola
 
 	template<char... Chars>
 	constexpr auto ConstexprStringValue = ConstexprString<Chars...>::value;
-
 }
