@@ -14,7 +14,6 @@
 #include "Backend/LLVM/LLVMIRGen.h"
 
 #include "Utility/DebugVisitor.h"
-#include "Utility/Managed.h"
 #include "autogen/OlaConfig.h"
 
 #include "spdlog/spdlog.h"

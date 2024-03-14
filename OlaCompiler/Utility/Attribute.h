@@ -4,13 +4,12 @@ namespace ola
 	template <typename Attr>
 	class Attribute
 	{
-		Attr attribute;
 	public:
 
 		constexpr Attribute() : attribute{ static_cast<Attr>(0) } {}
 		constexpr Attribute(Attr attr) : attribute{ attr } {}
 
-		OLA_NODISCARD bool hasAttr(Attr attr) const 
+		OLA_NODISCARD bool HasAttr(Attr attr) const 
 		{
 			return static_cast<uint32>(attribute) & static_cast<uint32>(attr);
 		}
@@ -28,5 +27,8 @@ namespace ola
 		{
 			return !static_cast<uint32>(attribute);
 		}
+
+	private:
+		Attr attribute;
 	};
 }

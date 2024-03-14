@@ -193,7 +193,6 @@ namespace ola
 		void Erase(pointer node)
 		{
 			Remove(node);
-			delete node;
 		}
 
 		void Clear()
