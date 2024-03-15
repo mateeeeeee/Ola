@@ -1,5 +1,6 @@
 #include "IRContext.h"
 #include "IRType.h"
+#include "Constant.h"
 
 namespace ola
 {
@@ -11,6 +12,9 @@ namespace ola
 		int8_type = new(this) IRIntType(*this, 8);
 		float_type = new(this) IRFloatType(*this);
 		label_type = new(this) IRLabelType(*this);
+
+		true_value = new ConstantInt(int1_type, 1);
+		false_value = new ConstantInt(int1_type, 0);
 	}
 
 	IRContext::~IRContext()
@@ -19,6 +23,13 @@ namespace ola
 		for (IRStructType* struct_type : struct_types)		delete struct_type;
 		for (IRPtrType* ref_type : pointer_types)			delete ref_type;
 		for (IRFuncType* function_type : function_types)	delete function_type;
+
+		for (auto& [_, v] : constant_strings) delete v;
+		for (auto& [_, v] : constant_ints64) delete v;
+		for (auto& [_, v] : constant_ints8) delete v;
+
+		delete false_value;
+		delete true_value;
 
 		delete label_type;
 		delete float_type;
@@ -108,21 +119,21 @@ namespace ola
 	ConstantString* IRContext::GetString(std::string_view str)
 	{
 		if (constant_strings.contains(str)) return constant_strings[str];
-		//constant_strings[str] = Create<ConstantString>(*this, str);
+		constant_strings[str] = new ConstantString(*this, str);
 		return constant_strings[str];
 	}
 
 	ConstantInt* IRContext::GetInt64(int64 value)
 	{
 		if (constant_ints64.contains(value)) return constant_ints64[value];
-		//constant_ints64[value] = Create<ConstantInt>(int8_type, value);
+		constant_ints64[value] = new ConstantInt(int8_type, value);
 		return constant_ints64[value];
 	}
 
 	ConstantInt* IRContext::GetInt8(int8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
-		//constant_ints8[value] = Create<ConstantInt>(int1_type, value);
+		constant_ints8[value] =new ConstantInt(int1_type, value);
 		return constant_ints8[value];
 	}
 

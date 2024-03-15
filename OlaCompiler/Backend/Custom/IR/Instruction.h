@@ -50,7 +50,7 @@ namespace ola
 		SMax,
 		IntegerOpEnd,
 		// floating point ops
-		FloatingPointOpBegin,
+		FloatOpBegin,
 		FAdd,
 		FSub,
 		FMul,
@@ -58,7 +58,7 @@ namespace ola
 		FNeg,
 		FAbs,
 		FFma,
-		FloatingPointOpEnd,
+		FloatOpEnd,
 		// compare ops
 		CompareOpBegin,
 		ICmp,
@@ -183,7 +183,7 @@ namespace ola
 		GET_INST_CATEGORY(Terminator)
 		GET_INST_CATEGORY(MemoryOp)
 		GET_INST_CATEGORY(IntegerOp)
-		GET_INST_CATEGORY(FloatingPointOp)
+		GET_INST_CATEGORY(FloatOp)
 		GET_INST_CATEGORY(CastOp)
 		GET_INST_CATEGORY(CompareOp)
 #undef GET_INST_CATEGORY
