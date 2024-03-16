@@ -44,11 +44,11 @@ namespace ola
 		ConstantInt* GetFalseValue() const { return false_value; }
 
 	private:
-		IRVoidType*	 void_type;
-		IRIntType* int1_type;
-		IRIntType* int8_type;
-		IRFloatType*   float_type;
-		IRLabelType*   label_type;
+		IRVoidType*		void_type;
+		IRIntType*		int1_type;
+		IRIntType*		int8_type;
+		IRFloatType*	float_type;
+		IRLabelType*	label_type;
 
 		std::vector<IRArrayType*>		array_types;
 		std::vector<IRPtrType*>   pointer_types;

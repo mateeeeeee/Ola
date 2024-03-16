@@ -9,6 +9,8 @@ namespace ola
 	class IRVoidType;
 	class IRPtrType;
 
+	class Function;
+	class BasicBlock;
 	class IRContext;
 
 	class IRBuilder
@@ -23,6 +25,10 @@ namespace ola
 
 	private:
 		IRContext& ctx;
+		Function* mCurrentFunction;
+		BasicBlock* mCurrentBlock;
+		//IntrusiveListIterator<Instruction> mInsertPoint;
+
 	};
 
 
