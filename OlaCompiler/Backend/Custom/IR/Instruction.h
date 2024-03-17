@@ -98,6 +98,7 @@ namespace ola
 	class Use : public IListNode<Use>
 	{
 	public:
+		Use() : value(nullptr), user(nullptr) {}
 		Use(Value* val, Instruction* user);
 		~Use();
 
@@ -172,6 +173,8 @@ namespace ola
 	class Instruction : public TrackableValue, public IListNode<Instruction>
 	{
 	public:
+		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), instr_id(InstructionID::None) {}
+
 		InstructionID GetInstrID() const 
 		{
 			return instr_id;

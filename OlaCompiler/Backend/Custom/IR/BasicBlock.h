@@ -59,6 +59,6 @@ namespace ola
 		Function* function;
 		std::string label;
 		uint32 block_idx;
-		IntrusiveList<Instruction> instructions;
+		IList<Instruction> instructions;
 	};
 }
