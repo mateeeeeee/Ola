@@ -61,8 +61,8 @@ set(FRONTEND_FILES
 
 
 set(BACKEND_FILES
-  Backend/LLVM/LLVMIRGen.h
-  Backend/LLVM/LLVMIRGen.cpp
+  Backend/LLVM/LLVMIRGenContext.h
+  Backend/LLVM/LLVMIRGenContext.cpp
   Backend/LLVM/LLVMIRVisitor.h
   Backend/LLVM/LLVMIRVisitor.cpp
   Backend/LLVM/LLVMOptimizer.h
@@ -73,8 +73,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRBuilder.cpp
   Backend/Custom/IR/IRContext.h
   Backend/Custom/IR/IRContext.cpp
-  Backend/Custom/IR/IRGen.h
-  Backend/Custom/IR/IRGen.cpp
+  Backend/Custom/IR/IRGenContext.h
+  Backend/Custom/IR/IRGenContext.cpp
   Backend/Custom/IR/IRModule.h
   Backend/Custom/IR/IRModule.cpp
   Backend/Custom/IR/IRType.h
@@ -89,7 +89,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/GlobalValue.h
   Backend/Custom/IR/GlobalValue.cpp
   Backend/Custom/IR/BasicBlock.h
-  Backend/Custom/IR/ConstantValue.h
+  Backend/Custom/IR/Constant.h
+  Backend/Custom/IR/Constant.cpp
 )
 
 set(COMPILER_FILES

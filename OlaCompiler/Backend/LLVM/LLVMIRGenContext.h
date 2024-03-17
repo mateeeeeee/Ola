@@ -10,15 +10,15 @@ namespace ola
 	struct AST;
 	class LLVMIRVisitor;
 
-	class LLVMIRGen
+	class LLVMIRGenContext
 	{
 	public:
-		explicit LLVMIRGen(std::string_view file_name);
-		~LLVMIRGen();
+		explicit LLVMIRGenContext(std::string_view file_name);
+		~LLVMIRGenContext();
 
 		void Generate(AST const* ast);
 		void Optimize(OptimizationLevel);
-		void PrintIR(std::string_view output_file);
+		void EmitIR(std::string_view output_file);
 
 	private:
 		llvm::LLVMContext context;

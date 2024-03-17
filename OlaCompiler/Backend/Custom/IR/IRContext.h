@@ -42,6 +42,7 @@ namespace ola
 		ConstantInt* GetInt8(int8 value);
 		ConstantInt* GetTrueValue()  const { return true_value; }
 		ConstantInt* GetFalseValue() const { return false_value; }
+		ConstantFloat* GetZeroFloat() const { return zero_float; }
 
 	private:
 		IRVoidType*		void_type;
@@ -57,10 +58,10 @@ namespace ola
 
 		ConstantInt* true_value;
 		ConstantInt* false_value;
+		ConstantFloat* zero_float;
 		std::unordered_map<std::string_view, ConstantString*> constant_strings;
 		std::unordered_map<int64, ConstantInt*> constant_ints64;
 		std::unordered_map<int8, ConstantInt*> constant_ints8;
-		
 	};
 }
 

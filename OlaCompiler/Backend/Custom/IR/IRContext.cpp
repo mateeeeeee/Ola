@@ -15,6 +15,7 @@ namespace ola
 
 		true_value = new ConstantInt(int1_type, 1);
 		false_value = new ConstantInt(int1_type, 0);
+		zero_float = new ConstantFloat(float_type, 0.0);
 	}
 
 	IRContext::~IRContext()
@@ -28,6 +29,7 @@ namespace ola
 		for (auto& [_, v] : constant_ints64) delete v;
 		for (auto& [_, v] : constant_ints8) delete v;
 
+		delete zero_float;
 		delete false_value;
 		delete true_value;
 

@@ -26,7 +26,7 @@ namespace ola
 
 	class LLVMIRVisitor : public ASTVisitor
 	{
-		friend class LLVMIRGen;
+		friend class LLVMIRGenContext;
 
 		using LLVMValueMap = VoidPointerMap<llvm::Value*>;
 		using LLVMVTableMap = VoidPointerMap<llvm::GlobalVariable*>;

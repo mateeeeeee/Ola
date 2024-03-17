@@ -11,7 +11,7 @@
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 
-#include "Backend/LLVM/LLVMIRGen.h"
+#include "Backend/LLVM/LLVMIRGenContext.h"
 
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
@@ -72,10 +72,10 @@ namespace ola
 
 			if (use_llvm)
 			{
-				LLVMIRGen llvm_ir_gen(source_file);
+				LLVMIRGenContext llvm_ir_gen(source_file);
 				llvm_ir_gen.Generate(ast);
 				llvm_ir_gen.Optimize(opt_level);
-				llvm_ir_gen.PrintIR(ir_file);
+				llvm_ir_gen.EmitIR(ir_file);
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				system(compile_cmd.c_str());
@@ -160,10 +160,10 @@ namespace ola
 			AST const* ast = parser.GetAST();
 			if (debug) DebugVisitor debug_ast(ast);
 
-			LLVMIRGen llvm_ir_generator("tmp.ola");
+			LLVMIRGenContext llvm_ir_generator("tmp.ola");
 			llvm_ir_generator.Generate(ast);
 			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
-			llvm_ir_generator.PrintIR(ir_file.string());
+			llvm_ir_generator.EmitIR(ir_file.string());
 
 			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file.string(), assembly_file.string());
 			system(compile_cmd.c_str());

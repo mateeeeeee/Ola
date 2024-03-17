@@ -6,14 +6,14 @@ namespace ola
 {
 	struct AST;
 
-	class IRGen
+	class IRGenContext
 	{
 	public:
-		explicit IRGen(std::string_view filename);
-		~IRGen();
+		explicit IRGenContext(std::string_view filename);
+		~IRGenContext();
 
 		void Generate(AST const* ast);
-		void PrintIR(std::string_view output_file);
+		void EmitIR(std::string_view output_file);
 
 		IRModule& GetModule() { return module; }
 

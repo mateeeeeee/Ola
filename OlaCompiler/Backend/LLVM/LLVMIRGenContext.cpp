@@ -1,4 +1,4 @@
-#include "LLVMIRGen.h"
+#include "LLVMIRGenContext.h"
 #include "LLVMIRVisitor.h"
 #include "LLVMOptimizer.h"
 #include "Core/Logger.h"
@@ -10,30 +10,30 @@
 namespace ola
 {
 
-	LLVMIRGen::LLVMIRGen(std::string_view file_name) : context(), module(file_name.data(), context)
+	LLVMIRGenContext::LLVMIRGenContext(std::string_view file_name) : context(), module(file_name.data(), context)
 	{
 		llvm::InitializeAllTargets();
 		llvm::InitializeAllTargetMCs();
 		llvm::InitializeAllAsmPrinters();
 		llvm::InitializeAllAsmParsers();
 	}
-	LLVMIRGen::~LLVMIRGen() = default;
+	LLVMIRGenContext::~LLVMIRGenContext() = default;
 
-	void LLVMIRGen::Generate(AST const* ast)
+	void LLVMIRGenContext::Generate(AST const* ast)
 	{
 		LLVMIRVisitor llvm_visitor(context, module);
 		llvm_visitor.VisitAST(ast);
 		bool verified = VerifyModule(module);
 	}
 
-	void LLVMIRGen::Optimize(OptimizationLevel level)
+	void LLVMIRGenContext::Optimize(OptimizationLevel level)
 	{
 		LLVMOptimizer optimizer(module);
 		optimizer.Optimize(level);
 		bool verified = VerifyModule(module);
 	}
 
-	void LLVMIRGen::PrintIR(std::string_view output_file)
+	void LLVMIRGenContext::EmitIR(std::string_view output_file)
 	{
 		std::error_code error;
 		llvm::raw_fd_ostream llvm_ir_file(output_file, error, llvm::sys::fs::OF_None);
@@ -45,7 +45,7 @@ namespace ola
 		module.print(llvm_ir_file, nullptr);
 	}
 
-	bool LLVMIRGen::VerifyModule(llvm::Module& module)
+	bool LLVMIRGenContext::VerifyModule(llvm::Module& module)
 	{
 		std::string error_msg;
 		llvm::raw_string_ostream error_stream(error_msg);

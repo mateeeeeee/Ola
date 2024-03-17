@@ -26,7 +26,7 @@ namespace ola
 
 	class IRVisitor : public ASTVisitor
 	{
-		friend class IRGen;
+		friend class IRGenContext;
 
 		using ValueMap = VoidPointerMap<Value*>;
 		using VTableMap = VoidPointerMap<GlobalVariable*>;

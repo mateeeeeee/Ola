@@ -21,7 +21,7 @@ namespace ola
 			return module_id;
 		}
 
-		void PrintIR(std::string_view filename);
+		void EmitIR(std::string_view filename);
 
 	private:
 		IRContext& context;

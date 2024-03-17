@@ -381,25 +381,25 @@ namespace ola
 		}
 	}
 
-	void LLVMIRVisitor::Visit(FieldDecl const& member_var, uint32)
+	void LLVMIRVisitor::Visit(FieldDecl const& field_decl, uint32)
 	{
-		QualType const& var_type = member_var.GetType();
+		QualType const& var_type = field_decl.GetType();
 		llvm::Type* llvm_type = ConvertToIRType(var_type);
 
-		if (Expr const* init_expr = member_var.GetInitExpr())
+		if (Expr const* init_expr = field_decl.GetInitExpr())
 		{
 			init_expr->Accept(*this);
 			llvm::Value* init_value = value_map[init_expr];
 			OLA_ASSERT(llvm::isa<llvm::Constant>(init_value));
-			value_map[&member_var] = cast<llvm::Constant>(init_value);
+			value_map[&field_decl] = cast<llvm::Constant>(init_value);
 		}
 		else
 		{
-			value_map[&member_var] = llvm::Constant::getNullValue(llvm_type);
+			value_map[&field_decl] = llvm::Constant::getNullValue(llvm_type);
 		}
 	}
 
-	void LLVMIRVisitor::Visit(ParamVarDecl const& param_var, uint32)
+	void LLVMIRVisitor::Visit(ParamVarDecl const&, uint32)
 	{
 	}
 
@@ -413,15 +413,14 @@ namespace ola
 		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
 	}
 
-	void LLVMIRVisitor::Visit(EnumMemberDecl const& enum_member, uint32)
+	void LLVMIRVisitor::Visit(EnumMemberDecl const& enum_member_decl, uint32)
 	{
-		llvm::ConstantInt* constant = builder.getInt64(enum_member.GetValue()); 
-		value_map[&enum_member] = constant;
+		llvm::ConstantInt* constant = builder.getInt64(enum_member_decl.GetValue()); 
+		value_map[&enum_member_decl] = constant;
 	}
 
 	void LLVMIRVisitor::Visit(AliasDecl const&, uint32)
 	{
-		//alias declaration doesn't generate any code
 	}
 
 	void LLVMIRVisitor::Visit(ClassDecl const& class_decl, uint32)

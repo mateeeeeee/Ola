@@ -3,6 +3,10 @@
 #include "IRModule.h"
 #include "IRContext.h"
 #include "IRType.h"
+#include "Instruction.h"
+#include "Constant.h"
+#include "BasicBlock.h"
+#include "GlobalValue.h"
 #include "Frontend/AST/AST.h"
 #include "Frontend/AST/Decl.h"
 #include "Frontend/AST/Stmt.h"
@@ -61,9 +65,22 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(FieldDecl const&, uint32)
+	void IRVisitor::Visit(FieldDecl const& field_decl, uint32)
 	{
+		QualType const& var_type = field_decl.GetType();
+		IRType* ir_type = ConvertToIRType(var_type);
 
+		if (Expr const* init_expr = field_decl.GetInitExpr())
+		{
+			init_expr->Accept(*this);
+			Value* init_value = value_map[init_expr];
+			OLA_ASSERT(isa<Constant>(init_value));
+			value_map[&field_decl] = cast<Constant>(init_value);
+		}
+		else
+		{
+			value_map[&field_decl] = Constant::GetNullValue(ir_type);
+		}
 	}
 
 	void IRVisitor::Visit(VarDecl const& var_decl, uint32)
@@ -123,7 +140,20 @@ namespace ola
 
 	void IRVisitor::Visit(ReturnStmt const& return_stmt, uint32)
 	{
-		
+		BasicBlock* current_block = builder->GetCurrentBlock();
+		Function* current_function = current_block->GetFunction();
+		if (Expr const* return_expr = return_stmt.GetExprStmt()->GetExpr())
+		{
+			return_expr->Accept(*this);
+			Value* return_expr_value = value_map[return_expr];
+			OLA_ASSERT(return_expr_value);
+
+			if (current_function->GetReturnType()->IsPointerType()) builder->MakeInst<StoreInst>(return_value, return_expr_value);
+			else return_value = return_expr_value;
+		}
+		//builder.CreateBr(exit_block);
+		BasicBlock* return_block = nullptr;// BasicBlock::Create(context, "return", current_function, current_block->getNextNode());
+		builder->SetCurrentBlock(return_block);
 	}
 
 	void IRVisitor::Visit(IfStmt const&, uint32)

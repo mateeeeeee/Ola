@@ -24,6 +24,9 @@ namespace ola
 		{
 			return V->GetKind() == ValueKind::Constant;
 		}
+
+		static Constant* GetNullValue(IRType* Ty);
+
 	protected:
 		ConstantID constant_id;
 
