@@ -11,7 +11,10 @@ namespace ola
 	{
 	public:
 		explicit BasicBlock(Function* function, uint32 idx = -1) : function(function), block_idx(idx) {}
-
+		~BasicBlock()
+		{
+			
+		}
 		auto& Instructions()
 		{
 			return instructions;

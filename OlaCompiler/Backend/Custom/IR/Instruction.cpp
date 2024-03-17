@@ -47,9 +47,19 @@ namespace ola
 		return false;
 	}
 
-	void Instruction::InsertBefore(BasicBlock* block, Instruction* pos)
+	IListIterator<Instruction> Instruction::InsertBefore(BasicBlock* BB, Instruction* I)
 	{
+		return InsertBefore(BB, I->GetIterator());
+	}
 
+	IListIterator<Instruction> Instruction::InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT)
+	{
+		if (basic_block) 
+		{
+			basic_block->Instructions().Remove(this);
+		}
+		basic_block = BB;
+		return BB->Instructions().Insert(IT, this);
 	}
 
 	bool Instruction::CanBeOperand() const

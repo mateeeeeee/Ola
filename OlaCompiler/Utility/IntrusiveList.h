@@ -659,12 +659,12 @@ namespace ola
 		{
 			Insert(this->begin(), count, val);
 		}
-		template<class InIt> IList(InIt first, InIt last)
+		template<class InIt> 
+		IList(InIt first, InIt last)
 		{
 			Insert(this->begin(), first, last);
 		}
 
-		// bring hidden functions into scope
 		using IPList<NodeTy>::Insert;
 		using IPList<NodeTy>::PushFront;
 		using IPList<NodeTy>::PushBack;
@@ -673,9 +673,11 @@ namespace ola
 		{
 			return Insert(where, this->CreateNode(val));
 		}
+		iterator Insert(iterator where, const NodeTy* val)
+		{
+			return Insert(where, this->CreateNode(val));
+		}
 
-
-		// Front and back inserters...
 		void PushFront(const NodeTy& val) { Insert(this->begin(), val); }
 		void PushBack(const NodeTy& val) { Insert(this->end(), val); }
 
@@ -706,8 +708,6 @@ namespace ola
 				Insert(last1, first2, last2);
 		}
 
-
-		// Resize members...
 		void Resize(size_type newsize, NodeTy val)
 		{
 			iterator i = this->begin();
@@ -728,14 +728,14 @@ namespace ola
 	template <typename NodeTy> struct IListEmbeddedSentinelTraits;
 	template <typename NodeTy> struct IListHalfEmbeddedSentinelTraits;
 
-	/// ilist_half_node - Base class that provides prev services for sentinels.
-	///
+
 	template<typename NodeTy>
 	class IListHalfNode
 	{
 		friend struct IListTraits<NodeTy>;
 		friend struct IListHalfEmbeddedSentinelTraits<NodeTy>;
 		NodeTy* prev;
+
 	protected:
 		NodeTy* GetPrev() { return prev; }
 		const NodeTy* GetPrev() const { return prev; }
@@ -748,9 +748,6 @@ namespace ola
 
 	template <typename NodeTy> class IListIterator;
 
-	/// ilist_node - Base class that provides next/prev services for nodes
-	/// that use ilist_nextprev_traits or ilist_default_traits.
-	///
 	template<typename NodeTy>
 	class IListNode : private IListHalfNode<NodeTy>
 	{
@@ -767,11 +764,11 @@ namespace ola
 		IListNode() : next(nullptr) {}
 
 	public:
-		IListIterator<NodeTy> getIterator()
+		IListIterator<NodeTy> GetIterator()
 		{
 			return IListIterator<NodeTy>(static_cast<NodeTy*>(this));
 		}
-		IListIterator<const NodeTy> getIterator() const
+		IListIterator<const NodeTy> GetIterator() const
 		{
 			return IListIterator<const NodeTy>(static_cast<const NodeTy*>(this));
 		}
@@ -779,41 +776,28 @@ namespace ola
 		NodeTy* GetPrevNode()
 		{
 			NodeTy* Prev = this->GetPrev();
-
-			// Check for sentinel.
-			if (!Prev->GetNext())
-				return nullptr;
-
+			if (!Prev->GetNext()) return nullptr;
 			return Prev;
 		}
 
 		const NodeTy* GetPrevNode() const
 		{
-			const NodeTy* Prev = this->GetPrev();
-
-			if (!Prev->GetNext())
-				return nullptr;
-
+			NodeTy const* Prev = this->GetPrev();
+			if (!Prev->GetNext()) return nullptr;
 			return Prev;
 		}
 
 		NodeTy* GetNextNode()
 		{
 			NodeTy* Next = GetNext();
-
-			if (!Next->GetNext())
-				return nullptr;
-
+			if (!Next->GetNext()) return nullptr;
 			return Next;
 		}
 
 		const NodeTy* GetNextNode() const
 		{
 			const NodeTy* Next = GetNext();
-
-			if (!Next->GetNext())
-				return nullptr;
-
+			if (!Next->GetNext()) return nullptr;
 			return Next;
 		}
 	};

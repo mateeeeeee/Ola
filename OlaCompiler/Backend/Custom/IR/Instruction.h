@@ -82,17 +82,12 @@ namespace ola
 		S2F,
 		FCast,
 		CastOpEnd,
-		// miscellaneous
+		// misc
 		Alloca,
 		GetElementPtr,
-		PtrCast,
-		PtrToInt,
-		IntToPtr,
-		PtrAdd,
 		Select,
 		Call,
-		Phi,
-		FunctionPtr
+		Phi
 	};
 
 	class Use : public IListNode<Use>
@@ -173,7 +168,7 @@ namespace ola
 	class Instruction : public TrackableValue, public IListNode<Instruction>
 	{
 	public:
-		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), instr_id(InstructionID::None) {}
+		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), instr_id(InstructionID::None), basic_block(nullptr) {}
 
 		InstructionID GetInstrID() const 
 		{
@@ -184,7 +179,8 @@ namespace ola
 			return basic_block;
 		}
 
-		void InsertBefore(BasicBlock* block, Instruction* pos);
+		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
+		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 
 #define GET_INST_CATEGORY(KIND) bool Is##KIND() const { return InstructionID::KIND##Begin < instr_id && instr_id < InstructionID::KIND##End; }
 		GET_INST_CATEGORY(Terminator)
