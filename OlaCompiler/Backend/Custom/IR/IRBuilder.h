@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <list>
 #include "Utility/IntrusiveList.h"
 
 namespace ola
@@ -17,7 +18,6 @@ namespace ola
 
 	class IRBuilder
 	{
-	public:
 	public:
 		explicit IRBuilder(IRContext& ctx) : ctx(ctx), current_function(nullptr), current_block(nullptr) {}
 		OLA_NONCOPYABLE(IRBuilder)
@@ -42,16 +42,21 @@ namespace ola
 		{
 			static_assert(std::is_base_of_v<Instruction, I>);
 			I* inst = new I(std::forward<Args>(args)...);
-			return inst->InsertBefore(current_block, insert_point);
+			inst->InsertBefore(current_block, insert_point);
+			return inst;
 		}
 
-		BasicBlock* AddBlock(char const*);
+		BasicBlock* AddBlock();
+		BasicBlock* AddBlock(Function* F);
+		BasicBlock* AddBlock(Function* F, BasicBlock* before);
 
 	private:
 		IRContext& ctx;
 		Function* current_function;
 		BasicBlock* current_block;
 		IListIterator<Instruction> insert_point;
+
+		uint32 bb_label_counter = 0;
 	};
 
 

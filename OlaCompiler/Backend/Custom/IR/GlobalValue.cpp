@@ -25,7 +25,7 @@ namespace ola
 	uint64 Function::GetInstructionCount() const
 	{
 		uint64 instruction_count = 0;
-		for (auto const& bb : block_list) instruction_count += bb->Instructions().Size();
+		for (auto const& bb : block_list) instruction_count += bb.Instructions().Size();
 		return instruction_count;
 	}
 
@@ -36,25 +36,17 @@ namespace ola
 
 	void Function::Insert(BasicBlock* BB)
 	{
-		block_list.push_back(BB);
+		block_list.PushBack(BB);
 	}
 
 	void Function::InsertBefore(BasicBlock* BB, BasicBlock* before)
 	{
-		for (auto it = block_list.begin(); it != block_list.end(); ++it)
-		{
-			if (*it = before)
-			{
-				block_list.insert(it, BB);
-				return;
-			}
-		}
-		Insert(BB);
+		block_list.Insert(before->GetIterator(), BB);
 	}
 
 	uint64 Function::Size() const
 	{
-		return block_list.size();
+		return block_list.Size();
 	}
 
 }

@@ -7,14 +7,12 @@ namespace ola
 	class Function;
 	class Instruction;
 
-	class BasicBlock
+	class BasicBlock : public IListNode<BasicBlock>
 	{
 	public:
+		BasicBlock() : function(nullptr), block_idx(-1) {}
 		explicit BasicBlock(Function* function, uint32 idx = -1) : function(function), block_idx(idx) {}
-		~BasicBlock()
-		{
-			
-		}
+		~BasicBlock() {}
 		auto& Instructions()
 		{
 			return instructions;

@@ -151,8 +151,9 @@ namespace ola
 			if (current_function->GetReturnType()->IsPointerType()) builder->MakeInst<StoreInst>(return_value, return_expr_value);
 			else return_value = return_expr_value;
 		}
-		//builder.CreateBr(exit_block);
-		BasicBlock* return_block = nullptr;// BasicBlock::Create(context, "return", current_function, current_block->getNextNode());
+		builder->MakeInst<BranchInst>(context, exit_block);
+		BasicBlock* return_block = builder->AddBlock(current_function, current_block->GetNextNode());
+		return_block->SetLabel("return");
 		builder->SetCurrentBlock(return_block);
 	}
 
@@ -213,7 +214,88 @@ namespace ola
 
 	void IRVisitor::Visit(UnaryExpr const& unary_expr, uint32)
 	{
-		
+		Expr const* operand_expr = unary_expr.GetOperand();
+		operand_expr->Accept(*this);
+		Value* operand_value = value_map[operand_expr];
+		OLA_ASSERT(operand_value);
+		Value* operand = Load(operand_expr->GetType(), operand_value);
+
+		bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
+		Value* result = nullptr;
+		Constant* zero = nullptr;
+		Constant* one = nullptr;
+		if (is_float_expr)
+		{
+			one  = context.GetFloat(1.0);
+			zero = context.GetFloat(0.0);
+		}
+		else
+		{
+			zero = cast<IRIntType>(operand->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
+			one  = cast<IRIntType>(operand->GetType())->GetWidth() == 1 ? context.GetInt8(1) : context.GetInt64(1);
+		}
+
+		switch (unary_expr.GetUnaryKind())
+		{
+		case UnaryExprKind::PreIncrement:
+		{
+			Value* incremented_value = nullptr;
+			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FAdd : InstructionID::Add, operand, one);
+			Store(incremented_value, operand_value);
+			result = incremented_value;
+		}
+		break;
+		case UnaryExprKind::PreDecrement:
+		{
+			Value* decremented_value = nullptr;
+			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FSub : InstructionID::Sub, operand, one);
+			Store(decremented_value, operand_value);
+			result = decremented_value;
+		}
+		break;
+		case UnaryExprKind::PostIncrement:
+		{
+			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
+			Store(operand_value, result);
+			Value* incremented_value = nullptr;
+			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FAdd : InstructionID::Add, operand, one);
+			Store(incremented_value, operand_value);
+		}
+		break;
+		case UnaryExprKind::PostDecrement:
+		{
+			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
+			Store(operand_value, result);
+			Value* decremented_value = nullptr;
+			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FSub : InstructionID::Sub, operand, one);
+			Store(decremented_value, operand_value);
+		}
+		break;
+		case UnaryExprKind::Plus:
+		{
+			result = operand_value;
+		}
+		break;
+		case UnaryExprKind::Minus:
+		{
+			result = is_float_expr ? builder->MakeInst<UnaryInst>(InstructionID::FNeg, operand) : builder->MakeInst<UnaryInst>(InstructionID::Neg, operand);
+		}
+		break;
+		case UnaryExprKind::BitNot:
+		{
+			result = builder->MakeInst<UnaryInst>(InstructionID::Not, operand);
+		}
+		break;
+		case UnaryExprKind::LogicalNot:
+		{
+			result = builder->MakeInst<CompareInst>(is_float_expr ? InstructionID::FCmpUEQ : InstructionID::ICmpEQ, operand, zero);
+		}
+		break;
+		default:
+			OLA_ASSERT(false);
+		}
+		OLA_ASSERT(result);
+		value_map[&unary_expr] = result;
 	}
 
 	void IRVisitor::Visit(BinaryExpr const& binary_expr, uint32)

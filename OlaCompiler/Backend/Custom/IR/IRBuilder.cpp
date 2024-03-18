@@ -28,19 +28,40 @@ namespace ola
 		SetInsertPoint(BB, I->GetIterator());
 	}
 
-
 	void IRBuilder::NextInsertPoint()
 	{
 		++insert_point;
 	}
 
-
-	BasicBlock* IRBuilder::AddBlock(char const* label)
+	BasicBlock* IRBuilder::AddBlock()
 	{
 		auto& blocks = current_function->Blocks();
-		BasicBlock* block = new BasicBlock(current_function, blocks.size());
+		BasicBlock* block = new BasicBlock(current_function, blocks.Size());
+		std::string label = "BB" + std::to_string(bb_label_counter++);
 		block->SetLabel(label);
-		blocks.push_back(block);
+		blocks.PushBack(block);
+		return block;
+	}
+
+
+	BasicBlock* IRBuilder::AddBlock(Function* F)
+	{
+		auto& blocks = F->Blocks();
+		BasicBlock* block = new BasicBlock(F, blocks.Size());
+		std::string label = "BB" + std::to_string(bb_label_counter++);
+		block->SetLabel(label);
+		blocks.PushBack(block);
+		return block;
+	}
+
+
+	BasicBlock* IRBuilder::AddBlock(Function* F, BasicBlock* before)
+	{
+		auto& blocks = F->Blocks();
+		BasicBlock* block = new BasicBlock(F, blocks.Size());
+		std::string label = "BB" + std::to_string(bb_label_counter++);
+		block->SetLabel(label);
+		blocks.Insert(before->GetIterator(), block);
 		return block;
 	}
 

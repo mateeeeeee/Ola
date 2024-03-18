@@ -66,8 +66,29 @@ namespace ola
 		FloatOpEnd,
 		// compare ops
 		CompareOpBegin,
-		ICmp,
-		FCmp,
+		ICmpEQ,
+		ICmpNE,
+		ICmpSLT,
+		ICmpSLE,
+		ICmpSGT,
+		ICmpSGE,
+		ICmpULT,
+		ICmpULE,
+		ICmpUGT,
+		ICmpUGE,
+
+		FCmpOEQ,
+		FCmpONE,
+		FCmpOLT,
+		FCmpOLE,
+		FCmpOGT,
+		FCmpOGE,
+		FCmpUEQ,
+		FCmpUNE,
+		FCmpULT,
+		FCmpULE,
+		FCmpUGT,
+		FCmpUGE,
 		CompareOpEnd,
 		// cast ops
 		CastOpBegin,
@@ -339,6 +360,62 @@ namespace ola
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
+	};
+
+	enum class CompareOp
+	{
+		ICmpEQ,
+		ICmpNE,
+		ICmpSLT,
+		ICmpSLE,
+		ICmpSGT,
+		ICmpSGE,
+		ICmpULT,
+		ICmpULE,
+		ICmpUGT,
+		ICmpUGE,
+
+		FCmpOEQ,
+		FCmpONE,
+		FCmpOLT,
+		FCmpOLE,
+		FCmpOGT,
+		FCmpOGE,
+		FCmpUEQ,
+		FCmpUNE,
+		FCmpULT,
+		FCmpULE,
+		FCmpUGT,
+		FCmpUGE
+	};
+
+	class CompareInst final : public Instruction
+	{
+	public:
+		CompareInst(InstructionID id, Value* lhs, Value* rhs);
+
+		Value* LHS() const
+		{
+			return Op<0>();
+		}
+		Value* RHS() const
+		{
+			return Op<1>();
+		}
+
+		CompareOp GetCompareOp() const { return cmp; }
+
+		static bool ClassOf(Instruction const* I)
+		{
+			return I->GetInstrID() > InstructionID::CompareOpBegin && I->GetInstrID() < InstructionID::CompareOpEnd;
+		}
+		static bool ClassOf(Value const* V)
+		{
+			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
+		}
+
+	private:
+		CompareOp cmp;
 	};
 
 	class CastInst final : public Instruction 

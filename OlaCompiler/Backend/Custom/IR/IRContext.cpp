@@ -135,8 +135,16 @@ namespace ola
 	ConstantInt* IRContext::GetInt8(int8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
-		constant_ints8[value] =new ConstantInt(int1_type, value);
+		constant_ints8[value] = new ConstantInt(int1_type, value);
 		return constant_ints8[value];
+	}
+
+
+	ConstantFloat* IRContext::GetFloat(double value)
+	{
+		if (constant_floats.contains(value)) return constant_floats[value];
+		constant_floats[value] = new ConstantFloat(float_type, value);
+		return constant_floats[value];
 	}
 
 }

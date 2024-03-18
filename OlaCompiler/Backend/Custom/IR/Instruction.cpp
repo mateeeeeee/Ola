@@ -169,4 +169,11 @@ namespace ola
 	}
 
 
+	CompareInst::CompareInst(InstructionID id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
+	{
+		uint32 id_int = (uint32)id;
+		OLA_ASSERT(id_int > (uint32)InstructionID::CompareOpBegin && id_int < (uint32)InstructionID::CompareOpEnd);
+		cmp = (CompareOp)(id_int - (uint32)InstructionID::CompareOpBegin - 1);
+	}
+
 }
