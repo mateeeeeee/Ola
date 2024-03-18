@@ -968,8 +968,7 @@ namespace ola
 		llvm::Value* false_value = value_map[false_expr];
 		OLA_ASSERT(false_value);
 		false_value = Load(false_expr->GetType(), false_value);
-
-		if (condition_value->getType() != llvm::Type::getInt1Ty(context)) OLA_ASSERT(false);
+		OLA_ASSERT(condition_value->getType() == llvm::Type::getInt1Ty(context));
 
 		value_map[&ternary_expr] = builder.CreateSelect(condition_value, true_value, false_value);
 	}

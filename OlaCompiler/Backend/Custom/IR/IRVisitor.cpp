@@ -303,9 +303,29 @@ namespace ola
 		
 	}
 
-	void IRVisitor::Visit(TernaryExpr const&, uint32)
+	void IRVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
 	{
+		Expr const* cond_expr = ternary_expr.GetCondExpr();
+		Expr const* true_expr = ternary_expr.GetTrueExpr();
+		Expr const* false_expr = ternary_expr.GetFalseExpr();
 
+		cond_expr->Accept(*this);
+		Value* condition_value = value_map[cond_expr];
+		OLA_ASSERT(condition_value);
+		condition_value = Load(bool_type, condition_value);
+
+		true_expr->Accept(*this);
+		Value* true_value = value_map[true_expr];
+		OLA_ASSERT(true_value);
+		true_value = Load(true_expr->GetType(), true_value);
+
+		false_expr->Accept(*this);
+		Value* false_value = value_map[false_expr];
+		OLA_ASSERT(false_value);
+		false_value = Load(false_expr->GetType(), false_value);
+
+		OLA_ASSERT(condition_value->GetType() == context.GetIntegerType(1));
+		value_map[&ternary_expr] = builder->MakeInst<SelectInst>(condition_value, true_value, false_value);
 	}
 
 	void IRVisitor::Visit(IdentifierExpr const&, uint32)
@@ -322,27 +342,41 @@ namespace ola
 
 	void IRVisitor::Visit(IntLiteral const& int_constant, uint32)
 	{
-
+		ConstantInt* constant = context.GetInt64(int_constant.GetValue()); 
+		value_map[&int_constant] = constant;
 	}
 
 	void IRVisitor::Visit(CharLiteral const& char_constant, uint32)
 	{
-		
+		ConstantInt* constant = context.GetInt8(char_constant.GetChar());
+		value_map[&char_constant] = constant;
 	}
 
 	void IRVisitor::Visit(StringLiteral const& string_constant, uint32)
 	{
-		
+		context.GetString(string_constant.GetString());
+
+		Constant* constant = context.GetString(string_constant.GetString());
+
+		static uint32 counter = 0;
+		std::string name = "__StringLiteral"; name += std::to_string(counter++);
+
+		Linkage linkage = Linkage::Internal;
+		GlobalVariable* global_string = new GlobalVariable(name, ConvertToIRType(string_constant.GetType()), linkage, constant);
+		value_map[&string_constant] = global_string;
+		module.AddGlobal(global_string);
 	}
 
 	void IRVisitor::Visit(BoolLiteral const& bool_constant, uint32)
 	{
-		
+		ConstantInt* constant = context.GetInt8(bool_constant.GetValue()); 
+		value_map[&bool_constant] = constant;
 	}
 
 	void IRVisitor::Visit(FloatLiteral const& float_constant, uint32)
 	{
-		
+		ConstantFloat* constant = context.GetFloat(float_constant.GetValue());
+		value_map[&float_constant] = constant;
 	}
 
 	void IRVisitor::Visit(ImplicitCastExpr const&, uint32)
@@ -375,14 +409,14 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(ThisExpr const&, uint32)
+	void IRVisitor::Visit(ThisExpr const& this_expr, uint32)
 	{
-
+		value_map[&this_expr] = this_value;
 	}
 
-	void IRVisitor::Visit(SuperExpr const&, uint32)
+	void IRVisitor::Visit(SuperExpr const& super_expr, uint32)
 	{
-
+		value_map[&super_expr] = this_value;
 	}
 
 	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)

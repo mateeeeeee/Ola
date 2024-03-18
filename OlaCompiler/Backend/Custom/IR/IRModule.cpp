@@ -1,6 +1,7 @@
+#include <fstream>
 #include "IRModule.h"
 #include "IRType.h"
-#include <fstream>
+#include "GlobalValue.h"
 
 namespace ola
 {

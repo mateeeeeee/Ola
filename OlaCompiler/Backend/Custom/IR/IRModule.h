@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
-#include "Utility/IntrusiveList.h"
+#include <vector>
 
 namespace ola
 {
 	class IRContext;
 	class Function;
 	class GlobalVariable;
+	class GlobalValue;
 
 	class IRModule
 	{
@@ -21,11 +22,18 @@ namespace ola
 			return module_id;
 		}
 
+		void AddGlobal(GlobalValue* GV)
+		{
+			globals.push_back(GV);
+		}
+		std::vector<GlobalValue*> const& Globals() const { return globals; }
+
 		void EmitIR(std::string_view filename);
 
 	private:
 		IRContext& context;
 		std::string module_id;
+		std::vector<GlobalValue*> globals;
 	};
 
 }

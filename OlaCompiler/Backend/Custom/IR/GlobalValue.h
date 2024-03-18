@@ -3,6 +3,7 @@
 #include <vector>
 #include "Instruction.h"
 #include "IRType.h"
+#include "BasicBlock.h"
 #include "Utility/Attribute.h"
 
 namespace ola
@@ -60,7 +61,7 @@ namespace ola
 		{
 		}
 		OLA_NONCOPYABLE(GlobalVariable)
-			~GlobalVariable();
+		~GlobalVariable() = default;
 
 		auto& Attributes() { return attr; }
 		auto const& Attributes() const { return attr; }
