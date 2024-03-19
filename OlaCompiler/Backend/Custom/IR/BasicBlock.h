@@ -1,18 +1,19 @@
 #pragma once
 #include <string>
-#include "Value.h"
+#include "Instruction.h"
 #include "Utility/IntrusiveList.h"
 
 namespace ola
 {
+	class IRContext;
 	class Function;
 	class Instruction;
 
-	class BasicBlock : public IListNode<BasicBlock>
+	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 	public:
-		BasicBlock() : function(nullptr), block_idx(-1) {}
-		explicit BasicBlock(Function* function, uint32 idx = -1) : function(function), block_idx(idx) {}
+		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1) {}
+		explicit BasicBlock(IRContext& C, Function* function, uint32 idx = -1);
 		~BasicBlock() {}
 		auto& Instructions()
 		{

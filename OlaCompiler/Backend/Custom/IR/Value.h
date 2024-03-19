@@ -12,7 +12,8 @@ namespace ola
 	{
 		Instruction,
 		Constant,
-		Argument
+		Argument,
+		BasicBlock
 	};
 
 	class Value
@@ -43,6 +44,10 @@ namespace ola
 		OLA_NODISCARD bool IsArgument() const 
 		{
 			return kind == ValueKind::Argument;
+		}
+		OLA_NODISCARD bool IsBasicBlock() const
+		{
+			return kind == ValueKind::BasicBlock;
 		}
 
 		OLA_NODISCARD virtual bool IsUndefined() const
