@@ -52,8 +52,8 @@ namespace ola
 		IRFloatType*	float_type;
 		IRLabelType*	label_type;
 
-		std::vector<IRArrayType*>		array_types;
-		std::vector<IRPtrType*>   pointer_types;
+		std::vector<IRArrayType*>	array_types;
+		std::vector<IRPtrType*>     pointer_types;
 		std::vector<IRFuncType*>	function_types;
 		std::vector<IRStructType*>	struct_types;
 

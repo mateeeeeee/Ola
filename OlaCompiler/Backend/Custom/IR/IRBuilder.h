@@ -47,6 +47,7 @@ namespace ola
 		}
 
 		BasicBlock* AddBlock();
+		BasicBlock* AddBlock(BasicBlock* before);
 		BasicBlock* AddBlock(Function* F);
 		BasicBlock* AddBlock(Function* F, BasicBlock* before);
 

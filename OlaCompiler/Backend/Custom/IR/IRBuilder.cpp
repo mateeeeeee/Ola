@@ -57,6 +57,19 @@ namespace ola
 
 	BasicBlock* IRBuilder::AddBlock(Function* F, BasicBlock* before)
 	{
+		OLA_ASSERT(before->GetFunction() == F);
+		auto& blocks = F->Blocks();
+		BasicBlock* block = new BasicBlock(F, blocks.Size());
+		std::string label = "BB" + std::to_string(bb_label_counter++);
+		block->SetLabel(label);
+		blocks.Insert(before->GetIterator(), block);
+		return block;
+	}
+
+
+	BasicBlock* IRBuilder::AddBlock(BasicBlock* before)
+	{
+		Function* F = before->GetFunction();
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(F, blocks.Size());
 		std::string label = "BB" + std::to_string(bb_label_counter++);

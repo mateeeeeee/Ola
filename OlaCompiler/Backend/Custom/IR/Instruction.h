@@ -177,7 +177,7 @@ namespace ola
 
 		static bool ClassOf(Value const* V)
 		{
-			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Global;
+			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant;
 		}
 	private:
 		IList<Use> users;
@@ -441,6 +441,7 @@ namespace ola
 	{
 	public:
 		explicit LoadInst(Value* address);
+		LoadInst(Value* address, IRType* type);
 
 		Value* GetAddressOp() { return GetOperand(0); }
 		Value const* GetAddressOp() const { return GetOperand(0); }

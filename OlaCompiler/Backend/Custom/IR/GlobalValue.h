@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include <vector>
-#include "Instruction.h"
+#include "Constant.h"
 #include "IRType.h"
 #include "BasicBlock.h"
 #include "Utility/Attribute.h"
@@ -15,10 +15,10 @@ namespace ola
 		External
 	};
 
-	class GlobalValue : public TrackableValue
+	class GlobalValue : public Constant
 	{
 	public:
-		GlobalValue(std::string_view symbol, IRType* type, Linkage linkage = Linkage::External) : TrackableValue(ValueKind::Global, IRPtrType::Get(type)), linkage(linkage), value_type(type)
+		GlobalValue(std::string_view symbol, IRType* type, Linkage linkage = Linkage::External) : Constant(ConstantID::Global, IRPtrType::Get(type)), linkage(linkage), value_type(type)
 		{
 			SetName(symbol);
 		}
@@ -40,7 +40,11 @@ namespace ola
 
 		static bool ClassOf(Value const* V)
 		{
-			return V->GetKind() == ValueKind::Global;
+			return V->GetKind() == ValueKind::Constant && ClassOf(cast<Constant>(V));
+		}
+		static bool ClassOf(Constant const* C)
+		{
+			return C->GetConstantID() == ConstantID::Global;
 		}
 
 	protected:

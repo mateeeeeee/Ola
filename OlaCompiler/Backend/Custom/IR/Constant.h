@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <span>
-#include "Value.h"
+#include "Instruction.h"
 #include "IRType.h"
 #include "Compiler/RTTI.h"
 
@@ -9,10 +9,10 @@ namespace ola
 {
 	enum class ConstantID : uint8
 	{ 
-		Integer, Float, String, Offset, Array, Struct, Undef
+		Global, Integer, Float, String, Offset, Array, Struct, Undef
 	};
 
-	class Constant : public Value
+	class Constant : public TrackableValue
 	{
 	public:
 		OLA_NONCOPYABLE(Constant)
@@ -31,7 +31,7 @@ namespace ola
 		ConstantID constant_id;
 
 	protected:
-		Constant(ConstantID constant_id, IRType* type) : Value(ValueKind::Constant, type), constant_id(constant_id) {}
+		Constant(ConstantID constant_id, IRType* type) : TrackableValue(ValueKind::Constant, type), constant_id(constant_id) {}
 	};
 
 	class ConstantInt final : public Constant

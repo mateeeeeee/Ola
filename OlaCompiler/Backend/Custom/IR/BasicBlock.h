@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Value.h"
 #include "Utility/IntrusiveList.h"
 
 namespace ola

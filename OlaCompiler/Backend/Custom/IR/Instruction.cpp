@@ -73,6 +73,12 @@ namespace ola
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
 	}
 
+	LoadInst::LoadInst(Value* address, IRType* type)
+		: Instruction(InstructionID::Load, type, { address })
+	{
+		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
+	}
+
 	StoreInst::StoreInst(Value* address, Value* value) : Instruction(InstructionID::Store, IRVoidType::Get(value->GetContext()), { address, value })
 	{
 	}

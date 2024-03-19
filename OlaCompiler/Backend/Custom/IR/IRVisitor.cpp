@@ -52,7 +52,30 @@ namespace ola
 
 	void IRVisitor::Visit(FunctionDecl const& function_decl, uint32)
 	{
-		
+		FuncType const* type = function_decl.GetFuncType();
+		IRFuncType* function_type = cast<IRFuncType>(ConvertToIRType(type));
+		Linkage linkage = function_decl.IsPublic() || function_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+		Function* ir_function = new Function(function_decl.GetMangledName(), function_type, linkage);
+		module.AddGlobal(ir_function);
+
+		Argument* param_arg = ir_function->GetArg(0);
+		if (isa<ClassType>(type->GetReturnType()))
+		{
+			Value* sret_value = param_arg;
+			++param_arg;
+			return_value = sret_value;
+		}
+		for (auto& param : function_decl.GetParamDecls())
+		{
+			Value* ir_param = param_arg;
+			ir_param->SetName(param->GetName());
+			value_map[param.get()] = ir_param;
+			++param_arg;
+		}
+
+		if (!function_decl.HasDefinition()) return;
+
+		VisitFunctionDeclCommon(function_decl, ir_function);
 	}
 
 	void IRVisitor::Visit(MethodDecl const&, uint32)
@@ -85,7 +108,124 @@ namespace ola
 
 	void IRVisitor::Visit(VarDecl const& var_decl, uint32)
 	{
+		Type const* var_type = var_decl.GetType().GetTypePtr();
+		bool const is_const = var_decl.GetType().IsConst();
+		IRType* ir_type = ConvertToIRType(var_type);
+		bool const is_array = isa<ArrayType>(var_type);
+		bool const is_class = isa<ClassType>(var_type);
+		bool const is_ref = isa<RefType>(var_type);
 
+		if (var_decl.IsGlobal())
+		{
+			if (var_decl.IsExtern())
+			{
+				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr);
+				if(is_const) global_var->SetReadOnly();
+				module.AddGlobal(global_var);
+				value_map[&var_decl] = global_var;
+			}
+			else if (Expr const* init_expr = var_decl.GetInitExpr())
+			{
+				if (is_array)
+				{
+					OLA_ASSERT(false);
+				}
+				else
+				{
+					OLA_ASSERT(init_expr->IsConstexpr());
+					init_expr->Accept(*this);
+					Value* init_value = value_map[init_expr];
+					Constant* constant_init_value = dyn_cast<Constant>(init_value);
+					OLA_ASSERT(constant_init_value);
+
+					Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+					GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr);
+					if (is_const) global_var->SetReadOnly();
+					module.AddGlobal(global_var);
+					value_map[&var_decl] = global_var;
+				}
+			}
+			else if (is_class)
+			{
+				ClassType const* class_type = cast<ClassType>(var_type);
+				ClassDecl const* class_decl = class_type->GetClassDecl();
+
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				std::vector<Constant*> initializers;
+				if (class_decl->IsPolymorphic())
+				{
+					initializers.push_back(vtable_map[class_decl]);
+				}
+
+				ClassDecl const* curr_class_decl = class_decl;
+				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+				{
+					for (auto const& base_field : base_class_decl->GetFields())
+					{
+						initializers.push_back(cast<Constant>(value_map[base_field.get()]));
+					}
+					curr_class_decl = base_class_decl;
+				}
+				for (uint64 i = 0; i < fields.size(); ++i)
+				{
+					initializers.push_back(cast<Constant>(value_map[fields[i].get()]));
+				}
+
+				IRStructType* llvm_struct_type = cast<IRStructType>(ir_type);
+				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr); // ConstantStruct::get(llvm_struct_type, initializers));
+				if (is_const) global_var->SetReadOnly();
+				module.AddGlobal(global_var);
+				value_map[&var_decl] = global_var;
+			}
+			else if (is_ref)
+			{
+				OLA_ASSERT_MSG(false, "todo");
+			}
+			else
+			{
+				Constant* constant_init_value = Constant::GetNullValue(ir_type); 
+				Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr);
+				if (is_const) global_var->SetReadOnly();
+				module.AddGlobal(global_var);
+				value_map[&var_decl] = global_var;
+			}
+		}
+		else
+		{
+			if (Expr const* init_expr = var_decl.GetInitExpr(); init_expr && !isa<ConstructorExpr>(init_expr))
+			{
+				init_expr->Accept(*this);
+				if (is_array)
+				{
+
+				}
+				else if (is_class)
+				{
+					
+				}
+				else if (is_ref)
+				{
+					
+				}
+				else
+				{
+					
+				}
+			}
+			else
+			{
+				if (is_class)
+				{
+					
+				}
+				else
+				{
+					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type, nullptr);
+					value_map[&var_decl] = alloc;
+				}
+			}
+		}
 	}
 
 	void IRVisitor::Visit(TagDecl const&, uint32)
@@ -98,19 +238,47 @@ namespace ola
 		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
 	}
 
-	void IRVisitor::Visit(EnumMemberDecl const&, uint32)
+	void IRVisitor::Visit(EnumMemberDecl const& enum_member_decl, uint32)
 	{
-
+		ConstantInt* constant = context.GetInt64(enum_member_decl.GetValue());
+		value_map[&enum_member_decl] = constant;
 	}
 
 	void IRVisitor::Visit(AliasDecl const&, uint32)
 	{
-
 	}
 
-	void IRVisitor::Visit(ClassDecl const&, uint32)
+	void IRVisitor::Visit(ClassDecl const& class_decl, uint32)
 	{
+		for (auto& field : class_decl.GetFields()) field->Accept(*this);
+		for (auto& method : class_decl.GetMethods()) method->Accept(*this);
 
+		if (class_decl.IsPolymorphic())
+		{
+			std::vector<MethodDecl const*> const& vtable = class_decl.GetVTable();
+			IRArrayType* vtable_type = context.GetArrayType(GetPointerType(void_type), vtable.size()); 
+			std::vector<Constant*> vtable_function_ptrs;
+
+			for (MethodDecl const* method : vtable)
+			{
+				Value* method_value = value_map[method];
+				if (!method->IsPure())
+				{
+					Function* method_fn = cast<Function>(method_value);
+					vtable_function_ptrs.push_back(method_fn);
+				}
+				else vtable_function_ptrs.push_back(Constant::GetNullValue(GetPointerType(void_type)));
+			}
+
+			std::string vtable_name = "VTable_";
+			vtable_name += class_decl.GetName();
+			GlobalVariable* vtable_var = new GlobalVariable(vtable_name, vtable_type, Linkage::Internal, nullptr); //todo
+
+			vtable_var->SetReadOnly();
+			module.AddGlobal(vtable_var);
+
+			vtable_map[&class_decl] = vtable_var;
+		}
 	}
 
 	void IRVisitor::Visit(Stmt const&, uint32)
@@ -197,14 +365,22 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(GotoStmt const&, uint32)
+	void IRVisitor::Visit(GotoStmt const& goto_stmt, uint32)
 	{
+		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
+		builder->MakeInst<BranchInst>(context, label_blocks[label_name]);
 
+		BasicBlock* goto_block = builder->AddBlock(exit_block);
+		goto_block->SetLabel("goto");
+		builder->SetCurrentBlock(goto_block);
 	}
 
-	void IRVisitor::Visit(LabelStmt const&, uint32)
+	void IRVisitor::Visit(LabelStmt const& label_stmt, uint32)
 	{
-
+		std::string block_name = "label."; block_name += label_stmt.GetName();
+		BasicBlock* label_block = label_blocks[block_name];
+		builder->MakeInst<BranchInst>(context, label_block);
+		builder->SetCurrentBlock(label_block);
 	}
 
 	void IRVisitor::Visit(Expr const&, uint32)
@@ -300,7 +476,142 @@ namespace ola
 
 	void IRVisitor::Visit(BinaryExpr const& binary_expr, uint32)
 	{
-		
+		Expr const* lhs_expr = binary_expr.GetLHS();
+		lhs_expr->Accept(*this);
+		Value* lhs_value = value_map[lhs_expr];
+		Expr const* rhs_expr = binary_expr.GetRHS();
+		rhs_expr->Accept(*this);
+		Value* rhs_value = value_map[rhs_expr];
+		OLA_ASSERT(lhs_value && rhs_value);
+
+		Value* lhs = Load(lhs_expr->GetType(), lhs_value);
+		Value* rhs = Load(rhs_expr->GetType(), rhs_value);
+		bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
+
+		Value* result = nullptr;
+		switch (binary_expr.GetBinaryKind())
+		{
+		case BinaryExprKind::Assign:
+		{
+			result = Store(rhs_value, lhs_value);
+		}
+		break;
+		case BinaryExprKind::Add:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FAdd : InstructionID::Add;
+			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Subtract:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FSub : InstructionID::Sub;
+			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Multiply:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FMul : InstructionID::Mul;
+			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Divide:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FDiv : InstructionID::SDiv;
+			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Modulo:
+		{
+			OLA_ASSERT(!is_float_expr);
+			result = builder->MakeInst<BinaryInst>(InstructionID::SRem, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::ShiftLeft:
+		{
+			result = builder->MakeInst<BinaryInst>(InstructionID::Shl, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::ShiftRight:
+		{
+			result = builder->MakeInst<BinaryInst>(InstructionID::AShr, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::BitAnd:
+		{
+			result = builder->MakeInst<BinaryInst>(InstructionID::And, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::BitOr:
+		{
+			result = builder->MakeInst<BinaryInst>(InstructionID::Or, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::BitXor:
+		{
+			result = builder->MakeInst<BinaryInst>(InstructionID::Xor, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::LogicalAnd:
+		{
+			Value* tmp = builder->MakeInst<BinaryInst>(InstructionID::And, lhs, rhs);
+			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
+			result = builder->MakeInst<CompareInst>(InstructionID::ICmpNE, tmp, zero);
+		}
+		break;
+		case BinaryExprKind::LogicalOr:
+		{
+			Value* tmp = builder->MakeInst<BinaryInst>(InstructionID::Or, lhs, rhs);
+			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
+			result = builder->MakeInst<CompareInst>(InstructionID::ICmpNE, tmp, zero);
+		}
+		break;
+		case BinaryExprKind::Equal:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpOEQ : InstructionID::ICmpEQ;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::NotEqual:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpONE : InstructionID::ICmpNE;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Less:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpOLT : InstructionID::ICmpSLT;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Greater:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpOGT : InstructionID::ICmpSGT;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::LessEqual:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpOLE : InstructionID::ICmpSLE;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::GreaterEqual:
+		{
+			InstructionID id = is_float_expr ? InstructionID::FCmpOGE : InstructionID::ICmpSGE;
+			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
+		}
+		break;
+		case BinaryExprKind::Comma:
+		{
+			result = rhs;
+		}
+		break;
+		case BinaryExprKind::Invalid:
+		default:
+			OLA_ASSERT(false);
+		}
+		OLA_ASSERT(result);
+		value_map[&binary_expr] = result;
 	}
 
 	void IRVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
@@ -478,24 +789,72 @@ namespace ola
 		return nullptr;
 	}
 
-	IRType* IRVisitor::ConvertClassDecl(ClassDecl const*)
+	IRType* IRVisitor::ConvertClassDecl(ClassDecl const* class_decl)
 	{
-		return nullptr;
+		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, IRStructType*, VoidPointerHash>;
+		static LLVMStructTypeMap struct_type_map;
+
+		if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
+
+		UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+		std::vector<IRType*> llvm_member_types;
+		if (class_decl->IsPolymorphic())
+		{
+			llvm_member_types.push_back(GetPointerType(GetPointerType(void_type)));
+		}
+		ClassDecl const* curr_class_decl = class_decl;
+		while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+		{
+			for (auto const& field : base_class_decl->GetFields()) llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+			curr_class_decl = base_class_decl;
+		}
+		for (auto const& field : fields) llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+
+		IRStructType* class_type = context.GetStructType(class_decl->GetName(), llvm_member_types);
+		struct_type_map[class_decl] = class_type;
+		return class_type;
 	}
 
-	IRFuncType* IRVisitor::ConvertMethodType(FuncType const*, IRType*)
+	IRFuncType* IRVisitor::ConvertMethodType(FuncType const* type, IRType* class_type)
 	{
-		return nullptr;
+		std::span<QualType const> function_params = type->GetParams();
+
+		IRType* return_type = ConvertToIRType(type->GetReturnType());
+		bool return_type_struct = return_type->IsStructType();
+
+		std::vector<IRType*> param_types; param_types.reserve(function_params.size());
+		if (return_type_struct) param_types.push_back(IRPtrType::Get(return_type));
+
+		param_types.push_back(IRPtrType::Get(class_type));
+		for (auto const& func_param_type : function_params)
+		{
+			IRType* param_type = ConvertToIRType(func_param_type);
+			param_types.push_back(param_type);
+		}
+		return context.GetFunctionType(return_type_struct ? void_type : return_type, param_types);
 	}
 
-	IRType* IRVisitor::GetStructType(Type const*)
+	IRType* IRVisitor::GetStructType(Type const* class_expr_type)
 	{
-		return nullptr;
+		if (isa<ClassType>(class_expr_type))
+		{
+			return ConvertToIRType(class_expr_type);
+		}
+		else if (isa<RefType>(class_expr_type))
+		{
+			RefType const* ref_type = cast<RefType>(class_expr_type);
+			if (isa<ClassType>(ref_type->GetReferredType()))
+			{
+				return ConvertToIRType(ref_type->GetReferredType());
+			}
+			else return nullptr;
+		}
+		else return nullptr;
 	}
 
 	IRPtrType* IRVisitor::GetPointerType(IRType* type)
 	{
-		return IRPtrType::Get(context, type);
+		return IRPtrType::Get(type);
 	}
 
 	Value* IRVisitor::Load(Type const* type, Value* ptr)
@@ -509,12 +868,22 @@ namespace ola
 
 	Value* IRVisitor::Load(IRType* ir_type, Value* ptr)
 	{
+		if (ptr->GetType()->IsPointerType())
+		{
+			if (ir_type->IsPointerType() && isa<GlobalVariable>(ptr))
+			{
+				return ptr;
+			}
+			return builder->MakeInst<LoadInst>(ptr, ir_type); // builder.CreateLoad(llvm_type, ptr);
+		}
 		return ptr;
 	}
 
 	Value* IRVisitor::Store(Value* value, Value* ptr)
 	{
-		return ptr;
+		if (!value->GetType()->IsPointerType()) return builder->MakeInst<StoreInst>(ptr, value);
+		Value* load = Load(value->GetType(), value);
+		return builder->MakeInst<StoreInst>(ptr, load);
 	}
 
 }

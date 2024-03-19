@@ -11,7 +11,6 @@ namespace ola
 	enum class ValueKind : uint8
 	{
 		Instruction,
-		Global,
 		Constant,
 		Argument
 	};
@@ -33,10 +32,6 @@ namespace ola
 			name = _name;
 		}
 
-		OLA_NODISCARD bool IsGlobal() const 
-		{
-			return kind == ValueKind::Global;
-		}
 		OLA_NODISCARD bool IsConstant() const
 		{
 			return kind == ValueKind::Constant;
