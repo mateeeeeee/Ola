@@ -89,8 +89,14 @@ set(BACKEND_FILES
   Backend/Custom/IR/GlobalValue.h
   Backend/Custom/IR/GlobalValue.cpp
   Backend/Custom/IR/BasicBlock.h
+  Backend/Custom/IR/BasicBlock.cpp
   Backend/Custom/IR/Constant.h
   Backend/Custom/IR/Constant.cpp
+
+  Backend/Custom/Codegen/MIR.h
+  Backend/Custom/Codegen/MIRFwd.h
+  Backend/Custom/Codegen/MIROperand.h
+  Backend/Custom/Codegen/MIRInstruction.h
 )
 
 set(COMPILER_FILES
