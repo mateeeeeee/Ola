@@ -211,49 +211,47 @@ LLVMDemangle.lib
 target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
 target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
 
-set(DISABLED_WARNINGS
-	/wd4141
-	/wd4146
-	/wd4244
-	/wd4267
-	/wd4291
-	/wd4351
-	/wd4456
-	/wd4457
-	/wd4458
-	/wd4459
-	/wd4503
-	/wd4624
-	/wd4722
-	/wd4100
-	/wd4127
-	/wd4512
-	/wd4505
-	/wd4610
-	/wd4510
-	/wd4702
-	/wd4245
-	/wd4706
-	/wd4310
-	/wd4701
-	/wd4703
-	/wd4389
-	/wd4611
-	/wd4804
-	/wd4805
-	/wd4204
-	/wd4577
-	/wd4091
-	/wd4592
-	/wd4319
-	/wd4709
-	/wd5105
-	/wd4324
-)
-
-target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
-
 if(MSVC)
+	set(DISABLED_WARNINGS
+		/wd4141
+		/wd4146
+		/wd4244
+		/wd4267
+		/wd4291
+		/wd4351
+		/wd4456
+		/wd4457
+		/wd4458
+		/wd4459
+		/wd4503
+		/wd4624
+		/wd4722
+		/wd4100
+		/wd4127
+		/wd4512
+		/wd4505
+		/wd4610
+		/wd4510
+		/wd4702
+		/wd4245
+		/wd4706
+		/wd4310
+		/wd4701
+		/wd4703
+		/wd4389
+		/wd4611
+		/wd4804
+		/wd4805
+		/wd4204
+		/wd4577
+		/wd4091
+		/wd4592
+		/wd4319
+		/wd4709
+		/wd5105
+		/wd4324
+	)
+	target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
     add_definitions(/FI"Core/Types.h" /FI"Core/Macros.h")
 else()                                                   
     add_definitions(-include Core/Types.h -include Core/Macros.h)

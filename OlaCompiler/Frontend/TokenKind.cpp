@@ -18,7 +18,7 @@ namespace ola
 		};
 		std::unordered_map<std::string_view, TokenKind> keywords_map =
 		{
-			#define KEYWORD(X) {#X, TokenKind::##KW_##X},
+			#define KEYWORD(X) {#X, TokenKind::KW_##X},
 			#include "Tokens.def"
 		};
 	}

@@ -6,12 +6,12 @@ namespace ola
 {
 	std::unordered_map<DiagCode, std::string_view> Diagnostics::diag_msgs =
 	{
-		#define DIAG(diag_code, diag_kind, diag_msg) {DiagCode::##diag_code, diag_msg},
+		#define DIAG(diag_code, diag_kind, diag_msg) {DiagCode::diag_code, diag_msg},
 		#include "Diagnostics.def"
 	};
 	std::unordered_map<DiagCode, Diagnostics::DiagKind> Diagnostics::diag_kinds =
 	{
-		#define DIAG(diag_code, diag_kind, diag_msg) {DiagCode::##diag_code, DiagKind::##diag_kind},
+		#define DIAG(diag_code, diag_kind, diag_msg) {DiagCode::diag_code, DiagKind::diag_kind},
 		#include "Diagnostics.def"
 	};
 

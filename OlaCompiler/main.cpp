@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 		else if (!input_files.empty())
 		{
 			if (output_file.empty()) output_file = input_files[0];
-			if (directory.empty()) directory = OLA_CONCAT(OLA_TESTS_PATH, "Tests");
+			if (directory.empty()) directory = OLA_TESTS_PATH"Tests";
 
 			ola::CompilerInput compiler_input{};
 			compiler_input.flags = test_debug_flag ? ola::CompilerFlag_DumpAST | ola::CompilerFlag_O0 : ola::CompilerFlag_O3;
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	if (output_file.empty()) output_file = input_files[0];
-	if (directory.empty()) directory = OLA_CONCAT(OLA_COMPILER_PATH, "Test");
+	if (directory.empty()) directory = OLA_COMPILER_PATH"Test";
 
 	ola::CompilerFlags compiler_flags = ola::CompilerFlag_None;
 	if(*ast_dump) compiler_flags |= ola::CompilerFlag_DumpAST;
