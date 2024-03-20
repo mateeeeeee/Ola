@@ -1,6 +1,10 @@
 #pragma once
 //https://opensource.apple.com/source/clang/clang-703.0.29/src/include/llvm/ADT/ilist.h.auto.html slightly modified
 
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+
 namespace ola
 {
 	template<typename NodeTy, typename Traits> class IPList;
