@@ -4,22 +4,6 @@
 
 namespace ola
 {
-	class MIRRelocable
-	{
-	public:
-		explicit MIRRelocable(std::string_view symbol) : symbol(symbol) {}
-		virtual ~MIRRelocable() = default;
-
-		std::string_view GetSymbol() const { return symbol; }
-		virtual bool IsFunction() const  
-		{
-			return false;
-		}
-
-	private:
-		std::string symbol;
-	};
-
 	constexpr uint32 VIRTUAL_REG_BEGIN = 0b0101U << 28;
 	constexpr uint32 STACK_OBJECT_BEGIN = 0b1010U << 28;
 	constexpr uint32 INVALID_REG = 0b1100U << 28;
@@ -100,6 +84,7 @@ namespace ola
 		}
 	};
 
+	class MIRRelocable;
 	class MIROperand
 	{
 	public:
@@ -178,6 +163,8 @@ namespace ola
 			return MIROperand(val, MIROperandType::Other);
 		}
 
+		uint64 GetHash() const;
+
 	private:
 		std::variant<std::monostate, MIRRelocable*, int64, MIRRegister> storage;
 		MIROperandType type = MIROperandType::Unknown;
@@ -192,6 +179,15 @@ namespace std
 		size_t operator()(ola::MIRRegister const& reg) const 
 		{
 			return hash<uint32_t>{}(reg.reg);
+		}
+	};
+
+	template <>
+	struct hash<ola::MIROperand>
+	{
+		size_t operator()(ola::MIROperand const& op) const
+		{
+			return op.GetHash();
 		}
 	};
 }

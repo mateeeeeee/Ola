@@ -51,8 +51,6 @@ namespace ola
 		Shl,
 		LShr,
 		AShr,
-		SMin,
-		SMax,
 		IntegerOpEnd,
 		// floating point ops
 		FloatOpBegin,
