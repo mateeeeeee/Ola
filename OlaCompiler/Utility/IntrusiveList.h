@@ -140,13 +140,13 @@ namespace ola
 		explicit IListIterator(reference NR) : node_ptr(&NR) {}
 		IListIterator() : node_ptr(nullptr) {}
 
-		template<class NodeTy>
-		IListIterator(const IListIterator<NodeTy>& RHS)
+		template<class Node>
+		IListIterator(const IListIterator<Node>& RHS)
 			: node_ptr(RHS.GetNodePtrUnchecked())
 		{}
 
-		template<class NodeTy>
-		const IListIterator& operator=(const IListIterator<NodeTy>& RHS)
+		template<class Node>
+		const IListIterator& operator=(const IListIterator<Node>& RHS)
 		{
 			node_ptr = RHS.GetNodePtrUnchecked();
 			return *this;

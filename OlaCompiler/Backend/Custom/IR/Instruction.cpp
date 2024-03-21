@@ -1,4 +1,3 @@
-#pragma once
 #include "IRType.h"
 #include "Instruction.h"
 #include "BasicBlock.h"

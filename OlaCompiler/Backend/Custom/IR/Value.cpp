@@ -1,4 +1,3 @@
-#pragma once
 #include "Value.h"
 #include "IRType.h"
 

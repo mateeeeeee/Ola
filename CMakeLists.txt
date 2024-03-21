@@ -15,13 +15,6 @@ set(OLA_BINARY_PATH   ${CMAKE_BINARY_DIR}/bin/)
 if(MSVC)
 	add_definitions(/MT)
 endif()
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
 
 if(CMAKE_CONFIGURATION_TYPES)
 	message("Multi-configuration generator")

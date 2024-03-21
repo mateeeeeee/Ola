@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Decl.h"
 #include "ASTVisitor.h"
 #include "Expr.h"

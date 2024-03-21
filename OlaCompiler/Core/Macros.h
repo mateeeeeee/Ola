@@ -23,9 +23,9 @@
 #define OLA_ALIGNAS(align)         alignas(align) 
 
 #ifdef __GNUC__ 
-#define OLA_UNREACHABLE()			___builtin_unreachable();
+#define OLA_UNREACHABLE()			__builtin_unreachable();
 #elifdef _MSC_VER 
-#define OLA_UNREACHABLE()			___assume(false);
+#define OLA_UNREACHABLE()			__assume(false);
 #else
 #define OLA_UNREACHABLE()	
 #endif
@@ -57,4 +57,4 @@
     OLA_DEFAULT_MOVABLE(ClassName)
 
 
-#define OLA_COMPILATION_FAILED_EXIT_CODE INT_MAX
+#define OLA_COMPILATION_FAILED_EXIT_CODE -1

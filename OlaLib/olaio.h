@@ -46,7 +46,7 @@ extern "C"
 	void ReadString(char* str, int64_t str_size)
 	{
 		unsigned int buf_size = (unsigned int)str_size;
-		scanf_s("%s", str, buf_size);
+		scanf("%s", str);
 	}
 }
 #pragma warning( pop )

@@ -24,6 +24,7 @@ namespace ola
 	};
 	using Qualifiers = uint8;
 
+	class Type;
 	class QualType
 	{
 		friend class Type;
