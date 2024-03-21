@@ -59,7 +59,6 @@ namespace ola
 		FMul,
 		FDiv,
 		FNeg,
-		FAbs,
 		FFma,
 		FloatOpEnd,
 		// compare ops

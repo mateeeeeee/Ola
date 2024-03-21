@@ -101,6 +101,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIRGlobal.h
   Backend/Custom/Codegen/MIRModule.h
   Backend/Custom/Codegen/MIRModule.cpp
+  Backend/Custom/Codegen/LoweringContext.h
+  Backend/Custom/Codegen/LoweringContext.cpp
 )
 
 set(COMPILER_FILES

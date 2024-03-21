@@ -67,7 +67,7 @@ namespace ola
 		}
 
 	private:
-		std::list<MIRBasicBlock*> blocks;
+		std::list<std::unique_ptr<MIRBasicBlock>> blocks;
 		std::unordered_map<MIROperand, StackObject> stack_objects;
 		std::vector<MIROperand> args;
 

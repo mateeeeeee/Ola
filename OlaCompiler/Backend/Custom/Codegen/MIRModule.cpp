@@ -5,22 +5,17 @@
 
 namespace ola
 {
+	
 
-	MIRModule::MIRModule(IRModule& ir_module) 
+	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this)
 	{
 		LowerModule(ir_module);
-	}
-
-	void MIRModule::Print(std::ofstream& of)
-	{
-
 	}
 
 	void MIRModule::LowerModule(IRModule& ir_module)
 	{
 		auto const& ir_globals = ir_module.Globals();
 
-		std::unordered_map<GlobalValue*, MIRGlobal*> global_map;
 		for (GlobalValue* GV : ir_globals)
 		{
 			if (GV->IsFunction())
@@ -96,7 +91,7 @@ namespace ola
 				}
 			}
 
-			global_map[GV] = &globals.back();
+			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
 		for (GlobalValue* GV : ir_globals)
@@ -104,18 +99,104 @@ namespace ola
 			if (GV->IsFunction())
 			{
 				Function* F = cast<Function>(GV);
-				MIRGlobal* mir_global = global_map[GV];
-				MIRFunction* MF = dynamic_cast<MIRFunction*>(mir_global->GetRelocable());
-				LowerFunction(F, MF, global_map);
+				LowerFunction(F);
 			}
 		}
 	}
 
-	void MIRModule::LowerFunction(Function*, MIRFunction*, std::unordered_map<GlobalValue*, MIRGlobal*>&)
+	void MIRModule::LowerFunction(Function* F)
 	{
-		std::unordered_map<BasicBlock*, MIRBasicBlock*> block_map;
-		std::unordered_map<Value*, MIROperand> value_map;
-		std::unordered_map<Value*, MIROperand> storage_map;
+		MIRGlobal* global = lowering_ctx.GetGlobal(F);
+		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
+
+		for (BasicBlock& BB : F->Blocks())
+		{
+			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
+			auto& MBB = MF.Blocks().back();
+			lowering_ctx.AddBlock(&BB, MBB.get());
+			for (auto& inst : BB.Instructions())
+			{
+				if (inst.GetInstrID() == InstructionID::Phi) 
+				{
+					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
+					lowering_ctx.AddOperand(&inst, vreg);
+				}
+			}
+		}
+
+		auto& args = MF.Args();
+		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
+		{
+			Argument* arg = F->GetArg(arg_idx);
+			IRType* arg_type = F->GetArgType(arg_idx);
+			auto vreg = lowering_ctx.VirtualReg(arg_type);
+			lowering_ctx.AddOperand(arg, vreg);
+			args.push_back(vreg);
+		}
+		lowering_ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
+		EmitPrologue(MF);
+
+		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
+
+		for (Instruction& inst : F->GetEntryBlock().Instructions()) 
+		{
+			if (inst.GetInstrID() == InstructionID::Alloca) //#todo alloca needs to added always in entry block of a function
+			{
+				AllocaInst* alloca_inst = cast<AllocaInst>(&inst);
+				IRType const* type = alloca_inst->GetAllocatedType();
+				//process allocas
+			}
+			else break;
+		}
+
+		for (BasicBlock& BB : F->Blocks())
+		{
+			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
+			lowering_ctx.SetCurrentBasicBlock(MBB);
+			for (Instruction& inst : BB.Instructions())
+			{
+				if (!TryLowerInstruction(&inst)) LowerInstruction(&inst);
+			}
+		}
+	}
+
+	void MIRModule::LowerInstruction(Instruction* inst)
+	{
+		switch (inst->GetInstrID())
+		{
+		case InstructionID::Add:
+		case InstructionID::Sub:
+		case InstructionID::Mul:
+		case InstructionID::UDiv:
+		case InstructionID::URem:
+		case InstructionID::And:
+		case InstructionID::Or:
+		case InstructionID::Xor:
+		case InstructionID::Shl:
+		case InstructionID::LShr:
+		case InstructionID::AShr:
+		case InstructionID::FAdd:
+		case InstructionID::FSub:
+		case InstructionID::FMul:
+		case InstructionID::FDiv:
+			LowerBinary(cast<BinaryInst>(inst));
+			break;
+		case InstructionID::Neg:
+		case InstructionID::Not:
+		case InstructionID::FNeg:
+			LowerUnary(cast<UnaryInst>(inst));
+			break;
+		}
+	}
+
+	void MIRModule::LowerBinary(BinaryInst*)
+	{
+
+	}
+
+	void MIRModule::LowerUnary(UnaryInst*)
+	{
+
 	}
 
 }

@@ -31,6 +31,7 @@ namespace ola
 		Int64,
 		Float32,
 		Float64,
+		Ptr,
 		Other
 	};
 
