@@ -90,7 +90,7 @@ namespace ola
 	public:
 		using Storage = std::vector<std::variant<uint8, uint16, uint32, uint64>>;
 	public:
-		MIRDataStorage(std::string_view symbol, bool readOnly) : MIRRelocable(symbol),  read_only(readOnly) {}
+		MIRDataStorage(std::string_view symbol, bool read_only) : MIRRelocable(symbol),  read_only(read_only) {}
 		
 		bool IsReadOnly() const
 		{
@@ -110,7 +110,7 @@ namespace ola
 		{
 			return Append(val);
 		}
-		uint32 AppendQWord(uint32 val)
+		uint32 AppendQWord(uint64 val)
 		{
 			return Append(val);
 		}
@@ -138,7 +138,7 @@ namespace ola
 
 		Linkage GetLinkage() const { return linkage; }
 		uint32  GetAlignment() const { return alignment; }
-		MIRRelocable const* GetRelocable() const { return relocable.get(); }
+		MIRRelocable* GetRelocable() const { return relocable.get(); }
 
 	private:
 		std::unique_ptr<MIRRelocable> relocable;
