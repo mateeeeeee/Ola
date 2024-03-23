@@ -96,6 +96,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIR.h
   Backend/Custom/Codegen/MIRFwd.h
   Backend/Custom/Codegen/MIROperand.h
+  Backend/Custom/Codegen/MIROperand.cpp
   Backend/Custom/Codegen/MIRInstruction.h
   Backend/Custom/Codegen/MIRBasicBlock.h
   Backend/Custom/Codegen/MIRGlobal.h

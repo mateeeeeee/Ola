@@ -7,14 +7,14 @@ namespace ola
 {
 	
 
-	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this)
+	MIRModule::MIRModule(IRModule& ir_module) : ctx(*this)
 	{
-		LowerModule(ir_module);
+		LowerModule(&ir_module);
 	}
 
-	void MIRModule::LowerModule(IRModule& ir_module)
+	void MIRModule::LowerModule(IRModule* ir_module)
 	{
-		auto const& ir_globals = ir_module.Globals();
+		auto const& ir_globals = ir_module->Globals();
 
 		for (GlobalValue* GV : ir_globals)
 		{
@@ -91,7 +91,7 @@ namespace ola
 				}
 			}
 
-			lowering_ctx.AddGlobal(GV, &globals.back());
+			ctx.AddGlobal(GV, &globals.back());
 		}
 
 		for (GlobalValue* GV : ir_globals)
@@ -106,20 +106,20 @@ namespace ola
 
 	void MIRModule::LowerFunction(Function* F)
 	{
-		MIRGlobal* global = lowering_ctx.GetGlobal(F);
+		MIRGlobal* global = ctx.GetGlobal(F);
 		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
 
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
+			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
-			lowering_ctx.AddBlock(&BB, MBB.get());
+			ctx.AddBlock(&BB, MBB.get());
 			for (auto& inst : BB.Instructions())
 			{
 				if (inst.GetInstrID() == InstructionID::Phi) 
 				{
-					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
-					lowering_ctx.AddOperand(&inst, vreg);
+					auto vreg = ctx.VirtualReg(inst.GetType());
+					ctx.AddOperand(&inst, vreg);
 				}
 			}
 		}
@@ -129,14 +129,14 @@ namespace ola
 		{
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
-			auto vreg = lowering_ctx.VirtualReg(arg_type);
-			lowering_ctx.AddOperand(arg, vreg);
+			auto vreg = ctx.VirtualReg(arg_type);
+			ctx.AddOperand(arg, vreg);
 			args.push_back(vreg);
 		}
-		lowering_ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
+		ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
 		EmitPrologue(MF);
 
-		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
+		ctx.SetCurrentBasicBlock(ctx.GetBlock(&F->GetEntryBlock()));
 
 		for (Instruction& inst : F->GetEntryBlock().Instructions()) 
 		{
@@ -144,15 +144,16 @@ namespace ola
 			{
 				AllocaInst* alloca_inst = cast<AllocaInst>(&inst);
 				IRType const* type = alloca_inst->GetAllocatedType();
-				//process allocas
+				auto ref = ctx.StackObject(); 
+				MF.StackObjects().emplace(ref, StackObject{ type->GetSize(), type->GetAlign(), 0, StackObjectUsage::Local });
 			}
 			else break;
 		}
 
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
-			lowering_ctx.SetCurrentBasicBlock(MBB);
+			MIRBasicBlock* MBB = ctx.GetBlock(&BB);
+			ctx.SetCurrentBasicBlock(MBB);
 			for (Instruction& inst : BB.Instructions())
 			{
 				if (!TryLowerInstruction(&inst)) LowerInstruction(&inst);
@@ -186,15 +187,112 @@ namespace ola
 		case InstructionID::FNeg:
 			LowerUnary(cast<UnaryInst>(inst));
 			break;
+		case InstructionID::Ret:
+			LowerRet(cast<ReturnInst>(inst));
+			break;
+		case InstructionID::Branch:
+		case InstructionID::ConditionalBranch:
+			LowerBranch(cast<BranchInst>(inst));
+			break;
+		case InstructionID::Load:
+			LowerLoad(cast<LoadInst>(inst));
+			break;
+		case InstructionID::Store:
+			LowerStore(cast<StoreInst>(inst));
+			break;
+		case InstructionID::Phi:  // noop
+			break;
+		default:
+			OLA_ASSERT_MSG(false, "Not implemented yet");
 		}
 	}
 
-	void MIRModule::LowerBinary(BinaryInst*)
+	void MIRModule::LowerBinary(BinaryInst* inst)
+	{
+		const auto GetMachineID = [](InstructionID instID)
+			{
+			switch (instID) 
+			{
+			case InstructionID::Add:
+				return InstAdd;
+			case InstructionID::Sub:
+				return InstSub;
+			case InstructionID::Mul:
+				return InstMul;
+			case InstructionID::UDiv:
+				return InstUDiv;
+			case InstructionID::URem:
+				return InstURem;
+			case InstructionID::And:
+				return InstAnd;
+			case InstructionID::Or:
+				return InstOr;
+			case InstructionID::Xor:
+				return InstXor;
+			case InstructionID::Shl:
+				return InstShl;
+			case InstructionID::LShr:
+				return InstLShr;
+			case InstructionID::AShr:
+				return InstAShr;
+			case InstructionID::FAdd:
+				return InstFAdd;
+			case InstructionID::FSub:
+				return InstFSub;
+			case InstructionID::FMul:
+				return InstFMul;
+			case InstructionID::FDiv:
+				return InstFDiv;
+			}
+			return InstUnknown;
+			};
+			MIROperand ret = ctx.VirtualReg(inst->GetType());
+			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
+			minst.SetOp<0>(ret).SetOp<1>(ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(ctx.GetOperand(inst->GetOperand(1)));
+			ctx.EmitInst(minst);
+			ctx.AddOperand(inst, ret);
+	}
+
+	void MIRModule::LowerUnary(UnaryInst* inst)
+	{
+		const auto GetMachineID = [](InstructionID instID)
+			{
+				switch (instID) 
+				{
+				case InstructionID::Neg:
+					return InstNeg;
+				case InstructionID::Not:
+					return InstNot;
+				case InstructionID::FNeg:
+					return InstFNeg;
+				}
+				return InstUnknown;
+			};
+
+			MIROperand ret = ctx.VirtualReg(inst->GetType());
+			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
+			minst.SetOp<0>(ret).SetOp<1>(ctx.GetOperand(inst->GetOperand(0)));
+			ctx.EmitInst(minst);
+			ctx.AddOperand(inst, ret);
+	}
+
+	void MIRModule::LowerRet(ReturnInst*)
 	{
 
 	}
 
-	void MIRModule::LowerUnary(UnaryInst*)
+
+	void MIRModule::LowerBranch(BranchInst*)
+	{
+
+	}
+
+	void MIRModule::LowerLoad(LoadInst*)
+	{
+
+	}
+
+	void MIRModule::LowerStore(StoreInst*)
 	{
 
 	}

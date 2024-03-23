@@ -7,6 +7,7 @@ namespace ola
 
 	enum MIRGenericInst : uint32
 	{
+		InstUnknown,
 		// control-flow
 		InstJump,    
 		InstBranch,  
@@ -39,7 +40,6 @@ namespace ola
 		InstFMul,
 		InstFDiv,
 		InstFNeg,
-		InstFAbs,
 		InstFFma,
 		// Comparison
 		InstICmpEQ,

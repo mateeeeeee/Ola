@@ -74,6 +74,10 @@ namespace ola
 		{
 			return MIROperand::VirtualReg(virt_reg_id++, type);
 		}
+		MIROperand StackObject()
+		{
+			return MIROperand::StackObject(stack_obj_id++, MIROperandType::Other);
+		}
 
 		std::string GetLabel() const
 		{
@@ -91,6 +95,7 @@ namespace ola
 		mutable std::unordered_map<Value*, MIROperand> storage_map;
 		mutable uint32 virt_reg_id = 0;
 		mutable uint32 label_id = 0;
+		mutable uint32 stack_obj_id = 0;
 
 	private:
 		static MIROperandType GetOperandType(IRType const* type);
