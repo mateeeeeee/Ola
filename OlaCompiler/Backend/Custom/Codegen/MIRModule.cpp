@@ -7,7 +7,7 @@ namespace ola
 {
 	
 
-	MIRModule::MIRModule(IRModule& ir_module) : ctx(*this)
+	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this), isel_ctx(*this)
 	{
 		LowerModule(&ir_module);
 	}
@@ -91,7 +91,7 @@ namespace ola
 				}
 			}
 
-			ctx.AddGlobal(GV, &globals.back());
+			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
 		for (GlobalValue* GV : ir_globals)
@@ -106,20 +106,20 @@ namespace ola
 
 	void MIRModule::LowerFunction(Function* F)
 	{
-		MIRGlobal* global = ctx.GetGlobal(F);
+		MIRGlobal* global = lowering_ctx.GetGlobal(F);
 		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
 
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, ctx.GetLabel()));
+			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
-			ctx.AddBlock(&BB, MBB.get());
+			lowering_ctx.AddBlock(&BB, MBB.get());
 			for (auto& inst : BB.Instructions())
 			{
 				if (inst.GetInstrID() == InstructionID::Phi) 
 				{
-					auto vreg = ctx.VirtualReg(inst.GetType());
-					ctx.AddOperand(&inst, vreg);
+					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
+					lowering_ctx.AddOperand(&inst, vreg);
 				}
 			}
 		}
@@ -129,14 +129,14 @@ namespace ola
 		{
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
-			auto vreg = ctx.VirtualReg(arg_type);
-			ctx.AddOperand(arg, vreg);
+			auto vreg = lowering_ctx.VirtualReg(arg_type);
+			lowering_ctx.AddOperand(arg, vreg);
 			args.push_back(vreg);
 		}
-		ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
+		lowering_ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
 		EmitPrologue(MF);
 
-		ctx.SetCurrentBasicBlock(ctx.GetBlock(&F->GetEntryBlock()));
+		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
 
 		for (Instruction& inst : F->GetEntryBlock().Instructions()) 
 		{
@@ -144,7 +144,7 @@ namespace ola
 			{
 				AllocaInst* alloca_inst = cast<AllocaInst>(&inst);
 				IRType const* type = alloca_inst->GetAllocatedType();
-				auto ref = ctx.StackObject(); 
+				auto ref = lowering_ctx.StackObject(); 
 				MF.StackObjects().emplace(ref, StackObject{ type->GetSize(), type->GetAlign(), 0, StackObjectUsage::Local });
 			}
 			else break;
@@ -152,13 +152,15 @@ namespace ola
 
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MIRBasicBlock* MBB = ctx.GetBlock(&BB);
-			ctx.SetCurrentBasicBlock(MBB);
+			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
+			lowering_ctx.SetCurrentBasicBlock(MBB);
 			for (Instruction& inst : BB.Instructions())
 			{
 				if (!TryLowerInstruction(&inst)) LowerInstruction(&inst);
 			}
 		}
+
+		isel_ctx.Run(MF);
 	}
 
 	void MIRModule::LowerInstruction(Instruction* inst)
@@ -249,11 +251,11 @@ namespace ola
 			}
 			return InstUnknown;
 			};
-			MIROperand ret = ctx.VirtualReg(inst->GetType());
+			MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
 			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
-			minst.SetOp<0>(ret).SetOp<1>(ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(ctx.GetOperand(inst->GetOperand(1)));
-			ctx.EmitInst(minst);
-			ctx.AddOperand(inst, ret);
+			minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
+			lowering_ctx.EmitInst(minst);
+			lowering_ctx.AddOperand(inst, ret);
 	}
 
 	void MIRModule::LowerUnary(UnaryInst* inst)
@@ -272,11 +274,11 @@ namespace ola
 				return InstUnknown;
 			};
 
-			MIROperand ret = ctx.VirtualReg(inst->GetType());
+			MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
 			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
-			minst.SetOp<0>(ret).SetOp<1>(ctx.GetOperand(inst->GetOperand(0)));
-			ctx.EmitInst(minst);
-			ctx.AddOperand(inst, ret);
+			minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
+			lowering_ctx.EmitInst(minst);
+			lowering_ctx.AddOperand(inst, ret);
 	}
 
 	void MIRModule::LowerRet(ReturnInst* inst)
@@ -304,5 +306,4 @@ namespace ola
 	{
 		EmitCall(inst);
 	}
-
 }

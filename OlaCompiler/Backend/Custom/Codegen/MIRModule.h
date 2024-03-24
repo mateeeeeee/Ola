@@ -2,6 +2,7 @@
 #include <iosfwd>
 #include "MIRGlobal.h"
 #include "LoweringContext.h"
+#include "ISelContext.h"
 
 namespace ola
 {
@@ -25,13 +26,15 @@ namespace ola
 		virtual ~MIRModule() = default;
 		
 		virtual void EmitPrologue(MIRFunction&) = 0;
+
 		virtual void EmitReturn(ReturnInst*) = 0;
 		virtual void EmitCall(CallInst*) = 0;
 		virtual bool TryLowerInstruction(Instruction*) { return false; }
 
 	protected:
 		std::vector<MIRGlobal> globals;
-		LoweringContext ctx;
+		LoweringContext lowering_ctx;
+		ISelContext isel_ctx;
 
 	private:
 		void LowerModule(IRModule*);

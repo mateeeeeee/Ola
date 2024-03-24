@@ -19,7 +19,6 @@ namespace ola
 	public:
 		explicit LoweringContext(MIRModule& module) : module(module) {}
 
-
 		void SetCurrentBasicBlock(MIRBasicBlock* block)
 		{
 			current_block = block;
@@ -80,7 +79,6 @@ namespace ola
 		{
 			return "label" + std::to_string(label_id++);
 		}
-
 
 	private:
 		MIRModule& module;
