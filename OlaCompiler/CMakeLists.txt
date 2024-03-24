@@ -93,7 +93,7 @@ set(BACKEND_FILES
   Backend/Custom/IR/Constant.h
   Backend/Custom/IR/Constant.cpp
   Backend/Custom/IR/FunctionPass.h
-  Backend/Custom/IR/ModulePass.h
+  Backend/Custom/IR/IRModulePass.h
 
   Backend/Custom/Codegen/MIR.h
   Backend/Custom/Codegen/MIRFwd.h
@@ -106,6 +106,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIRModule.cpp
   Backend/Custom/Codegen/LoweringContext.h
   Backend/Custom/Codegen/LoweringContext.cpp
+  Backend/Custom/Codegen/MIRModulePass.h
+  Backend/Custom/Codegen/MIRFunctionPass.h
 
   Backend/Custom/Pass.h
   Backend/Custom/Pass.cpp

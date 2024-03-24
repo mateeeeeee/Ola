@@ -4,10 +4,10 @@
 namespace ola
 {
 	class IRModule;
-	class ModulePass : public Pass
+	class IRModulePass : public Pass
 	{
 	public:
-		explicit ModulePass(char pid) : Pass(pid, PassKind::Module) {}
+		explicit IRModulePass(char pid) : Pass(pid, PassKind::Module) {}
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}
@@ -20,5 +20,5 @@ namespace ola
 		using BasePassT = IRModule;
 		using ParentUnitT = IRModule;
 	};
-	using ModulePassManager = PassManager<IRModule>;
+	using IRModulePassManager = PassManager<IRModule>;
 }
