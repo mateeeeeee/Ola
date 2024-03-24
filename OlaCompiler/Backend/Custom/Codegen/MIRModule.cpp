@@ -200,7 +200,10 @@ namespace ola
 		case InstructionID::Store:
 			LowerStore(cast<StoreInst>(inst));
 			break;
-		case InstructionID::Phi:  // noop
+		case InstructionID::Call:
+			LowerCall(cast<CallInst>(inst));
+			break;
+		case InstructionID::Phi: 
 			break;
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
@@ -276,9 +279,9 @@ namespace ola
 			ctx.AddOperand(inst, ret);
 	}
 
-	void MIRModule::LowerRet(ReturnInst*)
+	void MIRModule::LowerRet(ReturnInst* inst)
 	{
-
+		EmitReturn(inst);
 	}
 
 
@@ -295,6 +298,11 @@ namespace ola
 	void MIRModule::LowerStore(StoreInst*)
 	{
 
+	}
+
+	void MIRModule::LowerCall(CallInst* inst)
+	{
+		EmitCall(inst);
 	}
 
 }

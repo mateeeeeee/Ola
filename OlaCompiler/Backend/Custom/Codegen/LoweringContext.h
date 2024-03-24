@@ -55,10 +55,7 @@ namespace ola
 		{
 			return block_map[BB];
 		}
-		MIROperand GetOperand(Value* V)
-		{
-			return value_map[V];
-		}
+		MIROperand GetOperand(Value* V);
 
 		void EmitInst(MIRInstruction const& minst);
 		void EmitCopy(MIROperand const& dst, MIROperand const& src)

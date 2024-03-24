@@ -15,6 +15,8 @@ namespace ola
 	class BranchInst;
 	class LoadInst;
 	class StoreInst;
+	class ReturnInst;
+	class CallInst;
 
 	class MIRModule
 	{
@@ -22,7 +24,9 @@ namespace ola
 		explicit MIRModule(IRModule& ir_module);
 		virtual ~MIRModule() = default;
 		
-		virtual void EmitPrologue(MIRFunction& MF) = 0;
+		virtual void EmitPrologue(MIRFunction&) = 0;
+		virtual void EmitReturn(ReturnInst*) = 0;
+		virtual void EmitCall(CallInst*) = 0;
 		virtual bool TryLowerInstruction(Instruction*) { return false; }
 
 	protected:
@@ -40,5 +44,6 @@ namespace ola
 		void LowerBranch(BranchInst*);
 		void LowerLoad(LoadInst*);
 		void LowerStore(StoreInst*);
+		void LowerCall(CallInst*);
 	};
 }
