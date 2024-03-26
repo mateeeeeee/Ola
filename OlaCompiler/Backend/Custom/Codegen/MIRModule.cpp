@@ -100,6 +100,11 @@ namespace ola
 			{
 				Function* F = cast<Function>(GV);
 				LowerFunction(F);
+
+				MIRGlobal *global = lowering_ctx.GetGlobal(F);
+                MIRFunction &MF = *dynamic_cast<MIRFunction *>(global->GetRelocable());
+				ISelContext isel_ctx(*this);
+                isel_ctx.Run(MF);
 			}
 		}
 	}
@@ -159,8 +164,6 @@ namespace ola
 				if (!TryLowerInstruction(&inst)) LowerInstruction(&inst);
 			}
 		}
-
-		isel_ctx.Run(MF);
 	}
 
 	void MIRModule::LowerInstruction(Instruction* inst)

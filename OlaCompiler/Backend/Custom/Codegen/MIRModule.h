@@ -19,6 +19,9 @@ namespace ola
 	class ReturnInst;
 	class CallInst;
 
+	class MIRInstruction;
+	class MIRInstructionInfo;
+
 	class MIRModule
 	{
 	public:
@@ -30,6 +33,7 @@ namespace ola
 		virtual void EmitReturn(ReturnInst*) = 0;
 		virtual void EmitCall(CallInst*) = 0;
 		virtual bool TryLowerInstruction(Instruction*) { return false; }
+		virtual MIRInstructionInfo const& GetInstInfo(MIRInstruction&) = 0;
 
 	protected:
 		std::vector<MIRGlobal> globals;

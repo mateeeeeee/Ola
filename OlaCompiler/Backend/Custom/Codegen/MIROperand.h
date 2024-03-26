@@ -89,7 +89,7 @@ namespace ola
 	class MIROperand
 	{
 	public:
-		MIROperand() = default;
+		constexpr MIROperand() = default;
 		template <typename T>
 		constexpr MIROperand(T const& x, MIROperandType type) : storage{ x }, type{ type } {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MIROperand)
@@ -170,6 +170,15 @@ namespace ola
 		std::variant<std::monostate, MIRRelocable*, int64, MIRRegister> storage;
 		MIROperandType type = MIROperandType::Unknown;
 	};
+
+	inline bool IsOperandVReg(MIROperand const& operand)
+	{
+		return operand.IsReg() && IsVirtualReg(operand.GetReg().reg);
+	}
+	inline bool IsOperandStackObject(MIROperand const& operand)
+	{
+		return operand.IsReg() && IsStackObject(operand.GetReg().reg);
+	}
 }
 
 namespace std 
