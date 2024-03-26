@@ -110,6 +110,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIRFunctionPass.h
   Backend/Custom/Codegen/ISelContext.h
   Backend/Custom/Codegen/ISelContext.cpp
+  Backend/Custom/Codegen/LiveInterval.h
+  Backend/Custom/Codegen/RegisterAllocator.h
 
   Backend/Custom/Pass.h
   Backend/Custom/Pass.cpp
