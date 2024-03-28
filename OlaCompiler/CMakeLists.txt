@@ -94,6 +94,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Constant.cpp
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
+  Backend/Custom/IR/CFGAnalysis.h
+  Backend/Custom/IR/CFGAnalysis.cpp
 
   Backend/Custom/Codegen/MIR.h
   Backend/Custom/Codegen/MIRFwd.h
@@ -111,6 +113,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ISelContext.h
   Backend/Custom/Codegen/ISelContext.cpp
   Backend/Custom/Codegen/LiveInterval.h
+  Backend/Custom/Codegen/LiveInterval.cpp
   Backend/Custom/Codegen/RegisterAllocator.h
 
   Backend/Custom/Pass.h

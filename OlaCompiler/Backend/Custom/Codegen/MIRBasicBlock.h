@@ -28,10 +28,22 @@ namespace ola
 			return instructions;
 		}
 
+		void AddSuccessor(MIRBasicBlock* MBB)
+		{
+			successors.push_back(MBB);
+		}
+		void AddPredecessor(MIRBasicBlock* MBB)
+		{
+			predecessors.push_back(MBB);
+		}
+		std::vector<MIRBasicBlock*> const& Predecessors() const { return predecessors; }
+		std::vector<MIRBasicBlock*> const& Successors() const { return successors; }
 
 	private:
 		MIRFunction* function;
 		std::list<MIRInstruction> instructions;
 		std::string label;
+		std::vector<MIRBasicBlock*> successors;
+		std::vector<MIRBasicBlock*> predecessors;
 	};
 }

@@ -46,15 +46,15 @@ namespace ola
 			value_map[V] = MO;
 		}
 
-		MIRGlobal* GetGlobal(GlobalValue* GV) const
+		MIRGlobal* GetGlobal(GlobalValue const* GV) const
 		{
 			return global_map[GV];
 		}
-		MIRBasicBlock* GetBlock(BasicBlock* BB) const
+		MIRBasicBlock* GetBlock(BasicBlock const* BB) const
 		{
 			return block_map[BB];
 		}
-		MIROperand GetOperand(Value* V);
+		MIROperand GetOperand(Value const* V);
 
 		void EmitInst(MIRInstruction const& minst);
 		void EmitCopy(MIROperand const& dst, MIROperand const& src)
@@ -84,10 +84,10 @@ namespace ola
 		MIRModule& module;
 		MIRBasicBlock* current_block = nullptr;
 
-		mutable std::unordered_map<GlobalValue*, MIRGlobal*> global_map;
-		mutable std::unordered_map<BasicBlock*, MIRBasicBlock*> block_map;
-		mutable std::unordered_map<Value*, MIROperand> value_map;
-		mutable std::unordered_map<Value*, MIROperand> storage_map;
+		mutable std::unordered_map<GlobalValue const*, MIRGlobal*> global_map;
+		mutable std::unordered_map<BasicBlock const*, MIRBasicBlock*> block_map;
+		mutable std::unordered_map<Value const*, MIROperand> value_map;
+		mutable std::unordered_map<Value const*, MIROperand> storage_map;
 		mutable uint32 virt_reg_id = 0;
 		mutable uint32 label_id = 0;
 		mutable uint32 stack_obj_id = 0;

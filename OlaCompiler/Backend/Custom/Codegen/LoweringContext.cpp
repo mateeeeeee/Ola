@@ -7,14 +7,14 @@
 namespace ola
 {
 
-	MIROperand LoweringContext::GetOperand(Value* V)
+	MIROperand LoweringContext::GetOperand(Value const* V)
 	{
 		if(value_map.contains(V)) return value_map[V];
 		OLA_ASSERT(V->IsConstant());
-		Constant* C = cast<Constant>(V);
+		Constant const* C = cast<Constant>(V);
 		if (C->GetConstantID() == ConstantID::Global)
 		{
-			GlobalValue* GV = cast<GlobalValue>(C);
+			GlobalValue const* GV = cast<GlobalValue>(C);
 			MIROperand ptr = VirtualReg(MIROperandType::Int64);
 			MIRInstruction minst(InstLoadGlobalAddress);
 

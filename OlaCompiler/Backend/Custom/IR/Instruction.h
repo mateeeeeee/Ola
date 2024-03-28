@@ -553,11 +553,11 @@ namespace ola
 			return cases;
 		}
 
-		BasicBlock* DefaultCase()
+		BasicBlock* GetDefaultCase()
 		{
 			return default_block;
 		}
-		BasicBlock const* const DefaultCase() const
+		BasicBlock const* const GetDefaultCase() const
 		{
 			return default_block;
 		}

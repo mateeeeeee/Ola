@@ -2,6 +2,7 @@
 #include "MIRGlobal.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Backend/Custom/IR/CFGAnalysis.h"
 
 namespace ola
 {
@@ -128,6 +129,7 @@ namespace ola
 				}
 			}
 		}
+		LowerCFGAnalysis(F);
 
 		auto& args = MF.Args();
 		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
@@ -289,7 +291,6 @@ namespace ola
 		EmitReturn(inst);
 	}
 
-
 	void MIRModule::LowerBranch(BranchInst*)
 	{
 
@@ -309,4 +310,18 @@ namespace ola
 	{
 		EmitCall(inst);
 	}
+
+	void MIRModule::LowerCFGAnalysis(Function* F)
+	{
+		CFGAnalysisPass CFG{};
+		CFG.RunOn(*F);
+		CFGResult const& cfg_result = CFG.GetResult();
+		for (auto&& [BB, info] : cfg_result)
+		{
+			MIRBasicBlock* MBB = lowering_ctx.GetBlock(BB);
+			for (auto* P : info.predecessors) MBB->AddPredecessor(lowering_ctx.GetBlock(P));
+			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
+		}
+	}
+
 }

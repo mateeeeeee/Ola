@@ -62,4 +62,7 @@ namespace ola
 			g_PassRegistry.RegisterPass(*this);
 		}
 	};
+
+	#define REGISTER_PASS(type, name, analysis) \
+	static RegisterPass<type> OLA_CONCAT(_pass,__COUNTER__)(name, analysis)
 }

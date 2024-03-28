@@ -33,7 +33,7 @@ namespace ola
 		virtual void EmitReturn(ReturnInst*) = 0;
 		virtual void EmitCall(CallInst*) = 0;
 		virtual bool TryLowerInstruction(Instruction*) { return false; }
-		virtual MIRInstructionInfo const& GetInstInfo(MIRInstruction&) = 0;
+		virtual MIRInstructionInfo const& GetInstInfo(MIRInstruction const&) = 0;
 
 	protected:
 		std::vector<MIRGlobal> globals;
@@ -52,5 +52,7 @@ namespace ola
 		void LowerLoad(LoadInst*);
 		void LowerStore(StoreInst*);
 		void LowerCall(CallInst*);
+
+		void LowerCFGAnalysis(Function*);
 	};
 }
