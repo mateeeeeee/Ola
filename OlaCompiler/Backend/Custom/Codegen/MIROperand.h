@@ -109,6 +109,10 @@ namespace ola
 		{
 			return std::get<MIRRegister>(storage);
 		}
+		MIRRegister& GetReg() 
+		{ 
+			return std::get<MIRRegister>(storage); 
+		}
 
 		bool IsImmediate() const { return std::holds_alternative<int64>(storage); }
 		int64 GetImmediate() const

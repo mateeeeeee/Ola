@@ -49,7 +49,7 @@ namespace ola
 
 	struct LivenessAnalysisResult
 	{
-		std::unordered_map<MIRInstruction*, uint32> instr_num_map;
+		std::unordered_map<MIRInstruction*, uint32> inst_num_map;
 		std::unordered_map<MIRBasicBlock*, BlockLivenessInfo> block_info_map;
 		std::unordered_map<uint32, LiveInterval> reg_interval_map;
 	};
