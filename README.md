@@ -74,3 +74,7 @@ Ola consists of three parts:
   * -o     : Output file
   * --directory : Directory of project files
   * --simple : input code in the form of a string
+
+### Samples
+Currently to see the samples you can check the test folder: OlaTests/Tests/.
+
