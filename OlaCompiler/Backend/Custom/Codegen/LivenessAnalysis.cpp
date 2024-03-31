@@ -1,4 +1,4 @@
-#include "LiveInterval.h"
+#include "LivenessAnalysis.h"
 #include "MIRGlobal.h"
 #include "MIRBasicBlock.h"
 #include "MIRModule.h"

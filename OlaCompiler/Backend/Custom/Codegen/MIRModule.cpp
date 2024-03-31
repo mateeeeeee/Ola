@@ -6,8 +6,6 @@
 
 namespace ola
 {
-	
-
 	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this), isel_ctx(*this)
 	{
 		LowerModule(&ir_module);
