@@ -13,7 +13,7 @@ namespace ola
 
 		virtual void AssignRegisters(MIRFunction&) const = 0;
 
-	private:
+	protected:
 		MIRModule& M;
 	};
 

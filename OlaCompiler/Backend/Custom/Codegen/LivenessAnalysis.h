@@ -5,12 +5,12 @@
 
 namespace ola
 {
-	struct LiveSegment
+	struct LiveRange
 	{
 		uint64 begin, end;
 	};
 
-	inline bool operator<(LiveSegment const& lhs, LiveSegment const& rhs) 
+	inline bool operator<(LiveRange const& lhs, LiveRange const& rhs) 
 	{
 		return lhs.begin < rhs.begin;
 	}
@@ -20,19 +20,18 @@ namespace ola
 	public:
 		LiveInterval() = default;
 
-		void AddSegment(LiveSegment const& segment)
+		void AddRange(LiveRange const& segment)
 		{
-			segments.push_back(segment);
+			ranges.push_back(segment);
 		}
-		void EmplaceSegment(uint64 beg, uint64 end)
+		void EmplaceRange(uint64 beg, uint64 end)
 		{
-			segments.emplace_back(beg, end);
+			ranges.emplace_back(beg, end);
 		}
 
 	private:
-		std::vector<LiveSegment> segments;
+		std::vector<LiveRange> ranges;
 	};
-
 
 	struct BlockLivenessInfo
 	{
@@ -49,9 +48,7 @@ namespace ola
 
 	struct LivenessAnalysisResult
 	{
-		std::unordered_map<MIRInstruction*, uint32> inst_num_map;
-		std::unordered_map<MIRBasicBlock*, BlockLivenessInfo> block_info_map;
-		std::unordered_map<uint32, LiveInterval> reg_interval_map;
+		
 	};
 
 	LivenessAnalysisResult DoLivenessAnalysis(MIRModule& M, MIRFunction& MF);

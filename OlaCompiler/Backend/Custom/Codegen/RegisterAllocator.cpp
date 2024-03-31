@@ -7,7 +7,7 @@ namespace ola
 
 	void LinearScanRegisterAllocator::AssignRegisters(MIRFunction& MF) const
 	{
-
+		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 	}
 
 }
