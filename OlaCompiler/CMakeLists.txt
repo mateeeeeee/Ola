@@ -128,6 +128,9 @@ set(BACKEND_FILES
 set(COMPILER_FILES
   Compiler/Compiler.h
   Compiler/Compiler.cpp
+  Compiler/CompileRequest.h
+  Compiler/CompileRequest.cpp
+  Compiler/CompilerOptions.h
   Compiler/RTTI.h
 )
 

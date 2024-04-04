@@ -33,14 +33,6 @@ namespace ola
 		std::vector<LiveRange> ranges;
 	};
 
-	struct BlockLivenessInfo
-	{
-		std::unordered_set<uint32> uses;
-		std::unordered_set<uint32> defs;
-		std::unordered_set<uint32> ins;
-		std::unordered_set<uint32> outs;
-	};
-
 	class MIRInstruction;
 	class MIRBasicBlock;
 	class MIRFunction;

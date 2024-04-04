@@ -2,6 +2,7 @@
 #include <format>
 
 #include "Compiler.h"
+#include "CompileRequest.h"
 
 #include "Frontend/Context.h"
 #include "Frontend/Diagnostics.h"
@@ -10,12 +11,9 @@
 #include "Frontend/ImportProcessor.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
-
 #include "Backend/LLVM/LLVMIRGenContext.h"
-
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
-
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -45,14 +43,6 @@ namespace ola
 		{
 			src.Prepend("");
 		}
-		OptimizationLevel GetOptimizationLevelFromFlags(CompilerFlags flags)
-		{
-			if (flags & CompilerFlag_O0) return OptimizationLevel::O0;
-			if (flags & CompilerFlag_O1) return OptimizationLevel::O1;
-			if (flags & CompilerFlag_O2) return OptimizationLevel::O2;
-			if (flags & CompilerFlag_O3) return OptimizationLevel::O3;
-			return OptimizationLevel::O0;
-		}
 
 		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, bool use_llvm, bool ast_dump)
 		{
@@ -69,7 +59,6 @@ namespace ola
 			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
-
 			if (use_llvm)
 			{
 				LLVMIRGenContext llvm_ir_gen(source_file);
@@ -87,26 +76,36 @@ namespace ola
 		}
 	}
 
-	int32 Compile(CompilerInput const& input)
+	int32 Compile(CompileRequest const& compile_request)
 	{
 		InitLogger();
-		bool const ast_dump = input.flags & CompilerFlag_DumpAST;
-		bool const use_llvm = !(input.flags & CompilerFlag_NoLLVM);
-		OptimizationLevel opt_level = GetOptimizationLevelFromFlags(input.flags);
+		
+		bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
+		bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
+		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
-		fs::current_path(input.input_directory);
+		fs::current_path(compile_request.GetInputDirectory());
 
-		std::vector<std::string> object_files(input.sources.size());
-		std::string output_file = input.output_file; output_file += ".exe";
+		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
+		std::vector<std::string> object_files(source_files.size());
+		std::string output_file = compile_request.GetOutputFile();
+		
+		switch (compile_request.GetOutputType())
+		{
+		case CompilerOutput::Exe:  output_file += ".exe"; break;
+		case CompilerOutput::Dll:
+		case CompilerOutput::Lib:
+			OLA_ASSERT_MSG(false, "DLL and LIB outputs are not yet supported!");
+		}
 
 		Context context{};
-		for (uint64 i = 0; i < input.sources.size(); ++i)
+		for (uint64 i = 0; i < source_files.size(); ++i)
 		{
-			std::string file_name = fs::path(input.sources[i]).stem().string();
-			std::string file_ext = fs::path(input.sources[i]).extension().string();
+			std::string file_name = fs::path(source_files[i]).stem().string();
+			std::string file_ext = fs::path(source_files[i]).extension().string();
 
-			std::string source_file = input.sources[i]; source_file += ".ola";
+			std::string source_file = source_files[i]; source_file += ".ola";
 			std::string ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
@@ -131,51 +130,4 @@ namespace ola
 		fs::current_path(cur_path);
 		return res;
 	}
-
-	int32 CompileSimple(std::string_view input, bool debug)
-	{
-		InitLogger();
-		std::string code(input);
-
-		fs::path tmp_directory = std::filesystem::current_path() / "Tmp";
-		fs::create_directory(tmp_directory);
-
-		fs::path file_name = "tmp";
-		fs::path ir_file = tmp_directory / file_name; ir_file += ".ll";
-		fs::path assembly_file	= tmp_directory / file_name; assembly_file += ".s";
-		fs::path output_file	= tmp_directory / file_name; output_file += ".exe";
-
-		{
-			Diagnostics diagnostics{};
-			SourceBuffer src(code.data(), code.size());
-			AddBuiltins(src);
-			src.Prepend("import std.assert;\n");
-			Lexer lex(diagnostics);
-			lex.Lex(src);
-
-			Context context{};
-			Parser parser(&context, diagnostics);
-			parser.Parse(lex.GetTokens());
-
-			AST const* ast = parser.GetAST();
-			if (debug) DebugVisitor debug_ast(ast);
-
-			LLVMIRGenContext llvm_ir_generator("tmp.ola");
-			llvm_ir_generator.Generate(ast);
-			llvm_ir_generator.Optimize(debug ? OptimizationLevel::Od : OptimizationLevel::O3);
-			llvm_ir_generator.EmitIR(ir_file.string());
-
-			std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file.string(), assembly_file.string());
-			system(compile_cmd.c_str());
-		}
-
-		std::string assembly_cmd = std::format("clang {} -o {}", assembly_file.string(), output_file.string());
-		system(assembly_cmd.c_str());
-
-		std::string exe_cmd = std::format("{}", output_file.string());
-		int32 exitcode = system(exe_cmd.c_str());
-		fs::remove_all(tmp_directory);
-		return exitcode;
-	}
-
 }

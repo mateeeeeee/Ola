@@ -1,4 +1,5 @@
 #pragma once
+#include "Compiler/CompilerOptions.h"
 
 namespace llvm
 {
@@ -7,15 +8,6 @@ namespace llvm
 
 namespace ola
 {
-	enum class OptimizationLevel : uint8
-	{
-		Od,
-		O0 = Od,
-		O1,
-		O2,
-		O3
-	};
-
 	class LLVMOptimizer
 	{
 		friend class LLVMIRGenContext;

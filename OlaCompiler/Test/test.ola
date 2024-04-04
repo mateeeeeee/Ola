@@ -1,7 +1,21 @@
+import std.assert;
 
-public int main() 
+public int main()
 {
-	int b = 14;
-	int a = b * 3;
-    return a;
+    int a = 5;
+    int b = -a;
+    Assert(b == -5);
+
+    int c = 10;
+    int d = +c;
+    Assert(d == 10);
+
+    float f = 10.0;
+    float g = +f;
+    Assert(g == 10.0);
+
+    float e = -f;
+    Assert(e == -10.0);
+
+    return 0;
 }
