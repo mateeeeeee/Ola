@@ -5,42 +5,31 @@
 
 namespace ola
 {
-	struct LiveRange
+
+	struct LiveInterval
 	{
 		uint64 begin, end;
+		uint32 reg;
+		int32  stack_offset;
+		bool spilled;
 	};
 
-	inline bool operator<(LiveRange const& lhs, LiveRange const& rhs) 
+	inline bool operator<(LiveInterval const& lhs, LiveInterval const& rhs)
 	{
 		return lhs.begin < rhs.begin;
 	}
 
-	class LiveInterval 
-	{
-	public:
-		LiveInterval() = default;
-
-		void AddRange(LiveRange const& segment)
-		{
-			ranges.push_back(segment);
-		}
-		void EmplaceRange(uint64 beg, uint64 end)
-		{
-			ranges.emplace_back(beg, end);
-		}
-
-	private:
-		std::vector<LiveRange> ranges;
-	};
 
 	class MIRInstruction;
 	class MIRBasicBlock;
 	class MIRFunction;
 	class MIRModule;
 
+
 	struct LivenessAnalysisResult
 	{
-		
+		std::vector<LiveInterval> live_intervals;
+		std::unordered_map<MIRInstruction*, uint64> instruction_numbering_map;
 	};
 
 	LivenessAnalysisResult DoLivenessAnalysis(MIRModule& M, MIRFunction& MF);
