@@ -54,9 +54,16 @@ namespace ola
 					}
 					else if (inst_info.HasOpFlag(idx, OperandFlagUse))
 					{
+						if (reg_use_map.contains(reg_id))
+						{
+							live_interval_map[reg_id].end = instruction_idx + 1;
+						}
+						else
+						{
+							live_interval_map[reg_id] = LiveInterval{ reg_def_map[reg_id], instruction_idx + 1 };
+						}
 						reg_use_map[reg_id] = instruction_idx + 1;
 					}
-					live_interval_map[reg_id] = LiveInterval{ reg_def_map[reg_id], reg_use_map[reg_id] };
 				}
 			}
 		}

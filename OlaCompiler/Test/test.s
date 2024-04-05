@@ -1,26 +1,35 @@
-.intel_syntax noprefix
-
-.section .rodata
-
-.section .bss
-
-.section .data
-
-.section .text
-.globl main
-main:
-push rbp
-mov rbp, rsp
-sub rsp, 16
-and rsp, -16
-entry:
-mov qword ptr [rbp - 0], 14
-mov r12, qword ptr [rbp - 0]
-imul r12, 3
-mov qword ptr [rbp - 8], r12
-exit:
-mov rax, qword ptr [rbp - 8]
-mov rsp, rbp
-pop rbp
-ret
-
+	.text
+	.def	@feat.00;
+	.scl	3;
+	.type	0;
+	.endef
+	.globl	@feat.00
+.set @feat.00, 0
+	.intel_syntax noprefix
+	.file	"test.ola"
+	.def	main;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	main                            # -- Begin function main
+	.p2align	4, 0x90
+main:                                   # @main
+.seh_proc main
+# %bb.0:                                # %entry
+	sub	rsp, 16
+	.seh_stackalloc 16
+	.seh_endprologue
+	mov	qword ptr [rsp + 8], 5
+	mov	rax, qword ptr [rsp + 8]
+	add	rax, 3
+	mov	qword ptr [rsp], rax
+	mov	rax, qword ptr [rsp]
+	add	rax, 2
+	mov	qword ptr [rsp + 8], rax
+# %bb.1:                                # %exit
+	mov	rax, qword ptr [rsp + 8]
+	add	rsp, 16
+	ret
+	.seh_endproc
+                                        # -- End function
+	.addrsig
