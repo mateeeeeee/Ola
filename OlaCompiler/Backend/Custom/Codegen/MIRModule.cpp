@@ -120,7 +120,7 @@ namespace ola
 			lowering_ctx.AddBlock(&BB, MBB.get());
 			for (auto& inst : BB.Instructions())
 			{
-				if (inst.GetInstrID() == InstructionID::Phi) 
+				if (inst.GetInstID() == InstructionID::Phi) 
 				{
 					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
 					lowering_ctx.AddOperand(&inst, vreg);
@@ -145,12 +145,11 @@ namespace ola
 
 		for (Instruction& inst : F->GetEntryBlock().Instructions()) 
 		{
-			if (inst.GetInstrID() == InstructionID::Alloca) //#todo alloca needs to added always in entry block of a function
+			if (inst.GetInstID() == InstructionID::Alloca) //#todo alloca needs to added always in entry block of a function
 			{
 				AllocaInst* alloca_inst = cast<AllocaInst>(&inst);
 				IRType const* type = alloca_inst->GetAllocatedType();
-				auto ref = lowering_ctx.StackObject(); 
-				MF.StackObjects().emplace(ref, StackObject{ type->GetSize(), type->GetAlign(), 0, StackObjectUsage::Local });
+				MF.AllocateStack(type->GetSize());
 			}
 			else break;
 		}
@@ -168,7 +167,7 @@ namespace ola
 
 	void MIRModule::LowerInstruction(Instruction* inst)
 	{
-		switch (inst->GetInstrID())
+		switch (inst->GetInstID())
 		{
 		case InstructionID::Add:
 		case InstructionID::Sub:
@@ -255,7 +254,7 @@ namespace ola
 			return InstUnknown;
 			};
 			MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
+			MIRInstruction minst(GetMachineID(inst->GetInstID()));
 			minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
 			lowering_ctx.EmitInst(minst);
 			lowering_ctx.AddOperand(inst, ret);
@@ -278,7 +277,7 @@ namespace ola
 			};
 
 			MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-			MIRInstruction minst(GetMachineID(inst->GetInstrID()));
+			MIRInstruction minst(GetMachineID(inst->GetInstID()));
 			minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
 			lowering_ctx.EmitInst(minst);
 			lowering_ctx.AddOperand(inst, ret);

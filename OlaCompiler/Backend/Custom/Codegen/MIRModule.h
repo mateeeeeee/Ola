@@ -36,6 +36,7 @@ namespace ola
 		virtual MIRInstructionInfo const& GetInstInfo(MIRInstruction const&) = 0;
 		virtual void GetRegisters(std::vector<uint32>& regs) const = 0;
 		virtual void GetFPRegisters(std::vector<uint32>& regs) const = 0;
+		virtual uint32 GetFrameRegister() const = 0;
 
 	protected:
 		std::vector<MIRGlobal> globals;

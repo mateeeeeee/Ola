@@ -5,7 +5,6 @@
 namespace ola
 {
 	constexpr uint32 VIRTUAL_REG_BEGIN = 0b0101U << 28;
-	constexpr uint32 STACK_OBJECT_BEGIN = 0b1010U << 28;
 	constexpr uint32 INVALID_REG = 0b1100U << 28;
 
 	inline constexpr bool IsISAReg(uint32 r) 
@@ -15,10 +14,6 @@ namespace ola
 	inline constexpr bool IsVirtualReg(uint32 r) 
 	{
 		return (r & VIRTUAL_REG_BEGIN) == VIRTUAL_REG_BEGIN;
-	}
-	inline constexpr bool IsStackObject(uint32 r) 
-	{
-		return (r & STACK_OBJECT_BEGIN) == STACK_OBJECT_BEGIN;
 	}
 
 	enum class MIROperandType : uint32
@@ -85,6 +80,20 @@ namespace ola
 		}
 	};
 
+	struct MIRStackObject
+	{
+		int32 offset;
+
+		bool operator==(MIRStackObject const& rhs) const
+		{
+			return offset == rhs.offset;
+		}
+		bool operator!=(MIRStackObject const& rhs) const
+		{
+			return offset != rhs.offset;
+		}
+	};
+
 	class MIRRelocable;
 	class MIROperand
 	{
@@ -112,6 +121,15 @@ namespace ola
 		MIRRegister& GetReg() 
 		{ 
 			return std::get<MIRRegister>(storage); 
+		}
+
+		bool IsStackObject() const
+		{
+			return std::holds_alternative<MIRStackObject>(storage);
+		}
+		int32 GetStackOffset() const
+		{
+			return std::get<MIRStackObject>(storage).offset;
 		}
 
 		bool IsImmediate() const { return std::holds_alternative<int64>(storage); }
@@ -155,9 +173,9 @@ namespace ola
 		{
 			return MIROperand(MIRRegister{ reg + VIRTUAL_REG_BEGIN }, type);
 		}
-		static MIROperand StackObject(uint32 reg, MIROperandType type) 
+		static MIROperand StackObject(int32 offset, MIROperandType type) 
 		{
-			return MIROperand(MIRRegister{ reg + STACK_OBJECT_BEGIN }, type);
+			return MIROperand(MIRStackObject{ offset }, type);
 		}
 		static MIROperand InvalidReg() 
 		{
@@ -171,17 +189,13 @@ namespace ola
 		uint64 GetHash() const;
 
 	private:
-		std::variant<std::monostate, MIRRelocable*, int64, MIRRegister> storage;
+		std::variant<std::monostate, MIRRelocable*, int64, MIRRegister, MIRStackObject> storage;
 		MIROperandType type = MIROperandType::Unknown;
 	};
 
 	inline bool IsOperandVReg(MIROperand const& operand)
 	{
 		return operand.IsReg() && IsVirtualReg(operand.GetReg().reg);
-	}
-	inline bool IsOperandStackObject(MIROperand const& operand)
-	{
-		return operand.IsReg() && IsStackObject(operand.GetReg().reg);
 	}
 }
 
@@ -193,6 +207,15 @@ namespace std
 		size_t operator()(ola::MIRRegister const& reg) const 
 		{
 			return hash<uint32_t>{}(reg.reg);
+		}
+	};
+
+	template <>
+	struct hash<ola::MIRStackObject>
+	{
+		size_t operator()(ola::MIRStackObject const& so) const
+		{
+			return hash<int32_t>{}(so.offset);
 		}
 	};
 

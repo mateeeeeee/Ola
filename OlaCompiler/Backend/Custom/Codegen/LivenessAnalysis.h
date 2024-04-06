@@ -9,6 +9,7 @@ namespace ola
 	struct LiveInterval
 	{
 		uint64 begin, end;
+		uint32 vreg;
 		uint32 reg;
 		int32  stack_offset;
 		bool spilled;

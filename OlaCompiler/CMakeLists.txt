@@ -115,7 +115,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/LivenessAnalysis.h
   Backend/Custom/Codegen/LivenessAnalysis.cpp
   Backend/Custom/Codegen/RegisterAllocator.h
-  Backend/Custom/Codegen/RegisterAllocator.cpp
+  Backend/Custom/Codegen/LinearScanRegisterAllocator.h
+  Backend/Custom/Codegen/LinearScanRegisterAllocator.cpp
 
   Backend/Custom/Pass.h
   Backend/Custom/Pass.cpp

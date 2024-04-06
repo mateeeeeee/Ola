@@ -188,7 +188,7 @@ namespace ola
 	public:
 		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), instr_id(InstructionID::None), basic_block(nullptr) {}
 
-		InstructionID GetInstrID() const 
+		InstructionID GetInstID() const 
 		{
 			return instr_id;
 		}
@@ -317,7 +317,7 @@ namespace ola
 		
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetInstrID())
+			switch (I->GetInstID())
 			{
 			case InstructionID::Add:
 			case InstructionID::Sub:
@@ -345,7 +345,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetInstrID())
+			switch (I->GetInstID())
 			{
 			case InstructionID::Neg:
 			case InstructionID::Not:
@@ -404,7 +404,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() > InstructionID::CompareOpBegin && I->GetInstrID() < InstructionID::CompareOpEnd;
+			return I->GetInstID() > InstructionID::CompareOpBegin && I->GetInstID() < InstructionID::CompareOpEnd;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -445,7 +445,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Load;
+			return I->GetInstID() == InstructionID::Load;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -466,7 +466,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Store;
+			return I->GetInstID() == InstructionID::Store;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -500,7 +500,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Branch;
+			return I->GetInstID() == InstructionID::Branch;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -526,7 +526,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Ret;
+			return I->GetInstID() == InstructionID::Ret;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -572,7 +572,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Switch;
+			return I->GetInstID() == InstructionID::Switch;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -629,7 +629,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Call;
+			return I->GetInstID() == InstructionID::Call;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -658,7 +658,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Select;
+			return I->GetInstID() == InstructionID::Select;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -683,7 +683,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::Alloca;
+			return I->GetInstID() == InstructionID::Alloca;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -718,7 +718,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstrID() == InstructionID::GetElementPtr;
+			return I->GetInstID() == InstructionID::GetElementPtr;
 		}
 		static bool ClassOf(Value const* V)
 		{

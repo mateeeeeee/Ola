@@ -12,7 +12,7 @@ namespace ola
 			Instruction const* terminator = &block.GetTerminator();
 			if (terminator->IsBranch()) 
 			{
-				if (terminator->GetInstrID() == InstructionID::Switch)
+				if (terminator->GetInstID() == InstructionID::Switch)
 				{
 					SwitchInst const* switch_inst = cast<SwitchInst>(terminator);
 					std::unordered_set<BasicBlock const*> switch_targets;

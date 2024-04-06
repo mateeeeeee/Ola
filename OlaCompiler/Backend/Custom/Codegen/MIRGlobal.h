@@ -23,22 +23,6 @@ namespace ola
 		std::string symbol;
 	};
 
-	enum class StackObjectUsage
-	{ 
-		Argument, 
-		CalleeArgument, 
-		Local, 
-		RegSpill, 
-		CalleeSaved 
-	};
-	struct StackObject 
-	{
-		uint32 size;
-		uint32 alignment;
-		int32 offset; 
-		StackObjectUsage usage;
-	};
-
 	class MIRFunction final : public MIRRelocable
 	{
 	public:
@@ -56,9 +40,13 @@ namespace ola
 		{
 			return args;
 		}
-		auto& StackObjects() 
+		
+		MIROperand& AllocateStack(uint32 size)
 		{
-			return stack_objects;
+			MIROperand stack_object = MIROperand::StackObject(stack_offset, MIROperandType::Other);
+			stack_objects.push_back(stack_object);
+			stack_offset += size;
+			return stack_objects.back();
 		}
 
 		virtual bool IsFunction() const
@@ -68,9 +56,9 @@ namespace ola
 
 	private:
 		std::list<std::unique_ptr<MIRBasicBlock>> blocks;
-		std::unordered_map<MIROperand, StackObject> stack_objects;
 		std::vector<MIROperand> args;
-
+		int32 stack_offset = 0;
+		std::vector<MIROperand> stack_objects;
 	};
 
 	class MIRZeroStorage : public MIRRelocable

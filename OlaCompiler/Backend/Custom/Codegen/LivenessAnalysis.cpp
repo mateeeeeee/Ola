@@ -56,22 +56,22 @@ namespace ola
 					{
 						if (reg_use_map.contains(reg_id))
 						{
-							live_interval_map[reg_id].end = instruction_idx + 1;
+							live_interval_map[reg_id].end = instruction_idx;
 						}
 						else
 						{
-							live_interval_map[reg_id] = LiveInterval{ reg_def_map[reg_id], instruction_idx + 1 };
+							live_interval_map[reg_id] = LiveInterval{ reg_def_map[reg_id], instruction_idx };
 						}
-						reg_use_map[reg_id] = instruction_idx + 1;
+						reg_use_map[reg_id] = instruction_idx;
 					}
 				}
 			}
 		}
 
 		std::vector<LiveInterval> live_intervals;
-		for (auto&& [reg, interval] : live_interval_map)
+		for (auto&& [vreg, interval] : live_interval_map)
 		{
-			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .reg = reg, .spilled = false });
+			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false });
 		}
 		std::sort(std::begin(live_intervals), std::end(live_intervals));
 		result.live_intervals = std::move(live_intervals);
