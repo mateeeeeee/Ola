@@ -37,16 +37,5 @@ namespace ola
 		}
 		return def_count;
 	}
-
-	MIROperand& ISelContext::GetInstDef(MIRInstruction& inst) const
-	{
-		MIRInstructionInfo const& inst_info = module.GetInstInfo(inst);
-		for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
-			if (inst_info.HasOpFlag(idx, OperandFlagDef)) return inst.GetOperand(idx);
-
-		OLA_UNREACHABLE();
-		return inst.GetOperand(0);
-	}
-
 }
 

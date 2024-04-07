@@ -25,13 +25,5 @@ namespace ola
 		MIRModule& module;
 		MIRBasicBlock* current_block;
 		MinstructionListIP current_ip;
-
-		std::unordered_map<MIROperand, MIRInstruction*> instruction_mapping, constant_mapping;
-		std::unordered_map<MIROperand, MIROperand> replace_list;
-        std::unordered_set<MIRInstruction*> replace_block_list;
-        std::unordered_map<MIROperand, uint32> use_count;
-
-	private:
-		MIROperand& GetInstDef(MIRInstruction& inst) const;
 	};
 }
