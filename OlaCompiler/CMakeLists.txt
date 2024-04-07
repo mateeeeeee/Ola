@@ -110,8 +110,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/LoweringContext.cpp
   Backend/Custom/Codegen/MIRModulePass.h
   Backend/Custom/Codegen/MIRFunctionPass.h
-  Backend/Custom/Codegen/ISelContext.h
-  Backend/Custom/Codegen/ISelContext.cpp
+  Backend/Custom/Codegen/InstructionLegalizer.h
+  Backend/Custom/Codegen/InstructionLegalizer.cpp
   Backend/Custom/Codegen/LivenessAnalysis.h
   Backend/Custom/Codegen/LivenessAnalysis.cpp
   Backend/Custom/Codegen/RegisterAllocator.h

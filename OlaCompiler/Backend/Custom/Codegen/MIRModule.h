@@ -2,7 +2,6 @@
 #include <iosfwd>
 #include "MIRGlobal.h"
 #include "LoweringContext.h"
-#include "ISelContext.h"
 
 namespace ola
 {
@@ -41,7 +40,6 @@ namespace ola
 	protected:
 		std::vector<MIRGlobal> globals;
 		LoweringContext lowering_ctx;
-		ISelContext isel_ctx;
 
 	private:
 		void LowerModule(IRModule*);

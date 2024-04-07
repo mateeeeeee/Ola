@@ -11,15 +11,13 @@ namespace ola
     class MIRInstruction;
 	class MIRBasicBlock;
 
-	class ISelContext
+	class InstructionLegalizer
 	{
 		using MinstructionListIP = std::list<MIRInstruction>::iterator;
 
 	public:
-		explicit ISelContext(MIRModule& module) : module(module), current_block(nullptr) {}
+		explicit InstructionLegalizer(MIRModule& module) : module(module), current_block(nullptr) {}
 		void Run(MIRFunction& func);
-
-		std::unordered_map<MIROperand, uint32> GetDefCount(MIRFunction& func);
 
 	private:
 		MIRModule& module;

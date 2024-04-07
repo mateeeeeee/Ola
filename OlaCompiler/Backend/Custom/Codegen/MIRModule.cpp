@@ -1,12 +1,13 @@
 #include "MIRModule.h"
 #include "MIRGlobal.h"
+#include "InstructionLegalizer.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/CFGAnalysis.h"
 
 namespace ola
 {
-	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this), isel_ctx(*this)
+	MIRModule::MIRModule(IRModule& ir_module) : lowering_ctx(*this)
 	{
 		LowerModule(&ir_module);
 	}
@@ -102,8 +103,8 @@ namespace ola
 
 				MIRGlobal *global = lowering_ctx.GetGlobal(F);
                 MIRFunction &MF = *dynamic_cast<MIRFunction *>(global->GetRelocable());
-				ISelContext isel_ctx(*this);
-                isel_ctx.Run(MF);
+				InstructionLegalizer legalizer(*this);
+				legalizer.Run(MF);
 			}
 		}
 	}
