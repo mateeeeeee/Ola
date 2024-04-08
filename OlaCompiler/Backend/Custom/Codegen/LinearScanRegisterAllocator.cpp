@@ -20,8 +20,11 @@ namespace ola
 	{
 		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
-		M.GetRegisters(registers);
-		M.GetFPRegisters(fp_registers);
+
+		ModuleRegisterInfo const& reg_info = M.GetRegisterInfo();
+		registers = reg_info.regs;
+		fp_registers = reg_info.fp_regs;
+		frame_register = reg_info.frame_reg;
 
 		for (LiveInterval& LI : live_intervals)
 		{
@@ -108,7 +111,7 @@ namespace ola
 					{
 						MIROperand& MO = MF.AllocateStack(8);
 						int32 stack_offset = MO.GetStackOffset();
-						uint32 frame_reg = M.GetFrameRegister();
+						uint32 frame_reg = frame_register;
 
 						//todo
 					}

@@ -106,8 +106,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MIRGlobal.h
   Backend/Custom/Codegen/MIRModule.h
   Backend/Custom/Codegen/MIRModule.cpp
-  Backend/Custom/Codegen/LoweringContext.h
-  Backend/Custom/Codegen/LoweringContext.cpp
+  Backend/Custom/Codegen/LoweringPass.h
+  Backend/Custom/Codegen/LoweringPass.cpp
   Backend/Custom/Codegen/MIRModulePass.h
   Backend/Custom/Codegen/MIRFunctionPass.h
   Backend/Custom/Codegen/InstructionLegalizer.h

@@ -1,7 +1,7 @@
 #pragma once
 #include <iosfwd>
 #include "MIRGlobal.h"
-#include "LoweringContext.h"
+#include "LoweringPass.h"
 
 namespace ola
 {
@@ -17,43 +17,40 @@ namespace ola
 	class StoreInst;
 	class ReturnInst;
 	class CallInst;
+	class InstructionLegalizer;
 
 	class MIRInstruction;
 	class MIRInstructionInfo;
 
+	struct ModuleRegisterInfo
+	{
+		std::vector<uint32> regs;
+		std::vector<uint32> fp_regs;
+		uint32 frame_reg;
+	};
+
 	class MIRModule
 	{
+		friend class LoweringPass;
 	public:
 		explicit MIRModule(IRModule& ir_module);
 		virtual ~MIRModule() = default;
-		
-		virtual void EmitPrologue(MIRFunction&) = 0;
 
+		void EmitMachineCode();
+		LoweringPass& GetLoweringPass() { return lowering_pass; }
+
+		virtual InstructionLegalizer* GetLegalizer() = 0;
+
+		virtual void EmitPrologue(MIRFunction&) = 0;
 		virtual void EmitReturn(ReturnInst*) = 0;
 		virtual void EmitCall(CallInst*) = 0;
-		virtual bool TryLowerInstruction(Instruction*) { return false; }
+
 		virtual MIRInstructionInfo const& GetInstInfo(MIRInstruction const&) = 0;
-		virtual void GetRegisters(std::vector<uint32>& regs) const = 0;
-		virtual void GetFPRegisters(std::vector<uint32>& regs) const = 0;
-		virtual uint32 GetFrameRegister() const = 0;
+		virtual ModuleRegisterInfo const& GetRegisterInfo() const = 0;
 
 	protected:
+		IRModule& ir_module;
 		std::vector<MIRGlobal> globals;
-		LoweringContext lowering_ctx;
-
-	private:
-		void LowerModule(IRModule*);
-		void LowerFunction(Function*);
-		void LowerInstruction(Instruction*);
-
-		void LowerUnary(UnaryInst*);
-		void LowerBinary(BinaryInst*);
-		void LowerRet(ReturnInst*);
-		void LowerBranch(BranchInst*);
-		void LowerLoad(LoadInst*);
-		void LowerStore(StoreInst*);
-		void LowerCall(CallInst*);
-
-		void LowerCFGAnalysis(Function*);
+		LoweringPass lowering_pass;
 	};
 }

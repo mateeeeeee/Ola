@@ -13,15 +13,12 @@ namespace ola
 
 	class InstructionLegalizer
 	{
-		using MinstructionListIP = std::list<MIRInstruction>::iterator;
-
 	public:
 		explicit InstructionLegalizer(MIRModule& module) : module(module), current_block(nullptr) {}
-		void Run(MIRFunction& func);
+		virtual void Run(MIRFunction& func) = 0;
 
-	private:
+	protected:
 		MIRModule& module;
 		MIRBasicBlock* current_block;
-		MinstructionListIP current_ip;
 	};
 }
