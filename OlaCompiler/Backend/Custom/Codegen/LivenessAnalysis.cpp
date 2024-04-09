@@ -3,6 +3,7 @@
 #include "MIRGlobal.h"
 #include "MIRBasicBlock.h"
 #include "MIRModule.h"
+#include "Target.h"
 
 namespace ola
 {
@@ -31,6 +32,8 @@ namespace ola
 		LivenessAnalysisResult result{};
 		AssignInstNum(MF, result.instruction_numbering_map);
 
+		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
+
 		std::unordered_map<uint32, uint64> reg_def_map;
 		std::unordered_map<uint32, uint64> reg_use_map;
 		std::unordered_map<uint32, LiveInterval> live_interval_map;
@@ -39,8 +42,7 @@ namespace ola
 			for (MIRInstruction& MI : MBB->Instructions())
 			{
 				uint64 const instruction_idx = result.instruction_numbering_map[&MI];
-				MIRInstructionInfo const& inst_info = M.GetInstInfo(MI);
-
+				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MIROperand& MO = MI.GetOperand(idx);

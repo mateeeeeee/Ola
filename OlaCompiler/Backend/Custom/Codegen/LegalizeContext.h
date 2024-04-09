@@ -11,11 +11,10 @@ namespace ola
     class MIRInstruction;
 	class MIRBasicBlock;
 
-	class InstructionLegalizer
+	class LegalizeContext
 	{
 	public:
-		explicit InstructionLegalizer(MIRModule& module) : module(module), current_block(nullptr) {}
-		virtual void Run(MIRFunction& func) = 0;
+		explicit LegalizeContext(MIRModule& module) : module(module), current_block(nullptr) {}
 
 	protected:
 		MIRModule& module;

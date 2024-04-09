@@ -4,6 +4,7 @@
 #include "LivenessAnalysis.h"
 #include "MIRGlobal.h"
 #include "MIRModule.h"
+#include "Target.h"
 
 namespace ola
 {
@@ -21,10 +22,10 @@ namespace ola
 		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
 
-		ModuleRegisterInfo const& reg_info = M.GetRegisterInfo();
-		registers = reg_info.regs;
-		fp_registers = reg_info.fp_regs;
-		frame_register = reg_info.frame_reg;
+		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
+		registers = target_reg_info.GetIntegerRegisters();
+		fp_registers = target_reg_info.GetFPRegisters();
+		frame_register = target_reg_info.GetFramePointerRegister();
 
 		for (LiveInterval& LI : live_intervals)
 		{
@@ -95,11 +96,13 @@ namespace ola
 
 	void LinearScanRegisterAllocator::Finalize(MIRFunction& MF, std::vector<LiveInterval>& intervals)
 	{
+		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
+
 		for (auto& MBB : MF.Blocks())
 		{
 			for (MIRInstruction& MI : MBB->Instructions())
 			{
-				MIRInstructionInfo const& inst_info = M.GetInstInfo(MI);
+				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);;
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MIROperand& MO = MI.GetOperand(idx);
