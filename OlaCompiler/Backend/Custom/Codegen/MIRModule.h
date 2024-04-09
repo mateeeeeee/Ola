@@ -2,6 +2,7 @@
 #include <iosfwd>
 #include "MIRGlobal.h"
 #include "LoweringContext.h"
+#include "LegalizeContext.h"
 
 namespace ola
 {
@@ -34,6 +35,7 @@ namespace ola
 	protected:
 		std::vector<MIRGlobal> globals;
 		LoweringContext lowering_ctx;
+		LegalizeContext legalize_ctx;
 		Target const& target;
 
 	private:

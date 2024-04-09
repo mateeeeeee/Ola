@@ -89,7 +89,7 @@ namespace ola
 	public:
 		virtual ~TargetISelInfo() = default;
 
-		bool IsLegalInstruction(MIRInstruction) const;
+		bool IsLegalInstruction(MIRInstruction const&) const;
 		virtual bool IsLegalInstruction(uint32) const = 0;
 		virtual bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
 		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const = 0;

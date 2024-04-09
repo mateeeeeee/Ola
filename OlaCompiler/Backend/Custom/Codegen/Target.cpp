@@ -22,7 +22,7 @@ namespace ola
 		return GetInstInfo(inst.GetOpcode());
 	}
 
-	bool TargetISelInfo::IsLegalInstruction(MIRInstruction inst) const
+	bool TargetISelInfo::IsLegalInstruction(MIRInstruction const& inst) const
 	{
 		return IsLegalInstruction(inst.GetOpcode());
 	}

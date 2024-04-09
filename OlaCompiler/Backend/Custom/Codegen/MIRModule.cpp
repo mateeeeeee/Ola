@@ -1,4 +1,5 @@
 #include "MIRModule.h"
+#include "Target.h"
 #include "MIRGlobal.h"
 #include "LegalizeContext.h"
 #include "Backend/Custom/IR/IRModule.h"
@@ -7,7 +8,7 @@
 
 namespace ola
 {
-	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), target(target)
+	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), legalize_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
 	}
@@ -94,6 +95,7 @@ namespace ola
 			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
+		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (GlobalValue* GV : ir_globals)
 		{
 			if (GV->IsFunction())
@@ -104,7 +106,16 @@ namespace ola
 				MIRGlobal* global = lowering_ctx.GetGlobal(F);
 				MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
 
-				//run legalization
+				for (auto& MBB : MF.Blocks())
+				{
+					for (MIRInstruction& MI : MBB->Instructions())
+					{
+						if (!isel_info.IsLegalInstruction(MI))
+						{
+							isel_info.LegalizeInstruction(MI, legalize_ctx);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -154,13 +165,17 @@ namespace ola
 			else break;
 		}
 
+		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
 			lowering_ctx.SetCurrentBasicBlock(MBB);
 			for (Instruction& inst : BB.Instructions())
 			{
-				LowerInstruction(&inst);
+				if (!isel_info.LowerInstruction(&inst, lowering_ctx))
+				{
+					LowerInstruction(&inst);
+				}
 			}
 		}
 	}
