@@ -41,7 +41,7 @@ namespace ola
 	{
 		static constexpr uint32 MAX_OPERANDS = 7;
 	public:
-		InstInfo(uint32 operand_count, InstFlag inst_flag) : operand_count(operand_count), instruction_flag(inst_flag), operand_flags() {}
+		InstInfo() = default;
 
 		bool HasOpFlag(uint32 idx, OperandFlag flag) const
 		{
@@ -54,10 +54,16 @@ namespace ola
 		}
 		uint32 GetOperandCount() const { return operand_count; }
 
+		void SetOperandCount(uint32 _operand_count)
+		{
+			operand_count = _operand_count;
+		}
+		void SetOpFlag(uint32 idx, OperandFlag flag);
+		void SetInstFlag(InstFlag inst_flag);
 	private:
 		uint32 operand_count;
 		OperandFlag operand_flags[MAX_OPERANDS];
-		InstFlag instruction_flag;
+		InstFlag instruction_flag = InstFlagNone;
 	};
 
 	class TargetInstInfo

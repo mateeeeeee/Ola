@@ -120,6 +120,11 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/LinearScanRegisterAllocator.h
   Backend/Custom/Codegen/LinearScanRegisterAllocator.cpp
 
+  Backend/Custom/Codegen/x64/x64.h
+  Backend/Custom/Codegen/x64/x64Target.h
+  Backend/Custom/Codegen/x64/x64Target.cpp
+
+
   Backend/Custom/Pass.h
   Backend/Custom/Pass.cpp
   Backend/Custom/PassManagerBase.h

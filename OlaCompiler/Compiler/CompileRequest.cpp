@@ -17,7 +17,7 @@ namespace ola
 		CLI::Option* O1 = cli_parser.add_flag("--O1", "Optimize");
 		CLI::Option* O2 = cli_parser.add_flag("--O2", "Optimize more");
 		CLI::Option* O3 = cli_parser.add_flag("--O3", "Optimize even more");
-
+		
 		cli_parser.add_option("-i", source_files, "Input files");
 		cli_parser.add_option("-o", output_file, "Output file");
 		cli_parser.add_option("--directory", input_directory, "Directory of input files");

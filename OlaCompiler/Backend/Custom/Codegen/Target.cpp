@@ -27,5 +27,15 @@ namespace ola
 		return IsLegalInstruction(inst.GetOpcode());
 	}
 
+	void InstInfo::SetOpFlag(uint32 idx, OperandFlag flag)
+	{
+		operand_flags[idx] |= flag;
+	}
+
+	void InstInfo::SetInstFlag(InstFlag inst_flag)
+	{
+		instruction_flag |= inst_flag;
+	}
+
 }
 
