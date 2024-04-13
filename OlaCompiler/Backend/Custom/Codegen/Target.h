@@ -101,6 +101,7 @@ namespace ola
 		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const = 0;
 	};
 
+	class MIRModule;
 	class Target
 	{
 	public:
@@ -109,5 +110,6 @@ namespace ola
 		virtual TargetInstInfo const& GetInstInfo() const = 0;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const = 0;
 		virtual TargetISelInfo const& GetISelInfo() const = 0;
+		virtual void EmitAssembly(MIRModule& M, char const* file) const = 0;
 	};
 }

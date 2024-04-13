@@ -3,7 +3,5 @@ import std.assert;
 public int main()
 {
     int a = 5;
-    int b = a + 3;
-    a = b + 2;
     return a;
 }

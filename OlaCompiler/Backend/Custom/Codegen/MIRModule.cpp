@@ -13,6 +13,11 @@ namespace ola
 		LowerModule(&ir_module);
 	}
 
+	void MIRModule::EmitAssembly(char const* assembly_file)
+	{
+		target.EmitAssembly(*this, assembly_file);
+	}
+
 	void MIRModule::LowerModule(IRModule* ir_module)
 	{
 		auto const& ir_globals = ir_module->Globals();

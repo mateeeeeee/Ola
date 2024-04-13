@@ -43,9 +43,8 @@ namespace ola
 
 	class x64TargetISelInfo : public TargetISelInfo
 	{
-
 	public:
-		virtual bool IsLegalInstruction(uint32) const override
+		virtual bool IsLegalInstruction(uint32 opcode) const override
 		{
 			return false;
 		}
@@ -55,17 +54,30 @@ namespace ola
 			return false;
 		}
 
-
 		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const override
 		{
 			return false;
 		}
-
 	};
 
 	class x64TargetRegisterInfo : public TargetRegisterInfo
 	{
 	public:
+		x64TargetRegisterInfo()
+		{
+			gp_registers.reserve(x64::GPREnd - x64::GPRBegin + 1);
+			for (uint32 r = x64::GPRBegin; r <= x64::GPREnd; ++r)
+			{
+				gp_registers.push_back(r);
+			}
+
+			fp_registers.reserve(x64::FPREnd - x64::FPRBegin + 1);
+			for (uint32 r = x64::FPRBegin; r <= x64::FPREnd; ++r)
+			{
+				fp_registers.push_back(r);
+			}
+		}
+
 		virtual uint32 GetStackPointerRegister() const override
 		{
 			return x64::RSP;
@@ -85,29 +97,30 @@ namespace ola
 
 		virtual std::vector<uint32> const& GetIntegerRegisters() const override
 		{
-			return {};
+			return gp_registers;
 		}
-
 
 		virtual std::vector<uint32> const& GetFPRegisters() const override
 		{
-			return {};
+			return fp_registers;
 		}
 
 
-		virtual bool IsCallerSaved(uint32) const override
+		virtual bool IsCallerSaved(uint32 r) const override
 		{
-			return false;
+			return x64::IsCallerSaved(r);
 		}
 
 
-		virtual bool IsCalleeSaved(uint32) const override
+		virtual bool IsCalleeSaved(uint32 r) const override
 		{
-			return false;
+			return x64::IsCalleeSaved(r);
 		}
 
+	private:
+		std::vector<uint32> gp_registers;
+		std::vector<uint32> fp_registers;
 	};
-
 
 	TargetDataLayout const& x64Target::GetDataLayout() const
 	{
@@ -131,6 +144,11 @@ namespace ola
 	{
 		static x64TargetISelInfo x64_target_isel_info{};
 		return x64_target_isel_info;
+	}
+
+	void x64Target::EmitAssembly(MIRModule& M, char const* file) const
+	{
+
 	}
 
 }

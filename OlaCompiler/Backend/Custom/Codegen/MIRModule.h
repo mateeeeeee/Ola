@@ -31,6 +31,7 @@ namespace ola
 		virtual ~MIRModule() = default;
 
 		Target const& GetTarget() const { return target; }
+		void EmitAssembly(char const* assembly_file);
 
 	protected:
 		std::vector<MIRGlobal> globals;
