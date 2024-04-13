@@ -1351,9 +1351,6 @@ namespace ola
 		if (!func->getReturnType()->isVoidTy()) builder.CreateRet(Load(func->getReturnType(), return_value));
 		else builder.CreateRetVoid();
 
-		std::vector<llvm::BasicBlock*> unreachable_blocks{};
-		for (auto&& block : *func) if (block.hasNPredecessors(0) && &block != entry_block) unreachable_blocks.push_back(&block);
-
 		std::vector<llvm::BasicBlock*> empty_blocks{};
 		for (auto&& block : *func) if (block.empty()) empty_blocks.push_back(&block);
 

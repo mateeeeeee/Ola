@@ -58,10 +58,14 @@ namespace ola
 		{
 			block_idx = idx;
 		}
+
+
 	private:
 		Function* function;
 		std::string label;
 		uint32 block_idx;
 		IList<Instruction> instructions;
+
+		std::vector<BasicBlock*> predecessors;
 	};
 }

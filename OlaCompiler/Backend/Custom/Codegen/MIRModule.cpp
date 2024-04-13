@@ -227,6 +227,8 @@ namespace ola
 		case InstructionID::Call:
 			LowerCall(cast<CallInst>(inst));
 			break;
+		case InstructionID::Alloca:
+			break;
 		case InstructionID::Phi:
 			break;
 		default:

@@ -58,7 +58,8 @@ namespace ola
 		Function* ir_function = new Function(function_decl.GetMangledName(), function_type, linkage);
 		module.AddGlobal(ir_function);
 
-		Argument* param_arg = ir_function->GetArg(0);
+		uint32 arg_index = 0;
+		Argument* param_arg = ir_function->GetArg(arg_index);
 		if (isa<ClassType>(type->GetReturnType()))
 		{
 			Value* sret_value = param_arg;
@@ -70,7 +71,7 @@ namespace ola
 			Value* ir_param = param_arg;
 			ir_param->SetName(param->GetName());
 			value_map[param.get()] = ir_param;
-			++param_arg;
+			param_arg = ir_function->GetArg(++arg_index);
 		}
 
 		if (!function_decl.HasDefinition()) return;
@@ -732,7 +733,74 @@ namespace ola
 
 	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)
 	{
+		if (func_decl.IsInline()) func->SetForceInline();
+		else if (func_decl.IsNoInline()) func->SetNoInline();
+
+		BasicBlock* entry_block = builder->AddBlock(func); 
+		entry_block->SetName("entry");
+		builder->SetCurrentBlock(entry_block);
+
+		for (auto& param : func_decl.GetParamDecls())
+		{
+			Value* arg_value = value_map[param.get()];
+			AllocaInst* arg_alloc = builder->MakeInst<AllocaInst>(arg_value->GetType());
+
+			builder->MakeInst<StoreInst>(arg_alloc, arg_value);
+			if (isa<RefType>(param->GetType()))
+			{
+				Value* arg_ref = builder->MakeInst<LoadInst>(arg_alloc, arg_value->GetType());
+				value_map[param.get()] = arg_ref;
+			}
+			else
+			{
+				value_map[param.get()] = arg_alloc;
+			}
+		}
+		if (func->GetReturnType()->IsPointerType()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
 		
+		exit_block = builder->AddBlock(func);
+		exit_block->SetName("exit");
+
+		auto const& labels = func_decl.GetLabels();
+		for (LabelStmt const* label : labels)
+		{
+			BasicBlock* label_block = builder->AddBlock(func, exit_block); 
+			label_blocks[std::string(label_block->GetLabel())] = label_block;
+		}
+
+		func_decl.GetBodyStmt()->Accept(*this);
+
+		builder->SetCurrentBlock(exit_block);
+
+		if (!func->GetReturnType()->IsVoidType()) builder->MakeInst<ReturnInst>(Load(func->GetReturnType(), return_value));
+		else builder->MakeInst<ReturnInst>(context);
+
+		std::vector<BasicBlock*> empty_blocks{};
+		for (auto&& block : *func) if (block.Instructions().Empty()) empty_blocks.push_back(&block);
+
+		for (BasicBlock* empty_block : empty_blocks)
+		{
+			builder->SetCurrentBlock(empty_block);
+			AllocaInst* nop = builder->MakeInst<AllocaInst>(bool_type);
+			nop->SetName("nop");
+			if (empty_block_successors.contains(empty_block))
+				 builder->MakeInst<BranchInst>(context, empty_block_successors[empty_block]);
+			else builder->MakeInst<BranchInst>(context, exit_block);
+		}
+
+		for (auto&& block : *func)
+		{
+			if(!block.Instructions().Empty())
+			{
+				builder->SetCurrentBlock(&block);
+				builder->MakeInst<BranchInst>(context, exit_block);
+			}
+		}
+
+		label_blocks.clear();
+		exit_block = nullptr;
+		return_value = nullptr;
+		value_map[&func_decl] = func;
 	}
 
 	IRType* IRVisitor::ConvertToIRType(Type const* type)

@@ -24,7 +24,8 @@ namespace ola
 			if constexpr (std::is_same_v<ClassType, To> || std::is_base_of_v<To, ClassType>) return static_cast<ResultType>(value);
 			else if constexpr (std::is_base_of_v<ClassType, To>)
 			{
-				OLA_ASSERT_MSG(value, "Cannot perform dynamic cast from null");
+				if(!value) return static_cast<ResultType>(nullptr);
+
 				if (To::ClassOf(value)) return static_cast<ResultType>(value);
 				if constexpr (checked) OLA_ASSERT_MSG(false, "Unexpected dynamic type");
 				return static_cast<ResultType>(nullptr);
