@@ -28,16 +28,12 @@ namespace ola
 	class MIRFunction final : public MIRRelocable
 	{
 	public:
-		explicit MIRFunction(std::string_view symbol) : MIRRelocable( symbol ) {}
+		explicit MIRFunction(std::string_view symbol);
+		~MIRFunction();
 
-		auto& Blocks()
-		{
-			return blocks;
-		}
-		auto const& Blocks() const
-		{
-			return blocks;
-		}
+		auto& Blocks() { return blocks; }
+		auto const& Blocks() const { return blocks; }
+
 		std::vector<MIROperand>& Args()
 		{
 			return args;
@@ -118,7 +114,6 @@ namespace ola
 			return idx;
 		}
 	};
-
 
 	class MIRGlobal 
 	{

@@ -122,6 +122,23 @@ namespace ola
 		std::vector<uint32> fp_registers;
 	};
 
+	class x64TargetFrameInfo : public TargetFrameInfo
+	{
+	public:
+		virtual void EmitCall(CallInst* inst, LoweringContext& ctx) const override
+		{
+
+		}
+		virtual void EmitPrologue(MIRFunction& func, LoweringContext& ctx) const override
+		{
+
+		}
+		virtual void EmitReturn(ReturnInst* inst, LoweringContext& ctx) const override
+		{
+
+		}
+	};
+
 	TargetDataLayout const& x64Target::GetDataLayout() const
 	{
 		static x64TargetDataLayout x64_target_data_layout{};
@@ -144,6 +161,12 @@ namespace ola
 	{
 		static x64TargetISelInfo x64_target_isel_info{};
 		return x64_target_isel_info;
+	}
+
+	TargetFrameInfo const& x64Target::GetFrameInfo() const
+	{
+		static x64TargetFrameInfo x64_target_frame_info{};
+		return x64_target_frame_info;
 	}
 
 	void x64Target::EmitAssembly(MIRModule& M, char const* file) const

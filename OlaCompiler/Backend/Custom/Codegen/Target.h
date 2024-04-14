@@ -4,7 +4,10 @@ namespace ola
 {
 	class IRType;
 	class Instruction;
+	class CallInst;
+	class ReturnInst;
 	class MIRInstruction;
+	class MIRFunction;
 
 	class TargetDataLayout
 	{
@@ -101,6 +104,16 @@ namespace ola
 		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const = 0;
 	};
 
+	class TargetFrameInfo
+	{
+	public:
+		virtual ~TargetFrameInfo() = default;
+
+		virtual void EmitCall(CallInst* inst, LoweringContext& ctx) const = 0;
+		virtual void EmitPrologue(MIRFunction& func, LoweringContext& ctx) const = 0;
+		virtual void EmitReturn(ReturnInst* inst, LoweringContext& ctx) const = 0;
+	};
+
 	class MIRModule;
 	class Target
 	{
@@ -110,6 +123,7 @@ namespace ola
 		virtual TargetInstInfo const& GetInstInfo() const = 0;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const = 0;
 		virtual TargetISelInfo const& GetISelInfo() const = 0;
+		virtual TargetFrameInfo const& GetFrameInfo() const = 0;
 		virtual void EmitAssembly(MIRModule& M, char const* file) const = 0;
 	};
 }

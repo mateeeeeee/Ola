@@ -2,9 +2,9 @@
 #include "LinearScanRegisterAllocator.h"
 #include "RegisterAllocator.h"
 #include "LivenessAnalysis.h"
-#include "MIRGlobal.h"
 #include "MIRModule.h"
 #include "MIRBasicBlock.h"
+#include "MIRGlobal.h"
 #include "Target.h"
 
 namespace ola

@@ -308,6 +308,7 @@ namespace ola
 
 	void MIRModule::LowerRet(ReturnInst* inst)
 	{
+		target.GetFrameInfo().EmitReturn(inst, lowering_ctx);
 	}
 
 	void MIRModule::LowerBranch(BranchInst* inst)
@@ -338,6 +339,7 @@ namespace ola
 
 	void MIRModule::LowerCall(CallInst* inst)
 	{
+		target.GetFrameInfo().EmitCall(inst, lowering_ctx);
 	}
 
 	void MIRModule::LowerCFGAnalysis(Function* F)
