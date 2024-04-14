@@ -2,7 +2,8 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-#include "MIRBasicBlock.h"
+#include "MIRGlobal.h"
+#include "MIROperand.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
@@ -23,6 +24,7 @@ namespace ola
 		std::string symbol;
 	};
 
+	class MIRBasicBlock;
 	class MIRFunction final : public MIRRelocable
 	{
 	public:

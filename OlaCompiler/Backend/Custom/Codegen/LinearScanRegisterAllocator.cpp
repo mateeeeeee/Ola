@@ -4,6 +4,7 @@
 #include "LivenessAnalysis.h"
 #include "MIRGlobal.h"
 #include "MIRModule.h"
+#include "MIRBasicBlock.h"
 #include "Target.h"
 
 namespace ola

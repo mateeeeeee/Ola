@@ -1,6 +1,7 @@
 #include "MIRModule.h"
 #include "Target.h"
 #include "MIRGlobal.h"
+#include "MIRBasicBlock.h"
 #include "LegalizeContext.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -309,9 +310,20 @@ namespace ola
 	{
 	}
 
-	void MIRModule::LowerBranch(BranchInst*)
+	void MIRModule::LowerBranch(BranchInst* inst)
 	{
+		if (inst->IsUnconditional())
+		{
+			BasicBlock* target = inst->GetTrueTarget();
+			MIROperand dst_operand = MIROperand::Relocable(lowering_ctx.GetBlock(target));
+			MIRInstruction minst(InstJump);
+			minst.SetOp<0>(dst_operand);
+			lowering_ctx.EmitInst(minst);
+		}
+		else
+		{
 
+		}
 	}
 
 	void MIRModule::LowerLoad(LoadInst*)

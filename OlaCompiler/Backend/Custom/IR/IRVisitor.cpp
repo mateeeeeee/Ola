@@ -790,7 +790,7 @@ namespace ola
 
 		for (auto&& block : *func)
 		{
-			if(!block.Instructions().Empty())
+			if(block.Instructions().Empty())
 			{
 				builder->SetCurrentBlock(&block);
 				builder->MakeInst<BranchInst>(context, exit_block);

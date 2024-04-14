@@ -482,7 +482,7 @@ namespace ola
 		BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target);
 
 		bool IsUnconditional() const { return !IsConditional(); }
-		bool IsConditional()   const { return Op<0>() != nullptr; }
+		bool IsConditional()   const { return false_target != nullptr; }
 
 		BasicBlock* GetTrueTarget() const { return true_target; }
 		BasicBlock* GetFalseTarget() const { return false_target; }

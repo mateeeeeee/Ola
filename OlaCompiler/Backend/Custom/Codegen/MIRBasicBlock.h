@@ -1,23 +1,20 @@
 #pragma once
 #include <list>
 #include "MIRInstruction.h"
+#include "MIRGlobal.h"
 
 namespace ola
 {
 	class MIRFunction;
-	class MIRBasicBlock
+	class MIRBasicBlock : public MIRRelocable
 	{
 	public:
-		MIRBasicBlock(MIRFunction* function, std::string_view label) : function(function), label(label)
+		MIRBasicBlock(MIRFunction* function, std::string_view label) : MIRRelocable(label), function(function)
 		{}
 
 		MIRFunction* GetFunction() const 
 		{
 			return function;
-		}
-		std::string_view GetLabel() const
-		{
-			return label;
 		}
 		std::list<MIRInstruction>& Instructions()
 		{
@@ -42,7 +39,6 @@ namespace ola
 	private:
 		MIRFunction* function;
 		std::list<MIRInstruction> instructions;
-		std::string label;
 		std::vector<MIRBasicBlock*> successors;
 		std::vector<MIRBasicBlock*> predecessors;
 	};
