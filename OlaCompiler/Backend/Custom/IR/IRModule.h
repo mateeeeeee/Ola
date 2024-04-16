@@ -29,6 +29,7 @@ namespace ola
 		std::vector<GlobalValue*> const& Globals() const { return globals; }
 
 		void EmitIR(std::string_view filename);
+
 	private:
 		IRContext& context;
 		std::string module_id;

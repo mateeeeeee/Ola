@@ -1,4 +1,5 @@
 #pragma once
+#include "Backend/Custom/Codegen/MIRInstruction.h"
 
 namespace ola::x64
 {
@@ -89,5 +90,10 @@ namespace ola::x64
 		GreaterThan,
 		LessOrEqual,
 		Always
+	};
+
+	enum x64Inst : uint32
+	{
+		X64InstBegin = ISASpecificBegin
 	};
 }

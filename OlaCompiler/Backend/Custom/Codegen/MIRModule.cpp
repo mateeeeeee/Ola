@@ -1,3 +1,4 @@
+#include <fstream>
 #include "MIRModule.h"
 #include "Target.h"
 #include "MIRGlobal.h"
@@ -9,9 +10,51 @@
 
 namespace ola
 {
+	namespace
+	{
+		void EmitMIRInstruction(std::ofstream& mir, MIRInstruction& MI)
+		{
+			switch (MI.GetOpcode())
+			{
+			case InstJump:
+			{
+				mir << "Jump:";
+			}
+			break;
+			case InstMove:
+			{
+				mir << "Move:";
+			}
+			break;
+			}
+		}
+	}
+
 	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), legalize_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
+	}
+
+	void MIRModule::EmitMIR(char const* mir_file)
+	{
+		std::ofstream mir(mir_file);
+		for (MIRGlobal const& global : globals)
+		{
+			MIRRelocable* relocable = global.GetRelocable();
+			if (relocable->IsFunction())
+			{
+				MIRFunction* MF = dynamic_cast<MIRFunction*>(relocable);
+				mir << "MF-" << MF->GetSymbol() << ":\n";
+				for (auto& MBB : MF->Blocks())
+				{
+					mir << "MBB-" << MBB->GetSymbol() << ":\n";
+					for (auto& MI : MBB->Instructions())
+					{
+						EmitMIRInstruction(mir, MI);
+					}
+				}
+			}
+		}
 	}
 
 	void MIRModule::EmitAssembly(char const* assembly_file)
@@ -354,5 +397,6 @@ namespace ola
 			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
 		}
 	}
+
 
 }

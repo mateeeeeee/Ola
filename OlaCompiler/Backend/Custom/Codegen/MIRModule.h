@@ -31,6 +31,8 @@ namespace ola
 		virtual ~MIRModule() = default;
 
 		Target const& GetTarget() const { return target; }
+
+		void EmitMIR(char const* mir_file);
 		void EmitAssembly(char const* assembly_file);
 
 	protected:

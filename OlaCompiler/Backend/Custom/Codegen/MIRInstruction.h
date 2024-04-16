@@ -76,17 +76,7 @@ namespace ola
 		InstS2F,
 		InstFCast,
 		// Misc
-		InstCopy,
-		InstSelect,
-		InstLoadGlobalAddress,
-		InstLoadImm,
-		InstLoadStackObjectAddr,
-		InstCopyFromReg,
-		InstCopyToReg,
-		InstLoadImmToReg,
-		InstLoadRegFromStack,
-		InstStoreRegToStack,
-
+		InstMove,
 		ISASpecificBegin,
 	};
 

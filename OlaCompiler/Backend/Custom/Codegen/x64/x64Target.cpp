@@ -1,5 +1,6 @@
 #include "x64Target.h"
 #include "x64.h"
+#include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
 
 namespace ola
@@ -120,23 +121,6 @@ namespace ola
 	private:
 		std::vector<uint32> gp_registers;
 		std::vector<uint32> fp_registers;
-	};
-
-	class x64TargetFrameInfo : public TargetFrameInfo
-	{
-	public:
-		virtual void EmitCall(CallInst* inst, LoweringContext& ctx) const override
-		{
-
-		}
-		virtual void EmitPrologue(MIRFunction& func, LoweringContext& ctx) const override
-		{
-
-		}
-		virtual void EmitReturn(ReturnInst* inst, LoweringContext& ctx) const override
-		{
-
-		}
 	};
 
 	TargetDataLayout const& x64Target::GetDataLayout() const

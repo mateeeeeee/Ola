@@ -16,7 +16,7 @@ namespace ola
 		{
 			GlobalValue const* GV = cast<GlobalValue>(C);
 			MIROperand ptr = VirtualReg(MIROperandType::Int64);
-			MIRInstruction minst(InstLoadGlobalAddress);
+			MIRInstruction minst(InstMove);
 
 			MIRGlobal* mir_global = global_map[GV];
 			OLA_ASSERT(mir_global);
@@ -25,6 +25,12 @@ namespace ola
 			minst.SetOp<0>(ptr).SetOp<1>(global);
 			EmitInst(minst);
 			return ptr;
+		}
+		else if (C->GetConstantID() == ConstantID::Integer)
+		{
+			ConstantInt const* CI = cast<ConstantInt>(C);
+			MIROperand imm = MIROperand::Immediate(CI->GetValue(), MIROperandType::Int64);
+			return imm;
 		}
 		else
 		{
