@@ -1,7 +1,10 @@
+#include <fstream>
 #include "x64Target.h"
 #include "x64.h"
 #include "x64TargetFrameInfo.h"
+#include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
+#include "Backend/Custom/Codegen/MIRModule.h"
 
 namespace ola
 {
@@ -155,7 +158,19 @@ namespace ola
 
 	void x64Target::EmitAssembly(MIRModule& M, char const* file) const
 	{
+		x64AsmPrinter asm_printer(file);
 
+		auto const& globals = M.GetGlobals();
+		for (MIRGlobal const& global : globals)
+		{
+			MIRRelocable* relocable = global.GetRelocable();
+			if (relocable->IsFunction())
+			{
+				MIRFunction& MF = *dynamic_cast<MIRFunction*>(relocable);
+				asm_printer.EmitText("{}:", MF.GetSymbol());
+			}
+		}
+		asm_printer.Finalize();
 	}
 
 }

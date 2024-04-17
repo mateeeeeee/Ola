@@ -31,6 +31,7 @@ namespace ola
 		virtual ~MIRModule() = default;
 
 		Target const& GetTarget() const { return target; }
+		auto   const& GetGlobals() const { return globals; }
 
 		void EmitMIR(char const* mir_file);
 		void EmitAssembly(char const* assembly_file);
