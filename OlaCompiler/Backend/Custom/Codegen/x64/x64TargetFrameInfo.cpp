@@ -39,6 +39,7 @@ namespace ola
 
 				MIRInstruction copy_instruction(InstMove);
 				copy_instruction.SetOp<0>(return_register).SetOp<1>(ctx.GetOperand(V));
+				ctx.EmitInst(copy_instruction);
 			}
 			else
 			{

@@ -5,6 +5,7 @@
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MIRModule.h"
+#include "Backend/Custom/Codegen/MIRBasicBlock.h"
 
 namespace ola
 {
@@ -156,18 +157,75 @@ namespace ola
 		return x64_target_frame_info;
 	}
 
+
+	static std::string GetOperandString(MIROperand const& MO)
+	{
+		if (MO.IsReg())
+		{
+			OLA_ASSERT(IsISAReg(MO.GetReg().reg));
+			return x64::GetRegisterString(MO.GetReg().reg);
+		}
+		else if (MO.IsImmediate())
+		{
+			return std::to_string(MO.GetImmediate());
+		}
+		else if (MO.IsRelocable())
+		{
+			return std::string(MO.GetRelocable()->GetSymbol());
+		}
+		else if (MO.IsStackObject())
+		{
+			OLA_ASSERT(false);
+		}
+	}
+
 	void x64Target::EmitAssembly(MIRModule& M, char const* file) const
 	{
 		x64AsmPrinter asm_printer(file);
+		asm_printer.EmitPreamble(".intel_syntax noprefix");
+		//
+		//.globl  main
 
 		auto const& globals = M.GetGlobals();
 		for (MIRGlobal const& global : globals)
 		{
+			
 			MIRRelocable* relocable = global.GetRelocable();
 			if (relocable->IsFunction())
 			{
 				MIRFunction& MF = *dynamic_cast<MIRFunction*>(relocable);
+				if (global.GetLinkage() == Linkage::External)
+				{
+					asm_printer.EmitText(".globl {}", MF.GetSymbol());
+				}
 				asm_printer.EmitText("{}:", MF.GetSymbol());
+
+				for (auto& MBB : MF.Blocks())
+				{
+					asm_printer.EmitText("{}:", MBB->GetSymbol());
+					for (MIRInstruction& MI : MBB->Instructions())
+					{
+						switch (MI.GetOpcode())
+						{
+						case InstJump:
+						{
+							MIROperand const& dst = MI.GetOp<0>();
+							OLA_ASSERT(dst.IsRelocable());
+							MIRRelocable* relocable = dst.GetRelocable();
+							asm_printer.EmitText("jmp {}", relocable->GetSymbol());
+						}
+						break;
+						case InstMove:
+						{
+							MIROperand const& dst = MI.GetOp<0>();
+							MIROperand const& src = MI.GetOp<1>();
+							asm_printer.EmitText("mov {}, {}", GetOperandString(dst), GetOperandString(src));
+						}
+						break;
+						}
+					}
+				}
+				asm_printer.EmitText("ret");
 			}
 		}
 		asm_printer.Finalize();

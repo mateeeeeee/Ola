@@ -6,7 +6,7 @@ namespace ola
 
 	enum x64Section : uint32
 	{
-		x64Section_None,
+		x64Section_Preamble,
 		x64Section_Text,
 		x64Section_Data,
 		x64Section_ReadOnly,
@@ -18,6 +18,12 @@ namespace ola
 	public:
 		x64AsmPrinter(char const* asm_file) : AsmPrinter(asm_file)
 		{
+		}
+
+		template<typename... Args>
+		void EmitPreamble(char const* fmt, Args&&... args)
+		{
+			Emit<x64Section_Preamble>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
@@ -53,7 +59,7 @@ namespace ola
 				return ".rodata";
 			case x64Section_BSS:
 				return ".bss";
-			case x64Section_None:
+			case x64Section_Preamble:
 			default:
 				return "";
 			}

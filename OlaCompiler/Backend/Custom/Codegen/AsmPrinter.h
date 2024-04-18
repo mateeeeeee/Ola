@@ -2,7 +2,7 @@
 #include <fstream>
 #include <format>
 #include <string>
-#include <unordered_map>
+#include <map>
 
 namespace ola
 {
@@ -27,7 +27,7 @@ namespace ola
 
 	protected:
 		std::ofstream asm_stream;
-		std::unordered_map<SectionId, std::string> section_map;
+		std::map<SectionId, std::string> section_map;
 
 	protected:
 		template<SectionId Section, typename... Args>
