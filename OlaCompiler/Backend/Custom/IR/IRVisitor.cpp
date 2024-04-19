@@ -211,7 +211,10 @@ namespace ola
 				}
 				else
 				{
-					
+					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type);
+					Value* init_value = value_map[init_expr];
+					Store(init_value, alloc);
+					value_map[&var_decl] = alloc;
 				}
 			}
 			else
@@ -222,7 +225,7 @@ namespace ola
 				}
 				else
 				{
-					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type, nullptr);
+					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type);
 					value_map[&var_decl] = alloc;
 				}
 			}

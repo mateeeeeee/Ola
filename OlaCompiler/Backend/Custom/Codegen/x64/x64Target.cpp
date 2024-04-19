@@ -175,7 +175,10 @@ namespace ola
 		}
 		else if (MO.IsStackObject())
 		{
-			OLA_ASSERT(false);
+			int32 stack_offset = MO.GetStackOffset();
+			std::string offset = std::to_string(stack_offset);
+			if (stack_offset >= 0) offset = "+" + offset;
+			return "[" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
 		}
 	}
 
@@ -183,8 +186,6 @@ namespace ola
 	{
 		x64AsmPrinter asm_printer(file);
 		asm_printer.EmitPreamble(".intel_syntax noprefix");
-		//
-		//.globl  main
 
 		auto const& globals = M.GetGlobals();
 		for (MIRGlobal const& global : globals)

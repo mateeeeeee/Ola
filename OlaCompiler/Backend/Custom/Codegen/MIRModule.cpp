@@ -4,6 +4,7 @@
 #include "MIRGlobal.h"
 #include "MIRBasicBlock.h"
 #include "LegalizeContext.h"
+#include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/CFGAnalysis.h"
@@ -14,19 +15,6 @@ namespace ola
 	{
 		void EmitMIRInstruction(std::ofstream& mir, MIRInstruction& MI)
 		{
-			switch (MI.GetOpcode())
-			{
-			case InstJump:
-			{
-				mir << "Jump:";
-			}
-			break;
-			case InstMove:
-			{
-				mir << "Move:";
-			}
-			break;
-			}
 		}
 	}
 
@@ -165,6 +153,9 @@ namespace ola
 						}
 					}
 				}
+
+				LinearScanRegisterAllocator register_allocator(*this);
+				register_allocator.AssignRegisters(MF);
 			}
 		}
 	}
@@ -173,6 +164,7 @@ namespace ola
 	{
 		MIRGlobal* global = lowering_ctx.GetGlobal(F);
 		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
+		current_mf = &MF;
 
 		for (BasicBlock& BB : F->Blocks())
 		{
@@ -202,17 +194,6 @@ namespace ola
 		lowering_ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
 
 		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
-
-		for (Instruction& inst : F->GetEntryBlock().Instructions())
-		{
-			if (inst.GetInstID() == InstructionID::Alloca) //#todo alloca needs to added always in entry block of a function
-			{
-				AllocaInst* alloca_inst = cast<AllocaInst>(&inst);
-				IRType const* type = alloca_inst->GetAllocatedType();
-				MF.AllocateStack(type->GetSize());
-			}
-			else break;
-		}
 
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (BasicBlock& BB : F->Blocks())
@@ -272,6 +253,7 @@ namespace ola
 			LowerCall(cast<CallInst>(inst));
 			break;
 		case InstructionID::Alloca:
+			LowerAlloca(cast<AllocaInst>(inst));
 			break;
 		case InstructionID::Phi:
 			break;
@@ -370,12 +352,16 @@ namespace ola
 		}
 	}
 
-	void MIRModule::LowerLoad(LoadInst*)
+	void MIRModule::LowerLoad(LoadInst* inst)
 	{
-
+		MIROperand const& ret = lowering_ctx.VirtualReg(inst->GetType());
+		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetOperand(0));
+		MIRInstruction MI(InstLoad);
+		MI.SetOp<0>(ret).SetOp<1>(ptr);
+		lowering_ctx.AddOperand(inst, ret);
 	}
 
-	void MIRModule::LowerStore(StoreInst*)
+	void MIRModule::LowerStore(StoreInst* inst)
 	{
 
 	}
@@ -383,6 +369,13 @@ namespace ola
 	void MIRModule::LowerCall(CallInst* inst)
 	{
 		target.GetFrameInfo().EmitCall(inst, lowering_ctx);
+	}
+
+	void MIRModule::LowerAlloca(AllocaInst* inst)
+	{
+		IRType const* type = inst->GetAllocatedType();
+		MIROperand const& MO = current_mf->AllocateStack(type->GetSize());
+		lowering_ctx.AddOperand(inst, MO);
 	}
 
 	void MIRModule::LowerCFGAnalysis(Function* F)

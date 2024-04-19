@@ -18,9 +18,11 @@ namespace ola
 	class StoreInst;
 	class ReturnInst;
 	class CallInst;
+	class AllocaInst;
 
 	class MIRInstruction;
 	class MIRInstructionInfo;
+	class MIRFunction;
 
 	class Target;
 
@@ -42,6 +44,8 @@ namespace ola
 		LegalizeContext legalize_ctx;
 		Target const& target;
 
+		MIRFunction* current_mf;
+
 	private:
 		void LowerModule(IRModule*);
 		void LowerFunction(Function*);
@@ -54,6 +58,7 @@ namespace ola
 		void LowerLoad(LoadInst*);
 		void LowerStore(StoreInst*);
 		void LowerCall(CallInst*);
+		void LowerAlloca(AllocaInst*);
 
 		void LowerCFGAnalysis(Function*);
 	};

@@ -9,7 +9,7 @@ namespace ola
 	class LinearScanRegisterAllocator : public RegisterAllocator
 	{
 	public:
-		explicit LinearScanRegisterAllocator(MIRModule& M) : RegisterAllocator(M) {}
+		explicit LinearScanRegisterAllocator(MIRModule& M) : RegisterAllocator(M), frame_register() {}
 
 		virtual void AssignRegisters(MIRFunction&) override;
 
