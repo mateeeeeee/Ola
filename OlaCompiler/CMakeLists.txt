@@ -127,6 +127,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/x64/x64Target.cpp
   Backend/Custom/Codegen/x64/x64TargetFrameInfo.h
   Backend/Custom/Codegen/x64/x64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/x64/x64TargetInstInfo.h
+  Backend/Custom/Codegen/x64/x64TargetInstInfo.cpp
   Backend/Custom/Codegen/x64/x64AsmPrinter.h
 
 

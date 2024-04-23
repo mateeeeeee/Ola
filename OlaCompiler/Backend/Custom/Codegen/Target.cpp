@@ -17,7 +17,7 @@ namespace ola
 	};
 
 
-	InstInfo const& TargetInstInfo::GetInstInfo(MIRInstruction const& inst) const
+	InstInfo TargetInstInfo::GetInstInfo(MIRInstruction const& inst) const
 	{
 		return GetInstInfo(inst.GetOpcode());
 	}

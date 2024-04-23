@@ -2,6 +2,7 @@
 #include "x64Target.h"
 #include "x64.h"
 #include "x64TargetFrameInfo.h"
+#include "x64TargetInstInfo.h"
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MIRModule.h"
@@ -29,20 +30,6 @@ namespace ola
 		virtual uint64 GetStorageAlignment() const override
 		{
 			return 8u;
-		}
-	};
-
-	class x64TargetInstInfo : public TargetInstInfo
-	{
-	public:
-		virtual InstInfo const& GetInstInfo(uint32 opcode) const override
-		{
-			InstInfo inst_info{};
-			switch (opcode)
-			{
-
-			}
-			return inst_info;
 		}
 	};
 

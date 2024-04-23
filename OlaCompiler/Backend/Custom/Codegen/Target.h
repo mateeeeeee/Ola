@@ -31,15 +31,9 @@ namespace ola
 	enum InstFlag : uint32
 	{
 		InstFlagNone = 0,
-		InstFlagLoad = 1 << 0,
-		InstFlagStore = 1 << 1,
-		InstFlagTerminator = 1 << 2,
-		InstFlagBranch = 1 << 3,
-		InstFlagCall = 1 << 4,
-		InstFlagLoadConstant = 1 << 5,
-		InstFlagRegDef = 1 << 6,
-		InstFlagCommutative = 1 << 7,
-		InstFlagReturn = 1 << 8
+		InstFlagTerminator = 1 << 0,
+		InstFlagBranch = 1 << 1,
+		InstFlagCall = 1 << 2,
 	};
 	class InstInfo
 	{
@@ -65,8 +59,8 @@ namespace ola
 		void SetOpFlag(uint32 idx, OperandFlag flag);
 		void SetInstFlag(InstFlag inst_flag);
 	private:
-		uint32 operand_count;
-		OperandFlag operand_flags[MAX_OPERANDS];
+		uint32 operand_count = 0;
+		OperandFlag operand_flags[MAX_OPERANDS] = {};
 		InstFlag instruction_flag = InstFlagNone;
 	};
 
@@ -74,8 +68,8 @@ namespace ola
 	{
 	public:
 		virtual ~TargetInstInfo() = default;
-		virtual InstInfo const& GetInstInfo(uint32 opcode) const = 0;
-		InstInfo const& GetInstInfo(MIRInstruction const& inst) const;
+		virtual InstInfo GetInstInfo(uint32 opcode) const = 0;
+		InstInfo GetInstInfo(MIRInstruction const& inst) const;
 	};
 
 	class TargetRegisterInfo
