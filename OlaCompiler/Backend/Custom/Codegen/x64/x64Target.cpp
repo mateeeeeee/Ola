@@ -58,13 +58,13 @@ namespace ola
 		x64TargetRegisterInfo()
 		{
 			gp_registers.reserve(x64::GPREnd - x64::GPRBegin + 1);
-			for (uint32 r = x64::GPRBegin; r <= x64::GPREnd; ++r)
+			for (uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
 			{
 				gp_registers.push_back(r);
 			}
 
 			fp_registers.reserve(x64::FPREnd - x64::FPRBegin + 1);
-			for (uint32 r = x64::FPRBegin; r <= x64::FPREnd; ++r)
+			for (uint32 r = x64::FPRBegin; r < x64::FPREnd; ++r)
 			{
 				fp_registers.push_back(r);
 			}
@@ -144,6 +144,20 @@ namespace ola
 		return x64_target_frame_info;
 	}
 
+	static std::string GetOperandPrefix(MIROperand const& MO)
+	{
+		switch (MO.GetType())
+		{
+		case MIROperandType::Int8:  return "byte ptr";
+		case MIROperandType::Int16: return "word ptr";
+		case MIROperandType::Int32: return "dword ptr";
+		case MIROperandType::Int64:
+		case MIROperandType::Ptr:   
+		case MIROperandType::Other:
+									return "qword ptr";
+		}
+		return "";
+	}
 
 	static std::string GetOperandString(MIROperand const& MO)
 	{
@@ -165,7 +179,7 @@ namespace ola
 			int32 stack_offset = MO.GetStackOffset();
 			std::string offset = std::to_string(stack_offset);
 			if (stack_offset >= 0) offset = "+" + offset;
-			return "[" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
+			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
 		}
 	}
 

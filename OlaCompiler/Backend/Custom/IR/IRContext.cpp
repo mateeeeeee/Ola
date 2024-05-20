@@ -25,9 +25,9 @@ namespace ola
 		for (IRPtrType* ref_type : pointer_types)			delete ref_type;
 		for (IRFuncType* function_type : function_types)	delete function_type;
 
-		for (auto& [_, v] : constant_strings) delete v;
-		for (auto& [_, v] : constant_ints64) delete v;
-		for (auto& [_, v] : constant_ints8) delete v;
+		//for (auto& [_, v] : constant_strings) delete v;
+		//for (auto& [_, v] : constant_ints64) delete v;
+		//for (auto& [_, v] : constant_ints8) delete v;
 
 		delete zero_float;
 		delete false_value;

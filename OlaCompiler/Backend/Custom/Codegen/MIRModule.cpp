@@ -325,9 +325,9 @@ namespace ola
 			};
 
 		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction minst(GetMachineID(inst->GetInstID()));
-		minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
-		lowering_ctx.EmitInst(minst);
+		MIRInstruction MI(GetMachineID(inst->GetInstID()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
+		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
@@ -355,15 +355,22 @@ namespace ola
 	void MIRModule::LowerLoad(LoadInst* inst)
 	{
 		MIROperand const& ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetOperand(0));
+		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
 		MIRInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
+		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
 	void MIRModule::LowerStore(StoreInst* inst)
 	{
-
+		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
+		MIROperand const& val = lowering_ctx.GetOperand(inst->GetValueOp());
+		MIRInstruction MI(InstMove);
+		MI.SetOp<1>(val).SetOp<0>(ptr);
+		lowering_ctx.EmitInst(MI);
+		lowering_ctx.AddOperand(inst->GetAddressOp(), ptr);
+		lowering_ctx.AddOperand(inst->GetValueOp(), val);
 	}
 
 	void MIRModule::LowerCall(CallInst* inst)

@@ -541,7 +541,10 @@ namespace ola
 			return last;
 		}
 
-		void Clear() { if (head) Erase(begin(), end()); }
+		void Clear() 
+		{ 
+			if (head) Erase(begin(), end()); 
+		}
 
 		// Front and back inserters...
 		void PushFront(NodeTy* val) { Insert(begin(), val); }

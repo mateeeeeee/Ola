@@ -458,11 +458,11 @@ namespace ola
 	public:
 		StoreInst(Value* address, Value* value);
 
-		Value* GetValueOp() { return GetOperand(0); }
-		Value const* GetValueOp() const { return GetOperand(0); }
-		
-		Value* GetAddressOp() { return GetOperand(1); }
-		Value const* GetAddressOp() const { return GetOperand(1); }
+		Value* GetAddressOp() { return GetOperand(0); }
+		Value const* GetAddressOp() const { return GetOperand(0); }
+
+		Value* GetValueOp() { return GetOperand(1); }
+		Value const* GetValueOp() const { return GetOperand(1); }
 
 		static bool ClassOf(Instruction const* I)
 		{
