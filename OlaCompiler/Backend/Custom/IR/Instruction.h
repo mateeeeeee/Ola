@@ -109,7 +109,7 @@ namespace ola
 		Phi
 	};
 
-	class Use : public IListNode<Use>
+	class Use 
 	{
 	public:
 		Use() : value(nullptr), user(nullptr) {}
