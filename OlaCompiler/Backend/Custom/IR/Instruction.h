@@ -2,6 +2,7 @@
 #include <vector>
 #include <span>
 #include <unordered_map>
+#include <unordered_set>
 #include "Value.h"
 #include "Compiler/RTTI.h"
 #include "Utility/IntrusiveList.h"
@@ -142,42 +143,34 @@ namespace ola
 		bool ReplaceWith(Value* value);
 		bool ReplaceWithInBlock(BasicBlock* block, Value* value);
 
-		IList<Use>& Users()
-		{
-			return users;
-		}
-		IList<Use> const& Users() const
-		{
-			return users;
-		}
 
 		void AddUse(Use* u)
 		{
-			users.PushBack(u);
+			users.insert(u);
 		}
 		void RemoveUse(Use* u)
 		{
-			users.PushBack(u);
+			users.erase(u);
 		}
 		void ReplaceAllUseWith(Value* V)
 		{
-			for (auto& use : users) use.Set(V);
+			for (auto& use : users) use->Set(V);
 		}
 
 		bool IsUsed() const
 		{
-			return users.Size() > 0;
+			return !users.empty();
 		}
-		bool HasOneUse() const { return users.Size() == 1; }
-		bool HasNUses(uint32 N) const { return users.Size() == N; }
-		bool HasNUsesOrMore(unsigned N) const { return users.Size() >= N; }
+		bool HasOneUse() const { return users.size() == 1; }
+		bool HasNUses(uint32 N) const { return users.size() == N; }
+		bool HasNUsesOrMore(unsigned N) const { return users.size() >= N; }
 
 		static bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant;
 		}
 	private:
-		IList<Use> users;
+		std::unordered_set<Use*> users;
 
 	protected:
 		TrackableValue(ValueKind kind, IRType* type) : Value(kind, type) {}

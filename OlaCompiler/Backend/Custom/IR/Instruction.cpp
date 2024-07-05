@@ -17,6 +17,10 @@ namespace ola
 
 	Use::~Use()
 	{
+		if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
+		{
+			trackable_value->RemoveUse(this);
+		}
 	}
 
 	void Use::Set(Value* V)
