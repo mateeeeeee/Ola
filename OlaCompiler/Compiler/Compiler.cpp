@@ -12,6 +12,9 @@
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 #include "Backend/LLVM/LLVMIRGenContext.h"
+#include "Backend/Custom/IR/IRGenContext.h"
+#include "Backend/Custom/Codegen/MIRModule.h"
+#include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
 #include "spdlog/spdlog.h"
@@ -71,7 +74,13 @@ namespace ola
 			}
 			else
 			{
-				OLA_ASSERT_MSG(false, "Not implemented yet!");
+				IRGenContext ir_gen(source_file);
+				ir_gen.Generate(ast);
+				IRModule& module = ir_gen.GetModule();
+
+				x64Target x64_target{};
+				MIRModule machine_module(module, x64_target);
+				machine_module.EmitAssembly(assembly_file.data());
 			}
 		}
 	}

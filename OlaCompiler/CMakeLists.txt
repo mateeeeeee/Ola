@@ -68,6 +68,76 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.h
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/Passes/TestPass.h
+
+    Backend/Custom/IR/IRBuilder.h
+  Backend/Custom/IR/IRBuilder.cpp
+  Backend/Custom/IR/IRContext.h
+  Backend/Custom/IR/IRContext.cpp
+  Backend/Custom/IR/IRGenContext.h
+  Backend/Custom/IR/IRGenContext.cpp
+  Backend/Custom/IR/IRModule.h
+  Backend/Custom/IR/IRModule.cpp
+  Backend/Custom/IR/IRType.h
+  Backend/Custom/IR/IRType.cpp
+  Backend/Custom/IR/IRVisitor.h
+  Backend/Custom/IR/IRVisitor.cpp
+
+  Backend/Custom/IR/Value.h
+  Backend/Custom/IR/Value.cpp
+  Backend/Custom/IR/Instruction.h
+  Backend/Custom/IR/Instruction.cpp
+  Backend/Custom/IR/GlobalValue.h
+  Backend/Custom/IR/GlobalValue.cpp
+  Backend/Custom/IR/BasicBlock.h
+  Backend/Custom/IR/BasicBlock.cpp
+  Backend/Custom/IR/Constant.h
+  Backend/Custom/IR/Constant.cpp
+  Backend/Custom/IR/FunctionPass.h
+  Backend/Custom/IR/IRModulePass.h
+  Backend/Custom/IR/CFGAnalysis.h
+  Backend/Custom/IR/CFGAnalysis.cpp
+
+  Backend/Custom/Codegen/MIR.h
+  Backend/Custom/Codegen/MIRFwd.h
+  Backend/Custom/Codegen/MIROperand.h
+  Backend/Custom/Codegen/MIROperand.cpp
+  Backend/Custom/Codegen/MIRInstruction.h
+  Backend/Custom/Codegen/MIRBasicBlock.h
+  Backend/Custom/Codegen/MIRGlobal.h
+  Backend/Custom/Codegen/MIRGlobal.cpp
+  Backend/Custom/Codegen/MIRModule.h
+  Backend/Custom/Codegen/MIRModule.cpp
+  Backend/Custom/Codegen/Target.h
+  Backend/Custom/Codegen/Target.cpp
+  Backend/Custom/Codegen/LoweringContext.h
+  Backend/Custom/Codegen/LoweringContext.cpp
+  Backend/Custom/Codegen/MIRModulePass.h
+  Backend/Custom/Codegen/MIRFunctionPass.h
+  Backend/Custom/Codegen/LegalizeContext.h
+  Backend/Custom/Codegen/LegalizeContext.cpp
+  Backend/Custom/Codegen/LivenessAnalysis.h
+  Backend/Custom/Codegen/LivenessAnalysis.cpp
+  Backend/Custom/Codegen/RegisterAllocator.h
+  Backend/Custom/Codegen/LinearScanRegisterAllocator.h
+  Backend/Custom/Codegen/LinearScanRegisterAllocator.cpp
+  Backend/Custom/Codegen/AsmPrinter.h
+
+  Backend/Custom/Codegen/x64/x64.h
+  Backend/Custom/Codegen/x64/x64Target.h
+  Backend/Custom/Codegen/x64/x64Target.cpp
+  Backend/Custom/Codegen/x64/x64TargetFrameInfo.h
+  Backend/Custom/Codegen/x64/x64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/x64/x64TargetInstInfo.h
+  Backend/Custom/Codegen/x64/x64TargetInstInfo.cpp
+  Backend/Custom/Codegen/x64/x64AsmPrinter.h
+
+
+  Backend/Custom/Pass.h
+  Backend/Custom/Pass.cpp
+  Backend/Custom/PassManagerBase.h
+  Backend/Custom/PassManagerBase.cpp
+  Backend/Custom/PassManager.h
+  Backend/Custom/PassRegistry.h
 )
 
 set(COMPILER_FILES
