@@ -36,6 +36,11 @@ namespace ola
 		std::vector<MIRBasicBlock*> const& Predecessors() const { return predecessors; }
 		std::vector<MIRBasicBlock*> const& Successors() const { return successors; }
 
+		virtual RelocableKind GetRelocableKind() const override
+		{
+			return RelocableKind::Block;
+		}
+
 	private:
 		MIRFunction* function;
 		std::list<MIRInstruction> instructions;

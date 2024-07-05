@@ -8,6 +8,14 @@
 
 namespace ola
 {
+	enum class RelocableKind : uint8
+	{
+		Function,
+		ZeroStorage,
+		DataStorage,
+		Block
+	};
+
 	class MIRRelocable
 	{
 	public:
@@ -15,10 +23,12 @@ namespace ola
 		virtual ~MIRRelocable() = default;
 
 		std::string_view GetSymbol() const { return symbol; }
-		virtual bool IsFunction() const
-		{
-			return false;
-		}
+		virtual RelocableKind GetRelocableKind() const = 0;
+
+		bool IsFunction() const { return GetRelocableKind() == RelocableKind::Function; }
+		bool IsZeroStorage() const { return GetRelocableKind() == RelocableKind::ZeroStorage; }
+		bool IsDataStorage() const { return GetRelocableKind() == RelocableKind::DataStorage; }
+		bool IsBlock() const { return GetRelocableKind() == RelocableKind::Block; }
 
 	private:
 		std::string symbol;
@@ -47,9 +57,9 @@ namespace ola
 			return stack_objects.back();
 		}
 
-		virtual bool IsFunction() const
+		virtual RelocableKind GetRelocableKind() const override
 		{
-			return true;
+			return RelocableKind::Function;
 		}
 
 	private:
@@ -59,13 +69,18 @@ namespace ola
 		std::vector<MIROperand> stack_objects;
 	};
 
-	class MIRZeroStorage : public MIRRelocable
+	class MIRZeroStorage final : public MIRRelocable
 	{
 
 	public:
 		explicit MIRZeroStorage(std::string_view symbol, uint64 size) : MIRRelocable(symbol), size(size) {}
 
 		uint64 GetSize() const { return size; }
+
+		virtual RelocableKind GetRelocableKind() const override
+		{
+			return RelocableKind::ZeroStorage;
+		}
 
 	private:
 		uint64 size;
@@ -99,6 +114,11 @@ namespace ola
 		uint32 AppendQWord(uint64 val)
 		{
 			return Append(val);
+		}
+
+		virtual RelocableKind GetRelocableKind() const override
+		{
+			return RelocableKind::DataStorage;
 		}
 
 	private:
