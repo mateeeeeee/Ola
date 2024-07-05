@@ -684,6 +684,9 @@ namespace ola
 		void PushFront(const NodeTy& val) { Insert(this->begin(), val); }
 		void PushBack(const NodeTy& val) { Insert(this->end(), val); }
 
+		void PushFront(const NodeTy* val) { Insert(this->begin(), val); }
+		void PushBack(const NodeTy* val) { Insert(this->end(), val); }
+
 		void Insert(iterator where, size_type count, const NodeTy& val)
 		{
 			for (; count != 0; --count) Insert(where, val);

@@ -32,15 +32,6 @@ namespace ola
 			return instructions.Back();
 		}
 
-		std::string_view GetLabel() const 
-		{
-			return label;
-		}
-		void SetLabel(std::string_view _label)
-		{
-			label = _label;
-		}
-
 		Function* GetFunction() const 
 		{
 			return function;

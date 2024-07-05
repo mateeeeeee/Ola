@@ -38,7 +38,7 @@ namespace ola
 		auto& blocks = current_function->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, current_function, blocks.Size());
 		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetLabel(label);
+		block->SetName(label);
 		blocks.PushBack(block);
 		return block;
 	}
@@ -49,7 +49,7 @@ namespace ola
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
 		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetLabel(label);
+		block->SetName(label);
 		blocks.PushBack(block);
 		return block;
 	}
@@ -61,7 +61,7 @@ namespace ola
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
 		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetLabel(label);
+		block->SetName(label);
 		blocks.Insert(before->GetIterator(), block);
 		return block;
 	}
@@ -73,7 +73,7 @@ namespace ola
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
 		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetLabel(label);
+		block->SetName(label);
 		blocks.Insert(before->GetIterator(), block);
 		return block;
 	}

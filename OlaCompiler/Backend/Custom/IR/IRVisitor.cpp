@@ -325,7 +325,7 @@ namespace ola
 		}
 		builder->MakeInst<BranchInst>(context, exit_block);
 		BasicBlock* return_block = builder->AddBlock(current_function, current_block->GetNextNode());
-		return_block->SetLabel("return");
+		return_block->SetName("return");
 		builder->SetCurrentBlock(return_block);
 	}
 
@@ -375,7 +375,7 @@ namespace ola
 		builder->MakeInst<BranchInst>(context, label_blocks[label_name]);
 
 		BasicBlock* goto_block = builder->AddBlock(exit_block);
-		goto_block->SetLabel("goto");
+		goto_block->SetName("goto");
 		builder->SetCurrentBlock(goto_block);
 	}
 
@@ -768,7 +768,7 @@ namespace ola
 		for (LabelStmt const* label : labels)
 		{
 			BasicBlock* label_block = builder->AddBlock(func, exit_block); 
-			label_blocks[std::string(label_block->GetLabel())] = label_block;
+			label_blocks[std::string(label_block->GetName())] = label_block;
 		}
 
 		func_decl.GetBodyStmt()->Accept(*this);

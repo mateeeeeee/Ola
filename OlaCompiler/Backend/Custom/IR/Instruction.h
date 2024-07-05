@@ -143,7 +143,6 @@ namespace ola
 		bool ReplaceWith(Value* value);
 		bool ReplaceWithInBlock(BasicBlock* block, Value* value);
 
-
 		void AddUse(Use* u)
 		{
 			users.insert(u);
@@ -254,6 +253,7 @@ namespace ola
 		{
 			return V->GetKind() == ValueKind::Instruction;
 		}
+
 	private:
 		InstructionID instr_id;
 		std::vector<Use> operands;
@@ -307,7 +307,7 @@ namespace ola
 		{
 			return Op<1>();
 		}
-		
+
 		static bool ClassOf(Instruction const* I)
 		{
 			switch (I->GetInstID())
@@ -316,6 +316,7 @@ namespace ola
 			case InstructionID::Sub:
 			case InstructionID::SDiv:
 			case InstructionID::UDiv:
+			case InstructionID::Mul:
 				return true;
 			}
 			return false;

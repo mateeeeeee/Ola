@@ -19,6 +19,7 @@ namespace ola
 	void IRModule::EmitIR(std::string_view filename)
 	{
 		std::ofstream ola_ir_stream(filename.data());
+
 	}
 
 }

@@ -2,10 +2,14 @@
 .text
 .globl main
 main:
+push	rbp
+mov rbp, rsp
 label0:
+mov qword ptr [rbp+0], 5
 jmp label2
 label1:
 jmp label2
 label2:
-mov rax, 5
+mov rax, r15
+pop	rbp
 ret

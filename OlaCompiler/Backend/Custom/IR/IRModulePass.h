@@ -11,7 +11,7 @@ namespace ola
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}
-		virtual bool RunOn(IRModule& M) = 0;
+		virtual bool RunOn(IRModule&) = 0;
 	};
 
 	template<>
