@@ -1,16 +1,24 @@
 #include <ostream>
-#include "IRWriter.h"
+#include "PrintIRModule.h"
 #include "IRModule.h"
 #include "GlobalValue.h"
 
 namespace ola
 {
-
-	IRWriter::IRWriter(std::ostream& os) : os(os)
+	namespace
 	{
+		void PrintGlobalVariable(GlobalVariable const* GV)
+		{
+
+		}
+
+		void PrintFunction(Function const* F)
+		{
+
+		}
 	}
 
-	void IRWriter::PrintModule(IRModule const& M)
+	void PrintIRModule(std::ostream& os, IRModule const& M)
 	{
 		std::vector<GlobalValue*> const& globals = M.Globals();
 
@@ -29,16 +37,6 @@ namespace ola
 				os << "\n";
 			}
 		}
-	}
-
-	void IRWriter::PrintGlobalVariable(GlobalVariable const* GV)
-	{
-
-	}
-
-	void IRWriter::PrintFunction(Function const* F)
-	{
-		
 	}
 
 }

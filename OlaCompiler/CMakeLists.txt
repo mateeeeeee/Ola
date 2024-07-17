@@ -77,6 +77,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRGenContext.cpp
   Backend/Custom/IR/IRModule.h
   Backend/Custom/IR/IRModule.cpp
+  Backend/Custom/IR/PrintIRModule.h
+  Backend/Custom/IR/PrintIRModule.cpp
   Backend/Custom/IR/IRType.h
   Backend/Custom/IR/IRType.cpp
   Backend/Custom/IR/IRVisitor.h
