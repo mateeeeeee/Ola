@@ -69,7 +69,7 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMOptimizer.cpp
   Backend/LLVM/Passes/TestPass.h
 
-    Backend/Custom/IR/IRBuilder.h
+  Backend/Custom/IR/IRBuilder.h
   Backend/Custom/IR/IRBuilder.cpp
   Backend/Custom/IR/IRContext.h
   Backend/Custom/IR/IRContext.cpp
