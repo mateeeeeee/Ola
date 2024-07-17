@@ -39,6 +39,7 @@ set(WAVE_TESTS
 	Tests/test_polymorphism.ola
 	Tests/test_overloading.ola
 	Tests/test_constructors.ola
+	Tests/test_returns.ola
 )
 
 add_executable(OlaTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})

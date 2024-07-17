@@ -486,9 +486,7 @@ namespace ola
 			return_expr->Accept(*this);
 			llvm::Value* return_expr_value = value_map[return_expr];
 			OLA_ASSERT(return_expr_value);
-
-			if (current_function->getReturnType()->isPointerTy()) builder.CreateStore(return_expr_value, return_value);
-			else return_value = return_expr_value;
+			Store(return_expr_value, return_value);
 		}
 		builder.CreateBr(exit_block);
 		llvm::BasicBlock* return_block = llvm::BasicBlock::Create(context, "return", current_function, current_block->getNextNode());
@@ -1334,7 +1332,7 @@ namespace ola
 			}
 		}
 
-		if (func->getReturnType()->isPointerTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
+		if (!func->getReturnType()->isVoidTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
 		exit_block = llvm::BasicBlock::Create(context, "exit", func);
 
 		auto const& labels = func_decl.GetLabels();
