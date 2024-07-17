@@ -10,7 +10,7 @@ set(HEADERS
   autogen/OlaConfig.h
 )
 
-set(WAVE_TESTS
+set(OLA_TESTS
 	Tests/test_ternary.ola
 	Tests/test_while.ola
 	Tests/test_additive.ola
@@ -42,10 +42,10 @@ set(WAVE_TESTS
 	Tests/test_returns.ola
 )
 
-add_executable(OlaTests ${SOURCE} ${HEADERS} ${WAVE_TESTS})
+add_executable(OlaTests ${SOURCE} ${HEADERS} ${OLA_TESTS})
 
 source_group(" " FILES ${SOURCE} ${HEADERS})
-source_group("Tests" FILES ${WAVE_TESTS})
+source_group("Tests" FILES ${OLA_TESTS})
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 		cmake_policy(SET CMP0135 NEW)
