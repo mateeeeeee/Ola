@@ -77,6 +77,7 @@ namespace ola
 				IRGenContext ir_gen(source_file);
 				ir_gen.Generate(ast);
 				IRModule& module = ir_gen.GetModule();
+				module.EmitIR(ir_file);
 
 				x64Target x64_target{};
 				MIRModule machine_module(module, x64_target);

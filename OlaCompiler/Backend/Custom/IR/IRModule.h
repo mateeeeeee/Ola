@@ -29,7 +29,7 @@ namespace ola
 		}
 		std::vector<GlobalValue*> const& Globals() const { return globals; }
 
-		void EmitIR(std::string_view filename);
+		void EmitIR(std::string_view filename) const;
 
 	private:
 		IRContext& context;

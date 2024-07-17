@@ -37,6 +37,7 @@ namespace ola
 		{
 			return false;
 		}
+		virtual bool IsDeclaration() const = 0;
 
 		static bool ClassOf(Value const* V)
 		{
@@ -74,6 +75,11 @@ namespace ola
 
 		Value* GetInitValue() const { return init; }
 		std::string_view GetName() const { return name; }
+
+		virtual bool IsDeclaration() const override
+		{
+			return init == nullptr;
+		}
 
 		static bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }
 		static bool ClassOf(GlobalValue const* GV) { return !GV->IsFunction(); }
@@ -162,6 +168,13 @@ namespace ola
 		BasicBlock& back() { return *rbegin(); }
 		BasicBlock const& back() const { return *rbegin(); }
 
+		auto ArgBegin()			{ return arguments.begin(); }
+		auto ArgBegin()  const	{ return arguments.begin(); }
+		auto ArgEnd()			{ return arguments.end(); }
+		auto ArgEnd()    const	{ return arguments.end(); }
+		auto Arguments()		{ return IteratorRange(ArgBegin(), ArgEnd()); }
+		auto Arguments() const	{ return IteratorRange(ArgBegin(), ArgEnd()); }
+
 		IRType* GetArgType(uint32 i) const
 		{
 			return GetFunctionType()->GetParamType(i);
@@ -178,6 +191,10 @@ namespace ola
 		virtual bool IsFunction() const override
 		{
 			return true;
+		}
+		virtual bool IsDeclaration() const override
+		{
+			return Empty();
 		}
 
 		static bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }

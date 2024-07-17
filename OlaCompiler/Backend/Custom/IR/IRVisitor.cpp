@@ -319,9 +319,7 @@ namespace ola
 			return_expr->Accept(*this);
 			Value* return_expr_value = value_map[return_expr];
 			OLA_ASSERT(return_expr_value);
-
-			if (current_function->GetReturnType()->IsPointerType()) builder->MakeInst<StoreInst>(return_value, return_expr_value);
-			else return_value = return_expr_value;
+			Store(return_expr_value, return_value);
 		}
 		builder->MakeInst<BranchInst>(context, exit_block);
 		BasicBlock* return_block = builder->AddBlock(current_function, current_block->GetNextNode());
@@ -759,7 +757,7 @@ namespace ola
 				value_map[param.get()] = arg_alloc;
 			}
 		}
-		if (func->GetReturnType()->IsPointerType()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
+		if (!func->GetReturnType()->IsVoidType()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
 		
 		exit_block = builder->AddBlock(func);
 		exit_block->SetName("exit");

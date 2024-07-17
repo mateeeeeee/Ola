@@ -5,11 +5,12 @@ main:
 push	rbp
 mov rbp, rsp
 label0:
-mov qword ptr [rbp+0], 5
+mov qword ptr [rbp+8], 42
+mov qword ptr [rbp+0], r15
 jmp label2
 label1:
 jmp label2
 label2:
-mov rax, r15
+mov rax, r14
 pop	rbp
 ret

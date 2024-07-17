@@ -14,10 +14,5 @@ namespace ola
 		IRVisitor ir_visitor(context, module);
 		ir_visitor.VisitAST(ast);
 	}
-
-	void IRGenContext::EmitIR(std::string_view output_file)
-	{
-		module.EmitIR(output_file);
-	}
 }
 

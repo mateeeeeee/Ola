@@ -13,8 +13,6 @@ namespace ola
 		~IRGenContext();
 
 		void Generate(AST const* ast);
-		void EmitIR(std::string_view output_file);
-
 		IRModule& GetModule() { return module; }
 
 	private:
