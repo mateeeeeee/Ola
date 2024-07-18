@@ -1,2 +1,4 @@
 
+define @main external ptr  {
+}
 
