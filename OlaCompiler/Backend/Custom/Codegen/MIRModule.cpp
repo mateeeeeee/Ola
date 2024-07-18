@@ -23,9 +23,9 @@ namespace ola
 		LowerModule(&ir_module);
 	}
 
-	void MIRModule::EmitMIR(char const* mir_file)
+	void MIRModule::EmitMIR(std::string_view mir_file)
 	{
-		std::ofstream mir(mir_file);
+		std::ofstream mir(mir_file.data());
 		for (MIRGlobal const& global : globals)
 		{
 			MIRRelocable* relocable = global.GetRelocable();
@@ -45,7 +45,7 @@ namespace ola
 		}
 	}
 
-	void MIRModule::EmitAssembly(char const* assembly_file)
+	void MIRModule::EmitAssembly(std::string_view assembly_file)
 	{
 		target.EmitAssembly(*this, assembly_file);
 	}

@@ -13,11 +13,30 @@ namespace ola
 		x64Section_BSS
 	};
 
+	class MIRModule;
 	class x64AsmPrinter : public AsmPrinter
 	{
 	public:
-		x64AsmPrinter(char const* asm_file) : AsmPrinter(asm_file)
+		x64AsmPrinter(std::ostream& os) : AsmPrinter(os) {}
+		virtual void PrintModule(MIRModule const& M) override;
+
+	private:
+		virtual std::string GetSectionLabel(SectionId section) const override
 		{
+			switch (static_cast<x64Section>(section))
+			{
+			case x64Section_Text:
+				return ".text";
+			case x64Section_Data:
+				return ".data";
+			case x64Section_ReadOnly:
+				return ".rodata";
+			case x64Section_BSS:
+				return ".bss";
+			case x64Section_Preamble:
+			default:
+				return "";
+			}
 		}
 
 		template<typename... Args>
@@ -25,7 +44,6 @@ namespace ola
 		{
 			Emit<x64Section_Preamble>(fmt, std::forward<Args>(args)...);
 		}
-
 		template<typename... Args>
 		void EmitText(char const* fmt, Args&&... args)
 		{
@@ -46,25 +64,5 @@ namespace ola
 		{
 			Emit<x64Section_BSS>(fmt, std::forward<Args>(args)...);
 		}
-
-		virtual std::string GetSectionLabel(SectionId section) const override
-		{
-			switch (static_cast<x64Section>(section))
-			{
-			case x64Section_Text:
-				return ".text";
-			case x64Section_Data:
-				return ".data";
-			case x64Section_ReadOnly:
-				return ".rodata";
-			case x64Section_BSS:
-				return ".bss";
-			case x64Section_Preamble:
-			default:
-				return "";
-			}
-		}
-
-	private:
 	};
 }

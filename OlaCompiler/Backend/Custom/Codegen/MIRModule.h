@@ -35,8 +35,8 @@ namespace ola
 		Target const& GetTarget() const { return target; }
 		auto   const& GetGlobals() const { return globals; }
 
-		void EmitMIR(char const* mir_file);
-		void EmitAssembly(char const* assembly_file);
+		void EmitMIR(std::string_view mir_file);
+		void EmitAssembly(std::string_view assembly_file);
 
 	protected:
 		std::vector<MIRGlobal> globals;

@@ -1,5 +1,5 @@
 #pragma once
-#include <fstream>
+#include <iosfwd>
 #include <format>
 #include <string>
 #include <map>
@@ -7,29 +7,22 @@
 namespace ola
 {
 	using SectionId = uint32;
+	class MIRModule;
+
 	class AsmPrinter
 	{
 	public:
-		explicit AsmPrinter(char const* asm_file) : asm_stream(asm_file) {}
+		explicit AsmPrinter(std::ostream& os) : os(os) {}
 		~AsmPrinter() = default;
-
-		void Finalize()
-		{
-			for (auto const& [section, buffer] : section_map)
-			{
-				std::string section_label = GetSectionLabel(section);
-				if (!section_label.empty()) asm_stream << section_label << "\n";
-				asm_stream << buffer;
-			}
-			asm_stream.close();
-		}
-		virtual std::string GetSectionLabel(SectionId) const = 0;
+		virtual void PrintModule(MIRModule const& M) = 0;
 
 	protected:
-		std::ofstream asm_stream;
+		std::ostream& os;
 		std::map<SectionId, std::string> section_map;
 
 	protected:
+		virtual std::string GetSectionLabel(SectionId) const = 0;
+
 		template<SectionId Section, typename... Args>
 		void Emit(char const* fmt, Args&&... args)
 		{
@@ -37,5 +30,6 @@ namespace ola
 			output += "\n";
 			section_map[Section] += output;
 		}
+		void Finalize();
 	};
 }

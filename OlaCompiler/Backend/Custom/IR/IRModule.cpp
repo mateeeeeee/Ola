@@ -2,7 +2,7 @@
 #include "IRModule.h"
 #include "IRType.h"
 #include "GlobalValue.h"
-#include "PrintIRModule.h"
+#include "IRPrinter.h"
 
 namespace ola
 {
@@ -19,8 +19,9 @@ namespace ola
 	
 	void IRModule::EmitIR(std::string_view filename) const
 	{
-		std::ofstream ola_ir_stream(filename.data());
-		PrintIRModule(ola_ir_stream, *this);
+		std::ofstream ir_stream(filename.data());
+		IRPrinter ir_printer(ir_stream);
+		ir_printer.PrintModule(*this);
 	}
 
 }

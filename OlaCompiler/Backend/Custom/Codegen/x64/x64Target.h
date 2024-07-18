@@ -14,6 +14,6 @@ namespace ola
 		virtual TargetISelInfo const& GetISelInfo() const override;
 		virtual TargetFrameInfo const& GetFrameInfo() const override;
 
-		virtual void EmitAssembly(MIRModule& M, char const* file) const override;
+		virtual void EmitAssembly(MIRModule& M, std::string_view file) const override;
 	};
 }

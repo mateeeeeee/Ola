@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string_view>
 
 namespace ola
 {
@@ -119,6 +120,6 @@ namespace ola
 		virtual TargetRegisterInfo const& GetRegisterInfo() const = 0;
 		virtual TargetISelInfo const& GetISelInfo() const = 0;
 		virtual TargetFrameInfo const& GetFrameInfo() const = 0;
-		virtual void EmitAssembly(MIRModule& M, char const* file) const = 0;
+		virtual void EmitAssembly(MIRModule& M, std::string_view file) const = 0;
 	};
 }

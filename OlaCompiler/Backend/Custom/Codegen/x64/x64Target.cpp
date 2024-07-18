@@ -5,8 +5,6 @@
 #include "x64TargetInstInfo.h"
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
-#include "Backend/Custom/Codegen/MIRModule.h"
-#include "Backend/Custom/Codegen/MIRBasicBlock.h"
 
 namespace ola
 {
@@ -144,103 +142,11 @@ namespace ola
 		return x64_target_frame_info;
 	}
 
-	static std::string GetOperandPrefix(MIROperand const& MO)
+	void x64Target::EmitAssembly(MIRModule& M, std::string_view file) const
 	{
-		switch (MO.GetType())
-		{
-		case MIROperandType::Int8:  return "byte ptr";
-		case MIROperandType::Int16: return "word ptr";
-		case MIROperandType::Int32: return "dword ptr";
-		case MIROperandType::Int64:
-		case MIROperandType::Ptr:   
-		case MIROperandType::Other:
-									return "qword ptr";
-		}
-		return "";
-	}
-
-	static std::string GetOperandString(MIROperand const& MO)
-	{
-		if (MO.IsReg())
-		{
-			OLA_ASSERT(IsISAReg(MO.GetReg().reg));
-			return x64::GetRegisterString(MO.GetReg().reg);
-		}
-		else if (MO.IsImmediate())
-		{
-			return std::to_string(MO.GetImmediate());
-		}
-		else if (MO.IsRelocable())
-		{
-			return std::string(MO.GetRelocable()->GetSymbol());
-		}
-		else if (MO.IsStackObject())
-		{
-			int32 stack_offset = MO.GetStackOffset();
-			std::string offset = std::to_string(stack_offset);
-			if (stack_offset >= 0) offset = "+" + offset;
-			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
-		}
-		OLA_ASSERT(false);
-		return "";
-	}
-
-	void x64Target::EmitAssembly(MIRModule& M, char const* file) const
-	{
-		x64AsmPrinter asm_printer(file);
-		asm_printer.EmitPreamble(".intel_syntax noprefix");
-
-		auto const& globals = M.GetGlobals();
-		for (MIRGlobal const& global : globals)
-		{
-			MIRRelocable* relocable = global.GetRelocable();
-			if (relocable->IsFunction())
-			{
-				MIRFunction& MF = *dynamic_cast<MIRFunction*>(relocable);
-				if (global.GetLinkage() == Linkage::External)
-				{
-					asm_printer.EmitText(".globl {}", MF.GetSymbol());
-				}
-				asm_printer.EmitText("{}:", MF.GetSymbol());
-				asm_printer.EmitText("push	rbp");
-				asm_printer.EmitText("mov rbp, rsp");
-				for (auto& MBB : MF.Blocks())
-				{
-					asm_printer.EmitText("{}:", MBB->GetSymbol());
-					for (MIRInstruction& MI : MBB->Instructions())
-					{
-						switch (MI.GetOpcode())
-						{
-						case InstJump:
-						{
-							MIROperand const& dst = MI.GetOp<0>();
-							OLA_ASSERT(dst.IsRelocable());
-							MIRRelocable* relocable = dst.GetRelocable();
-							asm_printer.EmitText("jmp {}", relocable->GetSymbol());
-						}
-						break;
-						case InstMove:
-						{
-							MIROperand const& dst = MI.GetOp<0>();
-							MIROperand const& src = MI.GetOp<1>();
-							asm_printer.EmitText("mov {}, {}", GetOperandString(dst), GetOperandString(src));
-						}
-						break;
-						}
-					}
-				}
-				asm_printer.EmitText("pop	rbp");
-				asm_printer.EmitText("ret");
-			}
-			else if (relocable->IsDataStorage())
-			{
-			}
-			else if (relocable->IsZeroStorage())
-			{
-			}
-			else OLA_ASSERT_MSG(false, "Invalid relocable kind!");
-		}
-		asm_printer.Finalize();
+		std::ofstream asm_stream(file.data());
+		x64AsmPrinter asm_printer(asm_stream);
+		asm_printer.PrintModule(M);
 	}
 
 }

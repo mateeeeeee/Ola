@@ -77,8 +77,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRGenContext.cpp
   Backend/Custom/IR/IRModule.h
   Backend/Custom/IR/IRModule.cpp
-  Backend/Custom/IR/PrintIRModule.h
-  Backend/Custom/IR/PrintIRModule.cpp
+  Backend/Custom/IR/IRPrinter.h
+  Backend/Custom/IR/IRPrinter.cpp
   Backend/Custom/IR/IRType.h
   Backend/Custom/IR/IRType.cpp
   Backend/Custom/IR/IRVisitor.h
@@ -123,6 +123,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/LinearScanRegisterAllocator.h
   Backend/Custom/Codegen/LinearScanRegisterAllocator.cpp
   Backend/Custom/Codegen/AsmPrinter.h
+  Backend/Custom/Codegen/AsmPrinter.cpp
 
   Backend/Custom/Codegen/x64/x64.h
   Backend/Custom/Codegen/x64/x64Target.h
@@ -132,6 +133,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/x64/x64TargetInstInfo.h
   Backend/Custom/Codegen/x64/x64TargetInstInfo.cpp
   Backend/Custom/Codegen/x64/x64AsmPrinter.h
+  Backend/Custom/Codegen/x64/x64AsmPrinter.cpp
 
 
   Backend/Custom/Pass.h
