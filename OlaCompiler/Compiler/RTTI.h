@@ -9,7 +9,7 @@ namespace ola
 		concept AlwaysFalse = false;
 
 		template<typename To, typename From>
-		using merge_const_t = std::conditional_t<std::is_const_v<From>, std::add_const_t<To>, To>;
+		using MergeConstT = std::conditional_t<std::is_const_v<From>, std::add_const_t<To>, To>;
 
 		template <bool checked, typename To, typename From>
 		auto cast_impl(From&& value)
@@ -19,7 +19,7 @@ namespace ola
 			static_assert(std::is_pointer_v<std::remove_cvref_t<From>>, "Argument of cast function must be a pointer to a class type");
 			using ClassType = std::remove_pointer_t<std::remove_reference_t<From>>;
 			static_assert(std::is_class_v<ClassType>, "Value type of cast must be a (const-qualified) pointer or to a class type");
-			using ResultType = merge_const_t<To, ClassType>*;
+			using ResultType = MergeConstT<To, ClassType>*;
 
 			if constexpr (std::is_same_v<ClassType, To> || std::is_base_of_v<To, ClassType>) return static_cast<ResultType>(value);
 			else if constexpr (std::is_base_of_v<ClassType, To>)

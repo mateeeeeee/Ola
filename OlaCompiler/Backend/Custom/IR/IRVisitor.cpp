@@ -746,7 +746,7 @@ namespace ola
 			Value* arg_value = value_map[param.get()];
 			AllocaInst* arg_alloc = builder->MakeInst<AllocaInst>(arg_value->GetType());
 
-			builder->MakeInst<StoreInst>(arg_alloc, arg_value);
+			builder->MakeInst<StoreInst>(arg_value, arg_alloc);
 			if (isa<RefType>(param->GetType()))
 			{
 				Value* arg_ref = builder->MakeInst<LoadInst>(arg_alloc, arg_value->GetType());
@@ -943,16 +943,16 @@ namespace ola
 			{
 				return ptr;
 			}
-			return builder->MakeInst<LoadInst>(ptr, ir_type); // builder.CreateLoad(llvm_type, ptr);
+			return builder->MakeInst<LoadInst>(ptr, ir_type); 
 		}
 		return ptr;
 	}
 
 	Value* IRVisitor::Store(Value* value, Value* ptr)
 	{
-		if (!value->GetType()->IsPointerType()) return builder->MakeInst<StoreInst>(ptr, value);
+		if (!value->GetType()->IsPointerType()) return builder->MakeInst<StoreInst>(value, ptr);
 		Value* load = Load(value->GetType(), value);
-		return builder->MakeInst<StoreInst>(ptr, load);
+		return builder->MakeInst<StoreInst>(load, ptr);
 	}
 
 }

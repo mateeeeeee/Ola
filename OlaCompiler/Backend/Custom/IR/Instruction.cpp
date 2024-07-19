@@ -153,7 +153,7 @@ namespace ola
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
 	}
 
-	StoreInst::StoreInst(Value* address, Value* value) : Instruction(Opcode::Store, IRVoidType::Get(value->GetContext()), { address, value })
+	StoreInst::StoreInst(Value* value, Value* address) : Instruction(Opcode::Store, IRVoidType::Get(value->GetContext()), { value, address })
 	{
 	}
 

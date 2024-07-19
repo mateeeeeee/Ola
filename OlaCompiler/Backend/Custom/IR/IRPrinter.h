@@ -33,7 +33,7 @@ namespace ola
 		std::ostream& os;
 		std::string output;
 
-		std::unordered_map<std::string_view, uint32> names_count;
+		std::unordered_map<std::string, uint32> names_count;
 		std::unordered_map<Value const*, std::string> unique_names;
 
 	private:
@@ -41,14 +41,16 @@ namespace ola
 		void PrintFunction(Function const*);
 		void PrintBasicBlock(BasicBlock const&);
 		void PrintInstruction(Instruction const&);
-		void PrintConstant(Value*);
+		void PrintConstant(Constant const*);
 		void PrintOperand(Value const*, bool print_type = true);
 
 		std::string GetPrefixedName(std::string_view name, NamePrefix prefix);
 		std::string GetPrefixedName(Value const*);
 		void PrintFullName(Value const*);
 
-		std::string GetTypeAsString(IRType*, bool space = true);
+		void PrintType(IRType*);
+
+		//std::string GetTypeAsString(IRType*, bool space = true);
 
 		template<typename... Args>
 		void EmitLn(char const* fmt, Args&&... args)
@@ -63,8 +65,17 @@ namespace ola
 			std::string str = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
 			output += str;
 		}
+		void EmitSpace()
+		{
+			Emit(" ");
+		}
+		void EmitNewline()
+		{
+			EmitLn("");
+		}
+
 		template<uint32 N>
-		void OutputPopBack()
+		void PopOutput()
 		{
 			for (uint32 i = 0; i < N; ++i) output.pop_back();
 		}

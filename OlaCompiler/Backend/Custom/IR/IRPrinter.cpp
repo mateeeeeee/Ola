@@ -7,8 +7,9 @@ namespace ola
 {
 	void IRPrinter::PrintModule(IRModule const& M)
 	{
-		std::vector<GlobalValue*> const& globals = M.Globals();
+		std::string_view module_id = M.GetModuleId();
 
+		std::vector<GlobalValue*> const& globals = M.Globals();
 		for (GlobalValue const* global : globals)
 		{
 			if (GlobalVariable const* GV = dyn_cast<GlobalVariable>(global))
@@ -33,15 +34,19 @@ namespace ola
 		{
 			Emit("declare ");
 			PrintFullName(GV);
-			EmitLn(" {}", GetTypeAsString(GV->GetType()));
+			EmitSpace();
+			PrintType(GV->GetType());
+			EmitNewline();
 			return;
 		}
 		std::string linkage = GV->GetLinkage() == Linkage::External ? "external" : "internal";
 		Emit("define {} ", linkage);
 		PrintFullName(GV);
-		Emit(" {} ", GetTypeAsString(GV->GetValueType()));
-		PrintConstant(GV->GetInitValue());
-		EmitLn("");
+		EmitSpace();
+		PrintType(GV->GetType());
+		EmitSpace();
+		PrintConstant(dyn_cast<Constant>(GV->GetInitValue()));
+		EmitNewline();
 	}
 
 	void IRPrinter::PrintFunction(Function const* F)
@@ -50,13 +55,16 @@ namespace ola
 		{
 			Emit("declare ");
 			PrintFullName(F);
-			EmitLn(" {}", GetTypeAsString(F->GetFunctionType()));
+			EmitSpace();
+			PrintType(F->GetFunctionType());
 			return;
 		}
 		std::string linkage = F->GetLinkage() == Linkage::External ? "external" : "internal";
 		Emit("define {} ", linkage);
 		PrintFullName(F);
-		EmitLn(" {} {{", GetTypeAsString(F->GetFunctionType()));
+		EmitSpace();
+		PrintType(F->GetFunctionType());
+		EmitLn(" {{");
 		for (auto const& BB : F->Blocks())
 		{
 			PrintBasicBlock(BB);
@@ -88,8 +96,7 @@ namespace ola
 		if (isa<AllocaInst>(&I))
 		{
 			AllocaInst const* AI = cast<AllocaInst>(&I);
-			IRType* allocated_type = AI->GetAllocatedType();
-			Emit("{}", GetTypeAsString(allocated_type, false));
+			PrintType(AI->GetAllocatedType());
 		}
 		else if (isa<BranchInst>(&I))
 		{
@@ -107,18 +114,32 @@ namespace ola
 				PrintOperand(BI->GetTrueTarget(), true);
 			}
 		}
-		else
+		else if (I.GetNumOperands() > 0)
 		{
-			if (!type->IsVoidType())
+			IRType* type = I.GetOperand(0)->GetType(); 
+			if (LoadInst const* LI = dyn_cast<LoadInst>(&I))
 			{
-				Emit("{}, ", GetTypeAsString(type, false));
+				PrintType(LI->GetType());
+				Emit(", ");
+			}
+
+			bool print_all_types = false;
+			if (isa<SelectInst>(&I) || isa<StoreInst>(&I)) 
+			{
+				print_all_types = true;
+			}
+
+			if (!print_all_types)
+			{
+				PrintType(type);
+				EmitSpace();
 			}
 			for (auto& Op : I.Operands())
 			{
-				PrintOperand(Op.GetValue());
+				PrintOperand(Op.GetValue(), print_all_types);
 				Emit(", ");
 			}
-			if(I.GetNumOperands() > 0) OutputPopBack<2>();
+			if(I.GetNumOperands() > 0) PopOutput<2>();
 		}
 		EmitLn("");
 	}
@@ -130,18 +151,27 @@ namespace ola
 			Emit("null operand");
 			return;
 		}
+
+		Constant const* C = dyn_cast<Constant>(V);
+		if (C && !isa<GlobalValue>(C))
+		{
+			PrintConstant(C);
+			return;
+		}
+
 		if (print_type && V->GetType())
 		{
-			Emit("{}", GetTypeAsString(V->GetType()));
+			PrintType(V->GetType());
+			EmitSpace();
 		}
 		PrintFullName(V);
 	}
 
-	void IRPrinter::PrintConstant(Value* V)
+	void IRPrinter::PrintConstant(Constant const* V)
 	{
 		if (!V) return;
 		OLA_ASSERT(isa<Constant>(V));
-		Constant* C = cast<Constant>(V);
+		Constant const* C = cast<Constant>(V);
 		ConstantID const_id = C->GetConstantID();
 		switch (const_id)
 		{
@@ -201,53 +231,49 @@ namespace ola
 		PrintFullName(V);
 	}
 
-	std::string IRPrinter::GetTypeAsString(IRType* type, bool space)
+	void IRPrinter::PrintType(IRType* type)
 	{
 		std::string type_string;
 		switch (type->GetKind())
 		{
-		case IRTypeKind::Void:		type_string = "void"; break;
-		case IRTypeKind::Float:		type_string = "f64";  break;
-		case IRTypeKind::Pointer:	type_string = "ptr";  break;
-		case IRTypeKind::Label:		type_string = "label";  break;
+		case IRTypeKind::Void:		Emit("void"); break;
+		case IRTypeKind::Float:		Emit("f64");  break;
+		case IRTypeKind::Pointer:	Emit("ptr");  break;
+		case IRTypeKind::Label:		Emit("label");  break;
 		case IRTypeKind::Integer:
 		{
 			IRIntType* int_type = cast<IRIntType>(type);
 			switch (int_type->GetWidth())
 			{
-			case 1: type_string = "i8";  break;
-			case 8: type_string = "i64"; break;
+			case 1: Emit("i8");  break;
+			case 8: Emit("i64"); break;
 			}
 		}
 		break;
 		case IRTypeKind::Array:
 		{
 			IRArrayType* array_type = cast<IRArrayType>(type);
-			std::string base_type_string = GetTypeAsString(array_type->GetBaseType(), false);
-			base_type_string += "[";
-			base_type_string += std::to_string(array_type->GetArraySize());
-			base_type_string += "]";
+			PrintType(array_type->GetBaseType());
+			Emit("[{}]", array_type->GetArraySize());
 		}
 		break;
 		case IRTypeKind::Function:
 		{
 			IRFuncType* func_type = cast<IRFuncType>(type);
-			type_string = GetTypeAsString(func_type->GetReturnType());
-			type_string += "(";
-			uint32 const param_count = (uint32)func_type->GetParamCount();
+			PrintType(func_type->GetReturnType());
+			Emit("(");
+			uint32 const param_count = func_type->GetParamCount();
 			for (uint32 i = 0; i < param_count; ++i)
 			{
-				type_string += GetTypeAsString(func_type->GetParamType(i));
-				if (i != param_count - 1) type_string += ",";
+				PrintType(func_type->GetParamType(i));
+				Emit(",");
 			}
-			type_string += ")";
+			if(param_count > 0) PopOutput<1>();
+			Emit(")");
 		}
 		break;
 		case IRTypeKind::Struct: OLA_ASSERT_MSG(false, "Not implemented yet"); break;
 		}
-
-		if (space) type_string += " ";
-		return type_string;
 	}
 }
 

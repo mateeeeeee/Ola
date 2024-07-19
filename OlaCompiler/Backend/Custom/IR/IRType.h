@@ -145,7 +145,7 @@ namespace ola
 
 		IRType* GetReturnType() const { return return_type; }
 		std::vector<IRType*> const& GetParamTypes() const { return param_types; }
-		uint64 GetParamCount() const { return param_types.size(); }
+		uint32 GetParamCount() const { return (uint32)param_types.size(); }
 		IRType* GetParamType(uint32 i) const { return param_types[i]; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
