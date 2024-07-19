@@ -5,9 +5,96 @@
 
 namespace ola
 {
+
+	std::string_view NameManager::GetUniqueName(Value const* V)
+	{
+		if (isa<GlobalValue>(V))
+		{
+			if (!global_name_map.contains(V)) RegisterValue(V);
+			return global_name_map[V];
+		}
+		else
+		{
+			if (!local_name_map.contains(V)) RegisterValue(V);
+			return local_name_map[V];
+		}
+	}
+
+	void NameManager::ClearLocals()
+	{
+		local_name_map.clear();
+		local_slot_map.clear();
+	}
+
+	void NameManager::RegisterValue(Value const* V)
+	{
+		if (isa<GlobalValue>(V))
+		{
+			std::string prefixed_name = GetPrefixedName(V);
+			if (global_name_map.contains(V)) return;
+
+			if (global_slot_map.contains(prefixed_name))
+			{
+				uint32 slot = global_slot_map[prefixed_name]++;
+				global_name_map[V] = prefixed_name + std::to_string(slot);
+			}
+			else
+			{
+				global_slot_map[prefixed_name]++;
+				global_name_map[V] = prefixed_name;
+				if (prefixed_name.size() <= 1) global_name_map[V] += "0";
+			}
+		}
+		else
+		{
+			std::string prefixed_name = GetPrefixedName(V);
+			if (local_name_map.contains(V)) return;
+
+			if (local_slot_map.contains(prefixed_name))
+			{
+				uint32 slot = local_slot_map[prefixed_name]++;
+				local_name_map[V] = prefixed_name + std::to_string(slot);
+			}
+			else
+			{
+				local_slot_map[prefixed_name]++;
+				local_name_map[V] = prefixed_name;
+				if (prefixed_name.size() <= 1) local_name_map[V] += "0";
+			}
+		}
+	}
+
+	std::string NameManager::GetPrefixedName(Value const* V)
+	{
+		if (isa<BasicBlock>(V))			return GetPrefixedName(V->GetName(), NamePrefix::Label);
+		else if (isa<GlobalValue>(V))   return GetPrefixedName(V->GetName(), NamePrefix::Global);
+		else							return GetPrefixedName(V->GetName(), NamePrefix::Local);
+	}
+
+	std::string NameManager::GetPrefixedName(std::string_view name, NamePrefix prefix)
+	{
+		std::string str_prefix = "";
+		switch (prefix)
+		{
+			break;
+		case NamePrefix::Global:
+			str_prefix = "@";
+			break;
+		case NamePrefix::Local:
+			str_prefix = "%";
+			break;
+		case NamePrefix::None:
+		case NamePrefix::Label:
+		default:
+			break;
+		}
+		return str_prefix + std::string(name);
+	}
+
 	void IRPrinter::PrintModule(IRModule const& M)
 	{
 		std::string_view module_id = M.GetModuleId();
+		EmitLn("Module ID : {}", module_id);
 
 		std::vector<GlobalValue*> const& globals = M.Globals();
 		for (GlobalValue const* global : globals)
@@ -20,6 +107,7 @@ namespace ola
 			}
 			else if (Function const* F = dyn_cast<Function>(global))
 			{
+				name_manager.ClearLocals();
 				EmitLn("");
 				PrintFunction(F);
 				EmitLn("");
@@ -32,17 +120,13 @@ namespace ola
 	{
 		if (GV->IsDeclaration())
 		{
-			Emit("declare ");
-			PrintFullName(GV);
-			EmitSpace();
+			Emit("declare {} ", GetUniqueName(GV));
 			PrintType(GV->GetType());
 			EmitNewline();
 			return;
 		}
 		std::string linkage = GV->GetLinkage() == Linkage::External ? "external" : "internal";
-		Emit("define {} ", linkage);
-		PrintFullName(GV);
-		EmitSpace();
+		Emit("define {} {} ", linkage, GetUniqueName(GV));
 		PrintType(GV->GetType());
 		EmitSpace();
 		PrintConstant(dyn_cast<Constant>(GV->GetInitValue()));
@@ -53,16 +137,13 @@ namespace ola
 	{
 		if (F->IsDeclaration())
 		{
-			Emit("declare ");
-			PrintFullName(F);
-			EmitSpace();
+			Emit("declare {} ", GetUniqueName(F));
 			PrintType(F->GetFunctionType());
+			EmitNewline();
 			return;
 		}
 		std::string linkage = F->GetLinkage() == Linkage::External ? "external" : "internal";
-		Emit("define {} ", linkage);
-		PrintFullName(F);
-		EmitSpace();
+		Emit("define {} {} ", linkage, GetUniqueName(F));
 		PrintType(F->GetFunctionType());
 		EmitLn(" {{");
 		for (auto const& BB : F->Blocks())
@@ -74,9 +155,7 @@ namespace ola
 
 	void IRPrinter::PrintBasicBlock(BasicBlock const& BB)
 	{
-		PrintFullName(&BB);
-		Emit(":");
-		EmitLn("");
+		EmitLn("{}:", GetUniqueName(&BB));
 		for (Instruction const& I : BB.Instructions())
 		{
 			PrintInstruction(I);
@@ -88,8 +167,7 @@ namespace ola
 		IRType* type = I.GetType();
 		if (!type->IsVoidType())
 		{
-			PrintFullName(&I);
-			Emit(" = ");
+			Emit("{} = ", GetUniqueName(&I));
 		}
 		Emit("{} ", I.GetOpcodeName());
 
@@ -103,15 +181,15 @@ namespace ola
 			BranchInst const* BI = cast<BranchInst>(&I);
 			if (BI->IsConditional())
 			{
-				PrintOperand(BI->GetCondition(), true);
+				PrintOperand(BI->GetCondition());
 				Emit(", ");
-				PrintOperand(BI->GetTrueTarget(), true);
+				PrintOperand(BI->GetTrueTarget());
 				Emit(", ");
-				PrintOperand(BI->GetFalseTarget(), true);
+				PrintOperand(BI->GetFalseTarget());
 			}
 			else
 			{
-				PrintOperand(BI->GetTrueTarget(), true);
+				PrintOperand(BI->GetTrueTarget());
 			}
 		}
 		else if (I.GetNumOperands() > 0)
@@ -141,7 +219,7 @@ namespace ola
 			}
 			if(I.GetNumOperands() > 0) PopOutput<2>();
 		}
-		EmitLn("");
+		EmitNewline();
 	}
 
 	void IRPrinter::PrintOperand(Value const* V, bool print_type)
@@ -164,7 +242,7 @@ namespace ola
 			PrintType(V->GetType());
 			EmitSpace();
 		}
-		PrintFullName(V);
+		Emit("{}", GetUniqueName(V));
 	}
 
 	void IRPrinter::PrintConstant(Constant const* V)
@@ -179,56 +257,6 @@ namespace ola
 		case ConstantID::Integer:	Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
 		default: OLA_ASSERT_MSG(false, "not yet implemented");
 		}
-	}
-
-	std::string IRPrinter::GetPrefixedName(Value const* V)
-	{
-		if (isa<BasicBlock>(V))			return GetPrefixedName(V->GetName(), NamePrefix::Label);
-		else if (isa<GlobalValue>(V))   return GetPrefixedName(V->GetName(), NamePrefix::Global);
-		else							return GetPrefixedName(V->GetName(), NamePrefix::Local);
-	}
-
-	std::string IRPrinter::GetPrefixedName(std::string_view name, NamePrefix prefix)
-	{
-		std::string str_prefix = "";
-		switch (prefix)
-		{
-			break;
-		case NamePrefix::Global:
-			str_prefix = "@";
-			break;
-		case NamePrefix::Local:
-			str_prefix = "%";
-			break;
-		case NamePrefix::None:
-		case NamePrefix::Label:
-		default:
-			break;
-		}
-		return str_prefix + std::string(name);
-	}
-
-	void IRPrinter::PrintFullName(Value const* V)
-	{
-		if (unique_names.contains(V))
-		{
-			Emit("{}", unique_names[V]);
-			return;
-		}
-
-		std::string prefixed_name = GetPrefixedName(V);
-		if (names_count.contains(prefixed_name))
-		{
-			uint32 count = names_count[prefixed_name]++;
-			unique_names[V] = prefixed_name + std::to_string(count);
-		}
-		else
-		{
-			names_count[prefixed_name]++;
-			unique_names[V] = prefixed_name;
-			if (prefixed_name.size() <= 1) unique_names[V] += "0";
-		}
-		PrintFullName(V);
 	}
 
 	void IRPrinter::PrintType(IRType* type)

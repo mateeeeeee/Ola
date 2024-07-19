@@ -15,8 +15,10 @@ namespace ola
 	class Instruction;
 	class IRType;
 
-	class IRPrinter
+	class NameManager
 	{
+		using ValueStringMap = std::unordered_map<Value const*, std::string>;
+		using StringSlotMap  = std::unordered_map<std::string, uint32>;
 		enum class NamePrefix : uint32
 		{
 			None,
@@ -26,15 +28,35 @@ namespace ola
 		};
 
 	public:
+		NameManager() = default;
+		OLA_NONCOPYABLE(NameManager)
+		~NameManager() = default;
+
+		std::string_view GetUniqueName(Value const* V);
+		void ClearLocals();
+
+	private:
+		ValueStringMap global_name_map;
+		StringSlotMap  global_slot_map;
+		ValueStringMap local_name_map;
+		StringSlotMap  local_slot_map;
+
+	private:
+		void RegisterValue(Value const* V);
+		std::string GetPrefixedName(std::string_view name, NamePrefix prefix);
+		std::string GetPrefixedName(Value const*);
+	};
+
+	class IRPrinter
+	{
+	public:
 		explicit IRPrinter(std::ostream& os) : os(os) {}
 		void PrintModule(IRModule const& M);
 
 	private:
 		std::ostream& os;
 		std::string output;
-
-		std::unordered_map<std::string, uint32> names_count;
-		std::unordered_map<Value const*, std::string> unique_names;
+		NameManager name_manager;
 
 	private:
 		void PrintGlobalVariable(GlobalVariable const*);
@@ -44,13 +66,11 @@ namespace ola
 		void PrintConstant(Constant const*);
 		void PrintOperand(Value const*, bool print_type = true);
 
-		std::string GetPrefixedName(std::string_view name, NamePrefix prefix);
-		std::string GetPrefixedName(Value const*);
-		void PrintFullName(Value const*);
-
+		std::string_view GetUniqueName(Value const* V)
+		{
+			return name_manager.GetUniqueName(V);
+		}
 		void PrintType(IRType*);
-
-		//std::string GetTypeAsString(IRType*, bool space = true);
 
 		template<typename... Args>
 		void EmitLn(char const* fmt, Args&&... args)
