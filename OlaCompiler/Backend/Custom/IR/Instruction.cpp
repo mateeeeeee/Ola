@@ -6,6 +6,82 @@
 
 namespace ola
 {
+	static char const* OpcodeNames[] = 
+	{
+		"none",
+
+		"ret",
+		"br",
+		"switch",
+
+		"load",
+		"store",
+
+		"add",
+		"sub",
+		"mul",
+		"sdiv",
+		"udiv",
+		"srem",
+		"urem",
+		"neg",
+		"not",
+		"and",
+		"or",
+		"xor",
+		"shl",
+		"lshr",
+		"ashr",
+
+		"fadd",
+		"fsub",
+		"fmul",
+		"fdiv",
+		"fneg",
+		"ffma",
+
+		"icmp eq",
+		"icmp ne",
+		"icmp slt",
+		"icmp sle",
+		"icmp sgt",
+		"icmp sge",
+		"icmp ult",
+		"icmp ule",
+		"icmp ugt",
+		"icmp uge",
+
+		"fcmp oeq",
+		"fcmp one",
+		"fcmp olt",
+		"fcmp ole",
+		"fcmp ogt",
+		"fcmp oge",
+		"fcmp ueq",
+		"fcmp une",
+		"fcmp ult",
+		"fcmp ule",
+		"fcmp ugt",
+		"fcmp uge",
+
+		"sext",
+		"zext",
+		"signed trunc",
+		"unsigned trunc",
+		"bitcast",
+		"f2u",
+		"f2s",
+		"u2f",
+		"s2f",
+		"fcast",
+
+		"alloca",
+		"gep",
+		"select",
+		"call",
+		"phi"
+	};
+
 
 	Use::Use(Value* val, Instruction* user) : value(val), user(user)
 	{
@@ -40,6 +116,11 @@ namespace ola
 		return false;
 	}
 
+	char const* Instruction::GetOpcodeName() const
+	{
+		return OpcodeNames[(uint32)GetOpcode()];
+	}
+
 	IListIterator<Instruction> Instruction::InsertBefore(BasicBlock* BB, Instruction* I)
 	{
 		return InsertBefore(BB, I->GetIterator());
@@ -61,44 +142,46 @@ namespace ola
 	}
 
 	LoadInst::LoadInst(Value* address) 
-		: Instruction( InstructionID::Load, cast<IRPtrType>(address->GetType())->GetPointeeType(), {address})
+		: Instruction( Opcode::Load, cast<IRPtrType>(address->GetType())->GetPointeeType(), {address})
 	{
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
 	}
 
 	LoadInst::LoadInst(Value* address, IRType* type)
-		: Instruction(InstructionID::Load, type, { address })
+		: Instruction(Opcode::Load, type, { address })
 	{
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
 	}
 
-	StoreInst::StoreInst(Value* address, Value* value) : Instruction(InstructionID::Store, IRVoidType::Get(value->GetContext()), { address, value })
+	StoreInst::StoreInst(Value* address, Value* value) : Instruction(Opcode::Store, IRVoidType::Get(value->GetContext()), { address, value })
 	{
 	}
 
-	BranchInst::BranchInst(IRContext& C, BasicBlock* target) : Instruction(InstructionID::Branch, IRVoidType::Get(C)) , true_target(target), false_target(nullptr)
+	BranchInst::BranchInst(IRContext& C, BasicBlock* target) 
+		: Instruction(Opcode::Branch, IRVoidType::Get(C), { target }), true_target(target), false_target(nullptr)
 	{
 	}
 
-	BranchInst::BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target) : Instruction(InstructionID::Branch, IRVoidType::Get(condition->GetContext()), { condition }),
+	BranchInst::BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target) 
+		: Instruction(Opcode::Branch, IRVoidType::Get(condition->GetContext()), { true_target, false_target, condition }),
 		true_target(true_target), false_target(false_target)
 	{
 	}
 
-	ReturnInst::ReturnInst(IRContext& C) : Instruction(InstructionID::Ret, IRVoidType::Get(C), {})
+	ReturnInst::ReturnInst(IRContext& C) : Instruction(Opcode::Ret, IRVoidType::Get(C), {})
 	{
 	}
 
-	ReturnInst::ReturnInst(Value* ret_value) : Instruction(InstructionID::Ret, IRVoidType::Get(ret_value->GetContext()), { ret_value })
+	ReturnInst::ReturnInst(Value* ret_value) : Instruction(Opcode::Ret, IRVoidType::Get(ret_value->GetContext()), { ret_value })
 	{
 	}
 
-	SwitchInst::SwitchInst(Value* val, BasicBlock* default_block) : Instruction{ InstructionID::Switch, IRVoidType::Get(val->GetContext()), { val } }, default_block{ default_block }
+	SwitchInst::SwitchInst(Value* val, BasicBlock* default_block) : Instruction{ Opcode::Switch, IRVoidType::Get(val->GetContext()), { val } }, default_block{ default_block }
 	{
 
 	}
 
-	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(InstructionID::Call, cast<IRFuncType>(callee->GetType())->GetReturnType(), {})
+	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<IRFuncType>(callee->GetType())->GetReturnType(), {})
 	{
 		for (Value* arg : args) AddOperand(arg);
 		AddOperand(callee);
@@ -115,7 +198,7 @@ namespace ola
 		return GetBasicBlock()->GetFunction();
 	}
 
-	AllocaInst::AllocaInst(IRType* type, Value* array_size /*= nullptr*/) : Instruction(InstructionID::Alloca, IRPtrType::Get(type), { array_size }), allocated_type(type)
+	AllocaInst::AllocaInst(IRType* type, Value* array_size /*= nullptr*/) : Instruction(Opcode::Alloca, IRPtrType::Get(type), { array_size }), allocated_type(type)
 	{
 	}
 
@@ -153,7 +236,7 @@ namespace ola
 	}
 
 	GetElementPtrInst::GetElementPtrInst(Value* base, std::span<Value*> indices)
-		: Instruction{ InstructionID::GetElementPtr, IRPtrType::Get(GetValueType(base, indices)), {} }
+		: Instruction{ Opcode::GetElementPtr, IRPtrType::Get(GetValueType(base, indices)), {} }
 	{
 		for (Value* index : indices) AddOperand(index);
 		AddOperand(base);
@@ -168,11 +251,11 @@ namespace ola
 	}
 
 
-	CompareInst::CompareInst(InstructionID id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
+	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
 	{
 		uint32 id_int = (uint32)id;
-		OLA_ASSERT(id_int > (uint32)InstructionID::CompareOpBegin && id_int < (uint32)InstructionID::CompareOpEnd);
-		cmp = (CompareOp)(id_int - (uint32)InstructionID::CompareOpBegin - 1);
+		OLA_ASSERT(id_int > (uint32)Opcode::CompareOpBegin && id_int < (uint32)Opcode::CompareOpEnd);
+		cmp = (CompareOp)(id_int - (uint32)Opcode::CompareOpBegin - 1);
 	}
 
 }

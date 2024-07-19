@@ -418,7 +418,7 @@ namespace ola
 		case UnaryExprKind::PreIncrement:
 		{
 			Value* incremented_value = nullptr;
-			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FAdd : InstructionID::Add, operand, one);
+			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FAdd : Opcode::Add, operand, one);
 			Store(incremented_value, operand_value);
 			result = incremented_value;
 		}
@@ -426,7 +426,7 @@ namespace ola
 		case UnaryExprKind::PreDecrement:
 		{
 			Value* decremented_value = nullptr;
-			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FSub : InstructionID::Sub, operand, one);
+			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FSub : Opcode::Sub, operand, one);
 			Store(decremented_value, operand_value);
 			result = decremented_value;
 		}
@@ -436,7 +436,7 @@ namespace ola
 			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
 			Store(operand_value, result);
 			Value* incremented_value = nullptr;
-			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FAdd : InstructionID::Add, operand, one);
+			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FAdd : Opcode::Add, operand, one);
 			Store(incremented_value, operand_value);
 		}
 		break;
@@ -445,7 +445,7 @@ namespace ola
 			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
 			Store(operand_value, result);
 			Value* decremented_value = nullptr;
-			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? InstructionID::FSub : InstructionID::Sub, operand, one);
+			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FSub : Opcode::Sub, operand, one);
 			Store(decremented_value, operand_value);
 		}
 		break;
@@ -456,17 +456,17 @@ namespace ola
 		break;
 		case UnaryExprKind::Minus:
 		{
-			result = is_float_expr ? builder->MakeInst<UnaryInst>(InstructionID::FNeg, operand) : builder->MakeInst<UnaryInst>(InstructionID::Neg, operand);
+			result = is_float_expr ? builder->MakeInst<UnaryInst>(Opcode::FNeg, operand) : builder->MakeInst<UnaryInst>(Opcode::Neg, operand);
 		}
 		break;
 		case UnaryExprKind::BitNot:
 		{
-			result = builder->MakeInst<UnaryInst>(InstructionID::Not, operand);
+			result = builder->MakeInst<UnaryInst>(Opcode::Not, operand);
 		}
 		break;
 		case UnaryExprKind::LogicalNot:
 		{
-			result = builder->MakeInst<CompareInst>(is_float_expr ? InstructionID::FCmpUEQ : InstructionID::ICmpEQ, operand, zero);
+			result = builder->MakeInst<CompareInst>(is_float_expr ? Opcode::FCmpUEQ : Opcode::ICmpEQ, operand, zero);
 		}
 		break;
 		default:
@@ -500,106 +500,106 @@ namespace ola
 		break;
 		case BinaryExprKind::Add:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FAdd : InstructionID::Add;
+			Opcode id = is_float_expr ? Opcode::FAdd : Opcode::Add;
 			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Subtract:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FSub : InstructionID::Sub;
+			Opcode id = is_float_expr ? Opcode::FSub : Opcode::Sub;
 			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Multiply:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FMul : InstructionID::Mul;
+			Opcode id = is_float_expr ? Opcode::FMul : Opcode::Mul;
 			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Divide:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FDiv : InstructionID::SDiv;
+			Opcode id = is_float_expr ? Opcode::FDiv : Opcode::SDiv;
 			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Modulo:
 		{
 			OLA_ASSERT(!is_float_expr);
-			result = builder->MakeInst<BinaryInst>(InstructionID::SRem, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::SRem, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::ShiftLeft:
 		{
-			result = builder->MakeInst<BinaryInst>(InstructionID::Shl, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::Shl, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::ShiftRight:
 		{
-			result = builder->MakeInst<BinaryInst>(InstructionID::AShr, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::AShr, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::BitAnd:
 		{
-			result = builder->MakeInst<BinaryInst>(InstructionID::And, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::And, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::BitOr:
 		{
-			result = builder->MakeInst<BinaryInst>(InstructionID::Or, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::Or, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::BitXor:
 		{
-			result = builder->MakeInst<BinaryInst>(InstructionID::Xor, lhs, rhs);
+			result = builder->MakeInst<BinaryInst>(Opcode::Xor, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::LogicalAnd:
 		{
-			Value* tmp = builder->MakeInst<BinaryInst>(InstructionID::And, lhs, rhs);
+			Value* tmp = builder->MakeInst<BinaryInst>(Opcode::And, lhs, rhs);
 			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
-			result = builder->MakeInst<CompareInst>(InstructionID::ICmpNE, tmp, zero);
+			result = builder->MakeInst<CompareInst>(Opcode::ICmpNE, tmp, zero);
 		}
 		break;
 		case BinaryExprKind::LogicalOr:
 		{
-			Value* tmp = builder->MakeInst<BinaryInst>(InstructionID::Or, lhs, rhs);
+			Value* tmp = builder->MakeInst<BinaryInst>(Opcode::Or, lhs, rhs);
 			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
-			result = builder->MakeInst<CompareInst>(InstructionID::ICmpNE, tmp, zero);
+			result = builder->MakeInst<CompareInst>(Opcode::ICmpNE, tmp, zero);
 		}
 		break;
 		case BinaryExprKind::Equal:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpOEQ : InstructionID::ICmpEQ;
+			Opcode id = is_float_expr ? Opcode::FCmpOEQ : Opcode::ICmpEQ;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::NotEqual:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpONE : InstructionID::ICmpNE;
+			Opcode id = is_float_expr ? Opcode::FCmpONE : Opcode::ICmpNE;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Less:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpOLT : InstructionID::ICmpSLT;
+			Opcode id = is_float_expr ? Opcode::FCmpOLT : Opcode::ICmpSLT;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::Greater:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpOGT : InstructionID::ICmpSGT;
+			Opcode id = is_float_expr ? Opcode::FCmpOGT : Opcode::ICmpSGT;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::LessEqual:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpOLE : InstructionID::ICmpSLE;
+			Opcode id = is_float_expr ? Opcode::FCmpOLE : Opcode::ICmpSLE;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;
 		case BinaryExprKind::GreaterEqual:
 		{
-			InstructionID id = is_float_expr ? InstructionID::FCmpOGE : InstructionID::ICmpSGE;
+			Opcode id = is_float_expr ? Opcode::FCmpOGE : Opcode::ICmpSGE;
 			result = builder->MakeInst<CompareInst>(id, lhs, rhs);
 		}
 		break;

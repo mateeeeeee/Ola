@@ -173,7 +173,7 @@ namespace ola
 			lowering_ctx.AddBlock(&BB, MBB.get());
 			for (auto& inst : BB.Instructions())
 			{
-				if (inst.GetInstID() == InstructionID::Phi)
+				if (inst.GetOpcode() == Opcode::Phi)
 				{
 					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
 					lowering_ctx.AddOperand(&inst, vreg);
@@ -212,50 +212,49 @@ namespace ola
 
 	void MIRModule::LowerInstruction(Instruction* inst)
 	{
-		switch (inst->GetInstID())
+		switch (inst->GetOpcode())
 		{
-		case InstructionID::Add:
-		case InstructionID::Sub:
-		case InstructionID::Mul:
-		case InstructionID::UDiv:
-		case InstructionID::URem:
-		case InstructionID::And:
-		case InstructionID::Or:
-		case InstructionID::Xor:
-		case InstructionID::Shl:
-		case InstructionID::LShr:
-		case InstructionID::AShr:
-		case InstructionID::FAdd:
-		case InstructionID::FSub:
-		case InstructionID::FMul:
-		case InstructionID::FDiv:
+		case Opcode::Add:
+		case Opcode::Sub:
+		case Opcode::Mul:
+		case Opcode::UDiv:
+		case Opcode::URem:
+		case Opcode::And:
+		case Opcode::Or:
+		case Opcode::Xor:
+		case Opcode::Shl:
+		case Opcode::LShr:
+		case Opcode::AShr:
+		case Opcode::FAdd:
+		case Opcode::FSub:
+		case Opcode::FMul:
+		case Opcode::FDiv:
 			LowerBinary(cast<BinaryInst>(inst));
 			break;
-		case InstructionID::Neg:
-		case InstructionID::Not:
-		case InstructionID::FNeg:
+		case Opcode::Neg:
+		case Opcode::Not:
+		case Opcode::FNeg:
 			LowerUnary(cast<UnaryInst>(inst));
 			break;
-		case InstructionID::Ret:
+		case Opcode::Ret:
 			LowerRet(cast<ReturnInst>(inst));
 			break;
-		case InstructionID::Branch:
-		case InstructionID::ConditionalBranch:
+		case Opcode::Branch:
 			LowerBranch(cast<BranchInst>(inst));
 			break;
-		case InstructionID::Load:
+		case Opcode::Load:
 			LowerLoad(cast<LoadInst>(inst));
 			break;
-		case InstructionID::Store:
+		case Opcode::Store:
 			LowerStore(cast<StoreInst>(inst));
 			break;
-		case InstructionID::Call:
+		case Opcode::Call:
 			LowerCall(cast<CallInst>(inst));
 			break;
-		case InstructionID::Alloca:
+		case Opcode::Alloca:
 			LowerAlloca(cast<AllocaInst>(inst));
 			break;
-		case InstructionID::Phi:
+		case Opcode::Phi:
 			break;
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
@@ -264,45 +263,45 @@ namespace ola
 
 	void MIRModule::LowerBinary(BinaryInst* inst)
 	{
-		const auto GetMachineID = [](InstructionID instID)
+		const auto GetMachineID = [](Opcode opcode)
 			{
-				switch (instID)
+				switch (opcode)
 				{
-				case InstructionID::Add:
+				case Opcode::Add:
 					return InstAdd;
-				case InstructionID::Sub:
+				case Opcode::Sub:
 					return InstSub;
-				case InstructionID::Mul:
+				case Opcode::Mul:
 					return InstMul;
-				case InstructionID::UDiv:
+				case Opcode::UDiv:
 					return InstUDiv;
-				case InstructionID::URem:
+				case Opcode::URem:
 					return InstURem;
-				case InstructionID::And:
+				case Opcode::And:
 					return InstAnd;
-				case InstructionID::Or:
+				case Opcode::Or:
 					return InstOr;
-				case InstructionID::Xor:
+				case Opcode::Xor:
 					return InstXor;
-				case InstructionID::Shl:
+				case Opcode::Shl:
 					return InstShl;
-				case InstructionID::LShr:
+				case Opcode::LShr:
 					return InstLShr;
-				case InstructionID::AShr:
+				case Opcode::AShr:
 					return InstAShr;
-				case InstructionID::FAdd:
+				case Opcode::FAdd:
 					return InstFAdd;
-				case InstructionID::FSub:
+				case Opcode::FSub:
 					return InstFSub;
-				case InstructionID::FMul:
+				case Opcode::FMul:
 					return InstFMul;
-				case InstructionID::FDiv:
+				case Opcode::FDiv:
 					return InstFDiv;
 				}
 				return InstUnknown;
 			};
 		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction minst(GetMachineID(inst->GetInstID()));
+		MIRInstruction minst(GetMachineID(inst->GetOpcode()));
 		minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
 		lowering_ctx.EmitInst(minst);
 		lowering_ctx.AddOperand(inst, ret);
@@ -310,22 +309,22 @@ namespace ola
 
 	void MIRModule::LowerUnary(UnaryInst* inst)
 	{
-		const auto GetMachineID = [](InstructionID instID)
+		const auto GetMachineID = [](Opcode opcode)
 			{
-				switch (instID)
+				switch (opcode)
 				{
-				case InstructionID::Neg:
+				case Opcode::Neg:
 					return InstNeg;
-				case InstructionID::Not:
+				case Opcode::Not:
 					return InstNot;
-				case InstructionID::FNeg:
+				case Opcode::FNeg:
 					return InstFNeg;
 				}
 				return InstUnknown;
 			};
 
 		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction MI(GetMachineID(inst->GetInstID()));
+		MIRInstruction MI(GetMachineID(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);

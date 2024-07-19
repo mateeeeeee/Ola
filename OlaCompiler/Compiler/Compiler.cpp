@@ -116,7 +116,9 @@ namespace ola
 			std::string file_ext = fs::path(source_files[i]).extension().string();
 
 			std::string source_file = source_files[i]; source_file += ".ola";
-			std::string ir_file = file_name + ".ll";
+			std::string ir_file;
+			if(use_llvm) ir_file = file_name + ".ll";
+			else ir_file = file_name + ".oll";
 			std::string assembly_file = file_name + ".s";
 
 			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, use_llvm, ast_dump);

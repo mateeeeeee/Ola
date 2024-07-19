@@ -8,9 +8,8 @@
 
 namespace ola
 {
-	enum class Linkage
+	enum class Linkage : bool
 	{
-		None,
 		Internal,
 		External
 	};
@@ -49,7 +48,7 @@ namespace ola
 		}
 
 	protected:
-		Linkage linkage = Linkage::None;
+		Linkage linkage;
 		IRType* value_type;
 	};
 
@@ -78,7 +77,7 @@ namespace ola
 
 		virtual bool IsDeclaration() const override
 		{
-			return init == nullptr;
+			return init == nullptr && linkage == Linkage::External;
 		}
 
 		static bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }

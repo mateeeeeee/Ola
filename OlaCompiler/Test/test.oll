@@ -1,15 +1,17 @@
 
-BB_entry:
-AllocaInst
-StoreInst
-LoadInst
-BinaryOperator
-AllocaInst
-StoreInst
-BranchInst to:exit
+define external @main i64 ()  {
+entry:
+%0 = alloca i64
+%1 = alloca i64
+store ptr %1, i64 %0
+%2 = load ptr, ptr %1
+store ptr %0, ptr %2
+br label exit
+return:
+%nop = alloca i8
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
 
-BB_return:
-BranchInst to:exit
-
-BB_exit:
-ReturnInst

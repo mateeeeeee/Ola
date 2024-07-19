@@ -17,26 +17,23 @@ namespace ola
 	class IRType;
 	class IRPtrType;
 
-	enum class InstructionID : uint32
+	enum class Opcode : uint32
 	{
 		None,
-		// control-flow
-		// terminators
+
 		TerminatorBegin,
-		Ret,
+		Ret = TerminatorBegin,
 		Branch,
-		ConditionalBranch,
-		Unreachable,
 		Switch,
-		TerminatorEnd,
-		// memory ops
+		TerminatorEnd = Switch,
+
 		MemoryOpBegin,
-		Load,
+		Load = MemoryOpBegin,
 		Store,
-		MemoryOpEnd,
-		// integer arithmetic ops
+		MemoryOpEnd = Store,
+		
 		IntegerOpBegin,
-		Add,
+		Add = IntegerOpBegin,
 		Sub,
 		Mul,
 		SDiv,
@@ -52,19 +49,19 @@ namespace ola
 		Shl,
 		LShr,
 		AShr,
-		IntegerOpEnd,
+		IntegerOpEnd = AShr,
 		// floating point ops
 		FloatOpBegin,
-		FAdd,
+		FAdd = FloatOpBegin,
 		FSub,
 		FMul,
 		FDiv,
 		FNeg,
 		FFma,
-		FloatOpEnd,
+		FloatOpEnd = FFma,
 		// compare ops
 		CompareOpBegin,
-		ICmpEQ,
+		ICmpEQ = CompareOpBegin,
 		ICmpNE,
 		ICmpSLT,
 		ICmpSLE,
@@ -87,10 +84,10 @@ namespace ola
 		FCmpULE,
 		FCmpUGT,
 		FCmpUGE,
-		CompareOpEnd,
+		CompareOpEnd = FCmpUGE,
 		// cast ops
 		CastOpBegin,
-		SExt,
+		SExt = CastOpBegin,
 		ZExt,
 		SignedTrunc,
 		UnsignedTrunc,
@@ -100,7 +97,7 @@ namespace ola
 		U2F,
 		S2F,
 		FCast,
-		CastOpEnd,
+		CastOpEnd = FCast,
 		// misc
 		Alloca,
 		GetElementPtr,
@@ -108,7 +105,7 @@ namespace ola
 		Call,
 		Phi
 	};
-
+	
 	class Use 
 	{
 	public:
@@ -178,12 +175,14 @@ namespace ola
 	class Instruction : public TrackableValue, public IListNode<Instruction>
 	{
 	public:
-		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), instr_id(InstructionID::None), basic_block(nullptr) {}
+		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), opcode(Opcode::None), basic_block(nullptr) {}
 
-		InstructionID GetInstID() const 
+		Opcode GetOpcode() const 
 		{
-			return instr_id;
+			return opcode;
 		}
+		char const* GetOpcodeName() const;
+
 		BasicBlock* GetBasicBlock() const
 		{
 			return basic_block;
@@ -192,7 +191,7 @@ namespace ola
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 
-#define GET_INST_CATEGORY(KIND) bool Is##KIND() const { return InstructionID::KIND##Begin < instr_id && instr_id < InstructionID::KIND##End; }
+#define GET_INST_CATEGORY(KIND) bool Is##KIND() const { return Opcode::KIND##Begin <= opcode && opcode <= Opcode::KIND##End; }
 		GET_INST_CATEGORY(Terminator)
 		GET_INST_CATEGORY(MemoryOp)
 		GET_INST_CATEGORY(IntegerOp)
@@ -203,8 +202,7 @@ namespace ola
 
 		bool IsBranch() const 
 		{
-			return instr_id == InstructionID::Branch || instr_id == InstructionID::ConditionalBranch ||
-				instr_id == InstructionID::Switch;
+			return opcode == Opcode::Branch || opcode == Opcode::Switch;
 		}
 		bool CanBeOperand() const;
 
@@ -255,13 +253,13 @@ namespace ola
 		}
 
 	private:
-		InstructionID instr_id;
+		Opcode opcode;
 		std::vector<Use> operands;
 		BasicBlock* basic_block;
 
 	protected:
-		Instruction(InstructionID instr_id, IRType* type, std::vector<Value*> const& ops = {}) : TrackableValue(ValueKind::Instruction, type),
-			instr_id(instr_id), basic_block(nullptr)
+		Instruction(Opcode opcode, IRType* type, std::vector<Value*> const& ops = {}) : TrackableValue(ValueKind::Instruction, type),
+			opcode(opcode), basic_block(nullptr)
 		{
 			for (Value* op : ops)
 			{
@@ -294,7 +292,7 @@ namespace ola
 	class BinaryInst final : public Instruction 
 	{
 	public:
-		BinaryInst(InstructionID instID, Value* lhs, Value* rhs) : Instruction{ instID, lhs->GetType(), { lhs, rhs } } 
+		BinaryInst(Opcode opcode, Value* lhs, Value* rhs) : Instruction{ opcode, lhs->GetType(), { lhs, rhs } }
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
@@ -310,13 +308,13 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetInstID())
+			switch (I->GetOpcode())
 			{
-			case InstructionID::Add:
-			case InstructionID::Sub:
-			case InstructionID::SDiv:
-			case InstructionID::UDiv:
-			case InstructionID::Mul:
+			case Opcode::Add:
+			case Opcode::Sub:
+			case Opcode::SDiv:
+			case Opcode::UDiv:
+			case Opcode::Mul:
 				return true;
 			}
 			return false;
@@ -330,7 +328,7 @@ namespace ola
 	class UnaryInst final : public Instruction 
 	{
 	public:
-		UnaryInst(InstructionID instID, Value* val) : Instruction(instID, val->GetType(), { val }) {}
+		UnaryInst(Opcode opcode, Value* val) : Instruction(opcode, val->GetType(), { val }) {}
 		
 		Value* Operand() const
 		{
@@ -339,10 +337,10 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetInstID())
+			switch (I->GetOpcode())
 			{
-			case InstructionID::Neg:
-			case InstructionID::Not:
+			case Opcode::Neg:
+			case Opcode::Not:
 				return true;
 			}
 			return false;
@@ -383,7 +381,7 @@ namespace ola
 	class CompareInst final : public Instruction
 	{
 	public:
-		CompareInst(InstructionID id, Value* lhs, Value* rhs);
+		CompareInst(Opcode id, Value* lhs, Value* rhs);
 
 		Value* LHS() const
 		{
@@ -398,7 +396,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() > InstructionID::CompareOpBegin && I->GetInstID() < InstructionID::CompareOpEnd;
+			return I->GetOpcode() > Opcode::CompareOpBegin && I->GetOpcode() < Opcode::CompareOpEnd;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -412,8 +410,8 @@ namespace ola
 	class CastInst final : public Instruction 
 	{
 	public:
-		CastInst(InstructionID instID, IRType* cast_type, Value* src_value) 
-			: Instruction(instID, cast_type, { src_value }) {}
+		CastInst(Opcode opcode, IRType* cast_type, Value* src_value) 
+			: Instruction(opcode, cast_type, { src_value }) {}
 		
 		IRType* GetSrcType() const { return Op<0>()->GetType(); }
 		IRType* GetDestType() const { return GetType(); }
@@ -439,7 +437,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Load;
+			return I->GetOpcode() == Opcode::Load;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -460,7 +458,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Store;
+			return I->GetOpcode() == Opcode::Store;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -484,17 +482,17 @@ namespace ola
 		Value* GetCondition() const
 		{
 			OLA_ASSERT(IsConditional());
-			return Op<0>();
+			return Op<2>();
 		}
 		void SetCondition(Value* C)
 		{
 			OLA_ASSERT(IsConditional());
-			Op<0>() = C;
+			Op<2>() = C;
 		}
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Branch;
+			return I->GetOpcode() == Opcode::Branch;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -520,7 +518,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Ret;
+			return I->GetOpcode() == Opcode::Ret;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -566,7 +564,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Switch;
+			return I->GetOpcode() == Opcode::Switch;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -623,7 +621,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Call;
+			return I->GetOpcode() == Opcode::Call;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -634,7 +632,7 @@ namespace ola
 	class SelectInst final : public Instruction 
 	{
 	public:
-		SelectInst(Value* predicate, Value* lhs, Value* rhs) : Instruction( InstructionID::Select, lhs->GetType(), { predicate, lhs, rhs } )
+		SelectInst(Value* predicate, Value* lhs, Value* rhs) : Instruction( Opcode::Select, lhs->GetType(), { predicate, lhs, rhs } )
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
@@ -652,7 +650,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Select;
+			return I->GetOpcode() == Opcode::Select;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -677,7 +675,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::Alloca;
+			return I->GetOpcode() == Opcode::Alloca;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -712,7 +710,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetInstID() == InstructionID::GetElementPtr;
+			return I->GetOpcode() == Opcode::GetElementPtr;
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -723,7 +721,7 @@ namespace ola
 	class PhiInst final : public Instruction 
 	{
 	public:
-		explicit PhiInst(IRType* type) : Instruction( InstructionID::Phi, type, {} ) {}
+		explicit PhiInst(IRType* type) : Instruction( Opcode::Phi, type, {} ) {}
 
 		void AddIncoming(BasicBlock* block, Value* value);
 

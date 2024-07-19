@@ -23,6 +23,7 @@ namespace ola
 		{
 			return instructions;
 		}
+		
 		Instruction const& GetTerminator() const 
 		{
 			return instructions.Back();
@@ -50,12 +51,25 @@ namespace ola
 			block_idx = idx;
 		}
 
+		bool IsEntryBlock() const;
+		void AddPredecessor(BasicBlock* BB)
+		{
+			predecessors.push_back(BB);
+		}
+		std::vector<BasicBlock*> const& Predecessors() const
+		{
+			return predecessors;
+		}
+
+		static bool ClassOf(Value const* V)
+		{
+			return V->GetKind() == ValueKind::BasicBlock;
+		}
 	private:
 		Function* function;
 		std::string label;
 		uint32 block_idx;
 		IList<Instruction> instructions;
-
 		std::vector<BasicBlock*> predecessors;
 	};
 }
