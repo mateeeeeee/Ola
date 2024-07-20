@@ -45,21 +45,6 @@ namespace ola
 		minst_list.emplace_back(MI);
 	}
 
-	void LoweringContext::ReplaceInstruction(MIRInstruction& MI, std::span<MIRInstruction> instructions)
-	{
-		OLA_ASSERT(!instructions.empty());
-		auto& minst_list = current_block->Instructions();
-		for (auto it = minst_list.begin(); it != minst_list.end(); ++it)
-		{
-			if (&(*it) == &MI)
-			{
-				*it = instructions[0];
-				minst_list.insert(++it, instructions.begin() + 1, instructions.end());
-				break;
-			} //iterating and looping through a list at the same time, check if it's missing additional advance it
-		}
-	}
-
 	MIROperandType LoweringContext::GetOperandType(IRType const* type)
 	{
 		if (type->IsPointerType())

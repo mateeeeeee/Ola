@@ -101,7 +101,7 @@ namespace ola
 		virtual ~TargetISelInfo() = default;
 
 		virtual bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
-		virtual void LegalizeInstruction(InstLegalizeContext&) const = 0;
+		virtual void LegalizeInstruction(InstLegalizeContext&, LoweringContext&) const = 0;
 	};
 
 	class TargetFrameInfo

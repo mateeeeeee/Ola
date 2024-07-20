@@ -125,7 +125,7 @@ namespace ola
 					{
 						MIRInstruction& MI = *MIiterator;
 						InstLegalizeContext ctx{ MI, instructions, MIiterator };
-						isel_info.LegalizeInstruction(ctx);
+						isel_info.LegalizeInstruction(ctx, lowering_ctx);
 					}
 				}
 

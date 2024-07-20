@@ -58,7 +58,6 @@ namespace ola
 		MIROperand GetOperand(Value const* V);
 
 		void EmitInst(MIRInstruction const& MI);
-		void ReplaceInstruction(MIRInstruction& MI, std::span<MIRInstruction> instructions);
 
 		MIROperand VirtualReg(IRType const* type) const
 		{

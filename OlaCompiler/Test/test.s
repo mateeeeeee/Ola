@@ -13,7 +13,6 @@ label1:
 jmp label2
 label2:
 mov rax, r14
-add rsp, 16
 mov	rsp, rbp
 pop	rbp
 ret

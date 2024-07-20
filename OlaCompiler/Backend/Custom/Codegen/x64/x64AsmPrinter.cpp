@@ -96,7 +96,6 @@ namespace ola
 						}
 					}
 				}
-				if (stack_allocation > 0) EmitText("add rsp, {}", stack_allocation);
 				EmitText("mov	rsp, rbp"); 
 				EmitText("pop	rbp");
 				EmitText("ret");

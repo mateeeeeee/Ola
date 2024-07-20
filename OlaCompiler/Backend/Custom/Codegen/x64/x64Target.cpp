@@ -42,16 +42,27 @@ namespace ola
 			return false;
 		}
 
-		virtual void LegalizeInstruction(InstLegalizeContext& ctx) const override
+		virtual void LegalizeInstruction(InstLegalizeContext& legalize_ctx, LoweringContext& lowering_ctx) const override
 		{
-			MIRInstruction& MI = ctx.instruction;
-			auto& instructions = ctx.instructions;
-			auto& instruction_iter = ctx.instruction_iterator;
-
+			MIRInstruction& MI = legalize_ctx.instruction;
+			auto& instructions = legalize_ctx.instructions;
+			auto& instruction_iter = legalize_ctx.instruction_iterator;
 			if (MI.GetOpcode() == InstStore)
 			{
-				MIROperand& MO1 = MI.GetOp<0>();
-				MIROperand& MO2 = MI.GetOp<1>();
+				MIROperand& dst = MI.GetOp<0>();
+				MIROperand& src = MI.GetOp<1>();
+				if (dst.IsStackObject() && src.IsStackObject())
+				{
+					MIROperand reg = lowering_ctx.VirtualReg(MIROperandType::Int64);
+					MI.SetOp<0>(reg);
+					MIRInstruction tmp(InstStore);
+					tmp.SetOp<0>(dst).SetOp<1>(reg);
+					instructions.insert(++instruction_iter, tmp);
+				}
+			}
+			if (MI.GetOpcode() == InstLoad)
+			{
+
 			}
 		}
 	};
