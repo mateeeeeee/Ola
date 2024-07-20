@@ -2,7 +2,6 @@
 #include <iosfwd>
 #include "MIRGlobal.h"
 #include "LoweringContext.h"
-#include "LegalizeContext.h"
 
 namespace ola
 {
@@ -35,13 +34,11 @@ namespace ola
 		Target const& GetTarget() const { return target; }
 		auto   const& GetGlobals() const { return globals; }
 
-		void EmitMIR(std::string_view mir_file);
 		void EmitAssembly(std::string_view assembly_file);
 
 	protected:
 		std::vector<MIRGlobal> globals;
 		LoweringContext lowering_ctx;
-		LegalizeContext legalize_ctx;
 		Target const& target;
 
 		MIRFunction* current_mf;

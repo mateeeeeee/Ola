@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include <unordered_map>
 #include "MIROperand.h"
 
@@ -28,7 +29,7 @@ namespace ola
 			return current_block;
 		}
 
-		MIRModule& getModule() const
+		MIRModule& GetModule() const
 		{
 			return module;
 		}
@@ -56,7 +57,8 @@ namespace ola
 		}
 		MIROperand GetOperand(Value const* V);
 
-		void EmitInst(MIRInstruction const& minst);
+		void EmitInst(MIRInstruction const& MI);
+		void ReplaceInstruction(MIRInstruction& MI, std::span<MIRInstruction> instructions);
 
 		MIROperand VirtualReg(IRType const* type) const
 		{

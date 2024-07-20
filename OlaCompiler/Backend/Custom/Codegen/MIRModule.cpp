@@ -3,7 +3,6 @@
 #include "Target.h"
 #include "MIRGlobal.h"
 #include "MIRBasicBlock.h"
-#include "LegalizeContext.h"
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -18,31 +17,9 @@ namespace ola
 		}
 	}
 
-	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), legalize_ctx(*this), target(target)
+	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
-	}
-
-	void MIRModule::EmitMIR(std::string_view mir_file)
-	{
-		std::ofstream mir(mir_file.data());
-		for (MIRGlobal const& global : globals)
-		{
-			MIRRelocable* relocable = global.GetRelocable();
-			if (relocable->IsFunction())
-			{
-				MIRFunction* MF = dynamic_cast<MIRFunction*>(relocable);
-				mir << "MF-" << MF->GetSymbol() << ":\n";
-				for (auto& MBB : MF->Blocks())
-				{
-					mir << "MBB-" << MBB->GetSymbol() << ":\n";
-					for (auto& MI : MBB->Instructions())
-					{
-						EmitMIRInstruction(mir, MI);
-					}
-				}
-			}
-		}
 	}
 
 	void MIRModule::EmitAssembly(std::string_view assembly_file)
@@ -128,7 +105,6 @@ namespace ola
 					globals.emplace_back(new MIRZeroStorage(V->GetName(), size), V->GetLinkage(), alignment);
 				}
 			}
-
 			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
@@ -142,15 +118,14 @@ namespace ola
 
 				MIRGlobal* global = lowering_ctx.GetGlobal(F);
 				MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
-
 				for (auto& MBB : MF.Blocks())
 				{
-					for (MIRInstruction& MI : MBB->Instructions())
+					auto& instructions = MBB->Instructions();
+					for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 					{
-						if (!isel_info.IsLegalInstruction(MI))
-						{
-							isel_info.LegalizeInstruction(MI, legalize_ctx);
-						}
+						MIRInstruction& MI = *MIiterator;
+						InstLegalizeContext ctx{ MI, instructions, MIiterator };
+						isel_info.LegalizeInstruction(ctx);
 					}
 				}
 
@@ -191,8 +166,6 @@ namespace ola
 			lowering_ctx.AddOperand(arg, vreg);
 			args.push_back(vreg);
 		}
-		lowering_ctx.SetCurrentBasicBlock(MF.Blocks().front().get());
-
 		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
 
 		TargetISelInfo const& isel_info = target.GetISelInfo();
@@ -365,7 +338,7 @@ namespace ola
 	{
 		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
 		MIROperand const& val = lowering_ctx.GetOperand(inst->GetValueOp());
-		MIRInstruction MI(InstMove);
+		MIRInstruction MI(InstStore);
 		MI.SetOp<1>(val).SetOp<0>(ptr);
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst->GetAddressOp(), ptr);

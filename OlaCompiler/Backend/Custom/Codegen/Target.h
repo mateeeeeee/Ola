@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <vector>
 #include <string_view>
 
@@ -87,17 +88,20 @@ namespace ola
 		virtual bool IsCalleeSaved(uint32) const = 0;
 	};
 
-	class LegalizeContext;
 	class LoweringContext;
+	struct InstLegalizeContext
+	{
+		MIRInstruction& instruction;
+		std::list<MIRInstruction>& instructions;
+		std::list<MIRInstruction>::iterator instruction_iterator;
+	};
 	class TargetISelInfo
 	{
 	public:
 		virtual ~TargetISelInfo() = default;
 
-		bool IsLegalInstruction(MIRInstruction const&) const;
-		virtual bool IsLegalInstruction(uint32) const = 0;
 		virtual bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
-		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const = 0;
+		virtual void LegalizeInstruction(InstLegalizeContext&) const = 0;
 	};
 
 	class TargetFrameInfo

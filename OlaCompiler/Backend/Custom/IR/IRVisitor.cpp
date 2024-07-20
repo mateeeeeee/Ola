@@ -782,7 +782,7 @@ namespace ola
 		for (BasicBlock* empty_block : empty_blocks)
 		{
 			builder->SetCurrentBlock(empty_block);
-			AllocaInst* nop = builder->MakeInst<AllocaInst>(bool_type);
+			UnaryInst* nop = builder->MakeInst<UnaryInst>(Opcode::Neg, context.GetInt64(0));
 			nop->SetName("nop");
 			if (empty_block_successors.contains(empty_block))
 				 builder->MakeInst<BranchInst>(context, empty_block_successors[empty_block]);

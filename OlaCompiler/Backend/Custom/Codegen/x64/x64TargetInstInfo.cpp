@@ -10,7 +10,7 @@ namespace ola
 		InstInfo inst_info{};
 		switch (opcode)
 		{
-		case InstMove:
+		case InstStore:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

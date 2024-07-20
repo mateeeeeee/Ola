@@ -9,7 +9,7 @@ store 42, ptr %1
 store ptr %2, ptr %0
 br label exit
 return:
-%nop = alloca i8
+%nop = neg i64 0
 br label exit
 exit:
 %3 = load i64, ptr %0

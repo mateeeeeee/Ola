@@ -4,7 +4,17 @@ source_filename = "test.ola"
 define i64 @main() {
 entry:
   %0 = alloca i64, align 8
-  store ptr inttoptr (i64 42 to ptr), ptr %0, align 8
-  %1 = load i64, ptr %0, align 8
-  ret i64 %1
+  %1 = alloca i64, align 8
+  store i64 42, ptr %1, align 4
+  %2 = load ptr, ptr %1, align 8
+  store ptr %2, ptr %0, align 8
+  br label %exit
+
+return:                                           ; No predecessors!
+  %nop = alloca i1, align 1
+  br label %exit
+
+exit:                                             ; preds = %return, %entry
+  %3 = load i64, ptr %0, align 4
+  ret i64 %3
 }

@@ -67,6 +67,10 @@ namespace ola
 				EmitText("{}:", MF.GetSymbol());
 				EmitText("push	rbp");
 				EmitText("mov rbp, rsp");
+
+				int32 stack_allocation = MF.GetStackAllocationSize();
+				
+				if (stack_allocation > 0) EmitText("sub rsp, {}", stack_allocation);
 				for (auto& MBB : MF.Blocks())
 				{
 					EmitText("{}:", MBB->GetSymbol());
@@ -82,7 +86,7 @@ namespace ola
 							EmitText("jmp {}", relocable->GetSymbol());
 						}
 						break;
-						case InstMove:
+						case InstStore:
 						{
 							MIROperand const& dst = MI.GetOp<0>();
 							MIROperand const& src = MI.GetOp<1>();
@@ -92,6 +96,8 @@ namespace ola
 						}
 					}
 				}
+				if (stack_allocation > 0) EmitText("add rsp, {}", stack_allocation);
+				EmitText("mov	rsp, rbp"); 
 				EmitText("pop	rbp");
 				EmitText("ret");
 			}

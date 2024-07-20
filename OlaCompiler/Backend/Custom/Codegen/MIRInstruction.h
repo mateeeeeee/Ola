@@ -76,7 +76,6 @@ namespace ola
 		InstS2F,
 		InstFCast,
 		// Misc
-		InstMove,
 		ISASpecificBegin,
 	};
 

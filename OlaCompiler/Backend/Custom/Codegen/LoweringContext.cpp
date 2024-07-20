@@ -16,7 +16,7 @@ namespace ola
 		{
 			GlobalValue const* GV = cast<GlobalValue>(C);
 			MIROperand ptr = VirtualReg(MIROperandType::Int64);
-			MIRInstruction minst(InstMove);
+			MIRInstruction minst(InstStore);
 
 			MIRGlobal* mir_global = global_map[GV];
 			OLA_ASSERT(mir_global);
@@ -39,10 +39,25 @@ namespace ola
 		}
 	}
 
-	void LoweringContext::EmitInst(MIRInstruction const& minst)
+	void LoweringContext::EmitInst(MIRInstruction const& MI)
 	{
 		auto& minst_list = current_block->Instructions();
-		minst_list.emplace_back(minst);
+		minst_list.emplace_back(MI);
+	}
+
+	void LoweringContext::ReplaceInstruction(MIRInstruction& MI, std::span<MIRInstruction> instructions)
+	{
+		OLA_ASSERT(!instructions.empty());
+		auto& minst_list = current_block->Instructions();
+		for (auto it = minst_list.begin(); it != minst_list.end(); ++it)
+		{
+			if (&(*it) == &MI)
+			{
+				*it = instructions[0];
+				minst_list.insert(++it, instructions.begin() + 1, instructions.end());
+				break;
+			} //iterating and looping through a list at the same time, check if it's missing additional advance it
+		}
 	}
 
 	MIROperandType LoweringContext::GetOperandType(IRType const* type)

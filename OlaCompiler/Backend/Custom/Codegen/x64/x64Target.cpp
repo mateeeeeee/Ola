@@ -5,6 +5,9 @@
 #include "x64TargetInstInfo.h"
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
+#include "Backend/Custom/IR/Instruction.h"
+#include "Backend/Custom/Codegen/MIRInstruction.h"
+#include "Backend/Custom/Codegen/LoweringContext.h"
 
 namespace ola
 {
@@ -34,19 +37,22 @@ namespace ola
 	class x64TargetISelInfo : public TargetISelInfo
 	{
 	public:
-		virtual bool IsLegalInstruction(uint32 opcode) const override
+		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
 			return false;
 		}
 
-		virtual bool LowerInstruction(Instruction*, LoweringContext&) const override
+		virtual void LegalizeInstruction(InstLegalizeContext& ctx) const override
 		{
-			return false;
-		}
+			MIRInstruction& MI = ctx.instruction;
+			auto& instructions = ctx.instructions;
+			auto& instruction_iter = ctx.instruction_iterator;
 
-		virtual bool LegalizeInstruction(MIRInstruction&, LegalizeContext&) const override
-		{
-			return false;
+			if (MI.GetOpcode() == InstStore)
+			{
+				MIROperand& MO1 = MI.GetOp<0>();
+				MIROperand& MO2 = MI.GetOp<1>();
+			}
 		}
 	};
 

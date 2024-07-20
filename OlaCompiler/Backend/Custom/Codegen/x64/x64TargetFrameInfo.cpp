@@ -37,7 +37,7 @@ namespace ola
 					return_register = MIROperand::ISAReg(x64::RAX, MIROperandType::Int64);
 				}
 
-				MIRInstruction copy_instruction(InstMove);
+				MIRInstruction copy_instruction(InstStore);
 				copy_instruction.SetOp<0>(return_register).SetOp<1>(ctx.GetOperand(V));
 				ctx.EmitInst(copy_instruction);
 			}

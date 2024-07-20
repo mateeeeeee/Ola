@@ -48,13 +48,16 @@ namespace ola
 		{
 			return args;
 		}
-		
 		MIROperand& AllocateStack(uint32 size)
 		{
 			MIROperand stack_object = MIROperand::StackObject(stack_offset, MIROperandType::Other);
 			stack_objects.push_back(stack_object);
 			stack_offset += size;
 			return stack_objects.back();
+		}
+		int32 GetStackAllocationSize() const
+		{
+			return stack_offset;
 		}
 
 		virtual RelocableKind GetRelocableKind() const override
