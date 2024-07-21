@@ -2,5 +2,7 @@
 public int main()
 {
 	int a = 42;
-	return a;
+	int b = 14;
+	int c = a - b + 22;
+	return c - 25;
 }

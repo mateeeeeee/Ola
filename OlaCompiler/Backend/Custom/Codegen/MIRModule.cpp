@@ -139,19 +139,25 @@ namespace ola
 	{
 		MIRGlobal* global = lowering_ctx.GetGlobal(F);
 		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
-		current_mf = &MF;
 
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
 			lowering_ctx.AddBlock(&BB, MBB.get());
-			for (auto& inst : BB.Instructions())
+			for (auto& I : BB.Instructions())
 			{
-				if (inst.GetOpcode() == Opcode::Phi)
+				if (I.GetOpcode() == Opcode::Phi)
 				{
-					auto vreg = lowering_ctx.VirtualReg(inst.GetType());
-					lowering_ctx.AddOperand(&inst, vreg);
+					auto vreg = lowering_ctx.VirtualReg(I.GetType());
+					lowering_ctx.AddOperand(&I, vreg);
+				}
+				else if (I.GetOpcode() == Opcode::Alloca)
+				{
+					AllocaInst* AI = cast<AllocaInst>(&I);
+					IRType const* type = AI->GetAllocatedType();
+					MIROperand const& MO = MF.AllocateStack(GetOperandType(type));
+					lowering_ctx.AddOperand(AI, MO);
 				}
 			}
 		}
@@ -168,7 +174,10 @@ namespace ola
 		}
 		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
 
+		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
+
+		frame_info.EmitPrologue(MF, lowering_ctx);
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
@@ -181,6 +190,7 @@ namespace ola
 				}
 			}
 		}
+		frame_info.EmitEpilogue(MF, lowering_ctx);
 	}
 
 	void MIRModule::LowerInstruction(Instruction* inst)
@@ -225,8 +235,6 @@ namespace ola
 			LowerCall(cast<CallInst>(inst));
 			break;
 		case Opcode::Alloca:
-			LowerAlloca(cast<AllocaInst>(inst));
-			break;
 		case Opcode::Phi:
 			break;
 		default:
@@ -236,66 +244,15 @@ namespace ola
 
 	void MIRModule::LowerBinary(BinaryInst* inst)
 	{
-		const auto GetMachineID = [](Opcode opcode)
-			{
-				switch (opcode)
-				{
-				case Opcode::Add:
-					return InstAdd;
-				case Opcode::Sub:
-					return InstSub;
-				case Opcode::Mul:
-					return InstMul;
-				case Opcode::UDiv:
-					return InstUDiv;
-				case Opcode::URem:
-					return InstURem;
-				case Opcode::And:
-					return InstAnd;
-				case Opcode::Or:
-					return InstOr;
-				case Opcode::Xor:
-					return InstXor;
-				case Opcode::Shl:
-					return InstShl;
-				case Opcode::LShr:
-					return InstLShr;
-				case Opcode::AShr:
-					return InstAShr;
-				case Opcode::FAdd:
-					return InstFAdd;
-				case Opcode::FSub:
-					return InstFSub;
-				case Opcode::FMul:
-					return InstFMul;
-				case Opcode::FDiv:
-					return InstFDiv;
-				}
-				return InstUnknown;
-			};
 		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction minst(GetMachineID(inst->GetOpcode()));
-		minst.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
-		lowering_ctx.EmitInst(minst);
+		MIRInstruction MI(GetMachineID(inst->GetOpcode()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
+		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
 	void MIRModule::LowerUnary(UnaryInst* inst)
 	{
-		const auto GetMachineID = [](Opcode opcode)
-			{
-				switch (opcode)
-				{
-				case Opcode::Neg:
-					return InstNeg;
-				case Opcode::Not:
-					return InstNot;
-				case Opcode::FNeg:
-					return InstFNeg;
-				}
-				return InstUnknown;
-			};
-
 		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
 		MIRInstruction MI(GetMachineID(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
@@ -314,9 +271,9 @@ namespace ola
 		{
 			BasicBlock* target = inst->GetTrueTarget();
 			MIROperand dst_operand = MIROperand::Relocable(lowering_ctx.GetBlock(target));
-			MIRInstruction minst(InstJump);
-			minst.SetOp<0>(dst_operand);
-			lowering_ctx.EmitInst(minst);
+			MIRInstruction MI(InstJump);
+			MI.SetOp<0>(dst_operand);
+			lowering_ctx.EmitInst(MI);
 		}
 		else
 		{
@@ -346,13 +303,6 @@ namespace ola
 	void MIRModule::LowerCall(CallInst* inst)
 	{
 		target.GetFrameInfo().EmitCall(inst, lowering_ctx);
-	}
-
-	void MIRModule::LowerAlloca(AllocaInst* inst)
-	{
-		IRType const* type = inst->GetAllocatedType();
-		MIROperand const& MO = current_mf->AllocateStack(GetOperandType(type));
-		lowering_ctx.AddOperand(inst, MO);
 	}
 
 	void MIRModule::LowerCFGAnalysis(Function* F)

@@ -41,8 +41,6 @@ namespace ola
 		LoweringContext lowering_ctx;
 		Target const& target;
 
-		MIRFunction* current_mf;
-
 	private:
 		void LowerModule(IRModule*);
 		void LowerFunction(Function*);
@@ -55,7 +53,6 @@ namespace ola
 		void LowerLoad(LoadInst*);
 		void LowerStore(StoreInst*);
 		void LowerCall(CallInst*);
-		void LowerAlloca(AllocaInst*);
 
 		void LowerCFGAnalysis(Function*);
 	};

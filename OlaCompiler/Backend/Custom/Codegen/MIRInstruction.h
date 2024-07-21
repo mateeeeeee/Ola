@@ -5,8 +5,7 @@
 
 namespace ola
 {
-
-	enum MIRGenericInst : uint32
+	enum MachineOpcode : uint32
 	{
 		InstUnknown,
 		// control-flow
@@ -16,6 +15,9 @@ namespace ola
 		// Memory
 		InstLoad,
 		InstStore,
+		//Stack
+		InstPush,
+		InstPop,
 		// Arithmetic
 		InstAdd,
 		InstSub,

@@ -39,6 +39,22 @@ namespace ola
 	public:
 		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
+			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
+			{
+				MIROperand op1 = ctx.GetOperand(BI->GetOperand(0));
+				MIROperand op2 = ctx.GetOperand(BI->GetOperand(1));
+				MIROperand ret = ctx.VirtualReg(BI->GetType());
+				MIRInstruction MI(InstLoad);
+				MI.SetOp<0>(ret).SetOp<1>(op1);
+				ctx.EmitInst(MI);
+
+				MIRInstruction MI2(GetMachineID(BI->GetOpcode()));
+				MI2.SetOp<0>(ret).SetOp<1>(op2);
+				ctx.EmitInst(MI2);
+
+				ctx.AddOperand(I, ret);
+				return true;
+			}
 			return false;
 		}
 
@@ -48,7 +64,7 @@ namespace ola
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
 
-			if (MI.GetOpcode() == InstStore || MI.GetOpcode() == InstLoad) 
+			if (MI.GetOpcode() == InstStore) 
 			{
 				MIROperand dst = MI.GetOperand(0);
 				MIROperand src = MI.GetOperand(1);

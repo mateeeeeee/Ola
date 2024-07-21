@@ -1,5 +1,6 @@
 #include "x64AsmPrinter.h"
 #include "x64.h"
+#include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MIRModule.h"
 #include "Backend/Custom/Codegen/MIRBasicBlock.h"
@@ -54,6 +55,9 @@ namespace ola
 	{
 		EmitPreamble(".intel_syntax noprefix");
 
+		Target const& target = M.GetTarget();
+		TargetFrameInfo const& frame_info = target.GetFrameInfo();
+
 		auto const& globals = M.GetGlobals();
 		for (MIRGlobal const& global : globals)
 		{
@@ -66,12 +70,6 @@ namespace ola
 					EmitText(".globl {}", MF.GetSymbol());
 				}
 				EmitText("{}:", MF.GetSymbol());
-				EmitText("push	rbp");
-				EmitText("mov rbp, rsp");
-
-				int32 stack_allocation = MF.GetStackAllocationSize();
-				
-				if (stack_allocation > 0) EmitText("sub rsp, {}", stack_allocation);
 				for (auto& MBB : MF.Blocks())
 				{
 					EmitText("{}:", MBB->GetSymbol());
@@ -79,6 +77,18 @@ namespace ola
 					{
 						switch (MI.GetOpcode())
 						{
+						case InstPush:
+						{
+							MIROperand const& op = MI.GetOp<0>();
+							EmitText("push {}", GetOperandString(op));
+						}
+						break;
+						case InstPop:
+						{
+							MIROperand const& op = MI.GetOp<0>();
+							EmitText("pop {}", GetOperandString(op));
+						}
+						break;
 						case InstJump:
 						{
 							MIROperand const& dst = MI.GetOp<0>();
@@ -95,11 +105,23 @@ namespace ola
 							EmitText("mov {}, {}", GetOperandString(dst), GetOperandString(src));
 						}
 						break;
+						case InstAdd:
+						{
+							MIROperand const& dst = MI.GetOp<0>();
+							MIROperand const& src = MI.GetOp<1>();
+							EmitText("add {}, {}", GetOperandString(dst), GetOperandString(src));
+						}
+						break;
+						case InstSub:
+						{
+							MIROperand const& dst = MI.GetOp<0>();
+							MIROperand const& src = MI.GetOp<1>();
+							EmitText("sub {}, {}", GetOperandString(dst), GetOperandString(src));
+						}
+						break;
 						}
 					}
 				}
-				EmitText("mov	rsp, rbp"); 
-				EmitText("pop	rbp");
 				EmitText("ret");
 			}
 			else if (relocable->IsDataStorage())

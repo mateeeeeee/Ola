@@ -109,9 +109,10 @@ namespace ola
 	public:
 		virtual ~TargetFrameInfo() = default;
 
-		virtual void EmitCall(CallInst* inst, LoweringContext& ctx) const = 0;
-		virtual void EmitPrologue(MIRFunction& func, LoweringContext& ctx) const = 0;
-		virtual void EmitReturn(ReturnInst* inst, LoweringContext& ctx) const = 0;
+		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const = 0;
+		virtual void EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const = 0;
+		virtual void EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const = 0;
+		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const = 0;
 	};
 
 	class MIRModule;

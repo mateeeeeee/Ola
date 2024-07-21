@@ -5,8 +5,9 @@ namespace ola
 	class x64TargetFrameInfo : public TargetFrameInfo
 	{
 	public:
-		virtual void EmitCall(CallInst* inst, LoweringContext& ctx) const override;
-		virtual void EmitPrologue(MIRFunction& func, LoweringContext& ctx) const override;
-		virtual void EmitReturn(ReturnInst* inst, LoweringContext& ctx) const override;
+		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const override;
+		virtual void EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const override;
+		virtual void EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const override;
+		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const override;
 	};
 }

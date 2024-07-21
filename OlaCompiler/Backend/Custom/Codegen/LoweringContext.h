@@ -14,9 +14,11 @@ namespace ola
 	class BasicBlock;
 	class Value;
 	class IRType;
-
+	enum MachineOpcode : uint32;
+	enum class Opcode : uint32;
 
 	MIROperandType GetOperandType(IRType const* type);
+	MachineOpcode GetMachineID(Opcode opcode);
 
 	class LoweringContext
 	{

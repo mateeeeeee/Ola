@@ -5,14 +5,23 @@ entry:
 %0 = alloca i64
 %1 = alloca i64
 store 42, ptr %1
-%2 = load i64, ptr %1
-store i64 %2, ptr %0
+%2 = alloca i64
+store 14, ptr %2
+%3 = load i64, ptr %1
+%4 = load i64, ptr %2
+%5 = sub i64 %3, %4
+%6 = add i64 %5, 22
+%7 = alloca i64
+store i64 %6, ptr %7
+%8 = load i64, ptr %7
+%9 = sub i64 %8, 25
+store i64 %9, ptr %0
 br label exit
 return:
 %nop = neg i64 0
 br label exit
 exit:
-%3 = load i64, ptr %0
-ret i64 %3
+%10 = load i64, ptr %0
+ret i64 %10
 }
 

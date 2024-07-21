@@ -31,6 +31,49 @@ namespace ola
 		OLA_ASSERT(false);
 		return MIROperandType::Other;
 	}
+	MachineOpcode GetMachineID(Opcode opcode)
+	{
+		switch (opcode)
+		{
+		case Opcode::Neg:
+			return InstNeg;
+		case Opcode::Not:
+			return InstNot;
+		case Opcode::FNeg:
+			return InstFNeg;
+		case Opcode::Add:
+			return InstAdd;
+		case Opcode::Sub:
+			return InstSub;
+		case Opcode::Mul:
+			return InstMul;
+		case Opcode::UDiv:
+			return InstUDiv;
+		case Opcode::URem:
+			return InstURem;
+		case Opcode::And:
+			return InstAnd;
+		case Opcode::Or:
+			return InstOr;
+		case Opcode::Xor:
+			return InstXor;
+		case Opcode::Shl:
+			return InstShl;
+		case Opcode::LShr:
+			return InstLShr;
+		case Opcode::AShr:
+			return InstAShr;
+		case Opcode::FAdd:
+			return InstFAdd;
+		case Opcode::FSub:
+			return InstFSub;
+		case Opcode::FMul:
+			return InstFMul;
+		case Opcode::FDiv:
+			return InstFDiv;
+		}
+		return InstUnknown;
+	}
 
 	MIROperand LoweringContext::GetOperand(Value const* V)
 	{

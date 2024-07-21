@@ -33,6 +33,7 @@ namespace ola
 			ExpireOldIntervals(LI);
 			if (registers.empty())
 			{
+				OLA_ASSERT_MSG(false, "Register spilling!");
 				SpillAtInterval(LI);
 			}
 			else

@@ -10,8 +10,26 @@ namespace ola
 		InstInfo inst_info{};
 		switch (opcode)
 		{
-		case InstStore:
+		case InstPush:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+		}
+		break;
+		case InstPop:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
 		case InstLoad:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		case InstStore:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -22,6 +40,14 @@ namespace ola
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagNone);
+		}
+		break;
+		case InstAdd:
+		case InstSub:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
 		}
