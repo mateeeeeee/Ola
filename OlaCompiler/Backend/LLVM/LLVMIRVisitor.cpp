@@ -1561,7 +1561,16 @@ namespace ola
 	llvm::Value* LLVMIRVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!IsPointer(value->getType())) return builder.CreateStore(value, ptr);
-		llvm::Value* load = Load(value->getType(), value);
+		
+		llvm::Value* load = nullptr;
+		if (llvm::AllocaInst* AI = dyn_cast<llvm::AllocaInst>(value))
+		{
+			load = Load(AI->getAllocatedType(), AI);
+		}
+		else
+		{
+			load = Load(value->getType(), value);
+		}
 		return builder.CreateStore(load, ptr);
 	}
 
