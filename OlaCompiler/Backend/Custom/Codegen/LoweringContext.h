@@ -15,6 +15,9 @@ namespace ola
 	class Value;
 	class IRType;
 
+
+	MIROperandType GetOperandType(IRType const* type);
+
 	class LoweringContext
 	{
 	public:
@@ -82,8 +85,5 @@ namespace ola
 		mutable std::unordered_map<Value const*, MIROperand> storage_map;
 		mutable uint32 virt_reg_id = 0;
 		mutable uint32 label_id = 0;
-
-	private:
-		static MIROperandType GetOperandType(IRType const* type);
 	};
 }

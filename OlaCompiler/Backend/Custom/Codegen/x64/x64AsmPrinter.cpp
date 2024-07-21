@@ -12,12 +12,9 @@ namespace ola
 		switch (MO.GetType())
 		{
 		case MIROperandType::Int8:  return "byte ptr";
-		case MIROperandType::Int16: return "word ptr";
-		case MIROperandType::Int32: return "dword ptr";
-		case MIROperandType::Int64:
+		case MIROperandType::Int64: 
 		case MIROperandType::Ptr:
-		case MIROperandType::Other:
-			return "qword ptr";
+		case MIROperandType::Other: return "qword ptr";
 		}
 		return "";
 	}
@@ -40,9 +37,13 @@ namespace ola
 		else if (MO.IsStackObject())
 		{
 			int32 stack_offset = MO.GetStackOffset();
-			std::string offset = std::to_string(stack_offset);
-			if (stack_offset >= 0) offset = "+" + offset;
-			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
+			if (stack_offset != 0)
+			{
+				std::string offset = std::to_string(stack_offset);
+				if (stack_offset >= 0) offset = "+" + offset;
+				return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
+			}
+			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + "]";
 		}
 		OLA_ASSERT(false);
 		return "";
@@ -87,6 +88,7 @@ namespace ola
 						}
 						break;
 						case InstStore:
+						case InstLoad:
 						{
 							MIROperand const& dst = MI.GetOp<0>();
 							MIROperand const& src = MI.GetOp<1>();

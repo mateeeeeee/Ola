@@ -94,7 +94,8 @@ namespace ola::x64
 
 	enum x64Inst : uint32
 	{
-		X64InstBegin = ISASpecificBegin,
+		x64InstBegin = ISASpecificBegin,
+		InstMov = x64InstBegin,
 	};
 
 	inline char const* GetRegisterString(uint32 r)

@@ -47,22 +47,21 @@ namespace ola
 			MIRInstruction& MI = legalize_ctx.instruction;
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
-			if (MI.GetOpcode() == InstStore)
-			{
-				MIROperand& dst = MI.GetOp<0>();
-				MIROperand& src = MI.GetOp<1>();
-				if (dst.IsStackObject() && src.IsStackObject())
-				{
-					MIROperand reg = lowering_ctx.VirtualReg(MIROperandType::Int64);
-					MI.SetOp<0>(reg);
-					MIRInstruction tmp(InstStore);
-					tmp.SetOp<0>(dst).SetOp<1>(reg);
-					instructions.insert(++instruction_iter, tmp);
-				}
-			}
-			if (MI.GetOpcode() == InstLoad)
-			{
 
+			if (MI.GetOpcode() == InstStore || MI.GetOpcode() == InstLoad) 
+			{
+				MIROperand dst = MI.GetOperand(0);
+				MIROperand src = MI.GetOperand(1);
+				if ((src.IsStackObject() || src.IsRelocable()) && (dst.IsStackObject() || dst.IsRelocable()))
+				{
+					MIROperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MI.SetOp<0>(tmp);
+
+					MIRInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+					instructions.insert(++instruction_iter, MI2);
+				}
 			}
 		}
 	};

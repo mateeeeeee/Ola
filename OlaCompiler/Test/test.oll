@@ -5,8 +5,8 @@ entry:
 %0 = alloca i64
 %1 = alloca i64
 store 42, ptr %1
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
+%2 = load i64, ptr %1
+store i64 %2, ptr %0
 br label exit
 return:
 %nop = neg i64 0

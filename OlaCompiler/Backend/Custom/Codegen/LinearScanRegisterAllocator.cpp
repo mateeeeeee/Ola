@@ -103,7 +103,7 @@ namespace ola
 		{
 			for (MIRInstruction& MI : MBB->Instructions())
 			{
-				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);;
+				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MIROperand& MO = MI.GetOperand(idx);
@@ -113,7 +113,7 @@ namespace ola
 					//spilling
 					if (!vreg2reg_map.contains(vreg_id))
 					{
-						MIROperand& MO = MF.AllocateStack(8);
+						MIROperand& MO = MF.AllocateStack(MIROperandType::Int64);
 						int32 stack_offset = MO.GetStackOffset();
 						uint32 frame_reg = frame_register;
 

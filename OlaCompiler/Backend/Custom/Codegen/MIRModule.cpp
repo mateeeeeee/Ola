@@ -341,8 +341,6 @@ namespace ola
 		MIRInstruction MI(InstStore);
 		MI.SetOp<1>(val).SetOp<0>(ptr);
 		lowering_ctx.EmitInst(MI);
-		lowering_ctx.AddOperand(inst->GetAddressOp(), ptr);
-		lowering_ctx.AddOperand(inst->GetValueOp(), val);
 	}
 
 	void MIRModule::LowerCall(CallInst* inst)
@@ -353,7 +351,7 @@ namespace ola
 	void MIRModule::LowerAlloca(AllocaInst* inst)
 	{
 		IRType const* type = inst->GetAllocatedType();
-		MIROperand const& MO = current_mf->AllocateStack(type->GetSize());
+		MIROperand const& MO = current_mf->AllocateStack(GetOperandType(type));
 		lowering_ctx.AddOperand(inst, MO);
 	}
 

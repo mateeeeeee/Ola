@@ -11,6 +11,7 @@ namespace ola
 		switch (opcode)
 		{
 		case InstStore:
+		case InstLoad:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

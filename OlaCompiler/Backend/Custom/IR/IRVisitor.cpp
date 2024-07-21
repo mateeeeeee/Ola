@@ -951,7 +951,15 @@ namespace ola
 	Value* IRVisitor::Store(Value* value, Value* ptr)
 	{
 		if (!value->GetType()->IsPointerType()) return builder->MakeInst<StoreInst>(value, ptr);
-		Value* load = Load(value->GetType(), value);
+		Value* load = nullptr;
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(value))
+		{
+			load = Load(AI->GetAllocatedType(), AI);
+		}
+		else
+		{
+			load = Load(value->GetType(), value);
+		}
 		return builder->MakeInst<StoreInst>(load, ptr);
 	}
 

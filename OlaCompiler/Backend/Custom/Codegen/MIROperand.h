@@ -19,12 +19,8 @@ namespace ola
 	enum class MIROperandType : uint32
 	{
 		Unknown,
-		Bool,
 		Int8,
-		Int16,
-		Int32,
 		Int64,
-		Float32,
 		Float64,
 		Ptr,
 		Other
@@ -36,7 +32,7 @@ namespace ola
 	}
 	inline constexpr bool IsFPType(MIROperandType type)
 	{
-		return type == MIROperandType::Float32 || type == MIROperandType::Float64;
+		return type == MIROperandType::Float64;
 	}
 	inline constexpr uint32 GetOperandSize(MIROperandType type)
 	{
@@ -44,15 +40,11 @@ namespace ola
 		{
 		case MIROperandType::Int8:
 			return 1;
-		case MIROperandType::Int16:
-			return 2;
-		case MIROperandType::Int32:
-			return 4;
 		case MIROperandType::Int64:
 			return 8;
-		case MIROperandType::Float32:
-			return 4;
 		case MIROperandType::Float64:
+			return 8;
+		case MIROperandType::Ptr:
 			return 8;
 		}
 		OLA_ASSERT(false);
