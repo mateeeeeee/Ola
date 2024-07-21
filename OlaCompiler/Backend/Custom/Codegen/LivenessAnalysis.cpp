@@ -37,13 +37,11 @@ namespace ola
 		std::unordered_map<uint32, uint64> reg_def_map;
 		std::unordered_map<uint32, uint64> reg_use_map;
 		std::unordered_map<uint32, LiveInterval> live_interval_map;
-		uint64 max_instruction_idx = 0;
 		for (auto& MBB : MF.Blocks())
 		{
 			for (MIRInstruction& MI : MBB->Instructions())
 			{
 				uint64 const instruction_idx = result.instruction_numbering_map[&MI];
-				max_instruction_idx = std::max(max_instruction_idx, instruction_idx);
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
@@ -77,14 +75,6 @@ namespace ola
 		{
 			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false });
 		}
-
-		//for (auto&& [reg, def] : reg_def_map)
-		//{
-		//	if (!reg_use_map.contains(reg))
-		//	{
-		//		live_intervals.push_back(LiveInterval{ .begin = reg_def_map[reg], .end = max_instruction_idx, .vreg = reg, .spilled = false });
-		//	}
-		//}
 
 		std::sort(std::begin(live_intervals), std::end(live_intervals));
 		result.live_intervals = std::move(live_intervals);
