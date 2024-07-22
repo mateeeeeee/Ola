@@ -92,7 +92,7 @@ namespace ola
 		static constexpr uint32 MAX_OPERANDS = 7;
 
 	public:
-		explicit MIRInstruction(uint32 opcode) : opcode(opcode) {}
+		explicit MIRInstruction(uint32 opcode) : opcode(opcode), flags(MIRInstructionFlag_None) {}
 
 		MIRInstruction& SetOpcode(uint32 _opcode)
 		{

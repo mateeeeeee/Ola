@@ -1,8 +1,7 @@
 
 public int main()
 {
-	int a = 42;
-	int b = 14;
-	int c = a - b + 22;
-	return c - 25;
+    int a = 5;
+    a = a + 2;
+    return a;
 }

@@ -24,7 +24,7 @@ namespace ola
 	{
 		if (MO.IsReg())
 		{
-			OLA_ASSERT(IsISAReg(MO.GetReg().reg));
+			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register seen after register allocation!");
 			return x64::GetRegisterString(MO.GetReg().reg);
 		}
 		else if (MO.IsImmediate())

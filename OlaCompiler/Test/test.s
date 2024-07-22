@@ -5,19 +5,14 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp-8], 42
-mov qword ptr [rbp-16], 14
+sub rsp, 16
+mov qword ptr [rbp-8], 5
 mov r15, qword ptr [rbp-8]
-mov r14, qword ptr [rbp-16]
 mov r15, r15
-sub r15, r14
-mov r15, r15
-add r15, 22
-mov qword ptr [rbp-24], r15
-mov r15, qword ptr [rbp-24]
-mov r15, r15
-sub r15, 25
+add r15, 2
+mov r14, qword ptr [rbp-8]
+mov qword ptr [rbp-8], r15
+mov r15, qword ptr [rbp-8]
 mov qword ptr [rbp], r15
 jmp label2
 label1:

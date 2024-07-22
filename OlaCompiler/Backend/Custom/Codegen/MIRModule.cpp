@@ -30,7 +30,7 @@ namespace ola
 	void MIRModule::LowerModule(IRModule* ir_module)
 	{
 		auto const& ir_globals = ir_module->Globals();
-
+		globals.reserve(ir_globals.size());
 		for (GlobalValue* GV : ir_globals)
 		{
 			if (GV->IsFunction())

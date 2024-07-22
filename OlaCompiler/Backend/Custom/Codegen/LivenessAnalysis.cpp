@@ -75,6 +75,13 @@ namespace ola
 		{
 			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false });
 		}
+		for (auto&& [reg, instruction_idx] : reg_def_map)
+		{
+			if (!reg_use_map.contains(reg))
+			{
+				live_intervals.push_back(LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 3, .vreg = reg, .spilled = false });
+			}
+		}
 
 		std::sort(std::begin(live_intervals), std::end(live_intervals));
 		result.live_intervals = std::move(live_intervals);
