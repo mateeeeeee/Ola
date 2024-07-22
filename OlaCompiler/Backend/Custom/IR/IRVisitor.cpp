@@ -486,8 +486,13 @@ namespace ola
 		Value* rhs_value = value_map[rhs_expr];
 		OLA_ASSERT(lhs_value && rhs_value);
 
-		Value* lhs = Load(lhs_expr->GetType(), lhs_value);
-		Value* rhs = Load(rhs_expr->GetType(), rhs_value);
+		Value* lhs = nullptr;
+		Value* rhs = nullptr;
+		if (binary_expr.GetBinaryKind() != BinaryExprKind::Assign)
+		{
+			lhs = Load(lhs_expr->GetType(), lhs_value);
+			rhs = Load(rhs_expr->GetType(), rhs_value);
+		}
 		bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
 
 		Value* result = nullptr;

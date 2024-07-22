@@ -72,15 +72,11 @@ namespace ola
 				if (!op2.IsUnused())
 				{
 					MI.SetOp<1>(op2);
-					if (op1 != dst)
-					{
-						MIRInstruction MI2(InstLoad);
-						MI2.SetOp<0>(dst);
-						MI2.SetOp<1>(op1);
-						MI2.SetIgnoringDefFlag();
-
-						instructions.insert(instruction_iter, MI2);
-					}
+					MI.SetIgnoringDefFlag();
+					MIRInstruction MI2(InstLoad);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
 				}
 			}
 		}
