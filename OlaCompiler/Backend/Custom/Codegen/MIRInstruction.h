@@ -81,6 +81,12 @@ namespace ola
 		ISASpecificBegin,
 	};
 
+	enum MIRInstructionFlag : uint32
+	{
+		MIRInstructionFlag_None = 0x0,
+		MIRInstructionFlag_IgnoreDef = 0x1,
+	};
+
 	class MIRInstruction
 	{
 		static constexpr uint32 MAX_OPERANDS = 7;
@@ -132,8 +138,26 @@ namespace ola
 			operands[idx] = operand;
 		}
 
+		void SetFlag(MIRInstructionFlag flag)
+		{
+			flags |= flag;
+		}
+		void SetIgnoringDefFlag()
+		{
+			SetFlag(MIRInstructionFlag_IgnoreDef);
+		}
+		bool HasFlag(MIRInstructionFlag flag) const
+		{
+			return (flags & flag) != 0;
+		}
+		bool HasIgnoringDefFlag() const
+		{
+			return HasFlag(MIRInstructionFlag_IgnoreDef);
+		}
+
 	private:
 		uint32 opcode;
+		uint32 flags;
 		std::array<MIROperand, MAX_OPERANDS> operands;
 	};
 }

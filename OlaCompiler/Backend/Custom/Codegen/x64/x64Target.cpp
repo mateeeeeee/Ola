@@ -39,22 +39,6 @@ namespace ola
 	public:
 		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
-			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
-			{
-				MIROperand op1 = ctx.GetOperand(BI->GetOperand(0));
-				MIROperand op2 = ctx.GetOperand(BI->GetOperand(1));
-				MIROperand ret = ctx.VirtualReg(BI->GetType());
-				MIRInstruction MI(InstLoad);
-				MI.SetOp<0>(ret).SetOp<1>(op1);
-				ctx.EmitInst(MI);
-
-				MIRInstruction MI2(GetMachineID(BI->GetOpcode()));
-				MI2.SetOp<0>(ret).SetOp<1>(op2);
-				ctx.EmitInst(MI2);
-
-				ctx.AddOperand(I, ret);
-				return true;
-			}
 			return false;
 		}
 
@@ -72,11 +56,29 @@ namespace ola
 				{
 					MIROperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
+					MI.SetIgnoringDefFlag();
 
 					MIRInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
+				}
+			}
+			if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub)
+			{
+				MIROperand dst = MI.GetOperand(0);
+				MIROperand op1 = MI.GetOperand(1);
+				MIROperand op2 = MI.GetOperand(2);
+				if (!op2.IsUnused())
+				{
+					MI.SetOp<1>(op2);
+
+					MIRInstruction MI2(InstLoad);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(op1);
+					MI2.SetIgnoringDefFlag();
+
+					instructions.insert(instruction_iter, MI2);
 				}
 			}
 		}
