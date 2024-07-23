@@ -1,5 +1,11 @@
 Module ID : test.ola
 
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
 define external @main i64() {
 entry:
 %0 = alloca i64

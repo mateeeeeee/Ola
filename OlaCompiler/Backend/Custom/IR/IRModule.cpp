@@ -17,6 +17,15 @@ namespace ola
 	}
 
 	
+	void IRModule::AddGlobal(GlobalValue* GV)
+	{
+		globals.push_back(GV);
+		if (GV->IsFunction())
+		{
+			function_map[GV->GetName()] = cast<Function>(GV);
+		}
+	}
+
 	void IRModule::EmitIR(std::string_view filename) const
 	{
 		std::ofstream ir_stream(filename.data());

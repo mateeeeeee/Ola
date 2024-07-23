@@ -702,9 +702,35 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(CallExpr const&, uint32)
+	void IRVisitor::Visit(CallExpr const& call_expr, uint32)
 	{
+		Function* called_function = module.GetFunctionByName(call_expr.GetFunctionDecl()->GetMangledName());
+		OLA_ASSERT(called_function);
 
+		std::vector<Value*> args;
+		uint32 arg_index = 0;
+		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
+		AllocaInst* return_alloc = nullptr;
+		if (return_struct)
+		{
+			return_alloc = builder->MakeInst<AllocaInst>(called_function->GetArg(arg_index)->GetType());
+			args.push_back(return_alloc);
+			++arg_index;
+		}
+		for (auto const& arg_expr : call_expr.GetArgs())
+		{
+			arg_expr->Accept(*this);
+			Value* arg_value = value_map[arg_expr.get()];
+			OLA_ASSERT(arg_value);
+			IRType* arg_type = called_function->GetArg(arg_index)->GetType();
+			if (arg_type->IsPointerType()) args.push_back(arg_value);
+			else args.push_back(Load(arg_type, arg_value));
+
+			arg_index++;
+		}
+
+		Value* call_result = builder->MakeInst<CallInst>(called_function, args);
+		value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
 	void IRVisitor::Visit(InitializerListExpr const&, uint32)

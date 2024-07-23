@@ -1,5 +1,7 @@
 .intel_syntax noprefix
 .text
+.extern Assert
+.extern AssertMsg
 .globl main
 main:
 label0:

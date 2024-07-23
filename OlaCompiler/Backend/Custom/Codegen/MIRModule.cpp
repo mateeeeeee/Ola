@@ -36,7 +36,7 @@ namespace ola
 			if (GV->IsFunction())
 			{
 				Function* F = cast<Function>(GV);
-				globals.emplace_back(new MIRFunction(F->GetName()), F->GetLinkage());
+				globals.emplace_back(new MIRFunction(F->GetName(), F->IsDeclaration()), F->GetLinkage());
 			}
 			else
 			{
@@ -114,23 +114,26 @@ namespace ola
 			if (GV->IsFunction())
 			{
 				Function* F = cast<Function>(GV);
-				LowerFunction(F);
-
-				MIRGlobal* global = lowering_ctx.GetGlobal(F);
-				MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
-				for (auto& MBB : MF.Blocks())
+				if (!F->IsDeclaration())
 				{
-					auto& instructions = MBB->Instructions();
-					for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
-					{
-						MIRInstruction& MI = *MIiterator;
-						InstLegalizeContext ctx{ MI, instructions, MIiterator };
-						isel_info.LegalizeInstruction(ctx, lowering_ctx);
-					}
-				}
+					LowerFunction(F);
 
-				LinearScanRegisterAllocator register_allocator(*this);
-				register_allocator.AssignRegisters(MF);
+					MIRGlobal* global = lowering_ctx.GetGlobal(F);
+					MIRFunction& MF = *static_cast<MIRFunction*>(global->GetRelocable());
+					for (auto& MBB : MF.Blocks())
+					{
+						auto& instructions = MBB->Instructions();
+						for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
+						{
+							MIRInstruction& MI = *MIiterator;
+							InstLegalizeContext ctx{ MI, instructions, MIiterator };
+							isel_info.LegalizeInstruction(ctx, lowering_ctx);
+						}
+					}
+
+					LinearScanRegisterAllocator register_allocator(*this);
+					register_allocator.AssignRegisters(MF);
+				}
 			}
 		}
 	}
@@ -161,7 +164,7 @@ namespace ola
 				}
 			}
 		}
-		LowerCFGAnalysis(F);
+		//LowerCFGAnalysis(F);
 
 		auto& args = MF.Args();
 		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
@@ -233,6 +236,9 @@ namespace ola
 			break;
 		case Opcode::Call:
 			LowerCall(cast<CallInst>(inst));
+			break;
+		case Opcode::ICmpEQ:
+
 			break;
 		case Opcode::Alloca:
 		case Opcode::Phi:

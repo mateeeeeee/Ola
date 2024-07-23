@@ -64,11 +64,14 @@ namespace ola
 			MIRRelocable* relocable = global.GetRelocable();
 			if (relocable->IsFunction())
 			{
-				MIRFunction& MF = *dynamic_cast<MIRFunction*>(relocable);
+				MIRFunction& MF = *static_cast<MIRFunction*>(relocable);
 				if (global.GetLinkage() == Linkage::External)
 				{
-					EmitText(".globl {}", MF.GetSymbol());
+					if(!MF.IsDeclaration()) EmitText(".globl {}", MF.GetSymbol());
+					else EmitText(".extern {}", MF.GetSymbol());
 				}
+				if (MF.IsDeclaration()) continue;
+
 				EmitText("{}:", MF.GetSymbol());
 				for (auto& MBB : MF.Blocks())
 				{

@@ -38,8 +38,10 @@ namespace ola
 	class MIRFunction final : public MIRRelocable
 	{
 	public:
-		explicit MIRFunction(std::string_view symbol);
+		explicit MIRFunction(std::string_view symbol, bool is_declaration);
 		~MIRFunction();
+
+		bool IsDeclaration() const { return is_declaration; }
 
 		auto& Blocks() { return blocks; }
 		auto const& Blocks() const { return blocks; }
@@ -66,6 +68,7 @@ namespace ola
 		}
 
 	private:
+		bool is_declaration;
 		std::list<std::unique_ptr<MIRBasicBlock>> blocks;
 		std::vector<MIROperand> args;
 		int32 stack_offset = 0;

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <memory>
 
 namespace ola
@@ -23,10 +24,11 @@ namespace ola
 			return module_id;
 		}
 
-		void AddGlobal(GlobalValue* GV)
+		Function* GetFunctionByName(std::string_view name)
 		{
-			globals.push_back(GV);
+			return function_map[name];
 		}
+		void AddGlobal(GlobalValue* GV);
 		std::vector<GlobalValue*> const& Globals() const { return globals; }
 
 		void EmitIR(std::string_view filename) const;
@@ -35,6 +37,7 @@ namespace ola
 		IRContext& context;
 		std::string module_id;
 		std::vector<GlobalValue*> globals;
+		std::unordered_map<std::string_view, Function*> function_map;
 	};
 
 }

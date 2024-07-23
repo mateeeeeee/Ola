@@ -181,7 +181,7 @@ namespace ola
 
 	}
 
-	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<IRFuncType>(callee->GetType())->GetReturnType(), {})
+	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<Function>(callee)->GetReturnType(), {})
 	{
 		for (Value* arg : args) AddOperand(arg);
 		AddOperand(callee);
@@ -254,8 +254,8 @@ namespace ola
 	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
 	{
 		uint32 id_int = (uint32)id;
-		OLA_ASSERT(id_int > (uint32)Opcode::CompareOpBegin && id_int < (uint32)Opcode::CompareOpEnd);
-		cmp = (CompareOp)(id_int - (uint32)Opcode::CompareOpBegin - 1);
+		OLA_ASSERT(id_int >= (uint32)Opcode::CompareOpBegin && id_int <= (uint32)Opcode::CompareOpEnd);
+		cmp = (CompareOp)(id_int - (uint32)Opcode::CompareOpBegin);
 	}
 
 }

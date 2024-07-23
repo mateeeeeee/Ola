@@ -4,7 +4,7 @@
 namespace ola
 {
 
-	MIRFunction::MIRFunction(std::string_view symbol) : MIRRelocable(symbol)
+	MIRFunction::MIRFunction(std::string_view symbol, bool is_declaration) : MIRRelocable(symbol), is_declaration(is_declaration)
 	{
 	}
 
