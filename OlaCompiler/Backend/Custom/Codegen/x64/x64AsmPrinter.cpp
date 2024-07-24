@@ -53,7 +53,7 @@ namespace ola
 
 	void x64AsmPrinter::PrintModule(MIRModule const& M)
 	{
-		EmitPreamble(".intel_syntax noprefix");
+		EmitPreamble(".intel_syntax noprefix\n");
 
 		Target const& target = M.GetTarget();
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
@@ -67,8 +67,8 @@ namespace ola
 				MIRFunction& MF = *static_cast<MIRFunction*>(relocable);
 				if (global.GetLinkage() == Linkage::External)
 				{
-					if(!MF.IsDeclaration()) EmitText(".globl {}", MF.GetSymbol());
-					else EmitText(".extern {}", MF.GetSymbol());
+					if(!MF.IsDeclaration()) EmitText(".globl {}\n", MF.GetSymbol());
+					else EmitText(".extern {}\n", MF.GetSymbol());
 				}
 				if (MF.IsDeclaration()) continue;
 
@@ -122,10 +122,16 @@ namespace ola
 							EmitText("sub {}, {}", GetOperandString(dst), GetOperandString(src));
 						}
 						break;
+						case InstCall:
+						{
+							MIROperand const& callee = MI.GetOp<0>();
+							EmitText("call {}", GetOperandString(callee));
+						}
+						break;
 						}
 					}
 				}
-				EmitText("ret");
+				EmitText("ret\n");
 			}
 			else if (relocable->IsDataStorage())
 			{

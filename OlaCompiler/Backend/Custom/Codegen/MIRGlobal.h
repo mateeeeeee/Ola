@@ -52,9 +52,9 @@ namespace ola
 		}
 		MIROperand& AllocateStack(MIROperandType type)
 		{
+			stack_offset += GetOperandSize(type);
 			MIROperand stack_object = MIROperand::StackObject(-stack_offset, type);
 			stack_objects.push_back(stack_object);
-			stack_offset += GetOperandSize(type);
 			return stack_objects.back();
 		}
 		int32 GetStackAllocationSize() const

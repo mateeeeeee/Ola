@@ -8,11 +8,11 @@ namespace ola
 {
 	MIROperandType GetOperandType(IRType const* type)
 	{
-		if (type->IsPointerType())
+		if (type->IsPointer())
 		{
 			return MIROperandType::Ptr;
 		}
-		if (type->IsIntegerType())
+		if (type->IsInteger())
 		{
 			switch (cast<IRIntType>(type)->GetWidth())
 			{
@@ -24,7 +24,7 @@ namespace ola
 				OLA_ASSERT(false);
 			}
 		}
-		if (type->IsFloatType())
+		if (type->IsFloat())
 		{
 			return MIROperandType::Float64;
 		}

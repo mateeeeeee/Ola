@@ -723,7 +723,7 @@ namespace ola
 			Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
 			IRType* arg_type = called_function->GetArg(arg_index)->GetType();
-			if (arg_type->IsPointerType()) args.push_back(arg_value);
+			if (arg_type->IsPointer()) args.push_back(arg_value);
 			else args.push_back(Load(arg_type, arg_value));
 
 			arg_index++;
@@ -788,7 +788,7 @@ namespace ola
 				value_map[param.get()] = arg_alloc;
 			}
 		}
-		if (!func->GetReturnType()->IsVoidType()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
+		if (!func->GetReturnType()->IsVoid()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
 		
 		exit_block = builder->AddBlock(func);
 		exit_block->SetName("exit");
@@ -804,7 +804,7 @@ namespace ola
 
 		builder->SetCurrentBlock(exit_block);
 
-		if (!func->GetReturnType()->IsVoidType()) builder->MakeInst<ReturnInst>(Load(func->GetReturnType(), return_value));
+		if (!func->GetReturnType()->IsVoid()) builder->MakeInst<ReturnInst>(Load(func->GetReturnType(), return_value));
 		else builder->MakeInst<ReturnInst>(context);
 
 		std::vector<BasicBlock*> empty_blocks{};
@@ -861,7 +861,7 @@ namespace ola
 			std::span<QualType const> function_params = function_type->GetParams();
 
 			IRType* return_type = ConvertToIRType(function_type->GetReturnType());
-			bool return_type_struct = return_type->IsStructType();
+			bool return_type_struct = return_type->IsStruct();
 
 			std::vector<IRType*> param_types; param_types.reserve(function_params.size());
 			if (return_type_struct) param_types.push_back(GetPointerType(return_type));
@@ -920,7 +920,7 @@ namespace ola
 		std::span<QualType const> function_params = type->GetParams();
 
 		IRType* return_type = ConvertToIRType(type->GetReturnType());
-		bool return_type_struct = return_type->IsStructType();
+		bool return_type_struct = return_type->IsStruct();
 
 		std::vector<IRType*> param_types; param_types.reserve(function_params.size());
 		if (return_type_struct) param_types.push_back(IRPtrType::Get(return_type));
@@ -968,9 +968,9 @@ namespace ola
 
 	Value* IRVisitor::Load(IRType* ir_type, Value* ptr)
 	{
-		if (ptr->GetType()->IsPointerType())
+		if (ptr->GetType()->IsPointer())
 		{
-			if (ir_type->IsPointerType() && isa<GlobalVariable>(ptr))
+			if (ir_type->IsPointer() && isa<GlobalVariable>(ptr))
 			{
 				return ptr;
 			}
@@ -981,7 +981,7 @@ namespace ola
 
 	Value* IRVisitor::Store(Value* value, Value* ptr)
 	{
-		if (!value->GetType()->IsPointerType()) return builder->MakeInst<StoreInst>(value, ptr);
+		if (!value->GetType()->IsPointer()) return builder->MakeInst<StoreInst>(value, ptr);
 		Value* load = nullptr;
 		if (AllocaInst* AI = dyn_cast<AllocaInst>(value))
 		{

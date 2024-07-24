@@ -1,8 +1,15 @@
 import std.assert;
 
+int f()
+{
+    int a = 3;
+    int b = 5;
+    int c = a + b;
+    return c;
+}
+
 public int main()
 {
-    int a = 5;
-    a += 2;
-    return a;
+    int r = f();
+    return r;
 }

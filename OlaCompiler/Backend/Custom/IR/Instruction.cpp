@@ -209,11 +209,11 @@ namespace ola
 
 	IRType* GetElementPtrInst::GetValueType(Value* base, std::span<Value*> indices)
 	{
-		OLA_ASSERT(base->GetType()->IsPointerType());
+		OLA_ASSERT(base->GetType()->IsPointer());
 		IRType* current_type = base->GetType();
 		for (Value* index : indices)
 		{
-			if (index->GetType()->IsIntegerType()) 
+			if (index->GetType()->IsInteger()) 
 			{
 				if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type)) 
 				{

@@ -165,7 +165,7 @@ namespace ola
 	void IRPrinter::PrintInstruction(Instruction const& I)
 	{
 		IRType* type = I.GetType();
-		if (!type->IsVoidType())
+		if (!type->IsVoid())
 		{
 			Emit("{} = ", GetUniqueName(&I));
 		}

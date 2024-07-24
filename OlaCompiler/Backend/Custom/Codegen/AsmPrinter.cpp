@@ -9,7 +9,7 @@ namespace ola
 		for (auto const& [section, buffer] : section_map)
 		{
 			std::string section_label = GetSectionLabel(section);
-			if (!section_label.empty()) os << section_label << "\n";
+			if (!section_label.empty()) os << section_label << "\n\n";
 			os << buffer;
 		}
 	}

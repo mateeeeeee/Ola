@@ -10,8 +10,8 @@ namespace ola
 		InstUnknown,
 		// control-flow
 		InstJump,    
-		InstBranch,  
-		InstUnreachable,
+		InstBranch, 
+		InstCall,
 		// Memory
 		InstLoad,
 		InstStore,

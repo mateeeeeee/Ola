@@ -13,7 +13,73 @@ namespace ola
 	{
 		Function* callee = CI->GetCalleeAsFunction();
 		OLA_ASSERT(callee);
+		MIRGlobal const* global = ctx.GetGlobal(callee);
+
+		static constexpr uint32 PASS_BY_REG_OFFSET = 1 << 16;
+		std::vector<int32> offsets;  
+		uint32 const arg_count = CI->ArgSize();
+		offsets.reserve(arg_count);
+		uint32 gprs = 0;
+		uint32 current_stack_offset = 0;
+		for (auto& arg : CI->Args())
+		{
+			if (!arg.GetValue()->GetType()->IsFloat())
+			{
+				if (gprs < 4)
+				{
+					offsets.push_back(PASS_BY_REG_OFFSET + gprs++);
+				}
+			}
+			else
+			{
+				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
+			}
+
+			uint32 size = arg.GetValue()->GetType()->GetSize();
+			uint32 alignment = size;
+
+			current_stack_offset = (current_stack_offset + alignment - 1) / alignment * alignment;
+			offsets.push_back(current_stack_offset);
+			current_stack_offset += size;
+		}
+
+		MIRGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
+		MIRFunction& caller = *static_cast<MIRFunction*>(global->GetRelocable());
+
+		for (uint32 idx = 0; idx < arg_count; ++idx)
+		{
+			int32 offset = offsets[idx];
+			Value const* arg = CI->GetArgOp(idx);
+			MIROperand arg_operand = ctx.GetOperand(arg);
+			uint32 size = arg->GetType()->GetSize();
+			uint32 alignment = size;
+			if (offset < PASS_BY_REG_OFFSET)
+			{
+			}
+			else
+			{
+			}
+		}
+		MIRInstruction call_inst(InstCall);
+		call_inst.SetOp<0>(MIROperand::Relocable(global->GetRelocable()));
+		ctx.EmitInst(call_inst);
+		IRType const* return_type = CI->GetType();
+		if (return_type->IsVoid()) return;
+
+		const auto return_reg = ctx.VirtualReg(return_type);
+		MIROperand arch_return_reg;
+		if (return_type->IsFloat()) 
+		{
+			arch_return_reg = MIROperand::ISAReg(x64::XMM0, MIROperandType::Float64);
+		}
+		else 
+		{
+			arch_return_reg = MIROperand::ISAReg(x64::RAX, MIROperandType::Int64);
+		}
+		ctx.EmitInst(MIRInstruction(InstLoad).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
+		ctx.AddOperand(CI, return_reg);
 	}
+
 
 	void x64TargetFrameInfo::EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const
 	{
@@ -64,7 +130,7 @@ namespace ola
 			if (size <= 8)
 			{
 				MIROperand return_register;
-				if (V->GetType()->IsFloatType())
+				if (V->GetType()->IsFloat())
 				{
 					return_register = MIROperand::ISAReg(x64::XMM0, MIROperandType::Float64);
 				}

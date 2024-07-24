@@ -238,7 +238,6 @@ namespace ola
 			LowerCall(cast<CallInst>(inst));
 			break;
 		case Opcode::ICmpEQ:
-
 			break;
 		case Opcode::Alloca:
 		case Opcode::Phi:
