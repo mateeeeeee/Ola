@@ -142,7 +142,10 @@ namespace ola
 	{
 		MIRGlobal* global = lowering_ctx.GetGlobal(F);
 		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
+		//LowerCFGAnalysis(F);
 
+		TargetFrameInfo const& frame_info = target.GetFrameInfo();
+		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
@@ -150,12 +153,18 @@ namespace ola
 			lowering_ctx.AddBlock(&BB, MBB.get());
 			for (auto& I : BB.Instructions())
 			{
-				if (I.GetOpcode() == Opcode::Phi)
+				if (I.GetOpcode() == Opcode::Call)
 				{
-					auto vreg = lowering_ctx.VirtualReg(I.GetType());
-					lowering_ctx.AddOperand(&I, vreg);
+					frame_info.ReserveShadowSpace(MF, lowering_ctx);
+					break;
 				}
-				else if (I.GetOpcode() == Opcode::Alloca)
+			}
+		}
+		for (BasicBlock& BB : F->Blocks())
+		{
+			for (auto& I : BB.Instructions())
+			{
+				if (I.GetOpcode() == Opcode::Alloca)
 				{
 					AllocaInst* AI = cast<AllocaInst>(&I);
 					IRType const* type = AI->GetAllocatedType();
@@ -164,7 +173,6 @@ namespace ola
 				}
 			}
 		}
-		//LowerCFGAnalysis(F);
 
 		auto& args = MF.Args();
 		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
@@ -176,9 +184,6 @@ namespace ola
 			args.push_back(vreg);
 		}
 		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
-
-		TargetFrameInfo const& frame_info = target.GetFrameInfo();
-		TargetISelInfo const& isel_info = target.GetISelInfo();
 
 		frame_info.EmitPrologue(MF, lowering_ctx);
 		for (BasicBlock& BB : F->Blocks())

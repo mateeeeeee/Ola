@@ -28,6 +28,7 @@ namespace ola
 				if (gprs < 4)
 				{
 					offsets.push_back(PASS_BY_REG_OFFSET + gprs++);
+					continue;
 				}
 			}
 			else
@@ -46,7 +47,7 @@ namespace ola
 		MIRGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
 		MIRFunction& caller = *static_cast<MIRFunction*>(global->GetRelocable());
 
-		for (uint32 idx = 0; idx < arg_count; ++idx)
+		for (int32 idx = arg_count - 1; idx >= 0; --idx)
 		{
 			int32 offset = offsets[idx];
 			Value const* arg = CI->GetArgOp(idx);
@@ -55,9 +56,18 @@ namespace ola
 			uint32 alignment = size;
 			if (offset < PASS_BY_REG_OFFSET)
 			{
+				MIROperand& argument_stack = caller.AllocateStack(arg_operand.GetType());
+				MIRInstruction copy_arg_to_stack(InstLoad);
+				copy_arg_to_stack.SetOp<0>(argument_stack).SetOp<1>(arg_operand);
+				ctx.EmitInst(copy_arg_to_stack);
 			}
 			else
 			{
+				uint32 gpr = offset - PASS_BY_REG_OFFSET;
+				static constexpr x64::Register arg_regs[] = {x64::RCX, x64::RDX, x64::R8, x64::R9 };
+				MIRInstruction copy_arg_to_reg(InstLoad);
+				copy_arg_to_reg.SetOp<0>(MIROperand::ISAReg(arg_regs[gpr], arg_operand.GetType())).SetOp<1>(arg_operand);
+				ctx.EmitInst(copy_arg_to_reg);
 			}
 		}
 		MIRInstruction call_inst(InstCall);
@@ -103,6 +113,59 @@ namespace ola
 			allocate_stack.SetOp<0>(rsp).SetOp<1>(MIROperand::Immediate(stack_allocation, Int64));
 			ctx.EmitInst(allocate_stack);
 		}
+		static constexpr uint32 PASS_BY_REG_OFFSET = 1 << 16;
+
+		std::vector<MIROperand> const& args = MF.Args();
+		std::vector<uint32> offsets; 
+		offsets.reserve(args.size());
+		uint32 gprs = 0;
+		uint32 current_offset = 0;
+		for (MIROperand const& arg : args)
+		{
+			if (arg.GetType() != MIROperandType::Float64) 
+			{
+				if (gprs < 4) 
+				{
+					offsets.push_back(PASS_BY_REG_OFFSET + gprs++);
+					continue;
+				}
+			}
+			else
+			{
+				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
+			}
+			uint32 size = GetOperandSize(arg.GetType());
+			uint32 alignment = size;
+			current_offset = (current_offset + alignment - 1) / alignment * alignment;
+			offsets.push_back(current_offset);
+			current_offset += size;
+		}
+
+		for (uint32_t idx = 0; idx < args.size(); ++idx) 
+		{
+			uint32 offset = offsets[idx];
+			MIROperand const& arg = args[idx];
+
+			if (offset >= PASS_BY_REG_OFFSET)
+			{
+				uint32 gpr = offset - PASS_BY_REG_OFFSET;
+				static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
+				MIRInstruction copy_arg_from_reg(InstLoad);
+				copy_arg_from_reg.SetOp<1>(MIROperand::ISAReg(arg_regs[gpr], arg.GetType())).SetOp<0>(arg);
+				ctx.EmitInst(copy_arg_from_reg);
+			}
+		}
+		for (uint32 idx = 0; idx < args.size(); ++idx) 
+		{
+			uint32 offset = offsets[idx];
+			MIROperand const& arg = args[idx];
+			uint32 size = GetOperandSize(arg.GetType());
+			uint32 alignment = size;
+
+			if (offset < PASS_BY_REG_OFFSET)
+			{
+			}
+		}
 	}
 
 	void x64TargetFrameInfo::EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const
@@ -119,6 +182,11 @@ namespace ola
 		MIRInstruction pop_rbp(InstPop);
 		pop_rbp.SetOp<0>(rbp);
 		ctx.EmitInst(pop_rbp);
+	}
+
+	void x64TargetFrameInfo::ReserveShadowSpace(MIRFunction& MF, LoweringContext& ctx) const
+	{
+		MF.AllocateStack(32);
 	}
 
 	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, LoweringContext& ctx) const

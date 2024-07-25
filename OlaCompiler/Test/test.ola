@@ -1,15 +1,11 @@
-import std.assert;
 
-int f()
+int add(int a, int b)
 {
-    int a = 3;
-    int b = 5;
-    int c = a + b;
-    return c;
+    return a + b;
 }
 
 public int main()
 {
-    int r = f();
-    return r;
+    int r = add(5,7);
+    return r + 10;
 }

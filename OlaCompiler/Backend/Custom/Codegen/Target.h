@@ -112,6 +112,7 @@ namespace ola
 		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const = 0;
 		virtual void EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const = 0;
 		virtual void EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const = 0;
+		virtual void ReserveShadowSpace(MIRFunction& MF, LoweringContext& ctx) const = 0;
 		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const = 0;
 	};
 
