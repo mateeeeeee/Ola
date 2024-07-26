@@ -75,14 +75,14 @@ namespace ola
 		template<typename... Args>
 		void EmitLn(char const* fmt, Args&&... args)
 		{
-			std::string str = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+			std::string str = std::vformat(fmt, std::make_format_args(args...));
 			str += "\n";
 			output += str;
 		}
 		template<typename... Args>
 		void Emit(char const* fmt, Args&&... args)
 		{
-			std::string str = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+			std::string str = std::vformat(fmt, std::make_format_args(args...));
 			output += str;
 		}
 		void EmitSpace()
