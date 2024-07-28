@@ -1,8 +1,8 @@
-extern nomangling void PrintInt(int i);
-extern nomangling void PrintFloat(float f);
-extern nomangling void PrintChar(char c);
-extern nomangling void PrintString(char[] str);
-extern nomangling int ReadInt();
-extern nomangling float ReadFloat();
-extern nomangling char ReadChar();
-extern nomangling void ReadString(char[] str, int size);
+extern nomangle void PrintInt(int i);
+extern nomangle void PrintFloat(float f);
+extern nomangle void PrintChar(char c);
+extern nomangle void PrintString(char[] str);
+extern nomangle int ReadInt();
+extern nomangle float ReadFloat();
+extern nomangle char ReadChar();
+extern nomangle void ReadString(char[] str, int size);

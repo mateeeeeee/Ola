@@ -5,6 +5,5 @@ int main(int argc, char** argv)
 {
 	ola::CompileRequest compile_request{};
 	compile_request.Parse(argc, argv);
-	ola::int32 exit_code = ola::Compile(compile_request);
-	return exit_code;
+	return ola::Compile(compile_request);
 }

@@ -1290,11 +1290,11 @@ namespace ola
 					return;
 				}
 			}
-			else if (Consume(TokenKind::KW_nomangling))
+			else if (Consume(TokenKind::KW_nomangle))
 			{
-				if (!HasAttribute(attrs, FuncAttribute_NoMangling))
+				if (!HasAttribute(attrs, FuncAttribute_NoMangle))
 				{
-					attrs |= FuncAttribute_NoMangling;
+					attrs |= FuncAttribute_NoMangle;
 				}
 				else
 				{
@@ -1474,7 +1474,7 @@ namespace ola
 			current_token = token;
 			return true;
 		}
-		if (Consume(TokenKind::KW_nomangling))
+		if (Consume(TokenKind::KW_nomangle))
 		{
 			current_token = token;
 			return true;

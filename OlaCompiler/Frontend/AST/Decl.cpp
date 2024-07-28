@@ -207,7 +207,7 @@ namespace ola
 	std::string FunctionDecl::GetMangledName() const
 	{
 		std::string mangled_name(GetName());
-		if (NoMangling()) return mangled_name;
+		if (NoMangle()) return mangled_name;
 		for (auto const& param : param_decls)
 		{
 			QualType const& param_type = param->GetType();

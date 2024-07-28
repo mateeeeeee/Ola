@@ -1,13 +1,13 @@
 
-extern nomangling bool IsAlnum(char ch);
-extern nomangling bool IsAlpha(char ch);
-extern nomangling bool IsLower(char ch);
-extern nomangling bool IsUpper(char ch);
-extern nomangling bool IsDigit(char ch);
-extern nomangling bool IsSpace(char ch);
-extern nomangling char ToLower(char ch);
-extern nomangling char ToUpper(char ch);
+extern nomangle bool IsAlnum(char ch);
+extern nomangle bool IsAlpha(char ch);
+extern nomangle bool IsLower(char ch);
+extern nomangle bool IsUpper(char ch);
+extern nomangle bool IsDigit(char ch);
+extern nomangle bool IsSpace(char ch);
+extern nomangle char ToLower(char ch);
+extern nomangle char ToUpper(char ch);
 
-extern nomangling float StringToFloat(char[] str);
-extern nomangling int   StringToInt(char[] str);
-extern nomangling void  StringCopy(char[] src, char[] dst, int size);
+extern nomangle float StringToFloat(char[] str);
+extern nomangle int   StringToInt(char[] str);
+extern nomangle void  StringCopy(char[] src, char[] dst, int size);

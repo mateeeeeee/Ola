@@ -93,7 +93,7 @@ DIAG(missing_method_return_type_error, error, "Missing return type specifier for
 DIAG(ctor_init_on_non_class_variable, error, "Ctor initialization on non-class variable")
 DIAG(matching_ctor_not_found, error, "Matching constructor not found")
 DIAG(matching_ctor_ambiguous, error, "Matching constructor ambiguous")
-DIAG(method_cannot_be_nomangling, error, "Invalid attribute 'nomangling' on a method declaration")
+DIAG(method_cannot_be_nomangle, error, "Invalid attribute 'nomangle' on a method declaration")
 DIAG(base_ctor_call_outside_ctor, error, "Cannot call base constructor outside constructor")
 DIAG(ctor_call_outside_ctor, error, "Cannot call constructor outside constructor")
 DIAG(base_ctor_call_without_base_class, error, "Cannot call base constructor when there is no base class")
