@@ -1,2 +1,2 @@
-extern nomangling void Assert(bool);
-extern nomangling void AssertMsg(bool, char[]);
+extern nomangle void Assert(bool);
+extern nomangle void AssertMsg(bool, char[]);

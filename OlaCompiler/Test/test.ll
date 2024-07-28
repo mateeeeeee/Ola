@@ -1,20 +1,15 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
+define internal i64 @add__I__I(i64 %a, i64 %b) {
+entry:
+  %0 = add i64 %a, %b
+  ret i64 %0
+}
+
 define i64 @main() {
 entry:
-  %0 = alloca i64, align 8
-  %1 = alloca i64, align 8
-  store i64 42, ptr %1, align 4
-  %2 = load i64, ptr %1, align 4
-  store i64 %2, ptr %0, align 4
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %3 = load i64, ptr %0, align 4
-  ret i64 %3
+  %0 = call i64 @add__I__I(i64 5, i64 7)
+  %1 = add i64 %0, 10
+  ret i64 %1
 }

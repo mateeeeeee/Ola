@@ -162,7 +162,7 @@ namespace ola
 		FuncAttribute_None = 0x00,
 		FuncAttribute_NoInline = 0x01,
 		FuncAttribute_Inline = 0x02,
-		FuncAttribute_NoMangling = 0x04
+		FuncAttribute_NoMangle = 0x04
 	};
 	using FuncAttributes = uint8;
 
@@ -186,7 +186,7 @@ namespace ola
 		}
 		bool IsInline()   const { return HasFuncAttribute(FuncAttribute_Inline); }
 		bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
-		bool NoMangling() const { return HasFuncAttribute(FuncAttribute_NoMangling); }
+		bool NoMangle() const { return HasFuncAttribute(FuncAttribute_NoMangle); }
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_decls; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }

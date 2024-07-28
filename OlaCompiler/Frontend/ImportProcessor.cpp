@@ -183,7 +183,7 @@ namespace ola
 			{
 				import_tokens.emplace_back(TokenKind::KW_extern);
 				FuncType const* func_type = func_decl->GetFuncType();
-				if (func_decl->NoMangling()) import_tokens.emplace_back(TokenKind::KW_nomangling);
+				if (func_decl->NoMangle()) import_tokens.emplace_back(TokenKind::KW_nomangle);
 				TypeToTokens(func_type->GetReturnType(), import_tokens);
 				Token& tok = import_tokens.emplace_back(TokenKind::identifier);
 				tok.SetData(func_decl->GetName());
