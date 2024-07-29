@@ -4,7 +4,7 @@
 #include "LivenessAnalysis.h"
 #include "MachineModule.h"
 #include "MachineBasicBlock.h"
-#include "MachineGlobal.h"
+#include "MachineFunction.h"
 #include "Target.h"
 
 namespace ola

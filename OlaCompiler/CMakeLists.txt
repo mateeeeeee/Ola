@@ -103,8 +103,11 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineOperand.cpp
   Backend/Custom/Codegen/MachineInstruction.h
   Backend/Custom/Codegen/MachineBasicBlock.h
+  Backend/Custom/Codegen/MachineRelocable.h
+  Backend/Custom/Codegen/MachineStorage.h
+  Backend/Custom/Codegen/MachineFunction.h
+  Backend/Custom/Codegen/MachineFunction.cpp
   Backend/Custom/Codegen/MachineGlobal.h
-  Backend/Custom/Codegen/MachineGlobal.cpp
   Backend/Custom/Codegen/MachineModule.h
   Backend/Custom/Codegen/MachineModule.cpp
   Backend/Custom/Codegen/Target.h

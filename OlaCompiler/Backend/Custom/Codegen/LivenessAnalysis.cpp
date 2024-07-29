@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "LivenessAnalysis.h"
-#include "MachineGlobal.h"
+#include "MachineFunction.h"
 #include "MachineBasicBlock.h"
 #include "MachineModule.h"
 #include "Target.h"

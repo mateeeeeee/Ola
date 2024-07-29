@@ -5,6 +5,7 @@
 #include "Backend/Custom/Codegen/LoweringContext.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineGlobal.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
 
 namespace ola
 {

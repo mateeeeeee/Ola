@@ -4,6 +4,7 @@
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
 
 namespace ola
 {

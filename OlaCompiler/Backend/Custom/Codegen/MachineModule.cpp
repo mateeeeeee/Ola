@@ -1,7 +1,9 @@
 #include <fstream>
-#include "MachineModule.h"
 #include "Target.h"
+#include "MachineModule.h"
 #include "MachineGlobal.h"
+#include "MachineFunction.h"
+#include "MachineStorage.h"
 #include "MachineBasicBlock.h"
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
@@ -101,6 +103,7 @@ namespace ola
 			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
+		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (GlobalValue* GV : ir_globals)
 		{
@@ -144,16 +147,6 @@ namespace ola
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
 			lowering_ctx.AddBlock(&BB, MBB.get());
-			for (auto& I : BB.Instructions())
-			{
-				if (I.GetOpcode() == Opcode::Call)
-				{
-					break;
-				}
-			}
-		}
-		for (BasicBlock& BB : F->Blocks())
-		{
 			for (auto& I : BB.Instructions())
 			{
 				if (I.GetOpcode() == Opcode::Alloca)
