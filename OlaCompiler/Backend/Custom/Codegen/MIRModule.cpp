@@ -155,7 +155,6 @@ namespace ola
 			{
 				if (I.GetOpcode() == Opcode::Call)
 				{
-					frame_info.ReserveShadowSpace(MF, lowering_ctx);
 					break;
 				}
 			}

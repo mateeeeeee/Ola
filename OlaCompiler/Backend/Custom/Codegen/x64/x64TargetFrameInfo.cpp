@@ -184,11 +184,6 @@ namespace ola
 		ctx.EmitInst(pop_rbp);
 	}
 
-	void x64TargetFrameInfo::ReserveShadowSpace(MIRFunction& MF, LoweringContext& ctx) const
-	{
-		MF.AllocateStack(32);
-	}
-
 	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, LoweringContext& ctx) const
 	{
 		if (RI->GetNumOperands() > 0)

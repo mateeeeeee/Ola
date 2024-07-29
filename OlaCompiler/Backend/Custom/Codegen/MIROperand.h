@@ -45,22 +45,16 @@ namespace ola
 		case MIROperandType::Float64:
 			return 8;
 		case MIROperandType::Ptr:
+			OLA_ASSERT_MSG(false, "Call TargetDataLayout::GetPointerSize");
 			return 8;
 		}
 		OLA_ASSERT(false);
 		return 0;
 	}
 
-	enum MIRRegisterFlag : uint32 
-	{
-		MIRRegisterFlag_None = 0,
-		MIRRegisterFlag_Dead = 1 << 1,
-	};
-
 	struct MIRRegister
 	{
 		uint32 reg;
-		MIRRegisterFlag flag = MIRRegisterFlag_None;
 
 		bool operator==(const MIRRegister& rhs) const 
 		{
