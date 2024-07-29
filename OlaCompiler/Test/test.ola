@@ -1,11 +1,15 @@
+import std.assert;
 
-int add(int a, int b, int c, int d, int e)
+int global = 5;
+
+int add(int a, int b)
 {
-    return a + b + c + d + e;
+    return a + b;
 }
 
 public int main()
 {
-    int r = add(1,2,3,4,5);
+    int r = add(1,2);
+    //Assert(r == 3);
     return r;
 }

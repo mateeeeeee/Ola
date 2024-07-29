@@ -396,7 +396,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetOpcode() > Opcode::CompareOpBegin && I->GetOpcode() < Opcode::CompareOpEnd;
+			return I->GetOpcode() >= Opcode::CompareOpBegin && I->GetOpcode() <= Opcode::CompareOpEnd;
 		}
 		static bool ClassOf(Value const* V)
 		{

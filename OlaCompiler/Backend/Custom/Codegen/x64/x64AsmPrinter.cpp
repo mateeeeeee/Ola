@@ -5,6 +5,7 @@
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
 #include "Backend/Custom/Codegen/MachineFunction.h"
+#include "Backend/Custom/Codegen/MachineStorage.h"
 
 namespace ola
 {
@@ -136,9 +137,29 @@ namespace ola
 			}
 			else if (relocable->IsDataStorage())
 			{
+				MachineDataStorage& MDS = *static_cast<MachineDataStorage*>(relocable);
+				auto const& storage = MDS.GetStorage();
+
+				EmitText("{}:", relocable->GetSymbol());
+				for (auto const& element : storage)
+				{
+					std::visit([&](auto&& arg)
+						{
+							using T = std::decay_t<decltype(arg)>;
+							if constexpr (std::is_same_v<T, uint8>)		  EmitText(".byte {}", arg);
+							else if constexpr (std::is_same_v<T, uint16>) EmitText(".word {}", arg);
+							else if constexpr (std::is_same_v<T, uint32>) EmitText(".long {}", arg);
+							else if constexpr (std::is_same_v<T, uint64>) EmitText(".quad {}", arg);
+							else static_assert(false, "non-exhaustive visitor!");
+						}, element);
+				}
+				EmitText("\n");
 			}
 			else if (relocable->IsZeroStorage())
 			{
+				MachineZeroStorage& MZS = *static_cast<MachineZeroStorage*>(relocable);
+				EmitText("{}:", relocable->GetSymbol());
+				EmitText(".zero {}", MZS.GetSize());
 			}
 			else OLA_ASSERT_MSG(false, "Invalid relocable kind!");
 		}

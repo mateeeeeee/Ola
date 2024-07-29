@@ -2,40 +2,34 @@
 
 .text
 
-add__I__I__I__I__I:
+.extern Assert
+
+.extern AssertMsg
+
+global:
+.quad 5
+
+
+add__I__I:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 48
-mov r14, rcx
-mov r13, rdx
-mov r12, r8
-mov r11, r9
-mov qword ptr [rbp-8], r14
-mov qword ptr [rbp-16], r13
-mov qword ptr [rbp-24], r12
-mov qword ptr [rbp-32], r11
-mov qword ptr [rbp-40], r15
-mov r15, qword ptr [rbp-8]
-mov r11, qword ptr [rbp-16]
-mov r12, r15
-add r12, r11
-mov r11, qword ptr [rbp-24]
-mov r15, r12
-add r15, r11
-mov r11, qword ptr [rbp-32]
-mov r12, r15
-add r12, r11
-mov r11, qword ptr [rbp-40]
-mov r15, r12
-add r15, r11
-mov qword ptr [rbp-48], r15
+sub rsp, 24
+mov r15, rcx
+mov r14, rdx
+mov qword ptr [rbp-8], r15
+mov qword ptr [rbp-16], r14
+mov r14, qword ptr [rbp-8]
+mov r15, qword ptr [rbp-16]
+mov r13, r14
+add r13, r15
+mov qword ptr [rbp-24], r13
 jmp label2
 label1:
 jmp label2
 label2:
-mov r15, qword ptr [rbp-48]
-mov rax, r15
+mov r13, qword ptr [rbp-24]
+mov rax, r13
 mov rsp, rbp
 pop rbp
 ret
@@ -47,12 +41,9 @@ label3:
 push rbp
 mov rbp, rsp
 sub rsp, 16
-mov qword ptr [rbp-56], 5
-mov r9, 4
-mov r8, 3
 mov rdx, 2
 mov rcx, 1
-call add__I__I__I__I__I
+call add__I__I
 mov r15, rax
 mov qword ptr [rbp-16], r15
 mov r15, qword ptr [rbp-16]

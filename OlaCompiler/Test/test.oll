@@ -1,42 +1,39 @@
 Module ID : test.ola
 
-define internal @add__I__I__I__I__I i64(i64,i64,i64,i64,i64) {
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define external @global ptr 5
+
+
+define internal @add__I__I i64(i64,i64) {
 entry:
 %0 = alloca i64
 store i64 %a, ptr %0
 %1 = alloca i64
 store i64 %b, ptr %1
 %2 = alloca i64
-store i64 %c, ptr %2
-%3 = alloca i64
-store i64 %d, ptr %3
-%4 = alloca i64
-store i64 %e, ptr %4
-%5 = alloca i64
-%6 = load i64, ptr %0
-%7 = load i64, ptr %1
-%8 = add i64 %6, %7
-%9 = load i64, ptr %2
-%10 = add i64 %8, %9
-%11 = load i64, ptr %3
-%12 = add i64 %10, %11
-%13 = load i64, ptr %4
-%14 = add i64 %12, %13
-store i64 %14, ptr %5
+%3 = load i64, ptr %0
+%4 = load i64, ptr %1
+%5 = add i64 %3, %4
+store i64 %5, ptr %2
 br label exit
 return:
 %nop = neg i64 0
 br label exit
 exit:
-%15 = load i64, ptr %5
-ret i64 %15
+%6 = load i64, ptr %2
+ret i64 %6
 }
 
 
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = call i64 1, 2, 3, 4, 5, @add__I__I__I__I__I
+%1 = call i64 1, 2, @add__I__I
 %2 = alloca i64
 store i64 %1, ptr %2
 %3 = load i64, ptr %2

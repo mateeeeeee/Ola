@@ -133,7 +133,7 @@ namespace ola
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
 		link_cmd += olalib;
 		link_cmd += " -o " + output_file;
-		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE ";
+		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
 		system(link_cmd.c_str());
 		
 		std::string const& exe_cmd = output_file;

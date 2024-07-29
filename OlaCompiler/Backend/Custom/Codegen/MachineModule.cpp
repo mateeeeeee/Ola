@@ -55,12 +55,12 @@ namespace ola
 								int64 value = CI->GetValue();
 								switch (CI->GetBitWidth())
 								{
-								case 1:
+								case 8:
 								{
 									data->AppendByte((uint8)value);
 									break;
 								}
-								case 8:
+								case 64:
 								{
 									data->AppendQWord((uint64)value);
 									break;
@@ -241,7 +241,16 @@ namespace ola
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
 		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->LHS())).SetOp<2>(lowering_ctx.GetOperand(inst->RHS()));
+		lowering_ctx.EmitInst(MI);
+		lowering_ctx.AddOperand(inst, ret);
+	}
+
+	void MachineModule::LowerCompare(CompareInst* inst)
+	{
+		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
+		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->LHS())).SetOp<2>(lowering_ctx.GetOperand(inst->RHS()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}

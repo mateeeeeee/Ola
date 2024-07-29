@@ -48,6 +48,7 @@ namespace ola
 
 		void LowerUnary(UnaryInst*);
 		void LowerBinary(BinaryInst*);
+		void LowerCompare(CompareInst*);
 		void LowerRet(ReturnInst*);
 		void LowerBranch(BranchInst*);
 		void LowerLoad(LoadInst*);

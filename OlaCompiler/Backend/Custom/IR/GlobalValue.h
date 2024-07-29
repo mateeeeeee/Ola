@@ -73,7 +73,6 @@ namespace ola
 		void SetReadOnly() { attr.AddAttr(GlobalVariableAttribute::ReadOnly); }
 
 		Value* GetInitValue() const { return init; }
-		std::string_view GetName() const { return name; }
 
 		virtual bool IsDeclaration() const override
 		{
@@ -84,7 +83,6 @@ namespace ola
 		static bool ClassOf(GlobalValue const* GV) { return !GV->IsFunction(); }
 
 	private:
-		std::string name;
 		Value* init;
 		Attribute<GlobalVariableAttribute> attr;
 	};

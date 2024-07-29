@@ -71,6 +71,10 @@ namespace ola
 			return InstFMul;
 		case Opcode::FDiv:
 			return InstFDiv;
+		case Opcode::ICmpEQ:
+			return InstICmpEQ;
+		case Opcode::ICmpNE:
+			return InstICmpNE;
 		}
 		return InstUnknown;
 	}
