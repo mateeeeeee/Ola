@@ -1,9 +1,9 @@
-#include "MIROperand.h"
+#include "MachineOperand.h"
 
 
 namespace ola
 {
-	uint64 MIROperand::GetHash() const
+	uint64 MachineOperand::GetHash() const
 	{
 		return std::hash<decltype(storage)>{}(storage);
 	}

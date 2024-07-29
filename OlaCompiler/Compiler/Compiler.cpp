@@ -13,7 +13,7 @@
 #include "Frontend/Sema.h"
 #include "Backend/LLVM/LLVMIRGenContext.h"
 #include "Backend/Custom/IR/IRGenContext.h"
-#include "Backend/Custom/Codegen/MIRModule.h"
+#include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
@@ -80,7 +80,7 @@ namespace ola
 				module.EmitIR(ir_file);
 
 				x64Target x64_target{};
-				MIRModule machine_module(module, x64_target);
+				MachineModule machine_module(module, x64_target);
 				machine_module.EmitAssembly(assembly_file.data());
 			}
 		}

@@ -2,17 +2,17 @@
 
 namespace ola
 {
-	class MIRFunction;
-	class MIRModule;
+	class MachineFunction;
+	class MachineModule;
 	class RegisterAllocator
 	{
 	public:
-		explicit RegisterAllocator(MIRModule& M) : M(M)  {}
+		explicit RegisterAllocator(MachineModule& M) : M(M)  {}
 		virtual ~RegisterAllocator() = default;
 
-		virtual void AssignRegisters(MIRFunction&) = 0;
+		virtual void AssignRegisters(MachineFunction&) = 0;
 
 	protected:
-		MIRModule& M;
+		MachineModule& M;
 	};
 }

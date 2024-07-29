@@ -99,22 +99,20 @@ set(BACKEND_FILES
   Backend/Custom/IR/CFGAnalysis.h
   Backend/Custom/IR/CFGAnalysis.cpp
 
-  Backend/Custom/Codegen/MIR.h
-  Backend/Custom/Codegen/MIRFwd.h
-  Backend/Custom/Codegen/MIROperand.h
-  Backend/Custom/Codegen/MIROperand.cpp
-  Backend/Custom/Codegen/MIRInstruction.h
-  Backend/Custom/Codegen/MIRBasicBlock.h
-  Backend/Custom/Codegen/MIRGlobal.h
-  Backend/Custom/Codegen/MIRGlobal.cpp
-  Backend/Custom/Codegen/MIRModule.h
-  Backend/Custom/Codegen/MIRModule.cpp
+  Backend/Custom/Codegen/MachineOperand.h
+  Backend/Custom/Codegen/MachineOperand.cpp
+  Backend/Custom/Codegen/MachineInstruction.h
+  Backend/Custom/Codegen/MachineBasicBlock.h
+  Backend/Custom/Codegen/MachineGlobal.h
+  Backend/Custom/Codegen/MachineGlobal.cpp
+  Backend/Custom/Codegen/MachineModule.h
+  Backend/Custom/Codegen/MachineModule.cpp
   Backend/Custom/Codegen/Target.h
   Backend/Custom/Codegen/Target.cpp
   Backend/Custom/Codegen/LoweringContext.h
   Backend/Custom/Codegen/LoweringContext.cpp
-  Backend/Custom/Codegen/MIRModulePass.h
-  Backend/Custom/Codegen/MIRFunctionPass.h
+  Backend/Custom/Codegen/MachineModulePass.h
+  Backend/Custom/Codegen/MachineFunctionPass.h
   Backend/Custom/Codegen/LivenessAnalysis.h
   Backend/Custom/Codegen/LivenessAnalysis.cpp
   Backend/Custom/Codegen/RegisterAllocator.h

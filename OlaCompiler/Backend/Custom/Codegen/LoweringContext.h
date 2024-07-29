@@ -1,15 +1,15 @@
 #pragma once
 #include <span>
 #include <unordered_map>
-#include "MIROperand.h"
+#include "MachineOperand.h"
 
 namespace ola
 {
-	class MIRModule;
-	class MIRFunction;
-	class MIRBasicBlock;
-	class MIRInstruction;
-	class MIRGlobal;
+	class MachineModule;
+	class MachineFunction;
+	class MachineBasicBlock;
+	class MachineInstruction;
+	class MachineGlobal;
 	class GlobalValue;
 	class BasicBlock;
 	class Value;
@@ -17,60 +17,60 @@ namespace ola
 	enum MachineOpcode : uint32;
 	enum class Opcode : uint32;
 
-	MIROperandType GetOperandType(IRType const* type);
+	MachineOperandType GetOperandType(IRType const* type);
 	MachineOpcode GetMachineID(Opcode opcode);
 
 	class LoweringContext
 	{
 	public:
-		explicit LoweringContext(MIRModule& module) : module(module) {}
+		explicit LoweringContext(MachineModule& module) : module(module) {}
 
-		void SetCurrentBasicBlock(MIRBasicBlock* block)
+		void SetCurrentBasicBlock(MachineBasicBlock* block)
 		{
 			current_block = block;
 		}
-		MIRBasicBlock* GetCurrentBasicBlock() const
+		MachineBasicBlock* GetCurrentBasicBlock() const
 		{
 			return current_block;
 		}
 
-		MIRModule& GetModule() const
+		MachineModule& GetModule() const
 		{
 			return module;
 		}
 
-		void AddGlobal(GlobalValue* GV, MIRGlobal* MG)
+		void AddGlobal(GlobalValue* GV, MachineGlobal* MG)
 		{
 			global_map[GV] = MG;
 		}
-		void AddBlock(BasicBlock* BB, MIRBasicBlock* MBB)
+		void AddBlock(BasicBlock* BB, MachineBasicBlock* MBB)
 		{
 			block_map[BB] = MBB;
 		}
-		void AddOperand(Value* V, MIROperand MO)
+		void AddOperand(Value* V, MachineOperand MO)
 		{
 			value_map[V] = MO;
 		}
 
-		MIRGlobal* GetGlobal(GlobalValue const* GV) const
+		MachineGlobal* GetGlobal(GlobalValue const* GV) const
 		{
 			return global_map[GV];
 		}
-		MIRBasicBlock* GetBlock(BasicBlock const* BB) const
+		MachineBasicBlock* GetBlock(BasicBlock const* BB) const
 		{
 			return block_map[BB];
 		}
-		MIROperand GetOperand(Value const* V);
+		MachineOperand GetOperand(Value const* V);
 
-		void EmitInst(MIRInstruction const& MI);
+		void EmitInst(MachineInstruction const& MI);
 
-		MIROperand VirtualReg(IRType const* type) const
+		MachineOperand VirtualReg(IRType const* type) const
 		{
-			return MIROperand::VirtualReg(virt_reg_id++, GetOperandType(type));
+			return MachineOperand::VirtualReg(virt_reg_id++, GetOperandType(type));
 		}
-		MIROperand VirtualReg(MIROperandType type) const
+		MachineOperand VirtualReg(MachineOperandType type) const
 		{
-			return MIROperand::VirtualReg(virt_reg_id++, type);
+			return MachineOperand::VirtualReg(virt_reg_id++, type);
 		}
 		std::string GetLabel() const
 		{
@@ -78,13 +78,13 @@ namespace ola
 		}
 
 	private:
-		MIRModule& module;
-		MIRBasicBlock* current_block = nullptr;
+		MachineModule& module;
+		MachineBasicBlock* current_block = nullptr;
 
-		mutable std::unordered_map<GlobalValue const*, MIRGlobal*> global_map;
-		mutable std::unordered_map<BasicBlock const*, MIRBasicBlock*> block_map;
-		mutable std::unordered_map<Value const*, MIROperand> value_map;
-		mutable std::unordered_map<Value const*, MIROperand> storage_map;
+		mutable std::unordered_map<GlobalValue const*, MachineGlobal*> global_map;
+		mutable std::unordered_map<BasicBlock const*, MachineBasicBlock*> block_map;
+		mutable std::unordered_map<Value const*, MachineOperand> value_map;
+		mutable std::unordered_map<Value const*, MachineOperand> storage_map;
 		mutable uint32 virt_reg_id = 0;
 		mutable uint32 label_id = 0;
 	};

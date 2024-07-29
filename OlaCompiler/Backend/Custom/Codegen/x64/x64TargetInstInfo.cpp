@@ -1,6 +1,6 @@
 #include "x64.h"
 #include "x64TargetInstInfo.h"
-#include "Backend/Custom/Codegen/MIRInstruction.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola
 {

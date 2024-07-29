@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "MIROperand.h"
+#include "MachineOperand.h"
 #include "Utility/EnumOperators.h"
 
 namespace ola
@@ -81,20 +81,20 @@ namespace ola
 		ISASpecificBegin,
 	};
 
-	enum MIRInstructionFlag : uint32
+	enum MachineInstFlag : uint32
 	{
-		MIRInstructionFlag_None = 0x0,
-		MIRInstructionFlag_IgnoreDef = 0x1,
+		MachineInstFlag_None = 0x0,
+		MachineInstFlag_IgnoreDef = 0x1,
 	};
 
-	class MIRInstruction
+	class MachineInstruction
 	{
 		static constexpr uint32 MAX_OPERANDS = 7;
 
 	public:
-		explicit MIRInstruction(uint32 opcode) : opcode(opcode), flags(MIRInstructionFlag_None) {}
+		explicit MachineInstruction(uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) {}
 
-		MIRInstruction& SetOpcode(uint32 _opcode)
+		MachineInstruction& SetOpcode(uint32 _opcode)
 		{
 			opcode = _opcode;
 			return *this;
@@ -102,62 +102,62 @@ namespace ola
 		uint32 GetOpcode() const { return opcode; }
 
 
-		bool operator==(MIRInstruction const& rhs) const
+		bool operator==(MachineInstruction const& rhs) const
 		{
 			return opcode == rhs.opcode && operands == rhs.operands;
 		}
 
 		template<uint32 Idx>
-		MIROperand const& GetOp() const
+		MachineOperand const& GetOp() const
 		{
 			return operands[Idx];
 		}
 		template<uint32 Idx>
-		MIROperand& GetOp()
+		MachineOperand& GetOp()
 		{
 			return operands[Idx];
 		}
 		template<uint32 Idx>
-		MIRInstruction& SetOp(MIROperand const& operand)
+		MachineInstruction& SetOp(MachineOperand const& operand)
 		{
 			static_assert(Idx < MAX_OPERANDS);
 			operands[Idx] = operand;
 			return* this;
 		}
 
-		MIROperand& GetOperand(uint32 idx)
+		MachineOperand& GetOperand(uint32 idx)
 		{
 			return operands[idx];
 		}
-		MIROperand const& GetOperand(uint32 idx) const
+		MachineOperand const& GetOperand(uint32 idx) const
 		{
 			return operands[idx];
 		}
-		void SetOperand(uint32 idx, MIROperand const& operand)
+		void SetOperand(uint32 idx, MachineOperand const& operand)
 		{
 			operands[idx] = operand;
 		}
 
-		void SetFlag(MIRInstructionFlag flag)
+		void SetFlag(MachineInstFlag flag)
 		{
 			flags |= flag;
 		}
 		void SetIgnoringDefFlag()
 		{
-			SetFlag(MIRInstructionFlag_IgnoreDef);
+			SetFlag(MachineInstFlag_IgnoreDef);
 		}
-		bool HasFlag(MIRInstructionFlag flag) const
+		bool HasFlag(MachineInstFlag flag) const
 		{
 			return (flags & flag) != 0;
 		}
 		bool HasIgnoringDefFlag() const
 		{
-			return HasFlag(MIRInstructionFlag_IgnoreDef);
+			return HasFlag(MachineInstFlag_IgnoreDef);
 		}
 
 	private:
 		uint32 opcode;
 		uint32 flags;
-		std::array<MIROperand, MAX_OPERANDS> operands;
+		std::array<MachineOperand, MAX_OPERANDS> operands;
 	};
 }

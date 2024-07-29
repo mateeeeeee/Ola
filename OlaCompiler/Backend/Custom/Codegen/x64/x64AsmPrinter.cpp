@@ -2,25 +2,25 @@
 #include "x64.h"
 #include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
-#include "Backend/Custom/Codegen/MIRModule.h"
-#include "Backend/Custom/Codegen/MIRBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineModule.h"
+#include "Backend/Custom/Codegen/MachineBasicBlock.h"
 
 namespace ola
 {
 
-	static std::string GetOperandPrefix(MIROperand const& MO)
+	static std::string GetOperandPrefix(MachineOperand const& MO)
 	{
 		switch (MO.GetType())
 		{
-		case MIROperandType::Int8:  return "byte ptr";
-		case MIROperandType::Int64: 
-		case MIROperandType::Ptr:
-		case MIROperandType::Other: return "qword ptr";
+		case MachineOperandType::Int8:  return "byte ptr";
+		case MachineOperandType::Int64: 
+		case MachineOperandType::Ptr:
+		case MachineOperandType::Other: return "qword ptr";
 		}
 		return "";
 	}
 
-	static std::string GetOperandString(MIROperand const& MO)
+	static std::string GetOperandString(MachineOperand const& MO)
 	{
 		if (MO.IsReg())
 		{
@@ -51,7 +51,7 @@ namespace ola
 	}
 
 
-	void x64AsmPrinter::PrintModule(MIRModule const& M)
+	void x64AsmPrinter::PrintModule(MachineModule const& M)
 	{
 		EmitPreamble(".intel_syntax noprefix\n");
 
@@ -59,12 +59,12 @@ namespace ola
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 
 		auto const& globals = M.GetGlobals();
-		for (MIRGlobal const& global : globals)
+		for (MachineGlobal const& global : globals)
 		{
-			MIRRelocable* relocable = global.GetRelocable();
+			MachineRelocable* relocable = global.GetRelocable();
 			if (relocable->IsFunction())
 			{
-				MIRFunction& MF = *static_cast<MIRFunction*>(relocable);
+				MachineFunction& MF = *static_cast<MachineFunction*>(relocable);
 				if (global.GetLinkage() == Linkage::External)
 				{
 					if(!MF.IsDeclaration()) EmitText(".globl {}\n", MF.GetSymbol());
@@ -76,55 +76,55 @@ namespace ola
 				for (auto& MBB : MF.Blocks())
 				{
 					EmitText("{}:", MBB->GetSymbol());
-					for (MIRInstruction& MI : MBB->Instructions())
+					for (MachineInstruction& MI : MBB->Instructions())
 					{
 						switch (MI.GetOpcode())
 						{
 						case InstPush:
 						{
-							MIROperand const& op = MI.GetOp<0>();
+							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("push {}", GetOperandString(op));
 						}
 						break;
 						case InstPop:
 						{
-							MIROperand const& op = MI.GetOp<0>();
+							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("pop {}", GetOperandString(op));
 						}
 						break;
 						case InstJump:
 						{
-							MIROperand const& dst = MI.GetOp<0>();
+							MachineOperand const& dst = MI.GetOp<0>();
 							OLA_ASSERT(dst.IsRelocable());
-							MIRRelocable* relocable = dst.GetRelocable();
+							MachineRelocable* relocable = dst.GetRelocable();
 							EmitText("jmp {}", relocable->GetSymbol());
 						}
 						break;
 						case InstStore:
 						case InstLoad:
 						{
-							MIROperand const& dst = MI.GetOp<0>();
-							MIROperand const& src = MI.GetOp<1>();
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
 							EmitText("mov {}, {}", GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstAdd:
 						{
-							MIROperand const& dst = MI.GetOp<0>();
-							MIROperand const& src = MI.GetOp<1>();
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
 							EmitText("add {}, {}", GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstSub:
 						{
-							MIROperand const& dst = MI.GetOp<0>();
-							MIROperand const& src = MI.GetOp<1>();
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
 							EmitText("sub {}, {}", GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstCall:
 						{
-							MIROperand const& callee = MI.GetOp<0>();
+							MachineOperand const& callee = MI.GetOp<0>();
 							EmitText("call {}", GetOperandString(callee));
 						}
 						break;

@@ -9,8 +9,8 @@ namespace ola
 	class Instruction;
 	class CallInst;
 	class ReturnInst;
-	class MIRInstruction;
-	class MIRFunction;
+	class MachineInstruction;
+	class MachineFunction;
 
 	class TargetDataLayout
 	{
@@ -71,7 +71,7 @@ namespace ola
 	public:
 		virtual ~TargetInstInfo() = default;
 		virtual InstInfo GetInstInfo(uint32 opcode) const = 0;
-		InstInfo GetInstInfo(MIRInstruction const& inst) const;
+		InstInfo GetInstInfo(MachineInstruction const& inst) const;
 	};
 
 	class TargetRegisterInfo
@@ -91,9 +91,9 @@ namespace ola
 	class LoweringContext;
 	struct InstLegalizeContext
 	{
-		MIRInstruction& instruction;
-		std::list<MIRInstruction>& instructions;
-		std::list<MIRInstruction>::iterator instruction_iterator;
+		MachineInstruction& instruction;
+		std::list<MachineInstruction>& instructions;
+		std::list<MachineInstruction>::iterator instruction_iterator;
 	};
 	class TargetISelInfo
 	{
@@ -110,12 +110,12 @@ namespace ola
 		virtual ~TargetFrameInfo() = default;
 
 		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const = 0;
-		virtual void EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const = 0;
-		virtual void EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const = 0;
+		virtual void EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const = 0;
+		virtual void EmitEpilogue(MachineFunction& MF, LoweringContext& ctx) const = 0;
 		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const = 0;
 	};
 
-	class MIRModule;
+	class MachineModule;
 	class Target
 	{
 	public:
@@ -125,6 +125,6 @@ namespace ola
 		virtual TargetRegisterInfo const& GetRegisterInfo() const = 0;
 		virtual TargetISelInfo const& GetISelInfo() const = 0;
 		virtual TargetFrameInfo const& GetFrameInfo() const = 0;
-		virtual void EmitAssembly(MIRModule& M, std::string_view file) const = 0;
+		virtual void EmitAssembly(MachineModule& M, std::string_view file) const = 0;
 	};
 }

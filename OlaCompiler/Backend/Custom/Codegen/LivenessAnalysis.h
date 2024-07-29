@@ -21,17 +21,17 @@ namespace ola
 	}
 
 
-	class MIRInstruction;
-	class MIRBasicBlock;
-	class MIRFunction;
-	class MIRModule;
+	class MachineInstruction;
+	class MachineBasicBlock;
+	class MachineFunction;
+	class MachineModule;
 
 
 	struct LivenessAnalysisResult
 	{
 		std::vector<LiveInterval> live_intervals;
-		std::unordered_map<MIRInstruction*, uint64> instruction_numbering_map;
+		std::unordered_map<MachineInstruction*, uint64> instruction_numbering_map;
 	};
 
-	LivenessAnalysisResult DoLivenessAnalysis(MIRModule& M, MIRFunction& MF);
+	LivenessAnalysisResult DoLivenessAnalysis(MachineModule& M, MachineFunction& MF);
 }

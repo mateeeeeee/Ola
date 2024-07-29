@@ -1,6 +1,6 @@
 #pragma once
 #include <iosfwd>
-#include "MIRGlobal.h"
+#include "MachineGlobal.h"
 #include "LoweringContext.h"
 
 namespace ola
@@ -19,17 +19,17 @@ namespace ola
 	class CallInst;
 	class AllocaInst;
 
-	class MIRInstruction;
+	class MachineInstruction;
 	class MIRInstructionInfo;
-	class MIRFunction;
+	class MachineFunction;
 
 	class Target;
 
-	class MIRModule
+	class MachineModule
 	{
 	public:
-		explicit MIRModule(IRModule& ir_module, Target const& target);
-		virtual ~MIRModule() = default;
+		explicit MachineModule(IRModule& ir_module, Target const& target);
+		virtual ~MachineModule() = default;
 
 		Target const& GetTarget() const { return target; }
 		auto   const& GetGlobals() const { return globals; }
@@ -37,7 +37,7 @@ namespace ola
 		void EmitAssembly(std::string_view assembly_file);
 
 	protected:
-		std::vector<MIRGlobal> globals;
+		std::vector<MachineGlobal> globals;
 		LoweringContext lowering_ctx;
 		Target const& target;
 

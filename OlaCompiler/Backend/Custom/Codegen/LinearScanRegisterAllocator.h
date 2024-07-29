@@ -9,9 +9,9 @@ namespace ola
 	class LinearScanRegisterAllocator : public RegisterAllocator
 	{
 	public:
-		explicit LinearScanRegisterAllocator(MIRModule& M) : RegisterAllocator(M), frame_register() {}
+		explicit LinearScanRegisterAllocator(MachineModule& M) : RegisterAllocator(M), frame_register() {}
 
-		virtual void AssignRegisters(MIRFunction&) override;
+		virtual void AssignRegisters(MachineFunction&) override;
 
 	private:
 		std::vector<LiveInterval*> active;
@@ -23,6 +23,6 @@ namespace ola
 	private:
 		void ExpireOldIntervals(LiveInterval& LI);
 		void SpillAtInterval(LiveInterval& LI);
-		void Finalize(MIRFunction&, std::vector<LiveInterval>&);
+		void Finalize(MachineFunction&, std::vector<LiveInterval>&);
 	};
 }

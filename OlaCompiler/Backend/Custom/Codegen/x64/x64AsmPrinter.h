@@ -13,12 +13,12 @@ namespace ola
 		x64Section_BSS
 	};
 
-	class MIRModule;
+	class MachineModule;
 	class x64AsmPrinter : public AsmPrinter
 	{
 	public:
 		x64AsmPrinter(std::ostream& os) : AsmPrinter(os) {}
-		virtual void PrintModule(MIRModule const& M) override;
+		virtual void PrintModule(MachineModule const& M) override;
 
 	private:
 		virtual std::string GetSectionLabel(SectionId section) const override

@@ -7,14 +7,14 @@
 namespace ola
 {
 	using SectionId = uint32;
-	class MIRModule;
+	class MachineModule;
 
 	class AsmPrinter
 	{
 	public:
 		explicit AsmPrinter(std::ostream& os) : os(os) {}
 		~AsmPrinter() = default;
-		virtual void PrintModule(MIRModule const& M) = 0;
+		virtual void PrintModule(MachineModule const& M) = 0;
 
 	protected:
 		std::ostream& os;

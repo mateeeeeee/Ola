@@ -1,5 +1,5 @@
 #pragma once
-#include "Backend/Custom/Codegen/MIRInstruction.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola::x64
 {

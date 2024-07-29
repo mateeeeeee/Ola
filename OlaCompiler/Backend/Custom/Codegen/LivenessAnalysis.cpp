@@ -1,24 +1,24 @@
 #include <algorithm>
 #include "LivenessAnalysis.h"
-#include "MIRGlobal.h"
-#include "MIRBasicBlock.h"
-#include "MIRModule.h"
+#include "MachineGlobal.h"
+#include "MachineBasicBlock.h"
+#include "MachineModule.h"
 #include "Target.h"
 
 namespace ola
 {
-	static inline uint32 GetRegAsUint(MIROperand const& operand)
+	static inline uint32 GetRegAsUint(MachineOperand const& operand)
 	{
 		OLA_ASSERT(operand.IsReg() && (IsVirtualReg(operand.GetReg().reg) || IsISAReg(operand.GetReg().reg)));
 		return static_cast<uint32>(operand.GetReg().reg);
 	}
 
-	static void AssignInstNum(MIRFunction& MF, std::unordered_map<MIRInstruction*, uint64>& inst_number_map)
+	static void AssignInstNum(MachineFunction& MF, std::unordered_map<MachineInstruction*, uint64>& inst_number_map)
 	{
 		uint64 current = 0;
 		for (auto& block : MF.Blocks())
 		{
-			for (MIRInstruction& inst : block->Instructions()) 
+			for (MachineInstruction& inst : block->Instructions()) 
 			{
 				inst_number_map[&inst] = current;
 				current += 4;
@@ -27,7 +27,7 @@ namespace ola
 	}
 
 
-	LivenessAnalysisResult DoLivenessAnalysis(MIRModule& M, MIRFunction& MF)
+	LivenessAnalysisResult DoLivenessAnalysis(MachineModule& M, MachineFunction& MF)
 	{
 		LivenessAnalysisResult result{};
 		AssignInstNum(MF, result.instruction_numbering_map);
@@ -39,13 +39,13 @@ namespace ola
 		std::unordered_map<uint32, LiveInterval> live_interval_map;
 		for (auto& MBB : MF.Blocks())
 		{
-			for (MIRInstruction& MI : MBB->Instructions())
+			for (MachineInstruction& MI : MBB->Instructions())
 			{
 				uint64 const instruction_idx = result.instruction_numbering_map[&MI];
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
-					MIROperand& MO = MI.GetOperand(idx);
+					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
 					uint32 reg_id = GetRegAsUint(MO);
 

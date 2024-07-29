@@ -1,5 +1,5 @@
 #include "Target.h"
-#include "MIRInstruction.h"
+#include "MachineInstruction.h"
 #include "Utility/EnumOperators.h"
 
 namespace ola
@@ -17,7 +17,7 @@ namespace ola
 	};
 
 
-	InstInfo TargetInstInfo::GetInstInfo(MIRInstruction const& inst) const
+	InstInfo TargetInstInfo::GetInstInfo(MachineInstruction const& inst) const
 	{
 		return GetInstInfo(inst.GetOpcode());
 	}

@@ -2,9 +2,9 @@
 #include "LinearScanRegisterAllocator.h"
 #include "RegisterAllocator.h"
 #include "LivenessAnalysis.h"
-#include "MIRModule.h"
-#include "MIRBasicBlock.h"
-#include "MIRGlobal.h"
+#include "MachineModule.h"
+#include "MachineBasicBlock.h"
+#include "MachineGlobal.h"
 #include "Target.h"
 
 namespace ola
@@ -18,7 +18,7 @@ namespace ola
 	//		else
 	//			register[i] ← a register removed from pool of free registers
 	//			add i to active, sorted by increasing end point
-	void LinearScanRegisterAllocator::AssignRegisters(MIRFunction& MF)
+	void LinearScanRegisterAllocator::AssignRegisters(MachineFunction& MF)
 	{
 		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
@@ -96,25 +96,25 @@ namespace ola
 		}
 	}
 
-	void LinearScanRegisterAllocator::Finalize(MIRFunction& MF, std::vector<LiveInterval>& intervals)
+	void LinearScanRegisterAllocator::Finalize(MachineFunction& MF, std::vector<LiveInterval>& intervals)
 	{
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 
 		for (auto& MBB : MF.Blocks())
 		{
-			for (MIRInstruction& MI : MBB->Instructions())
+			for (MachineInstruction& MI : MBB->Instructions())
 			{
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
-					MIROperand& MO = MI.GetOperand(idx);
+					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
 					uint32 vreg_id = MO.GetReg().reg;
 
 					//spilling
 					if (!vreg2reg_map.contains(vreg_id))
 					{
-						MIROperand& MO = MF.AllocateStack(MIROperandType::Int64);
+						MachineOperand& MO = MF.AllocateStack(MachineOperandType::Int64);
 						int32 stack_offset = MO.GetStackOffset();
 						uint32 frame_reg = frame_register;
 
@@ -123,7 +123,7 @@ namespace ola
 					else
 					{
 						uint32 reg_id = vreg2reg_map[vreg_id];
-						MO = MIROperand::ISAReg(reg_id, MO.GetType());
+						MO = MachineOperand::ISAReg(reg_id, MO.GetType());
 					}
 				}
 			}

@@ -1,8 +1,8 @@
 #include <fstream>
-#include "MIRModule.h"
+#include "MachineModule.h"
 #include "Target.h"
-#include "MIRGlobal.h"
-#include "MIRBasicBlock.h"
+#include "MachineGlobal.h"
+#include "MachineBasicBlock.h"
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -10,24 +10,17 @@
 
 namespace ola
 {
-	namespace
-	{
-		void EmitMIRInstruction(std::ofstream& mir, MIRInstruction& MI)
-		{
-		}
-	}
-
-	MIRModule::MIRModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), target(target)
+	MachineModule::MachineModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
 	}
 
-	void MIRModule::EmitAssembly(std::string_view assembly_file)
+	void MachineModule::EmitAssembly(std::string_view assembly_file)
 	{
 		target.EmitAssembly(*this, assembly_file);
 	}
 
-	void MIRModule::LowerModule(IRModule* ir_module)
+	void MachineModule::LowerModule(IRModule* ir_module)
 	{
 		auto const& ir_globals = ir_module->Globals();
 		globals.reserve(ir_globals.size());
@@ -36,7 +29,7 @@ namespace ola
 			if (GV->IsFunction())
 			{
 				Function* F = cast<Function>(GV);
-				globals.emplace_back(new MIRFunction(F->GetName(), F->IsDeclaration()), F->GetLinkage());
+				globals.emplace_back(new MachineFunction(F->GetName(), F->IsDeclaration()), F->GetLinkage());
 			}
 			else
 			{
@@ -51,7 +44,7 @@ namespace ola
 					Constant* C = cast<Constant>(init_value);
 
 					bool const read_only = V->IsReadOnly();
-					MIRDataStorage* data = new MIRDataStorage(V->GetName(), read_only);
+					MachineDataStorage* data = new MachineDataStorage(V->GetName(), read_only);
 
 					auto ExpandValue = [&](auto&& self, Value* V) -> void
 						{
@@ -102,7 +95,7 @@ namespace ola
 				}
 				else
 				{
-					globals.emplace_back(new MIRZeroStorage(V->GetName(), size), V->GetLinkage(), alignment);
+					globals.emplace_back(new MachineZeroStorage(V->GetName(), size), V->GetLinkage(), alignment);
 				}
 			}
 			lowering_ctx.AddGlobal(GV, &globals.back());
@@ -118,14 +111,14 @@ namespace ola
 				{
 					LowerFunction(F);
 
-					MIRGlobal* global = lowering_ctx.GetGlobal(F);
-					MIRFunction& MF = *static_cast<MIRFunction*>(global->GetRelocable());
+					MachineGlobal* global = lowering_ctx.GetGlobal(F);
+					MachineFunction& MF = *static_cast<MachineFunction*>(global->GetRelocable());
 					for (auto& MBB : MF.Blocks())
 					{
 						auto& instructions = MBB->Instructions();
 						for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 						{
-							MIRInstruction& MI = *MIiterator;
+							MachineInstruction& MI = *MIiterator;
 							InstLegalizeContext ctx{ MI, instructions, MIiterator };
 							isel_info.LegalizeInstruction(ctx, lowering_ctx);
 						}
@@ -138,17 +131,17 @@ namespace ola
 		}
 	}
 
-	void MIRModule::LowerFunction(Function* F)
+	void MachineModule::LowerFunction(Function* F)
 	{
-		MIRGlobal* global = lowering_ctx.GetGlobal(F);
-		MIRFunction& MF = *dynamic_cast<MIRFunction*>(global->GetRelocable());
+		MachineGlobal* global = lowering_ctx.GetGlobal(F);
+		MachineFunction& MF = *dynamic_cast<MachineFunction*>(global->GetRelocable());
 		//LowerCFGAnalysis(F);
 
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MF.Blocks().push_back(std::make_unique<MIRBasicBlock>(&MF, lowering_ctx.GetLabel()));
+			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
 			lowering_ctx.AddBlock(&BB, MBB.get());
 			for (auto& I : BB.Instructions())
@@ -167,7 +160,7 @@ namespace ola
 				{
 					AllocaInst* AI = cast<AllocaInst>(&I);
 					IRType const* type = AI->GetAllocatedType();
-					MIROperand const& MO = MF.AllocateStack(GetOperandType(type));
+					MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
 					lowering_ctx.AddOperand(AI, MO);
 				}
 			}
@@ -187,7 +180,7 @@ namespace ola
 		frame_info.EmitPrologue(MF, lowering_ctx);
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MIRBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
+			MachineBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
 			lowering_ctx.SetCurrentBasicBlock(MBB);
 			for (Instruction& inst : BB.Instructions())
 			{
@@ -200,7 +193,7 @@ namespace ola
 		frame_info.EmitEpilogue(MF, lowering_ctx);
 	}
 
-	void MIRModule::LowerInstruction(Instruction* inst)
+	void MachineModule::LowerInstruction(Instruction* inst)
 	{
 		switch (inst->GetOpcode())
 		{
@@ -251,36 +244,36 @@ namespace ola
 		}
 	}
 
-	void MIRModule::LowerBinary(BinaryInst* inst)
+	void MachineModule::LowerBinary(BinaryInst* inst)
 	{
-		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction MI(GetMachineID(inst->GetOpcode()));
+		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
+		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0))).SetOp<2>(lowering_ctx.GetOperand(inst->GetOperand(1)));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
-	void MIRModule::LowerUnary(UnaryInst* inst)
+	void MachineModule::LowerUnary(UnaryInst* inst)
 	{
-		MIROperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIRInstruction MI(GetMachineID(inst->GetOpcode()));
+		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
+		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
-	void MIRModule::LowerRet(ReturnInst* inst)
+	void MachineModule::LowerRet(ReturnInst* inst)
 	{
 		target.GetFrameInfo().EmitReturn(inst, lowering_ctx);
 	}
 
-	void MIRModule::LowerBranch(BranchInst* inst)
+	void MachineModule::LowerBranch(BranchInst* inst)
 	{
 		if (inst->IsUnconditional())
 		{
 			BasicBlock* target = inst->GetTrueTarget();
-			MIROperand dst_operand = MIROperand::Relocable(lowering_ctx.GetBlock(target));
-			MIRInstruction MI(InstJump);
+			MachineOperand dst_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(target));
+			MachineInstruction MI(InstJump);
 			MI.SetOp<0>(dst_operand);
 			lowering_ctx.EmitInst(MI);
 		}
@@ -290,38 +283,38 @@ namespace ola
 		}
 	}
 
-	void MIRModule::LowerLoad(LoadInst* inst)
+	void MachineModule::LowerLoad(LoadInst* inst)
 	{
-		MIROperand const& ret = lowering_ctx.VirtualReg(inst->GetType());
-		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
-		MIRInstruction MI(InstLoad);
+		MachineOperand const& ret = lowering_ctx.VirtualReg(inst->GetType());
+		MachineOperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
+		MachineInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}
 
-	void MIRModule::LowerStore(StoreInst* inst)
+	void MachineModule::LowerStore(StoreInst* inst)
 	{
-		MIROperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
-		MIROperand const& val = lowering_ctx.GetOperand(inst->GetValueOp());
-		MIRInstruction MI(InstStore);
+		MachineOperand const& ptr = lowering_ctx.GetOperand(inst->GetAddressOp());
+		MachineOperand const& val = lowering_ctx.GetOperand(inst->GetValueOp());
+		MachineInstruction MI(InstStore);
 		MI.SetOp<1>(val).SetOp<0>(ptr);
 		lowering_ctx.EmitInst(MI);
 	}
 
-	void MIRModule::LowerCall(CallInst* inst)
+	void MachineModule::LowerCall(CallInst* inst)
 	{
 		target.GetFrameInfo().EmitCall(inst, lowering_ctx);
 	}
 
-	void MIRModule::LowerCFGAnalysis(Function* F)
+	void MachineModule::LowerCFGAnalysis(Function* F)
 	{
 		CFGAnalysisPass CFG{};
 		CFG.RunOn(*F);
 		CFGResult const& cfg_result = CFG.GetResult();
 		for (auto&& [BB, info] : cfg_result)
 		{
-			MIRBasicBlock* MBB = lowering_ctx.GetBlock(BB);
+			MachineBasicBlock* MBB = lowering_ctx.GetBlock(BB);
 			for (auto* P : info.predecessors) MBB->AddPredecessor(lowering_ctx.GetBlock(P));
 			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
 		}

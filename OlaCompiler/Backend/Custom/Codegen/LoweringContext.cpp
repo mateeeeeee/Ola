@@ -1,35 +1,35 @@
 #include "LoweringContext.h"
-#include "MIRBasicBlock.h"
-#include "MIRGlobal.h"
+#include "MachineBasicBlock.h"
+#include "MachineGlobal.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Constant.h"
 
 namespace ola
 {
-	MIROperandType GetOperandType(IRType const* type)
+	MachineOperandType GetOperandType(IRType const* type)
 	{
 		if (type->IsPointer())
 		{
-			return MIROperandType::Ptr;
+			return MachineOperandType::Ptr;
 		}
 		if (type->IsInteger())
 		{
 			switch (cast<IRIntType>(type)->GetWidth())
 			{
 			case 1:
-				return MIROperandType::Int8;
+				return MachineOperandType::Int8;
 			case 8:
-				return MIROperandType::Int64;
+				return MachineOperandType::Int64;
 			default:
 				OLA_ASSERT(false);
 			}
 		}
 		if (type->IsFloat())
 		{
-			return MIROperandType::Float64;
+			return MachineOperandType::Float64;
 		}
 		OLA_ASSERT(false);
-		return MIROperandType::Other;
+		return MachineOperandType::Other;
 	}
 	MachineOpcode GetMachineID(Opcode opcode)
 	{
@@ -75,7 +75,7 @@ namespace ola
 		return InstUnknown;
 	}
 
-	MIROperand LoweringContext::GetOperand(Value const* V)
+	MachineOperand LoweringContext::GetOperand(Value const* V)
 	{
 		if (value_map.contains(V)) return value_map[V];
 		OLA_ASSERT(V->IsConstant());
@@ -83,13 +83,13 @@ namespace ola
 		if (C->GetConstantID() == ConstantID::Global)
 		{
 			GlobalValue const* GV = cast<GlobalValue>(C);
-			MIROperand ptr = VirtualReg(MIROperandType::Int64);
-			MIRInstruction minst(InstStore);
+			MachineOperand ptr = VirtualReg(MachineOperandType::Int64);
+			MachineInstruction minst(InstStore);
 
-			MIRGlobal* mir_global = global_map[GV];
+			MachineGlobal* mir_global = global_map[GV];
 			OLA_ASSERT(mir_global);
 
-			MIROperand global = MIROperand::Relocable(mir_global->GetRelocable());
+			MachineOperand global = MachineOperand::Relocable(mir_global->GetRelocable());
 			minst.SetOp<0>(ptr).SetOp<1>(global);
 			EmitInst(minst);
 			return ptr;
@@ -97,17 +97,17 @@ namespace ola
 		else if (C->GetConstantID() == ConstantID::Integer)
 		{
 			ConstantInt const* CI = cast<ConstantInt>(C);
-			MIROperand imm = MIROperand::Immediate(CI->GetValue(), MIROperandType::Int64);
+			MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineOperandType::Int64);
 			return imm;
 		}
 		else
 		{
 			OLA_ASSERT(false);
-			return MIROperand();
+			return MachineOperand();
 		}
 	}
 
-	void LoweringContext::EmitInst(MIRInstruction const& MI)
+	void LoweringContext::EmitInst(MachineInstruction const& MI)
 	{
 		auto& minst_list = current_block->Instructions();
 		minst_list.emplace_back(MI);

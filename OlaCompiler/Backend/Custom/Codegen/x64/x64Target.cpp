@@ -6,7 +6,7 @@
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
-#include "Backend/Custom/Codegen/MIRInstruction.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/LoweringContext.h"
 
 namespace ola
@@ -44,21 +44,21 @@ namespace ola
 
 		virtual void LegalizeInstruction(InstLegalizeContext& legalize_ctx, LoweringContext& lowering_ctx) const override
 		{
-			MIRInstruction& MI = legalize_ctx.instruction;
+			MachineInstruction& MI = legalize_ctx.instruction;
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
 
 			if (MI.GetOpcode() == InstStore) 
 			{
-				MIROperand dst = MI.GetOperand(0);
-				MIROperand src = MI.GetOperand(1);
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
 				if ((src.IsStackObject() || src.IsRelocable()) && (dst.IsStackObject() || dst.IsRelocable()))
 				{
-					MIROperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
 					MI.SetIgnoringDefFlag();
 
-					MIRInstruction MI2(InstStore);
+					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
@@ -66,14 +66,14 @@ namespace ola
 			}
 			if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub)
 			{
-				MIROperand dst = MI.GetOperand(0);
-				MIROperand op1 = MI.GetOperand(1);
-				MIROperand op2 = MI.GetOperand(2);
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
 				if (!op2.IsUnused())
 				{
 					MI.SetOp<1>(op2);
 					MI.SetIgnoringDefFlag();
-					MIRInstruction MI2(InstLoad);
+					MachineInstruction MI2(InstLoad);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
@@ -174,7 +174,7 @@ namespace ola
 		return x64_target_frame_info;
 	}
 
-	void x64Target::EmitAssembly(MIRModule& M, std::string_view file) const
+	void x64Target::EmitAssembly(MachineModule& M, std::string_view file) const
 	{
 		std::ofstream asm_stream(file.data());
 		x64AsmPrinter asm_printer(asm_stream);

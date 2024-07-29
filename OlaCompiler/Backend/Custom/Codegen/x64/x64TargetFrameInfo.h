@@ -6,8 +6,8 @@ namespace ola
 	{
 	public:
 		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const override;
-		virtual void EmitPrologue(MIRFunction& MF, LoweringContext& ctx) const override;
-		virtual void EmitEpilogue(MIRFunction& MF, LoweringContext& ctx) const override;
+		virtual void EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const override;
+		virtual void EmitEpilogue(MachineFunction& MF, LoweringContext& ctx) const override;
 		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const override;
 	};
 }

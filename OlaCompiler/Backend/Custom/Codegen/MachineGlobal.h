@@ -2,8 +2,8 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-#include "MIRGlobal.h"
-#include "MIROperand.h"
+#include "MachineGlobal.h"
+#include "MachineOperand.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
@@ -16,11 +16,11 @@ namespace ola
 		Block
 	};
 
-	class MIRRelocable
+	class MachineRelocable
 	{
 	public:
-		explicit MIRRelocable(std::string_view symbol) : symbol(symbol) {}
-		virtual ~MIRRelocable() = default;
+		explicit MachineRelocable(std::string_view symbol) : symbol(symbol) {}
+		virtual ~MachineRelocable() = default;
 
 		std::string_view GetSymbol() const { return symbol; }
 		virtual RelocableKind GetRelocableKind() const = 0;
@@ -34,33 +34,33 @@ namespace ola
 		std::string symbol;
 	};
 
-	class MIRBasicBlock;
-	class MIRFunction final : public MIRRelocable
+	class MachineBasicBlock;
+	class MachineFunction final : public MachineRelocable
 	{
 	public:
-		explicit MIRFunction(std::string_view symbol, bool is_declaration);
-		~MIRFunction();
+		explicit MachineFunction(std::string_view symbol, bool is_declaration);
+		~MachineFunction();
 
 		bool IsDeclaration() const { return is_declaration; }
 
 		auto& Blocks() { return blocks; }
 		auto const& Blocks() const { return blocks; }
 
-		std::vector<MIROperand>& Args()
+		std::vector<MachineOperand>& Args()
 		{
 			return args;
 		}
-		MIROperand& AllocateStack(MIROperandType type)
+		MachineOperand& AllocateStack(MachineOperandType type)
 		{
 			stack_offset += GetOperandSize(type);
-			MIROperand stack_object = MIROperand::StackObject(-stack_offset, type);
+			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, type);
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}
-		MIROperand& AllocateStack(uint32 size)
+		MachineOperand& AllocateStack(uint32 size)
 		{
 			stack_offset += size;
-			MIROperand stack_object = MIROperand::StackObject(-stack_offset, MIROperandType::Unknown);
+			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineOperandType::Unknown);
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}
@@ -76,17 +76,17 @@ namespace ola
 
 	private:
 		bool is_declaration;
-		std::list<std::unique_ptr<MIRBasicBlock>> blocks;
-		std::vector<MIROperand> args;
+		std::list<std::unique_ptr<MachineBasicBlock>> blocks;
+		std::vector<MachineOperand> args;
 		int32 stack_offset = 0;
-		std::vector<MIROperand> stack_objects;
+		std::vector<MachineOperand> stack_objects;
 	};
 
-	class MIRZeroStorage final : public MIRRelocable
+	class MachineZeroStorage final : public MachineRelocable
 	{
 
 	public:
-		explicit MIRZeroStorage(std::string_view symbol, uint64 size) : MIRRelocable(symbol), size(size) {}
+		explicit MachineZeroStorage(std::string_view symbol, uint64 size) : MachineRelocable(symbol), size(size) {}
 
 		uint64 GetSize() const { return size; }
 
@@ -99,12 +99,12 @@ namespace ola
 		uint64 size;
 	};
 
-	class MIRDataStorage final : public MIRRelocable 
+	class MachineDataStorage final : public MachineRelocable 
 	{
 	public:
 		using Storage = std::vector<std::variant<uint8, uint16, uint32, uint64>>;
 	public:
-		MIRDataStorage(std::string_view symbol, bool read_only) : MIRRelocable(symbol),  read_only(read_only) {}
+		MachineDataStorage(std::string_view symbol, bool read_only) : MachineRelocable(symbol),  read_only(read_only) {}
 		
 		bool IsReadOnly() const
 		{
@@ -148,18 +148,18 @@ namespace ola
 		}
 	};
 
-	class MIRGlobal 
+	class MachineGlobal 
 	{
 	public:
-		MIRGlobal(MIRRelocable* relocable, Linkage linkage, uint32 alignment = 0)
+		MachineGlobal(MachineRelocable* relocable, Linkage linkage, uint32 alignment = 0)
 			: relocable(relocable), linkage(linkage), alignment(alignment) {}
 
 		Linkage GetLinkage() const { return linkage; }
 		uint32  GetAlignment() const { return alignment; }
-		MIRRelocable* GetRelocable() const { return relocable.get(); }
+		MachineRelocable* GetRelocable() const { return relocable.get(); }
 
 	private:
-		std::unique_ptr<MIRRelocable> relocable;
+		std::unique_ptr<MachineRelocable> relocable;
 		Linkage linkage;
 		uint32 alignment;
 	};
