@@ -240,7 +240,7 @@ namespace ola
 	void MachineModule::LowerBinary(BinaryInst* inst)
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
+		MachineInstruction MI(GetMachineOpcode(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->LHS())).SetOp<2>(lowering_ctx.GetOperand(inst->RHS()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
@@ -249,7 +249,7 @@ namespace ola
 	void MachineModule::LowerCompare(CompareInst* inst)
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
+		MachineInstruction MI(GetMachineOpcode(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->LHS())).SetOp<2>(lowering_ctx.GetOperand(inst->RHS()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
@@ -258,7 +258,7 @@ namespace ola
 	void MachineModule::LowerUnary(UnaryInst* inst)
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
-		MachineInstruction MI(GetMachineID(inst->GetOpcode()));
+		MachineInstruction MI(GetMachineOpcode(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);

@@ -31,7 +31,7 @@ namespace ola
 		OLA_ASSERT(false);
 		return MachineOperandType::Other;
 	}
-	MachineOpcode GetMachineID(Opcode opcode)
+	MachineOpcode GetMachineOpcode(Opcode opcode)
 	{
 		switch (opcode)
 		{

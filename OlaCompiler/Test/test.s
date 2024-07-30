@@ -47,6 +47,11 @@ call add__I__I
 mov r15, rax
 mov qword ptr [rbp-16], r15
 mov r15, qword ptr [rbp-16]
+cmp r15, 3
+sete r15b
+mov cl, r15b
+call Assert
+mov r15, qword ptr [rbp-16]
 mov qword ptr [rbp-8], r15
 jmp label5
 label4:

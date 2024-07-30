@@ -18,7 +18,7 @@ namespace ola
 	enum class Opcode : uint32;
 
 	MachineOperandType GetOperandType(IRType const* type);
-	MachineOpcode GetMachineID(Opcode opcode);
+	MachineOpcode GetMachineOpcode(Opcode opcode);
 
 	class LoweringContext
 	{

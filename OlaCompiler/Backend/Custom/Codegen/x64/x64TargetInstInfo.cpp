@@ -50,6 +50,21 @@ namespace ola
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
+		case x64::InstICmp:
+		case x64::InstFCmp:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		case x64::SetE:
+		case x64::SetNE:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
 		}
 		return inst_info;
 	}

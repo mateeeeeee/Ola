@@ -26,8 +26,8 @@ namespace ola
 	{
 		if (MO.IsReg())
 		{
-			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register seen after register allocation!");
-			return x64::GetRegisterString(MO.GetReg().reg);
+			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
+			return x64::GetRegisterString(MO.GetReg().reg, MO.GetType());
 		}
 		else if (MO.IsImmediate())
 		{
@@ -44,9 +44,9 @@ namespace ola
 			{
 				std::string offset = std::to_string(stack_offset);
 				if (stack_offset >= 0) offset = "+" + offset;
-				return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + offset + "]";
+				return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP, MachineOperandType::Ptr)) + offset + "]";
 			}
-			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP)) + "]";
+			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP, MachineOperandType::Ptr)) + "]";
 		}
 		OLA_ASSERT(false);
 		return "";
@@ -128,6 +128,19 @@ namespace ola
 						{
 							MachineOperand const& callee = MI.GetOp<0>();
 							EmitText("call {}", GetOperandString(callee));
+						}
+						break;
+						case x64::InstICmp:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("cmp {}, {}", GetOperandString(op1), GetOperandString(op2));
+						}
+						break;
+						case x64::SetE:
+						{
+							MachineOperand const& op = MI.GetOp<0>();
+							EmitText("sete {}", GetOperandString(op));
 						}
 						break;
 						}

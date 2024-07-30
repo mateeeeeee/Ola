@@ -95,80 +95,105 @@ namespace ola::x64
 	enum x64Inst : uint32
 	{
 		x64InstBegin = ISASpecificBegin,
-		InstMov = x64InstBegin,
+		InstICmp = x64InstBegin,
+		InstFCmp,
+		SetE,
+		SetNE
 	};
 
-	inline char const* GetRegisterString(uint32 r)
+	inline x64Inst GetCmpInstruction(MachineOpcode opcode)
 	{
-		switch (r)
+		switch (opcode)
 		{
-		case RAX:
-			return "rax";
-		case RCX:
-			return "rcx";
-		case RDX:
-			return "rdx";
-		case RBX:
-			return "rbx";
-		case RSP:
-			return "rsp";
-		case RBP:
-			return "rbp";
-		case RSI:
-			return "rsi";
-		case RDI:
-			return "rdi";
-		case R8:
-			return "r8";
-		case R9:
-			return "r9";
-		case R10:
-			return "r10";
-		case R11:
-			return "r11";
-		case R12:
-			return "r12";
-		case R13:
-			return "r13";
-		case R14:
-			return "r14";
-		case R15:
-			return "r15";
-		case XMM0:
-			return "xmm0";
-		case XMM1:
-			return "xmm1";
-		case XMM2:
-			return "xmm2";
-		case XMM3:
-			return "xmm3";
-		case XMM4:
-			return "xmm4";
-		case XMM5:
-			return "xmm5";
-		case XMM6:
-			return "xmm6";
-		case XMM7:
-			return "xmm7";
-		case XMM8:
-			return "xmm8";
-		case XMM9:
-			return "xmm9";
-		case XMM10:
-			return "xmm10";
-		case XMM11:
-			return "xmm11";
-		case XMM12:
-			return "xmm12";
-		case XMM13:
-			return "xmm13";
-		case XMM14:
-			return "xmm14";
-		case XMM15:
-			return "xmm15";
-		default:
-			OLA_ASSERT(false);
+		case InstICmpEQ: 
+		case InstICmpNE: 
+			return x64::InstICmp;
+		case InstFCmpOEQ:
+		case InstFCmpONE:
+			return x64::InstFCmp;
 		}
-		return "";
+		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+	}
+
+	inline x64Inst GetSetCondition(uint32 opcode)
+	{
+		switch (opcode)
+		{
+		case InstICmpEQ: return x64::SetE;
+		case InstICmpNE: return x64::SetNE;
+		}
+		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+	}
+
+	inline char const* GetRegisterString(uint32_t r, MachineOperandType type)
+	{
+		using enum MachineOperandType;
+		switch (type) 
+		{
+		case Int8:
+			switch (r) 
+			{
+			case RAX: return "al";
+			case RCX: return "cl";
+			case RDX: return "dl";
+			case RBX: return "bl";
+			case RSI: return "sil";
+			case RDI: return "dil";
+			case R8:  return "r8b";
+			case R9:  return "r9b";
+			case R10: return "r10b";
+			case R11: return "r11b";
+			case R12: return "r12b";
+			case R13: return "r13b";
+			case R14: return "r14b";
+			case R15: return "r15b";
+			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
+			}
+		case Int64:
+		case Ptr:
+			switch (r) 
+			{
+			case RAX: return "rax";
+			case RCX: return "rcx";
+			case RDX: return "rdx";
+			case RBX: return "rbx";
+			case RSP: return "rsp";
+			case RBP: return "rbp";
+			case RSI: return "rsi";
+			case RDI: return "rdi";
+			case R8:  return "r8";
+			case R9:  return "r9";
+			case R10: return "r10";
+			case R11: return "r11";
+			case R12: return "r12";
+			case R13: return "r13";
+			case R14: return "r14";
+			case R15: return "r15";
+			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
+			}
+		case Float64:
+			switch (r)
+			{
+			case XMM0: return "xmm0";
+			case XMM1: return "xmm1";
+			case XMM2: return "xmm2";
+			case XMM3: return "xmm3";
+			case XMM4: return "xmm4";
+			case XMM5: return "xmm5";
+			case XMM6: return "xmm6";
+			case XMM7: return "xmm7";
+			case XMM8: return "xmm8";
+			case XMM9: return "xmm9";
+			case XMM10: return "xmm10";
+			case XMM11: return "xmm11";
+			case XMM12: return "xmm12";
+			case XMM13: return "xmm13";
+			case XMM14: return "xmm14";
+			case XMM15: return "xmm15";
+			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
+			}
+		default:
+			OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
+		}
 	}
 }

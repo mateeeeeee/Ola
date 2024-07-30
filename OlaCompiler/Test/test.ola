@@ -10,6 +10,6 @@ int add(int a, int b)
 public int main()
 {
     int r = add(1,2);
-    //Assert(r == 3);
+    Assert(r == 3);
     return r;
 }

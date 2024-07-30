@@ -39,6 +39,22 @@ namespace ola
 	public:
 		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
+			if (CompareInst* CI = dyn_cast<CompareInst>(I))
+			{
+				Opcode opcode = I->GetOpcode();
+				MachineOpcode machine_opcode = GetMachineOpcode(opcode);
+				MachineInstruction MI(x64::GetCmpInstruction(machine_opcode));
+				MI.SetOp<0>(ctx.GetOperand(CI->LHS())).SetOp<1>(ctx.GetOperand(CI->RHS()));
+				ctx.EmitInst(MI);
+
+				MachineOperand ret = ctx.VirtualReg(CI->GetType());
+				MachineInstruction MI2(x64::GetSetCondition(machine_opcode));
+				MI2.SetOp<0>(ret);
+				ctx.EmitInst(MI2);
+				ctx.AddOperand(CI, ret);
+
+				return true;
+			}
 			return false;
 		}
 
