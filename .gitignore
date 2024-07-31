@@ -22,10 +22,13 @@ OlaCompiler/todo.txt
 OlaCompiler/autogen/
 OlaCompiler/OlaCompiler.args.json
 OlaTests/autogen/
-OlaTests/Tests/*.exe
-OlaTests/Tests/*.s
-OlaTests/Tests/*.ll
-OlaTests/Tests/*.oll
+OlaTests/Tests/LLVM/*.exe
+OlaTests/Tests/LLVM/*.s
+OlaTests/Tests/LLVM/*.ll
+OlaTests/Tests/Custom/*.exe
+OlaTests/Tests/Custom/*.s
+OlaTests/Tests/Custom/*.ll
+OlaTests/Tests/Custom/*.oll
 OlaCompiler/OlaCompiler.args.json
 
 
