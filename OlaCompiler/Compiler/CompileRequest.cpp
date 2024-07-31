@@ -29,7 +29,11 @@ namespace ola
 			if (!source_files.empty())
 			{
 				if (output_file.empty()) output_file = source_files[0];
-				if (input_directory.empty()) input_directory = OLA_TESTS_PATH"Tests";
+				if (input_directory.empty())
+				{
+					if(*no_llvm) input_directory = OLA_TESTS_PATH"Tests/Custom";
+					else		 input_directory = OLA_TESTS_PATH"Tests/LLVM";
+				}
 			}
 			else
 			{

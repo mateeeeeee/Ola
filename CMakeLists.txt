@@ -24,8 +24,8 @@ elseif()
 endif()
 
 add_compile_definitions(
-  "$<$<CONFIG:DEBUG>:OLA_DEBUG_BUILD>"
-  "$<$<CONFIG:RELEASE>: OLA_RELEASE_BUILD>"
+  "$<$<CONFIG:DEBUG>:DEBUG>"
+  "$<$<CONFIG:RELEASE>:RELEASE>"
 )
 
 
