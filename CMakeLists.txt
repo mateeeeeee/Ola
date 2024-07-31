@@ -26,7 +26,7 @@ endif()
 
 add_compile_definitions(
   "$<$<CONFIG:DEBUG>:DEBUG>"
-  "$<$<CONFIG:RELEASE>: RELEASE>"
+  "$<$<CONFIG:RELEASE>:RELEASE>"
 )
 
 
