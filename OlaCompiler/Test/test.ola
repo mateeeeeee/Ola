@@ -1,15 +1,8 @@
 import std.assert;
 
-int global = 5;
-
-int add(int a, int b)
-{
-    return a + b;
-}
-
 public int main()
 {
-    int r = add(1,2);
-    Assert(r == 3);
+    int r = 3;
+    Assert(r > 2);
     return r;
 }

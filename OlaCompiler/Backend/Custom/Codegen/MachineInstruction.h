@@ -92,7 +92,10 @@ namespace ola
 		static constexpr uint32 MAX_OPERANDS = 7;
 
 	public:
-		explicit MachineInstruction(uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) {}
+		explicit MachineInstruction(uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) 
+		{
+		
+		}
 
 		MachineInstruction& SetOpcode(uint32 _opcode)
 		{

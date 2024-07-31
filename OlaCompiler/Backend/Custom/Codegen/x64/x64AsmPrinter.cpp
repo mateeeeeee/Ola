@@ -80,18 +80,23 @@ namespace ola
 					EmitText("{}:", MBB->GetSymbol());
 					for (MachineInstruction& MI : MBB->Instructions())
 					{
-						switch (MI.GetOpcode())
+						uint32 opcode = MI.GetOpcode();
+						char const* opcode_string = x64::GetOpcodeString(opcode);
+						switch (opcode)
 						{
 						case InstPush:
-						{
-							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("push {}", GetOperandString(op));
-						}
-						break;
 						case InstPop:
+						case InstCall:
+						case InstNeg:
+						case x64::SetE:
+						case x64::SetNE:
+						case x64::SetGT:
+						case x64::SetGE:
+						case x64::SetLT:
+						case x64::SetLE:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("pop {}", GetOperandString(op));
+							EmitText("{} {}", opcode_string, GetOperandString(op));
 						}
 						break;
 						case InstJump:
@@ -104,45 +109,17 @@ namespace ola
 						break;
 						case InstStore:
 						case InstLoad:
-						{
-							MachineOperand const& dst = MI.GetOp<0>();
-							MachineOperand const& src = MI.GetOp<1>();
-							EmitText("mov {}, {}", GetOperandString(dst), GetOperandString(src));
-						}
-						break;
 						case InstAdd:
-						{
-							MachineOperand const& dst = MI.GetOp<0>();
-							MachineOperand const& src = MI.GetOp<1>();
-							EmitText("add {}, {}", GetOperandString(dst), GetOperandString(src));
-						}
-						break;
 						case InstSub:
-						{
-							MachineOperand const& dst = MI.GetOp<0>();
-							MachineOperand const& src = MI.GetOp<1>();
-							EmitText("sub {}, {}", GetOperandString(dst), GetOperandString(src));
-						}
-						break;
-						case InstCall:
-						{
-							MachineOperand const& callee = MI.GetOp<0>();
-							EmitText("call {}", GetOperandString(callee));
-						}
-						break;
 						case x64::InstICmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
-							EmitText("cmp {}, {}", GetOperandString(op1), GetOperandString(op2));
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
-						case x64::SetE:
-						{
-							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("sete {}", GetOperandString(op));
-						}
-						break;
+						default: 
+							OLA_ASSERT(false);
 						}
 					}
 				}

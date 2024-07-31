@@ -138,10 +138,11 @@ namespace ola
 	{
 		MachineGlobal* global = lowering_ctx.GetGlobal(F);
 		MachineFunction& MF = *dynamic_cast<MachineFunction*>(global->GetRelocable());
-		//LowerCFGAnalysis(F);
 
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
+
+		bool is_leaf = true;
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
@@ -156,8 +157,13 @@ namespace ola
 					MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
 					lowering_ctx.AddOperand(AI, MO);
 				}
+				else if (I.GetOpcode() == Opcode::Call)
+				{
+					is_leaf = false;
+				}
 			}
 		}
+		if (!is_leaf) MF.AllocateStack(32);
 
 		auto& args = MF.Args();
 		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
@@ -257,6 +263,7 @@ namespace ola
 
 	void MachineModule::LowerUnary(UnaryInst* inst)
 	{
+		if (inst->GetName() == "nop") return;
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
 		MachineInstruction MI(GetMachineOpcode(inst->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));

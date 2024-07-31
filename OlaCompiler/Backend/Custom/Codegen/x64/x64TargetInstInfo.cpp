@@ -60,6 +60,10 @@ namespace ola
 		break;
 		case x64::SetE:
 		case x64::SetNE:
+		case x64::SetGT:
+		case x64::SetGE:
+		case x64::SetLT:
+		case x64::SetLE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagDef);

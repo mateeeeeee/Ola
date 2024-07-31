@@ -75,54 +75,75 @@ namespace ola::x64
 		}
 	}
 
-	enum class X64Condition : uint32
-	{
-		Equal,
-		NotEqual,
-		AboveOrEqual,
-		Below,
-		Negative,
-		PositiveOrZero,
-		Above,
-		BelowOrEqual,
-		GreaterOrEqual,
-		LessThan,
-		GreaterThan,
-		LessOrEqual,
-		Always
-	};
-
 	enum x64Inst : uint32
 	{
 		x64InstBegin = ISASpecificBegin,
 		InstICmp = x64InstBegin,
 		InstFCmp,
 		SetE,
-		SetNE
+		SetNE,
+		SetGT,
+		SetGE,
+		SetLT,
+		SetLE
 	};
 
-	inline x64Inst GetCmpInstruction(MachineOpcode opcode)
+	inline char const* GetOpcodeString(uint32 opcode)
+	{
+		switch (opcode)
+		{
+		case InstPush:  return "push";
+		case InstPop:   return "pop";
+		case InstJump:  return "jmp";
+		case InstCall:  return "call";
+		case InstStore:
+		case InstLoad:  return "mov";
+		case InstNeg:	return "neg";
+		case InstAdd:   return "add";
+		case InstSub:   return "sub";
+		case InstICmp:  return "cmp";
+		case InstFCmp:  return "comisd";
+		case SetE:      return "sete";
+		case SetNE:	    return "setne";
+		case SetGT:		return "setg";
+		case SetGE:		return "setge";
+		case SetLT:		return "setl";
+		case SetLE:		return "setle";
+		}
+		return "";
+	}
+
+	inline uint32 GetCmpInstruction(uint32 opcode)
 	{
 		switch (opcode)
 		{
 		case InstICmpEQ: 
 		case InstICmpNE: 
+		case InstICmpSGE: 
+		case InstICmpSGT: 
+		case InstICmpSLE: 
+		case InstICmpSLT: 
 			return x64::InstICmp;
 		case InstFCmpOEQ:
 		case InstFCmpONE:
 			return x64::InstFCmp;
 		}
 		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+		return InstUnknown;
 	}
-
-	inline x64Inst GetSetCondition(uint32 opcode)
+	inline uint32 GetSetCondition(uint32 opcode)
 	{
 		switch (opcode)
 		{
-		case InstICmpEQ: return x64::SetE;
-		case InstICmpNE: return x64::SetNE;
+		case InstICmpEQ:  return x64::SetE;
+		case InstICmpNE:  return x64::SetNE;
+		case InstICmpSGT: return x64::SetGT;
+		case InstICmpSGE: return x64::SetGE;
+		case InstICmpSLT: return x64::SetLT;
+		case InstICmpSLE: return x64::SetLE;
 		}
 		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+		return InstUnknown;
 	}
 
 	inline char const* GetRegisterString(uint32_t r, MachineOperandType type)
