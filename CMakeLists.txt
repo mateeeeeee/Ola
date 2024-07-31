@@ -13,6 +13,7 @@ set(OLA_TESTS_PATH    ${CMAKE_CURRENT_SOURCE_DIR}/OlaTests/)
 set(OLA_BINARY_PATH   ${CMAKE_BINARY_DIR}/bin/)
 
 if(MSVC)
+	add_compile_options(/MP)
 	add_definitions(/MT)
 endif()
 
@@ -24,8 +25,8 @@ elseif()
 endif()
 
 add_compile_definitions(
-  "$<$<CONFIG:DEBUG>:OLA_DEBUG_BUILD>"
-  "$<$<CONFIG:RELEASE>: OLA_RELEASE_BUILD>"
+  "$<$<CONFIG:DEBUG>:DEBUG>"
+  "$<$<CONFIG:RELEASE>: RELEASE>"
 )
 
 

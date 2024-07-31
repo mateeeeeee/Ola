@@ -7,7 +7,7 @@
 #define OLA_CODE(...) OLA_STRINGIFY(__VA_ARGS__)
 #define OLA_CODE_EX(...) OLA_STRINGIFY(public int main(){__VA_ARGS__})
 
-#ifdef OLA_DEBUG_BUILD
+#ifdef DEBUG
 #define OLA_EXE_PATH OLA_CONCAT(OLA_BINARY_PATH, "Debug/Ola.exe")
 #define OLA(...) system(OLA_STRINGIFY(OLA_EXE_PATH --Od --test __VA_ARGS__))
 #define OLA_SIMPLE(...) system(OLA_STRINGIFY(OLA_EXE_PATH --testdebug --test --simple OLA_CODE(__VA_ARGS__)))

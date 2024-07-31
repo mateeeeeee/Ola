@@ -24,7 +24,7 @@ namespace ola
 {
 	namespace
 	{
-#if OLA_DEBUG_BUILD
+#if DEBUG
 		static char const* olalib = OLA_BINARY_PATH"Debug/olalib.lib";
 #else 
 		static char const* olalib = OLA_BINARY_PATH"Release/olalib.lib";
