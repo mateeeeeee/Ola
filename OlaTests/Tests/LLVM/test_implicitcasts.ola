@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test implicit cast when assigning and initializing
 void TestImplicitCastAssignInit()
 {
     int intVal = 42;
@@ -63,7 +62,6 @@ void TestImplicitCastParam()
 }
 
 
-// Main testing function
 public int main()
 {
     TestImplicitCastAssignInit();

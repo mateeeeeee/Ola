@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test left shift and right shift with integers
 void TestShiftOperatorsIntegers()
 {
     int intA = 5;
@@ -29,7 +28,6 @@ void TestCompoundShiftOperatorsIntegers()
     Assert(intA == 5);
 }
 
-// Main testing function
 public int main()
 {
     TestShiftOperatorsIntegers();

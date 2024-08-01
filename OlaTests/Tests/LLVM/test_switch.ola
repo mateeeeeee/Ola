@@ -25,7 +25,7 @@ public int main()
     switch (value)
     {
         case 1:
-            Assert(true);  // The value is not 1, but this case falls through to the next one
+            Assert(true);  // The value is 1, but this case falls through to the next one
         case 2:
             Assert(true);  // The value is 2, so this case should execute
             break;

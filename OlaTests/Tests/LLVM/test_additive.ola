@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test addition for int
 void TestIntAddition()
 {
     int a = 5;
@@ -13,7 +12,6 @@ void TestIntAddition()
     Assert(a == 12);
 }
 
-// Test subtraction for int
 void TestIntSubtraction()
 {
     int a = 15;
@@ -26,7 +24,6 @@ void TestIntSubtraction()
     Assert(a == 12);
 }
 
-// Test addition for float
 void TestFloatAddition()
 {
     float x = 3.5;
@@ -39,7 +36,6 @@ void TestFloatAddition()
     Assert(x == 4.7);
 }
 
-// Test subtraction for float
 void TestFloatSubtraction()
 {
     float x = 5.0;
@@ -53,12 +49,10 @@ void TestFloatSubtraction()
 }
 
 
-// Main testing function
 public int main()
 {
     TestIntAddition();
     TestIntSubtraction();
-
     TestFloatAddition();
     TestFloatSubtraction();
 

@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test basic if-else statement
 void TestIfElseBasic()
 {
     int x = 10;
@@ -10,7 +9,6 @@ void TestIfElseBasic()
     else Assert(false);
 }
 
-// Test if-else statement with multiple conditions
 void TestIfElseMultipleConditions()
 {
     int a = 5;
@@ -30,7 +28,6 @@ void TestIfElseMultipleConditions()
     }
 }
 
-// Test nested if-else statements
 void TestNestedIfElse()
 {
     int num = 42;
@@ -44,7 +41,6 @@ void TestNestedIfElse()
 
 }
 
-// Test complex nested if-else scenario
 void TestComplexNestedIfElse()
 {
     int i = 1, j = 5, k = 5;
@@ -72,7 +68,6 @@ void TestComplexNestedIfElse()
     }
 }
 
-// Test if-else statement with logical operators
 void TestIfElseLogicalOperators()
 {
     int value = 15;
@@ -86,7 +81,6 @@ void TestIfElseLogicalOperators()
     }
 }
 
-// Main testing function
 public int main()
 {
     TestIfElseBasic();

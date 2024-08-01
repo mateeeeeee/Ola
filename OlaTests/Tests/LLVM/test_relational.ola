@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test less than operators with integers and floats
 void TestLessThanOperators()
 {
     int intA = 5;
@@ -12,7 +11,6 @@ void TestLessThanOperators()
     Assert(floatC < floatD);
 }
 
-// Test less than or equal operators with integers and floats
 void TestLessThanOrEqualOperators()
 {
     int intA = 5;
@@ -24,7 +22,6 @@ void TestLessThanOrEqualOperators()
     Assert(floatC <= floatD);
 }
 
-// Test greater than operators with integers and floats
 void TestGreaterThanOperators()
 {
     int intA = 5;
@@ -36,7 +33,6 @@ void TestGreaterThanOperators()
     Assert(floatC > floatD == false);
 }
 
-// Test greater than or equal operators with integers and floats
 void TestGreaterThanOrEqualOperators()
 {
     int intA = 5;
@@ -48,7 +44,6 @@ void TestGreaterThanOrEqualOperators()
     Assert(floatC >= floatD == false);
 }
 
-// Test equal operators with integers and floats
 void TestEqualOperators()
 {
     int intA = 5;
@@ -60,7 +55,6 @@ void TestEqualOperators()
     Assert(floatC == floatD == false);
 }
 
-// Test not equal operators with integers and floats
 void TestNotEqualOperators()
 {
     int intA = 5;
@@ -72,25 +66,13 @@ void TestNotEqualOperators()
     Assert(floatC != floatD == true);
 }
 
-// Main testing function
 public int main()
 {
-    // Test less than operators
     TestLessThanOperators();
-
-    // Test less than or equal operators
     TestLessThanOrEqualOperators();
-
-    // Test greater than operators
     TestGreaterThanOperators();
-
-    // Test greater than or equal operators
     TestGreaterThanOrEqualOperators();
-
-    // Test equal operators
     TestEqualOperators();
-
-    // Test not equal operators
     TestNotEqualOperators();
 
     return 0;

@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test sizeof with types
 void TestSizeofTypes()
 {
     Assert(sizeof(int) == 8);
@@ -8,7 +7,6 @@ void TestSizeofTypes()
     Assert(sizeof(bool) == 1);
 }
 
-// Test sizeof with expressions
 void TestSizeofExpressions()
 {
     int intVar = 42;
@@ -32,16 +30,10 @@ void TestSizeofArrays()
     Assert(sizeof(boolArray) == 3);  // 1 byte per bool * 3 bools
 }
 
-// Main testing function
 public int main()
 {
-    // Test sizeof with types
     TestSizeofTypes();
-
-    // Test sizeof with expressions
     TestSizeofExpressions();
-
-    // Test sizeof with arrays
     TestSizeofArrays();
 
     return 0;
