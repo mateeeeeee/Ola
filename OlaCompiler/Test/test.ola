@@ -1,37 +1,55 @@
 import std.assert;
 
-// Test addition for int
-void TestIntAddition()
+void TestLessThanOperators()
 {
-    int a = 5;
-    int b = 10;
-    int result = a + b;
-    Assert(result == 15);
-
-    int c = 7;
-    a += c;
-    Assert(a == 12);
+    int intA = 5;
+    int intB = 10;
+    Assert(intA < intB);
 }
 
-// Test subtraction for int
-void TestIntSubtraction()
+void TestLessThanOrEqualOperators()
 {
-    int a = 15;
-    int b = 7;
-    int result = a - b;
-    Assert(result == 8);
-
-    int c = 3;
-    a -= c;
-    Assert(a == 12);
+    int intA = 5;
+    int intB = 10;
+    Assert(intA <= intB);
 }
 
+void TestGreaterThanOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    Assert(intA > intB == false);
+}
 
-// Main testing function
+void TestGreaterThanOrEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    Assert(intA >= intB == false);
+}
+
+void TestEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    Assert(intA == intB == false);
+}
+
+void TestNotEqualOperators()
+{
+    int intA = 5;
+    int intB = 10;
+    Assert(intA != intB == true);
+}
+
 public int main()
 {
-    TestIntAddition();
-    TestIntSubtraction();
+    TestLessThanOperators();
+    TestLessThanOrEqualOperators();
+    TestGreaterThanOperators();
+    TestGreaterThanOrEqualOperators();
+    TestEqualOperators();
+    TestNotEqualOperators();
 
     return 0;
 }
