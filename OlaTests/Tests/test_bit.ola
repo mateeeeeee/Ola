@@ -1,51 +1,41 @@
 import std.assert;
 
-// Test bitwise AND and compound AND for int
 void TestIntBitwiseAnd()
 {
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
 
-    // Test bitwise AND
     int resultAnd = a & b;  // 0001 in binary
     Assert(resultAnd == 1);
 
-    // Test compound bitwise AND
     a &= b;
     Assert(a == 1);
 }
 
-// Test bitwise OR and compound OR for int
 void TestIntBitwiseOr()
 {
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
 
-    // Test bitwise OR
     int resultOr = a | b;   // 0111 in binary
     Assert(resultOr == 7);
 
-    // Test compound bitwise OR
     a |= b;
     Assert(a == 7);
 }
 
-// Test bitwise XOR and compound XOR for int
 void TestIntBitwiseXor()
 {
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
 
-    // Test bitwise XOR
     int resultXor = a ^ b;  // 0110 in binary
     Assert(resultXor == 6);
 
-    // Test compound bitwise XOR
     a ^= b;
     Assert(a == 6);
 }
 
-// Test bitwise NOT for int
 void TestIntBitwiseNot()
 {
     int s = 5;
@@ -69,37 +59,29 @@ void TestIntBitwiseNot()
     Assert(resultNotZ == -65536); 
 }
 
-// Test bitwise AND, OR, XOR, and NOT for bool
 void TestBoolBitOperators()
 {
     bool p = true;
     bool q = false;
 
-    // Test bitwise AND (logical AND for bool)
     bool resultAnd = p & q;
     Assert(resultAnd == false);
 
-    // Test compound bitwise AND (logical AND for bool)
     p &= q;
     Assert(p == false);
 
-    // Test bitwise OR (logical OR for bool)
     bool resultOr = p | q;
     Assert(resultOr == false);
 
-    // Test compound bitwise OR (logical OR for bool)
     p |= q;
     Assert(p == false);
 
-    // Test bitwise XOR (logical XOR for bool)
     bool resultXor = p ^ q;
     Assert(resultXor == false);
 
-    // Test compound bitwise XOR (logical XOR for bool)
     p ^= q;
     Assert(p == false);
 
-    // Test bitwise NOT (logical NOT for bool)
     bool resultNotP = ~p;
     Assert(resultNotP == true);
 
@@ -107,7 +89,6 @@ void TestBoolBitOperators()
     Assert(resultNotQ == true);
 }
 
-// Main testing function
 public int main()
 {
     TestIntBitwiseAnd();

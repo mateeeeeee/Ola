@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test basic for loop with int
 void TestForLoopInt()
 {
     int sum = 0;
@@ -11,7 +10,6 @@ void TestForLoopInt()
     Assert(sum == 15);
 }
 
-// Test basic for loop with bool condition
 void TestForLoopBoolCondition()
 {
     int iterations = 0;
@@ -22,7 +20,6 @@ void TestForLoopBoolCondition()
     Assert(iterations == 3);
 }
 
-// Test basic for loop with multiple expressions
 void TestForLoopMultipleExpressions()
 {
     int sum = 0;
@@ -33,7 +30,6 @@ void TestForLoopMultipleExpressions()
     Assert(sum == 18);
 }
 
-// Test nested for loops
 void TestNestedForLoops()
 {
     int outerCounter = 0;
@@ -50,7 +46,6 @@ void TestNestedForLoops()
     Assert(innerCounter == 2);
 }
 
-// Test for loop with break statement
 void TestForLoopWithBreak()
 {
     int sum = 0;
@@ -64,7 +59,6 @@ void TestForLoopWithBreak()
     Assert(sum == 6);
 }
 
-// Test for loop with continue statement
 void TestForLoopWithContinue()
 {
     int sum = 0;
@@ -78,7 +72,6 @@ void TestForLoopWithContinue()
     Assert(sum == 12);
 }
 
-// Main testing function
 public int main()
 {
     TestForLoopInt();

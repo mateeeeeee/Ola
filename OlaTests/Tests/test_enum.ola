@@ -1,6 +1,5 @@
 import std.assert;
 
-// Define an enum
 enum Color
 {
     Red,
@@ -8,10 +7,8 @@ enum Color
     Blue
 };
 
-// Test global enum declaration
 Color globalColor = Red;
 
-// Test if enum values are correct
 public int TestEnumValues()
 {
     Color color = Blue;
@@ -19,7 +16,6 @@ public int TestEnumValues()
     return 0;
 }
 
-// Test if enum values are correct after modifying a member value
 enum Day
 {
     Monday,
@@ -42,7 +38,6 @@ public int TestEnumValuesAfterModification()
     return 0;
 }
 
-// Test using enum in switch statement
 public int TestEnumSwitch()
 {
     Color switchColor = Green;
@@ -67,7 +62,6 @@ public int TestEnumSwitch()
 
 public int TestLocalEnumDeclaration()
 {
-    // Local enum declaration
     enum Status
     {
         Active,
@@ -80,22 +74,12 @@ public int TestLocalEnumDeclaration()
     return 0;
 }
 
-// Main testing function
 public int main()
 {
-    // Test global enum declaration
     Assert(globalColor == Red);
-
-    // Test local enum declaration
     TestLocalEnumDeclaration();
-
-    // Test if enum values are correct
     TestEnumValues();
-
-    // Test if enum values are correct after modifying a member value
     TestEnumValuesAfterModification();
-
-    // Test using enum in switch statement
     TestEnumSwitch();
 
     return 0;

@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test unary logical operators
 void TestUnaryLogicalOperators()
 {
     bool a = true;
@@ -14,13 +13,11 @@ void TestUnaryLogicalOperators()
     Assert(notB == true);
 }
 
-// Test binary logical operators
 void TestBinaryLogicalOperators()
 {
     bool trueValue = true;
     bool falseValue = false;
 
-    // Logical AND
     bool andResultTrueTrue = trueValue && trueValue;
     bool andResultTrueFalse = trueValue && falseValue;
     bool andResultFalseTrue = falseValue && trueValue;
@@ -31,7 +28,6 @@ void TestBinaryLogicalOperators()
     Assert(andResultFalseTrue == false);
     Assert(andResultFalseFalse == false);
 
-    // Logical OR
     bool orResultTrueTrue = trueValue || trueValue;
     bool orResultTrueFalse = trueValue || falseValue;
     bool orResultFalseTrue = falseValue || trueValue;
@@ -43,7 +39,6 @@ void TestBinaryLogicalOperators()
     Assert(orResultFalseFalse == false);
 }
 
-// Test implicit casts with binary logical operators
 void TestBinaryLogicalOperatorsImplicitCasts()
 {
     // Integer and float tests
@@ -67,7 +62,6 @@ void TestBinaryLogicalOperatorsImplicitCasts()
     Assert(orResultFloatFloat == true);
 }
 
-// Test implicit casts with unary and binary logical operators
 void TestLogicalOperatorsImplicitCasts()
 {
     // Integer and float tests
@@ -89,16 +83,11 @@ void TestLogicalOperatorsImplicitCasts()
     // Add more tests as needed
 }
 
-// Main testing function
 public int main()
 {
-    // Test unary logical operators
     TestUnaryLogicalOperators();
-
-    // Test binary logical operators
     TestBinaryLogicalOperators();
 
-    // Test implicit casts with unary and binary logical operators
     TestBinaryLogicalOperatorsImplicitCasts();
     TestLogicalOperatorsImplicitCasts();
 

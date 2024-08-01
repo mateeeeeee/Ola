@@ -31,7 +31,7 @@ void TestRefSimple()
 	Assert(c == 12);
 	Assert(a == 11);
 
-	////assigning ref T to ref T variable 
+	//assigning ref T to ref T variable 
 	ref int d = b; 
 	++d;
 	Assert(a == 12);

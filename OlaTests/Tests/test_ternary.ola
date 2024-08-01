@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test ternary operator with integers
 void TestTernaryOperatorIntegers()
 {
     int a = 5;
@@ -10,7 +9,6 @@ void TestTernaryOperatorIntegers()
     Assert(result == 10);
 }
 
-// Test ternary operator with floats
 void TestTernaryOperatorFloats()
 {
     float c = 2.5;
@@ -20,7 +18,6 @@ void TestTernaryOperatorFloats()
     Assert(result == 3.0);
 }
 
-// Test ternary operator with bools
 void TestTernaryOperatorBools()
 {
     bool condition = true;
@@ -31,16 +28,10 @@ void TestTernaryOperatorBools()
     Assert(result == 5);
 }
 
-// Main testing function
 public int main()
 {
-    // Test ternary operator with integers
     TestTernaryOperatorIntegers();
-
-    // Test ternary operator with floats
     TestTernaryOperatorFloats();
-
-    // Test ternary operator with bools
     TestTernaryOperatorBools();
 
     return 0;

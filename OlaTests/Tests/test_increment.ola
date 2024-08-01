@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test pre-increment and pre-decrement for both integers and floats
 void TestPreIncrementDecrement()
 {
     // Integer tests
@@ -28,7 +27,6 @@ void TestPreIncrementDecrement()
     //Assert(g == 7.5);
 }
 
-// Test post-increment and post-decrement for both integers and floats
 void TestPostIncrementDecrement()
 {
     // Integer tests
@@ -56,7 +54,6 @@ void TestPostIncrementDecrement()
     Assert(h == 11.5);
 }
 
-// Main testing function
 public int main()
 {
     TestPreIncrementDecrement();

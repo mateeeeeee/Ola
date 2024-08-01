@@ -1,6 +1,5 @@
 import std.assert;
 
-// Test basic do-while loop with int
 void TestDoWhileLoopInt()
 {
     int sum = 0;
@@ -15,7 +14,6 @@ void TestDoWhileLoopInt()
     Assert(sum == 15);
 }
 
-// Test basic do-while loop with bool
 void TestDoWhileLoopBool()
 {
     bool condition = true;
@@ -33,7 +31,6 @@ void TestDoWhileLoopBool()
     Assert(iterations == 3);
 }
 
-// Test nested do-while loops
 void TestNestedDoWhileLoops()
 {
     int outerCounter = 0;
@@ -53,7 +50,6 @@ void TestNestedDoWhileLoops()
     Assert(innerCounter == 4);
 }
 
-// Test do-while loop with break statement
 void TestDoWhileLoopWithBreak()
 {
     int sum = 0;
@@ -73,7 +69,6 @@ void TestDoWhileLoopWithBreak()
     Assert(sum == 15);
 }
 
-// Test do-while loop with continue statement
 void TestDoWhileLoopWithContinue()
 {
     int sum = 0;
@@ -94,7 +89,6 @@ void TestDoWhileLoopWithContinue()
     Assert(sum == 9);
 }
 
-// Main testing function
 public int main()
 {
     TestDoWhileLoopInt();

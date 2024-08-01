@@ -1,25 +1,21 @@
 import std.assert;
 
 
-// Function that adds two integers
 int Add(int a, int b)
 {
     return a + b;
 }
 
-// Function that calculates the product of two floats
 float Multiply(float x, float y)
 {
     return x * y;
 }
 
-// Function that performs logical AND on two booleans
 bool LogicalAnd(bool p, bool q)
 {
     return p && q;
 }
 
-// Function that takes a mix of parameters: int, float, bool, and an array
 float MixParams(int a, float b, bool c, int[] arr, int size)
 {
     int arrSum = 0;
@@ -40,16 +36,12 @@ void ConcatArrays(int[] arr1, int size1, int[] arr2, int size2, int[] result)
     }
 }
 
-// Main testing function
 public int main()
 {
-    // Test function call with integers
     Assert(Add(3, 5) == 8);
 
-    // Test function call with floats
     Assert(Multiply(2.5, 3.0) == 7.5);
 
-    // Test function call with booleans
     Assert(LogicalAnd(true, false) == false);
 
     int[2] mixArr = {10, 20};
