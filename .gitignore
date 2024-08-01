@@ -29,6 +29,11 @@ OlaTests/Tests/Custom/*.exe
 OlaTests/Tests/Custom/*.s
 OlaTests/Tests/Custom/*.ll
 OlaTests/Tests/Custom/*.oll
+OlaTests/Tests/Custom/*.exe
+OlaTests/Tests/*.s
+OlaTests/Tests/*.ll
+OlaTests/Tests/*.oll
+OlaTests/Tests/*.exe
 OlaCompiler/OlaCompiler.args.json
 
 
