@@ -1,4 +1,25 @@
+import std.assert;
+
+
+int Add(int a, int b)
+{
+    return a + b;
+}
+
+int AddThreeNumbers(int a, int b, int c)
+{
+    return a + b + c;
+}
+
+int AddFourNumbers(int a, int b, int c, int d)
+{
+    return a + b + c + d;
+}
+
 public int main()
 {
+    Assert(Add(1, 2) == 3);
+    Assert(AddThreeNumbers(1,2,3) == 6);
+    Assert(AddFourNumbers(1,2,3,4) == 10);
     return 0;
 }

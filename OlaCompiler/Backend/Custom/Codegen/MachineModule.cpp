@@ -266,7 +266,7 @@ namespace ola
 		if (inst->GetName() == "nop") return;
 		MachineOperand ret = lowering_ctx.VirtualReg(inst->GetType());
 		MachineInstruction MI(GetMachineOpcode(inst->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->GetOperand(0)));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(inst->Operand()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(inst, ret);
 	}

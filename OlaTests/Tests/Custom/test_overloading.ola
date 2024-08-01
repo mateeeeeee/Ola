@@ -1,4 +1,18 @@
-public int main()
+import std.Assert;
+
+int f(int a)
 {
+    return 1;
+}
+int f(int a, int b)
+{
+     return 2;
+}
+
+
+public int main() 
+{
+    Assert(f(1) == 1);
+    Assert(f(1,2) == 2);
     return 0;
 }

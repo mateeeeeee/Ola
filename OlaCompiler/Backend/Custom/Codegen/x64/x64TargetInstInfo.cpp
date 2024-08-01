@@ -58,6 +58,7 @@ namespace ola
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
+		case InstNeg:
 		case x64::SetE:
 		case x64::SetNE:
 		case x64::SetGT:

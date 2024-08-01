@@ -64,7 +64,7 @@ namespace ola
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
 
-			if (MI.GetOpcode() == InstStore) 
+			if (MI.GetOpcode() == InstStore)
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
@@ -94,6 +94,17 @@ namespace ola
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
 				}
+			}
+			if (MI.GetOpcode() == InstNeg)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op  = MI.GetOperand(1);
+				MI.SetIgnoringDefFlag();
+
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(op);
+				instructions.insert(instruction_iter, MI2);
 			}
 		}
 	};

@@ -1,55 +1,7 @@
 import std.assert;
 
-void TestLessThanOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA < intB);
-}
-
-void TestLessThanOrEqualOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA <= intB);
-}
-
-void TestGreaterThanOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA > intB == false);
-}
-
-void TestGreaterThanOrEqualOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA >= intB == false);
-}
-
-void TestEqualOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA == intB == false);
-}
-
-void TestNotEqualOperators()
-{
-    int intA = 5;
-    int intB = 10;
-    Assert(intA != intB == true);
-}
 
 public int main()
 {
-    TestLessThanOperators();
-    TestLessThanOrEqualOperators();
-    TestGreaterThanOperators();
-    TestGreaterThanOrEqualOperators();
-    TestEqualOperators();
-    TestNotEqualOperators();
-
     return 0;
 }

@@ -1,4 +1,13 @@
+import std.assert;
+
 public int main()
 {
+    int a = 5;
+    int b = -a;
+    Assert(b == -5);
+
+    int c = 10;
+    int d = +c;
+    Assert(d == 10);
     return 0;
 }

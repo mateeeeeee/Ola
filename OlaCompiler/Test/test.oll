@@ -6,95 +6,29 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestLessThanOperators void() {
+define internal @TestSizeofTypes void() {
 entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp sgt i64 %2, %3
-call i8 %4, @Assert
+%0 = icmp eq i64 8, 8
+call i8 %0, @Assert
+%1 = icmp eq i64 8, 8
+call i8 %1, @Assert
+%2 = icmp eq i64 1, 1
+call i8 %2, @Assert
 exit:
 ret 
 }
 
 
-define internal @TestLessThanOrEqualOperators void() {
+define internal @TestSizeofExpressions void() {
 entry:
 %0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp sle i64 %2, %3
-call i8 %4, @Assert
-exit:
-ret 
-}
-
-
-define internal @TestGreaterThanOperators void() {
-entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp sgt i64 %2, %3
-%5 = icmp eq i8 %4, 0
-call i8 %5, @Assert
-exit:
-ret 
-}
-
-
-define internal @TestGreaterThanOrEqualOperators void() {
-entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp sge i64 %2, %3
-%5 = icmp eq i8 %4, 0
-call i8 %5, @Assert
-exit:
-ret 
-}
-
-
-define internal @TestEqualOperators void() {
-entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp eq i64 %2, %3
-%5 = icmp eq i8 %4, 0
-call i8 %5, @Assert
-exit:
-ret 
-}
-
-
-define internal @TestNotEqualOperators void() {
-entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp ne i64 %2, %3
-%5 = icmp eq i8 %4, 1
-call i8 %5, @Assert
+store 42, ptr %0
+%1 = alloca i8
+store 1, ptr %1
+%2 = icmp eq i64 8, 8
+call i8 %2, @Assert
+%3 = icmp eq i64 1, 1
+call i8 %3, @Assert
 exit:
 ret 
 }
@@ -103,12 +37,8 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestLessThanOperators
-call ptr @TestLessThanOrEqualOperators
-call ptr @TestGreaterThanOperators
-call ptr @TestGreaterThanOrEqualOperators
-call ptr @TestEqualOperators
-call ptr @TestNotEqualOperators
+call ptr @TestSizeofTypes
+call ptr @TestSizeofExpressions
 store 0, ptr %0
 br label exit
 return:
