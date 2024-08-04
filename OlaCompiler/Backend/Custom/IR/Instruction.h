@@ -315,6 +315,12 @@ namespace ola
 			case Opcode::SDiv:
 			case Opcode::UDiv:
 			case Opcode::Mul:
+			case Opcode::Shl:
+			case Opcode::AShr:
+			case Opcode::LShr:
+			case Opcode::And:
+			case Opcode::Or:
+			case Opcode::Xor:
 				return true;
 			}
 			return false;

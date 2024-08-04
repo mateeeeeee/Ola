@@ -44,6 +44,9 @@ namespace ola
 		break;
 		case InstAdd:
 		case InstSub:
+		case InstShl:
+		case InstAShr:
+		case InstLShr:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

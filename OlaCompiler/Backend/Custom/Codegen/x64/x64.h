@@ -109,6 +109,9 @@ namespace ola::x64
 		case SetGE:		return "setge";
 		case SetLT:		return "setl";
 		case SetLE:		return "setle";
+		case InstShl:	return "shl";
+		case InstAShr:  return "sar";
+		case InstLShr:  return "shr";
 		}
 		return "";
 	}

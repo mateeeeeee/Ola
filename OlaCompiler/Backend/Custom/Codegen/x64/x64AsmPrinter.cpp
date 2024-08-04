@@ -111,6 +111,8 @@ namespace ola
 						case InstLoad:
 						case InstAdd:
 						case InstSub:
+						case InstShl:
+						case InstAShr:
 						case x64::InstICmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();

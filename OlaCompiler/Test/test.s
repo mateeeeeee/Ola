@@ -6,20 +6,32 @@
 
 .extern AssertMsg
 
-TestSizeofTypes:
+TestShiftOperatorsIntegers:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-cmp 8, 8
-sete r15b
-mov cl, r15b
+sub rsp, 64
+mov qword ptr [rbp-8], 5
+mov qword ptr [rbp-16], 2
+mov r15, qword ptr [rbp-8]
+mov r14, qword ptr [rbp-16]
+mov rcx, r14
+mov r14, r15
+shl r14, cl
+mov qword ptr [rbp-24], r14
+mov r14, qword ptr [rbp-24]
+cmp r14, 20
+sete r14b
+mov cl, r14b
 call Assert
-cmp 8, 8
-sete r15b
-mov cl, r15b
-call Assert
-cmp 1, 1
+mov r14, qword ptr [rbp-8]
+mov r15, qword ptr [rbp-16]
+mov rcx, r15
+mov r15, r14
+sar r15, cl
+mov qword ptr [rbp-32], r15
+mov r15, qword ptr [rbp-32]
+cmp r15, 1
 sete r15b
 mov cl, r15b
 call Assert
@@ -28,18 +40,32 @@ mov rsp, rbp
 pop rbp
 ret
 
-TestSizeofExpressions:
+TestCompoundShiftOperatorsIntegers:
 label2:
 push rbp
 mov rbp, rsp
-sub rsp, 41
-mov qword ptr [rbp-8], 42
-mov byte ptr [rbp-9], 1
-cmp 8, 8
-sete r15b
-mov cl, r15b
+sub rsp, 48
+mov qword ptr [rbp-8], 5
+mov qword ptr [rbp-16], 2
+mov r15, qword ptr [rbp-8]
+mov r14, qword ptr [rbp-16]
+mov rcx, r14
+mov r14, r15
+shl r14, cl
+mov qword ptr [rbp-8], r14
+mov r14, qword ptr [rbp-8]
+cmp r14, 20
+sete r14b
+mov cl, r14b
 call Assert
-cmp 1, 1
+mov r14, qword ptr [rbp-8]
+mov r15, qword ptr [rbp-16]
+mov rcx, r15
+mov r15, r14
+sar r15, cl
+mov qword ptr [rbp-8], r15
+mov r15, qword ptr [rbp-8]
+cmp r15, 5
 sete r15b
 mov cl, r15b
 call Assert
@@ -55,8 +81,8 @@ label4:
 push rbp
 mov rbp, rsp
 sub rsp, 40
-call TestSizeofTypes
-call TestSizeofExpressions
+call TestShiftOperatorsIntegers
+call TestCompoundShiftOperatorsIntegers
 mov qword ptr [rbp-8], 0
 jmp label6
 label5:
