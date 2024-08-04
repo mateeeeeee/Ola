@@ -288,6 +288,26 @@ namespace ola
 		}
 		else
 		{
+			Value* condition = inst->GetCondition();
+			BasicBlock* true_target = inst->GetTrueTarget();
+			BasicBlock* false_target = inst->GetFalseTarget();
+
+			MachineOperand const& cond_op = lowering_ctx.GetOperand(condition);
+
+			MachineInstruction testMI(InstTest);
+			testMI.SetOp<0>(cond_op);
+			testMI.SetOp<1>(cond_op); 
+			lowering_ctx.EmitInst(testMI);
+
+			MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
+			MachineInstruction jmpTrueMI(InstJNE); 
+			jmpTrueMI.SetOp<0>(true_operand);
+			lowering_ctx.EmitInst(jmpTrueMI);
+
+			MachineOperand false_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(false_target));
+			MachineInstruction jmpFalseMI(InstJump);
+			jmpFalseMI.SetOp<0>(false_operand);
+			lowering_ctx.EmitInst(jmpFalseMI);
 
 		}
 	}

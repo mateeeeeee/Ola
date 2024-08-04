@@ -9,7 +9,7 @@ namespace ola
 		for (auto& block : F.Blocks()) 
 		{
 			BasicBlockCFGInfo& self_info = info[&block];
-			Instruction const* terminator = &block.GetTerminator();
+			Instruction const* terminator = block.GetTerminator();
 			if (terminator->IsBranch()) 
 			{
 				if (terminator->GetOpcode() == Opcode::Switch)

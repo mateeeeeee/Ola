@@ -1,36 +1,17 @@
 import std.assert;
 
-void TestShiftOperatorsIntegers()
-{
-    int intA = 5;
-    int intB = 2;
-
-    // Left shift
-    int leftShiftResult = intA << intB;
-    Assert(leftShiftResult == 20);
-
-    // Right shift
-    int rightShiftResult = intA >> intB;
-    Assert(rightShiftResult == 1);
-}
-
-void TestCompoundShiftOperatorsIntegers()
-{
-    int intA = 5;
-    int intB = 2;
-
-    // Compound left shift
-    intA <<= intB;
-    Assert(intA == 20);
-
-    // Compound right shift
-    intA >>= intB;
-    Assert(intA == 5);
-}
 
 public int main()
 {
-    TestShiftOperatorsIntegers();
-    TestCompoundShiftOperatorsIntegers();
-    return 0;
+    int x = 10;
+    int y = 0;
+    if(x > 11) 
+    {
+        y += 10;
+    }
+    else
+    {
+        y -= 10;
+    }
+    return y;
 }

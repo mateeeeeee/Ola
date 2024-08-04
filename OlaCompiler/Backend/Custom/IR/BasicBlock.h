@@ -24,13 +24,13 @@ namespace ola
 			return instructions;
 		}
 		
-		Instruction const& GetTerminator() const 
+		Instruction const* GetTerminator() const 
 		{
-			return instructions.Back();
+			return instructions.Size() && instructions.Back().IsTerminator() ? &instructions.Back() : nullptr;
 		}
-		Instruction& GetTerminator() 
+		Instruction* GetTerminator() 
 		{
-			return instructions.Back();
+			return instructions.Size() && instructions.Back().IsTerminator() ? &instructions.Back() : nullptr;
 		}
 
 		Function* GetFunction() const 

@@ -327,9 +327,37 @@ namespace ola
 		builder->SetCurrentBlock(return_block);
 	}
 
-	void IRVisitor::Visit(IfStmt const&, uint32)
+	void IRVisitor::Visit(IfStmt const& if_stmt, uint32)
 	{
+		Expr const* cond_expr = if_stmt.GetCondExpr();
+		Stmt const* then_stmt = if_stmt.GetThenStmt();
+		Stmt const* else_stmt = if_stmt.GetElseStmt();
 
+		Function* function = builder->GetCurrentFunction();
+		BasicBlock* then_block = builder->AddBlock(function, exit_block); then_block->SetName("if.then");
+		BasicBlock* else_block = builder->AddBlock(function, exit_block); else_block->SetName("if.else");
+		BasicBlock* end_block  = builder->AddBlock(function, exit_block); end_block->SetName("if.end");
+
+		cond_expr->Accept(*this);
+		Value* condition_value = value_map[cond_expr];
+		OLA_ASSERT(condition_value);
+		ConditionalBranch(condition_value, then_block, else_stmt ? else_block : end_block);
+
+		builder->SetCurrentBlock(then_block);
+
+		end_blocks.push_back(end_block);
+		then_stmt->Accept(*this);
+		if (!then_block->GetTerminator()) builder->MakeInst<BranchInst>(context, end_block);
+		if (else_stmt)
+		{
+			builder->SetCurrentBlock(else_block);
+			else_stmt->Accept(*this);
+			if (!else_block->GetTerminator()) builder->MakeInst<BranchInst>(context, end_block);
+		}
+		end_blocks.pop_back();
+
+		builder->SetCurrentBlock(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void IRVisitor::Visit(BreakStmt const&, uint32)
@@ -833,6 +861,45 @@ namespace ola
 		exit_block = nullptr;
 		return_value = nullptr;
 		value_map[&func_decl] = func;
+	}
+
+	void IRVisitor::ConditionalBranch(Value* condition_value, BasicBlock* true_block, BasicBlock* false_block)
+	{
+		if (condition_value->GetType()->IsPointer())
+		{
+			if (isa<AllocaInst>(condition_value))
+			{
+				AllocaInst* alloca_inst = cast<AllocaInst>(condition_value);
+				condition_value = builder->MakeInst<LoadInst>(condition_value, alloca_inst->GetAllocatedType());
+			}
+			else if (isa<GlobalVariable>(condition_value))
+			{
+				GlobalVariable* global_var_alloc = cast<GlobalVariable>(condition_value);
+				condition_value = builder->MakeInst<LoadInst>(condition_value, global_var_alloc->GetValueType());
+			}
+		}
+
+		if (condition_value->GetType()->IsInteger())
+		{
+			IRIntType* int_type = cast<IRIntType>(condition_value->GetType());
+			if (int_type->GetWidth() == 1)
+			{
+				builder->MakeInst<BranchInst>(condition_value, true_block, false_block);
+			}
+			else
+			{
+				Value* condition = Load(int_type, condition_value);
+				Value* boolean_cond = builder->MakeInst<CompareInst>(Opcode::ICmpNE, condition, context.GetInt64(0));
+				builder->MakeInst<BranchInst>(boolean_cond, true_block, false_block);
+			}
+		}
+		else if (condition_value->GetType()->IsFloat())
+		{
+			Value* condition = Load(float_type, condition_value);
+			Value* boolean_cond = builder->MakeInst<CompareInst>(Opcode::FCmpONE, condition, context.GetFloat(0.0));
+			builder->MakeInst<BranchInst>(boolean_cond, true_block, false_block);
+		}
+		else OLA_ASSERT(false);
 	}
 
 	IRType* IRVisitor::ConvertToIRType(Type const* type)

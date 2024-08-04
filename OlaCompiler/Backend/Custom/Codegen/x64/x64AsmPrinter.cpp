@@ -100,11 +100,13 @@ namespace ola
 						}
 						break;
 						case InstJump:
+						case InstJE:
+						case InstJNE:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							OLA_ASSERT(dst.IsRelocable());
 							MachineRelocable* relocable = dst.GetRelocable();
-							EmitText("jmp {}", relocable->GetSymbol());
+							EmitText("{} {}", opcode_string, relocable->GetSymbol());
 						}
 						break;
 						case InstStore:
@@ -113,6 +115,7 @@ namespace ola
 						case InstSub:
 						case InstShl:
 						case InstAShr:
+						case InstTest:
 						case x64::InstICmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();

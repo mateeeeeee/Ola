@@ -53,6 +53,7 @@ namespace ola
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
+		case InstTest:
 		case x64::InstICmp:
 		case x64::InstFCmp:
 		{

@@ -95,6 +95,8 @@ namespace ola::x64
 		case InstPush:  return "push";
 		case InstPop:   return "pop";
 		case InstJump:  return "jmp";
+		case InstJE:    return "je";
+		case InstJNE:   return "jne";
 		case InstCall:  return "call";
 		case InstStore:
 		case InstLoad:  return "mov";
@@ -112,6 +114,7 @@ namespace ola::x64
 		case InstShl:	return "shl";
 		case InstAShr:  return "sar";
 		case InstLShr:  return "shr";
+		case InstTest:  return "test";
 		}
 		return "";
 	}
