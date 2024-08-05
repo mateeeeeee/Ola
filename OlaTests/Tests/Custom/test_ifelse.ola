@@ -1,4 +1,93 @@
+import std.assert;
+
+void TestIfElseBasic()
+{
+    int x = 10;
+    int y = 20;
+
+    if (x < y) Assert(true);
+    else Assert(false);
+}
+
+void TestIfElseMultipleConditions()
+{
+    int a = 5;
+    int b = 5;
+
+    if (a > b)
+    {
+        Assert(false);
+    }
+    else if (a < b)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
+}
+
+void TestNestedIfElse()
+{
+    int num = 42;
+
+    if (num > 21)
+    {
+        if (num > 0)  Assert(true);
+        else Assert(false);
+    }
+    else Assert(false);
+
+}
+
+void TestComplexNestedIfElse()
+{
+    int i = 1, j = 5, k = 5;
+
+    if (i > 0)
+    {
+        if (j < 10)
+        {
+            if (k == 5) Assert(true); // Condition met: i > 0, j < 10, k == 5
+            else  Assert(false); 
+        }
+        else
+        {
+            Assert(false);
+        }
+    }
+    else
+    {
+        if (j == 0)  Assert(false); 
+        else
+        {
+            if (k > 0) Assert(false); 
+            else  Assert(false); 
+        }
+    }
+}
+
+void TestIfElseLogicalOperators()
+{
+    int value = 15;
+    if (value > 10) // && value < 20)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+}
+
 public int main()
 {
+    TestIfElseBasic();
+    TestIfElseMultipleConditions();
+    TestNestedIfElse();
+    TestComplexNestedIfElse();
+    TestIfElseLogicalOperators();
+
     return 0;
 }

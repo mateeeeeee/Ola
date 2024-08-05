@@ -379,9 +379,50 @@ namespace ola
 		builder->SetCurrentBlock(continue_block);
 	}
 
-	void IRVisitor::Visit(ForStmt const&, uint32)
+	void IRVisitor::Visit(ForStmt const& for_stmt, uint32)
 	{
+		Stmt const* init_stmt = for_stmt.GetInitStmt();
+		Expr const* cond_expr = for_stmt.GetCondExpr();
+		Expr const* iter_expr = for_stmt.GetIterExpr();
+		Stmt const* body_stmt = for_stmt.GetBodyStmt();
 
+		Function* function = builder->GetCurrentFunction();
+		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("for.body"); 
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block); body_block->SetName("for.cond"); 
+		BasicBlock* iter_block = builder->AddBlock(function, exit_block); body_block->SetName("for.iter"); 
+		BasicBlock* end_block  = builder->AddBlock(function, exit_block); body_block->SetName("for.end");  
+
+		if (init_stmt) init_stmt->Accept(*this);
+		builder->MakeInst<BranchInst>(context, cond_block);
+		builder->SetCurrentBlock(cond_block);
+		if (cond_expr)
+		{
+			cond_expr->Accept(*this);
+			Value* condition_value = value_map[cond_expr];
+			OLA_ASSERT(condition_value);
+			ConditionalBranch(condition_value, body_block, end_block);
+		}
+		else
+		{
+			builder->MakeInst<BranchInst>(context, body_block);
+		}
+		builder->SetCurrentBlock(body_block);
+
+		end_blocks.push_back(end_block);
+		continue_blocks.push_back(iter_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+		end_blocks.pop_back();
+
+		builder->MakeInst<BranchInst>(context, iter_block);
+		builder->SetCurrentBlock(iter_block);
+		if (iter_expr) iter_expr->Accept(*this);
+		builder->MakeInst<BranchInst>(context, cond_block);
+
+		builder->SetCurrentBlock(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void IRVisitor::Visit(WhileStmt const& while_stmt, uint32)
@@ -417,9 +458,37 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(DoWhileStmt const&, uint32)
+	void IRVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
 	{
+		Expr const* cond_expr = do_while_stmt.GetCondExpr();
+		Stmt const* body_stmt = do_while_stmt.GetBodyStmt();
 
+		Function* function = builder->GetCurrentFunction();
+		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("dowhile.body");
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block); cond_block->SetName("dowhile.cond");
+		BasicBlock* end_block = builder->AddBlock(function, exit_block);  end_block->SetName("dowhile.end");
+
+		builder->MakeInst<BranchInst>(context, body_block);
+		builder->SetCurrentBlock(body_block);
+
+		end_blocks.push_back(end_block);
+		continue_blocks.push_back(cond_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+		end_blocks.pop_back();
+
+		builder->MakeInst<BranchInst>(context, cond_block);
+		builder->SetCurrentBlock(cond_block);
+
+		cond_expr->Accept(*this);
+		Value* condition_value = value_map[cond_expr];
+		OLA_ASSERT(condition_value);
+		ConditionalBranch(condition_value, body_block, end_block);
+
+		builder->SetCurrentBlock(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void IRVisitor::Visit(CaseStmt const&, uint32)

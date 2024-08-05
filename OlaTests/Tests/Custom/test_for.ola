@@ -1,4 +1,85 @@
+import std.assert;
+
+void TestForLoopInt()
+{
+    int sum = 0;
+    for (int i = 1; i <= 5; i++)
+    {
+        sum += i;
+    }
+    Assert(sum == 15);
+}
+
+void TestForLoopBoolCondition()
+{
+    int iterations = 0;
+    for (; iterations < 3;)
+    {
+        iterations++;
+    }
+    Assert(iterations == 3);
+}
+
+void TestForLoopMultipleExpressions()
+{
+    int sum = 0;
+    for (int i = 1, j = 5; i <= 3; i++, j--)
+    {
+        sum += i + j;
+    }
+    Assert(sum == 18);
+}
+
+void TestNestedForLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    for (; outerCounter < 3; outerCounter++)
+    {
+        for (; innerCounter < 2; innerCounter++)
+        {
+        }
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+}
+
+void TestForLoopWithBreak()
+{
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++)
+    {
+        sum += i;
+        if (i == 3) break;
+    }
+
+    Assert(sum == 6);
+}
+
+void TestForLoopWithContinue()
+{
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++)
+    {
+        if (i == 3) continue;
+        sum += i;
+    }
+
+    Assert(sum == 12);
+}
+
 public int main()
 {
+    TestForLoopInt();
+    TestForLoopBoolCondition();
+    TestForLoopMultipleExpressions();
+    TestNestedForLoops();
+    TestForLoopWithBreak();
+    TestForLoopWithContinue();
+
     return 0;
 }
