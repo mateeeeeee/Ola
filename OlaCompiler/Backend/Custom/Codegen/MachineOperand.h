@@ -45,7 +45,7 @@ namespace ola
 		case MachineOperandType::Float64:
 			return 8;
 		case MachineOperandType::Ptr:
-			OLA_ASSERT_MSG(false, "Call TargetDataLayout::GetPointerSize");
+			//OLA_ASSERT_MSG(false, "Call TargetDataLayout::GetPointerSize");
 			return 8;
 		}
 		OLA_ASSERT(false);

@@ -360,14 +360,23 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(BreakStmt const&, uint32)
+	void IRVisitor::Visit(BreakStmt const& break_stmt, uint32)
 	{
-
+		OLA_ASSERT(!break_blocks.empty());
+		builder->MakeInst<BranchInst>(context, break_blocks.back());
+		BasicBlock* break_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block);
+		break_block->SetName("break");
+		builder->SetCurrentBlock(break_block);
 	}
 
-	void IRVisitor::Visit(ContinueStmt const&, uint32)
+	void IRVisitor::Visit(ContinueStmt const& continue_stmt, uint32)
 	{
+		OLA_ASSERT(!continue_blocks.empty());
 
+		builder->MakeInst<BranchInst>(context, continue_blocks.back());
+		BasicBlock* continue_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block);
+		continue_block->SetName("continue");
+		builder->SetCurrentBlock(continue_block);
 	}
 
 	void IRVisitor::Visit(ForStmt const&, uint32)
@@ -375,9 +384,37 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(WhileStmt const&, uint32)
+	void IRVisitor::Visit(WhileStmt const& while_stmt, uint32)
 	{
+		Expr const* cond_expr = while_stmt.GetCondExpr();
+		Stmt const* body_stmt = while_stmt.GetBodyStmt();
 
+		Function* function = builder->GetCurrentFunction();
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block); cond_block->SetName("while.cond");
+		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("while.body");
+		BasicBlock* end_block = builder->AddBlock(function, exit_block);  end_block->SetName("while.end");
+
+		builder->MakeInst<BranchInst>(context, cond_block);
+		builder->SetCurrentBlock(cond_block);
+		cond_expr->Accept(*this);
+		Value* condition_value = value_map[cond_expr];
+		OLA_ASSERT(condition_value);
+		ConditionalBranch(condition_value, body_block, end_block);
+
+		builder->SetCurrentBlock(body_block);
+
+		end_blocks.push_back(end_block);
+		continue_blocks.push_back(cond_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		continue_blocks.pop_back();
+		end_blocks.pop_back();
+
+		builder->MakeInst<BranchInst>(context, cond_block);
+
+		builder->SetCurrentBlock(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void IRVisitor::Visit(DoWhileStmt const&, uint32)
@@ -850,7 +887,7 @@ namespace ola
 
 		for (auto&& block : *func)
 		{
-			if(block.Instructions().Empty())
+			if (block.GetTerminator() == nullptr)
 			{
 				builder->SetCurrentBlock(&block);
 				builder->MakeInst<BranchInst>(context, exit_block);

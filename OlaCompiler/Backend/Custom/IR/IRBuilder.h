@@ -37,7 +37,7 @@ namespace ola
 		void NextInsertPoint();
 		IListIterator<Instruction> GetInsertPoint() const { return insert_point; }
 
-		template <typename I, typename... Args>
+		template <typename I, typename... Args> requires std::is_constructible_v<I, Args...>
 		auto MakeInst(Args&&... args)
 		{
 			static_assert(std::is_base_of_v<Instruction, I>);

@@ -1,17 +1,26 @@
 import std.assert;
 
+void TestWhileLoopWithBreak()
+{
+    int sum = 0;
+    int i = 1;
+
+    while (true)
+    {
+        sum += i;
+        i++;
+
+        if (i > 5)
+        {
+            break;
+        }
+    }
+    Assert(sum == 15);
+}
+
 
 public int main()
 {
-    int x = 10;
-    int y = 0;
-    if(x > 11) 
-    {
-        y += 10;
-    }
-    else
-    {
-        y -= 10;
-    }
-    return y;
+    TestWhileLoopWithBreak();
+    return 0;
 }
