@@ -20,6 +20,8 @@ namespace ola
 	//			add i to active, sorted by increasing end point
 	void LinearScanRegisterAllocator::AssignRegisters(MachineFunction& MF)
 	{
+		//note that some registers are already non-virtual because of target instruction limitations
+		//LivenessAnalysis should return what ISA registers are "taken" and in what interval
 		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
 

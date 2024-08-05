@@ -368,6 +368,4 @@ namespace ola
 			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
 		}
 	}
-
-
 }

@@ -9,7 +9,7 @@
 #define OLA_CODE(...) OLA_STRINGIFY(__VA_ARGS__)
 #define OLA_CODE_EX(...) OLA_STRINGIFY(public int main(){__VA_ARGS__})
 
-#ifdef NOLLVM
+#if NOLLVM
 
 #ifdef DEBUG
 #define OLA_EXE_PATH OLA_CONCAT(OLA_BINARY_PATH, "Debug/Ola.exe")
