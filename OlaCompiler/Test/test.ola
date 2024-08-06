@@ -1,8 +1,34 @@
+import std.assert;
+
+void TestIntAddition()
+{
+    int a = 5;
+    int b = 10;
+    int result = a + b;
+    Assert(result == 15);
+
+    int c = 7;
+    a += c;
+    Assert(a == 12);
+}
+
+void TestIntSubtraction()
+{
+    int a = 15;
+    int b = 7;
+    int result = a - b;
+    Assert(result == 8);
+
+    int c = 3;
+    a -= c;
+    Assert(a == 12);
+}
+
 
 public int main()
 {
-    int a = 3 * 5;
-    int b = a * 2;
-    int c = b / 4;
-    return c;
+    TestIntAddition();
+    TestIntSubtraction();
+
+    return 0;
 }

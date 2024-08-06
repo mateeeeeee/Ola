@@ -1,3 +1,4 @@
+#include <format>
 #include "x64AsmPrinter.h"
 #include "x64.h"
 #include "x64TargetFrameInfo.h"
@@ -35,18 +36,14 @@ namespace ola
 		}
 		else if (MO.IsRelocable())
 		{
-			return std::string(MO.GetRelocable()->GetSymbol());
+			return MO.GetRelocable()->IsFunction() ? std::string(MO.GetRelocable()->GetSymbol()) : std::format("{} {}[rip]", GetOperandPrefix(MO), MO.GetRelocable()->GetSymbol());
 		}
 		else if (MO.IsStackObject())
 		{
 			int32 stack_offset = MO.GetStackOffset();
-			if (stack_offset != 0)
-			{
-				std::string offset = std::to_string(stack_offset);
-				if (stack_offset >= 0) offset = "+" + offset;
-				return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP, MachineOperandType::Ptr)) + offset + "]";
-			}
-			return GetOperandPrefix(MO) + " [" + std::string(GetRegisterString(x64::RBP, MachineOperandType::Ptr)) + "]";
+			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr), stack_offset);
+			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr), -stack_offset);
+			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr));
 		}
 		OLA_ASSERT(false);
 		return "";
