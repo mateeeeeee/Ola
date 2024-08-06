@@ -113,6 +113,9 @@ namespace ola
 						case InstLoad:
 						case InstAdd:
 						case InstSub:
+						case InstAnd:
+						case InstOr:
+						case InstXor:
 						case InstShl:
 						case InstAShr:
 						case InstTest:

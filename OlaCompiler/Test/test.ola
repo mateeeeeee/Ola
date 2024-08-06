@@ -1,6 +1,15 @@
 
 public int main()
 {
-    int a = 3 * 5;
-    return a;
+    int a = 0;
+    bool b = a > 0;
+    if(!b)
+    {
+        return 10;
+    }
+    else
+    {
+        return 15;
+    }
+    return 5;
 }

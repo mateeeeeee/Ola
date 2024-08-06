@@ -54,6 +54,7 @@ namespace ola
 		void LowerLoad(LoadInst*);
 		void LowerStore(StoreInst*);
 		void LowerCall(CallInst*);
+		void LowerCast(CastInst*);
 
 		void LowerCFGAnalysis(Function*);
 	};

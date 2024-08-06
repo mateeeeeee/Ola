@@ -47,6 +47,9 @@ namespace ola
 		case InstShl:
 		case InstAShr:
 		case InstLShr:
+		case InstAnd:
+		case InstOr:
+		case InstXor:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

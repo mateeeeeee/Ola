@@ -23,9 +23,13 @@ namespace ola
 		// Arithmetic
 		InstAdd,
 		InstSub,
-		InstMul,
+		InstUMul,
+		InstSMul,
 		InstUDiv,
 		InstURem,
+		// Signed Div/Rem
+		InstSDiv,
+		InstSRem,
 		// Bitwise
 		InstAnd,
 		InstOr,
@@ -33,9 +37,6 @@ namespace ola
 		InstShl,
 		InstLShr,
 		InstAShr,
-		// Signed Div/Rem
-		InstSDiv,
-		InstSRem,
 		// Unary
 		InstNeg,
 		InstNot,
@@ -71,14 +72,9 @@ namespace ola
 		InstFCmpUGT,
 		InstFCmpUGE,
 		// Conversion
-		InstSExt,
 		InstZExt,
-		InstTrunc,
-		InstF2U,
 		InstF2S,
-		InstU2F,
 		InstS2F,
-		InstFCast,
 		// Misc
 		ISASpecificBegin,
 	};
@@ -95,9 +91,7 @@ namespace ola
 
 	public:
 		explicit MachineInstruction(uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) 
-		{
-		
-		}
+		{}
 
 		MachineInstruction& SetOpcode(uint32 _opcode)
 		{
@@ -147,7 +141,7 @@ namespace ola
 		{
 			flags |= flag;
 		}
-		void SetIgnoringDefFlag()
+		void SetIgnoreDef()
 		{
 			SetFlag(MachineInstFlag_IgnoreDef);
 		}
@@ -155,7 +149,7 @@ namespace ola
 		{
 			return (flags & flag) != 0;
 		}
-		bool HasIgnoringDefFlag() const
+		bool HasIgnoreDef() const
 		{
 			return HasFlag(MachineInstFlag_IgnoreDef);
 		}

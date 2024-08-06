@@ -127,8 +127,8 @@ namespace ola
 		IRType* GetStructType(Type const*);
 		IRPtrType* GetPointerType(IRType*);
 
-		[[maybe_unused]] Value* Load(Type const*, Value*);
-		[[maybe_unused]] Value* Load(IRType*, Value*);
-		[[maybe_unused]] Value* Store(Value*, Value*);
+		OLA_MAYBE_UNUSED Value* Load(Type const*, Value*);
+		OLA_MAYBE_UNUSED Value* Load(IRType*, Value*);
+		OLA_MAYBE_UNUSED Value* Store(Value*, Value*);
 	};
 }

@@ -831,9 +831,83 @@ namespace ola
 		value_map[&float_constant] = constant;
 	}
 
-	void IRVisitor::Visit(ImplicitCastExpr const&, uint32)
+	void IRVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
 	{
+		Expr const* cast_operand_expr = cast_expr.GetOperand();
+		cast_operand_expr->Accept(*this);
+		Value* cast_operand_value = value_map[cast_operand_expr];
+		OLA_ASSERT(cast_operand_value);
 
+		IRType* cast_type = ConvertToIRType(cast_expr.GetType());
+		IRType* cast_operand_type = ConvertToIRType(cast_operand_expr->GetType());
+
+		Value* cast_operand = Load(cast_operand_type, cast_operand_value);
+		if (cast_type == int_type)
+		{
+			if (cast_operand_type == bool_type)
+			{
+				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::ZExt, int_type, cast_operand);
+			}
+			else if (cast_operand_type == float_type)
+			{
+				//value_map[&cast_expr] = builder.CreateFPToSI(cast_operand, int_type);
+			}
+			//else if (IsRef(cast_operand_type))
+			//{
+			//	value_map[&cast_expr] = builder.CreateLoad(int_type, cast_operand_value);
+			//}
+			else OLA_ASSERT(false);
+		}
+		else if (cast_type == bool_type)
+		{
+			if (cast_operand_type == int_type)
+			{
+				value_map[&cast_expr] = builder->MakeInst<CompareInst>(Opcode::ICmpNE, cast_operand, context.GetInt64(0));
+			}
+			else if (cast_operand_type == float_type)
+			{
+				//value_map[&cast_expr] = builder.CreateFPToUI(cast_operand, bool_type);
+			}
+			//else if (IsRef(cast_operand_type))
+			//{
+			//	value_map[&cast_expr] = builder.CreateLoad(bool_type, cast_operand);
+			//}
+			else OLA_ASSERT(false);
+		}
+		else if (cast_type == float_type)
+		{
+			if (cast_operand_type == bool_type)
+			{
+				//value_map[&cast_expr] = builder.CreateUIToFP(cast_operand, float_type);
+			}
+			else if (cast_operand_type == int_type)
+			{
+				//value_map[&cast_expr] = builder.CreateSIToFP(cast_operand, float_type);
+			}
+			//else if (IsRef(cast_operand_type))
+			//{
+			//	value_map[&cast_expr] = builder.CreateLoad(float_type, cast_operand);
+			//}
+			else OLA_ASSERT(false);
+		}
+		else if (cast_type->IsStruct())
+		{
+			if (cast_operand_type->IsPointer())
+			{
+				value_map[&cast_expr] = cast_operand_value;
+			}
+			else if (cast_operand_type->IsStruct())
+			{
+				//Value* bitcast_value = builder.CreateBitCast(cast_operand_value, GetPointerType(cast_type));
+				//value_map[&cast_expr] = builder.CreateStructGEP(cast_type, bitcast_value, 0);
+			}
+			else OLA_ASSERT(false);
+		}
+		else if (cast_type->IsPointer())
+		{
+			value_map[&cast_expr] = cast_operand_value;
+		}
+		else OLA_ASSERT(value_map[&cast_expr] != nullptr);
 	}
 
 	void IRVisitor::Visit(CallExpr const& call_expr, uint32)

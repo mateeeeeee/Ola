@@ -87,17 +87,11 @@ namespace ola
 		CompareOpEnd = FCmpUGE,
 		// cast ops
 		CastOpBegin,
-		SExt = CastOpBegin,
-		ZExt,
-		SignedTrunc,
-		UnsignedTrunc,
+		ZExt = CastOpBegin,
 		Bitcast,
-		F2U,
 		F2S,
-		U2F,
 		S2F,
-		FCast,
-		CastOpEnd = FCast,
+		CastOpEnd = S2F,
 		// misc
 		Alloca,
 		GetElementPtr,
@@ -419,6 +413,7 @@ namespace ola
 		CastInst(Opcode opcode, IRType* cast_type, Value* src_value) 
 			: Instruction(opcode, cast_type, { src_value }) {}
 		
+		Value*  GetSrc() const { return Op<0>(); }
 		IRType* GetSrcType() const { return Op<0>()->GetType(); }
 		IRType* GetDestType() const { return GetType(); }
 

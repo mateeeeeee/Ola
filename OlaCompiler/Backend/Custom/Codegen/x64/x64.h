@@ -115,6 +115,9 @@ namespace ola::x64
 		case InstAShr:  return "sar";
 		case InstLShr:  return "shr";
 		case InstTest:  return "test";
+		case InstAnd:   return "and";
+		case InstOr:    return "or";
+		case InstXor:   return "xor";
 		}
 		return "";
 	}

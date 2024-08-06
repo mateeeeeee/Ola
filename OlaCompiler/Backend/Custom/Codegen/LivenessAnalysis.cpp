@@ -49,7 +49,7 @@ namespace ola
 					if (!IsOperandVReg(MO)) continue;
 					uint32 reg_id = GetRegAsUint(MO);
 
-					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoringDefFlag())
+					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
 					{
 						OLA_ASSERT(!reg_def_map.contains(reg_id));
 						reg_def_map[reg_id] = instruction_idx;

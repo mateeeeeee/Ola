@@ -46,7 +46,7 @@ namespace ola
 		case Opcode::Sub:
 			return InstSub;
 		case Opcode::Mul:
-			return InstMul;
+			return InstUMul;
 		case Opcode::UDiv:
 			return InstUDiv;
 		case Opcode::URem:
@@ -83,6 +83,8 @@ namespace ola
 			return InstICmpSLE;
 		case Opcode::ICmpSLT:
 			return InstICmpSLT;
+		case Opcode::ZExt:
+			return InstZExt;
 		}
 		return InstUnknown;
 	}

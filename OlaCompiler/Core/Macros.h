@@ -12,6 +12,7 @@
 #define OLA_DEBUGBREAK()			__debugbreak()
 #define OLA_FORCEINLINE			    __forceinline
 #define OLA_NODISCARD				[[nodiscard]]
+#define OLA_MAYBE_UNUSED            [[maybe_unused]]
 #define OLA_DEPRECATED			    [[deprecated]]
 #define OLA_DEPRECATED_MSG(msg)	    [[deprecated(#msg)]]
 

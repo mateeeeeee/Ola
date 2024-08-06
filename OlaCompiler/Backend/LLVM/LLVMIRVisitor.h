@@ -124,9 +124,9 @@ namespace ola
 		llvm::Type* GetStructType(Type const*);
 		llvm::PointerType* GetPointerType(llvm::Type*);
 
-		[[maybe_unused]] llvm::Value* Load(Type const*, llvm::Value*);
-		[[maybe_unused]] llvm::Value* Load(llvm::Type*, llvm::Value*);
-		[[maybe_unused]] llvm::Value* Store(llvm::Value*, llvm::Value*);
+		OLA_MAYBE_UNUSED llvm::Value* Load(Type const*, llvm::Value*);
+		OLA_MAYBE_UNUSED llvm::Value* Load(llvm::Type*, llvm::Value*);
+		OLA_MAYBE_UNUSED llvm::Value* Store(llvm::Value*, llvm::Value*);
 
 		static bool IsPointer(llvm::Type*);
 		static bool IsBoolean(llvm::Type*);

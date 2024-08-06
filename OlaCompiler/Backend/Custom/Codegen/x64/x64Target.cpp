@@ -72,7 +72,7 @@ namespace ola
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
-					MI.SetIgnoringDefFlag();
+					MI.SetIgnoreDef();
 
 					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
@@ -80,38 +80,57 @@ namespace ola
 					instructions.insert(++instruction_iter, MI2);
 				}
 			}
-			if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub || MI.GetOpcode() == InstShl || MI.GetOpcode() == InstAShr)
+			if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub)
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
 				MachineOperand op2 = MI.GetOperand(2);
 				if (!op2.IsUnused())
 				{
-					if (MI.GetOpcode() == InstShl || MI.GetOpcode() == InstAShr) 
-					{
-						if (!op2.IsImmediate()) 
-						{
-							MachineInstruction cl_move(InstStore);
-							cl_move.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
-							cl_move.SetOp<1>(op2);
-							instructions.insert(instruction_iter, cl_move);
-							MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineOperandType::Int8));
-						}
-					}
-					else MI.SetOp<1>(op2);
-
-					MI.SetIgnoringDefFlag();
+					MI.SetOp<1>(op2);
+					MI.SetIgnoreDef();
 					MachineInstruction MI2(InstLoad);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
 				}
 			}
+			else if (MI.GetOpcode() == InstAnd || MI.GetOpcode() == InstOr || MI.GetOpcode() == InstXor)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				MI.SetOp<1>(op2);
+				MI.SetIgnoreDef();
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(op1);
+				instructions.insert(instruction_iter, MI2);
+			}
+			else if (MI.GetOpcode() == InstShl || MI.GetOpcode() == InstAShr)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				if (!op2.IsImmediate())
+				{
+					MachineInstruction cl_move(InstStore);
+					cl_move.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
+					cl_move.SetOp<1>(op2);
+					instructions.insert(instruction_iter, cl_move);
+					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineOperandType::Int8));
+				}
+				MI.SetIgnoreDef();
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(op1);
+				instructions.insert(instruction_iter, MI2);
+			}
 			if (MI.GetOpcode() == InstNeg)
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op  = MI.GetOperand(1);
-				MI.SetIgnoringDefFlag();
+				MI.SetIgnoreDef();
 
 				MachineInstruction MI2(InstLoad);
 				MI2.SetOp<0>(dst);
