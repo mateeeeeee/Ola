@@ -198,19 +198,15 @@ namespace ola
 		{
 		case Opcode::Add:
 		case Opcode::Sub:
-		case Opcode::Mul:
-		case Opcode::UDiv:
-		case Opcode::URem:
+		case Opcode::SMul:
+		case Opcode::SDiv:
+		case Opcode::SRem:
 		case Opcode::And:
 		case Opcode::Or:
 		case Opcode::Xor:
 		case Opcode::Shl:
 		case Opcode::LShr:
 		case Opcode::AShr:
-		case Opcode::FAdd:
-		case Opcode::FSub:
-		case Opcode::FMul:
-		case Opcode::FDiv:
 		case Opcode::ICmpEQ:
 		case Opcode::ICmpNE:
 		case Opcode::ICmpSGE:
@@ -240,6 +236,8 @@ namespace ola
 			LowerCall(cast<CallInst>(inst));
 			break;
 		case Opcode::ZExt:
+			LowerCast(cast<CastInst>(inst));
+			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
 		case Opcode::Phi:

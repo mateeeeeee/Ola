@@ -88,12 +88,13 @@ namespace ola
 						case InstPop:
 						case InstCall:
 						case InstNeg:
-						case x64::SetE:
-						case x64::SetNE:
-						case x64::SetGT:
-						case x64::SetGE:
-						case x64::SetLT:
-						case x64::SetLE:
+						case InstSDiv:
+						case x64::InstSetE:
+						case x64::InstSetNE:
+						case x64::InstSetGT:
+						case x64::InstSetGE:
+						case x64::InstSetLT:
+						case x64::InstSetLE:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));
@@ -119,11 +120,17 @@ namespace ola
 						case InstShl:
 						case InstAShr:
 						case InstTest:
+						case InstSMul:
 						case x64::InstICmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+						}
+						break;
+						case x64::InstCqo:
+						{
+							EmitText("{}", opcode_string);
 						}
 						break;
 						default: 

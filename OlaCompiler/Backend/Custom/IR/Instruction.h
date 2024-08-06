@@ -35,11 +35,9 @@ namespace ola
 		IntegerOpBegin,
 		Add = IntegerOpBegin,
 		Sub,
-		Mul,
+		SMul,
 		SDiv,
-		UDiv,
 		SRem,
-		URem,
 		Neg,
 		// bitwise ops
 		Not,
@@ -306,9 +304,9 @@ namespace ola
 			{
 			case Opcode::Add:
 			case Opcode::Sub:
+			case Opcode::SMul:
 			case Opcode::SDiv:
-			case Opcode::UDiv:
-			case Opcode::Mul:
+			case Opcode::SRem:
 			case Opcode::Shl:
 			case Opcode::AShr:
 			case Opcode::LShr:

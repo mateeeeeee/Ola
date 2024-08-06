@@ -1,18 +1,8 @@
 
 public int main()
 {
-    int a = 0;
-    bool b = a > 0;
-    if(!b)
-    {
-        goto skip;
-        return 10;
-    }
-    else
-    {
-        return 15;
-    }
-
-skip:
-    return 5;
+    int a = 3 * 5;
+    int b = a * 2;
+    int c = b / 4;
+    return c;
 }

@@ -651,7 +651,7 @@ namespace ola
 		break;
 		case BinaryExprKind::Multiply:
 		{
-			Opcode id = is_float_expr ? Opcode::FMul : Opcode::Mul;
+			Opcode id = is_float_expr ? Opcode::FMul : Opcode::SMul;
 			result = builder->MakeInst<BinaryInst>(id, lhs, rhs);
 		}
 		break;

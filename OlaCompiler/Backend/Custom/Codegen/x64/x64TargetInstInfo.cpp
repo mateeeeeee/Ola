@@ -11,6 +11,8 @@ namespace ola
 		switch (opcode)
 		{
 		case InstPush:
+		case InstSDiv:
+		case InstSRem:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagUse);
@@ -50,6 +52,7 @@ namespace ola
 		case InstAnd:
 		case InstOr:
 		case InstXor:
+		case InstSMul:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -66,15 +69,20 @@ namespace ola
 		}
 		break;
 		case InstNeg:
-		case x64::SetE:
-		case x64::SetNE:
-		case x64::SetGT:
-		case x64::SetGE:
-		case x64::SetLT:
-		case x64::SetLE:
+		case x64::InstSetE:
+		case x64::InstSetNE:
+		case x64::InstSetGT:
+		case x64::InstSetGE:
+		case x64::InstSetLT:
+		case x64::InstSetLE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
+		case x64::InstCqo:
+		{
+			inst_info.SetOperandCount(0);
 		}
 		break;
 		}

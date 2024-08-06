@@ -45,12 +45,12 @@ namespace ola
 			return InstAdd;
 		case Opcode::Sub:
 			return InstSub;
-		case Opcode::Mul:
-			return InstUMul;
-		case Opcode::UDiv:
-			return InstUDiv;
-		case Opcode::URem:
-			return InstURem;
+		case Opcode::SMul:
+			return InstSMul;
+		case Opcode::SDiv:
+			return InstSDiv;
+		case Opcode::SRem:
+			return InstSRem;
 		case Opcode::And:
 			return InstAnd;
 		case Opcode::Or:

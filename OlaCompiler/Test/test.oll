@@ -2,40 +2,26 @@ Module ID : test.ola
 
 define external @main i64() {
 entry:
-%0 = bitcast i64
-%1 = bitcast i64
-store 0, ptr %1
-%2 = load i64, ptr %1
-%3 = icmp sgt i64 %2, 0
-%4 = bitcast i8
-store i8 %3, ptr %4
-%5 = load i8, ptr %4
-%6 = icmp eq i8 %5, 0
-br i8 %6, label if.then, label if.else
-skip:
-store 5, ptr %0
+%0 = signed trunc i64
+%1 = mul i64 3, 5
+%2 = signed trunc i64
+store i64 %1, ptr %2
+%3 = load i64, ptr %2
+%4 = mul i64 %3, 2
+%5 = signed trunc i64
+store i64 %4, ptr %5
+%6 = load i64, ptr %5
+%7 = sdiv i64 %6, 4
+%8 = signed trunc i64
+store i64 %7, ptr %8
+%9 = load i64, ptr %8
+store i64 %9, ptr %0
 br label exit
 return:
-%nop = neg i64 0
-br label exit
-if.then:
-br label skip
-if.else:
-store 15, ptr %0
-br label exit
-return1:
-%nop1 = neg i64 0
-br label exit
-if.end:
-br label skip
-goto:
-store 10, ptr %0
-br label exit
-return2:
-%nop2 = neg i64 0
+%nop = srem i64 0
 br label exit
 exit:
-%7 = load i64, ptr %0
-ret i64 %7
+%10 = load i64, ptr %0
+ret i64 %10
 }
 

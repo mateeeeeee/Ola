@@ -52,8 +52,60 @@ namespace ola
 				MI2.SetOp<0>(ret);
 				ctx.EmitInst(MI2);
 				ctx.AddOperand(CI, ret);
-
 				return true;
+			}
+			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
+			{
+				Opcode opcode = I->GetOpcode();
+				if (opcode == Opcode::SDiv || opcode == Opcode::SRem)
+				{
+					MachineOperand dst = ctx.VirtualReg(BI->GetType());
+					MachineOperand op1 = ctx.GetOperand(BI->LHS());
+					MachineOperand op2 = ctx.GetOperand(BI->RHS());
+
+					MachineInstruction move_to_rax(InstStore);
+					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
+					move_to_rax.SetOp<1>(op1);
+					ctx.EmitInst(move_to_rax);
+
+					MachineInstruction cqo(x64::InstCqo);
+					ctx.EmitInst(cqo);
+
+					if (op2.IsImmediate())
+					{
+						MachineOperand op2_reg = ctx.VirtualReg(BI->GetType());
+						MachineInstruction move_to_reg(InstStore);
+						move_to_reg.SetOp<0>(op2_reg);
+						move_to_reg.SetOp<1>(op2);
+						ctx.EmitInst(move_to_reg);
+						MachineInstruction idiv(InstSDiv);
+						idiv.SetOp<0>(op2_reg);
+						ctx.EmitInst(idiv);
+					}
+					else
+					{
+						MachineInstruction idiv(InstSDiv);
+						idiv.SetOp<0>(op2);
+						ctx.EmitInst(idiv);
+					}
+
+					if (opcode == Opcode::SDiv)
+					{
+						MachineInstruction move_quotient(InstStore);
+						move_quotient.SetOp<0>(dst);
+						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
+						ctx.EmitInst(move_quotient);
+					}
+					else if (opcode == Opcode::SRem)
+					{
+						MachineInstruction move_remainder(InstStore);
+						move_remainder.SetOp<0>(dst);
+						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineOperandType::Int64));
+						ctx.EmitInst(move_remainder);
+					}
+					ctx.AddOperand(BI, dst);
+					return true;
+				}
 			}
 			return false;
 		}
@@ -64,7 +116,9 @@ namespace ola
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
 
-			if (MI.GetOpcode() == InstStore)
+			switch (MI.GetOpcode())
+			{
+			case InstStore:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
@@ -80,7 +134,9 @@ namespace ola
 					instructions.insert(++instruction_iter, MI2);
 				}
 			}
-			if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub)
+			break;
+			case InstAdd:
+			case InstSub:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
@@ -95,7 +151,10 @@ namespace ola
 					instructions.insert(instruction_iter, MI2);
 				}
 			}
-			else if (MI.GetOpcode() == InstAnd || MI.GetOpcode() == InstOr || MI.GetOpcode() == InstXor)
+			break;
+			case InstAnd:
+			case InstOr:
+			case InstXor:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
@@ -107,7 +166,9 @@ namespace ola
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
 			}
-			else if (MI.GetOpcode() == InstShl || MI.GetOpcode() == InstAShr)
+			break;
+			case InstShl:
+			case InstAShr:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
@@ -126,16 +187,34 @@ namespace ola
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
 			}
-			if (MI.GetOpcode() == InstNeg)
+			break;
+			case InstNeg:
 			{
 				MachineOperand dst = MI.GetOperand(0);
-				MachineOperand op  = MI.GetOperand(1);
+				MachineOperand op = MI.GetOperand(1);
 				MI.SetIgnoreDef();
 
 				MachineInstruction MI2(InstLoad);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op);
 				instructions.insert(instruction_iter, MI2);
+			}
+			break;
+			case InstSMul:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				
+				MI.SetOp<1>(op2);
+				MI.SetIgnoreDef();
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(op1);
+				instructions.insert(instruction_iter, MI2);
+				//IMUL has this version: IMUL r64, r/m64, imm32 which might be useful
+			}
+			break;
 			}
 		}
 	};

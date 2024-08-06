@@ -80,12 +80,13 @@ namespace ola::x64
 		x64InstBegin = ISASpecificBegin,
 		InstICmp = x64InstBegin,
 		InstFCmp,
-		SetE,
-		SetNE,
-		SetGT,
-		SetGE,
-		SetLT,
-		SetLE
+		InstSetE,
+		InstSetNE,
+		InstSetGT,
+		InstSetGE,
+		InstSetLT,
+		InstSetLE,
+		InstCqo
 	};
 
 	inline char const* GetOpcodeString(uint32 opcode)
@@ -105,12 +106,12 @@ namespace ola::x64
 		case InstSub:   return "sub";
 		case InstICmp:  return "cmp";
 		case InstFCmp:  return "comisd";
-		case SetE:      return "sete";
-		case SetNE:	    return "setne";
-		case SetGT:		return "setg";
-		case SetGE:		return "setge";
-		case SetLT:		return "setl";
-		case SetLE:		return "setle";
+		case InstSetE:      return "sete";
+		case InstSetNE:	    return "setne";
+		case InstSetGT:		return "setg";
+		case InstSetGE:		return "setge";
+		case InstSetLT:		return "setl";
+		case InstSetLE:		return "setle";
 		case InstShl:	return "shl";
 		case InstAShr:  return "sar";
 		case InstLShr:  return "shr";
@@ -118,6 +119,9 @@ namespace ola::x64
 		case InstAnd:   return "and";
 		case InstOr:    return "or";
 		case InstXor:   return "xor";
+		case InstSMul:  return "imul";
+		case InstSDiv:  return "idiv";
+		case InstCqo:   return "cqo";
 		}
 		return "";
 	}
@@ -144,12 +148,12 @@ namespace ola::x64
 	{
 		switch (opcode)
 		{
-		case InstICmpEQ:  return x64::SetE;
-		case InstICmpNE:  return x64::SetNE;
-		case InstICmpSGT: return x64::SetGT;
-		case InstICmpSGE: return x64::SetGE;
-		case InstICmpSLT: return x64::SetLT;
-		case InstICmpSLE: return x64::SetLE;
+		case InstICmpEQ:  return x64::InstSetE;
+		case InstICmpNE:  return x64::InstSetNE;
+		case InstICmpSGT: return x64::InstSetGT;
+		case InstICmpSGE: return x64::InstSetGE;
+		case InstICmpSLT: return x64::InstSetLT;
+		case InstICmpSLE: return x64::InstSetLE;
 		}
 		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 		return InstUnknown;
