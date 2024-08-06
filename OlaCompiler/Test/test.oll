@@ -12,12 +12,14 @@ store i8 %3, ptr %4
 %5 = load i8, ptr %4
 %6 = icmp eq i8 %5, 0
 br i8 %6, label if.then, label if.else
-if.then:
-store 10, ptr %0
+skip:
+store 5, ptr %0
 br label exit
 return:
 %nop = neg i64 0
 br label exit
+if.then:
+br label skip
 if.else:
 store 15, ptr %0
 br label exit
@@ -25,7 +27,9 @@ return1:
 %nop1 = neg i64 0
 br label exit
 if.end:
-store 5, ptr %0
+br label skip
+goto:
+store 10, ptr %0
 br label exit
 return2:
 %nop2 = neg i64 0

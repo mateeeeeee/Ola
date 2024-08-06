@@ -723,7 +723,7 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(GotoStmt const& goto_stmt, uint32)
 	{
-		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
+		std::string label_name(goto_stmt.GetLabelName());
 		builder.CreateBr(label_blocks[label_name]);
 
 		llvm::Function* function = builder.GetInsertBlock()->getParent();
@@ -733,7 +733,7 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(LabelStmt const& label_stmt, uint32)
 	{
-		std::string block_name = "label."; block_name += label_stmt.GetName();
+		std::string block_name(label_stmt.GetName()); 
 		llvm::BasicBlock* label_block = label_blocks[block_name];
 		builder.CreateBr(label_block);
 		builder.SetInsertPoint(label_block);
@@ -1338,7 +1338,7 @@ namespace ola
 		auto const& labels = func_decl.GetLabels();
 		for (LabelStmt const* label : labels)
 		{
-			std::string block_name = "label."; block_name += label->GetName();
+			std::string block_name(label->GetName());
 			llvm::BasicBlock* label_block = llvm::BasicBlock::Create(context, block_name, func, exit_block);
 			label_blocks[block_name] = label_block;
 		}

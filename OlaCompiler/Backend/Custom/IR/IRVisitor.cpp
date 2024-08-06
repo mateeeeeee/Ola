@@ -503,7 +503,7 @@ namespace ola
 
 	void IRVisitor::Visit(GotoStmt const& goto_stmt, uint32)
 	{
-		std::string label_name = "label."; label_name += goto_stmt.GetLabelName();
+		std::string label_name(goto_stmt.GetLabelName());
 		builder->MakeInst<BranchInst>(context, label_blocks[label_name]);
 
 		BasicBlock* goto_block = builder->AddBlock(exit_block);
@@ -513,8 +513,8 @@ namespace ola
 
 	void IRVisitor::Visit(LabelStmt const& label_stmt, uint32)
 	{
-		std::string block_name = "label."; block_name += label_stmt.GetName();
-		BasicBlock* label_block = label_blocks[block_name];
+		std::string label_name(label_stmt.GetName());
+		BasicBlock* label_block = label_blocks[label_name];
 		builder->MakeInst<BranchInst>(context, label_block);
 		builder->SetCurrentBlock(label_block);
 	}
@@ -1004,8 +1004,10 @@ namespace ola
 		auto const& labels = func_decl.GetLabels();
 		for (LabelStmt const* label : labels)
 		{
+			std::string label_name = std::string(label->GetName());
 			BasicBlock* label_block = builder->AddBlock(func, exit_block); 
-			label_blocks[std::string(label_block->GetName())] = label_block;
+			label_block->SetName(label_name);
+			label_blocks[label_name] = label_block;
 		}
 
 		func_decl.GetBodyStmt()->Accept(*this);
