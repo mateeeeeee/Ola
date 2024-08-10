@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <list>
+#include "ConstantFold.h"
 #include "Utility/IntrusiveList.h"
 
 namespace ola
@@ -37,11 +38,15 @@ namespace ola
 		void NextInsertPoint();
 		IListIterator<Instruction> GetInsertPoint() const { return insert_point; }
 
-		template <typename I, typename... Args> requires std::is_constructible_v<I, Args...>
-		auto MakeInst(Args&&... args)
+		template <typename InstructionT, typename... Args> requires std::is_constructible_v<InstructionT, Args...>
+		Value* MakeInst(Args&&... args)
 		{
-			static_assert(std::is_base_of_v<Instruction, I>);
-			I* inst = new I(std::forward<Args>(args)...);
+			static_assert(std::is_base_of_v<Instruction, InstructionT>);
+			if (Value* V = TryConstantFold<InstructionT>(std::forward<Args>(args)...))
+			{
+				return V;
+			}
+			InstructionT* inst = new InstructionT(std::forward<Args>(args)...);
 			inst->InsertBefore(current_block, insert_point);
 			return inst;
 		}

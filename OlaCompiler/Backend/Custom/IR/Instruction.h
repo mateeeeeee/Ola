@@ -97,6 +97,68 @@ namespace ola
 		Call,
 		Phi
 	};
+
+	inline bool IsOpcodeTerminator(Opcode opcode)
+	{
+		return Opcode::TerminatorBegin <= opcode && opcode <= Opcode::TerminatorEnd;
+	}
+	inline bool IsOpcodeMemoryOp(Opcode opcode) 
+	{
+		return Opcode::MemoryOpBegin <= opcode && opcode <= Opcode::MemoryOpEnd;
+	}
+	inline bool IsOpcodeIntegerOp(Opcode opcode) 
+	{
+		return Opcode::IntegerOpBegin <= opcode && opcode <= Opcode::IntegerOpEnd;
+	}
+	inline bool IsOpcodeFloatOp(Opcode opcode) 
+	{
+		return Opcode::FloatOpBegin <= opcode && opcode <= Opcode::FloatOpEnd;
+	}
+	inline bool IsOpcodeCastOp(Opcode opcode) 
+	{
+		return Opcode::CastOpBegin <= opcode && opcode <= Opcode::CastOpEnd;
+	}
+	inline bool IsOpcodeCompareOp(Opcode opcode) 
+	{
+		return Opcode::CompareOpBegin <= opcode && opcode <= Opcode::CompareOpEnd;
+	}
+	inline bool IsOpcodeBinaryOp(Opcode opcode)
+	{
+		switch (opcode)
+		{
+		case Opcode::Add:
+		case Opcode::Sub:
+		case Opcode::SMul:
+		case Opcode::SDiv:
+		case Opcode::SRem:
+		case Opcode::And:
+		case Opcode::Or:
+		case Opcode::Xor:
+		case Opcode::Shl:
+		case Opcode::LShr:
+		case Opcode::AShr:
+		case Opcode::FAdd:
+		case Opcode::FSub:
+		case Opcode::FMul:
+		case Opcode::FDiv:
+		case Opcode::FFma:
+			return true;
+		default:
+			return false;
+		}
+	}
+	inline bool IsOpcodeUnaryOp(Opcode opcode)
+	{
+		switch (opcode)
+		{
+		case Opcode::Neg:
+		case Opcode::Not:
+		case Opcode::FNeg:
+			return true;
+		default:
+			return false;
+		}
+	}
 	
 	class Use 
 	{
@@ -183,14 +245,38 @@ namespace ola
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 
-#define GET_INST_CATEGORY(KIND) bool Is##KIND() const { return Opcode::KIND##Begin <= opcode && opcode <= Opcode::KIND##End; }
-		GET_INST_CATEGORY(Terminator)
-		GET_INST_CATEGORY(MemoryOp)
-		GET_INST_CATEGORY(IntegerOp)
-		GET_INST_CATEGORY(FloatOp)
-		GET_INST_CATEGORY(CastOp)
-		GET_INST_CATEGORY(CompareOp)
-#undef GET_INST_CATEGORY
+		bool IsTerminator() const 
+		{
+			return IsOpcodeTerminator(opcode);
+		}
+		bool IsMemoryOp() const 
+		{
+			return IsOpcodeMemoryOp(opcode);
+		}
+		bool IsIntegerOp() const 
+		{
+			return IsOpcodeIntegerOp(opcode);
+		}
+		bool IsFloatOp() const
+		{
+			return IsOpcodeFloatOp(opcode);
+		}
+		bool IsCastOp() const 
+		{
+			return IsOpcodeCastOp(opcode);
+		}
+		bool IsUnaryOp() const
+		{
+			return IsOpcodeUnaryOp(opcode);
+		}
+		bool IsBinaryOp() const
+		{
+			return IsOpcodeBinaryOp(opcode);
+		}
+		bool IsCompareOp() const
+		{
+			return IsOpcodeCompareOp(opcode);
+		}
 
 		bool IsBranch() const 
 		{
@@ -300,22 +386,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetOpcode())
-			{
-			case Opcode::Add:
-			case Opcode::Sub:
-			case Opcode::SMul:
-			case Opcode::SDiv:
-			case Opcode::SRem:
-			case Opcode::Shl:
-			case Opcode::AShr:
-			case Opcode::LShr:
-			case Opcode::And:
-			case Opcode::Or:
-			case Opcode::Xor:
-				return true;
-			}
-			return false;
+			return I->IsBinaryOp();
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -335,13 +406,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			switch (I->GetOpcode())
-			{
-			case Opcode::Neg:
-			case Opcode::Not:
-				return true;
-			}
-			return false;
+			return I->IsUnaryOp();
 		}
 		static bool ClassOf(Value const* V)
 		{
@@ -394,7 +459,7 @@ namespace ola
 
 		static bool ClassOf(Instruction const* I)
 		{
-			return I->GetOpcode() >= Opcode::CompareOpBegin && I->GetOpcode() <= Opcode::CompareOpEnd;
+			return I->IsCompareOp();
 		}
 		static bool ClassOf(Value const* V)
 		{

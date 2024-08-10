@@ -1,34 +1,11 @@
 import std.assert;
 
-void TestIntAddition()
-{
-    int a = 5;
-    int b = 10;
-    int result = a + b;
-    Assert(result == 15);
-
-    int c = 7;
-    a += c;
-    Assert(a == 12);
-}
-
-void TestIntSubtraction()
-{
-    int a = 15;
-    int b = 7;
-    int result = a - b;
-    Assert(result == 8);
-
-    int c = 3;
-    a -= c;
-    Assert(a == 12);
-}
-
 
 public int main()
 {
-    TestIntAddition();
-    TestIntSubtraction();
-
-    return 0;
+    int[3] LocalArray2 = {-5,0,5};
+	//Assert(LocalArray2[1] == 0);
+	Assert(length(LocalArray2) == 3);
+	int a = 5 * 3 * 2 + 5;
+	return a;
 }

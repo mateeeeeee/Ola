@@ -253,8 +253,11 @@ namespace ola
 		ConstantID const_id = C->GetConstantID();
 		switch (const_id)
 		{
-		case ConstantID::Float:		Emit("{}", cast<ConstantFloat>(C)->GetValue()); break;
-		case ConstantID::Integer:	Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
+		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue()); break;
+		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
+		case ConstantID::UnaryExpr:  Emit("unary const expr #TODO"); break;
+		case ConstantID::BinaryExpr: Emit("binary const expr #TODO"); break;
+
 		default: OLA_ASSERT_MSG(false, "not yet implemented");
 		}
 	}

@@ -6,76 +6,19 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestIntAddition void() {
-entry:
-%0 = signed trunc i64
-store 5, ptr %0
-%1 = signed trunc i64
-store 10, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = add i64 %2, %3
-%5 = signed trunc i64
-store i64 %4, ptr %5
-%6 = load i64, ptr %5
-%7 = fneg i64 %6, 15
-f2u i8 %7, @Assert
-%8 = signed trunc i64
-store 7, ptr %8
-%9 = load i64, ptr %0
-%10 = load i64, ptr %8
-%11 = add i64 %9, %10
-store i64 %11, ptr %0
-%12 = load i64, ptr %0
-%13 = fneg i64 %12, 12
-f2u i8 %13, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestIntSubtraction void() {
-entry:
-%0 = signed trunc i64
-store 15, ptr %0
-%1 = signed trunc i64
-store 7, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = sub i64 %2, %3
-%5 = signed trunc i64
-store i64 %4, ptr %5
-%6 = load i64, ptr %5
-%7 = fneg i64 %6, 8
-f2u i8 %7, @Assert
-%8 = signed trunc i64
-store 3, ptr %8
-%9 = load i64, ptr %0
-%10 = load i64, ptr %8
-%11 = sub i64 %9, %10
-store i64 %11, ptr %0
-%12 = load i64, ptr %0
-%13 = fneg i64 %12, 12
-f2u i8 %13, @Assert
-br label exit
-exit:
-ret 
-}
-
-
 define external @main i64() {
 entry:
 %0 = signed trunc i64
-f2u ptr @TestIntAddition
-f2u ptr @TestIntSubtraction
-store 0, ptr %0
+f2u i8 1, @Assert
+%1 = signed trunc i64
+store 35, ptr %1
+%2 = load i64, ptr %1
+store i64 %2, ptr %0
 br label exit
 return:
-%nop = srem i64 0
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+%3 = load i64, ptr %0
+ret i64 %3
 }
 

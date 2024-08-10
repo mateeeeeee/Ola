@@ -100,10 +100,10 @@ namespace ola
 			MachineOperand ptr = VirtualReg(MachineOperandType::Int64);
 			MachineInstruction minst(InstStore);
 
-			MachineGlobal* mir_global = global_map[GV];
-			OLA_ASSERT(mir_global);
+			MachineGlobal* machine_global = global_map[GV];
+			OLA_ASSERT(machine_global);
 
-			MachineOperand global = MachineOperand::Relocable(mir_global->GetRelocable());
+			MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
 			minst.SetOp<0>(ptr).SetOp<1>(global);
 			EmitInst(minst);
 			return ptr;

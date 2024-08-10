@@ -9,7 +9,7 @@ namespace ola
 {
 	enum class ConstantID : uint8
 	{ 
-		Global, Integer, Float, String, Offset, Array, Struct, Undef
+		Global, Integer, Float, String, Offset, Array, Struct, Undef, UnaryExpr, BinaryExpr
 	};
 
 	class Constant : public TrackableValue

@@ -211,7 +211,7 @@ namespace ola
 				}
 				else
 				{
-					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type);
+					Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
 					Value* init_value = value_map[init_expr];
 					Store(init_value, alloc);
 					value_map[&var_decl] = alloc;
@@ -225,7 +225,7 @@ namespace ola
 				}
 				else
 				{
-					AllocaInst* alloc = builder->MakeInst<AllocaInst>(ir_type);
+					Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
 					value_map[&var_decl] = alloc;
 				}
 			}
@@ -918,7 +918,7 @@ namespace ola
 		std::vector<Value*> args;
 		uint32 arg_index = 0;
 		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
-		AllocaInst* return_alloc = nullptr;
+		Value* return_alloc = nullptr;
 		if (return_struct)
 		{
 			return_alloc = builder->MakeInst<AllocaInst>(called_function->GetArg(arg_index)->GetType());
@@ -983,7 +983,7 @@ namespace ola
 		for (auto& param : func_decl.GetParamDecls())
 		{
 			Value* arg_value = value_map[param.get()];
-			AllocaInst* arg_alloc = builder->MakeInst<AllocaInst>(arg_value->GetType());
+			Value* arg_alloc = builder->MakeInst<AllocaInst>(arg_value->GetType());
 
 			builder->MakeInst<StoreInst>(arg_value, arg_alloc);
 			if (isa<RefType>(param->GetType()))
@@ -1023,7 +1023,7 @@ namespace ola
 		for (BasicBlock* empty_block : empty_blocks)
 		{
 			builder->SetCurrentBlock(empty_block);
-			UnaryInst* nop = builder->MakeInst<UnaryInst>(Opcode::Neg, context.GetInt64(0));
+			Value* nop = builder->MakeInst<UnaryInst>(Opcode::Neg, context.GetInt64(0));
 			nop->SetName("nop");
 			if (empty_block_successors.contains(empty_block))
 				 builder->MakeInst<BranchInst>(context, empty_block_successors[empty_block]);

@@ -71,6 +71,8 @@ set(BACKEND_FILES
 
   Backend/Custom/IR/IRBuilder.h
   Backend/Custom/IR/IRBuilder.cpp
+  Backend/Custom/IR/ConstantFold.h
+  Backend/Custom/IR/ConstantFold.cpp
   Backend/Custom/IR/IRContext.h
   Backend/Custom/IR/IRContext.cpp
   Backend/Custom/IR/IRGenContext.h
