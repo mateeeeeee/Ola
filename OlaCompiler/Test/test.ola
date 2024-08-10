@@ -4,8 +4,9 @@ import std.assert;
 public int main()
 {
     int[3] LocalArray2 = {-5,0,5};
-	//Assert(LocalArray2[1] == 0);
+	Assert(LocalArray2[1] == 0);
 	Assert(length(LocalArray2) == 3);
+
 	int a = 5 * 3 * 2 + 5;
 	return a;
 }

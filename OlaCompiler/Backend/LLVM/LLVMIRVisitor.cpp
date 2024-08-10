@@ -244,7 +244,7 @@ namespace ola
 						{
 							llvm::ConstantInt* index = builder.getInt64(i);
 							llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
-							Store(llvm::ConstantInt::get(char_type, str[i], true), ptr);
+							Store(builder.getInt8(str[i]), ptr);
 						}
 						llvm::ConstantInt* index = builder.getInt64(str.size()); 
 						llvm::Value* ptr = builder.CreateGEP(llvm_type, alloc, { zero, index });
@@ -985,14 +985,14 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(IntLiteral const& int_constant, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(int_type, int_constant.GetValue());
+		llvm::ConstantInt* constant = builder.getInt64(int_constant.GetValue());
 		value_map[&int_constant] = constant;
 	}
 
 	void LLVMIRVisitor::Visit(CharLiteral const& char_constant, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(char_type, char_constant.GetChar(), true);
-		value_map[&char_constant] = constant;
+		llvm::ConstantInt* constant = builder.getInt8(char_constant.GetChar());
+		value_map[&char_constant] = constant; 
 	}
 
 	void LLVMIRVisitor::Visit(StringLiteral const& string_constant, uint32)
@@ -1009,7 +1009,7 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(BoolLiteral const& bool_constant, uint32)
 	{
-		llvm::ConstantInt* constant = llvm::ConstantInt::get(bool_type, bool_constant.GetValue());
+		llvm::ConstantInt* constant = builder.getInt1(bool_constant.GetValue()); 
 		value_map[&bool_constant] = constant;
 	}
 
@@ -1050,7 +1050,7 @@ namespace ola
 		{
 			if (IsInteger(cast_operand_type))
 			{
-				value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+				value_map[&cast_expr] = builder.CreateICmpNE(cast_operand, builder.getInt64(0));
 			}
 			else if (IsFloat(cast_operand_type))
 			{
@@ -1129,13 +1129,13 @@ namespace ola
 		value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
-	void LLVMIRVisitor::Visit(InitializerListExpr const& initializer_list, uint32)
+	void LLVMIRVisitor::Visit(InitializerListExpr const& initializer_list_expr, uint32)
 	{
-		UniqueExprPtrList const& init_expr_list = initializer_list.GetInitList();
+		UniqueExprPtrList const& init_expr_list = initializer_list_expr.GetInitList();
 		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
-		if (initializer_list.IsConstexpr())
+		if (initializer_list_expr.IsConstexpr())
 		{
-			ArrayType const* array_type = cast<ArrayType>(initializer_list.GetType());
+			ArrayType const* array_type = cast<ArrayType>(initializer_list_expr.GetType());
 			llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetBaseType());
 			llvm::Type* llvm_array_type = ConvertToIRType(array_type);
 
@@ -1146,36 +1146,38 @@ namespace ola
 				else array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
 			}
 			llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_array_type), array_init_list);
-			value_map[&initializer_list] = constant_array;
+			value_map[&initializer_list_expr] = constant_array;
 		}
 		
 	}
 
-	void LLVMIRVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
+	void LLVMIRVisitor::Visit(ArrayAccessExpr const& array_access_expr, uint32)
 	{
-		Expr const* array_expr = array_access.GetArrayExpr();
-		Expr const* index_expr = array_access.GetIndexExpr();
+		Expr const* array_expr = array_access_expr.GetArrayExpr();
+		Expr const* index_expr = array_access_expr.GetIndexExpr();
 
 		array_expr->Accept(*this);
 		index_expr->Accept(*this);
 
 		llvm::Value* array_value = value_map[array_expr];
 		llvm::Value* index_value = value_map[index_expr];
+		OLA_ASSERT(array_value && index_value);
+
 		index_value = Load(int_type, index_value);
 
-		llvm::ConstantInt* zero = llvm::ConstantInt::get(context, llvm::APInt(64, 0, true));
+		llvm::ConstantInt* zero = builder.getInt64(0);
 		if (llvm::AllocaInst* alloc = dyn_cast<llvm::AllocaInst>(array_value))
 		{
 			llvm::Type* alloc_type = alloc->getAllocatedType();
 			if (alloc_type->isArrayTy())
 			{
 				llvm::Value* ptr = builder.CreateGEP(alloc_type, alloc, { zero, index_value });
-				value_map[&array_access] = ptr;
+				value_map[&array_access_expr] = ptr;
 			}
 			else if (alloc_type->isPointerTy())
 			{
 				llvm::Value* ptr = builder.CreateInBoundsGEP(alloc_type, Load(alloc_type, alloc), index_value);
-				value_map[&array_access] = ptr;
+				value_map[&array_access_expr] = ptr;
 			}
 			else OLA_ASSERT(false);
 		}
@@ -1187,10 +1189,10 @@ namespace ola
 			if (isa<ArrayType>(array_type->GetBaseType()))
 			{
 				uint32 array_size = array_type->GetArraySize();
-				index_value = builder.CreateMul(index_value, llvm::ConstantInt::get(int_type, array_size));
+				index_value = builder.CreateMul(index_value, builder.getInt64(array_size));
 			}
 			llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
-			value_map[&array_access] = ptr;
+			value_map[&array_access_expr] = ptr;
 		}
 	}
 

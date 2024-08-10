@@ -199,7 +199,7 @@ namespace ola
 				init_expr->Accept(*this);
 				if (is_array)
 				{
-
+					
 				}
 				else if (is_class)
 				{
@@ -946,9 +946,51 @@ namespace ola
 
 	}
 
-	void IRVisitor::Visit(ArrayAccessExpr const&, uint32)
+	void IRVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
 	{
+		Expr const* array_expr = array_access.GetArrayExpr();
+		Expr const* index_expr = array_access.GetIndexExpr();
 
+		array_expr->Accept(*this);
+		index_expr->Accept(*this);
+
+		Value* array_value = value_map[array_expr];
+		Value* index_value = value_map[index_expr];
+		OLA_ASSERT(array_value && index_value);
+		index_value = Load(int_type, index_value);
+
+		ConstantInt* zero = context.GetInt64(0);
+		if (AllocaInst* alloc = dyn_cast<AllocaInst>(array_value))
+		{
+			IRType* alloc_type = alloc->GetAllocatedType();
+			if (alloc_type->IsArray())
+			{
+				std::vector<Value*> indices = { zero, index_value };
+				Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
+				value_map[&array_access] = ptr;
+			}
+			else if (alloc_type->IsPointer())
+			{
+				std::vector<Value*> indices = { index_value };
+				Value* ptr = builder->MakeInst<GetElementPtrInst>(Load(alloc_type, alloc), indices);
+				value_map[&array_access] = ptr;
+			}
+			else OLA_ASSERT(false);
+		}
+		else
+		{
+			Type const* array_expr_type = array_expr->GetType();
+			OLA_ASSERT(isa<ArrayType>(array_expr_type));
+			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
+			if (isa<ArrayType>(array_type->GetBaseType()))
+			{
+				uint32 array_size = array_type->GetArraySize();
+				index_value = builder->MakeInst<BinaryInst>(Opcode::SMul, index_value, context.GetInt64(array_size));
+			}
+			std::vector<Value*> indices = { index_value };
+			Value* ptr = builder->MakeInst<GetElementPtrInst>(array_value, indices);
+			value_map[&array_access] = ptr;
+		}
 	}
 
 	void IRVisitor::Visit(MemberExpr const&, uint32)
