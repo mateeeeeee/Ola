@@ -82,7 +82,7 @@ namespace ola
 								uint32 const remaining_count = array_type->GetArraySize() - values.size();
 								if (remaining_count)
 								{
-									const auto rem_size = array_type->GetBaseType()->GetSize() * remaining_count;
+									const auto rem_size = array_type->GetElementType()->GetSize() * remaining_count;
 									for (uint32 i = 0; i < remaining_count; ++i)
 									{
 										data->AppendByte(0);

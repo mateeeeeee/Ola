@@ -123,7 +123,7 @@ namespace ola
 	{
 		friend class IRContext;
 	public:
-		IRType* GetBaseType() const { return base_type; }
+		IRType* GetElementType() const { return element_type; }
 		uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
@@ -131,11 +131,11 @@ namespace ola
 		static IRArrayType* Get(IRContext& ctx, IRType* base_type, uint32 array_size);
 
 	private:
-		IRType* base_type;
+		IRType* element_type;
 		uint32 array_size;
 
 	private:
-		IRArrayType(IRContext& ctx, IRType* base_type, uint32 array_size) : IRType(ctx, IRTypeKind::Array, base_type->GetAlign(), base_type->GetSize() * array_size), base_type(base_type), array_size(array_size) {}
+		IRArrayType(IRContext& ctx, IRType* element_type, uint32 array_size) : IRType(ctx, IRTypeKind::Array, element_type->GetAlign(), element_type->GetSize() * array_size), element_type(element_type), array_size(array_size) {}
 	};
 
 	class IRFuncType : public IRType

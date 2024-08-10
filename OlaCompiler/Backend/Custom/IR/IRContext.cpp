@@ -67,7 +67,7 @@ namespace ola
 	{
 		for (auto const& array_type : array_types)
 		{
-			if (array_type->GetBaseType() == base_type && array_type->GetArraySize() == array_size) return array_type;
+			if (array_type->GetElementType() == base_type && array_type->GetArraySize() == array_size) return array_type;
 		}
 		IRArrayType* new_type = new(this) IRArrayType(*this, base_type, array_size);
 		array_types.push_back(new_type);
@@ -145,6 +145,21 @@ namespace ola
 		if (constant_floats.contains(value)) return constant_floats[value];
 		constant_floats[value] = new ConstantFloat(float_type, value);
 		return constant_floats[value];
+	}
+
+	ConstantArray* IRContext::GetNullArray(IRArrayType* array_type)
+	{
+		if (!constant_null_arrays.contains(array_type))
+		{
+			IRType* element_type = array_type->GetElementType();
+			uint32 array_size = array_type->GetArraySize();
+
+			Constant* element_null_value = Constant::GetNullValue(element_type);
+			std::vector<Constant*> elements(array_size, element_null_value);
+
+			constant_null_arrays[array_type] = new ConstantArray(array_type, elements);
+		}
+		return constant_null_arrays[array_type];
 	}
 
 }

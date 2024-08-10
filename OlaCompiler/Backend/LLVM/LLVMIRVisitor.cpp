@@ -130,7 +130,7 @@ namespace ola
 				if (is_array)
 				{
 					ArrayType const* array_type = cast<ArrayType>(var_type);
-					llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetBaseType());
+					llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetElementType());
 
 					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
@@ -215,7 +215,7 @@ namespace ola
 				if (is_array)
 				{
 					ArrayType const* array_type = cast<ArrayType>(var_type);
-					llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetBaseType());
+					llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetElementType());
 					llvm::ConstantInt* zero = builder.getInt64(0); 
 					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
 					{
@@ -1136,7 +1136,7 @@ namespace ola
 		if (initializer_list_expr.IsConstexpr())
 		{
 			ArrayType const* array_type = cast<ArrayType>(initializer_list_expr.GetType());
-			llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetBaseType());
+			llvm::Type* llvm_element_type = ConvertToIRType(array_type->GetElementType());
 			llvm::Type* llvm_array_type = ConvertToIRType(array_type);
 
 			std::vector<llvm::Constant*> array_init_list(array_type->GetArraySize());
@@ -1186,7 +1186,7 @@ namespace ola
 			Type const* array_expr_type = array_expr->GetType();
 			OLA_ASSERT(isa<ArrayType>(array_expr_type));
 			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
-			if (isa<ArrayType>(array_type->GetBaseType()))
+			if (isa<ArrayType>(array_type->GetElementType()))
 			{
 				uint32 array_size = array_type->GetArraySize();
 				index_value = builder.CreateMul(index_value, builder.getInt64(array_size));
@@ -1432,8 +1432,8 @@ namespace ola
 		case TypeKind::Array:
 		{
 			ArrayType const* array_type = cast<ArrayType>(type);
-			if (array_type->GetArraySize() > 0) return llvm::ArrayType::get(ConvertToIRType(array_type->GetBaseType()), array_type->GetArraySize());
-			else return GetPointerType(ConvertToIRType(array_type->GetBaseType()));
+			if (array_type->GetArraySize() > 0) return llvm::ArrayType::get(ConvertToIRType(array_type->GetElementType()), array_type->GetArraySize());
+			else return GetPointerType(ConvertToIRType(array_type->GetElementType()));
 		}
 		case TypeKind::Function:
 		{

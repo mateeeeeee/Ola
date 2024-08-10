@@ -184,18 +184,18 @@ namespace ola
 
 		virtual bool IsAssignableFrom(Type const*) const override;
 
-		QualType const& GetBaseType() const { return base_type; }
+		QualType const& GetElementType() const { return element_type; }
 		uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Array; }
 		static ArrayType* Get(Context* ctx, QualType const& type, uint32 array_size = 0);
 	private:
-		QualType base_type;
+		QualType element_type;
 		uint32 array_size;
 
 	private:
 		ArrayType(QualType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
-			base_type(type), array_size(array_size) {}
+			element_type(type), array_size(array_size) {}
 	};
 
 	class FuncType : public Type

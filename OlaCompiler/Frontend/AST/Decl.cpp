@@ -185,7 +185,7 @@ namespace ola
 		else if (isa<ArrayType>(type))
 		{
 			ArrayType const* arr_type = cast<ArrayType>(type);
-			type_mangled_name += GetTypeMangledName(arr_type->GetBaseType());
+			type_mangled_name += GetTypeMangledName(arr_type->GetElementType());
 			type_mangled_name += std::to_string(arr_type->GetArraySize());
 		}
 		else if (isa<RefType>(type))

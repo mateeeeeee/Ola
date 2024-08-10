@@ -468,13 +468,13 @@ namespace ola
 		QualType var_type = var_decl->GetType();
 		if (!var_type.IsNull())
 		{
-			if (var_type.GetTypePtr() != array_type->GetBaseType().GetTypePtr())
+			if (var_type.GetTypePtr() != array_type->GetElementType().GetTypePtr())
 			{
 				diagnostics.Report(var_decl->GetLocation(), foreach_loop_type_mismatch);
 				return nullptr;
 			}
 		}
-		else var_decl->SetType(array_type->GetBaseType());
+		else var_decl->SetType(array_type->GetElementType());
 		var_decl->SetInitExpr(ActOnArrayAccessExpr(loc, std::move(array_identifier), MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc)));
 
 		UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
@@ -1233,7 +1233,7 @@ namespace ola
 		UniqueArrayAccessExprPtr array_access_expr = MakeUnique<ArrayAccessExpr>(loc);
 		array_access_expr->SetArrayExpr(std::move(array_expr));
 		array_access_expr->SetIndexExpr(std::move(index_expr));
-		array_access_expr->SetType(array_type->GetBaseType());
+		array_access_expr->SetType(array_type->GetElementType());
 		return array_access_expr;
 	}
 
@@ -1520,7 +1520,7 @@ namespace ola
 			{
 				ArrayType const* init_expr_type = cast<ArrayType>(array_init_expr->GetType());
 
-				bool is_multidimensional_array = isa<ArrayType>(init_expr_type->GetBaseType());
+				bool is_multidimensional_array = isa<ArrayType>(init_expr_type->GetElementType());
 				if (is_multidimensional_array && init_expr_is_decl_ref)
 				{
 					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
@@ -1529,7 +1529,7 @@ namespace ola
 				if (has_type_specifier && !is_multidimensional_array)
 				{
 					ArrayType const* decl_type = cast<ArrayType>(type);
-					if (!decl_type->GetBaseType().IsConst() && init_expr_type->GetBaseType().IsConst())
+					if (!decl_type->GetElementType().IsConst() && init_expr_type->GetElementType().IsConst())
 					{
 						diagnostics.Report(loc, assigning_const_array_to_non_const_array, name);
 						return nullptr;
@@ -1554,7 +1554,7 @@ namespace ola
 
 				if (!has_type_specifier)
 				{
-					QualType base_type = init_expr_type->GetBaseType();
+					QualType base_type = init_expr_type->GetElementType();
 					if (type.IsConst()) base_type.AddConst();
 					if (init_expr_is_decl_ref)
 					{
@@ -1570,7 +1570,7 @@ namespace ola
 					ArrayType const* arr_type = cast<ArrayType>(type);
 					if (arr_type->GetArraySize() == 0)
 					{
-						QualType base_type = arr_type->GetBaseType();
+						QualType base_type = arr_type->GetElementType();
 						if (type.IsConst()) base_type.AddConst();
 						var_decl->SetType(ArrayType::Get(ctx, base_type, init_expr_type->GetArraySize()));
 					}

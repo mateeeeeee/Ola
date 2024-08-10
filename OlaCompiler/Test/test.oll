@@ -6,6 +6,9 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
+declare @Array ptr
+
+
 define external @main i64() {
 entry:
 %0 = signed trunc i64

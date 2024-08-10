@@ -82,7 +82,7 @@ namespace ola
 	{
 		if (!isa<ArrayType>(other)) return false;
 		ArrayType const* other_array_type = cast<ArrayType>(other);
-		return base_type.GetTypePtr() == other_array_type->base_type.GetTypePtr();
+		return element_type.GetTypePtr() == other_array_type->element_type.GetTypePtr();
 	}
 	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
 	{

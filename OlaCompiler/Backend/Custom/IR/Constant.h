@@ -162,7 +162,8 @@ namespace ola
 	protected:
 		ConstantAggregate(ConstantID constant_id, IRType* type, std::span<Constant*> values) : Constant(constant_id, type)
 		{
-			for (uint32 i = 0; i <= values.size(); ++i)
+			aggregate_values.resize(values.size());
+			for (uint32 i = 0; i < values.size(); ++i)
 			{
 				if (IRStructType* ST = dyn_cast<IRStructType>(type))
 				{
@@ -170,7 +171,7 @@ namespace ola
 				}
 				else if (IRArrayType* AT = dyn_cast<IRArrayType>(type))
 				{
-					OLA_ASSERT_MSG(AT->GetBaseType() == values[i]->GetType(), "Aggregate member type mismatch!");
+					OLA_ASSERT_MSG(AT->GetElementType() == values[i]->GetType(), "Aggregate member type mismatch!");
 				}
 				aggregate_values[i] = values[i];
 			}

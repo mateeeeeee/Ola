@@ -6,6 +6,8 @@
 
 .extern AssertMsg
 
+Array:
+.zero 24
 .globl main
 
 main:

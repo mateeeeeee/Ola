@@ -19,6 +19,7 @@ namespace ola
 	class ConstantString;
 	class ConstantInt;
 	class ConstantFloat;
+	class ConstantArray;
 
 	class IRContext
 	{
@@ -45,6 +46,8 @@ namespace ola
 		ConstantFloat* GetZeroFloat() const { return zero_float; }
 		ConstantFloat* GetFloat(double val);
 
+		ConstantArray* GetNullArray(IRArrayType* array_type);
+
 	private:
 		IRVoidType*		void_type;
 		IRIntType*		int1_type;
@@ -64,6 +67,7 @@ namespace ola
 		std::unordered_map<int64, ConstantInt*> constant_ints64;
 		std::unordered_map<int8, ConstantInt*> constant_ints8;
 		std::unordered_map<double, ConstantFloat*> constant_floats;
+		std::unordered_map<IRArrayType*, ConstantArray*> constant_null_arrays;
 	};
 }
 

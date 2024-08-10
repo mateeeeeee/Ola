@@ -15,7 +15,10 @@ namespace ola
 			return ctx.GetZeroFloat();
 		case IRTypeKind::Struct:
 		case IRTypeKind::Array:
-			OLA_ASSERT_MSG(false, "todo");
+		{
+			IRArrayType* array_type = cast<IRArrayType>(Ty);
+			return ctx.GetNullArray(array_type);
+		}
 		default:
 			OLA_ASSERT(false);
 		}

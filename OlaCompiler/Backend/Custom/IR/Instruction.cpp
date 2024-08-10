@@ -217,7 +217,7 @@ namespace ola
 			{
 				if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type)) 
 				{
-					current_type = array_type->GetBaseType();
+					current_type = array_type->GetElementType();
 				}
 				else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 				{

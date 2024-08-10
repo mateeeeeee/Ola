@@ -30,7 +30,7 @@ namespace ola
 	{
 		for (auto const& array_type : array_types)
 		{
-			if (array_type->GetBaseType() == type && array_type->GetArraySize() == array_size) return array_type;
+			if (array_type->GetElementType() == type && array_type->GetArraySize() == array_size) return array_type;
 		}
 		ArrayType* new_type = new(this) ArrayType(type, array_size);
 		array_types.push_back(new_type);

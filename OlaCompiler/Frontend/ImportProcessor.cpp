@@ -155,7 +155,7 @@ namespace ola
 				case TypeKind::Array:
 				{
 					ArrayType const* arr_type = cast<ArrayType>(type);
-					TypeToTokens(arr_type->GetBaseType(), tokens);
+					TypeToTokens(arr_type->GetElementType(), tokens);
 					tokens.emplace_back(TokenKind::left_square);
 					tokens.emplace_back(TokenKind::right_square);
 				}

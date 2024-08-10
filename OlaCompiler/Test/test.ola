@@ -1,12 +1,11 @@
 import std.assert;
 
+int[3] Array; // = {-5,0,5};
+
 
 public int main()
 {
-    int[3] LocalArray2 = {-5,0,5};
-	Assert(LocalArray2[1] == 0);
-	Assert(length(LocalArray2) == 3);
-
+	Assert(length(Array) == 3);
 	int a = 5 * 3 * 2 + 5;
-	return a;
+	return a; //Array[0];
 }

@@ -281,7 +281,7 @@ namespace ola
 		case IRTypeKind::Array:
 		{
 			IRArrayType* array_type = cast<IRArrayType>(type);
-			PrintType(array_type->GetBaseType());
+			PrintType(array_type->GetElementType());
 			Emit("[{}]", array_type->GetArraySize());
 		}
 		break;
