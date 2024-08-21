@@ -212,7 +212,6 @@ namespace ola
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
-				//IMUL has this version: IMUL r64, r/m64, imm32 which might be useful
 			}
 			break;
 			}

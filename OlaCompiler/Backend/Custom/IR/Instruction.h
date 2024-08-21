@@ -759,6 +759,10 @@ namespace ola
 		uint32 GetNumIndices() const { return GetNumOperands() - 1; }
 		bool HasIndices() const { return GetNumIndices() > 0; }
 
+		Value* GetPointerOperand() { return GetOperand(0); }
+		const Value* getPointerOperand() const { return GetOperand(0); }
+		IRType* getPointerOperandType() const { return getPointerOperand()->GetType(); }
+
 		OpIterator       IdxBegin() { return OpBegin() + 1; }
 		ConstOpIterator  IdxBegin() const { return OpBegin() + 1; }
 		OpIterator       IdxEnd() { return OpEnd(); }

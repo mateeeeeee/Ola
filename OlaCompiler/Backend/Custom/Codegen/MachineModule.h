@@ -18,6 +18,7 @@ namespace ola
 	class ReturnInst;
 	class CallInst;
 	class AllocaInst;
+	class GetElementPtrInst;
 
 	class MachineInstruction;
 	class MIRInstructionInfo;
@@ -55,6 +56,7 @@ namespace ola
 		void LowerStore(StoreInst*);
 		void LowerCall(CallInst*);
 		void LowerCast(CastInst*);
+		void LowerGEP(GetElementPtrInst*);
 
 		void LowerCFGAnalysis(Function*);
 	};

@@ -238,6 +238,9 @@ namespace ola
 		case Opcode::ZExt:
 			LowerCast(cast<CastInst>(inst));
 			break;
+		case Opcode::GetElementPtr:
+			LowerGEP(cast<GetElementPtrInst>(inst));
+			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
 		case Opcode::Phi:
@@ -367,6 +370,34 @@ namespace ola
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->GetSrc()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(CI, ret);
+	}
+
+	void MachineModule::LowerGEP(GetElementPtrInst* GEP)
+	{
+		MachineOperand base = lowering_ctx.GetOperand(GEP->GetPointerOperand());
+		MachineOperand address = base;
+
+		IRType* base_type = GEP->getPointerOperandType();
+		uint32  element_size = base_type->GetSize();  
+		MachineOperand stride = MachineOperand::Immediate(element_size, MachineOperandType::Int64);
+		
+		for (Value* index_value : GEP->Indices())
+		{
+			MachineOperand index = lowering_ctx.GetOperand(index_value);
+
+			MachineInstruction offsetMI(InstSMul);  
+			MachineOperand temp_offset = lowering_ctx.VirtualReg(index_value->GetType());
+			offsetMI.SetOp<0>(temp_offset).SetOp<1>(index).SetOp<2>(stride);
+			lowering_ctx.EmitInst(offsetMI);
+
+			MachineInstruction addMI(InstAdd);
+			MachineOperand new_address = lowering_ctx.VirtualReg(address.GetType());
+			addMI.SetOp<0>(new_address).SetOp<1>(address).SetOp<2>(temp_offset);
+			lowering_ctx.EmitInst(addMI);
+
+			address = new_address;
+		}
+		lowering_ctx.AddOperand(GEP, address);
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)
