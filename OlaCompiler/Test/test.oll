@@ -12,19 +12,14 @@ declare @Array ptr
 define external @main i64() {
 entry:
 %0 = signed trunc i64
-f2u i8 1, @Assert
-%1 = signed trunc i64
-store 35, ptr %1
-%2 = unsigned trunc i64 0, @Array
-%3 = load i64, ptr %2
-%4 = load i64, ptr %1
-%5 = add i64 %3, %4
-store i64 %5, ptr %0
+%1 = unsigned trunc ptr @Array, 2
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%6 = load i64, ptr %0
-ret i64 %6
+%3 = load i64, ptr %0
+ret i64 %3
 }
 

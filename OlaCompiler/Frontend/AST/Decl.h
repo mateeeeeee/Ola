@@ -437,7 +437,6 @@ namespace ola
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-
 		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
 
 	private:

@@ -17,6 +17,7 @@ namespace ola
 		// Memory
 		InstLoad,
 		InstStore,
+		InstLoadAddress,
 		//Stack
 		InstPush,
 		InstPop,
@@ -137,14 +138,16 @@ namespace ola
 			operands[idx] = operand;
 		}
 
-		void SetFlag(MachineInstFlag flag)
+		MachineInstruction& SetFlag(MachineInstFlag flag)
 		{
 			flags |= flag;
+			return *this;
 		}
-		void SetIgnoreDef()
+		MachineInstruction& SetIgnoreDef()
 		{
-			SetFlag(MachineInstFlag_IgnoreDef);
+			return SetFlag(MachineInstFlag_IgnoreDef);
 		}
+
 		bool HasFlag(MachineInstFlag flag) const
 		{
 			return (flags & flag) != 0;

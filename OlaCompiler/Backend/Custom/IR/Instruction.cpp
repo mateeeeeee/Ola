@@ -236,10 +236,14 @@ namespace ola
 	}
 
 	GetElementPtrInst::GetElementPtrInst(Value* base, std::span<Value*> indices)
-		: Instruction{ Opcode::GetElementPtr, IRPtrType::Get(GetValueType(base, indices)), {} }
+		: Instruction{ Opcode::GetElementPtr, IRPtrType::Get(GetValueType(base, indices)), {} },
+		result_element_type(GetValueType(base, indices))
 	{
-		for (Value* index : indices) AddOperand(index);
+		OLA_ASSERT(base->GetType()->IsPointer());
+		source_element_type = cast<IRPtrType>(base->GetType())->GetPointeeType(); 
+
 		AddOperand(base);
+		for (Value* index : indices) AddOperand(index);
 	}
 
 	void PhiInst::AddIncoming(BasicBlock* block, Value* value)

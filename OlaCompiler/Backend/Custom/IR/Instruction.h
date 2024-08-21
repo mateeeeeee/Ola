@@ -759,10 +759,6 @@ namespace ola
 		uint32 GetNumIndices() const { return GetNumOperands() - 1; }
 		bool HasIndices() const { return GetNumIndices() > 0; }
 
-		Value* GetPointerOperand() { return GetOperand(0); }
-		const Value* getPointerOperand() const { return GetOperand(0); }
-		IRType* getPointerOperandType() const { return getPointerOperand()->GetType(); }
-
 		OpIterator       IdxBegin() { return OpBegin() + 1; }
 		ConstOpIterator  IdxBegin() const { return OpBegin() + 1; }
 		OpIterator       IdxEnd() { return OpEnd(); }
@@ -776,6 +772,10 @@ namespace ola
 			return MakeRange(IdxBegin(), IdxEnd());
 		}
 
+		Value* GetBaseOperand()	       const { return GetOperand(0); }
+		IRType* GetSourceElementType() const { return source_element_type; }
+		IRType* GetResultElementType() const { return result_element_type; }
+
 		static bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::GetElementPtr;
@@ -784,6 +784,10 @@ namespace ola
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
+
+	private:
+		IRType* source_element_type;
+		IRType* result_element_type;
 	};
 
 	class PhiInst final : public Instruction 

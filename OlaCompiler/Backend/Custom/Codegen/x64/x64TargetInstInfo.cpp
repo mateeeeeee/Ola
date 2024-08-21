@@ -25,6 +25,7 @@ namespace ola
 		}
 		break;
 		case InstLoad:
+		case InstLoadAddress:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

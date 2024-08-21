@@ -106,12 +106,12 @@ namespace ola::x64
 		case InstSub:   return "sub";
 		case InstICmp:  return "cmp";
 		case InstFCmp:  return "comisd";
-		case InstSetE:      return "sete";
-		case InstSetNE:	    return "setne";
-		case InstSetGT:		return "setg";
-		case InstSetGE:		return "setge";
-		case InstSetLT:		return "setl";
-		case InstSetLE:		return "setle";
+		case InstSetE:  return "sete";
+		case InstSetNE:	return "setne";
+		case InstSetGT:	return "setg";
+		case InstSetGE:	return "setge";
+		case InstSetLT:	return "setl";
+		case InstSetLE:	return "setle";
 		case InstShl:	return "shl";
 		case InstAShr:  return "sar";
 		case InstLShr:  return "shr";
@@ -122,6 +122,7 @@ namespace ola::x64
 		case InstSMul:  return "imul";
 		case InstSDiv:  return "idiv";
 		case InstCqo:   return "cqo";
+		case InstLoadAddress: return "lea";
 		}
 		return "";
 	}

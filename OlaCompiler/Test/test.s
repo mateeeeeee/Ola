@@ -14,11 +14,14 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 48
-mov rcx, 1
-call Assert
-mov qword ptr [rbp - 16], 35
-mov r15, qword ptr [rbp - 16]
+sub rsp, 8
+lea r15, [rip + Array]
+mov r14, r15
+mov r15, 2
+imul r15, 8
+mov r14, r14
+add r14, r15
+mov r15, r14
 mov qword ptr [rbp - 8], r15
 jmp label2
 label1:

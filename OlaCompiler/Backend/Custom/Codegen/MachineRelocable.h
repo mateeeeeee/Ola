@@ -20,10 +20,10 @@ namespace ola
 		std::string_view GetSymbol() const { return symbol; }
 		virtual RelocableKind GetRelocableKind() const = 0;
 
-		bool IsFunction() const { return GetRelocableKind() == RelocableKind::Function; }
+		bool IsFunction() const { return	GetRelocableKind() == RelocableKind::Function; }
 		bool IsZeroStorage() const { return GetRelocableKind() == RelocableKind::ZeroStorage; }
 		bool IsDataStorage() const { return GetRelocableKind() == RelocableKind::DataStorage; }
-		bool IsBlock() const { return GetRelocableKind() == RelocableKind::Block; }
+		bool IsBlock() const { return		GetRelocableKind() == RelocableKind::Block; }
 
 	private:
 		std::string symbol;

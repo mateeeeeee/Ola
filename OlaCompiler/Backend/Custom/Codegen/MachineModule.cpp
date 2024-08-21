@@ -163,7 +163,7 @@ namespace ola
 				}
 			}
 		}
-		if (!is_leaf) MF.AllocateStack(32);
+		if (!is_leaf) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
 
 		auto& args = MF.Args();
 		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
@@ -374,30 +374,70 @@ namespace ola
 
 	void MachineModule::LowerGEP(GetElementPtrInst* GEP)
 	{
-		MachineOperand base = lowering_ctx.GetOperand(GEP->GetPointerOperand());
-		MachineOperand address = base;
+		Value* base = GEP->GetBaseOperand();
+		MachineOperand base_op = lowering_ctx.GetOperand(base);  
+		MachineOperand result = lowering_ctx.VirtualReg(GEP->GetType());  
+		IRType* current_type = GEP->GetSourceElementType();  
 
-		IRType* base_type = GEP->getPointerOperandType();
-		uint32  element_size = base_type->GetSize();  
-		MachineOperand stride = MachineOperand::Immediate(element_size, MachineOperandType::Int64);
-		
-		for (Value* index_value : GEP->Indices())
+		lowering_ctx.EmitInst(MachineInstruction(InstStore)
+							  .SetOp<0>(result)
+							  .SetOp<1>(base_op).SetIgnoreDef()); //weird, it should be done in for loop not here
+
+		for (Value* index : GEP->Indices())
 		{
-			MachineOperand index = lowering_ctx.GetOperand(index_value);
+			MachineOperand index_op = lowering_ctx.GetOperand(index);
 
-			MachineInstruction offsetMI(InstSMul);  
-			MachineOperand temp_offset = lowering_ctx.VirtualReg(index_value->GetType());
-			offsetMI.SetOp<0>(temp_offset).SetOp<1>(index).SetOp<2>(stride);
-			lowering_ctx.EmitInst(offsetMI);
+			if (auto* array_type = dyn_cast<IRArrayType>(current_type))
+			{
+				uint32 element_size = array_type->GetElementType()->GetSize();
 
-			MachineInstruction addMI(InstAdd);
-			MachineOperand new_address = lowering_ctx.VirtualReg(address.GetType());
-			addMI.SetOp<0>(new_address).SetOp<1>(address).SetOp<2>(temp_offset);
-			lowering_ctx.EmitInst(addMI);
+				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
+				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
+					.SetOp<0>(offset)
+					.SetOp<1>(index_op)
+					.SetOp<2>(MachineOperand::Immediate(element_size, index_op.GetType())));
 
-			address = new_address;
+				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+					.SetOp<0>(result)
+					.SetOp<1>(result)
+					.SetOp<2>(offset));
+
+				current_type = array_type->GetElementType();
+			}
+			else if (auto* struct_type = dyn_cast<IRStructType>(current_type))
+			{
+				ConstantOffset* offset_const = dyn_cast<ConstantOffset>(index);
+				uint32 field_offset = struct_type->GetFieldOffset(offset_const->GetIndex());
+
+				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+					.SetOp<0>(result)
+					.SetOp<1>(result)
+					.SetOp<2>(MachineOperand::Immediate(field_offset, result.GetType())));
+				current_type = struct_type->GetMemberType(offset_const->GetIndex());
+			}
+			else if (auto* pointer_type = dyn_cast<IRPtrType>(current_type))
+			{
+				uint32 pointer_size = pointer_type->GetPointeeType()->GetSize();
+
+				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
+				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
+					.SetOp<0>(offset)
+					.SetOp<1>(index_op)
+					.SetOp<2>(MachineOperand::Immediate(pointer_size, index_op.GetType())));
+
+				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+					.SetOp<0>(result)
+					.SetOp<1>(result)
+					.SetOp<2>(offset));
+
+				current_type = pointer_type->GetPointeeType();
+			}
+			else
+			{
+				OLA_ASSERT_MSG(false, "Unhandled type in GEP lowering!");
+			}
 		}
-		lowering_ctx.AddOperand(GEP, address);
+		lowering_ctx.AddOperand(GEP, result);
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)

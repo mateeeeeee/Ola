@@ -98,15 +98,26 @@ namespace ola
 		{
 			GlobalValue const* GV = cast<GlobalValue>(C);
 			MachineOperand ptr = VirtualReg(MachineOperandType::Int64);
-			MachineInstruction minst(InstStore);
-
-			MachineGlobal* machine_global = global_map[GV];
-			OLA_ASSERT(machine_global);
-
-			MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
-			minst.SetOp<0>(ptr).SetOp<1>(global);
-			EmitInst(minst);
+			if (GV->GetValueType()->IsArray())
+			{
+				MachineInstruction MI(InstLoadAddress);
+				MachineGlobal* machine_global = global_map[GV];
+				OLA_ASSERT(machine_global);
+				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
+				MI.SetOp<0>(ptr).SetOp<1>(global);
+				EmitInst(MI);
+			}
+			else
+			{
+				MachineInstruction MI(InstStore);
+				MachineGlobal* machine_global = global_map[GV];
+				OLA_ASSERT(machine_global);
+				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
+				MI.SetOp<0>(ptr).SetOp<1>(global);
+				EmitInst(MI);
+			}
 			return ptr;
+
 		}
 		else if (C->GetConstantID() == ConstantID::Integer)
 		{
