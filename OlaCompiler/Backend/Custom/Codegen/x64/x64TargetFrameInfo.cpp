@@ -58,7 +58,7 @@ namespace ola
 			if (offset < PASS_BY_REG_OFFSET)
 			{
 				MachineOperand& argument_stack = caller.AllocateStack(arg_operand.GetType());
-				MachineInstruction copy_arg_to_stack(InstLoad);
+				MachineInstruction copy_arg_to_stack(InstStore);
 				copy_arg_to_stack.SetOp<0>(argument_stack).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
 			}
@@ -66,7 +66,7 @@ namespace ola
 			{
 				uint32 gpr = offset - PASS_BY_REG_OFFSET;
 				static constexpr x64::Register arg_regs[] = {x64::RCX, x64::RDX, x64::R8, x64::R9 };
-				MachineInstruction copy_arg_to_reg(InstLoad);
+				MachineInstruction copy_arg_to_reg(InstStore);
 				copy_arg_to_reg.SetOp<0>(MachineOperand::ISAReg(arg_regs[gpr], arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_reg);
 			}
@@ -87,7 +87,7 @@ namespace ola
 		{
 			arch_return_reg = MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64);
 		}
-		ctx.EmitInst(MachineInstruction(InstLoad).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
+		ctx.EmitInst(MachineInstruction(InstStore).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
 		ctx.AddOperand(CI, return_reg);
 	}
 
@@ -151,7 +151,7 @@ namespace ola
 			{
 				uint32 gpr = offset - PASS_BY_REG_OFFSET;
 				static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
-				MachineInstruction copy_arg_from_reg(InstLoad);
+				MachineInstruction copy_arg_from_reg(InstStore);
 				copy_arg_from_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[gpr], arg.GetType())).SetOp<0>(arg);
 				ctx.EmitInst(copy_arg_from_reg);
 			}
@@ -203,7 +203,7 @@ namespace ola
 					return_register = MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64);
 				}
 
-				MachineInstruction copy_instruction(InstLoad);
+				MachineInstruction copy_instruction(InstStore);
 				copy_instruction.SetOp<0>(return_register).SetOp<1>(ctx.GetOperand(V));
 				ctx.EmitInst(copy_instruction);
 			}

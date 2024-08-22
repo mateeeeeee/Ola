@@ -1,9 +1,9 @@
 import std.assert;
 
-int[3] Array; // = {-5,0,5};
-
+int[3] Array;
 
 public int main()
 {
-	return Array[2];
+	Array[2] = 10;
+	return 0;
 }

@@ -6,7 +6,7 @@ namespace ola::x64
 	enum Register : uint32
 	{
 		GPRBegin,
-		RAX = GPRBegin, RCX, RDX, RBX, RSP, RBP, RSI, RDI,
+		RAX = GPRBegin, RSP, RBP, RCX, RDX, RBX, RSI, RDI,
 		R8, R9, R10, R11, R12, R13, R14, R15,
 		GPREnd,
 		FPRBegin,
@@ -122,7 +122,7 @@ namespace ola::x64
 		case InstSMul:  return "imul";
 		case InstSDiv:  return "idiv";
 		case InstCqo:   return "cqo";
-		case InstLoadAddress: return "lea";
+		case InstLoadGlobalAddress: return "lea";
 		}
 		return "";
 	}

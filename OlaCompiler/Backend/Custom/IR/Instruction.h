@@ -725,17 +725,10 @@ namespace ola
 	class AllocaInst final : public Instruction
 	{
 	public:
-		AllocaInst(IRType* type, Value* array_size = nullptr);
-		bool IsArrayAllocation() const
-		{
-			return GetArraySize() != nullptr;
-		}
+		explicit AllocaInst(IRType* type);
 
 		IRPtrType* GetPtrType() const;
 		IRType* GetAllocatedType() const { return allocated_type; }
-
-		Value const* GetArraySize() const { return GetOperand(0); }
-		Value* GetArraySize() { return GetOperand(0); }
 
 		static bool ClassOf(Instruction const* I)
 		{

@@ -971,7 +971,7 @@ namespace ola
 			}
 			else if (alloc_type->IsPointer())
 			{
-				std::vector<Value*> indices = { index_value };
+				std::vector<Value*> indices = { zero, index_value };
 				Value* ptr = builder->MakeInst<GetElementPtrInst>(Load(alloc_type, alloc), indices);
 				value_map[&array_access] = ptr;
 			}
@@ -987,7 +987,7 @@ namespace ola
 				uint32 array_size = array_type->GetArraySize();
 				index_value = builder->MakeInst<BinaryInst>(Opcode::SMul, index_value, context.GetInt64(array_size));
 			}
-			std::vector<Value*> indices = { index_value };
+			std::vector<Value*> indices = { zero, index_value };
 			Value* ptr = builder->MakeInst<GetElementPtrInst>(array_value, indices);
 			value_map[&array_access] = ptr;
 		}
@@ -1277,6 +1277,10 @@ namespace ola
 		if (AllocaInst* AI = dyn_cast<AllocaInst>(value))
 		{
 			load = Load(AI->GetAllocatedType(), AI);
+		}
+		else if (GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(value))
+		{
+			load = Load(GEPI->GetResultElementType(), GEPI);
 		}
 		else
 		{

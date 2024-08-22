@@ -198,7 +198,7 @@ namespace ola
 		return GetBasicBlock()->GetFunction();
 	}
 
-	AllocaInst::AllocaInst(IRType* type, Value* array_size /*= nullptr*/) : Instruction(Opcode::Alloca, IRPtrType::Get(type), { array_size }), allocated_type(type)
+	AllocaInst::AllocaInst(IRType* type) : Instruction(Opcode::Alloca, IRPtrType::Get(type), {}), allocated_type(type)
 	{
 	}
 
@@ -236,7 +236,7 @@ namespace ola
 	}
 
 	GetElementPtrInst::GetElementPtrInst(Value* base, std::span<Value*> indices)
-		: Instruction{ Opcode::GetElementPtr, IRPtrType::Get(GetValueType(base, indices)), {} },
+		: Instruction{ Opcode::GetElementPtr, base->GetType(), {} },
 		result_element_type(GetValueType(base, indices))
 	{
 		OLA_ASSERT(base->GetType()->IsPointer());

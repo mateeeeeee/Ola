@@ -154,8 +154,17 @@ namespace ola
 				{
 					AllocaInst* AI = cast<AllocaInst>(&I);
 					IRType const* type = AI->GetAllocatedType();
-					MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
-					lowering_ctx.AddOperand(AI, MO);
+					if (type->IsArray())
+					{
+						IRArrayType const* array_type = cast<IRArrayType>(type);
+						MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
+						lowering_ctx.AddOperand(AI, MO);
+					}
+					else
+					{
+						MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
+						lowering_ctx.AddOperand(AI, MO);
+					}
 				}
 				else if (I.GetOpcode() == Opcode::Call)
 				{
@@ -343,7 +352,8 @@ namespace ola
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
 		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
-		MachineInstruction MI(InstLoad);
+		MachineOpcode opcode = ptr.IsStackObject() ? InstStore : InstLoad;
+		MachineInstruction MI(opcode);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(LI, ret);
@@ -372,22 +382,22 @@ namespace ola
 		lowering_ctx.AddOperand(CI, ret);
 	}
 
-	void MachineModule::LowerGEP(GetElementPtrInst* GEP)
+	void MachineModule::LowerGEP(GetElementPtrInst* GEPI)
 	{
-		Value* base = GEP->GetBaseOperand();
+		Value* base = GEPI->GetBaseOperand();
 		MachineOperand base_op = lowering_ctx.GetOperand(base);  
-		MachineOperand result = lowering_ctx.VirtualReg(GEP->GetType());  
-		IRType* current_type = GEP->GetSourceElementType();  
+		MachineOperand result = lowering_ctx.VirtualReg(GEPI->GetType());  
+		IRType* current_type = GEPI->GetType();  
 
 		lowering_ctx.EmitInst(MachineInstruction(InstStore)
 							  .SetOp<0>(result)
-							  .SetOp<1>(base_op).SetIgnoreDef()); //weird, it should be done in for loop not here
+							  .SetOp<1>(base_op)); 
 
-		for (Value* index : GEP->Indices())
+		for (Value* index : GEPI->Indices())
 		{
 			MachineOperand index_op = lowering_ctx.GetOperand(index);
 
-			if (auto* array_type = dyn_cast<IRArrayType>(current_type))
+			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
 			{
 				uint32 element_size = array_type->GetElementType()->GetSize();
 
@@ -397,25 +407,30 @@ namespace ola
 					.SetOp<1>(index_op)
 					.SetOp<2>(MachineOperand::Immediate(element_size, index_op.GetType())));
 
+				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
 				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
-					.SetOp<0>(result)
+					.SetOp<0>(new_result)
 					.SetOp<1>(result)
 					.SetOp<2>(offset));
 
+				result = new_result;
 				current_type = array_type->GetElementType();
 			}
-			else if (auto* struct_type = dyn_cast<IRStructType>(current_type))
+			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
 			{
 				ConstantOffset* offset_const = dyn_cast<ConstantOffset>(index);
 				uint32 field_offset = struct_type->GetFieldOffset(offset_const->GetIndex());
 
+				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
 				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
-					.SetOp<0>(result)
+					.SetOp<0>(new_result)
 					.SetOp<1>(result)
 					.SetOp<2>(MachineOperand::Immediate(field_offset, result.GetType())));
+
+				result = new_result;
 				current_type = struct_type->GetMemberType(offset_const->GetIndex());
 			}
-			else if (auto* pointer_type = dyn_cast<IRPtrType>(current_type))
+			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 			{
 				uint32 pointer_size = pointer_type->GetPointeeType()->GetSize();
 
@@ -425,11 +440,13 @@ namespace ola
 					.SetOp<1>(index_op)
 					.SetOp<2>(MachineOperand::Immediate(pointer_size, index_op.GetType())));
 
+				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
 				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
-					.SetOp<0>(result)
+					.SetOp<0>(new_result)
 					.SetOp<1>(result)
 					.SetOp<2>(offset));
 
+				result = new_result;
 				current_type = pointer_type->GetPointeeType();
 			}
 			else
@@ -437,7 +454,7 @@ namespace ola
 				OLA_ASSERT_MSG(false, "Unhandled type in GEP lowering!");
 			}
 		}
-		lowering_ctx.AddOperand(GEP, result);
+		lowering_ctx.AddOperand(GEPI, result);
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)

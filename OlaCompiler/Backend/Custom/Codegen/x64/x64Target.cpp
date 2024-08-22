@@ -145,7 +145,7 @@ namespace ola
 				{
 					MI.SetOp<1>(op2);
 					MI.SetIgnoreDef();
-					MachineInstruction MI2(InstLoad);
+					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
@@ -161,7 +161,7 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 				MI.SetOp<1>(op2);
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstLoad);
+				MachineInstruction MI2(InstStore);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
@@ -182,7 +182,7 @@ namespace ola
 					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineOperandType::Int8));
 				}
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstLoad);
+				MachineInstruction MI2(InstStore);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
@@ -194,7 +194,7 @@ namespace ola
 				MachineOperand op = MI.GetOperand(1);
 				MI.SetIgnoreDef();
 
-				MachineInstruction MI2(InstLoad);
+				MachineInstruction MI2(InstStore);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op);
 				instructions.insert(instruction_iter, MI2);
@@ -208,7 +208,7 @@ namespace ola
 				
 				MI.SetOp<1>(op2);
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstLoad);
+				MachineInstruction MI2(InstStore);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);

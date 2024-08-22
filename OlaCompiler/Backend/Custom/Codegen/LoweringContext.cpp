@@ -100,7 +100,7 @@ namespace ola
 			MachineOperand ptr = VirtualReg(MachineOperandType::Int64);
 			if (GV->GetValueType()->IsArray())
 			{
-				MachineInstruction MI(InstLoadAddress);
+				MachineInstruction MI(InstLoadGlobalAddress);
 				MachineGlobal* machine_global = global_map[GV];
 				OLA_ASSERT(machine_global);
 				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
@@ -109,7 +109,7 @@ namespace ola
 			}
 			else
 			{
-				MachineInstruction MI(InstStore);
+				MachineInstruction MI(InstLoad);
 				MachineGlobal* machine_global = global_map[GV];
 				OLA_ASSERT(machine_global);
 				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());

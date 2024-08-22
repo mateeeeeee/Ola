@@ -15,20 +15,24 @@ label0:
 push rbp
 mov rbp, rsp
 sub rsp, 8
-lea r15, [rip + Array]
-mov r14, r15
-mov r15, 2
-imul r15, 8
-mov r14, r14
-add r14, r15
-mov r15, r14
-mov qword ptr [rbp - 8], r15
+lea r9, [rip + Array]
+mov r15, r9
+mov r14, 0
+imul r14, 24
+mov r13, r15
+add r13, r14
+mov r12, 2
+imul r12, 8
+mov r11, r13
+add r11, r12
+mov r11, 10
+mov qword ptr [rbp - 8], 0
 jmp label2
 label1:
 jmp label2
 label2:
-mov r15, qword ptr [rbp - 8]
-mov rax, r15
+mov r10, qword ptr [rbp - 8]
+mov rax, r10
 mov rsp, rbp
 pop rbp
 ret

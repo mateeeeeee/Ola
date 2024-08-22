@@ -109,7 +109,6 @@ namespace ola
 						}
 						break;
 						case InstStore:
-						case InstLoad:
 						case InstAdd:
 						case InstSub:
 						case InstAnd:
@@ -126,7 +125,14 @@ namespace ola
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
-						case InstLoadAddress:
+						case InstLoad:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, [{}]", opcode_string, GetOperandString(op1), GetOperandString(op2));
+						}
+						break;
+						case InstLoadGlobalAddress:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();

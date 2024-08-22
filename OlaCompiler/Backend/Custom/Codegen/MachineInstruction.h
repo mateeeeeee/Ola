@@ -17,7 +17,7 @@ namespace ola
 		// Memory
 		InstLoad,
 		InstStore,
-		InstLoadAddress,
+		InstLoadGlobalAddress,
 		//Stack
 		InstPush,
 		InstPop,
