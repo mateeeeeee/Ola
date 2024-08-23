@@ -609,13 +609,14 @@ namespace ola
 			return cases;
 		}
 
-		BasicBlock* GetDefaultCase()
+		BasicBlock* GetDefaultCase() const
 		{
 			return default_block;
 		}
-		BasicBlock const* const GetDefaultCase() const
+
+		BasicBlock* GetCase(uint32 case_idx) const
 		{
-			return default_block;
+			return cases.contains(case_idx) ? cases.find(case_idx)->second : nullptr;
 		}
 
 		Value* GetCondition() const { return GetOperand(0); }

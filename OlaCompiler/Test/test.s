@@ -25,7 +25,7 @@ mov r12, 2
 imul r12, 8
 mov r11, r13
 add r11, r12
-mov r11, 10
+mov qword ptr [r11], 10
 mov qword ptr [rbp - 8], 0
 jmp label2
 label1:

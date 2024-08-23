@@ -250,6 +250,9 @@ namespace ola
 		case Opcode::GetElementPtr:
 			LowerGEP(cast<GetElementPtrInst>(inst));
 			break;
+		case Opcode::Switch:
+			LowerSwitch(cast<SwitchInst>(inst));
+			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
 		case Opcode::Phi:
@@ -455,6 +458,11 @@ namespace ola
 			}
 		}
 		lowering_ctx.AddOperand(GEPI, result);
+	}
+
+	void MachineModule::LowerSwitch(SwitchInst* SI)
+	{
+
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)

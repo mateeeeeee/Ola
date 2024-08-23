@@ -491,14 +491,73 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(CaseStmt const&, uint32)
+	void IRVisitor::Visit(CaseStmt const& case_stmt, uint32)
 	{
-
+		OLA_ASSERT(!switch_instructions.empty());
+		SwitchInst* switch_inst = switch_instructions.back();
+		if (case_stmt.IsDefault())
+		{
+			builder->SetCurrentBlock(switch_inst->GetDefaultCase());
+		}
+		else
+		{
+			int64 case_value = case_stmt.GetValue();
+			Function* function = builder->GetCurrentFunction();
+			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
+			BasicBlock* case_block = builder->AddBlock(function, exit_block);
+			case_block->SetName(block_name);
+			switch_inst->AddCase(case_value, case_block);
+			builder->SetCurrentBlock(case_block);
+		}
 	}
 
-	void IRVisitor::Visit(SwitchStmt const&, uint32)
+	void IRVisitor::Visit(SwitchStmt const& switch_stmt, uint32)
 	{
+		Expr const* cond_expr = switch_stmt.GetCondExpr();
+		Stmt const* body_stmt = switch_stmt.GetBodyStmt();
 
+		Function* function = builder->GetCurrentFunction();
+		BasicBlock* header_block	= builder->AddBlock(function, exit_block); header_block->SetName("switch.header");
+		BasicBlock* default_block	= builder->AddBlock(function, exit_block); default_block->SetName("switch.default");
+		BasicBlock* end_block		= builder->AddBlock(function, exit_block); end_block->SetName("switch.end");
+
+		builder->MakeInst<BranchInst>(context, header_block);
+		builder->SetCurrentBlock(header_block);
+
+		cond_expr->Accept(*this);
+		Value* condition_value = value_map[cond_expr];
+		OLA_ASSERT(condition_value);
+		Value* condition = Load(int_type, condition_value);
+		SwitchInst* switch_inst = static_cast<SwitchInst*>(builder->MakeInst<SwitchInst>(condition, default_block));
+
+		switch_instructions.push_back(switch_inst);
+		end_blocks.push_back(end_block);
+		break_blocks.push_back(end_block);
+		body_stmt->Accept(*this);
+		break_blocks.pop_back();
+		end_blocks.pop_back();
+		switch_instructions.pop_back();
+
+		std::vector<BasicBlock*> case_blocks;
+		for (auto& case_stmt : switch_inst->Cases())
+		{
+			if (BasicBlock* successor = switch_inst->GetCase(case_stmt.first + 1))
+			{
+				case_blocks.push_back(successor);
+			}
+		}
+		for (uint32 i = 0; i < case_blocks.size(); ++i)
+		{
+			BasicBlock* case_block = case_blocks[i];
+			if (!case_block->GetTerminator())
+			{
+				BasicBlock* dest_block = i < case_blocks.size() - 1 ? case_blocks[i + 1] : default_block;
+				builder->SetCurrentBlock(case_block);
+				builder->MakeInst<BranchInst>(context, dest_block);
+			}
+		}
+		builder->SetCurrentBlock(end_block);
+		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
 	void IRVisitor::Visit(GotoStmt const& goto_stmt, uint32)

@@ -12,14 +12,39 @@ declare @Array ptr
 define external @main i64() {
 entry:
 %0 = signed trunc i64
-%1 = unsigned trunc ptr @Array, 0, 2
-store 10, ptr %1
+%1 = signed trunc i64
+store 2, ptr %1
+br label switch.header
+switch.header:
+%2 = load i64, ptr %1
+switch i64 %2
+switch.default:
+f2u i8 0, @Assert
+br label switch.end
+switch.end:
 store 0, ptr %0
 br label exit
 return:
 br label exit
+switch.case1:
+f2u i8 0, @Assert
+br label switch.end
+break:
+br label exit
+switch.case2:
+f2u i8 1, @Assert
+br label switch.end
+break1:
+br label exit
+switch.case3:
+f2u i8 0, @Assert
+br label switch.end
+break2:
+br label exit
+break3:
+br label exit
 exit:
-%2 = load i64, ptr %0
-ret i64 %2
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
