@@ -135,6 +135,11 @@ namespace ola
 			return std::holds_alternative<std::monostate>(storage);
 		}
 
+		bool IsMemoryOperand() const
+		{
+			return IsStackObject() || IsRelocable();
+		}
+
 		bool operator==(MachineOperand const& rhs) const
 		{
 			return storage == rhs.storage;

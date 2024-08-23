@@ -122,7 +122,7 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if ((src.IsStackObject() || src.IsRelocable()) && (dst.IsStackObject() || dst.IsRelocable()))
+				if (src.IsMemoryOperand() && dst.IsMemoryOperand())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
@@ -131,7 +131,7 @@ namespace ola
 					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
-					instructions.insert(++instruction_iter, MI2);
+					instructions.insert(instruction_iter, MI2);
 				}
 			}
 			break;

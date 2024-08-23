@@ -355,7 +355,7 @@ namespace ola
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
 		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
-		MachineOpcode opcode = ptr.IsStackObject() ? InstStore : InstLoad;
+		MachineOpcode opcode = ptr.IsMemoryOperand() ? InstStore : InstLoad;
 		MachineInstruction MI(opcode);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
