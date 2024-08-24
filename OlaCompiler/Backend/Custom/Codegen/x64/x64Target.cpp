@@ -229,11 +229,7 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (dst.IsReg() && (src.IsReg() || src.IsImmediate()))
-				{
-					MI.SetOpcode(InstMove);
-				}
-				else if (dst.IsMemoryOperand())
+				if (dst.IsMemoryOperand())
 				{
 					MI.SetOpcode(InstStore);
 				}

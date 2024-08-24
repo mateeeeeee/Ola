@@ -347,7 +347,7 @@ namespace ola
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
 		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
-		MachineInstruction MI(InstMove);
+		MachineInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(LI, ret);
@@ -357,7 +357,7 @@ namespace ola
 	{
 		MachineOperand const& ptr = lowering_ctx.GetOperand(SI->GetAddressOp());
 		MachineOperand const& val = lowering_ctx.GetOperand(SI->GetValueOp());
-		MachineInstruction MI(InstMove);
+		MachineInstruction MI(InstStore);
 		MI.SetOp<0>(ptr).SetOp<1>(val);
 		lowering_ctx.EmitInst(MI);
 	}

@@ -29,8 +29,14 @@ namespace ola
 		{
 			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
 			std::string reg_name = x64::GetRegisterString(MO.GetReg().reg, MO.GetType());
-			std::string format_string = dereference ? "[{}]" : "{}";
-			return std::vformat(format_string, std::make_format_args(reg_name));
+			if (dereference)
+			{
+				return std::format("{} [{}]", GetOperandPrefix(MO), reg_name);
+			}
+			else
+			{
+				return reg_name;
+			}
 		}
 		else if (MO.IsImmediate())
 		{

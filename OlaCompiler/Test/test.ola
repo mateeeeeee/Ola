@@ -1,14 +1,11 @@
 import std.assert;
 
 
-int Add(int a, int b)
-{
-    return a + b;
-}
+int[3] arr;
 
 
 public int main()
 {
-    Assert(Add(1, 2) == 3);
+    arr[2] = 5;
     return 0;
 }

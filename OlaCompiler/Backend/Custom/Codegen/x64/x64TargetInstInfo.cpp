@@ -25,12 +25,18 @@ namespace ola
 		}
 		break;
 		case InstMove:
-		case InstStore:
 		case InstLoad:
 		case InstLoadGlobalAddress:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		case InstStore:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagUse);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
