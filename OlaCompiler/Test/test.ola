@@ -1,9 +1,14 @@
 import std.assert;
 
-int[3] Array;
+
+int Add(int a, int b)
+{
+    return a + b;
+}
+
 
 public int main()
 {
-	Array[2] = 10;
-	return Array[2];
+    Assert(Add(1, 2) == 3);
+    return 0;
 }

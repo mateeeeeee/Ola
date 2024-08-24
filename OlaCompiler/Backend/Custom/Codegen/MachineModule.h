@@ -61,5 +61,8 @@ namespace ola
 		void LowerSwitch(SwitchInst*);
 
 		void LowerCFGAnalysis(Function*);
+
+		void LegalizeInstructions(MachineFunction& MF);
+		void PostLegalizeInstructions(MachineFunction& MF);
 	};
 }

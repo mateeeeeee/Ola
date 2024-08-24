@@ -14,11 +14,11 @@ namespace ola
 		InstJE,    
 		InstJNE,    
 		InstCall,
-		// Generic Memory
-		InstLoad,  //generic, after post legalization: reg <- [memory]
-		InstStore, //generic, after post legalization: [memory] <- reg
-		InstLoadGlobalAddress, //reg <- memory
-		InstMove, //reg <- reg, reg <- immediate
+		//Memory
+		InstMove,					//generic; later: reg <- reg, reg <- immediate
+		InstLoad,					//reg <- [memory]
+		InstStore,					//[memory] <- reg
+		InstLoadGlobalAddress,		//reg <- memory
 
 		//Stack
 		InstPush,

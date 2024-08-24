@@ -63,7 +63,7 @@ namespace ola
 					MachineOperand op1 = ctx.GetOperand(BI->LHS());
 					MachineOperand op2 = ctx.GetOperand(BI->RHS());
 
-					MachineInstruction move_to_rax(InstStore);
+					MachineInstruction move_to_rax(InstMove);
 					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
 					move_to_rax.SetOp<1>(op1);
 					ctx.EmitInst(move_to_rax);
@@ -74,7 +74,7 @@ namespace ola
 					if (op2.IsImmediate())
 					{
 						MachineOperand op2_reg = ctx.VirtualReg(BI->GetType());
-						MachineInstruction move_to_reg(InstStore);
+						MachineInstruction move_to_reg(InstMove);
 						move_to_reg.SetOp<0>(op2_reg);
 						move_to_reg.SetOp<1>(op2);
 						ctx.EmitInst(move_to_reg);
@@ -91,14 +91,14 @@ namespace ola
 
 					if (opcode == Opcode::SDiv)
 					{
-						MachineInstruction move_quotient(InstStore);
+						MachineInstruction move_quotient(InstMove);
 						move_quotient.SetOp<0>(dst);
 						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
 						ctx.EmitInst(move_quotient);
 					}
 					else if (opcode == Opcode::SRem)
 					{
-						MachineInstruction move_remainder(InstStore);
+						MachineInstruction move_remainder(InstMove);
 						move_remainder.SetOp<0>(dst);
 						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineOperandType::Int64));
 						ctx.EmitInst(move_remainder);
@@ -118,7 +118,7 @@ namespace ola
 
 			switch (MI.GetOpcode())
 			{
-			case InstStore:
+			case InstMove:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
@@ -128,7 +128,7 @@ namespace ola
 					MI.SetOp<0>(tmp);
 					MI.SetIgnoreDef();
 
-					MachineInstruction MI2(InstStore);
+					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(instruction_iter, MI2);
@@ -145,7 +145,7 @@ namespace ola
 				{
 					MI.SetOp<1>(op2);
 					MI.SetIgnoreDef();
-					MachineInstruction MI2(InstStore);
+					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
@@ -161,7 +161,7 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 				MI.SetOp<1>(op2);
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstStore);
+				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
@@ -175,14 +175,14 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 				if (!op2.IsImmediate())
 				{
-					MachineInstruction cl_move(InstStore);
+					MachineInstruction cl_move(InstMove);
 					cl_move.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
 					cl_move.SetOp<1>(op2);
 					instructions.insert(instruction_iter, cl_move);
 					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineOperandType::Int8));
 				}
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstStore);
+				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
@@ -194,7 +194,7 @@ namespace ola
 				MachineOperand op = MI.GetOperand(1);
 				MI.SetIgnoreDef();
 
-				MachineInstruction MI2(InstStore);
+				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op);
 				instructions.insert(instruction_iter, MI2);
@@ -208,7 +208,7 @@ namespace ola
 				
 				MI.SetOp<1>(op2);
 				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstStore);
+				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
@@ -225,8 +225,7 @@ namespace ola
 
 			switch (MI.GetOpcode())
 			{
-			case InstStore:
-			case InstLoad:
+			case InstMove:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);

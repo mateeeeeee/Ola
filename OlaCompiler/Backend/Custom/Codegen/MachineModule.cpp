@@ -103,8 +103,6 @@ namespace ola
 			lowering_ctx.AddGlobal(GV, &globals.back());
 		}
 
-		TargetFrameInfo const& frame_info = target.GetFrameInfo();
-		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (GlobalValue* GV : ir_globals)
 		{
 			if (GV->IsFunction())
@@ -116,30 +114,13 @@ namespace ola
 
 					MachineGlobal* global = lowering_ctx.GetGlobal(F);
 					MachineFunction& MF = *static_cast<MachineFunction*>(global->GetRelocable());
-					for (auto& MBB : MF.Blocks())
-					{
-						auto& instructions = MBB->Instructions();
-						for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
-						{
-							MachineInstruction& MI = *MIiterator;
-							InstLegalizeContext ctx{ MI, instructions, MIiterator };
-							isel_info.LegalizeInstruction(ctx, lowering_ctx);
-						}
-					}
+
+					LegalizeInstructions(MF);
 
 					LinearScanRegisterAllocator register_allocator(*this);
 					register_allocator.AssignRegisters(MF);
 
-					for (auto& MBB : MF.Blocks())
-					{
-						auto& instructions = MBB->Instructions();
-						for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
-						{
-							MachineInstruction& MI = *MIiterator;
-							InstLegalizeContext ctx{ MI, instructions, MIiterator };
-							isel_info.PostLegalizeInstruction(ctx);
-						}
-					}
+					PostLegalizeInstructions(MF);
 				}
 			}
 		}
@@ -366,8 +347,7 @@ namespace ola
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
 		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
-		MachineOpcode opcode = InstLoad;
-		MachineInstruction MI(opcode);
+		MachineInstruction MI(InstMove);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(LI, ret);
@@ -377,7 +357,7 @@ namespace ola
 	{
 		MachineOperand const& ptr = lowering_ctx.GetOperand(SI->GetAddressOp());
 		MachineOperand const& val = lowering_ctx.GetOperand(SI->GetValueOp());
-		MachineInstruction MI(InstStore);
+		MachineInstruction MI(InstMove);
 		MI.SetOp<0>(ptr).SetOp<1>(val);
 		lowering_ctx.EmitInst(MI);
 	}
@@ -403,7 +383,7 @@ namespace ola
 		MachineOperand result = lowering_ctx.VirtualReg(GEPI->GetType());  
 		IRType* current_type = GEPI->GetType();  
 
-		lowering_ctx.EmitInst(MachineInstruction(InstStore)
+		lowering_ctx.EmitInst(MachineInstruction(InstMove)
 							  .SetOp<0>(result)
 							  .SetOp<1>(base_op)); 
 
@@ -488,4 +468,36 @@ namespace ola
 			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
 		}
 	}
+
+	void MachineModule::LegalizeInstructions(MachineFunction& MF)
+	{
+		TargetISelInfo const& isel_info = target.GetISelInfo();
+		for (auto& MBB : MF.Blocks())
+		{
+			auto& instructions = MBB->Instructions();
+			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
+			{
+				MachineInstruction& MI = *MIiterator;
+				InstLegalizeContext ctx{ MI, instructions, MIiterator };
+				isel_info.LegalizeInstruction(ctx, lowering_ctx);
+			}
+		}
+	}
+
+	void MachineModule::PostLegalizeInstructions(MachineFunction& MF)
+	{
+		TargetISelInfo const& isel_info = target.GetISelInfo();
+
+		for (auto& MBB : MF.Blocks())
+		{
+			auto& instructions = MBB->Instructions();
+			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
+			{
+				MachineInstruction& MI = *MIiterator;
+				InstLegalizeContext ctx{ MI, instructions, MIiterator };
+				isel_info.PostLegalizeInstruction(ctx);
+			}
+		}
+	}
+
 }
