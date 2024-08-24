@@ -7,5 +7,5 @@ int[3] arr;
 public int main()
 {
     arr[2] = 5;
-    return 0;
+    return arr[2];
 }

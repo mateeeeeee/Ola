@@ -7,10 +7,10 @@ namespace ola
 	enum x64Section : uint32
 	{
 		x64Section_Preamble,
-		x64Section_Text,
-		x64Section_Data,
 		x64Section_ReadOnly,
-		x64Section_BSS
+		x64Section_BSS,
+		x64Section_Data,
+		x64Section_Text
 	};
 
 	class MachineModule;

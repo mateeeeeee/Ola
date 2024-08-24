@@ -14,12 +14,14 @@ entry:
 %0 = signed trunc i64
 %1 = unsigned trunc ptr @arr, 0, 2
 store 5, ptr %1
-store 0, ptr %0
+%2 = unsigned trunc ptr @arr, 0, 2
+%3 = load i64, ptr %2
+store i64 %3, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%2 = load i64, ptr %0
-ret i64 %2
+%4 = load i64, ptr %0
+ret i64 %4
 }
 

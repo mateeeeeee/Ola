@@ -178,26 +178,26 @@ namespace ola
 				MachineDataStorage& MDS = *static_cast<MachineDataStorage*>(relocable);
 				auto const& storage = MDS.GetStorage();
 
-				EmitText("{}:", relocable->GetSymbol());
+				EmitData("{}:", relocable->GetSymbol());
 				for (auto const& element : storage)
 				{
 					std::visit([&](auto&& arg)
 						{
 							using T = std::decay_t<decltype(arg)>;
-							if constexpr (std::is_same_v<T, uint8>)		  EmitText(".byte {}", arg);
-							else if constexpr (std::is_same_v<T, uint16>) EmitText(".word {}", arg);
-							else if constexpr (std::is_same_v<T, uint32>) EmitText(".long {}", arg);
-							else if constexpr (std::is_same_v<T, uint64>) EmitText(".quad {}", arg);
+							if constexpr (std::is_same_v<T, uint8>)		  EmitData(".byte {}", arg);
+							else if constexpr (std::is_same_v<T, uint16>) EmitData(".word {}", arg);
+							else if constexpr (std::is_same_v<T, uint32>) EmitData(".long {}", arg);
+							else if constexpr (std::is_same_v<T, uint64>) EmitData(".quad {}", arg);
 							else static_assert(false, "non-exhaustive visitor!");
 						}, element);
 				}
-				EmitText("\n");
+				EmitData("\n");
 			}
 			else if (relocable->IsZeroStorage())
 			{
 				MachineZeroStorage& MZS = *static_cast<MachineZeroStorage*>(relocable);
-				EmitText("{}:", relocable->GetSymbol());
-				EmitText(".zero {}", MZS.GetSize());
+				EmitBSS("{}:", relocable->GetSymbol());
+				EmitBSS(".zero {}", MZS.GetSize());
 			}
 			else OLA_ASSERT_MSG(false, "Invalid relocable kind!");
 		}
