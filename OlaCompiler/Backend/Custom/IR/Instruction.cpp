@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	static char const* OpcodeNames[] = 
+	static char const* OpcodeNames[] =
 	{
 		"none",
 
@@ -19,12 +19,11 @@ namespace ola
 
 		"add",
 		"sub",
-		"mul",
+		"smul",
 		"sdiv",
-		"udiv",
 		"srem",
-		"urem",
 		"neg",
+
 		"not",
 		"and",
 		"or",
@@ -64,16 +63,10 @@ namespace ola
 		"fcmp ugt",
 		"fcmp uge",
 
-		"sext",
 		"zext",
-		"signed trunc",
-		"unsigned trunc",
 		"bitcast",
-		"f2u",
 		"f2s",
-		"u2f",
 		"s2f",
-		"fcast",
 
 		"alloca",
 		"gep",
@@ -81,7 +74,7 @@ namespace ola
 		"call",
 		"phi"
 	};
-
+	static_assert((uint32)Opcode::Count == std::size(OpcodeNames));
 
 	Use::Use(Value* val, Instruction* user) : value(val), user(user)
 	{

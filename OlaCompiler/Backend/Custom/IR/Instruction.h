@@ -95,7 +95,8 @@ namespace ola
 		GetElementPtr,
 		Select,
 		Call,
-		Phi
+		Phi,
+		Count
 	};
 
 	inline bool IsOpcodeTerminator(Opcode opcode)

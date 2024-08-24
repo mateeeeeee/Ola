@@ -11,10 +11,10 @@ declare @arr ptr
 
 define external @main i64() {
 entry:
-%0 = signed trunc i64
-%1 = unsigned trunc ptr @arr, 0, 2
+%0 = alloca i64
+%1 = gep ptr @arr, 0, 2
 store 5, ptr %1
-%2 = unsigned trunc ptr @arr, 0, 2
+%2 = gep ptr @arr, 0, 2
 %3 = load i64, ptr %2
 store i64 %3, ptr %0
 br label exit
