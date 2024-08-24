@@ -129,6 +129,17 @@ namespace ola
 
 					LinearScanRegisterAllocator register_allocator(*this);
 					register_allocator.AssignRegisters(MF);
+
+					for (auto& MBB : MF.Blocks())
+					{
+						auto& instructions = MBB->Instructions();
+						for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
+						{
+							MachineInstruction& MI = *MIiterator;
+							InstLegalizeContext ctx{ MI, instructions, MIiterator };
+							isel_info.PostLegalizeInstruction(ctx);
+						}
+					}
 				}
 			}
 		}
@@ -355,7 +366,7 @@ namespace ola
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
 		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
-		MachineOpcode opcode = ptr.IsMemoryOperand() ? InstStore : InstLoad;
+		MachineOpcode opcode = InstLoad;
 		MachineInstruction MI(opcode);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
@@ -367,7 +378,7 @@ namespace ola
 		MachineOperand const& ptr = lowering_ctx.GetOperand(SI->GetAddressOp());
 		MachineOperand const& val = lowering_ctx.GetOperand(SI->GetValueOp());
 		MachineInstruction MI(InstStore);
-		MI.SetOp<1>(val).SetOp<0>(ptr);
+		MI.SetOp<0>(ptr).SetOp<1>(val);
 		lowering_ctx.EmitInst(MI);
 	}
 

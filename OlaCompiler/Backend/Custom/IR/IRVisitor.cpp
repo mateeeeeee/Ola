@@ -1048,7 +1048,8 @@ namespace ola
 			}
 			std::vector<Value*> indices = { zero, index_value };
 			Value* ptr = builder->MakeInst<GetElementPtrInst>(array_value, indices);
-			value_map[&array_access] = ptr;
+			GetElementPtrInst* gep = cast<GetElementPtrInst>(ptr);
+			value_map[&array_access] = builder->MakeInst<LoadInst>(gep, gep->GetResultElementType());
 		}
 	}
 

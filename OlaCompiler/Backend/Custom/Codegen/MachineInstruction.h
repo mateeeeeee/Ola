@@ -14,10 +14,12 @@ namespace ola
 		InstJE,    
 		InstJNE,    
 		InstCall,
-		// Memory
-		InstLoad,
-		InstStore,
-		InstLoadGlobalAddress,
+		// Generic Memory
+		InstLoad,  //generic, after post legalization: reg <- [memory]
+		InstStore, //generic, after post legalization: [memory] <- reg
+		InstLoadGlobalAddress, //reg <- memory
+		InstMove, //reg <- reg, reg <- immediate
+
 		//Stack
 		InstPush,
 		InstPop,
@@ -76,7 +78,7 @@ namespace ola
 		InstZExt,
 		InstF2S,
 		InstS2F,
-		// Misc
+		
 		ISASpecificBegin,
 	};
 

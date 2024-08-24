@@ -216,6 +216,36 @@ namespace ola
 			break;
 			}
 		}
+
+		virtual void PostLegalizeInstruction(InstLegalizeContext& legalize_ctx) const override
+		{
+			MachineInstruction& MI = legalize_ctx.instruction;
+			auto& instructions = legalize_ctx.instructions;
+			auto& instruction_iter = legalize_ctx.instruction_iterator;
+
+			switch (MI.GetOpcode())
+			{
+			case InstStore:
+			case InstLoad:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (dst.IsReg() && (src.IsReg() || src.IsImmediate()))
+				{
+					MI.SetOpcode(InstMove);
+				}
+				else if (dst.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstStore);
+				}
+				else if (src.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstLoad);
+				}
+			}
+			break;
+			}
+		}
 	};
 
 	class x64TargetRegisterInfo : public TargetRegisterInfo

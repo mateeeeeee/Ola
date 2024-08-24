@@ -102,6 +102,7 @@ namespace ola
 
 		virtual bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
 		virtual void LegalizeInstruction(InstLegalizeContext&, LoweringContext&) const = 0;
+		virtual void PostLegalizeInstruction(InstLegalizeContext&) const = 0;
 	};
 
 	class TargetFrameInfo

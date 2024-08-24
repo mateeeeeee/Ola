@@ -5,5 +5,5 @@ int[3] Array;
 public int main()
 {
 	Array[2] = 10;
-	return 0;
+	return Array[2];
 }

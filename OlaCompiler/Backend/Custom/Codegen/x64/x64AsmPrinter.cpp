@@ -23,12 +23,14 @@ namespace ola
 		return "";
 	}
 
-	static std::string GetOperandString(MachineOperand const& MO)
+	static std::string GetOperandString(MachineOperand const& MO, bool dereference = false)
 	{
 		if (MO.IsReg())
 		{
 			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
-			return x64::GetRegisterString(MO.GetReg().reg, MO.GetType());
+			std::string reg_name = x64::GetRegisterString(MO.GetReg().reg, MO.GetType());
+			std::string format_string = dereference ? "[{}]" : "{}";
+			return std::vformat(format_string, std::make_format_args(reg_name));
 		}
 		else if (MO.IsImmediate())
 		{
@@ -36,8 +38,8 @@ namespace ola
 		}
 		else if (MO.IsRelocable())
 		{
-			return MO.GetRelocable()->IsFunction() ? std::string(MO.GetRelocable()->GetSymbol()) 
-												   : std::format("{} {}[rip]", GetOperandPrefix(MO), MO.GetRelocable()->GetSymbol());
+			return MO.GetRelocable()->IsFunction() ? std::string(MO.GetRelocable()->GetSymbol())
+				: std::format("{} {}[rip]", GetOperandPrefix(MO), MO.GetRelocable()->GetSymbol());
 		}
 		else if (MO.IsStackObject())
 		{
@@ -108,7 +110,6 @@ namespace ola
 							EmitText("{} {}", opcode_string, relocable->GetSymbol());
 						}
 						break;
-						case InstStore:
 						case InstAdd:
 						case InstSub:
 						case InstAnd:
@@ -125,11 +126,25 @@ namespace ola
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
+						case InstStore:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1, true), GetOperandString(op2));
+						}
+						break;
 						case InstLoad:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
-							EmitText("{} {}, [{}]", opcode_string, GetOperandString(op1), GetOperandString(op2));
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2, true));
+						}
+						break;
+						case InstMove:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
 						case InstLoadGlobalAddress:

@@ -100,6 +100,7 @@ namespace ola::x64
 		case InstJNE:   return "jne";
 		case InstCall:  return "call";
 		case InstStore:
+		case InstMove:
 		case InstLoad:  return "mov";
 		case InstNeg:	return "neg";
 		case InstAdd:   return "add";
