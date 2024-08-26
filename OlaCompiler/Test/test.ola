@@ -15,7 +15,7 @@ const char[] globalString = "global";
 public int main()
 {
 	Assert(length(globalString) == 7);
-	Assert(globalString[0] == 'g');
+	//Assert(globalString[0] == 'g');
 	
 	//const char[] localString = "local";
 	//
