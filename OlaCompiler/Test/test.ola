@@ -1,11 +1,10 @@
 import std.assert;
 
 
-int[3] arr;
+int[3] arr = {1,2,3};
 
 
 public int main()
 {
-    arr[2] = 5;
-    return arr[2];
+    return arr[1];
 }

@@ -162,5 +162,24 @@ namespace ola
 		return constant_null_arrays[array_type];
 	}
 
+	Constant* IRContext::GetNullValue(IRType* type)
+	{
+		if (isa<IRIntType>(type))
+		{
+			IRIntType* int_type = cast<IRIntType>(type);
+			if (int_type->GetWidth() == 8) return GetInt64(0);
+			else return GetInt8(0);
+		}
+		else if (isa<IRFloatType>(type))
+		{
+			return GetZeroFloat();
+		}
+		else if (isa<IRArrayType>(type))
+		{
+			return GetNullArray(cast<IRArrayType>(type));
+		}
+		return nullptr;
+	}
+
 }
 

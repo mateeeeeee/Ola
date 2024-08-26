@@ -16,6 +16,7 @@ namespace ola
 	class IRFuncType;
 	class IRLabelType;
 
+	class Constant;
 	class ConstantString;
 	class ConstantInt;
 	class ConstantFloat;
@@ -47,6 +48,7 @@ namespace ola
 		ConstantFloat* GetFloat(double val);
 
 		ConstantArray* GetNullArray(IRArrayType* array_type);
+		Constant* GetNullValue(IRType* type);
 
 	private:
 		IRVoidType*		void_type;

@@ -50,7 +50,7 @@ namespace ola
 
 					auto ExpandValue = [&](auto&& self, Value* V) -> void
 						{
-							if (ConstantInt* CI = dyn_cast<ConstantInt>(C))
+							if (ConstantInt* CI = dyn_cast<ConstantInt>(V))
 							{
 								int64 value = CI->GetValue();
 								switch (CI->GetBitWidth())
@@ -67,13 +67,13 @@ namespace ola
 								}
 								}
 							}
-							else if (ConstantFloat* CF = dyn_cast<ConstantFloat>(C))
+							else if (ConstantFloat* CF = dyn_cast<ConstantFloat>(V))
 							{
 								double value = CF->GetValue();
 								void* value_ptr = static_cast<void*>(&value);
 								data->AppendQWord(*static_cast<uint64*>(value_ptr));
 							}
-							else if (ConstantArray* CA = dyn_cast<ConstantArray>(C))
+							else if (ConstantArray* CA = dyn_cast<ConstantArray>(V))
 							{
 								IRArrayType const* array_type = CA->GetArrayType();
 								auto const& values = CA->Values();

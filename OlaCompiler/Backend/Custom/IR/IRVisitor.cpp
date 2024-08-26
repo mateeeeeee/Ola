@@ -129,7 +129,25 @@ namespace ola
 			{
 				if (is_array)
 				{
-					OLA_ASSERT(false);
+					ArrayType const* array_type = cast<ArrayType>(var_type);
+					IRType* element_type = ConvertToIRType(array_type->GetElementType());
+
+					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
+					{
+						OLA_ASSERT(init_list_expr->IsConstexpr());
+						init_list_expr->Accept(*this);
+
+						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+						GlobalVariable* global_array = new GlobalVariable(var_decl.GetName(), ir_type, linkage, value_map[init_list_expr]);
+						if(is_const) global_array->SetReadOnly();
+						module.AddGlobal(global_array);
+						value_map[&var_decl] = global_array;
+					}
+					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
+					{
+						OLA_ASSERT_MSG(false, "Todo: strings");
+					}
+					else OLA_ASSERT(false);
 				}
 				else
 				{
@@ -1000,9 +1018,26 @@ namespace ola
 		value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
-	void IRVisitor::Visit(InitializerListExpr const&, uint32)
+	void IRVisitor::Visit(InitializerListExpr const& initializer_list_expr, uint32)
 	{
+		UniqueExprPtrList const& init_expr_list = initializer_list_expr.GetInitList();
+		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
+		if (initializer_list_expr.IsConstexpr())
+		{
+			ArrayType const* array_type = cast<ArrayType>(initializer_list_expr.GetType());
+			IRType* ir_element_type = ConvertToIRType(array_type->GetElementType());
+			IRType* ir_array_type = ConvertToIRType(array_type);
+			OLA_ASSERT(isa<IRArrayType>(ir_array_type));
 
+			std::vector<Constant*> array_init_list(array_type->GetArraySize());
+			for (uint64 i = 0; i < array_type->GetArraySize(); ++i)
+			{
+				if (i < init_expr_list.size())  array_init_list[i] = dyn_cast<Constant>(value_map[init_expr_list[i].get()]);
+				else array_init_list[i] = context.GetNullValue(ir_element_type); 
+			}
+			Constant* constant_array = new ConstantArray(cast<IRArrayType>(ir_array_type), array_init_list);
+			value_map[&initializer_list_expr] = constant_array;
+		}
 	}
 
 	void IRVisitor::Visit(ArrayAccessExpr const& array_access, uint32)

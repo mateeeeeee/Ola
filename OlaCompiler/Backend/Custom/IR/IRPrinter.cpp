@@ -255,6 +255,18 @@ namespace ola
 		{
 		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue()); break;
 		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
+		case ConstantID::Array:
+		{
+			ConstantArray const* CA = cast<ConstantArray>(C);
+			Emit("[");
+			for (Constant* E : CA->Values())
+			{
+				PrintConstant(E);
+				Emit(",");
+			}
+			Emit("]");
+		}
+		break;
 		default: OLA_ASSERT_MSG(false, "not yet implemented");
 		}
 	}
