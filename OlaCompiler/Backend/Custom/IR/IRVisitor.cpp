@@ -217,7 +217,30 @@ namespace ola
 				init_expr->Accept(*this);
 				if (is_array)
 				{
-					
+					ArrayType const* array_type = cast<ArrayType>(var_type);
+					IRType* element_type = ConvertToIRType(array_type->GetElementType());
+					ConstantInt* zero = context.GetInt64(0);
+					if (InitializerListExpr const* init_list_expr = dyn_cast<InitializerListExpr>(init_expr))
+					{
+						Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
+						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
+
+						for (uint64 i = 0; i < init_list.size(); ++i)
+						{
+							ConstantInt* index = context.GetInt64(i);
+							Value* indices[] = { zero, index };
+							Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
+							Store(value_map[init_list[i].get()], ptr);
+						}
+						for (uint64 i = init_list.size(); i < array_type->GetArraySize(); ++i)
+						{
+							ConstantInt* index = context.GetInt64(i);
+							Value* indices[] = { zero, index };
+							Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
+							Store(context.GetNullValue(element_type), ptr);
+						}
+						value_map[&var_decl] = alloc;
+					}
 				}
 				else if (is_class)
 				{

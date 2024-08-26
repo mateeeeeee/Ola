@@ -157,8 +157,14 @@ namespace ola
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
-							OLA_ASSERT(op2.IsRelocable());
-							EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), op2.GetRelocable()->GetSymbol());
+							if (op2.IsRelocable())
+							{
+								EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), op2.GetRelocable()->GetSymbol());
+							}
+							else
+							{
+								EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+							}
 						}
 						break;
 						case x64::InstCqo:

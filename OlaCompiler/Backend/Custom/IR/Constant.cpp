@@ -19,6 +19,10 @@ namespace ola
 			IRArrayType* array_type = cast<IRArrayType>(Ty);
 			return ctx.GetNullArray(array_type);
 		}
+		case IRTypeKind::Pointer:
+		{
+			
+		}
 		default:
 			OLA_ASSERT(false);
 		}

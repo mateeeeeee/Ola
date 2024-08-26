@@ -383,9 +383,18 @@ namespace ola
 		MachineOperand result = lowering_ctx.VirtualReg(GEPI->GetType());  
 		IRType* current_type = GEPI->GetType();  
 
-		lowering_ctx.EmitInst(MachineInstruction(InstMove)
-							  .SetOp<0>(result)
-							  .SetOp<1>(base_op)); 
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI->GetAllocatedType()->IsArray())
+		{
+			lowering_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+				.SetOp<0>(result)
+				.SetOp<1>(base_op));
+		}
+		else
+		{
+			lowering_ctx.EmitInst(MachineInstruction(InstMove)
+				.SetOp<0>(result)
+				.SetOp<1>(base_op));
+		}
 
 		for (Value* index : GEPI->Indices())
 		{
