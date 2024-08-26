@@ -73,6 +73,10 @@ namespace ola
 								void* value_ptr = static_cast<void*>(&value);
 								data->AppendQWord(*static_cast<uint64*>(value_ptr));
 							}
+							else if (ConstantString* CS = dyn_cast<ConstantString>(V))
+							{
+								data->AppendString(CS->GetValue());
+							}
 							else if (ConstantArray* CA = dyn_cast<ConstantArray>(V))
 							{
 								IRArrayType const* array_type = CA->GetArrayType();
@@ -383,7 +387,7 @@ namespace ola
 		MachineOperand result = lowering_ctx.VirtualReg(GEPI->GetType());  
 		IRType* current_type = GEPI->GetType();  
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI->GetAllocatedType()->IsArray())
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
 		{
 			lowering_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(result)

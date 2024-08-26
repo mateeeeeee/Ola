@@ -145,7 +145,13 @@ namespace ola
 					}
 					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
 					{
-						OLA_ASSERT_MSG(false, "Todo: strings");
+						Constant* constant = new ConstantString(context, string->GetString());
+
+						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+						GlobalVariable* global_string = new GlobalVariable(var_decl.GetName(), ir_type, linkage, constant);
+						if (is_const) global_string->SetReadOnly();
+						module.AddGlobal(global_string);
+						value_map[&var_decl] = global_string;
 					}
 					else OLA_ASSERT(false);
 				}

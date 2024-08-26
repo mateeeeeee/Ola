@@ -24,7 +24,7 @@ namespace ola
 	class MachineDataStorage final : public MachineRelocable
 	{
 	public:
-		using Storage = std::vector<std::variant<uint8, uint16, uint32, uint64>>;
+		using Storage = std::vector<std::variant<uint8, uint16, uint32, uint64, std::string>>;
 	public:
 		MachineDataStorage(std::string_view symbol, bool read_only) : MachineRelocable(symbol), read_only(read_only) {}
 
@@ -49,6 +49,11 @@ namespace ola
 		uint32 AppendQWord(uint64 val)
 		{
 			return Append(val);
+		}
+
+		uint32 AppendString(std::string_view str)
+		{
+			return Append(std::string(str));
 		}
 
 		virtual RelocableKind GetRelocableKind() const override

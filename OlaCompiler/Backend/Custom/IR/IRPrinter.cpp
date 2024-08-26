@@ -255,6 +255,7 @@ namespace ola
 		{
 		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue()); break;
 		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
+		case ConstantID::String:	 Emit("{}", cast<ConstantString>(C)->GetValue()); break;
 		case ConstantID::Array:
 		{
 			ConstantArray const* CA = cast<ConstantArray>(C);
