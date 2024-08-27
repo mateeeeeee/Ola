@@ -6,39 +6,6 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-declare @IsAlnum i8(i8)
-
-
-declare @IsAlpha i8(i8)
-
-
-declare @IsLower i8(i8)
-
-
-declare @IsUpper i8(i8)
-
-
-declare @IsDigit i8(i8)
-
-
-declare @IsSpace i8(i8)
-
-
-declare @ToLower i8(i8)
-
-
-declare @ToUpper i8(i8)
-
-
-declare @StringToFloat f64(ptr)
-
-
-declare @StringToInt i64(ptr)
-
-
-declare @StringCopy void(ptr,ptr,i64)
-
-
 define internal @globalString ptr global
 
 

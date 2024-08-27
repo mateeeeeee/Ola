@@ -138,7 +138,7 @@ namespace ola
 						init_list_expr->Accept(*this);
 						
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
-						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
+						llvm::GlobalVariable* global_array = new llvm::GlobalVariable(module, llvm_type, array_type->GetElementType().IsConst(), linkage, cast<llvm::Constant>(value_map[init_list_expr]), var_decl.GetName());
 						value_map[&var_decl] = global_array;
 					}
 					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
@@ -146,7 +146,7 @@ namespace ola
 						llvm::Constant* constant = llvm::ConstantDataArray::getString(context, string->GetString());
 
 						llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
-						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, is_const, linkage, constant, var_decl.GetName());
+						llvm::GlobalVariable* global_string = new llvm::GlobalVariable(module, llvm_type, array_type->GetElementType().IsConst(), linkage, constant, var_decl.GetName());
 						value_map[&var_decl] = global_string;
 					}
 					else OLA_ASSERT(false);

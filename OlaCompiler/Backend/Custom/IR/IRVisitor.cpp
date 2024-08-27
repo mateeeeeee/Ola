@@ -139,7 +139,7 @@ namespace ola
 
 						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
 						GlobalVariable* global_array = new GlobalVariable(var_decl.GetName(), ir_type, linkage, value_map[init_list_expr]);
-						if(is_const) global_array->SetReadOnly();
+						if(array_type->GetElementType().IsConst()) global_array->SetReadOnly();
 						module.AddGlobal(global_array);
 						value_map[&var_decl] = global_array;
 					}
@@ -149,7 +149,7 @@ namespace ola
 
 						Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
 						GlobalVariable* global_string = new GlobalVariable(var_decl.GetName(), ir_type, linkage, constant);
-						if (is_const) global_string->SetReadOnly();
+						if (array_type->GetElementType().IsConst()) global_string->SetReadOnly();
 						module.AddGlobal(global_string);
 						value_map[&var_decl] = global_string;
 					}

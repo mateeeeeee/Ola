@@ -1,5 +1,4 @@
 import std.assert;
-import std.string;
 
 const char[] globalString = "global";
 

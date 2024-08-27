@@ -12,28 +12,6 @@ globalString:
 
 .extern AssertMsg
 
-.extern IsAlnum
-
-.extern IsAlpha
-
-.extern IsLower
-
-.extern IsUpper
-
-.extern IsDigit
-
-.extern IsSpace
-
-.extern ToLower
-
-.extern ToUpper
-
-.extern StringToFloat
-
-.extern StringToInt
-
-.extern StringCopy
-
 .globl main
 
 main:

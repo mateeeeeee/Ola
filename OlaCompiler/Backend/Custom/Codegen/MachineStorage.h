@@ -53,7 +53,6 @@ namespace ola
 
 		uint32 AppendString(std::string_view str)
 		{
-			read_only = true;
 			return Append(std::string(str));
 		}
 
