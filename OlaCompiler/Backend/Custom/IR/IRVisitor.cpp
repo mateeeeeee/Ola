@@ -247,6 +247,41 @@ namespace ola
 						}
 						value_map[&var_decl] = alloc;
 					}
+					else if (StringLiteral const* string = dyn_cast<StringLiteral>(init_expr))
+					{
+						Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
+						std::string_view str = string->GetString();
+						for (uint64 i = 0; i < str.size(); ++i)
+						{
+							ConstantInt* index = context.GetInt64(i);
+							Value* indices[] = { zero, index };
+							Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
+							Store(context.GetInt8(str[i]), ptr);
+						}
+						ConstantInt* index = context.GetInt64(str.size());
+						Value* indices[] = { zero, index };
+						Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
+						Store(context.GetInt8('\0'), ptr);
+						value_map[&var_decl] = alloc;
+					}
+					else if (isoneof<DeclRefExpr, ArrayAccessExpr>(init_expr))
+					{
+						OLA_ASSERT(isa<ArrayType>(init_expr->GetType()));
+						IRType* init_expr_type = ConvertToIRType(init_expr->GetType());
+						Value* alloc = builder->MakeInst<AllocaInst>(GetPointerType(element_type));
+						Value* ptr = nullptr;
+						if (init_expr_type->IsArray())
+						{
+							Value* indices[] = { zero, zero };
+							ptr = builder->MakeInst<GetElementPtrInst>(value_map[init_expr], indices);
+						}
+						else
+						{
+							ptr = builder->MakeInst<LoadInst>(value_map[init_expr], init_expr_type);
+						}
+						builder->MakeInst<StoreInst>(ptr, alloc);
+						value_map[&var_decl] = alloc;
+					}
 				}
 				else if (is_class)
 				{
@@ -921,8 +956,9 @@ namespace ola
 
 		Linkage linkage = Linkage::Internal;
 		GlobalVariable* global_string = new GlobalVariable(name, ConvertToIRType(string_constant.GetType()), linkage, constant);
-		value_map[&string_constant] = global_string;
+		global_string->SetReadOnly();
 		module.AddGlobal(global_string);
+		value_map[&string_constant] = global_string;
 	}
 
 	void IRVisitor::Visit(BoolLiteral const& bool_constant, uint32)
@@ -1094,7 +1130,7 @@ namespace ola
 			}
 			else if (alloc_type->IsPointer())
 			{
-				std::vector<Value*> indices = { zero, index_value };
+				std::vector<Value*> indices = { index_value };
 				Value* ptr = builder->MakeInst<GetElementPtrInst>(Load(alloc_type, alloc), indices);
 				value_map[&array_access] = ptr;
 			}

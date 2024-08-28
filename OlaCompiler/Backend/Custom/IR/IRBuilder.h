@@ -44,11 +44,15 @@ namespace ola
 			static_assert(std::is_base_of_v<Instruction, InstructionT>);
 			if (Value* V = TryConstantFold<InstructionT>(std::forward<Args>(args)...))
 			{
+				if (Instruction* I = dyn_cast<Instruction>(V))
+				{
+					I->InsertBefore(current_block, insert_point);
+				}
 				return V;
 			}
-			InstructionT* inst = new InstructionT(std::forward<Args>(args)...);
-			inst->InsertBefore(current_block, insert_point);
-			return inst;
+			InstructionT* I = new InstructionT(std::forward<Args>(args)...);
+			I->InsertBefore(current_block, insert_point);
+			return I;
 		}
 
 		BasicBlock* AddBlock();

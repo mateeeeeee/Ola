@@ -58,4 +58,39 @@ namespace ola
 		return nullptr;
 	}
 
+	Value* TryConstantFold_GetElementPtrInst(Value* base, std::span<Value*> indices)
+	{
+		if (!base) return nullptr;
+
+		std::vector<ConstantInt*> constant_indices;
+		for (Value* idx : indices)
+		{
+			if (!isa<ConstantInt>(idx)) return nullptr;
+			constant_indices.push_back(cast<ConstantInt>(idx));
+		}
+
+		Value* base_address = base;
+		uint32 offset = 0;
+		IRType* current_type = base->GetType();
+		for (ConstantInt* idx : constant_indices)
+		{
+			int64 index_value = idx->GetValue();
+			offset += index_value * current_type->GetSize();
+
+			if (idx->GetType()->IsInteger())
+			{
+				if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
+				{
+					current_type = array_type->GetElementType();
+				}
+				else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
+				{
+					current_type = pointer_type->GetPointeeType();
+				}
+			}
+			else return nullptr;
+		}
+		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
+		return new PtrAddInst(base, new ConstantInt(int_type, offset), current_type);
+	}
 }

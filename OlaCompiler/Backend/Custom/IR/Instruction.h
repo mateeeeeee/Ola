@@ -93,6 +93,7 @@ namespace ola
 		// misc
 		Alloca,
 		GetElementPtr,
+		PtrAdd,
 		Select,
 		Call,
 		Phi,
@@ -179,7 +180,7 @@ namespace ola
 
 		operator Value* () const { return value; }
 		Value* Get() const { return value; }
-		void Set(Value*  V);
+		void Set(Value* V);
 
 		Value* operator->() { return value; }
 		Value const* operator->() const { return value; }
@@ -784,6 +785,29 @@ namespace ola
 		IRType* source_element_type;
 		IRType* result_element_type;
 	};
+
+	class PtrAddInst final : public Instruction 
+	{
+	public:
+		explicit PtrAddInst(Value* base, Value* offset, IRType* result_element_type);
+
+		Value* GetBase() const { return Op<0>(); }
+		Value* GetOffset() const { return Op<1>(); }
+		IRType* GetResultElementType() const { return result_element_type; }
+
+		static bool ClassOf(Instruction const* I)
+		{
+			return I->GetOpcode() == Opcode::PtrAdd;
+		}
+		static bool ClassOf(Value const* V)
+		{
+			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
+		}
+
+	private:
+		IRType* result_element_type;
+	};
+
 
 	class PhiInst final : public Instruction 
 	{

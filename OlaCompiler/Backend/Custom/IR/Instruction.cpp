@@ -70,6 +70,7 @@ namespace ola
 
 		"alloca",
 		"gep",
+		"ptr add",
 		"select",
 		"call",
 		"phi"
@@ -218,11 +219,6 @@ namespace ola
 				}
 				else OLA_ASSERT(false);
 			}
-			else if (auto offset = dyn_cast<ConstantOffset>(index))
-			{
-				OLA_ASSERT(isa<IRStructType>(current_type));
-				current_type = cast<IRStructType>(current_type)->GetMemberType(offset->GetIndex());
-			}
 			else OLA_ASSERT(false);
 		}
 		return current_type;
@@ -253,6 +249,13 @@ namespace ola
 		uint32 id_int = (uint32)id;
 		OLA_ASSERT(id_int >= (uint32)Opcode::CompareOpBegin && id_int <= (uint32)Opcode::CompareOpEnd);
 		cmp = (CompareOp)(id_int - (uint32)Opcode::CompareOpBegin);
+	}
+
+	PtrAddInst::PtrAddInst(Value* base, Value* offset, IRType* result_element_type) : Instruction(Opcode::PtrAdd, base->GetType(), { base, offset }),
+		result_element_type(result_element_type)
+	{
+		OLA_ASSERT(base->GetType()->IsPointer());
+		OLA_ASSERT(isa<ConstantInt>(offset));
 	}
 
 }

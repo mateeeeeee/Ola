@@ -32,7 +32,7 @@ namespace ola
 		MachineOperand& AllocateStack(uint32 size)
 		{
 			stack_offset += size;
-			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineOperandType::Unknown);
+			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineOperandType::Ptr);
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}

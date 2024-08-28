@@ -246,6 +246,9 @@ namespace ola
 		case Opcode::GetElementPtr:
 			LowerGEP(cast<GetElementPtrInst>(inst));
 			break;
+		case Opcode::PtrAdd:
+			LowerPtrAdd(cast<PtrAddInst>(inst));
+			break;
 		case Opcode::Switch:
 			LowerSwitch(cast<SwitchInst>(inst));
 			break;
@@ -350,7 +353,8 @@ namespace ola
 	void MachineModule::LowerLoad(LoadInst* LI)
 	{
 		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
-		MachineOperand const& ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
+		MachineOperand ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
+		ptr.SetType(ret.GetType());
 		MachineInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
@@ -425,17 +429,7 @@ namespace ola
 			}
 			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
 			{
-				ConstantOffset* offset_const = dyn_cast<ConstantOffset>(index);
-				uint32 field_offset = struct_type->GetFieldOffset(offset_const->GetIndex());
-
-				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
-				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
-					.SetOp<0>(new_result)
-					.SetOp<1>(result)
-					.SetOp<2>(MachineOperand::Immediate(field_offset, result.GetType())));
-
-				result = new_result;
-				current_type = struct_type->GetMemberType(offset_const->GetIndex());
+				OLA_ASSERT(false);
 			}
 			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 			{
@@ -461,7 +455,45 @@ namespace ola
 				OLA_ASSERT_MSG(false, "Unhandled type in GEP lowering!");
 			}
 		}
+
+		result.SetType(GetOperandType(GEPI->GetResultElementType()));
 		lowering_ctx.AddOperand(GEPI, result);
+	}
+
+	void MachineModule::LowerPtrAdd(PtrAddInst* PAI)
+	{
+		Value* base = PAI->GetBase();
+		ConstantInt* offset = cast<ConstantInt>(PAI->GetOffset());
+
+		MachineOperand base_op = lowering_ctx.GetOperand(base);
+		MachineOperand base_register = lowering_ctx.VirtualReg(PAI->GetType());
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
+		{
+			lowering_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+				.SetOp<0>(base_register)
+				.SetOp<1>(base_op));
+		}
+		else
+		{
+			lowering_ctx.EmitInst(MachineInstruction(InstMove)
+				.SetOp<0>(base_register)
+				.SetOp<1>(base_op));
+		}
+
+		if (offset->GetValue() == 0)
+		{
+			lowering_ctx.AddOperand(PAI, base_register);
+		}
+		else
+		{
+			MachineOperand result = lowering_ctx.VirtualReg(MachineOperandType::Ptr);
+			lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+				.SetOp<0>(result)
+				.SetOp<1>(base_register)
+				.SetOp<2>(MachineOperand::Immediate(offset->GetValue(), MachineOperandType::Int64)));
+			result.SetType(GetOperandType(PAI->GetResultElementType()));
+			lowering_ctx.AddOperand(PAI, result);
+		}
 	}
 
 	void MachineModule::LowerSwitch(SwitchInst* SI)

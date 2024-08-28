@@ -107,34 +107,6 @@ namespace ola
 		std::string value;
 	};
 
-	class ConstantOffset final : public Constant
-	{
-	public:
-		ConstantOffset(IRStructType const* base, uint32 index) : Constant(ConstantID::String, IRVoidType::Get(base->GetContext())), base{ base }, index{ index } {}
-		
-		IRStructType const* GetBase() const 
-		{
-			return base;
-		}
-		uint32 GetIndex() const 
-		{
-			return index;
-		}
-
-		static bool ClassOf(Value const* V)
-		{
-			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
-		}
-		static bool ClassOf(Constant const* C)
-		{
-			return C->GetConstantID() == ConstantID::Offset;
-		}
-		
-	private:
-		IRStructType const* base;
-		uint32 index;
-	};
-
 	class ConstantAggregate : public Constant
 	{
 	public:

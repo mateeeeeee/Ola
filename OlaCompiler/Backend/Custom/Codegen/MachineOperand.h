@@ -98,6 +98,10 @@ namespace ola
 		{
 			return type;
 		}
+		void SetType(MachineOperandType _type)
+		{
+			type = _type;
+		}
 
 		bool IsReg() const { return std::holds_alternative<MachineRegister>(storage); }
 		MachineRegister GetReg() const

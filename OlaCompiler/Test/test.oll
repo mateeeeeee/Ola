@@ -6,19 +6,140 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @globalString ptr global
+declare @PrintInt void(i64)
+
+
+declare @PrintFloat void(f64)
+
+
+declare @PrintChar void(i8)
+
+
+declare @PrintString void(ptr)
+
+
+declare @ReadInt i64()
+
+
+declare @ReadFloat f64()
+
+
+declare @ReadChar i8()
+
+
+declare @ReadString void(ptr,i64)
+
+
+declare @IsAlnum i8(i8)
+
+
+declare @IsAlpha i8(i8)
+
+
+declare @IsLower i8(i8)
+
+
+declare @IsUpper i8(i8)
+
+
+declare @IsDigit i8(i8)
+
+
+declare @IsSpace i8(i8)
+
+
+declare @ToLower i8(i8)
+
+
+declare @ToUpper i8(i8)
+
+
+declare @StringToFloat f64(ptr)
+
+
+declare @StringToInt i64(ptr)
+
+
+declare @StringCopy void(ptr,ptr,i64)
+
+
+define internal @PassStringLiteral__C0 void(ptr) {
+entry:
+%0 = alloca ptr
+store ptr %literal, ptr %0
+%1 = load ptr, ptr %0
+%2 = ptr add ptr %1, 0
+%3 = load i8, ptr %2
+%4 = icmp eq i8 %3, 76
+call i8 %4, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @PassStringVariable__C0 void(ptr) {
+entry:
+%0 = alloca ptr
+store ptr %variable, ptr %0
+%1 = load ptr, ptr %0
+%2 = ptr add ptr %1, 0
+%3 = load i8, ptr %2
+%4 = icmp eq i8 %3, 86
+call i8 %4, @Assert
+br label exit
+exit:
+ret 
+}
 
 
 define external @main i64() {
 entry:
 %0 = alloca i64
-call i8 1, @Assert
+%1 = alloca i8[2]
+%2 = ptr add ptr %1, 0
+store 109, ptr %2
+%3 = ptr add ptr %1, 2
+store 0, ptr %3
+%4 = alloca ptr
+%5 = ptr add ptr %1, 0
+store ptr %5, ptr %4
+%6 = load ptr, ptr %4
+%7 = ptr add ptr %6, 0
+%8 = load i8, ptr %7
+%9 = icmp eq i8 %8, 109
+call i8 %9, @Assert
+%10 = alloca i8[6]
+%11 = ptr add ptr %10, 0
+store 49, ptr %11
+%12 = ptr add ptr %10, 6
+store 50, ptr %12
+%13 = ptr add ptr %10, 12
+store 51, ptr %13
+%14 = ptr add ptr %10, 18
+store 52, ptr %14
+%15 = ptr add ptr %10, 24
+store 53, ptr %15
+%16 = ptr add ptr %10, 30
+store 0, ptr %16
+%17 = call ptr %10, @StringToInt
+%18 = alloca i64
+store i64 %17, ptr %18
+%19 = load i64, ptr %18
+%20 = icmp eq i64 %19, 12345
+call i8 %20, @Assert
 store 0, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+%21 = load i64, ptr %0
+ret i64 %21
 }
+
+
+define internal @__StringLiteral0 ptr m
+
+
+define internal @__StringLiteral1 ptr 12345
 
