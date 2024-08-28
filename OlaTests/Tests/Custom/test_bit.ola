@@ -1,4 +1,54 @@
+import std.assert;
+
+
 public int main()
 {
+    int a = 5;    // 0101 in binary
+    int b = 3;    // 0011 in binary
+
+    int resultAnd = a & b;  // 0001 in binary
+    Assert(resultAnd == 1);
+
+    a &= b;
+    Assert(a == 1);
+
+    int c = 5;    // 0101 in binary
+    int d = 3;    // 0011 in binary
+
+    int resultOr = c | d;   // 0111 in binary
+    Assert(resultOr == 7);
+
+    c |= d;
+    Assert(c == 7);
+
+    int e = 5;    // 0101 in binary
+    int f = 3;    // 0011 in binary
+
+    int resultXor = e ^ f;  // 0110 in binary
+    Assert(resultXor == 6);
+
+    e ^= f;
+    Assert(e == 6);
+
+    //int s = 5;
+    //int resultNotS = ~s; 
+    //Assert(resultNotS == -6); 
+    //
+    //int t = -1;
+    //int resultNotT = ~t; 
+    //Assert(resultNotT == 0);
+    //
+    //int u = 0;
+    //int resultNotU = ~u;  
+    //Assert(resultNotU == -1); 
+    //
+    //int v = 255;  
+    //int resultNotV = ~v;  
+    //Assert(resultNotV == -256);   
+    //
+    //int z = 65535;  
+    //int resultNotZ = ~z;  
+    //Assert(resultNotZ == -65536); 
+
     return 0;
 }

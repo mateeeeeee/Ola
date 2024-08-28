@@ -1,4 +1,40 @@
+import std.assert;
+
+void TestSizeofTypes()
+{
+    Assert(sizeof(int) == 8);
+    Assert(sizeof(float) == 8);
+    Assert(sizeof(bool) == 1);
+}
+
+void TestSizeofExpressions()
+{
+    int intVar = 42;
+    //float floatVar = 3.14;
+    bool boolVar = true;
+
+    Assert(sizeof(intVar) == 8);
+    //Assert(sizeof(floatVar) == 8);
+    Assert(sizeof(boolVar) == 1);
+}
+
+// Test sizeof with arrays
+void TestSizeofArrays()
+{
+    int[5] intArray;
+    //float[10] floatArray;
+    bool[3] boolArray;
+
+    Assert(sizeof(intArray) == 40);  // 8 bytes per int * 5 ints
+    Assert(sizeof(float[10]) == 80);  // 8 bytes per float * 10 floats
+    Assert(sizeof(boolArray) == 3);  // 1 byte per bool * 3 bools
+}
+
 public int main()
 {
+    TestSizeofTypes();
+    TestSizeofExpressions();
+    TestSizeofArrays();
+
     return 0;
 }

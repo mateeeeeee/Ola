@@ -74,9 +74,6 @@ namespace ola
 		IRType* current_type = base->GetType();
 		for (ConstantInt* idx : constant_indices)
 		{
-			int64 index_value = idx->GetValue();
-			offset += index_value * current_type->GetSize();
-
 			if (idx->GetType()->IsInteger())
 			{
 				if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
@@ -89,6 +86,9 @@ namespace ola
 				}
 			}
 			else return nullptr;
+
+			int64 index_value = idx->GetValue();
+			offset += index_value * current_type->GetSize();
 		}
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
 		return new PtrAddInst(base, new ConstantInt(int_type, offset), current_type);

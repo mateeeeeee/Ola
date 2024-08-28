@@ -1,4 +1,68 @@
+import std.assert;
+
+void TestMultiplication()
+{
+    int intA = 5;
+    int intB = 3;
+    //float floatC = 2.5;
+    //float floatD = 1.2;
+
+    int resultIntMul = intA * intB;
+    Assert(resultIntMul == 15);
+
+    //float resultFloatMul = floatC * floatD;
+    //Assert(resultFloatMul == 3.0);
+
+    intA *= 2;
+    Assert(intA == 10);
+
+    //floatC *= 1.5;
+    //Assert(floatC == 3.75);
+}
+
+void TestDivision()
+{
+    // Integer and float tests
+    int intA = 15;
+    int intB = 3;
+    //float floatC = 5.0;
+    //float floatD = 2.0;
+
+    // Division
+    int resultIntDiv = intA / intB;
+    Assert(resultIntDiv == 5);
+
+    //float resultFloatDiv = floatC / floatD;
+    //Assert(resultFloatDiv == 2.5);
+
+    // Compound division
+    intA /= 2;
+    Assert(intA == 7);
+
+    //floatC /= 2.0;
+    //Assert(floatC == 2.5);
+}
+
+void TestModulo()
+{
+    // Integer tests
+    int intA = 17;
+    int intB = 4;
+
+    // Modulo
+    int resultModulo = intA % intB;
+    Assert(resultModulo == 1);
+
+    // Compound modulo
+    intA %= 3;
+    Assert(intA == 2);
+}
+
 public int main()
 {
+    TestMultiplication();
+    TestDivision();
+    TestModulo();
+
     return 0;
 }

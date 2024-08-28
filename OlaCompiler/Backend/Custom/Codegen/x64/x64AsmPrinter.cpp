@@ -93,6 +93,7 @@ namespace ola
 						case InstPop:
 						case InstCall:
 						case InstNeg:
+						case InstNot:
 						case InstSDiv:
 						case x64::InstSetE:
 						case x64::InstSetNE:

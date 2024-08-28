@@ -1,4 +1,86 @@
+import std.assert;
+
+enum Color
+{
+    Red,
+    Green,
+    Blue
+};
+
+Color globalColor = Red;
+
+public int TestEnumValues()
+{
+    Color color = Blue;
+    Assert(color == Blue);
+    return 0;
+}
+
+enum Day
+{
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday = 4,
+    Friday,
+    Saturday,
+    Sunday
+};
+
+public int TestEnumValuesAfterModification()
+{
+    Day weekendDay = Sunday;
+    Assert(weekendDay == Sunday);
+
+    Day midweekDay = Wednesday;
+    Assert(midweekDay == Wednesday);
+
+    return 0;
+}
+
+public int TestEnumSwitch()
+{
+    Color switchColor = Green;
+    int result = 0;
+
+    switch (switchColor)
+    {
+        case Red:
+            result = 1;
+            break;
+        case Green:
+            result = 2;
+            break;
+        case Blue:
+            result = 3;
+            break;
+    }
+
+    Assert(result == 2);
+    return 0;
+}
+
+public int TestLocalEnumDeclaration()
+{
+    enum Status
+    {
+        Active,
+        Inactive,
+        Pending
+    };
+
+    Status localStatus = Active;
+    Assert(localStatus == Active);
+    return 0;
+}
+
 public int main()
 {
+    Assert(globalColor == Red);
+    TestLocalEnumDeclaration();
+    TestEnumValues();
+    TestEnumValuesAfterModification();
+    TestEnumSwitch();
+
     return 0;
 }

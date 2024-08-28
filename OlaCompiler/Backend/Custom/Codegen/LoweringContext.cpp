@@ -113,8 +113,9 @@ namespace ola
 				MachineGlobal* machine_global = global_map[GV];
 				OLA_ASSERT(machine_global);
 				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
-				MI.SetOp<0>(ptr).SetOp<1>(global);
-				EmitInst(MI);
+				return global;
+				//MI.SetOp<0>(ptr).SetOp<1>(global);
+				//EmitInst(MI);
 			}
 			return ptr;
 

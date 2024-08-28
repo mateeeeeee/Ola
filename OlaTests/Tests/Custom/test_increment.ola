@@ -1,4 +1,63 @@
+import std.assert;
+
+void TestPreIncrementDecrement()
+{
+    // Integer tests
+    int a = 5;
+    int c = 8;
+
+    int preIncResultA = ++a;
+    Assert(preIncResultA == 6);
+    Assert(a == 6);
+
+    int preDecResultC = --c;
+    Assert(preDecResultC == 7);
+    Assert(c == 7);
+
+    // Float tests
+    //float e = 3.5;
+    //float g = 8.5;
+    //
+    //float preIncResultE = ++e;
+    //Assert(preIncResultE == 4.5);
+    //Assert(e == 4.5);
+    //
+    //float preDecResultG = --g;
+    //Assert(preDecResultG == 7.5);
+    ////Assert(g == 7.5);
+}
+
+void TestPostIncrementDecrement()
+{
+    // Integer tests
+    int b = 10;
+    int d = 15;
+
+    int postIncResultB = b++;
+    Assert(postIncResultB == 10);
+    Assert(b == 11);
+
+    int postDecResultD = d--;
+    Assert(postDecResultD == 15);
+    Assert(d == 14);
+
+    // Float tests
+    //float f = 6.5;
+    //float h = 12.5;
+    //
+    //float postIncResultF = f++;
+    //Assert(postIncResultF == 6.5);
+    //Assert(f == 7.5);
+    //
+    //float postDecResultH = h--;
+    //Assert(postDecResultH == 12.5);
+    //Assert(h == 11.5);
+}
+
 public int main()
 {
+    TestPreIncrementDecrement();
+    TestPostIncrementDecrement();
+
     return 0;
 }

@@ -1,4 +1,14 @@
+import std.assert;
+
+alias MyInt = int;
+
 public int main()
 {
-    return 0;
+	MyInt myInt = 1;
+	alias MyIntArray = int[3];
+	MyIntArray myIntArray = {myInt, myInt, myInt};
+	Assert(myIntArray[0] == 1);
+	Assert(myIntArray[1] == 1);
+	Assert(myIntArray[2] == 1);
+	return 0;
 }

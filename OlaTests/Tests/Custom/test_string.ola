@@ -1,4 +1,33 @@
+import std.assert;
+import std.string;
+
+const char[] globalString = "global";
+
+void PassStringLiteral(const char[] literal)
+{
+	Assert(literal[0] == 'L');
+}
+void PassStringVariable(const char[] variable)
+{
+	Assert(variable[0] == 'l');
+}
+
 public int main()
 {
-    return 0;
+	Assert(length(globalString) == 7);
+	
+	const char[] localString = "local";
+
+	Assert(length(localString) == 6);
+	const char[] localAlias = localString;
+	Assert(localAlias[0] == 'l');
+
+	PassStringLiteral("Literal");
+	//PassStringVariable(localString);
+
+	//const char[] numString = "12345";
+	//int number = StringToInt(numString);
+	//Assert(number == 12345);
+
+	return 0;
 }

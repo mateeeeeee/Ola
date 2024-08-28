@@ -21,6 +21,10 @@ namespace ola
 		{
 			return TryConstantFold_UnaryInst(std::forward<Args>(args)...);
 		}
+		else if constexpr (std::is_same_v<InstructionT, CompareInst>)
+		{
+			return TryConstantFold_CompareInst(std::forward<Args>(args)...);
+		}
 		else if constexpr (std::is_same_v<InstructionT, GetElementPtrInst>)
 		{
 			return TryConstantFold_GetElementPtrInst(std::forward<Args>(args)...);

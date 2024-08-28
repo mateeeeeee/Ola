@@ -1,4 +1,71 @@
+import std.assert;
+
+void TestGotoNestedLoops()
+{
+    int targetValue = 5;
+    int i, j;
+
+    for (i = 0; i < 10; i++)
+    {
+        for (j = 0; j < 10; j++)
+        {
+            if (i * j == targetValue)
+            {
+                goto Found;
+            }
+        }
+    }
+
+Found:
+    Assert(i * j == targetValue);
+}
+
+int TestGotoErrorHandling()
+{
+    int result = 0;
+
+    int errorCode = 1;
+
+    if (errorCode != 0)
+    {
+        goto HandleError;
+    }
+
+    result = 42;
+    return result;
+
+HandleError:
+    result = -1;
+    return result;
+}
+
+int TestGotoEndOfFunction()
+{
+    int result = 0;
+
+    // Some code...
+
+    if (result != 0)
+    {
+        goto CleanUpAndReturn;
+    }
+
+    // More code...
+
+CleanUpAndReturn:
+    // Clean up resources and return
+    return result;
+}
+
 public int main()
 {
+    TestGotoNestedLoops();
+    
+    int errorHandlingResult = TestGotoErrorHandling();
+    Assert(errorHandlingResult == -1);
+
+    int endOfFunctionResult = TestGotoEndOfFunction();
+    Assert(endOfFunctionResult == 0);
+
     return 0;
 }

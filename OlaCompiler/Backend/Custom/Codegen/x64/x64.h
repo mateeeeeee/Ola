@@ -120,6 +120,7 @@ namespace ola::x64
 		case InstAnd:   return "and";
 		case InstOr:    return "or";
 		case InstXor:   return "xor";
+		case InstNot:	return "not";
 		case InstSMul:  return "imul";
 		case InstSDiv:  return "idiv";
 		case InstCqo:   return "cqo";
@@ -161,7 +162,7 @@ namespace ola::x64
 		return InstUnknown;
 	}
 
-	inline char const* GetRegisterString(uint32_t r, MachineOperandType type)
+	inline char const* GetRegisterString(uint32 r, MachineOperandType type)
 	{
 		using enum MachineOperandType;
 		switch (type) 
