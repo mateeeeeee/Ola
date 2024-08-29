@@ -147,6 +147,8 @@ namespace ola
 						}
 						break;
 						case InstMove:
+						case InstCMoveEQ:
+						case InstCMoveNE:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();

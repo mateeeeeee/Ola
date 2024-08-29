@@ -59,6 +59,4 @@ namespace ola
 		if (*O3) opt_level = OptimizationLevel::O3;
 		return 0;
 	}
-
-
 }

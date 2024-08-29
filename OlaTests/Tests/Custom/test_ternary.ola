@@ -1,4 +1,38 @@
+import std.assert;
+
+void TestTernaryOperatorIntegers()
+{
+    int a = 5;
+    int b = 10;
+
+    int result = (a > b) ? a : b;
+    Assert(result == 10);
+}
+
+void TestTernaryOperatorFloats()
+{
+    //float c = 2.5;
+    //float d = 3.0;
+    //
+    //float result = (c > d) ? c : d;
+    //Assert(result == 3.0);
+}
+
+void TestTernaryOperatorBools()
+{
+    bool condition = true;
+    int x = 5;
+    int y = 10;
+
+    int result = condition ? x : y;
+    Assert(result == 5);
+}
+
 public int main()
 {
+    TestTernaryOperatorIntegers();
+    TestTernaryOperatorFloats();
+    TestTernaryOperatorBools();
+
     return 0;
 }

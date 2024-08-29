@@ -621,12 +621,9 @@ namespace ola
 		switch_instructions.pop_back();
 
 		std::vector<BasicBlock*> case_blocks;
-		for (auto& case_stmt : switch_inst->Cases())
+		for (uint32 i = 0; i < switch_inst->GetNumCases(); ++i)
 		{
-			if (BasicBlock* successor = switch_inst->GetCase(case_stmt.first + 1))
-			{
-				case_blocks.push_back(successor);
-			}
+			case_blocks.push_back(switch_inst->GetCaseBlock(i));
 		}
 		for (uint32 i = 0; i < case_blocks.size(); ++i)
 		{

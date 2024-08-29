@@ -1,19 +1,12 @@
-//import std.assert;
+import std.assert;
 
 public int main()
 {
-    int value = 1;
-    int ret = 0;
-    switch (value)
-    {
-        case 1:
-            ret = 1;  // The value is 1, but this case falls through to the next one
-        case 2:
-            ret = 2;  // The value is 2, so this case should execute
-            break;
-        default:
-            ret = 3;  // This case should not execute
-            break;
-    }
-    return ret;
+    bool condition = true;
+    int x = 5;
+    int y = 10;
+
+    int result = condition ? x : y;
+    Assert(result == 5);
+    return result;
 }

@@ -91,37 +91,39 @@ namespace ola::x64
 	{
 		switch (opcode)
 		{
-		case InstPush:  return "push";
-		case InstPop:   return "pop";
-		case InstJump:  return "jmp";
-		case InstJE:    return "je";
-		case InstJNE:   return "jne";
-		case InstCall:  return "call";
+		case InstPush:    return "push";
+		case InstPop:     return "pop";
+		case InstJump:    return "jmp";
+		case InstJE:      return "je";
+		case InstJNE:     return "jne";
+		case InstCall:    return "call";
 		case InstStore:
 		case InstMove:
-		case InstLoad:  return "mov";
-		case InstNeg:	return "neg";
-		case InstAdd:   return "add";
-		case InstSub:   return "sub";
-		case InstICmp:  return "cmp";
-		case InstFCmp:  return "comisd";
-		case InstSetE:  return "sete";
-		case InstSetNE:	return "setne";
-		case InstSetGT:	return "setg";
-		case InstSetGE:	return "setge";
-		case InstSetLT:	return "setl";
-		case InstSetLE:	return "setle";
-		case InstShl:	return "shl";
-		case InstAShr:  return "sar";
-		case InstLShr:  return "shr";
-		case InstTest:  return "test";
-		case InstAnd:   return "and";
-		case InstOr:    return "or";
-		case InstXor:   return "xor";
-		case InstNot:	return "not";
-		case InstSMul:  return "imul";
-		case InstSDiv:  return "idiv";
-		case InstCqo:   return "cqo";
+		case InstLoad:    return "mov";
+		case InstCMoveEQ: return "cmove";
+		case InstCMoveNE: return "cmovne";
+		case InstNeg:	  return "neg";
+		case InstAdd:     return "add";
+		case InstSub:     return "sub";
+		case InstICmp:    return "cmp";
+		case InstFCmp:    return "comisd";
+		case InstSetE:    return "sete";
+		case InstSetNE:	  return "setne";
+		case InstSetGT:	  return "setg";
+		case InstSetGE:	  return "setge";
+		case InstSetLT:	  return "setl";
+		case InstSetLE:	  return "setle";
+		case InstShl:	  return "shl";
+		case InstAShr:    return "sar";
+		case InstLShr:    return "shr";
+		case InstTest:    return "test";
+		case InstAnd:     return "and";
+		case InstOr:      return "or";
+		case InstXor:     return "xor";
+		case InstNot:	  return "not";
+		case InstSMul:    return "imul";
+		case InstSDiv:    return "idiv";
+		case InstCqo:     return "cqo";
 		case InstLoadGlobalAddress: return "lea";
 		}
 		return "";

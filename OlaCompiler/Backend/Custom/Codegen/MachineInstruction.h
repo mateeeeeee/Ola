@@ -9,20 +9,23 @@ namespace ola
 	{
 		InstUnknown,
 		// control-flow
-		InstJump,    
-		InstTest,    
-		InstJE,    
-		InstJNE,    
 		InstCall,
+		InstJump,
+		InstJE,
+		InstJNE,
+
 		//Memory
 		InstMove,					//generic; later: reg <- reg, reg <- immediate
 		InstLoad,					//reg <- [memory]
 		InstStore,					//[memory] <- reg
 		InstLoadGlobalAddress,		//reg <- memory
+		InstCMoveEQ,
+		InstCMoveNE,
 
 		//Stack
 		InstPush,
 		InstPop,
+
 		// Arithmetic
 		InstAdd,
 		InstSub,
@@ -30,9 +33,11 @@ namespace ola
 		InstSMul,
 		InstUDiv,
 		InstURem,
+
 		// Signed Div/Rem
 		InstSDiv,
 		InstSRem,
+
 		// Bitwise
 		InstAnd,
 		InstOr,
@@ -40,9 +45,11 @@ namespace ola
 		InstShl,
 		InstLShr,
 		InstAShr,
+
 		// Unary
 		InstNeg,
 		InstNot,
+
 		// FP
 		InstFAdd,
 		InstFSub,
@@ -50,9 +57,11 @@ namespace ola
 		InstFDiv,
 		InstFNeg,
 		InstFFma,
+
 		// Comparison
-		InstICmp,  //
-		InstFCmp,  //
+		InstICmp,
+		InstFCmp,
+		InstTest,
 
 		// Conversion
 		InstZExt,

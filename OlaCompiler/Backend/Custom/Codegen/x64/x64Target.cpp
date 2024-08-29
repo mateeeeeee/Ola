@@ -233,6 +233,23 @@ namespace ola
 				}
 			}
 			break;
+			case InstCMoveEQ:
+			case InstCMoveNE:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);
+					MI2.SetIgnoreDef();
+					MI.SetOp<1>(tmp);
+					instructions.insert(instruction_iter, MI2);
+				}
+			}
+			break;
 			}
 		}
 

@@ -197,9 +197,9 @@ namespace ola
 		frame_info.EmitEpilogue(MF, lowering_ctx);
 	}
 
-	void MachineModule::LowerInstruction(Instruction* inst)
+	void MachineModule::LowerInstruction(Instruction* I)
 	{
-		switch (inst->GetOpcode())
+		switch (I->GetOpcode())
 		{
 		case Opcode::Add:
 		case Opcode::Sub:
@@ -212,7 +212,7 @@ namespace ola
 		case Opcode::Shl:
 		case Opcode::LShr:
 		case Opcode::AShr:
-			LowerBinary(cast<BinaryInst>(inst));
+			LowerBinary(cast<BinaryInst>(I));
 			break;
 		case Opcode::ICmpEQ:
 		case Opcode::ICmpNE:
@@ -220,39 +220,42 @@ namespace ola
 		case Opcode::ICmpSGT:
 		case Opcode::ICmpSLE:
 		case Opcode::ICmpSLT:
-			LowerCompare(cast<CompareInst>(inst));
+			LowerCompare(cast<CompareInst>(I));
 			break;
 		case Opcode::Neg:
 		case Opcode::Not:
 		case Opcode::FNeg:
-			LowerUnary(cast<UnaryInst>(inst));
+			LowerUnary(cast<UnaryInst>(I));
 			break;
 		case Opcode::Ret:
-			LowerRet(cast<ReturnInst>(inst));
+			LowerRet(cast<ReturnInst>(I));
 			break;
 		case Opcode::Branch:
-			LowerBranch(cast<BranchInst>(inst));
+			LowerBranch(cast<BranchInst>(I));
 			break;
 		case Opcode::Load:
-			LowerLoad(cast<LoadInst>(inst));
+			LowerLoad(cast<LoadInst>(I));
 			break;
 		case Opcode::Store:
-			LowerStore(cast<StoreInst>(inst));
+			LowerStore(cast<StoreInst>(I));
 			break;
 		case Opcode::Call:
-			LowerCall(cast<CallInst>(inst));
+			LowerCall(cast<CallInst>(I));
 			break;
 		case Opcode::ZExt:
-			LowerCast(cast<CastInst>(inst));
+			LowerCast(cast<CastInst>(I));
 			break;
 		case Opcode::GetElementPtr:
-			LowerGEP(cast<GetElementPtrInst>(inst));
+			LowerGEP(cast<GetElementPtrInst>(I));
 			break;
 		case Opcode::PtrAdd:
-			LowerPtrAdd(cast<PtrAddInst>(inst));
+			LowerPtrAdd(cast<PtrAddInst>(I));
 			break;
 		case Opcode::Switch:
-			LowerSwitch(cast<SwitchInst>(inst));
+			LowerSwitch(cast<SwitchInst>(I));
+			break;
+		case Opcode::Select:
+			LowerSelect(cast<SelectInst>(I));
 			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
@@ -539,6 +542,32 @@ namespace ola
 
 		BasicBlock* default_block = SI->GetDefaultCase();
 		if(default_block) lowering_ctx.EmitInst(MachineInstruction(InstJump).SetOp<0>(MachineOperand::Relocable(lowering_ctx.GetBlock(default_block))));
+	}
+
+	void MachineModule::LowerSelect(SelectInst* SI)
+	{
+		Value* predicate = SI->GetPredicate();
+		Value* true_value = SI->GetTrueValue();
+		Value* false_value = SI->GetFalseValue();
+
+		MachineOperand result_reg = lowering_ctx.VirtualReg(SI->GetType());
+		MachineOperand true_op = lowering_ctx.GetOperand(true_value);
+		MachineOperand false_op = lowering_ctx.GetOperand(false_value);
+		MachineOperand predicate_op = lowering_ctx.GetOperand(predicate);
+
+		lowering_ctx.EmitInst(MachineInstruction(InstMove)
+			.SetOp<0>(result_reg)   
+			.SetOp<1>(false_op));
+
+		MachineInstruction testMI(InstTest);
+		testMI.SetOp<0>(predicate_op);
+		testMI.SetOp<1>(predicate_op);
+		lowering_ctx.EmitInst(testMI);
+
+		lowering_ctx.EmitInst(MachineInstruction(InstCMoveNE)
+			.SetOp<0>(result_reg)    
+			.SetOp<1>(true_op).SetIgnoreDef());
+		lowering_ctx.AddOperand(SI, result_reg);
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)

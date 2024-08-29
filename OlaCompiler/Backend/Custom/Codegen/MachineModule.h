@@ -21,6 +21,7 @@ namespace ola
 	class GetElementPtrInst;
 	class SwitchInst;
 	class PtrAddInst;
+	class SelectInst;
 
 	class MachineInstruction;
 	class MIRInstructionInfo;
@@ -61,6 +62,7 @@ namespace ola
 		void LowerGEP(GetElementPtrInst*);
 		void LowerPtrAdd(PtrAddInst*);
 		void LowerSwitch(SwitchInst*);
+		void LowerSelect(SelectInst*);
 
 		void LowerCFGAnalysis(Function*);
 

@@ -706,7 +706,10 @@ namespace ola
 		switch_instructions.pop_back();
 
 		std::vector<llvm::BasicBlock*> case_blocks;
-		for (auto& case_stmt : switch_inst->cases()) case_blocks.push_back(case_stmt.getCaseSuccessor());
+		for (auto& case_stmt : switch_inst->cases())
+		{
+			case_blocks.push_back(case_stmt.getCaseSuccessor());
+		}
 		for (uint32 i = 0; i < case_blocks.size(); ++i)
 		{
 			llvm::BasicBlock* case_block = case_blocks[i];

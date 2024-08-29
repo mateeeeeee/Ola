@@ -27,6 +27,8 @@ namespace ola
 		case InstMove:
 		case InstLoad:
 		case InstLoadGlobalAddress:
+		case InstCMoveEQ:
+		case InstCMoveNE:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

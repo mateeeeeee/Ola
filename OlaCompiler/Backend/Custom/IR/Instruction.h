@@ -599,8 +599,7 @@ namespace ola
 
 		void AddCase(int64 key, BasicBlock* label)
 		{
-			OLA_ASSERT(!cases.contains(key));
-			cases[key] = label;
+			cases.emplace_back(key, label);
 		}
 		auto& Cases() 
 		{
@@ -616,9 +615,15 @@ namespace ola
 			return default_block;
 		}
 
-		BasicBlock* GetCase(uint32 case_idx) const
+		BasicBlock* GetCaseBlock(uint32 case_idx) const
 		{
-			return cases.contains(case_idx) ? cases.find(case_idx)->second : nullptr;
+			if (case_idx >= cases.size()) return nullptr;
+			return cases[case_idx].second;
+		}
+		int64 GetCaseValue(uint32 case_idx) const
+		{
+			if (case_idx >= cases.size()) return INT64_MAX;
+			return cases[case_idx].first;
 		}
 
 		Value* GetCondition() const { return GetOperand(0); }
@@ -640,7 +645,7 @@ namespace ola
 
 	private:
 		BasicBlock* default_block;
-		std::unordered_map<int64, BasicBlock*> cases;
+		std::vector<std::pair<int64, BasicBlock*>> cases;
 	};
 
 	class CallInst final : public Instruction
