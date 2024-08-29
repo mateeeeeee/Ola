@@ -7,11 +7,15 @@ globalString:
 
 
 __StringLiteral0:
-.string "local"
+.string "l"
 
 
 __StringLiteral1:
 .string "Literal"
+
+
+__StringLiteral2:
+.string "12345"
 
 
 .section .text
@@ -88,36 +92,20 @@ main:
 label4:
 push rbp
 mov rbp, rsp
-sub rsp, 54
+sub rsp, 64
 mov rcx, 1
 call Assert
-lea r15, qword ptr [rbp - 14]
+lea r15, qword ptr [rbp - 10]
 mov qword ptr [r15], 108
-lea r15, qword ptr [rbp - 14]
+lea r15, qword ptr [rbp - 10]
 mov r14, r15
 add r14, 1
-mov byte ptr [r14], 111
-lea r14, qword ptr [rbp - 14]
-mov r15, r14
-add r15, 2
-mov byte ptr [r15], 99
-lea r15, qword ptr [rbp - 14]
-mov r14, r15
-add r14, 3
-mov byte ptr [r14], 97
-lea r14, qword ptr [rbp - 14]
-mov r15, r14
-add r15, 4
-mov byte ptr [r15], 108
-lea r15, qword ptr [rbp - 14]
-mov r14, r15
-add r14, 5
 mov byte ptr [r14], 0
 mov rcx, 1
 call Assert
-lea r14, qword ptr [rbp - 14]
-mov qword ptr [rbp - 22], r14
-mov r14, qword ptr [rbp - 22]
+lea r14, qword ptr [rbp - 10]
+mov qword ptr [rbp - 18], r14
+mov r14, qword ptr [rbp - 18]
 mov r15, r14
 mov r14b, byte ptr [r15]
 cmp r14b, 108
@@ -127,15 +115,40 @@ call Assert
 lea r14, [rip + __StringLiteral1]
 mov rcx, r14
 call PassStringLiteral__C0
-mov rcx, qword ptr [rbp - 14]
-call PassStringVariable__C0
-mov qword ptr [rbp - 8], 0
+lea r14, qword ptr [rbp - 24]
+mov qword ptr [r14], 49
+lea r14, qword ptr [rbp - 24]
+mov r15, r14
+add r15, 1
+mov byte ptr [r15], 50
+lea r15, qword ptr [rbp - 24]
+mov r14, r15
+add r14, 2
+mov byte ptr [r14], 51
+lea r14, qword ptr [rbp - 24]
+mov r15, r14
+add r15, 3
+mov byte ptr [r15], 52
+lea r15, qword ptr [rbp - 24]
+mov r14, r15
+add r14, 4
+mov byte ptr [r14], 53
+lea r14, qword ptr [rbp - 24]
+mov r15, r14
+add r15, 5
+mov byte ptr [r15], 0
+mov rcx, qword ptr [rbp - 24]
+call StringToInt
+mov r15, rax
+mov qword ptr [rbp - 32], r15
+mov r15, qword ptr [rbp - 32]
+mov qword ptr [rbp - 8], r15
 jmp label6
 label5:
 jmp label6
 label6:
-mov r14, qword ptr [rbp - 8]
-mov rax, r14
+mov r15, qword ptr [rbp - 8]
+mov rax, r15
 mov rsp, rbp
 pop rbp
 ret

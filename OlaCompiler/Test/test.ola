@@ -16,18 +16,18 @@ public int main()
 {
 	Assert(length(globalString) == 7);
 	
-	const char[] localString = "local";
+	const char[] localString = "l";
 
-	Assert(length(localString) == 6);
+	Assert(length(localString) == 2);
 	const char[] localAlias = localString;
 	Assert(localAlias[0] == 'l');
 
 	PassStringLiteral("Literal");
 	//PassStringVariable(localString);
 
-	//const char[] numString = "12345";
-	//int number = StringToInt(numString);
+	const char[] numString = "12345";
+	int number = StringToInt(numString);
 	//Assert(number == 12345);
 
-	return 0;
+	return number;
 }
