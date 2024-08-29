@@ -39,7 +39,7 @@ void TestNotEqualOperators()
 {
     int intA = 5;
     int intB = 10;
-    Assert(intA != intB == true);
+    Assert(intA != intB);
 }
 
 public int main()

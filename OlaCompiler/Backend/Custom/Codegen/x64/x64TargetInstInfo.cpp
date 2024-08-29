@@ -62,8 +62,8 @@ namespace ola
 		}
 		break;
 		case InstTest:
-		case x64::InstICmp:
-		case x64::InstFCmp:
+		case InstICmp:
+		case InstFCmp:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagUse);

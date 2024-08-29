@@ -125,7 +125,7 @@ namespace ola
 						case InstAShr:
 						case InstTest:
 						case InstSMul:
-						case x64::InstICmp:
+						case InstICmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();

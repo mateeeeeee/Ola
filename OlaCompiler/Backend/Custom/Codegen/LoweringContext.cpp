@@ -72,17 +72,12 @@ namespace ola
 		case Opcode::FDiv:
 			return InstFDiv;
 		case Opcode::ICmpEQ:
-			return InstICmpEQ;
 		case Opcode::ICmpNE:
-			return InstICmpNE;
 		case Opcode::ICmpSGE:
-			return InstICmpSGE;
 		case Opcode::ICmpSGT:
-			return InstICmpSGT;
 		case Opcode::ICmpSLE:
-			return InstICmpSLE;
 		case Opcode::ICmpSLT:
-			return InstICmpSLT;
+			return InstICmp;
 		case Opcode::ZExt:
 			return InstZExt;
 		}

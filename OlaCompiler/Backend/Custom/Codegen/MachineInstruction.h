@@ -51,29 +51,9 @@ namespace ola
 		InstFNeg,
 		InstFFma,
 		// Comparison
-		InstICmpEQ,
-		InstICmpNE,
-		InstICmpSLT,
-		InstICmpSLE,
-		InstICmpSGT,
-		InstICmpSGE,
-		InstICmpULT,
-		InstICmpULE,
-		InstICmpUGT,
-		InstICmpUGE,
+		InstICmp,  //
+		InstFCmp,  //
 
-		InstFCmpOEQ,
-		InstFCmpONE,
-		InstFCmpOLT,
-		InstFCmpOLE,
-		InstFCmpOGT,
-		InstFCmpOGE,
-		InstFCmpUEQ,
-		InstFCmpUNE,
-		InstFCmpULT,
-		InstFCmpULE,
-		InstFCmpUGT,
-		InstFCmpUGE,
 		// Conversion
 		InstZExt,
 		InstF2S,

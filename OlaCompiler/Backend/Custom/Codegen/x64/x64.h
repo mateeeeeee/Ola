@@ -78,8 +78,6 @@ namespace ola::x64
 	enum x64Inst : uint32
 	{
 		x64InstBegin = ISASpecificBegin,
-		InstICmp = x64InstBegin,
-		InstFCmp,
 		InstSetE,
 		InstSetNE,
 		InstSetGT,
@@ -127,39 +125,6 @@ namespace ola::x64
 		case InstLoadGlobalAddress: return "lea";
 		}
 		return "";
-	}
-
-	inline uint32 GetCmpInstruction(uint32 opcode)
-	{
-		switch (opcode)
-		{
-		case InstICmpEQ: 
-		case InstICmpNE: 
-		case InstICmpSGE: 
-		case InstICmpSGT: 
-		case InstICmpSLE: 
-		case InstICmpSLT: 
-			return x64::InstICmp;
-		case InstFCmpOEQ:
-		case InstFCmpONE:
-			return x64::InstFCmp;
-		}
-		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
-		return InstUnknown;
-	}
-	inline uint32 GetSetCondition(uint32 opcode)
-	{
-		switch (opcode)
-		{
-		case InstICmpEQ:  return x64::InstSetE;
-		case InstICmpNE:  return x64::InstSetNE;
-		case InstICmpSGT: return x64::InstSetGT;
-		case InstICmpSGE: return x64::InstSetGE;
-		case InstICmpSLT: return x64::InstSetLT;
-		case InstICmpSLE: return x64::InstSetLE;
-		}
-		OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
-		return InstUnknown;
 	}
 
 	inline char const* GetRegisterString(uint32 r, MachineOperandType type)

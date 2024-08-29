@@ -39,21 +39,6 @@ namespace ola
 	public:
 		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
-			if (CompareInst* CI = dyn_cast<CompareInst>(I))
-			{
-				Opcode opcode = I->GetOpcode();
-				MachineOpcode machine_opcode = GetMachineOpcode(opcode);
-				MachineInstruction MI(x64::GetCmpInstruction(machine_opcode));
-				MI.SetOp<0>(ctx.GetOperand(CI->LHS())).SetOp<1>(ctx.GetOperand(CI->RHS()));
-				ctx.EmitInst(MI);
-
-				MachineOperand ret = ctx.VirtualReg(CI->GetType());
-				MachineInstruction MI2(x64::GetSetCondition(machine_opcode));
-				MI2.SetOp<0>(ret);
-				ctx.EmitInst(MI2);
-				ctx.AddOperand(CI, ret);
-				return true;
-			}
 			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
 			{
 				Opcode opcode = I->GetOpcode();
@@ -212,6 +197,40 @@ namespace ola
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
+			}
+			break;
+			case InstICmp:
+			{
+				if (!MI.GetOperand(2).IsUnused())
+				{
+					MachineOperand dst = MI.GetOperand(0);
+					MachineOperand op1 = MI.GetOperand(1);
+					MachineOperand op2 = MI.GetOperand(2);
+					MachineOperand compare_op = MI.GetOperand(3);
+
+					MI.SetOp<0>(op1).SetOp<1>(op2);
+
+					auto GetSetCondition = [](MachineOperand compare_op) -> uint32
+						{
+							OLA_ASSERT(compare_op.IsImmediate());
+							CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+							switch (cmp_op)
+							{
+							case CompareOp::ICmpEQ:  return x64::InstSetE;
+							case CompareOp::ICmpNE:  return x64::InstSetNE;
+							case CompareOp::ICmpSGT: return x64::InstSetGT;
+							case CompareOp::ICmpSGE: return x64::InstSetGE;
+							case CompareOp::ICmpSLT: return x64::InstSetLT;
+							case CompareOp::ICmpSLE: return x64::InstSetLE;
+							}
+							OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+							return InstUnknown;
+						};
+
+					MachineInstruction MI2(GetSetCondition(compare_op));
+					MI2.SetOp<0>(dst);
+					instructions.insert(++instruction_iter, MI2);
+				}
 			}
 			break;
 			}

@@ -212,13 +212,15 @@ namespace ola
 		case Opcode::Shl:
 		case Opcode::LShr:
 		case Opcode::AShr:
+			LowerBinary(cast<BinaryInst>(inst));
+			break;
 		case Opcode::ICmpEQ:
 		case Opcode::ICmpNE:
 		case Opcode::ICmpSGE:
 		case Opcode::ICmpSGT:
 		case Opcode::ICmpSLE:
 		case Opcode::ICmpSLT:
-			LowerBinary(cast<BinaryInst>(inst));
+			LowerCompare(cast<CompareInst>(inst));
 			break;
 		case Opcode::Neg:
 		case Opcode::Not:
@@ -274,7 +276,9 @@ namespace ola
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->LHS())).SetOp<2>(lowering_ctx.GetOperand(CI->RHS()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->LHS()))
+			.SetOp<2>(lowering_ctx.GetOperand(CI->RHS()))
+			.SetOp<3>(MachineOperand::Immediate((uint32)CI->GetCompareOp(), MachineOperandType::Other));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(CI, ret);
 	}
@@ -332,7 +336,7 @@ namespace ola
 			else
 			{
 				int64 imm = cond_op.GetImmediate();
-				if (imm > 0)
+				if (imm != 0)
 				{
 					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
 					MachineInstruction jmp_true(InstJump);
@@ -498,7 +502,43 @@ namespace ola
 
 	void MachineModule::LowerSwitch(SwitchInst* SI)
 	{
+		if (!SI || SI->GetNumCases() == 0) return;
 
+		Value* cond_value = SI->GetCondition();
+		MachineOperand cond_op = lowering_ctx.GetOperand(cond_value);
+
+		for (auto& case_pair : SI->Cases())
+		{
+			int64 case_value = case_pair.first;
+			BasicBlock* case_block = case_pair.second;
+
+			if (!cond_op.IsImmediate())
+			{
+				MachineInstruction testMI(InstICmp);
+				testMI.SetOp<0>(cond_op);
+				testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineOperandType::Int64));
+				lowering_ctx.EmitInst(testMI);
+
+				MachineOperand case_label = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));
+				MachineInstruction case_jmp(InstJE);
+				case_jmp.SetOp<0>(case_label);
+				lowering_ctx.EmitInst(case_jmp);
+			}
+			else
+			{
+				int64 imm = cond_op.GetImmediate();
+				if (imm != 0)
+				{
+					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));
+					MachineInstruction jmp_true(InstJump);
+					jmp_true.SetOp<0>(true_operand);
+					lowering_ctx.EmitInst(jmp_true);
+				}
+			}
+		}
+
+		BasicBlock* default_block = SI->GetDefaultCase();
+		if(default_block) lowering_ctx.EmitInst(MachineInstruction(InstJump).SetOp<0>(MachineOperand::Relocable(lowering_ctx.GetBlock(default_block))));
 	}
 
 	void MachineModule::LowerCFGAnalysis(Function* F)

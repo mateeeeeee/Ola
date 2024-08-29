@@ -1,33 +1,19 @@
-import std.assert;
-import std.string;
-
-const char[] globalString = "global";
-
-void PassStringLiteral(const char[] literal)
-{
-	Assert(literal[0] == 'L');
-}
-void PassStringVariable(const char[] variable)
-{
-	Assert(variable[0] == 'l');
-}
+//import std.assert;
 
 public int main()
 {
-	Assert(length(globalString) == 7);
-	
-	const char[] localString = "l";
-
-	Assert(length(localString) == 2);
-	const char[] localAlias = localString;
-	Assert(localAlias[0] == 'l');
-
-	PassStringLiteral("Literal");
-	//PassStringVariable(localString);
-
-	const char[] numString = "12345";
-	int number = StringToInt(numString);
-	//Assert(number == 12345);
-
-	return number;
+    int value = 1;
+    int ret = 0;
+    switch (value)
+    {
+        case 1:
+            ret = 1;  // The value is 1, but this case falls through to the next one
+        case 2:
+            ret = 2;  // The value is 2, so this case should execute
+            break;
+        default:
+            ret = 3;  // This case should not execute
+            break;
+    }
+    return ret;
 }
