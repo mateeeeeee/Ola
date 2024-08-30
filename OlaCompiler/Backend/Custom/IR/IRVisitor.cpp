@@ -706,7 +706,7 @@ namespace ola
 		case UnaryExprKind::PostIncrement:
 		{
 			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
-			Store(operand_value, result);
+			Store(operand, result);
 			Value* incremented_value = nullptr;
 			incremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FAdd : Opcode::Add, operand, one);
 			Store(incremented_value, operand_value);
@@ -715,7 +715,7 @@ namespace ola
 		case UnaryExprKind::PostDecrement:
 		{
 			result = builder->MakeInst<AllocaInst>(operand_value->GetType());
-			Store(operand_value, result);
+			Store(operand, result);
 			Value* decremented_value = nullptr;
 			decremented_value = builder->MakeInst<BinaryInst>(is_float_expr ? Opcode::FSub : Opcode::Sub, operand, one);
 			Store(decremented_value, operand_value);

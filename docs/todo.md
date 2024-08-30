@@ -1,7 +1,5 @@
 ## TODO
 ### LLVM Backend
-- Fix known bugs
-	- global variables and postdecrement/increment
 - Improve tests
 	- Comparison operators
 	- Multiplicative operators

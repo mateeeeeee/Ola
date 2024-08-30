@@ -778,7 +778,7 @@ namespace ola
 		case UnaryExprKind::PostIncrement:
 		{
 			result = builder.CreateAlloca(operand_value->getType());
-			Store(operand_value, result);
+			Store(operand, result);
 			llvm::Value* incremented_value = is_float_expr ? builder.CreateFAdd(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
 															 builder.CreateAdd(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(incremented_value, operand_value);
@@ -787,7 +787,7 @@ namespace ola
 		case UnaryExprKind::PostDecrement:
 		{
 			result = builder.CreateAlloca(operand_value->getType());
-			Store(operand_value, result);
+			Store(operand, result);
 			llvm::Value* decremented_value = is_float_expr ? builder.CreateFSub(operand, llvm::ConstantFP::get(operand->getType(), 1.0)) :
 															 builder.CreateSub(operand, llvm::ConstantInt::get(operand->getType(), 1));
 			Store(decremented_value, operand_value);

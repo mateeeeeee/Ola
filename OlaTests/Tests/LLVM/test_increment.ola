@@ -38,13 +38,16 @@ void TestIntIncrementDecrement()
     Assert(GlobalInt2 == 9);
     
     // Integer Post-Increment and Post-Decrement with Globals
-    //int postIncResultGlobal1 = GlobalInt1++;
-    //Assert(postIncResultGlobal1 == 6); // 6 before increment
-    //Assert(GlobalInt1 == 7); // 6 + 1
-    //int postDecResultGlobal2 = GlobalInt2--;
-    //Assert(postDecResultGlobal2 == 9); // 9 before decrement
-    //Assert(GlobalInt2 == 8); // 9 - 1
+    int postIncResultGlobal1 = GlobalInt1++;
+    Assert(postIncResultGlobal1 == 6); // 6 before increment
+    Assert(GlobalInt1 == 7); // 6 + 1
+    int postDecResultGlobal2 = GlobalInt2--;
+    Assert(postDecResultGlobal2 == 9); // 9 before decrement
+    Assert(GlobalInt2 == 8); // 9 - 1
 }
+
+float GlobalFloat1 = 3.5;
+float GlobalFloat2 = 8.5;
 
 void TestFloatIncrementDecrement()
 {
@@ -71,6 +74,15 @@ void TestFloatIncrementDecrement()
     float postDecResultH = h--;
     Assert(postDecResultH == 12.5);
     Assert(h == 11.5);
+
+    // Float Post-Increment and Post-Decrement with Globals
+    float postIncResultGlobal1 = GlobalFloat1++;
+    Assert(postIncResultGlobal1 == 3.5); 
+    Assert(GlobalFloat1 == 4.5);
+    
+    float postDecResultGlobal2 = GlobalFloat2--;
+    Assert(postDecResultGlobal2 == 8.5); 
+    Assert(GlobalFloat2 == 7.5); 
 }
 
 public int main()
