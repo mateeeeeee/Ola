@@ -95,6 +95,11 @@ namespace ola
 		UnaryExprKind GetUnaryKind() const { return op; }
 		Expr const* GetOperand() const { return operand.get(); }
 
+		virtual bool IsConstexpr() const override
+		{ 
+			return operand->IsConstexpr(); 
+		}
+
 		virtual void Accept(ASTVisitor&, uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 

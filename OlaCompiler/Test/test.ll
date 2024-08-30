@@ -1,7 +1,8 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-@Array = internal global [3 x i64] zeroinitializer
+@GlobalInt = internal global i64 7
+@GlobalFloat = internal global double 1.400000e+01
 
 declare void @Assert(i1)
 
@@ -9,7 +10,19 @@ declare void @AssertMsg(i1, ptr)
 
 define i64 @main() {
 entry:
-  %0 = load i64, ptr getelementptr inbounds ([3 x i64], ptr @Array, i64 0, i64 2), align 16
-  store i64 10, i64 %0, align 4
-  ret i64 %0
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  %0 = load i64, ptr @GlobalInt, align 8
+  %1 = icmp eq i64 %0, 7
+  call void @Assert(i1 %1)
+  %2 = load double, ptr @GlobalFloat, align 8
+  %3 = fcmp oeq double %2, 1.400000e+01
+  call void @Assert(i1 %3)
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  call void @Assert(i1 true)
+  ret i64 0
 }

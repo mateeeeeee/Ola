@@ -1,8 +1,11 @@
 import std.assert;
 
-void TestPreIncrementDecrement()
+int GlobalInt1 = 5;
+int GlobalInt2 = 10;
+
+void TestIntIncrementDecrement()
 {
-    // Integer tests
+    // Integer Pre-Increment and Pre-Decrement
     int a = 5;
     int c = 8;
 
@@ -14,22 +17,7 @@ void TestPreIncrementDecrement()
     Assert(preDecResultC == 7);
     Assert(c == 7);
 
-    // Float tests
-    float e = 3.5;
-    float g = 8.5;
-
-    float preIncResultE = ++e;
-    Assert(preIncResultE == 4.5);
-    Assert(e == 4.5);
-
-    float preDecResultG = --g;
-    Assert(preDecResultG == 7.5);
-    //Assert(g == 7.5);
-}
-
-void TestPostIncrementDecrement()
-{
-    // Integer tests
+    // Integer Post-Increment and Post-Decrement
     int b = 10;
     int d = 15;
 
@@ -41,7 +29,38 @@ void TestPostIncrementDecrement()
     Assert(postDecResultD == 15);
     Assert(d == 14);
 
-    // Float tests
+    int preIncResultGlobal1 = ++GlobalInt1;
+    Assert(preIncResultGlobal1 == 6); 
+    Assert(GlobalInt1 == 6);
+    
+    int preDecResultGlobal2 = --GlobalInt2;
+    Assert(preDecResultGlobal2 == 9); 
+    Assert(GlobalInt2 == 9);
+    
+    // Integer Post-Increment and Post-Decrement with Globals
+    //int postIncResultGlobal1 = GlobalInt1++;
+    //Assert(postIncResultGlobal1 == 6); // 6 before increment
+    //Assert(GlobalInt1 == 7); // 6 + 1
+    //int postDecResultGlobal2 = GlobalInt2--;
+    //Assert(postDecResultGlobal2 == 9); // 9 before decrement
+    //Assert(GlobalInt2 == 8); // 9 - 1
+}
+
+void TestFloatIncrementDecrement()
+{
+    // Float Pre-Increment and Pre-Decrement
+    float e = 3.5;
+    float g = 8.5;
+
+    float preIncResultE = ++e;
+    Assert(preIncResultE == 4.5);
+    Assert(e == 4.5);
+
+    float preDecResultG = --g;
+    Assert(preDecResultG == 7.5);
+    Assert(g == 7.5);
+
+    // Float Post-Increment and Post-Decrement
     float f = 6.5;
     float h = 12.5;
 
@@ -56,8 +75,8 @@ void TestPostIncrementDecrement()
 
 public int main()
 {
-    TestPreIncrementDecrement();
-    TestPostIncrementDecrement();
+    TestIntIncrementDecrement();
+    TestFloatIncrementDecrement();
 
     return 0;
 }

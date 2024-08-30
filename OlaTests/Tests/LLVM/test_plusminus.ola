@@ -1,7 +1,11 @@
 import std.assert;
 
+int GlobalInt = 7;
+float GlobalFloat = 14.0;
+
 public int main()
 {
+    // Local variables
     int a = 5;
     int b = -a;
     Assert(b == -5);
@@ -16,6 +20,30 @@ public int main()
 
     float e = -f;
     Assert(e == -10.0);
+
+    int globalNegate = -GlobalInt;
+    Assert(globalNegate == -7); 
+
+    //int globalIdentity = +GlobalInt;
+    //Assert(globalIdentity == -7); // GlobalInt is 7
+    
+    float globalFloatNegate = -GlobalFloat;
+    Assert(globalFloatNegate == -14.0); 
+    
+    //float globalFloatIdentity = +GlobalFloat;
+    //Assert(globalFloatIdentity == 14.0); 
+    
+    int literalNegate = -8;
+    Assert(literalNegate == -8); 
+    
+    int literalIdentity = +8;
+    Assert(literalIdentity == 8); 
+    
+    float literalFloatNegate = -3.5;
+    Assert(literalFloatNegate == -3.5); 
+    
+    float literalFloatIdentity = +3.5;
+    Assert(literalFloatIdentity == 3.5);
 
     return 0;
 }

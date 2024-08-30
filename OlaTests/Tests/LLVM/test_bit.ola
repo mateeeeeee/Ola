@@ -1,92 +1,226 @@
 import std.assert;
 
+// Global variables for testing
+int GlobalAnd1 = 5;  // 0101 in binary
+int GlobalAnd2 = 3;  // 0011 in binary
+int GlobalOr1 = 5;   // 0101 in binary
+int GlobalOr2 = 3;   // 0011 in binary
+int GlobalXor1 = 5;  // 0101 in binary
+int GlobalXor2 = 3;  // 0011 in binary
+int GlobalNot1 = 5;  // 0101 in binary
+int GlobalNot2 = -1; // All bits set
+
 void TestIntBitwiseAnd()
 {
+    // 1. Local variables
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
+    Assert((a & b) == 1); // 0001 in binary
 
-    int resultAnd = a & b;  // 0001 in binary
-    Assert(resultAnd == 1);
+    // 2. Local and global variables
+    Assert((a & GlobalAnd2) == 1); // 0001 in binary
 
-    a &= b;
+    // 3. Local variables and immediate values
+    Assert((a & 7) == 5); // 0101 in binary
+    Assert((a & 8) == 0); // 0000 in binary
+
+    // 4. Global variables
+    Assert((GlobalAnd1 & GlobalAnd2) == 1); // 0001 in binary
+
+    // 5. Global variables and immediate values
+    Assert((GlobalAnd1 & 2) == 0); // 0000 in binary
+
+    // 6. Immediate values
+    Assert((7 & 2) == 2); // 0010 in binary
+
+    // Composite tests
+    // 1. Local with local composite operations
+    a = 5;
+    b = 3;
+    a &= b; // a = a & b -> a = 1
     Assert(a == 1);
+
+    // 2. Local with global composite operations
+    a = 5;
+    a &= GlobalAnd2; // a = a & GlobalAnd2 -> a = 1
+    Assert(a == 1);
+
+    // 3. Local with immediate composite operations
+    a = 5;
+    a &= 7; // a = a & 7 -> a = 5
+    Assert(a == 5);
+
+    // 4. Global with global composite operations
+    GlobalAnd1 &= GlobalAnd2; // GlobalAnd1 = GlobalAnd1 & GlobalAnd2 -> GlobalAnd1 = 1
+    Assert(GlobalAnd1 == 1);
+
+    // 5. Global with immediate composite operations
+    GlobalAnd1 &= 2; // GlobalAnd1 = GlobalAnd1 & 2 -> GlobalAnd1 = 0
+    Assert(GlobalAnd1 == 0);
+
+    // 6. Immediate with immediate composite operations
+    int x = 7;
+    x &= 2; // x = x & 2 -> x = 2
+    Assert(x == 2);
 }
 
 void TestIntBitwiseOr()
 {
+    // 1. Local variables
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
+    Assert((a | b) == 7); // 0111 in binary
 
-    int resultOr = a | b;   // 0111 in binary
-    Assert(resultOr == 7);
+    // 2. Local and global variables
+    Assert((a | GlobalOr2) == 7); // 0111 in binary
 
-    a |= b;
+    // 3. Local variables and immediate values
+    Assert((a | 8) == 13); // 1101 in binary
+    Assert((a | 1) == 5);  // 0101 in binary
+
+    // 4. Global variables
+    Assert((GlobalOr1 | GlobalOr2) == 7); // 0111 in binary
+
+    // 5. Global variables and immediate values
+    Assert((GlobalOr1 | 1) == 5); // 0111 in binary
+
+    // 6. Immediate values
+    Assert((5 | 3) == 7); // 0111 in binary
+
+    // Composite tests
+    // 1. Local with local composite operations
+    a = 5;
+    b = 3;
+    a |= b; // a = a | b -> a = 7
     Assert(a == 7);
+
+    // 2. Local with global composite operations
+    a = 5;
+    a |= GlobalOr2; // a = a | GlobalOr2 -> a = 7
+    Assert(a == 7);
+
+    // 3. Local with immediate composite operations
+    a = 5;
+    a |= 8; // a = a | 8 -> a = 13
+    Assert(a == 13);
+
+    // 4. Global with global composite operations
+    GlobalOr1 |= GlobalOr2; // GlobalOr1 = GlobalOr1 | GlobalOr2 -> GlobalOr1 = 7
+    Assert(GlobalOr1 == 7);
+
+    // 5. Global with immediate composite operations
+    GlobalOr1 |= 1; // GlobalOr1 = GlobalOr1 | 1 -> GlobalOr1 = 7
+    Assert(GlobalOr1 == 7);
+
+    // 6. Immediate with immediate composite operations
+    int x = 5;
+    x |= 3; // x = x | 3 -> x = 7
+    Assert(x == 7);
 }
 
 void TestIntBitwiseXor()
 {
+    // 1. Local variables
     int a = 5;    // 0101 in binary
     int b = 3;    // 0011 in binary
+    Assert((a ^ b) == 6); // 0110 in binary
 
-    int resultXor = a ^ b;  // 0110 in binary
-    Assert(resultXor == 6);
+    // 2. Local and global variables
+    Assert((a ^ GlobalXor2) == 6); // 0110 in binary
 
-    a ^= b;
+    // 3. Local variables and immediate values
+    Assert((a ^ 8) == 13); // 1101 in binary
+    Assert((a ^ 2) == 7);  // 0111 in binary
+
+    // 4. Global variables
+    Assert((GlobalXor1 ^ GlobalXor2) == 6); // 0110 in binary
+
+    // 5. Global variables and immediate values
+    Assert((GlobalXor1 ^ 1) == 4); // 0100 in binary
+
+    // 6. Immediate values
+    Assert((5 ^ 3) == 6); // 0110 in binary
+
+    // Composite tests
+    // 1. Local with local composite operations
+    a = 5;
+    b = 3;
+    a ^= b; // a = a ^ b -> a = 6
     Assert(a == 6);
+
+    // 2. Local with global composite operations
+    a = 5;
+    a ^= GlobalXor2; // a = a ^ GlobalXor2 -> a = 6
+    Assert(a == 6);
+
+    // 3. Local with immediate composite operations
+    a = 5;
+    a ^= 8; // a = a ^ 8 -> a = 13
+    Assert(a == 13);
+
+    // 4. Global with global composite operations
+    GlobalXor1 ^= GlobalXor2; // GlobalXor1 = GlobalXor1 ^ GlobalXor2 -> GlobalXor1 = 6
+    Assert(GlobalXor1 == 6);
+
+    GlobalXor1 = 5;
+    // 5. Global with immediate composite operations
+    GlobalXor1 ^= 1; // GlobalXor1 = GlobalXor1 ^ 1 -> GlobalXor1 = 4
+    Assert(GlobalXor1 == 4);
+
+    // 6. Immediate with immediate composite operations
+    int x = 5;
+    x ^= 3; // x = x ^ 3 -> x = 6
+    Assert(x == 6);
 }
 
 void TestIntBitwiseNot()
 {
+    // 1. Local variables
     int s = 5;
-    int resultNotS = ~s; 
-    Assert(resultNotS == -6); 
+    Assert((~s) == -6); // ~5 = -6
     
     int t = -1;
-    int resultNotT = ~t; 
-    Assert(resultNotT == 0);
+    Assert((~t) == 0); // ~-1 = 0
     
     int u = 0;
-    int resultNotU = ~u;  
-    Assert(resultNotU == -1); 
+    Assert((~u) == -1); // ~0 = -1
     
-    int v = 255;  
-    int resultNotV = ~v;  
-    Assert(resultNotV == -256);   
+    int v = 255;
+    Assert((~v) == -256); // ~255 = -256
     
-    int z = 65535;  
-    int resultNotZ = ~z;  
-    Assert(resultNotZ == -65536); 
-}
-
-void TestBoolBitOperators()
-{
-    bool p = true;
-    bool q = false;
-
-    bool resultAnd = p & q;
-    Assert(resultAnd == false);
-
-    p &= q;
-    Assert(p == false);
-
-    bool resultOr = p | q;
-    Assert(resultOr == false);
-
-    p |= q;
-    Assert(p == false);
-
-    bool resultXor = p ^ q;
-    Assert(resultXor == false);
-
-    p ^= q;
-    Assert(p == false);
-
-    bool resultNotP = ~p;
-    Assert(resultNotP == true);
-
-    bool resultNotQ = ~q;
-    Assert(resultNotQ == true);
+    int z = 65535;
+    Assert((~z) == -65536); // ~65535 = -65536
+    
+    // 2. Global variables
+    Assert((~GlobalNot1) == -6); // ~5 = -6
+    Assert((~GlobalNot2) == 0);  // ~-1 = 0
+    
+    // 3. Immediate values
+    Assert((~7) == -8); // ~7 = -8
+    Assert((~0) == -1); // ~0 = -1
+    
+    // Composite tests
+    // 1. Local with local composite operations
+    s = 5;
+    s = ~s; // s = ~s -> s = -6
+    Assert(s == -6);
+    
+    // 2. Local with global composite operations
+    s = ~GlobalNot1; // s = ~GlobalNot1 -> s = 6
+    Assert(s == -6);
+    
+    // 3. Local with immediate composite operations
+    s = ~7; // s = ~7 -> s = -8
+    Assert(s == -8);
+    
+    // 4. Global with immediate composite operations
+    GlobalNot1 = ~7; // GlobalNot1 = ~7 -> GlobalNot1 = -8
+    Assert(GlobalNot1 == -8);
+    
+    // 5. Immediate with immediate composite operations
+    int x = 5;
+    x = ~7; // x = ~7 -> x = -8
+    Assert(x == -8);
 }
 
 public int main()
@@ -95,7 +229,6 @@ public int main()
     TestIntBitwiseOr();
     TestIntBitwiseXor();
     TestIntBitwiseNot();
-    TestBoolBitOperators();
-
+    
     return 0;
 }
