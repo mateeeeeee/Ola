@@ -23,11 +23,11 @@ public int main()
 	Assert(localAlias[0] == 'l');
 
 	PassStringLiteral("Literal");
-	//PassStringVariable(localString);
+	PassStringVariable(localString);
 
-	//const char[] numString = "12345";
-	//int number = StringToInt(numString);
-	//Assert(number == 12345);
+	const char[] numString = "12345";
+	int number = StringToInt(numString);
+	Assert(number == 12345);
 
 	return 0;
 }

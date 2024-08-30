@@ -9,7 +9,7 @@ void PassStringLiteral(const char[] literal)
 }
 void PassStringVariable(const char[] variable)
 {
-	Assert(variable[0] == 'V');
+	Assert(variable[0] == 'l');
 }
 
 public int main()
@@ -23,7 +23,7 @@ public int main()
 	Assert(localAlias[0] == 'l');
 
 	PassStringLiteral("Literal");
-	PassStringVariable("Variable");
+	PassStringVariable(localString);
 
 	const char[] numString = "12345";
 	int number = StringToInt(numString);
