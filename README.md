@@ -1,4 +1,4 @@
-<img align="left" src="OlaCompiler/olalogo.jpg" width="120px"/>
+<img align="left" src="OlaCompiler/olalogo.png" width="120px"/>
 
 # Ola
 Ola is a toy object-oriented programming language with LLVM backend. 
