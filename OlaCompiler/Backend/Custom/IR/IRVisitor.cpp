@@ -723,7 +723,7 @@ namespace ola
 		break;
 		case UnaryExprKind::Plus:
 		{
-			result = operand_value;
+			result = operand;
 		}
 		break;
 		case UnaryExprKind::Minus:

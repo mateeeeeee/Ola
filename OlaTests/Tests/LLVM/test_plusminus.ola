@@ -24,14 +24,14 @@ public int main()
     int globalNegate = -GlobalInt;
     Assert(globalNegate == -7); 
 
-    //int globalIdentity = +GlobalInt;
-    //Assert(globalIdentity == -7); // GlobalInt is 7
+    int globalIdentity = +GlobalInt;
+    Assert(globalIdentity == 7); // GlobalInt is 7
     
     float globalFloatNegate = -GlobalFloat;
     Assert(globalFloatNegate == -14.0); 
     
-    //float globalFloatIdentity = +GlobalFloat;
-    //Assert(globalFloatIdentity == 14.0); 
+    float globalFloatIdentity = +GlobalFloat;
+    Assert(globalFloatIdentity == 14.0); 
     
     int literalNegate = -8;
     Assert(literalNegate == -8); 

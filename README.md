@@ -1,7 +1,7 @@
 <img align="left" src="OlaCompiler/olalogo.png" width="120px"/>
 
 # Ola
-Ola is a toy object-oriented programming language with LLVM backend. 
+Ola is a toy programming language with LLVM backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.

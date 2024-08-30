@@ -2,7 +2,6 @@
 ### LLVM Backend
 - Fix known bugs
 	- global variables and postdecrement/increment
-	- global variables and unary plus operator
 - Improve tests
 	- Comparison operators
 	- Multiplicative operators

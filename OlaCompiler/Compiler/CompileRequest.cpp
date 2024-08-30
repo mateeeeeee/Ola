@@ -51,7 +51,7 @@ namespace ola
 		if (input_directory.empty()) input_directory = OLA_COMPILER_PATH"Test";
 
 		if (*ast_dump) compiler_flags |= ola::CompilerFlag_DumpAST;
-		//if (*no_llvm) compiler_flags |= ola::CompilerFlag_NoLLVM;
+		if (*no_llvm) compiler_flags |= ola::CompilerFlag_NoLLVM;
 
 		if (*O0 || *Od) opt_level = OptimizationLevel::O0;
 		if (*O1) opt_level = OptimizationLevel::O1;
