@@ -19,8 +19,9 @@ namespace ola
 		InstLoad,					//reg <- [memory]
 		InstStore,					//[memory] <- reg
 		InstLoadGlobalAddress,		//reg <- memory
-		InstCMoveEQ,
+		InstCMoveEQ,			
 		InstCMoveNE,
+		InstMoveFP,
 
 		//Stack
 		InstPush,

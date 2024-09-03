@@ -120,6 +120,33 @@ namespace ola
 				}
 			}
 			break;
+			case InstStore:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (dst.GetType() == MachineOperandType::Float64)
+				{
+					OLA_ASSERT(src.GetType() == MachineOperandType::Float64);
+					if (src.IsImmediate())
+					{
+						//MOVSD xmm1, xmm2	Move scalar double precision floating - point value from xmm2 to xmm1 register.
+						//MOVSD xmm1, m64	Load scalar double precision floating - point value from m64 to xmm1 register.
+						//MOVSD xmm1 / m64, xmm2
+					}
+				}
+			}
+			break;
+			case InstLoad:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (dst.GetType() == MachineOperandType::Float64)
+				{
+					OLA_ASSERT(src.GetType() == MachineOperandType::Float64);
+					
+				}
+			}
+			break;
 			case InstAdd:
 			case InstSub:
 			{

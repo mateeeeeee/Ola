@@ -156,7 +156,7 @@ namespace ola
 		template <typename T>
 		static MachineOperand Immediate(T val, MachineOperandType type)
 		{
-			static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
+			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>);
 			return MachineOperand(static_cast<int64>(val), type);
 		}
 		static MachineOperand ISAReg(uint32 reg, MachineOperandType type)

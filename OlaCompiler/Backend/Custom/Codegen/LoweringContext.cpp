@@ -110,14 +110,19 @@ namespace ola
 				OLA_ASSERT(machine_global);
 				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
 				return global;
-				//MI.SetOp<0>(ptr).SetOp<1>(global);
-				//EmitInst(MI);
 			}
 		}
 		else if (C->GetConstantID() == ConstantID::Integer)
 		{
 			ConstantInt const* CI = cast<ConstantInt>(C);
 			MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineOperandType::Int64);
+			return imm;
+		}
+		else if (C->GetConstantID() == ConstantID::Float)
+		{
+			ConstantFloat const* CF = cast<ConstantFloat>(C);
+			float value = CF->GetValue();
+			MachineOperand imm = MachineOperand::Immediate(value, MachineOperandType::Float64);
 			return imm;
 		}
 		else
