@@ -1,8 +1,5 @@
 import std.assert;
 
-//4. methods and fields
-//5. global variables
-
 void IntByRef(ref int a)
 {
 	++a;

@@ -313,7 +313,6 @@ namespace ola
 			return x64::RAX;
 		}
 
-
 		virtual std::vector<uint32> const& GetIntegerRegisters() const override
 		{
 			return gp_registers;

@@ -1,17 +1,14 @@
 ## TODO
-### LLVM Backend
-- Improve tests
-	- Ternary operator
-	
+
 ### Custom Backend
 - Add basic support for:
 	- Floats
 	- References
 	- Classes
-	- Stack Layout
+	- Stack Layout/Call Conventions
 - IR optimization passes
-	- Mem2reg
-	- Constant propagation
+	- Mem2Reg
+	- Constant Propagation
 	- CSE
 	- GVN
 	- DCE

@@ -13,6 +13,7 @@ namespace ola
 		uint32 reg;
 		int32  stack_offset;
 		bool spilled;
+		bool is_float;
 	};
 
 	inline bool operator<(LiveInterval const& lhs, LiveInterval const& rhs)
