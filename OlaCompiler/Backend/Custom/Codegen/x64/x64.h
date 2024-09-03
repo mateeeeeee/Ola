@@ -84,7 +84,10 @@ namespace ola::x64
 		InstSetGE,
 		InstSetLT,
 		InstSetLE,
-		InstCqo
+		InstCqo,
+		InstMoveFP,
+		InstStoreFP,
+		InstLoadFP
 	};
 
 	inline char const* GetOpcodeString(uint32 opcode)
@@ -98,10 +101,11 @@ namespace ola::x64
 		case InstJNE:     return "jne";
 		case InstCall:    return "call";
 		case InstStore:
-		case InstMove:
-		case InstLoad:    return "mov";
+		case InstLoad:    
+		case InstMove:    return "mov";
 		case InstCMoveEQ: return "cmove";
 		case InstCMoveNE: return "cmovne";
+		case InstLoadGlobalAddress: return "lea";
 		case InstNeg:	  return "neg";
 		case InstAdd:     return "add";
 		case InstSub:     return "sub";
@@ -124,7 +128,9 @@ namespace ola::x64
 		case InstSMul:    return "imul";
 		case InstSDiv:    return "idiv";
 		case InstCqo:     return "cqo";
-		case InstLoadGlobalAddress: return "lea";
+		case InstStoreFP:   
+		case InstLoadFP:   
+		case InstMoveFP:   return "movsd";
 		}
 		return "";
 	}

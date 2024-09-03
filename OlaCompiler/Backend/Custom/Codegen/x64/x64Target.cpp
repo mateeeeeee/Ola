@@ -124,26 +124,23 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (dst.GetType() == MachineOperandType::Float64)
-				{
-					OLA_ASSERT(src.GetType() == MachineOperandType::Float64);
-					if (src.IsImmediate())
-					{
-						//MOVSD xmm1, xmm2	Move scalar double precision floating - point value from xmm2 to xmm1 register.
-						//MOVSD xmm1, m64	Load scalar double precision floating - point value from m64 to xmm1 register.
-						//MOVSD xmm1 / m64, xmm2
-					}
-				}
-			}
-			break;
-			case InstLoad:
-			{
-				MachineOperand dst = MI.GetOperand(0);
-				MachineOperand src = MI.GetOperand(1);
-				if (dst.GetType() == MachineOperandType::Float64)
+				if (dst.GetType() == MachineOperandType::Float64 && src.IsImmediate())
 				{
 					OLA_ASSERT(src.GetType() == MachineOperandType::Float64);
 					
+					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MI.SetOp<0>(tmp);
+					MI.SetIgnoreDef();
+					MI.SetOpcode(InstMove);
+
+					MachineInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+					instructions.insert(++instruction_iter, MI2);
+						 
+					//MOVSD xmm1, xmm2	Move scalar double precision floating - point value from xmm2 to xmm1 register.
+					//MOVSD xmm1, m64	Load scalar double precision floating - point value from m64 to xmm1 register.
+					//MOVSD xmm1 / m64, xmm2
 				}
 			}
 			break;
@@ -302,6 +299,17 @@ namespace ola
 				}
 			}
 			break;
+			}
+
+			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				if (dst.GetType() == MachineOperandType::Float64)
+				{
+					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64::InstMoveFP);
+					if (MI.GetOpcode() == InstStore) MI.SetOpcode(x64::InstStoreFP);
+					if (MI.GetOpcode() == InstLoad) MI.SetOpcode(x64::InstLoadFP);
+				}
 			}
 		}
 	};

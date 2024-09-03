@@ -48,6 +48,7 @@ namespace ola
 					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
 					uint32 reg_id = GetRegAsUint(MO);
+					bool is_float_reg = MO.GetType() == MachineOperandType::Float64;
 
 					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
 					{
@@ -62,7 +63,7 @@ namespace ola
 						}
 						else
 						{
-							live_interval_map[reg_id] = LiveInterval{ reg_def_map[reg_id], instruction_idx };
+							live_interval_map[reg_id] = LiveInterval{ .begin = reg_def_map[reg_id], .end = instruction_idx, .is_float = is_float_reg };
 						}
 						reg_use_map[reg_id] = instruction_idx;
 					}

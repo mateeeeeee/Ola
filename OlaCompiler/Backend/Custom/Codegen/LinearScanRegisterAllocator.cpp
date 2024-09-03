@@ -40,9 +40,18 @@ namespace ola
 			}
 			else
 			{
-				uint32 reg = registers.back();
-				registers.pop_back();
-				LI.reg = reg;
+				if (LI.is_float)
+				{
+					uint32 reg = fp_registers.back();
+					fp_registers.pop_back();
+					LI.reg = reg;
+				}
+				else
+				{
+					uint32 reg = registers.back();
+					registers.pop_back();
+					LI.reg = reg;
+				}
 				vreg2reg_map[LI.vreg] = LI.reg;
 
 				active.push_back(&LI);

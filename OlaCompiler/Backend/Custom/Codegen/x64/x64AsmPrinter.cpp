@@ -169,6 +169,25 @@ namespace ola
 							}
 						}
 						break;
+						case x64::InstStoreFP:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1, true), GetOperandString(op2));
+						}
+						break;
+						case x64::InstLoadFP:
+						{
+
+						}
+						break;
+						case x64::InstMoveFP:
+						{
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+						}
+						break;
 						case x64::InstCqo:
 						{
 							EmitText("{}", opcode_string);

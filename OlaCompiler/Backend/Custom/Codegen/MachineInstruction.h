@@ -21,7 +21,6 @@ namespace ola
 		InstLoadGlobalAddress,		//reg <- memory
 		InstCMoveEQ,			
 		InstCMoveNE,
-		InstMoveFP,
 
 		//Stack
 		InstPush,
