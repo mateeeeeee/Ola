@@ -1,7 +1,14 @@
 import std.assert;
 
+// Global variables
+int GlobalIntX = 15;
+int GlobalIntY = 20;
+float GlobalFloatX = 7.5;
+float GlobalFloatY = 12.5;
+
 void TestLessThanOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
@@ -9,10 +16,31 @@ void TestLessThanOperators()
 
     Assert(intA < intB);
     Assert(floatC < floatD);
+
+    // 2. Local and global variables
+    Assert(intA < GlobalIntY);
+    Assert(floatC < GlobalFloatY);
+
+    // 3. Local variables and immediate values
+    Assert(intA < 20);
+    Assert(floatC < 7.5);
+
+    // 4. Global variables
+    Assert(GlobalIntX < GlobalIntY);
+    Assert(GlobalFloatX < GlobalFloatY);
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntX < 30);
+    Assert(GlobalFloatX < 15.0);
+
+    // 6. Immediate values
+    Assert(3 < 5);
+    Assert(1.5 < 2.0);
 }
 
 void TestLessThanOrEqualOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
@@ -20,32 +48,95 @@ void TestLessThanOrEqualOperators()
 
     Assert(intA <= intB);
     Assert(floatC <= floatD);
+
+    // 2. Local and global variables
+    Assert(intA <= GlobalIntY);
+    Assert(floatC <= GlobalFloatY);
+
+    // 3. Local variables and immediate values
+    Assert(intA <= 20);
+    Assert(floatC <= 7.5);
+
+    // 4. Global variables
+    Assert(GlobalIntX <= GlobalIntY);
+    Assert(GlobalFloatX <= GlobalFloatY);
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntX <= 15);
+    Assert(GlobalFloatX <= 7.5);
+
+    // 6. Immediate values
+    Assert(3 <= 5);
+    Assert(1.5 <= 1.5);
 }
 
 void TestGreaterThanOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
     float floatD = 5.0;
 
-    Assert(intA > intB == false);
-    Assert(floatC > floatD == false);
+    Assert(intB > intA);
+    Assert(floatD > floatC);
+
+    // 2. Local and global variables
+    Assert(GlobalIntX > intB);
+    Assert(GlobalFloatX > floatD);
+
+    // 3. Local variables and immediate values
+    Assert(intB > 5);
+    Assert(floatD > 2.5);
+
+    // 4. Global variables
+    Assert(GlobalIntY > GlobalIntX);
+    Assert(GlobalFloatY > GlobalFloatX);
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntY > 10);
+    Assert(GlobalFloatY > 5.0);
+
+    // 6. Immediate values
+    Assert(5 > 3);
+    Assert(2.0 > 1.5);
 }
 
 void TestGreaterThanOrEqualOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
     float floatD = 5.0;
 
-    Assert(intA >= intB == false);
-    Assert(floatC >= floatD == false);
+    Assert(intB >= intA);
+    Assert(floatD >= floatC);
+
+    // 2. Local and global variables
+    Assert(GlobalIntX >= intB);
+    Assert(GlobalFloatX >= floatD);
+
+    // 3. Local variables and immediate values
+    Assert(intB >= 5);
+    Assert(floatD >= 2.5);
+
+    // 4. Global variables
+    Assert(GlobalIntY >= GlobalIntX);
+    Assert(GlobalFloatY >= GlobalFloatX);
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntY >= 15);
+    Assert(GlobalFloatY >= 7.5);
+
+    // 6. Immediate values
+    Assert(5 >= 3);
+    Assert(2.0 >= 1.5);
 }
 
 void TestEqualOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
@@ -53,10 +144,31 @@ void TestEqualOperators()
 
     Assert(intA == intB == false);
     Assert(floatC == floatD == false);
+
+    // 2. Local and global variables
+    Assert(intA == GlobalIntX == false);
+    Assert(floatC == GlobalFloatX == false);
+
+    // 3. Local variables and immediate values
+    Assert(intA == 5);
+    Assert(floatC == 2.5);
+
+    // 4. Global variables
+    Assert(GlobalIntX == GlobalIntX); // true
+    Assert(GlobalFloatX == GlobalFloatX); // true
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntX == 15); // true
+    Assert(GlobalFloatX == 7.5); // true
+
+    // 6. Immediate values
+    Assert(3 == 3); // true
+    Assert(1.5 == 1.5); // true
 }
 
 void TestNotEqualOperators()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 10;
     float floatC = 2.5;
@@ -64,6 +176,26 @@ void TestNotEqualOperators()
 
     Assert(intA != intB == true);
     Assert(floatC != floatD == true);
+
+    // 2. Local and global variables
+    Assert(intA != GlobalIntX == true);
+    Assert(floatC != GlobalFloatX == true);
+
+    // 3. Local variables and immediate values
+    Assert(intA != 10);
+    Assert(floatC != 5.0);
+
+    // 4. Global variables
+    Assert(GlobalIntX != GlobalIntY == true);
+    Assert(GlobalFloatX != GlobalFloatY == true);
+
+    // 5. Global variables and immediate values
+    Assert(GlobalIntX != 20 == true);
+    Assert(GlobalFloatX != 10.0 == true);
+
+    // 6. Immediate values
+    Assert(3 != 5); // true
+    Assert(1.5 != 2.0); // true
 }
 
 public int main()

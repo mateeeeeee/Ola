@@ -1,9 +1,6 @@
 ## TODO
 ### LLVM Backend
 - Improve tests
-	- Comparison operators
-	- Multiplicative operators
-	- Shift operators
 	- Ternary operator
 	
 ### Custom Backend

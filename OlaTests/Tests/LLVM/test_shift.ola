@@ -1,7 +1,12 @@
 import std.assert;
 
+// Global variables
+int GlobalIntX = 8;
+int GlobalIntY = 3;
+
 void TestShiftOperatorsIntegers()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 2;
 
@@ -12,10 +17,43 @@ void TestShiftOperatorsIntegers()
     // Right shift
     int rightShiftResult = intA >> intB;
     Assert(rightShiftResult == 1);
+
+    // 2. Local and global variables
+    int leftShiftLocalGlobal = intA << GlobalIntY;
+    Assert(leftShiftLocalGlobal == 40);
+
+    int rightShiftLocalGlobal = intA >> GlobalIntY;
+    Assert(rightShiftLocalGlobal == 0);
+
+    // 3. Local variables and immediate values
+    int leftShiftImmediate = intA << 1;
+    Assert(leftShiftImmediate == 10);
+
+    int rightShiftImmediate = intA >> 1;
+    Assert(rightShiftImmediate == 2);
+
+    // 4. Global variables
+    int leftShiftGlobal = GlobalIntX << GlobalIntY;
+    Assert(leftShiftGlobal == 64);
+
+    int rightShiftGlobal = GlobalIntX >> GlobalIntY;
+    Assert(rightShiftGlobal == 1);
+
+    // 5. Global variables and immediate values
+    int leftShiftGlobalImmediate = GlobalIntX << 2;
+    Assert(leftShiftGlobalImmediate == 32);
+
+    int rightShiftGlobalImmediate = GlobalIntX >> 2;
+    Assert(rightShiftGlobalImmediate == 2);
+
+    // 6. Immediate values
+    Assert((4 << 1) == 8);
+    Assert((4 >> 1) == 2);
 }
 
 void TestCompoundShiftOperatorsIntegers()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 2;
 
@@ -26,6 +64,20 @@ void TestCompoundShiftOperatorsIntegers()
     // Compound right shift
     intA >>= intB;
     Assert(intA == 5);
+
+    // 2. Global variables with compound operators
+    GlobalIntX <<= GlobalIntY;
+    Assert(GlobalIntX == 64);
+
+    GlobalIntX >>= GlobalIntY;
+    Assert(GlobalIntX == 8);
+
+    // 3. Global variables with immediate values
+    GlobalIntY <<= 1;
+    Assert(GlobalIntY == 6);
+
+    GlobalIntY >>= 1;
+    Assert(GlobalIntY == 3);
 }
 
 public int main()

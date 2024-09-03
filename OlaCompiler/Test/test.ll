@@ -1,104 +1,86 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-@GlobalInt1 = internal global i64 5
-@GlobalInt2 = internal global i64 10
-@GlobalFloat1 = internal global double 3.500000e+00
-@GlobalFloat2 = internal global double 8.500000e+00
+@GlobalIntA = internal global i64 12
+@GlobalIntB = internal global i64 7
+@GlobalFloatC = internal global double 4.500000e+00
+@GlobalFloatD = internal global double 9.000000e+00
+@GlobalCondition = internal global i1 false
 
 declare void @Assert(i1)
 
 declare void @AssertMsg(i1, ptr)
 
-define internal void @TestIntIncrementDecrement() {
+define internal void @TestTernaryOperatorIntegers() {
 entry:
   call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  %0 = load i64, ptr @GlobalInt1, align 8
-  %1 = add i64 %0, 1
-  store i64 %1, ptr @GlobalInt1, align 8
-  %2 = icmp eq i64 %1, 6
+  %0 = load i64, ptr @GlobalIntB, align 8
+  %1 = call i64 @llvm.smax.i64(i64 %0, i64 5)
+  %2 = icmp eq i64 %1, 7
   call void @Assert(i1 %2)
-  %3 = load i64, ptr @GlobalInt1, align 8
-  %4 = icmp eq i64 %3, 6
-  call void @Assert(i1 %4)
-  %5 = load i64, ptr @GlobalInt2, align 8
-  %6 = add i64 %5, -1
-  store i64 %6, ptr @GlobalInt2, align 8
-  %7 = icmp eq i64 %6, 9
-  call void @Assert(i1 %7)
-  %8 = load i64, ptr @GlobalInt2, align 8
-  %9 = icmp eq i64 %8, 9
-  call void @Assert(i1 %9)
-  %10 = load i64, ptr @GlobalInt1, align 8
-  %11 = add i64 %10, 1
-  store i64 %11, ptr @GlobalInt1, align 8
-  %12 = icmp eq i64 %10, 6
-  call void @Assert(i1 %12)
-  %13 = load i64, ptr @GlobalInt1, align 8
-  %14 = icmp eq i64 %13, 7
-  call void @Assert(i1 %14)
-  %15 = load i64, ptr @GlobalInt2, align 8
-  %16 = add i64 %15, -1
-  store i64 %16, ptr @GlobalInt2, align 8
-  %17 = icmp eq i64 %15, 9
-  call void @Assert(i1 %17)
-  %18 = load i64, ptr @GlobalInt2, align 8
-  %19 = icmp eq i64 %18, 8
-  call void @Assert(i1 %19)
+  %3 = load i64, ptr @GlobalIntA, align 8
+  %4 = load i64, ptr @GlobalIntB, align 8
+  %5 = call i64 @llvm.smax.i64(i64 %3, i64 %4)
+  %6 = icmp eq i64 %5, 12
+  call void @Assert(i1 %6)
+  %7 = load i64, ptr @GlobalIntA, align 8
+  %8 = icmp slt i64 %7, 16
+  call void @Assert(i1 %8)
+  call void @Assert(i1 true)
   ret void
 }
 
-define internal void @TestFloatIncrementDecrement() {
+define internal void @TestTernaryOperatorFloats() {
 entry:
   call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  call void @Assert(i1 true)
-  %0 = load double, ptr @GlobalFloat1, align 8
-  %1 = alloca ptr, align 8
-  store double %0, ptr %1, align 8
-  %2 = fadd double %0, 1.000000e+00
-  store double %2, ptr @GlobalFloat1, align 8
-  %3 = alloca double, align 8
-  %4 = load ptr, ptr %1, align 8
-  store ptr %4, ptr %3, align 8
-  %5 = load double, ptr %3, align 8
-  %6 = fcmp oeq double %5, 3.500000e+00
-  call void @Assert(i1 %6)
-  %7 = load double, ptr @GlobalFloat1, align 8
-  %8 = fcmp oeq double %7, 4.500000e+00
+  %0 = load double, ptr @GlobalFloatD, align 8
+  %1 = fcmp olt double %0, 2.500000e+00
+  %2 = select i1 %1, double 2.500000e+00, double %0
+  %3 = fcmp oeq double %2, 9.000000e+00
+  call void @Assert(i1 %3)
+  %4 = load double, ptr @GlobalFloatC, align 8
+  %5 = load double, ptr @GlobalFloatD, align 8
+  %6 = fcmp ogt double %4, %5
+  %7 = select i1 %6, double %4, double %5
+  %8 = fcmp oeq double %7, 9.000000e+00
   call void @Assert(i1 %8)
-  %9 = load double, ptr @GlobalFloat2, align 8
-  %10 = alloca ptr, align 8
-  store double %9, ptr %10, align 8
-  %11 = fadd double %9, -1.000000e+00
-  store double %11, ptr @GlobalFloat2, align 8
-  %12 = alloca double, align 8
-  %13 = load ptr, ptr %10, align 8
-  store ptr %13, ptr %12, align 8
-  %14 = load double, ptr %12, align 8
-  %15 = fcmp oeq double %14, 8.500000e+00
-  call void @Assert(i1 %15)
-  %16 = load double, ptr @GlobalFloat2, align 8
-  %17 = fcmp oeq double %16, 7.500000e+00
-  call void @Assert(i1 %17)
+  %9 = load double, ptr @GlobalFloatC, align 8
+  %10 = fcmp ogt double %9, 5.000000e+00
+  %11 = select i1 %10, double %9, double 5.000000e+00
+  %12 = fcmp oeq double %11, 5.000000e+00
+  call void @Assert(i1 %12)
+  call void @Assert(i1 true)
+  ret void
+}
+
+define internal void @TestTernaryOperatorBools() {
+entry:
+  call void @Assert(i1 true)
+  %0 = load i1, ptr @GlobalCondition, align 1
+  %not. = xor i1 %0, true
+  call void @Assert(i1 %not.)
+  %1 = load i1, ptr @GlobalCondition, align 1
+  %2 = load i64, ptr @GlobalIntA, align 8
+  %3 = load i64, ptr @GlobalIntB, align 8
+  %4 = select i1 %1, i64 %2, i64 %3
+  %5 = icmp eq i64 %4, 7
+  call void @Assert(i1 %5)
+  %6 = load i1, ptr @GlobalCondition, align 1
+  %not.1 = xor i1 %6, true
+  call void @Assert(i1 %not.1)
+  call void @Assert(i1 true)
   ret void
 }
 
 define i64 @main() {
 entry:
-  call void @TestIntIncrementDecrement()
-  call void @TestFloatIncrementDecrement()
+  call void @TestTernaryOperatorIntegers()
+  call void @TestTernaryOperatorFloats()
+  call void @TestTernaryOperatorBools()
   ret i64 0
 }
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.smax.i64(i64, i64) #0
+
+attributes #0 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }

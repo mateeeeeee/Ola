@@ -1,12 +1,36 @@
 import std.assert;
 
+// Global variables
+int GlobalIntA = 12;
+int GlobalIntB = 7;
+float GlobalFloatC = 4.5;
+float GlobalFloatD = 9.0;
+bool GlobalCondition = false;
+
 void TestTernaryOperatorIntegers()
 {
     int a = 5;
     int b = 10;
 
-    int result = (a > b) ? a : b;
-    Assert(result == 10);
+    // 1. Local variables
+    int resultLocal = (a > b) ? a : b;
+    Assert(resultLocal == 10);
+
+    // 2. Local and global variables
+    int resultLocalGlobal = (a > GlobalIntB) ? a : GlobalIntB;
+    Assert(resultLocalGlobal == 7);
+
+    // 3. Global variables
+    int resultGlobal = (GlobalIntA > GlobalIntB) ? GlobalIntA : GlobalIntB;
+    Assert(resultGlobal == 12);
+
+    // 4. Global variables and immediate values
+    int resultGlobalImmediate = (GlobalIntA > 15) ? GlobalIntA : 15;
+    Assert(resultGlobalImmediate == 15);
+
+    // 5. Immediate values
+    int resultImmediate = (3 > 1) ? 3 : 1;
+    Assert(resultImmediate == 3);
 }
 
 void TestTernaryOperatorFloats()
@@ -14,8 +38,25 @@ void TestTernaryOperatorFloats()
     float c = 2.5;
     float d = 3.0;
 
-    float result = (c > d) ? c : d;
-    Assert(result == 3.0);
+    // 1. Local variables
+    float resultLocal = (c > d) ? c : d;
+    Assert(resultLocal == 3.0);
+
+    // 2. Local and global variables
+    float resultLocalGlobal = (c > GlobalFloatD) ? c : GlobalFloatD;
+    Assert(resultLocalGlobal == 9.0);
+
+    // 3. Global variables
+    float resultGlobal = (GlobalFloatC > GlobalFloatD) ? GlobalFloatC : GlobalFloatD;
+    Assert(resultGlobal == 9.0);
+
+    // 4. Global variables and immediate values
+    float resultGlobalImmediate = (GlobalFloatC > 5.0) ? GlobalFloatC : 5.0;
+    Assert(resultGlobalImmediate == 5.0);
+
+    // 5. Immediate values
+    float resultImmediate = (7.0 > 2.0) ? 7.0 : 2.0;
+    Assert(resultImmediate == 7.0);
 }
 
 void TestTernaryOperatorBools()
@@ -24,8 +65,25 @@ void TestTernaryOperatorBools()
     int x = 5;
     int y = 10;
 
-    int result = condition ? x : y;
-    Assert(result == 5);
+    // 1. Local variables
+    int resultLocal = condition ? x : y;
+    Assert(resultLocal == 5);
+
+    // 2. Local and global variables
+    int resultLocalGlobal = GlobalCondition ? x : y;
+    Assert(resultLocalGlobal == 10);
+
+    // 3. Global variables
+    int resultGlobal = GlobalCondition ? GlobalIntA : GlobalIntB;
+    Assert(resultGlobal == 7);
+
+    // 4. Global variables and immediate values
+    int resultGlobalImmediate = GlobalCondition ? 20 : 30;
+    Assert(resultGlobalImmediate == 30);
+
+    // 5. Immediate values
+    int resultImmediate = true ? 1 : 0;
+    Assert(resultImmediate == 1);
 }
 
 public int main()
