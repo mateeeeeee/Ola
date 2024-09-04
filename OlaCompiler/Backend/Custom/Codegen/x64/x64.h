@@ -130,7 +130,8 @@ namespace ola::x64
 		case InstCqo:     return "cqo";
 		case InstStoreFP:   
 		case InstLoadFP:   
-		case InstMoveFP:   return "movsd";
+		case InstMoveFP:  return "movsd";
+		case InstF2S:     return "cvttsd2si";
 		}
 		return "";
 	}

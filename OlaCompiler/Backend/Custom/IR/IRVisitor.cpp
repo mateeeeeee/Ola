@@ -989,7 +989,7 @@ namespace ola
 			}
 			else if (cast_operand_type == float_type)
 			{
-				//value_map[&cast_expr] = builder.CreateFPToSI(cast_operand, int_type);
+				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::F2S, int_type, cast_operand);
 			}
 			//else if (IsRef(cast_operand_type))
 			//{

@@ -80,6 +80,8 @@ namespace ola
 			return InstICmp;
 		case Opcode::ZExt:
 			return InstZExt;
+		case Opcode::F2S:
+			return InstF2S;
 		}
 		return InstUnknown;
 	}
@@ -121,7 +123,7 @@ namespace ola
 		else if (C->GetConstantID() == ConstantID::Float)
 		{
 			ConstantFloat const* CF = cast<ConstantFloat>(C);
-			float value = CF->GetValue();
+			double value = CF->GetValue();
 			MachineOperand imm = MachineOperand::Immediate(value, MachineOperandType::Float64);
 			return imm;
 		}

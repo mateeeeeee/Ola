@@ -74,7 +74,14 @@ namespace ola
 		{
 			LiveInterval* interval = active[i];
 			if (interval->end >= LI.begin) break;
-			registers.push_back(interval->reg);
+			if (interval->is_float)
+			{
+				fp_registers.push_back(interval->reg);
+			}
+			else
+			{
+				registers.push_back(interval->reg);
+			}
 		}
 		active = std::vector<LiveInterval*>(active.begin() + i, active.end());
 	}

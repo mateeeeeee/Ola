@@ -34,8 +34,6 @@ namespace ola
 
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 
-		std::unordered_map<uint32, uint64> reg_def_map;
-		std::unordered_map<uint32, uint64> reg_use_map;
 		std::unordered_map<uint32, LiveInterval> live_interval_map;
 		for (auto& MBB : MF.Blocks())
 		{
@@ -52,20 +50,21 @@ namespace ola
 
 					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
 					{
-						OLA_ASSERT(!reg_def_map.contains(reg_id));
-						reg_def_map[reg_id] = instruction_idx;
+						OLA_ASSERT(!live_interval_map.contains(reg_id));
+						live_interval_map[reg_id] = LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 3, .is_float = is_float_reg };
 					}
 					else if (inst_info.HasOpFlag(idx, OperandFlagUse))
 					{
-						if (reg_use_map.contains(reg_id))
+						if (!live_interval_map.contains(reg_id)) //double check this, why does this happen
+						{
+							live_interval_map[reg_id].begin = instruction_idx;
+							live_interval_map[reg_id].end = instruction_idx + 3;
+							live_interval_map[reg_id].is_float = is_float_reg;
+						}
+						else 
 						{
 							live_interval_map[reg_id].end = instruction_idx;
 						}
-						else
-						{
-							live_interval_map[reg_id] = LiveInterval{ .begin = reg_def_map[reg_id], .end = instruction_idx, .is_float = is_float_reg };
-						}
-						reg_use_map[reg_id] = instruction_idx;
 					}
 				}
 			}
@@ -74,14 +73,7 @@ namespace ola
 		std::vector<LiveInterval> live_intervals;
 		for (auto&& [vreg, interval] : live_interval_map)
 		{
-			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false });
-		}
-		for (auto&& [reg, instruction_idx] : reg_def_map)
-		{
-			if (!reg_use_map.contains(reg))
-			{
-				live_intervals.push_back(LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 3, .vreg = reg, .spilled = false });
-			}
+			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false, .is_float = interval.is_float });
 		}
 
 		std::sort(std::begin(live_intervals), std::end(live_intervals));

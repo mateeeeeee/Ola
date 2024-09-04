@@ -39,6 +39,8 @@ namespace ola
 			}
 		}
 
+		std::string GetFPConstantPoolEntry(int64 value);
+
 		template<typename... Args>
 		void EmitPreamble(char const* fmt, Args&&... args)
 		{

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <variant>
+#include <bit>
 
 namespace ola
 {
@@ -157,7 +158,12 @@ namespace ola
 		static MachineOperand Immediate(T val, MachineOperandType type)
 		{
 			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>);
-			return MachineOperand(static_cast<int64>(val), type);
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				static_assert(std::is_same_v<T, double>);
+				return MachineOperand(std::bit_cast<int64>(val), type);
+			}
+			else return MachineOperand(static_cast<int64>(val), type);
 		}
 		static MachineOperand ISAReg(uint32 reg, MachineOperandType type)
 		{

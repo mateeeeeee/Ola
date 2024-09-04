@@ -57,7 +57,6 @@ namespace ola
 		return "";
 	}
 
-
 	void x64AsmPrinter::PrintModule(MachineModule const& M)
 	{
 		EmitPreamble(".intel_syntax noprefix\n");
@@ -114,6 +113,11 @@ namespace ola
 							OLA_ASSERT(dst.IsRelocable());
 							MachineRelocable* relocable = dst.GetRelocable();
 							EmitText("{} {}", opcode_string, relocable->GetSymbol());
+						}
+						break;
+						case x64::InstCqo:
+						{
+							EmitText("{}", opcode_string);
 						}
 						break;
 						case InstAdd:
@@ -185,14 +189,35 @@ namespace ola
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+							if (op2.IsImmediate())
+							{
+								int64 imm = op2.GetImmediate();
+								std::string entry = GetFPConstantPoolEntry(imm);
+								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
+							}
+							else
+							{
+								EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+							}
 						}
 						break;
-						case x64::InstCqo:
+						case InstF2S:
 						{
-							EmitText("{}", opcode_string);
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							if (op2.IsImmediate())
+							{
+								int64 imm = op2.GetImmediate();
+								std::string entry = GetFPConstantPoolEntry(imm);
+								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
+							}
+							else
+							{
+								EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
+							}
 						}
 						break;
+						
 						default: 
 							OLA_ASSERT(false);
 						}
@@ -251,6 +276,21 @@ namespace ola
 			else OLA_ASSERT_MSG(false, "Invalid relocable kind!");
 		}
 		Finalize();
+	}
+
+
+	std::string x64AsmPrinter::GetFPConstantPoolEntry(int64 value)
+	{
+		static std::unordered_map<int64, std::string> fp_constant_pool;
+		if (!fp_constant_pool.contains(value))
+		{
+			static uint32 entry_index = 0;
+			fp_constant_pool[value] = "_FP" + std::to_string(entry_index++);
+			EmitReadOnly("{}:", fp_constant_pool[value]);
+			EmitReadOnly(".quad {}", value);
+			EmitReadOnly("\n");
+		}
+		return fp_constant_pool[value];
 	}
 
 }

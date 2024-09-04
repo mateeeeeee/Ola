@@ -243,6 +243,7 @@ namespace ola
 			LowerCall(cast<CallInst>(I));
 			break;
 		case Opcode::ZExt:
+		case Opcode::F2S:
 			LowerCast(cast<CastInst>(I));
 			break;
 		case Opcode::GetElementPtr:
