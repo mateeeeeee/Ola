@@ -30,6 +30,7 @@ namespace ola
 		case InstCMoveEQ:
 		case InstCMoveNE:
 		case InstF2S:
+		case x64::InstMoveFP:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -58,6 +59,8 @@ namespace ola
 		case InstOr:
 		case InstXor:
 		case InstSMul:
+		case InstFAdd:
+		case InstFSub:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

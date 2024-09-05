@@ -137,10 +137,6 @@ namespace ola
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
-						 
-					//MOVSD xmm1, xmm2	Move scalar double precision floating - point value from xmm2 to xmm1 register.
-					//MOVSD xmm1, m64	Load scalar double precision floating - point value from m64 to xmm1 register.
-					//MOVSD xmm1 / m64, xmm2
 				}
 			}
 			break;
@@ -272,6 +268,21 @@ namespace ola
 					MI.SetOp<1>(tmp);
 					instructions.insert(instruction_iter, MI2);
 				}
+			}
+			break;
+			case InstFAdd:
+			case InstFSub:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				MI.SetOp<1>(op2);
+				MI.SetIgnoreDef();
+				MachineInstruction MI2(x64::InstMoveFP);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(op1); //if op1 is immediate, i need to allocate new register and move immediate there first
+				instructions.insert(instruction_iter, MI2);
 			}
 			break;
 			}

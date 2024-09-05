@@ -21,7 +21,9 @@ mov rbp, rsp
 sub rsp, 16
 movsd xmm15,  [rip + _FP0]
 movsd  [rbp - 16], xmm15
-cvttsd2si r15, xmm15
+movsd xmm14, xmm15
+addsd xmm14, 4616414798036126925
+cvttsd2si r15, xmm14
 mov qword ptr [rbp - 8], r15
 jmp label2
 label1:
