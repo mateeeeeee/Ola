@@ -184,7 +184,9 @@ namespace ola
 						break;
 						case x64::InstLoadFP:
 						{
-
+							MachineOperand const& op1 = MI.GetOp<0>();
+							MachineOperand const& op2 = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2, true));
 						}
 						break;
 						case x64::InstMoveFP:

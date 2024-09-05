@@ -213,6 +213,7 @@ namespace ola
 		case Opcode::LShr:
 		case Opcode::AShr:
 		case Opcode::FAdd:
+		case Opcode::FSub:
 			LowerBinary(cast<BinaryInst>(I));
 			break;
 		case Opcode::ICmpEQ:

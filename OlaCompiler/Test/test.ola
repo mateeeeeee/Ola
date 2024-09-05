@@ -4,6 +4,6 @@ import std.assert;
 
 public int main()
 {
-    float a = 2.5;
-    return a + 4.2;
+    float a = 5.5;
+    return a - 4.2;
 }

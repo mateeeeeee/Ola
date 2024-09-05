@@ -281,8 +281,21 @@ namespace ola
 				MI.SetIgnoreDef();
 				MachineInstruction MI2(x64::InstMoveFP);
 				MI2.SetOp<0>(dst);
-				MI2.SetOp<1>(op1); //if op1 is immediate, i need to allocate new register and move immediate there first
+				MI2.SetOp<1>(op1);
+
 				instructions.insert(instruction_iter, MI2);
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineOperandType::Float64);
+					
+					MachineInstruction MI3(x64::InstMoveFP);
+					MI3.SetOp<0>(tmp);
+					MI3.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI3);
+
+					MI.SetOp<1>(tmp);
+				}
 			}
 			break;
 			}

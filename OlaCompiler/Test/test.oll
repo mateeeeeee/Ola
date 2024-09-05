@@ -10,9 +10,9 @@ define external @main i64() {
 entry:
 %0 = alloca i64
 %1 = alloca f64
-store 2.5, ptr %1
+store 5.5, ptr %1
 %2 = load f64, ptr %1
-%3 = fadd f64 %2, 4.2
+%3 = fsub f64 %2, 4.2
 %4 = f2s f64 %3
 store i64 %4, ptr %0
 br label exit
