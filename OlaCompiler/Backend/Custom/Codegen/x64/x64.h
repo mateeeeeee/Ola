@@ -134,6 +134,8 @@ namespace ola::x64
 		case InstF2S:     return "cvttsd2si";
 		case InstFAdd:    return "addsd";
 		case InstFSub:    return "subsd";
+		case InstFMul:    return "mulsd";
+		case InstFDiv:    return "divsd";
 		}
 		return "";
 	}

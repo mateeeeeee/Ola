@@ -56,7 +56,6 @@ namespace ola
 		InstFMul,
 		InstFDiv,
 		InstFNeg,
-		InstFFma,
 
 		// Comparison
 		InstICmp,

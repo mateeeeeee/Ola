@@ -272,6 +272,8 @@ namespace ola
 			break;
 			case InstFAdd:
 			case InstFSub:
+			case InstFMul:
+			case InstFDiv:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);

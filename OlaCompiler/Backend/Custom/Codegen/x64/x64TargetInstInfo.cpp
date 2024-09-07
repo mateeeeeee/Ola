@@ -63,6 +63,8 @@ namespace ola
 		case InstSMul:
 		case InstFAdd:
 		case InstFSub:
+		case InstFMul:
+		case InstFDiv:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);

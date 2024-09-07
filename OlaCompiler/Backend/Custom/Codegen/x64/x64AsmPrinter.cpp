@@ -132,6 +132,8 @@ namespace ola
 						case InstICmp:
 						case InstFAdd:
 						case InstFSub:
+						case InstFMul:
+						case InstFDiv:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
