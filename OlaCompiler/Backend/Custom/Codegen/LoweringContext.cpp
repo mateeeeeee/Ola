@@ -6,30 +6,30 @@
 
 namespace ola
 {
-	MachineOperandType GetOperandType(IRType const* type)
+	MachineType GetOperandType(IRType const* type)
 	{
 		if (type->IsPointer())
 		{
-			return MachineOperandType::Ptr;
+			return MachineType::Ptr;
 		}
 		if (type->IsInteger())
 		{
 			switch (cast<IRIntType>(type)->GetWidth())
 			{
 			case 1:
-				return MachineOperandType::Int8;
+				return MachineType::Int8;
 			case 8:
-				return MachineOperandType::Int64;
+				return MachineType::Int64;
 			default:
 				OLA_ASSERT(false);
 			}
 		}
 		if (type->IsFloat())
 		{
-			return MachineOperandType::Float64;
+			return MachineType::Float64;
 		}
 		OLA_ASSERT(false);
-		return MachineOperandType::Other;
+		return MachineType::Other;
 	}
 	MachineOpcode GetMachineOpcode(Opcode opcode)
 	{
@@ -100,7 +100,7 @@ namespace ola
 				MachineGlobal* machine_global = global_map[GV];
 				OLA_ASSERT(machine_global);
 				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
-				MachineOperand ptr = VirtualReg(MachineOperandType::Int64);
+				MachineOperand ptr = VirtualReg(MachineType::Int64);
 				MI.SetOp<0>(ptr).SetOp<1>(global);
 				EmitInst(MI);
 				return ptr;
@@ -117,14 +117,14 @@ namespace ola
 		else if (C->GetConstantID() == ConstantID::Integer)
 		{
 			ConstantInt const* CI = cast<ConstantInt>(C);
-			MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineOperandType::Int64);
+			MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineType::Int64);
 			return imm;
 		}
 		else if (C->GetConstantID() == ConstantID::Float)
 		{
 			ConstantFloat const* CF = cast<ConstantFloat>(C);
 			double value = CF->GetValue();
-			MachineOperand imm = MachineOperand::Immediate(value, MachineOperandType::Float64);
+			MachineOperand imm = MachineOperand::Immediate(value, MachineType::Float64);
 			return imm;
 		}
 		else

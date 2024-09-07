@@ -56,7 +56,7 @@ namespace ola
 			uint32 size = arg->GetType()->GetSize();
 			uint32 alignment = size;
 
-			uint32 opcode = (arg_operand.IsMemoryOperand() && arg_operand.GetType() == MachineOperandType::Ptr) ? InstLoadGlobalAddress : InstMove;
+			uint32 opcode = (arg_operand.IsMemoryOperand() && arg_operand.GetType() == MachineType::Ptr) ? InstLoadGlobalAddress : InstMove;
 			if (offset < PASS_BY_REG_OFFSET)
 			{
 				MachineOperand& argument_stack = caller.AllocateStack(arg_operand.GetType());
@@ -83,11 +83,11 @@ namespace ola
 		MachineOperand arch_return_reg;
 		if (return_type->IsFloat()) 
 		{
-			arch_return_reg = MachineOperand::ISAReg(x64::XMM0, MachineOperandType::Float64);
+			arch_return_reg = MachineOperand::ISAReg(x64::XMM0, MachineType::Float64);
 		}
 		else 
 		{
-			arch_return_reg = MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64);
+			arch_return_reg = MachineOperand::ISAReg(x64::RAX, MachineType::Int64);
 		}
 		ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
 		ctx.AddOperand(CI, return_reg);
@@ -96,7 +96,7 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const
 	{
-		using enum MachineOperandType;
+		using enum MachineType;
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
@@ -125,7 +125,7 @@ namespace ola
 		uint32 current_offset = 0;
 		for (MachineOperand const& arg : args)
 		{
-			if (arg.GetType() != MachineOperandType::Float64) 
+			if (arg.GetType() != MachineType::Float64) 
 			{
 				if (gprs < 4) 
 				{
@@ -172,7 +172,7 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, LoweringContext& ctx) const
 	{
-		using enum MachineOperandType;
+		using enum MachineType;
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
@@ -197,11 +197,11 @@ namespace ola
 				MachineOperand return_register;
 				if (V->GetType()->IsFloat())
 				{
-					return_register = MachineOperand::ISAReg(x64::XMM0, MachineOperandType::Float64);
+					return_register = MachineOperand::ISAReg(x64::XMM0, MachineType::Float64);
 				}
 				else 
 				{
-					return_register = MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64);
+					return_register = MachineOperand::ISAReg(x64::RAX, MachineType::Int64);
 				}
 
 				MachineInstruction copy_instruction(InstMove);

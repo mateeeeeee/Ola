@@ -132,7 +132,7 @@ namespace ola
 					//spilling
 					if (!vreg2reg_map.contains(vreg_id))
 					{
-						MachineOperand& MO = MF.AllocateStack(MachineOperandType::Int64);
+						MachineOperand& MO = MF.AllocateStack(MachineType::Int64);
 						int32 stack_offset = MO.GetStackOffset();
 						uint32 frame_reg = frame_register;
 

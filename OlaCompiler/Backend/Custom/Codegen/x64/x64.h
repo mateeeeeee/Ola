@@ -87,7 +87,8 @@ namespace ola::x64
 		InstCqo,
 		InstMoveFP,
 		InstStoreFP,
-		InstLoadFP
+		InstLoadFP,
+		InstXorFP
 	};
 
 	inline char const* GetOpcodeString(uint32 opcode)
@@ -136,13 +137,14 @@ namespace ola::x64
 		case InstFSub:    return "subsd";
 		case InstFMul:    return "mulsd";
 		case InstFDiv:    return "divsd";
+		case InstXorFP:   return "xorpd";
 		}
 		return "";
 	}
 
-	inline char const* GetRegisterString(uint32 r, MachineOperandType type)
+	inline char const* GetRegisterString(uint32 r, MachineType type)
 	{
-		using enum MachineOperandType;
+		using enum MachineType;
 		switch (type) 
 		{
 		case Int8:

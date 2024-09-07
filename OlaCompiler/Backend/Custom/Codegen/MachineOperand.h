@@ -17,7 +17,7 @@ namespace ola
 		return (r & VIRTUAL_REG_BEGIN) == VIRTUAL_REG_BEGIN;
 	}
 
-	enum class MachineOperandType : uint32
+	enum class MachineType : uint32
 	{
 		Unknown,
 		Int8,
@@ -27,25 +27,25 @@ namespace ola
 		Other
 	};
 
-	inline constexpr bool IsIntegerType(MachineOperandType type)
+	inline constexpr bool IsIntegerType(MachineType type)
 	{
-		return type <= MachineOperandType::Int64;
+		return type <= MachineType::Int64;
 	}
-	inline constexpr bool IsFPType(MachineOperandType type)
+	inline constexpr bool IsFPType(MachineType type)
 	{
-		return type == MachineOperandType::Float64;
+		return type == MachineType::Float64;
 	}
-	inline constexpr uint32 GetOperandSize(MachineOperandType type)
+	inline constexpr uint32 GetOperandSize(MachineType type)
 	{
 		switch (type)
 		{
-		case MachineOperandType::Int8:
+		case MachineType::Int8:
 			return 1;
-		case MachineOperandType::Int64:
+		case MachineType::Int64:
 			return 8;
-		case MachineOperandType::Float64:
+		case MachineType::Float64:
 			return 8;
-		case MachineOperandType::Ptr:
+		case MachineType::Ptr:
 			//OLA_ASSERT_MSG(false, "Call TargetDataLayout::GetPointerSize");
 			return 8;
 		}
@@ -87,7 +87,7 @@ namespace ola
 	public:
 		constexpr MachineOperand() = default;
 		template <typename T>
-		constexpr MachineOperand(T const& x, MachineOperandType type) : storage{ x }, type{ type } {}
+		constexpr MachineOperand(T const& x, MachineType type) : storage{ x }, type{ type } {}
 		OLA_DEFAULT_COPYABLE_MOVABLE(MachineOperand)
 		~MachineOperand() = default;
 
@@ -95,11 +95,11 @@ namespace ola
 		{
 			return storage;
 		}
-		MachineOperandType GetType() const
+		MachineType GetType() const
 		{
 			return type;
 		}
-		void SetType(MachineOperandType _type)
+		void SetType(MachineType _type)
 		{
 			type = _type;
 		}
@@ -155,7 +155,7 @@ namespace ola
 		}
 
 		template <typename T>
-		static MachineOperand Immediate(T val, MachineOperandType type)
+		static MachineOperand Immediate(T val, MachineType type)
 		{
 			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>);
 			if constexpr (std::is_floating_point_v<T>)
@@ -165,33 +165,33 @@ namespace ola
 			}
 			else return MachineOperand(static_cast<int64>(val), type);
 		}
-		static MachineOperand ISAReg(uint32 reg, MachineOperandType type)
+		static MachineOperand ISAReg(uint32 reg, MachineType type)
 		{
 			OLA_ASSERT(IsISAReg(reg));
 			return MachineOperand(MachineRegister{ reg }, type);
 		}
-		static MachineOperand VirtualReg(uint32 reg, MachineOperandType type)
+		static MachineOperand VirtualReg(uint32 reg, MachineType type)
 		{
 			return MachineOperand(MachineRegister{ reg + VIRTUAL_REG_BEGIN }, type);
 		}
-		static MachineOperand StackObject(int32 offset, MachineOperandType type) 
+		static MachineOperand StackObject(int32 offset, MachineType type) 
 		{
 			return MachineOperand(MachineStackObject{ offset }, type);
 		}
 		static MachineOperand InvalidReg() 
 		{
-			return MachineOperand(MachineRegister{ INVALID_REG }, MachineOperandType::Other);
+			return MachineOperand(MachineRegister{ INVALID_REG }, MachineType::Other);
 		}
 		static MachineOperand Relocable(MachineRelocable* val) 
 		{
-			return MachineOperand(val, MachineOperandType::Other);
+			return MachineOperand(val, MachineType::Other);
 		}
 
 		uint64 GetHash() const;
 
 	private:
 		std::variant<std::monostate, MachineRelocable*, int64, MachineRegister, MachineStackObject> storage;
-		MachineOperandType type = MachineOperandType::Unknown;
+		MachineType type = MachineType::Unknown;
 	};
 
 	inline bool IsOperandVReg(MachineOperand const& operand)

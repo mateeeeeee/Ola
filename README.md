@@ -43,7 +43,6 @@ Ola is a toy programming language with LLVM backend.
 	- Custom IR and MIR 
 	- x86-64 code generation
 	- todo:
-		- floats
 		- references
 		- classes
 		- stack layout 

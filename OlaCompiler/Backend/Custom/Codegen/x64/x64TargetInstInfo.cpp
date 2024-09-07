@@ -65,6 +65,7 @@ namespace ola
 		case InstFSub:
 		case InstFMul:
 		case InstFDiv:
+		case x64::InstXorFP:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -81,6 +82,7 @@ namespace ola
 		}
 		break;
 		case InstNeg:
+		case InstFNeg:
 		case x64::InstSetE:
 		case x64::InstSetNE:
 		case x64::InstSetGT:

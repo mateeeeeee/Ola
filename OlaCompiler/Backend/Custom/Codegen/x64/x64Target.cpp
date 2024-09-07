@@ -49,7 +49,7 @@ namespace ola
 					MachineOperand op2 = ctx.GetOperand(BI->RHS());
 
 					MachineInstruction move_to_rax(InstMove);
-					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
+					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineType::Int64));
 					move_to_rax.SetOp<1>(op1);
 					ctx.EmitInst(move_to_rax);
 
@@ -78,14 +78,14 @@ namespace ola
 					{
 						MachineInstruction move_quotient(InstMove);
 						move_quotient.SetOp<0>(dst);
-						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64::RAX, MachineOperandType::Int64));
+						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64::RAX, MachineType::Int64));
 						ctx.EmitInst(move_quotient);
 					}
 					else if (opcode == Opcode::SRem)
 					{
 						MachineInstruction move_remainder(InstMove);
 						move_remainder.SetOp<0>(dst);
-						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineOperandType::Int64));
+						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineType::Int64));
 						ctx.EmitInst(move_remainder);
 					}
 					ctx.AddOperand(BI, dst);
@@ -124,9 +124,9 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (dst.GetType() == MachineOperandType::Float64 && src.IsImmediate())
+				if (dst.GetType() == MachineType::Float64 && src.IsImmediate())
 				{
-					OLA_ASSERT(src.GetType() == MachineOperandType::Float64);
+					OLA_ASSERT(src.GetType() == MachineType::Float64);
 					
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
@@ -184,7 +184,7 @@ namespace ola
 					cl_move.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
 					cl_move.SetOp<1>(op2);
 					instructions.insert(instruction_iter, cl_move);
-					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineOperandType::Int8));
+					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineType::Int8));
 				}
 				MI.SetIgnoreDef();
 				MachineInstruction MI2(InstMove);
@@ -289,7 +289,7 @@ namespace ola
 
 				if (op2.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(MachineOperandType::Float64);
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
 					
 					MachineInstruction MI3(x64::InstMoveFP);
 					MI3.SetOp<0>(tmp);
@@ -298,6 +298,28 @@ namespace ola
 
 					MI.SetOp<1>(tmp);
 				}
+			}
+			break;
+			case InstFNeg:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+
+				MachineInstruction MI2(x64::InstMoveFP);
+				MI2.SetOp<0>(dst);
+				MI2.SetOp<1>(src);
+				instructions.insert(instruction_iter, MI2);
+
+				MachineInstruction MI3(x64::InstMoveFP);
+				MachineOperand neg_mask = lowering_ctx.VirtualReg(MachineType::Float64);
+				MI3.SetOp<0>(neg_mask);
+				MI3.SetOp<1>(MachineOperand::Immediate(0x8000000000000000, MachineType::Float64));
+				instructions.insert(instruction_iter, MI3);
+
+				MI.SetOpcode(x64::InstXorFP);
+				MI.SetOp<0>(dst);
+				MI.SetOp<1>(neg_mask);
+				MI.SetIgnoreDef();
 			}
 			break;
 			}
@@ -330,7 +352,7 @@ namespace ola
 			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 			{
 				MachineOperand dst = MI.GetOperand(0);
-				if (dst.GetType() == MachineOperandType::Float64)
+				if (dst.GetType() == MachineType::Float64)
 				{
 					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64::InstMoveFP);
 					if (MI.GetOpcode() == InstStore) MI.SetOpcode(x64::InstStoreFP);

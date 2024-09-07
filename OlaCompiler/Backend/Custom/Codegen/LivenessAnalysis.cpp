@@ -46,7 +46,7 @@ namespace ola
 					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
 					uint32 reg_id = GetRegAsUint(MO);
-					bool is_float_reg = MO.GetType() == MachineOperandType::Float64;
+					bool is_float_reg = MO.GetType() == MachineType::Float64;
 
 					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
 					{

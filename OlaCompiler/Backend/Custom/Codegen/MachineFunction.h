@@ -22,7 +22,7 @@ namespace ola
 		{
 			return args;
 		}
-		MachineOperand& AllocateStack(MachineOperandType type)
+		MachineOperand& AllocateStack(MachineType type)
 		{
 			stack_offset += GetOperandSize(type);
 			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, type);
@@ -32,7 +32,7 @@ namespace ola
 		MachineOperand& AllocateStack(uint32 size)
 		{
 			stack_offset += size;
-			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineOperandType::Ptr);
+			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineType::Ptr);
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}

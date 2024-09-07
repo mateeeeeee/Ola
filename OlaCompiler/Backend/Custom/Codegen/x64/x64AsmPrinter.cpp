@@ -15,10 +15,10 @@ namespace ola
 	{
 		switch (MO.GetType())
 		{
-		case MachineOperandType::Int8:  return "byte ptr";
-		case MachineOperandType::Int64: 
-		case MachineOperandType::Ptr:
-		case MachineOperandType::Other: return "qword ptr";
+		case MachineType::Int8:  return "byte ptr";
+		case MachineType::Int64: 
+		case MachineType::Ptr:
+		case MachineType::Other: return "qword ptr";
 		}
 		return "";
 	}
@@ -30,7 +30,7 @@ namespace ola
 			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
 			if (dereference)
 			{
-				return std::format("{} [{}]", GetOperandPrefix(MO), x64::GetRegisterString(MO.GetReg().reg, MachineOperandType::Ptr));
+				return std::format("{} [{}]", GetOperandPrefix(MO), x64::GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
 			}
 			else
 			{
@@ -49,9 +49,9 @@ namespace ola
 		else if (MO.IsStackObject())
 		{
 			int32 stack_offset = MO.GetStackOffset();
-			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr), stack_offset);
-			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr), -stack_offset);
-			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineOperandType::Ptr));
+			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), stack_offset);
+			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), -stack_offset);
+			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr));
 		}
 		OLA_ASSERT(false);
 		return "";
@@ -134,6 +134,7 @@ namespace ola
 						case InstFSub:
 						case InstFMul:
 						case InstFDiv:
+						case x64::InstXorFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();

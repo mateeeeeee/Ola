@@ -3,7 +3,7 @@ import std.assert;
 
 public int main()
 {
-    float a = 7.5;
-    int b = a / 3.1;
-    return b;
+    float a = 24.5;
+    int b = -a;
+    return -b;
 }

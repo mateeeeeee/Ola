@@ -286,7 +286,7 @@ namespace ola
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->LHS()))
 			.SetOp<2>(lowering_ctx.GetOperand(CI->RHS()))
-			.SetOp<3>(MachineOperand::Immediate((uint32)CI->GetCompareOp(), MachineOperandType::Other));
+			.SetOp<3>(MachineOperand::Immediate((uint32)CI->GetCompareOp(), MachineType::Other));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(CI, ret);
 	}
@@ -498,11 +498,11 @@ namespace ola
 		}
 		else
 		{
-			MachineOperand result = lowering_ctx.VirtualReg(MachineOperandType::Ptr);
+			MachineOperand result = lowering_ctx.VirtualReg(MachineType::Ptr);
 			lowering_ctx.EmitInst(MachineInstruction(InstAdd)
 				.SetOp<0>(result)
 				.SetOp<1>(base_register)
-				.SetOp<2>(MachineOperand::Immediate(offset->GetValue(), MachineOperandType::Int64)));
+				.SetOp<2>(MachineOperand::Immediate(offset->GetValue(), MachineType::Int64)));
 			result.SetType(GetOperandType(PAI->GetResultElementType()));
 			lowering_ctx.AddOperand(PAI, result);
 		}
@@ -524,7 +524,7 @@ namespace ola
 			{
 				MachineInstruction testMI(InstICmp);
 				testMI.SetOp<0>(cond_op);
-				testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineOperandType::Int64));
+				testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineType::Int64));
 				lowering_ctx.EmitInst(testMI);
 
 				MachineOperand case_label = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));

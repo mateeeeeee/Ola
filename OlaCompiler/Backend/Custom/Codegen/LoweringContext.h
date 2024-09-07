@@ -17,7 +17,7 @@ namespace ola
 	enum MachineOpcode : uint32;
 	enum class Opcode : uint32;
 
-	MachineOperandType GetOperandType(IRType const* type);
+	MachineType GetOperandType(IRType const* type);
 	MachineOpcode GetMachineOpcode(Opcode opcode);
 
 	class LoweringContext
@@ -68,7 +68,7 @@ namespace ola
 		{
 			return MachineOperand::VirtualReg(virt_reg_id++, GetOperandType(type));
 		}
-		MachineOperand VirtualReg(MachineOperandType type) const
+		MachineOperand VirtualReg(MachineType type) const
 		{
 			return MachineOperand::VirtualReg(virt_reg_id++, type);
 		}
