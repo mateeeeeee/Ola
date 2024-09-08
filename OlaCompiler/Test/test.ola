@@ -3,8 +3,7 @@ import std.assert;
 
 public int main()
 {
-    float b = 3.5;
-    float a = 2.5;
-    bool c = a > b;
-    return c;
+    float b = 2.5;
+    if(b) return 10;
+    return 10000;
 }

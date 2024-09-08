@@ -130,7 +130,6 @@ namespace ola
 						case InstTest:
 						case InstSMul:
 						case InstICmp:
-						case InstFCmp:
 						case InstFAdd:
 						case InstFSub:
 						case InstFMul:
@@ -194,6 +193,8 @@ namespace ola
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2, true));
 						}
 						break;
+						case InstF2S:
+						case InstFCmp:
 						case x64::InstMoveFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
@@ -210,14 +211,14 @@ namespace ola
 							}
 						}
 						break;
-						case InstF2S:
+						case InstS2F:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsImmediate())
 							{
 								int64 imm = op2.GetImmediate();
-								std::string entry = GetFPConstantPoolEntry(imm);
+								std::string entry = GetIntConstantPoolEntry(imm);
 								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
 							}
 							else
@@ -226,7 +227,6 @@ namespace ola
 							}
 						}
 						break;
-						
 						default: 
 							OLA_ASSERT(false);
 						}
@@ -300,6 +300,20 @@ namespace ola
 			EmitReadOnly("\n");
 		}
 		return fp_constant_pool[value];
+	}
+
+	std::string x64AsmPrinter::GetIntConstantPoolEntry(int64 value)
+	{
+		static std::unordered_map<int64, std::string> int_constant_pool;
+		if (!int_constant_pool.contains(value))
+		{
+			static uint32 entry_index = 0;
+			int_constant_pool[value] = "_INT" + std::to_string(entry_index++);
+			EmitReadOnly("{}:", int_constant_pool[value]);
+			EmitReadOnly(".quad {}", value);
+			EmitReadOnly("\n");
+		}
+		return int_constant_pool[value];
 	}
 
 }

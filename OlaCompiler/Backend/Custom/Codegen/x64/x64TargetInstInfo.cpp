@@ -31,6 +31,7 @@ namespace ola
 		case InstCMoveNE:
 		case InstZExt:
 		case InstF2S:
+		case InstS2F:
 		case x64::InstLoadFP:
 		case x64::InstMoveFP:
 		{

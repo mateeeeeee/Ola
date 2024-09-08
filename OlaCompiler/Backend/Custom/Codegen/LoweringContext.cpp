@@ -89,6 +89,8 @@ namespace ola
 			return InstZExt;
 		case Opcode::F2S:
 			return InstF2S;
+		case Opcode::S2F:
+			return InstS2F;
 		}
 		return InstUnknown;
 	}

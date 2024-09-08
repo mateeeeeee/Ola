@@ -142,6 +142,9 @@ namespace ola
 			break;
 			case InstAdd:
 			case InstSub:
+			case InstAnd:
+			case InstOr:
+			case InstXor:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
@@ -155,21 +158,6 @@ namespace ola
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
 				}
-			}
-			break;
-			case InstAnd:
-			case InstOr:
-			case InstXor:
-			{
-				MachineOperand dst = MI.GetOperand(0);
-				MachineOperand op1 = MI.GetOperand(1);
-				MachineOperand op2 = MI.GetOperand(2);
-				MI.SetOp<1>(op2);
-				MI.SetIgnoreDef();
-				MachineInstruction MI2(InstMove);
-				MI2.SetOp<0>(dst);
-				MI2.SetOp<1>(op1);
-				instructions.insert(instruction_iter, MI2);
 			}
 			break;
 			case InstShl:
@@ -250,6 +238,12 @@ namespace ola
 					MachineInstruction MI2(GetSetCondition(compare_op));
 					MI2.SetOp<0>(dst);
 					instructions.insert(++instruction_iter, MI2);
+
+					MachineInstruction MI3(InstAnd);
+					MI3.SetOp<0>(dst);
+					MI3.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
+					MI3.SetIgnoreDef();
+					instructions.insert(instruction_iter++, MI3);
 				}
 			}
 			break;
@@ -351,6 +345,12 @@ namespace ola
 				MachineInstruction MI2(GetSetCondition(compare_op));
 				MI2.SetOp<0>(dst);
 				instructions.insert(++instruction_iter, MI2);
+
+				MachineInstruction MI3(InstAnd);
+				MI3.SetOp<0>(dst);
+				MI3.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
+				MI3.SetIgnoreDef();
+				instructions.insert(instruction_iter++, MI3);
 			}
 			break;
 			}
