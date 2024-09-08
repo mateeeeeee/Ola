@@ -224,6 +224,12 @@ namespace ola
 		case Opcode::ICmpSGT:
 		case Opcode::ICmpSLE:
 		case Opcode::ICmpSLT:
+		case Opcode::FCmpOEQ:
+		case Opcode::FCmpONE:
+		case Opcode::FCmpOGE:
+		case Opcode::FCmpOGT:
+		case Opcode::FCmpOLE:
+		case Opcode::FCmpOLT:
 			LowerCompare(cast<CompareInst>(I));
 			break;
 		case Opcode::Neg:

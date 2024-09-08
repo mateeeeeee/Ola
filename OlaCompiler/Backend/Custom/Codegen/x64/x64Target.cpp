@@ -131,7 +131,7 @@ namespace ola
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
 					MI.SetIgnoreDef();
-					MI.SetOpcode(InstMove);
+					MI.SetOpcode(x64::InstMoveFP);
 
 					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
@@ -322,6 +322,37 @@ namespace ola
 				MI.SetIgnoreDef();
 			}
 			break;
+			case InstFCmp:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				MachineOperand compare_op = MI.GetOperand(3);
+
+				MI.SetOp<0>(op1).SetOp<1>(op2);
+
+				auto GetSetCondition = [](MachineOperand compare_op) -> uint32
+					{
+						OLA_ASSERT(compare_op.IsImmediate());
+						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+						switch (cmp_op)
+						{
+						case CompareOp::FCmpOEQ: return x64::InstSetE;
+						case CompareOp::FCmpONE: return x64::InstSetNE;
+						case CompareOp::FCmpOGT: return x64::InstSetGT;
+						case CompareOp::FCmpOGE: return x64::InstSetGE;
+						case CompareOp::FCmpOLT: return x64::InstSetLT;
+						case CompareOp::FCmpOLE: return x64::InstSetLE;
+						}
+						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+						return InstUnknown;
+					};
+
+				MachineInstruction MI2(GetSetCondition(compare_op));
+				MI2.SetOp<0>(dst);
+				instructions.insert(++instruction_iter, MI2);
+			}
+			break;
 			}
 		}
 
@@ -352,7 +383,8 @@ namespace ola
 			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 			{
 				MachineOperand dst = MI.GetOperand(0);
-				if (dst.GetType() == MachineType::Float64)
+				MachineOperand src = MI.GetOperand(1);
+				if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 				{
 					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64::InstMoveFP);
 					if (MI.GetOpcode() == InstStore) MI.SetOpcode(x64::InstStoreFP);

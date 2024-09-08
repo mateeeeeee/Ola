@@ -1005,7 +1005,7 @@ namespace ola
 			}
 			else if (cast_operand_type == float_type)
 			{
-				//value_map[&cast_expr] = builder.CreateFPToUI(cast_operand, bool_type);
+				value_map[&cast_expr] = builder->MakeInst<CompareInst>(Opcode::ICmpNE, cast_operand, context.GetFloat(0.0));
 			}
 			//else if (IsRef(cast_operand_type))
 			//{
@@ -1017,11 +1017,11 @@ namespace ola
 		{
 			if (cast_operand_type == bool_type)
 			{
-				//value_map[&cast_expr] = builder.CreateUIToFP(cast_operand, float_type);
+				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::S2F, float_type, cast_operand);
 			}
 			else if (cast_operand_type == int_type)
 			{
-				//value_map[&cast_expr] = builder.CreateSIToFP(cast_operand, float_type);
+				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::S2F, float_type, cast_operand);
 			}
 			//else if (IsRef(cast_operand_type))
 			//{

@@ -29,6 +29,7 @@ namespace ola
 		case InstLoadGlobalAddress:
 		case InstCMoveEQ:
 		case InstCMoveNE:
+		case InstZExt:
 		case InstF2S:
 		case x64::InstLoadFP:
 		case x64::InstMoveFP:

@@ -138,6 +138,7 @@ namespace ola::x64
 		case InstFMul:    return "mulsd";
 		case InstFDiv:    return "divsd";
 		case InstXorFP:   return "xorpd";
+		case InstZExt:    return "movzx";
 		}
 		return "";
 	}

@@ -130,6 +130,7 @@ namespace ola
 						case InstTest:
 						case InstSMul:
 						case InstICmp:
+						case InstFCmp:
 						case InstFAdd:
 						case InstFSub:
 						case InstFMul:
@@ -158,6 +159,7 @@ namespace ola
 						case InstMove:
 						case InstCMoveEQ:
 						case InstCMoveNE:
+						case InstZExt:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
