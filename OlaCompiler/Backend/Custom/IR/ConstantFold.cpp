@@ -6,18 +6,31 @@ namespace ola
 
 	Value* TryConstantFold_BinaryInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
-		ConstantInt* C1 = dyn_cast<ConstantInt>(lhs);
-		ConstantInt* C2 = dyn_cast<ConstantInt>(rhs);
-		if (C1 && C2)
+		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);
+		ConstantInt* CI2 = dyn_cast<ConstantInt>(rhs);
+		if (CI1 && CI2)
 		{
 			switch (opcode)
 			{
-			case Opcode::Add:  return new ConstantInt(lhs->GetType(), C1->GetValue() + C2->GetValue());
-			case Opcode::Sub:  return new ConstantInt(lhs->GetType(), C1->GetValue() - C2->GetValue());
-			case Opcode::SMul: return new ConstantInt(lhs->GetType(), C1->GetValue() * C2->GetValue());
-			case Opcode::SDiv: return new ConstantInt(lhs->GetType(), C1->GetValue() / C2->GetValue());
-			case Opcode::Shl:  return new ConstantInt(lhs->GetType(), C1->GetValue() << C2->GetValue());
-			case Opcode::AShr: return new ConstantInt(lhs->GetType(), C1->GetValue() >> C2->GetValue());
+			case Opcode::Add:  return new ConstantInt(lhs->GetType(), CI1->GetValue() + CI2->GetValue());
+			case Opcode::Sub:  return new ConstantInt(lhs->GetType(), CI1->GetValue() - CI2->GetValue());
+			case Opcode::SMul: return new ConstantInt(lhs->GetType(), CI1->GetValue() * CI2->GetValue());
+			case Opcode::SDiv: return new ConstantInt(lhs->GetType(), CI1->GetValue() / CI2->GetValue());
+			case Opcode::Shl:  return new ConstantInt(lhs->GetType(), CI1->GetValue() << CI2->GetValue());
+			case Opcode::AShr: return new ConstantInt(lhs->GetType(), CI1->GetValue() >> CI2->GetValue());
+			}
+		}
+
+		ConstantFloat* CF1 = dyn_cast<ConstantFloat>(lhs);
+		ConstantFloat* CF2 = dyn_cast<ConstantFloat>(rhs);
+		if (CF1 && CF2)
+		{
+			switch (opcode)
+			{
+			case Opcode::FAdd:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() + CF2->GetValue());
+			case Opcode::FSub:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() - CF2->GetValue());
+			case Opcode::FMul:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() * CF2->GetValue());
+			case Opcode::FDiv:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() / CF2->GetValue());
 			}
 		}
 		return nullptr;
@@ -39,22 +52,38 @@ namespace ola
 
 	Value* TryConstantFold_CompareInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
-		ConstantInt* C1 = dyn_cast<ConstantInt>(lhs);
-		ConstantInt* C2 = dyn_cast<ConstantInt>(rhs);
-
 		IRType* bool_type = IRIntType::Get(lhs->GetContext(), 1);
-		if (C1 && C2)
+
+		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);
+		ConstantInt* CI2 = dyn_cast<ConstantInt>(rhs);
+		if (CI1 && CI2)
 		{
 			switch (opcode)
 			{
-			case Opcode::ICmpEQ:  return new ConstantInt(bool_type, C1->GetValue() == C2->GetValue());
-			case Opcode::ICmpNE:  return new ConstantInt(bool_type, C1->GetValue() != C2->GetValue());
-			case Opcode::ICmpSGE: return new ConstantInt(bool_type, C1->GetValue() >= C2->GetValue());
-			case Opcode::ICmpSGT: return new ConstantInt(bool_type, C1->GetValue() > C2->GetValue());
-			case Opcode::ICmpSLE: return new ConstantInt(bool_type, C1->GetValue() <= C2->GetValue());
-			case Opcode::ICmpSLT: return new ConstantInt(bool_type, C1->GetValue() < C2->GetValue());
+			case Opcode::ICmpEQ:  return new ConstantInt(bool_type, CI1->GetValue() == CI2->GetValue());
+			case Opcode::ICmpNE:  return new ConstantInt(bool_type, CI1->GetValue() != CI2->GetValue());
+			case Opcode::ICmpSGE: return new ConstantInt(bool_type, CI1->GetValue() >= CI2->GetValue());
+			case Opcode::ICmpSGT: return new ConstantInt(bool_type, CI1->GetValue() > CI2->GetValue());
+			case Opcode::ICmpSLE: return new ConstantInt(bool_type, CI1->GetValue() <= CI2->GetValue());
+			case Opcode::ICmpSLT: return new ConstantInt(bool_type, CI1->GetValue() < CI2->GetValue());
 			}
 		}
+
+		ConstantFloat* CF1 = dyn_cast<ConstantFloat>(lhs);
+		ConstantFloat* CF2 = dyn_cast<ConstantFloat>(rhs);
+		if (CF1 && CF2)
+		{
+			switch (opcode)
+			{
+			case Opcode::FCmpOEQ: return new ConstantInt(bool_type, CF1->GetValue() == CF2->GetValue());
+			case Opcode::FCmpONE: return new ConstantInt(bool_type, CF1->GetValue() != CF2->GetValue());
+			case Opcode::FCmpOGE: return new ConstantInt(bool_type, CF1->GetValue() >= CF2->GetValue());
+			case Opcode::FCmpOGT: return new ConstantInt(bool_type, CF1->GetValue() > CF2->GetValue());
+			case Opcode::FCmpOLE: return new ConstantInt(bool_type, CF1->GetValue() <= CF2->GetValue());
+			case Opcode::FCmpOLT: return new ConstantInt(bool_type, CF1->GetValue() < CF2->GetValue());
+			}
+		}
+
 		return nullptr;
 	}
 

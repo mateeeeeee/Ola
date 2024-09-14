@@ -353,6 +353,21 @@ namespace ola
 				instructions.insert(instruction_iter++, MI3);
 			}
 			break;
+			case InstS2F:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				OLA_ASSERT(dst.GetType() == MachineType::Float64);
+
+				if (src.GetType() == MachineType::Int8)
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineInstruction MI2(InstZExt);
+					MI2.SetOp<0>(tmp).SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
+			}
 			}
 		}
 
