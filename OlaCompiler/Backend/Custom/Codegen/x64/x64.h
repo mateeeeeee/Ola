@@ -84,6 +84,12 @@ namespace ola::x64
 		InstSetGE,
 		InstSetLT,
 		InstSetLE,
+
+		InstSetA,
+		InstSetAE,
+		InstSetB,
+		InstSetBE,
+
 		InstCqo,
 		InstMoveFP,
 		InstStoreFP,
@@ -118,6 +124,10 @@ namespace ola::x64
 		case InstSetGE:	  return "setge";
 		case InstSetLT:	  return "setl";
 		case InstSetLE:	  return "setle";
+		case InstSetA:	  return "seta";
+		case InstSetAE:   return "setae";
+		case InstSetB:    return "setb";
+		case InstSetBE:   return "setbe";
 		case InstShl:	  return "shl";
 		case InstAShr:    return "sar";
 		case InstLShr:    return "shr";

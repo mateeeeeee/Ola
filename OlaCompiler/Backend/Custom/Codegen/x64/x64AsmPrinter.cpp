@@ -100,6 +100,10 @@ namespace ola
 						case x64::InstSetGE:
 						case x64::InstSetLT:
 						case x64::InstSetLE:
+						case x64::InstSetA:
+						case x64::InstSetAE:
+						case x64::InstSetB:
+						case x64::InstSetBE:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));

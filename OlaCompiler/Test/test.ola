@@ -1,9 +1,48 @@
 import std.assert;
 
 
+float GlobalFloat1 = 3.5;
+float GlobalFloat2 = 8.5;
+
+void TestFloatIncrementDecrement()
+{
+    // Float Pre-Increment and Pre-Decrement
+    //float e = 3.5;
+    //float g = 8.5;
+    //
+    //float preIncResultE = ++e;
+    //Assert(preIncResultE == 4.5);
+    //Assert(e == 4.5);
+    //
+    //float preDecResultG = --g;
+    //Assert(preDecResultG == 7.5);
+    //Assert(g == 7.5);
+    
+    // Float Post-Increment and Post-Decrement
+    float f = 6.5;
+    float h = 12.5;
+    
+    float postIncResultF = f++;
+    Assert(postIncResultF == 6.5);
+    Assert(f == 7.5);
+    //
+    //float postDecResultH = h--;
+    //Assert(postDecResultH == 12.5);
+    //Assert(h == 11.5);
+    //
+    //// Float Post-Increment and Post-Decrement with Globals
+    //float postIncResultGlobal1 = GlobalFloat1++;
+    //Assert(postIncResultGlobal1 == 3.5); 
+    //Assert(GlobalFloat1 == 4.5);
+    //
+    //float postDecResultGlobal2 = GlobalFloat2--;
+    //Assert(postDecResultGlobal2 == 8.5); 
+    //Assert(GlobalFloat2 == 7.5); 
+}
+
 public int main()
 {
-    float b = 2.5;
-    if(b) return 10;
-    return 10000;
+    TestFloatIncrementDecrement();
+
+    return 0;
 }

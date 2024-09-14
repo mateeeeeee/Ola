@@ -333,10 +333,10 @@ namespace ola
 						{
 						case CompareOp::FCmpOEQ: return x64::InstSetE;
 						case CompareOp::FCmpONE: return x64::InstSetNE;
-						case CompareOp::FCmpOGT: return x64::InstSetGT;
-						case CompareOp::FCmpOGE: return x64::InstSetGE;
-						case CompareOp::FCmpOLT: return x64::InstSetLT;
-						case CompareOp::FCmpOLE: return x64::InstSetLE;
+						case CompareOp::FCmpOGT: return x64::InstSetA;
+						case CompareOp::FCmpOGE: return x64::InstSetAE;
+						case CompareOp::FCmpOLT: return x64::InstSetB;
+						case CompareOp::FCmpOLE: return x64::InstSetBE;
 						}
 						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 						return InstUnknown;

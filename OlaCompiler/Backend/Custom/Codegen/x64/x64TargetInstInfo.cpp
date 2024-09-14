@@ -91,6 +91,10 @@ namespace ola
 		case x64::InstSetGE:
 		case x64::InstSetLT:
 		case x64::InstSetLE:
+		case x64::InstSetA:
+		case x64::InstSetAE:
+		case x64::InstSetB:
+		case x64::InstSetBE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagDef);
