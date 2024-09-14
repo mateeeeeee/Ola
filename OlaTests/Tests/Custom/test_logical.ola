@@ -41,44 +41,46 @@ void TestBinaryLogicalOperators()
 
 void TestBinaryLogicalOperatorsImplicitCasts()
 {
-    //// Integer and float tests
-    //int intValue = 42;
-    //float floatValue = 3.14;
-    //
-    //// Logical AND with implicit cast
-    //bool andResultIntFloat = intValue && floatValue;
-    //Assert(andResultIntFloat == true);
-    //
-    //// Logical OR with implicit cast
-    //bool orResultIntFloat = intValue || floatValue;
-    //Assert(orResultIntFloat == true);
-    //
-    //// Logical AND with two integers
-    //bool andResultIntInt = intValue && intValue;
-    //Assert(andResultIntInt == true);
-    //
-    //// Logical OR with two floats
-    //bool orResultFloatFloat = floatValue || floatValue;
-    //Assert(orResultFloatFloat == true);
+    // Integer and float tests
+    int intValue = 42;
+    float floatValue = 3.14;
+
+    // Logical AND with implicit cast
+    bool andResultIntFloat = intValue && floatValue;
+    Assert(andResultIntFloat == true);
+
+    // Logical OR with implicit cast
+    bool orResultIntFloat = intValue || floatValue;
+    Assert(orResultIntFloat == true);
+
+    // Logical AND with two integers
+    bool andResultIntInt = intValue && intValue;
+    Assert(andResultIntInt == true);
+
+    // Logical OR with two floats
+    bool orResultFloatFloat = floatValue || floatValue;
+    Assert(orResultFloatFloat == true);
 }
 
 void TestLogicalOperatorsImplicitCasts()
 {
-    //// Integer and float tests
-    //int intValue = 42;
-    //float floatValue = 3.14;
-    //
-    //// Logical NOT with implicit cast
-    //bool notResultInt = !intValue;
-    //Assert(notResultInt == false);
-    //
-    //// Logical AND with implicit cast
-    //bool andResultFloatInt = floatValue && intValue;
-    //Assert(andResultFloatInt == true);
-    //
-    //// Logical OR with implicit cast
-    //bool orResultIntFloat = intValue || floatValue;
-    //Assert(orResultIntFloat == true);
+    // Integer and float tests
+    int intValue = 42;
+    float floatValue = 3.14;
+
+    // Logical NOT with implicit cast
+    bool notResultInt = !intValue;
+    Assert(notResultInt == false);
+
+    // Logical AND with implicit cast
+    bool andResultFloatInt = floatValue && intValue;
+    Assert(andResultFloatInt == true);
+
+    // Logical OR with implicit cast
+    bool orResultIntFloat = intValue || floatValue;
+    Assert(orResultIntFloat == true);
+
+    // Add more tests as needed
 }
 
 public int main()

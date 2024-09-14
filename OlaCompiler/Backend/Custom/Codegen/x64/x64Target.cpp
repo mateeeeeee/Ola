@@ -384,11 +384,17 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
+				if (src.GetType() == MachineType::Float64 && MI.GetOpcode() == InstStore)
+				{
+					MI.SetOpcode(x64::InstStoreFP);
+				}
+				else if (dst.GetType() == MachineType::Float64 && MI.GetOpcode() == InstLoad)
+				{
+					MI.SetOpcode(x64::InstLoadFP);
+				}
+				else if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 				{
 					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64::InstMoveFP);
-					if (MI.GetOpcode() == InstStore) MI.SetOpcode(x64::InstStoreFP);
-					if (MI.GetOpcode() == InstLoad) MI.SetOpcode(x64::InstLoadFP);
 				}
 			}
 		}

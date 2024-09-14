@@ -1005,7 +1005,7 @@ namespace ola
 			}
 			else if (cast_operand_type == float_type)
 			{
-				value_map[&cast_expr] = builder->MakeInst<CompareInst>(Opcode::ICmpNE, cast_operand, context.GetFloat(0.0));
+				value_map[&cast_expr] = builder->MakeInst<CompareInst>(Opcode::FCmpONE, cast_operand, context.GetFloat(0.0));
 			}
 			//else if (IsRef(cast_operand_type))
 			//{

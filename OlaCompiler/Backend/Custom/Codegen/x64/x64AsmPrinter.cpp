@@ -17,6 +17,7 @@ namespace ola
 		{
 		case MachineType::Int8:  return "byte ptr";
 		case MachineType::Int64: 
+		case MachineType::Float64: 
 		case MachineType::Ptr:
 		case MachineType::Other: return "qword ptr";
 		}

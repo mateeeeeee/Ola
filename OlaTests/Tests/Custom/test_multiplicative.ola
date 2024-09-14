@@ -1,57 +1,148 @@
 import std.assert;
 
+// Global variables
+int GlobalIntX = 20;
+int GlobalIntY = 4;
+float GlobalFloatX = 7.5;
+float GlobalFloatY = 2.5;
+
 void TestMultiplication()
 {
+    // 1. Local variables
     int intA = 5;
     int intB = 3;
-    //float floatC = 2.5;
-    //float floatD = 1.2;
+    float floatC = 2.5;
+    float floatD = 1.2;
 
     int resultIntMul = intA * intB;
     Assert(resultIntMul == 15);
 
-    //float resultFloatMul = floatC * floatD;
-    //Assert(resultFloatMul == 3.0);
+    float resultFloatMul = floatC * floatD;
+    Assert(resultFloatMul == 3.0);
 
+    // 2. Local and global variables
+    int resultIntMulLocalGlobal = intA * GlobalIntY;
+    Assert(resultIntMulLocalGlobal == 20);
+
+    float resultFloatMulLocalGlobal = floatC * GlobalFloatY;
+    Assert(resultFloatMulLocalGlobal == 6.25);
+
+    // 3. Local variables and immediate values
+    int resultIntMulImmediate = intA * 2;
+    Assert(resultIntMulImmediate == 10);
+
+    float resultFloatMulImmediate = floatC * 2.0;
+    Assert(resultFloatMulImmediate == 5.0);
+
+    // 4. Global variables
+    int resultIntMulGlobal = GlobalIntX * GlobalIntY;
+    Assert(resultIntMulGlobal == 80);
+
+    float resultFloatMulGlobal = GlobalFloatX * GlobalFloatY;
+    Assert(resultFloatMulGlobal == 18.75);
+
+    // 5. Global variables and immediate values
+    int resultIntMulGlobalImmediate = GlobalIntX * 2;
+    Assert(resultIntMulGlobalImmediate == 40);
+
+    float resultFloatMulGlobalImmediate = GlobalFloatX * 2.0;
+    Assert(resultFloatMulGlobalImmediate == 15.0);
+
+    // 6. Immediate values
+    Assert(2 * 3 == 6);
+    Assert(2.0 * 3.0 == 6.0);
+
+    // Compound multiplication
     intA *= 2;
     Assert(intA == 10);
 
-    //floatC *= 1.5;
-    //Assert(floatC == 3.75);
+    floatC *= 1.5;
+    Assert(floatC == 3.75);
 }
 
 void TestDivision()
 {
-    // Integer and float tests
+    // 1. Local variables
     int intA = 15;
     int intB = 3;
-    //float floatC = 5.0;
-    //float floatD = 2.0;
+    float floatC = 5.0;
+    float floatD = 2.0;
 
     // Division
     int resultIntDiv = intA / intB;
     Assert(resultIntDiv == 5);
 
-    //float resultFloatDiv = floatC / floatD;
-    //Assert(resultFloatDiv == 2.5);
+    float resultFloatDiv = floatC / floatD;
+    Assert(resultFloatDiv == 2.5);
+
+    // 2. Local and global variables
+    int resultIntDivLocalGlobal = intA / GlobalIntY;
+    Assert(resultIntDivLocalGlobal == 3);
+
+    float resultFloatDivLocalGlobal = floatC / GlobalFloatY;
+    Assert(resultFloatDivLocalGlobal == 2.0);
+
+    // 3. Local variables and immediate values
+    int resultIntDivImmediate = intA / 3;
+    Assert(resultIntDivImmediate == 5);
+
+    float resultFloatDivImmediate = floatC / 2.0;
+    Assert(resultFloatDivImmediate == 2.5);
+
+    // 4. Global variables
+    int resultIntDivGlobal = GlobalIntX / GlobalIntY;
+    Assert(resultIntDivGlobal == 5);
+
+    float resultFloatDivGlobal = GlobalFloatX / GlobalFloatY;
+    Assert(resultFloatDivGlobal == 3.0);
+
+    // 5. Global variables and immediate values
+    int resultIntDivGlobalImmediate = GlobalIntX / 5;
+    Assert(resultIntDivGlobalImmediate == 4);
+
+    float resultFloatDivGlobalImmediate = GlobalFloatX / 2.5;
+    Assert(resultFloatDivGlobalImmediate == 3.0);
+
+    // 6. Immediate values
+    Assert(10 / 2 == 5);
+    Assert(10.0 / 2.0 == 5.0);
 
     // Compound division
     intA /= 2;
     Assert(intA == 7);
 
-    //floatC /= 2.0;
-    //Assert(floatC == 2.5);
+    floatC /= 2.0;
+    Assert(floatC == 2.5);
 }
 
 void TestModulo()
 {
-    // Integer tests
+    // 1. Local variables
     int intA = 17;
     int intB = 4;
 
     // Modulo
     int resultModulo = intA % intB;
     Assert(resultModulo == 1);
+
+    // 2. Local and global variables
+    int resultModuloLocalGlobal = intA % GlobalIntY;
+    Assert(resultModuloLocalGlobal == 1);
+
+    // 3. Local variables and immediate values
+    int resultModuloImmediate = intA % 3;
+    Assert(resultModuloImmediate == 2);
+
+    // 4. Global variables
+    int resultModuloGlobal = GlobalIntX % GlobalIntY;
+    Assert(resultModuloGlobal == 0);
+
+    // 5. Global variables and immediate values
+    int resultModuloGlobalImmediate = GlobalIntX % 3;
+    Assert(resultModuloGlobalImmediate == 2);
+
+    // 6. Immediate values
+    Assert(10 % 3 == 1);
 
     // Compound modulo
     intA %= 3;
