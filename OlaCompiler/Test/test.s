@@ -25,20 +25,20 @@ mov qword ptr [rbp - 8], 5
 mov qword ptr [rbp - 16], 2
 mov r15, qword ptr [rbp - 8]
 mov r14, qword ptr [rbp - 16]
+mov r13, r15
 mov rcx, r14
-mov r14, r15
-shl r14, cl
-mov qword ptr [rbp - 24], r14
-mov r14, qword ptr [rbp - 24]
-cmp r14, 20
-sete r14b
-and r14b, 1
-mov cl, r14b
+shl r13, cl
+mov qword ptr [rbp - 24], r13
+mov r13, qword ptr [rbp - 24]
+cmp r13, 20
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
-mov r14, qword ptr [rbp - 8]
-mov r15, qword ptr [rbp - 16]
-mov rcx, r15
-mov r15, r14
+mov r13, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r15, r13
+mov rcx, r14
 sar r15, cl
 mov qword ptr [rbp - 32], r15
 mov r15, qword ptr [rbp - 32]
@@ -49,20 +49,20 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr [rbp - 8]
 mov r14, qword ptr GlobalIntY[rip]
+mov r13, r15
 mov rcx, r14
-mov r14, r15
-shl r14, cl
-mov qword ptr [rbp - 40], r14
-mov r14, qword ptr [rbp - 40]
-cmp r14, 40
-sete r14b
-and r14b, 1
-mov cl, r14b
+shl r13, cl
+mov qword ptr [rbp - 40], r13
+mov r13, qword ptr [rbp - 40]
+cmp r13, 40
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
-mov r14, qword ptr [rbp - 8]
-mov r15, qword ptr GlobalIntY[rip]
-mov rcx, r15
-mov r15, r14
+mov r13, qword ptr [rbp - 8]
+mov r14, qword ptr GlobalIntY[rip]
+mov r15, r13
+mov rcx, r14
 sar r15, cl
 mov qword ptr [rbp - 48], r15
 mov r15, qword ptr [rbp - 48]
@@ -73,7 +73,7 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr [rbp - 8]
 mov r14, r15
-shl r14, r15
+shl r14, 1
 mov qword ptr [rbp - 56], r14
 mov r14, qword ptr [rbp - 56]
 cmp r14, 10
@@ -83,7 +83,7 @@ mov cl, r14b
 call Assert
 mov r14, qword ptr [rbp - 8]
 mov r15, r14
-sar r15, r14
+sar r15, 1
 mov qword ptr [rbp - 64], r15
 mov r15, qword ptr [rbp - 64]
 cmp r15, 2
@@ -93,20 +93,20 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr GlobalIntX[rip]
 mov r14, qword ptr GlobalIntY[rip]
+mov r13, r15
 mov rcx, r14
-mov r14, r15
-shl r14, cl
-mov qword ptr [rbp - 72], r14
-mov r14, qword ptr [rbp - 72]
-cmp r14, 64
-sete r14b
-and r14b, 1
-mov cl, r14b
+shl r13, cl
+mov qword ptr [rbp - 72], r13
+mov r13, qword ptr [rbp - 72]
+cmp r13, 64
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r15, qword ptr GlobalIntY[rip]
-mov rcx, r15
-mov r15, r14
+mov r13, qword ptr GlobalIntX[rip]
+mov r14, qword ptr GlobalIntY[rip]
+mov r15, r13
+mov rcx, r14
 sar r15, cl
 mov qword ptr [rbp - 80], r15
 mov r15, qword ptr [rbp - 80]
@@ -117,7 +117,7 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr GlobalIntX[rip]
 mov r14, r15
-shl r14, r15
+shl r14, 2
 mov qword ptr [rbp - 88], r14
 mov r14, qword ptr [rbp - 88]
 cmp r14, 32
@@ -127,7 +127,7 @@ mov cl, r14b
 call Assert
 mov r14, qword ptr GlobalIntX[rip]
 mov r15, r14
-sar r15, r14
+sar r15, 2
 mov qword ptr [rbp - 96], r15
 mov r15, qword ptr [rbp - 96]
 cmp r15, 2
@@ -154,20 +154,20 @@ mov qword ptr [rbp - 8], 5
 mov qword ptr [rbp - 16], 2
 mov r15, qword ptr [rbp - 8]
 mov r14, qword ptr [rbp - 16]
+mov r13, r15
 mov rcx, r14
-mov r14, r15
-shl r14, cl
-mov qword ptr [rbp - 8], r14
-mov r14, qword ptr [rbp - 8]
-cmp r14, 20
-sete r14b
-and r14b, 1
-mov cl, r14b
+shl r13, cl
+mov qword ptr [rbp - 8], r13
+mov r13, qword ptr [rbp - 8]
+cmp r13, 20
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
-mov r14, qword ptr [rbp - 8]
-mov r15, qword ptr [rbp - 16]
-mov rcx, r15
-mov r15, r14
+mov r13, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r15, r13
+mov rcx, r14
 sar r15, cl
 mov qword ptr [rbp - 8], r15
 mov r15, qword ptr [rbp - 8]
@@ -178,20 +178,20 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr GlobalIntX[rip]
 mov r14, qword ptr GlobalIntY[rip]
+mov r13, r15
 mov rcx, r14
-mov r14, r15
-shl r14, cl
-mov qword ptr GlobalIntX[rip], r14
-mov r14, qword ptr GlobalIntX[rip]
-cmp r14, 64
-sete r14b
-and r14b, 1
-mov cl, r14b
+shl r13, cl
+mov qword ptr GlobalIntX[rip], r13
+mov r13, qword ptr GlobalIntX[rip]
+cmp r13, 64
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r15, qword ptr GlobalIntY[rip]
-mov rcx, r15
-mov r15, r14
+mov r13, qword ptr GlobalIntX[rip]
+mov r14, qword ptr GlobalIntY[rip]
+mov r15, r13
+mov rcx, r14
 sar r15, cl
 mov qword ptr GlobalIntX[rip], r15
 mov r15, qword ptr GlobalIntX[rip]
@@ -202,7 +202,7 @@ mov cl, r15b
 call Assert
 mov r15, qword ptr GlobalIntY[rip]
 mov r14, r15
-shl r14, r15
+shl r14, 1
 mov qword ptr GlobalIntY[rip], r14
 mov r14, qword ptr GlobalIntY[rip]
 cmp r14, 6
@@ -212,7 +212,7 @@ mov cl, r14b
 call Assert
 mov r14, qword ptr GlobalIntY[rip]
 mov r15, r14
-sar r15, r14
+sar r15, 1
 mov qword ptr GlobalIntY[rip], r15
 mov r15, qword ptr GlobalIntY[rip]
 cmp r15, 3

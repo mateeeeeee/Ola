@@ -166,19 +166,22 @@ namespace ola
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
 				MachineOperand op2 = MI.GetOperand(2);
-				if (!op2.IsImmediate())
-				{
-					MachineInstruction cl_move(InstMove);
-					cl_move.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
-					cl_move.SetOp<1>(op2);
-					instructions.insert(instruction_iter, cl_move);
-					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineType::Int8));
-				}
+
+				MI.SetOp<1>(op2);
 				MI.SetIgnoreDef();
 				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 				instructions.insert(instruction_iter, MI2);
+
+				if (!op2.IsImmediate())
+				{
+					MachineInstruction MI3(InstMove);
+					MI3.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
+					MI3.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI3);
+					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineType::Int8));
+				}
 			}
 			break;
 			case InstNeg:
