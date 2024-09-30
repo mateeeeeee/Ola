@@ -137,11 +137,6 @@ namespace ola
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
 
-			if (name.compare("modifyArrayCopy") == 0)
-			{
-				int x = 5;
-			}
-
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
