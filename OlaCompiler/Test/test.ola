@@ -1,22 +1,7 @@
-import std.assert;
-
-int[2][2] Global2dArray = { {1,2}, {3,4}}; 
 
 public int main()
 {
-    int sum2d = 0;
-	int globalSum2d = 0;
-	int[2][2] int2d = { {1,2}, {3,4}}; 
-	for(int i = 0; i < 2; ++i)
-	{
-		for(int j = 0; j < 2; ++j)
-		{
-			sum2d += int2d[i][j];
-			globalSum2d += Global2dArray[i][j];
-		}
-	}
-	Assert(sum2d == 10);  
-	Assert(globalSum2d == 10);  
-
-    return 0;
+    int b = 5;
+    int a = 4 * b;
+    return a;
 }

@@ -28,5 +28,5 @@ namespace ola
 	private:
 		CFGResult info;
 	};
-	REGISTER_PASS(CFGAnalysisPass, "CFG Analysis", true);
+	OLA_REGISTER_PASS(CFGAnalysisPass, "CFG Analysis", true);
 }

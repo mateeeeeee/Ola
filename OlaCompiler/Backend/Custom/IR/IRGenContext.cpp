@@ -14,5 +14,17 @@ namespace ola
 		IRVisitor ir_visitor(context, module);
 		ir_visitor.VisitAST(ast);
 	}
+
+	void IRGenContext::Optimize(OptimizationLevel level)
+	{
+		IROptimizer optimizer(module);
+		optimizer.Optimize(level);
+	}
+
+	void IRGenContext::EmitIR(std::string_view filename)
+	{
+		module.EmitIR(filename);
+	}
+
 }
 

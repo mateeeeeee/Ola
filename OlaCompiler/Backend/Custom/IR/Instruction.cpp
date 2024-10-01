@@ -130,6 +130,16 @@ namespace ola
 		return BB->Instructions().Insert(IT, this);
 	}
 
+	void Instruction::RemoveFromParent()
+	{
+		basic_block->Instructions().Remove(this);
+	}
+
+	IListIterator<Instruction> Instruction::EraseFromParent()
+	{
+		return basic_block->Instructions().Erase(this);
+	}
+
 	bool Instruction::CanBeOperand() const
 	{
 		return true;

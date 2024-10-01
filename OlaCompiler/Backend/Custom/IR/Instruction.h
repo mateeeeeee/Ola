@@ -247,6 +247,9 @@ namespace ola
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 
+		void RemoveFromParent();
+		IListIterator<Instruction> EraseFromParent();
+
 		bool IsTerminator() const 
 		{
 			return IsOpcodeTerminator(opcode);

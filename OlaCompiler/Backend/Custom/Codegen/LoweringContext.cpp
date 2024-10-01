@@ -148,5 +148,4 @@ namespace ola
 		auto& minst_list = current_block->Instructions();
 		minst_list.emplace_back(MI);
 	}
-
 }

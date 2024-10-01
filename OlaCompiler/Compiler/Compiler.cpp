@@ -76,9 +76,10 @@ namespace ola
 			{
 				IRGenContext ir_gen(source_file);
 				ir_gen.Generate(ast);
-				IRModule& module = ir_gen.GetModule();
-				module.EmitIR(ir_file);
+				ir_gen.Optimize(opt_level);
+				ir_gen.EmitIR(ir_file);
 
+				IRModule& module = ir_gen.GetModule();
 				x64Target x64_target{};
 				MachineModule machine_module(module, x64_target);
 				machine_module.EmitAssembly(assembly_file.data());

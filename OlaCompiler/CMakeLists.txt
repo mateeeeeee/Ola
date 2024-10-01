@@ -79,6 +79,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRGenContext.cpp
   Backend/Custom/IR/IRModule.h
   Backend/Custom/IR/IRModule.cpp
+  Backend/Custom/IR/IROptimizer.h
+  Backend/Custom/IR/IROptimizer.cpp
   Backend/Custom/IR/IRPrinter.h
   Backend/Custom/IR/IRPrinter.cpp
   Backend/Custom/IR/IRType.h
@@ -100,6 +102,11 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRModulePass.h
   Backend/Custom/IR/CFGAnalysis.h
   Backend/Custom/IR/CFGAnalysis.cpp
+
+  Backend/Custom/IR/Passes/DCEPass.h
+  Backend/Custom/IR/Passes/DCEPass.cpp
+  Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.h
+  Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.cpp
 
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp

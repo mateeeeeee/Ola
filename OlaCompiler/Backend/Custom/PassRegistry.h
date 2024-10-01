@@ -63,6 +63,6 @@ namespace ola
 		}
 	};
 
-	#define REGISTER_PASS(type, name, analysis) \
+	#define OLA_REGISTER_PASS(type, name, analysis) \
 	static RegisterPass<type> OLA_CONCAT(_pass,__COUNTER__)(name, analysis)
 }

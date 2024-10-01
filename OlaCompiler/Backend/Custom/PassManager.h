@@ -39,7 +39,7 @@ namespace ola
 			bool changed = false;
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass)->RunOn(U);
+				static_cast<BasePassT&>(*pass).RunOn(U);
 			}
 			return changed;
 		}
@@ -48,15 +48,15 @@ namespace ola
 			bool changed = false;
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass)->Init(PU);
+				static_cast<BasePassT&>(*pass).Init(PU);
 			}
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass)->RunOn(U);
+				static_cast<BasePassT&>(*pass).RunOn(U);
 			}
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass)->Deinit(PU);
+				static_cast<BasePassT&>(*pass).Deinit(PU);
 			}
 			return changed;
 		}
