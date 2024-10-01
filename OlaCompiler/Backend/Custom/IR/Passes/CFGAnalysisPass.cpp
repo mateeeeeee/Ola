@@ -1,6 +1,6 @@
 #include <unordered_set>
-#include "CFGAnalysis.h"
-#include "GlobalValue.h"
+#include "CFGAnalysisPass.h"
+#include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
 {

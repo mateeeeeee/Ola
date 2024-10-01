@@ -64,8 +64,6 @@ namespace ola
 		void LowerSwitch(SwitchInst*);
 		void LowerSelect(SelectInst*);
 
-		void LowerCFGAnalysis(Function*);
-
 		void LegalizeInstructions(MachineFunction& MF);
 		void PostLegalizeInstructions(MachineFunction& MF);
 	};

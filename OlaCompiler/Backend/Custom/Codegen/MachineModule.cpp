@@ -8,7 +8,6 @@
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
-#include "Backend/Custom/IR/CFGAnalysis.h"
 
 namespace ola
 {
@@ -580,19 +579,6 @@ namespace ola
 			.SetOp<0>(result_reg)    
 			.SetOp<1>(true_op).SetIgnoreDef());
 		lowering_ctx.AddOperand(SI, result_reg);
-	}
-
-	void MachineModule::LowerCFGAnalysis(Function* F)
-	{
-		CFGAnalysisPass CFG{};
-		CFG.RunOn(*F);
-		CFGResult const& cfg_result = CFG.GetResult();
-		for (auto&& [BB, info] : cfg_result)
-		{
-			MachineBasicBlock* MBB = lowering_ctx.GetBlock(BB);
-			for (auto* P : info.predecessors) MBB->AddPredecessor(lowering_ctx.GetBlock(P));
-			for (auto* S : info.successors) MBB->AddSuccessor(lowering_ctx.GetBlock(S));
-		}
 	}
 
 	void MachineModule::LegalizeInstructions(MachineFunction& MF)

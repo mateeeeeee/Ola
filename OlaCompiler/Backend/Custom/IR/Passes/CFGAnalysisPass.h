@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "FunctionPass.h"
 #include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/FunctionPass.h"
 
 namespace ola
 {

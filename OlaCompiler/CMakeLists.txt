@@ -100,9 +100,9 @@ set(BACKEND_FILES
   Backend/Custom/IR/Constant.cpp
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
-  Backend/Custom/IR/CFGAnalysis.h
-  Backend/Custom/IR/CFGAnalysis.cpp
-
+  
+  Backend/Custom/IR/Passes/CFGAnalysisPass.h
+  Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DCEPass.h
   Backend/Custom/IR/Passes/DCEPass.cpp
   Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.h
