@@ -5,16 +5,17 @@ namespace ola
 {
 	class Instruction;
 
-	class DCEPass : public FunctionPass
+	class DeadCodeEliminationPass : public FunctionPass
 	{
 	public:
 		inline static char ID = 0;
 	public:
-		DCEPass() : FunctionPass(ID) {}
+		DeadCodeEliminationPass() : FunctionPass(ID) {}
 
 		virtual bool RunOn(Function& F) override;
 
 	private:
 		static bool IsInstructionDead(Instruction const* I);
 	};
+	using DCEPass = DeadCodeEliminationPass;
 }

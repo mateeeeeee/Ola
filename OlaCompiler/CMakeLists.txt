@@ -103,8 +103,8 @@ set(BACKEND_FILES
   
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
-  Backend/Custom/IR/Passes/DCEPass.h
-  Backend/Custom/IR/Passes/DCEPass.cpp
+  Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
+  Backend/Custom/IR/Passes/DeadCodeEliminationPass.cpp
   Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.h
   Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.cpp
 

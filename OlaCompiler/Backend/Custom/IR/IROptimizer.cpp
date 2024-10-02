@@ -2,6 +2,7 @@
 #include "IRModule.h"
 #include "GlobalValue.h"
 #include "Passes/ArithmeticStrengthReductionPass.h"
+#include "Passes/DeadCodeEliminationPass.h"
 
 namespace ola
 {
@@ -21,6 +22,7 @@ namespace ola
 			[[fallthrough]];
 		case OptimizationLevel::O1:
 			FPM.AddPass(new ArithmeticStrengthReductionPass());
+			FPM.AddPass(new DeadCodeEliminationPass());
 		}
 
 		for (auto& G : M.Globals())
