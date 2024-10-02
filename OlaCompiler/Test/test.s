@@ -11,8 +11,8 @@ mov rbp, rsp
 sub rsp, 24
 mov qword ptr [rbp - 16], 5
 mov r15, qword ptr [rbp - 16]
-mov r14, 4
-imul r14, r15
+mov r14, r15
+sar r14, 2
 mov qword ptr [rbp - 24], r14
 mov r14, qword ptr [rbp - 24]
 mov qword ptr [rbp - 8], r14

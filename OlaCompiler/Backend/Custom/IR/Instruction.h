@@ -175,6 +175,7 @@ namespace ola
 			return rhs;
 		}
 
+		void SetValue(Value* V) { value = V; }
 		Value* GetValue() const { return value; }
 		Instruction* GetUser() const { return user; }
 
@@ -338,6 +339,7 @@ namespace ola
 		Instruction(Opcode opcode, IRType* type, std::vector<Value*> const& ops = {}) : TrackableValue(ValueKind::Instruction, type),
 			opcode(opcode), basic_block(nullptr)
 		{
+			operands.reserve(8);
 			for (Value* op : ops)
 			{
 				operands.emplace_back(op, this);

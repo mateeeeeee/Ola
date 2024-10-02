@@ -32,11 +32,26 @@ namespace ola
 		if (left_op && IsPowerOfTwo(left_op->GetValue()))
 		{
 			int64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->RHS(), ctx.GetInt64(logOfPowerOf2));
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->RHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 		else if (right_op && IsPowerOfTwo(right_op->GetValue()))
+		{
+			int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
+			BI->ReplaceAllUseWith(new_inst);
+			instructions_to_remove.push_back(BI);
+		}
+	}
+	static void TryReducingDiv(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
+	{
+		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->RHS());
+
+		IRContext& ctx = BI->GetContext();
+		IRBuilder builder(ctx);
+		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
+		if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
 			int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
@@ -59,6 +74,10 @@ namespace ola
 					if (BI->GetOpcode() == Opcode::SMul)
 					{
 						TryReducingMul(BI, instructions_to_remove);
+					}
+					else if (BI->GetOpcode() == Opcode::SDiv)
+					{
+						TryReducingDiv(BI, instructions_to_remove);
 					}
 				}
 			}

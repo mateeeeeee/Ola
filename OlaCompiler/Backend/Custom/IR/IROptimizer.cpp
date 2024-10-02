@@ -13,7 +13,15 @@ namespace ola
 	void IROptimizer::Optimize(OptimizationLevel level)
 	{
 		FunctionPassManager FPM;
-		//FPM.AddPass(new ArithmeticStrengthReductionPass());
+		switch (level)
+		{
+		case OptimizationLevel::O3:
+			[[fallthrough]];
+		case OptimizationLevel::O2:
+			[[fallthrough]];
+		case OptimizationLevel::O1:
+			FPM.AddPass(new ArithmeticStrengthReductionPass());
+		}
 
 		for (auto& G : M.Globals())
 		{

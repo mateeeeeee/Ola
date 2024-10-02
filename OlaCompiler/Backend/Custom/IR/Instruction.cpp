@@ -93,16 +93,7 @@ namespace ola
 		{
 			trackable_value->RemoveUse(this);
 		}
-
-		for (Use& op : user->Operands())
-		{
-			if (op.GetValue() == value)
-			{
-				op.Set(V);
-			}
-		}
 		value = V;
-
 		if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
 		{
 			trackable_value->AddUse(this);
