@@ -140,6 +140,14 @@ namespace ola
 	}
 
 
+	ConstantInt* IRContext::GetInt(IRType* type, int64 value)
+	{
+		OLA_ASSERT(type->IsInteger());
+		IRIntType* int_type = cast<IRIntType>(type);
+		if (int_type->GetWidth() == 8) return GetInt64(value);
+		else return GetInt8(value);
+	}
+
 	ConstantFloat* IRContext::GetFloat(double value)
 	{
 		if (constant_floats.contains(value)) return constant_floats[value];

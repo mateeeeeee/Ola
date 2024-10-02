@@ -42,6 +42,7 @@ namespace ola
 		ConstantString* GetString(std::string_view str);
 		ConstantInt* GetInt64(int64 value);
 		ConstantInt* GetInt8(int8 value);
+		ConstantInt* GetInt(IRType* type, int64 value);
 		ConstantInt* GetTrueValue()  const { return true_value; }
 		ConstantInt* GetFalseValue() const { return false_value; }
 		ConstantFloat* GetZeroFloat() const { return zero_float; }

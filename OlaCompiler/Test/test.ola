@@ -2,6 +2,6 @@
 public int main()
 {
     int b = 5;
-    int a = 4 * b;
+    int a = b * 4;
     return a;
 }

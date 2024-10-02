@@ -1,23 +1,26 @@
 #include "ConstantFold.h"
 #include "Constant.h"
+#include "IRContext.h"
 
 namespace ola
 {
 
 	Value* TryConstantFold_BinaryInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
+		IRContext& ctx = lhs->GetContext();
+
 		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);
 		ConstantInt* CI2 = dyn_cast<ConstantInt>(rhs);
 		if (CI1 && CI2)
 		{
 			switch (opcode)
 			{
-			case Opcode::Add:  return new ConstantInt(lhs->GetType(), CI1->GetValue() + CI2->GetValue());
-			case Opcode::Sub:  return new ConstantInt(lhs->GetType(), CI1->GetValue() - CI2->GetValue());
-			case Opcode::SMul: return new ConstantInt(lhs->GetType(), CI1->GetValue() * CI2->GetValue());
-			case Opcode::SDiv: return new ConstantInt(lhs->GetType(), CI1->GetValue() / CI2->GetValue());
-			case Opcode::Shl:  return new ConstantInt(lhs->GetType(), CI1->GetValue() << CI2->GetValue());
-			case Opcode::AShr: return new ConstantInt(lhs->GetType(), CI1->GetValue() >> CI2->GetValue());
+			case Opcode::Add:  return ctx.GetInt(lhs->GetType(), CI1->GetValue() + CI2->GetValue());
+			case Opcode::Sub:  return ctx.GetInt(lhs->GetType(), CI1->GetValue() - CI2->GetValue());
+			case Opcode::SMul: return ctx.GetInt(lhs->GetType(), CI1->GetValue() * CI2->GetValue());
+			case Opcode::SDiv: return ctx.GetInt(lhs->GetType(), CI1->GetValue() / CI2->GetValue());
+			case Opcode::Shl:  return ctx.GetInt(lhs->GetType(), CI1->GetValue() << CI2->GetValue());
+			case Opcode::AShr: return ctx.GetInt(lhs->GetType(), CI1->GetValue() >> CI2->GetValue());
 			}
 		}
 
@@ -25,12 +28,13 @@ namespace ola
 		ConstantFloat* CF2 = dyn_cast<ConstantFloat>(rhs);
 		if (CF1 && CF2)
 		{
+			OLA_ASSERT(lhs->GetType()->IsFloat());
 			switch (opcode)
 			{
-			case Opcode::FAdd:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() + CF2->GetValue());
-			case Opcode::FSub:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() - CF2->GetValue());
-			case Opcode::FMul:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() * CF2->GetValue());
-			case Opcode::FDiv:  return new ConstantFloat(lhs->GetType(), CF1->GetValue() / CF2->GetValue());
+			case Opcode::FAdd:  return ctx.GetFloat(CF1->GetValue() + CF2->GetValue());
+			case Opcode::FSub:  return ctx.GetFloat(CF1->GetValue() - CF2->GetValue());
+			case Opcode::FMul:  return ctx.GetFloat(CF1->GetValue() * CF2->GetValue());
+			case Opcode::FDiv:  return ctx.GetFloat(CF1->GetValue() / CF2->GetValue());
 			}
 		}
 		return nullptr;
@@ -38,13 +42,14 @@ namespace ola
 
 	Value* TryConstantFold_UnaryInst(Opcode opcode, Value* operand)
 	{
+		IRContext& ctx = operand->GetContext();
 		ConstantInt* C = dyn_cast<ConstantInt>(operand);
 		if (C)
 		{
 			switch (opcode)
 			{
-			case Opcode::Neg:  return new ConstantInt(operand->GetType(), -C->GetValue());
-			case Opcode::Not:  return new ConstantInt(operand->GetType(), ~C->GetValue());
+			case Opcode::Neg:  return ctx.GetInt(operand->GetType(), -C->GetValue());
+			case Opcode::Not:  return ctx.GetInt(operand->GetType(), ~C->GetValue());
 			}
 		}
 		return nullptr;
@@ -52,7 +57,9 @@ namespace ola
 
 	Value* TryConstantFold_CompareInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
-		IRType* bool_type = IRIntType::Get(lhs->GetContext(), 1);
+		IRContext& ctx = lhs->GetContext();
+
+		IRType* bool_type = IRIntType::Get(ctx, 1);
 
 		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);
 		ConstantInt* CI2 = dyn_cast<ConstantInt>(rhs);
@@ -60,12 +67,12 @@ namespace ola
 		{
 			switch (opcode)
 			{
-			case Opcode::ICmpEQ:  return new ConstantInt(bool_type, CI1->GetValue() == CI2->GetValue());
-			case Opcode::ICmpNE:  return new ConstantInt(bool_type, CI1->GetValue() != CI2->GetValue());
-			case Opcode::ICmpSGE: return new ConstantInt(bool_type, CI1->GetValue() >= CI2->GetValue());
-			case Opcode::ICmpSGT: return new ConstantInt(bool_type, CI1->GetValue() > CI2->GetValue());
-			case Opcode::ICmpSLE: return new ConstantInt(bool_type, CI1->GetValue() <= CI2->GetValue());
-			case Opcode::ICmpSLT: return new ConstantInt(bool_type, CI1->GetValue() < CI2->GetValue());
+			case Opcode::ICmpEQ:  return ctx.GetInt(bool_type, CI1->GetValue() == CI2->GetValue());
+			case Opcode::ICmpNE:  return ctx.GetInt(bool_type, CI1->GetValue() != CI2->GetValue());
+			case Opcode::ICmpSGE: return ctx.GetInt(bool_type, CI1->GetValue() >= CI2->GetValue());
+			case Opcode::ICmpSGT: return ctx.GetInt(bool_type, CI1->GetValue() > CI2->GetValue());
+			case Opcode::ICmpSLE: return ctx.GetInt(bool_type, CI1->GetValue() <= CI2->GetValue());
+			case Opcode::ICmpSLT: return ctx.GetInt(bool_type, CI1->GetValue() < CI2->GetValue());
 			}
 		}
 
@@ -75,12 +82,12 @@ namespace ola
 		{
 			switch (opcode)
 			{
-			case Opcode::FCmpOEQ: return new ConstantInt(bool_type, CF1->GetValue() == CF2->GetValue());
-			case Opcode::FCmpONE: return new ConstantInt(bool_type, CF1->GetValue() != CF2->GetValue());
-			case Opcode::FCmpOGE: return new ConstantInt(bool_type, CF1->GetValue() >= CF2->GetValue());
-			case Opcode::FCmpOGT: return new ConstantInt(bool_type, CF1->GetValue() > CF2->GetValue());
-			case Opcode::FCmpOLE: return new ConstantInt(bool_type, CF1->GetValue() <= CF2->GetValue());
-			case Opcode::FCmpOLT: return new ConstantInt(bool_type, CF1->GetValue() < CF2->GetValue());
+			case Opcode::FCmpOEQ: return ctx.GetInt(bool_type, CF1->GetValue() == CF2->GetValue());
+			case Opcode::FCmpONE: return ctx.GetInt(bool_type, CF1->GetValue() != CF2->GetValue());
+			case Opcode::FCmpOGE: return ctx.GetInt(bool_type, CF1->GetValue() >= CF2->GetValue());
+			case Opcode::FCmpOGT: return ctx.GetInt(bool_type, CF1->GetValue() > CF2->GetValue());
+			case Opcode::FCmpOLE: return ctx.GetInt(bool_type, CF1->GetValue() <= CF2->GetValue());
+			case Opcode::FCmpOLT: return ctx.GetInt(bool_type, CF1->GetValue() < CF2->GetValue());
 			}
 		}
 
@@ -90,6 +97,7 @@ namespace ola
 	Value* TryConstantFold_GetElementPtrInst(Value* base, std::span<Value*> indices)
 	{
 		if (!base) return nullptr;
+		IRContext& ctx = base->GetContext();
 
 		std::vector<ConstantInt*> constant_indices;
 		for (Value* idx : indices)
@@ -120,6 +128,6 @@ namespace ola
 			offset += index_value * current_type->GetSize();
 		}
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
-		return new PtrAddInst(base, new ConstantInt(int_type, offset), current_type);
+		return new PtrAddInst(base, ctx.GetInt(int_type, offset), current_type);
 	}
 }
