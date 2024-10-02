@@ -6,57 +6,50 @@ namespace ola
 {
 	bool DeadCodeEliminationPass::RunOn(Function& F)
 	{
-		bool changed = false;
-
-		std::set<Instruction*> Alive;
-		std::vector<Instruction*> Worklist;
-		// Collect the set of "root" instructions that are known live.
+		std::set<Instruction*> alive;
+		std::vector<Instruction*> worklist;
 		for (BasicBlock& BB : F)
 		{
 			for (Instruction& I : BB.Instructions())
 			{
 				if (I.IsTerminator() || isa<StoreInst>(&I))
 				{
-					Alive.insert(&I);
-					Worklist.push_back(&I);
+					alive.insert(&I);
+					worklist.push_back(&I);
 				}
 			}
 		}
-		// Propagate liveness backwards to operands
-		while (!Worklist.empty())
+		while (!worklist.empty())
 		{
-			Instruction* Curr = Worklist.back();
-			Worklist.pop_back();
-			for (Use& U : Curr->Operands())
+			Instruction* curr = worklist.back();
+			worklist.pop_back();
+			for (Use& U : curr->Operands())
 			{
 				if (Instruction* I = dyn_cast<Instruction>(U.GetValue()))
 				{
-					if (Alive.insert(I).second) Worklist.push_back(I);
+					if (alive.insert(I).second) worklist.push_back(I);
 				}
 			}
 		}
-		//the instructions which are not in live set are
-		//considered dead in this pass.The instructions which do not
-		//effect the control flow, return value and do not have any
-		//side effects are hence deleted.
+
 		for (BasicBlock& BB : F)
 		{
 			for (Instruction& I : BB.Instructions())
 			{
-				if (!Alive.contains(&I))
+				if (!alive.contains(&I))
 				{
-					Worklist.push_back(&I);
+					worklist.push_back(&I);
 					I.ReplaceAllUseWith(nullptr);
 				}
 			}
 		}
 
-		for (Instruction*& I : Worklist) 
+		for (Instruction*& I : worklist) 
 		{
 			I->EraseFromParent();
 		}
 
-		return !Worklist.empty();
+		return !worklist.empty();
 	}
 
 	bool DeadCodeEliminationPass::IsInstructionDead(Instruction const* I)
