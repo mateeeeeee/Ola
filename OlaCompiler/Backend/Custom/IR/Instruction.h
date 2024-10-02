@@ -193,9 +193,6 @@ namespace ola
 	class TrackableValue : public Value
 	{
 	public:
-		bool ReplaceWith(Value* value);
-		bool ReplaceWithInBlock(BasicBlock* block, Value* value);
-
 		void AddUse(Use* u)
 		{
 			users.insert(u);
@@ -204,10 +201,7 @@ namespace ola
 		{
 			users.erase(u);
 		}
-		void ReplaceAllUseWith(Value* V)
-		{
-			for (auto& use : users) use->Set(V);
-		}
+		void ReplaceAllUseWith(Value* V);
 
 		bool IsUsed() const
 		{

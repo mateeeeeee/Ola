@@ -93,21 +93,20 @@ namespace ola
 		{
 			trackable_value->RemoveUse(this);
 		}
+
+		for (Use& op : user->Operands())
+		{
+			if (op.GetValue() == value)
+			{
+				op.Set(V);
+			}
+		}
 		value = V;
+
 		if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
 		{
 			trackable_value->AddUse(this);
 		}
-	}
-
-	bool TrackableValue::ReplaceWith(Value* value)
-	{
-		return false;
-	}
-
-	bool TrackableValue::ReplaceWithInBlock(BasicBlock* block, Value* value)
-	{
-		return false;
 	}
 
 	char const* Instruction::GetOpcodeName() const
@@ -266,6 +265,15 @@ namespace ola
 	{
 		OLA_ASSERT(base->GetType()->IsPointer());
 		OLA_ASSERT(isa<ConstantInt>(offset));
+	}
+
+	void TrackableValue::ReplaceAllUseWith(Value* V)
+	{
+		while (!users.empty())
+		{
+			Use* const& U = *users.begin();
+			U->Set(V);
+		}
 	}
 
 }
