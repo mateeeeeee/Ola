@@ -23,7 +23,7 @@ namespace ola
 
 	private:
 		CompilerFlags compiler_flags = CompilerFlag_None;
-		OptimizationLevel opt_level = OptimizationLevel::O0;
+		OptimizationLevel opt_level = OptimizationLevel::O1;
 		CompilerOutput output_type = CompilerOutput::Exe;
 		std::string input_directory;
 		std::vector<std::string> source_files;

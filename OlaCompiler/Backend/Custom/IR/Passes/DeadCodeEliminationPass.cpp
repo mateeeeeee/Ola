@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	bool DeadCodeEliminationPass::RunOn(Function& F)
+	bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		std::set<Instruction*> alive;
 		std::vector<Instruction*> worklist;

@@ -1,9 +1,13 @@
 #pragma once
 #include "Backend/Custom/PassManager.h"
+#include "Backend/Custom/AnalysisManager.h"
 
 namespace ola
 {
 	class Function;
+	using FunctionPassManager = PassManager<Function>;
+	using FunctionAnalysisManager = AnalysisManager<Function>;
+
 	class FunctionPass : public Pass
 	{
 	public:
@@ -11,7 +15,7 @@ namespace ola
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}
-		virtual bool RunOn(Function& F) = 0;
+		virtual bool RunOn(Function&, FunctionAnalysisManager&) = 0;
 	};
 
 	class IRModule;
@@ -21,5 +25,4 @@ namespace ola
 		using BasePassT = FunctionPass;
 		using ParentUnitT = IRModule;
 	};
-	using FunctionPassManager = PassManager<Function>;
 }

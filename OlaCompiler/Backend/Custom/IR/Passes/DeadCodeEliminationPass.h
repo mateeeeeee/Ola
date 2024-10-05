@@ -12,7 +12,7 @@ namespace ola
 	public:
 		DeadCodeEliminationPass() : FunctionPass(ID) {}
 
-		virtual bool RunOn(Function& F) override;
+		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 	private:
 		static bool IsInstructionDead(Instruction const* I);

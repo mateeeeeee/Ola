@@ -11,6 +11,9 @@ namespace ola
 	struct UnitTraits;
 
 	template<typename UnitT>
+	class AnalysisManager;
+
+	template<typename UnitT>
 	class PassManager 
 	{
 		using BasePassT = typename UnitTraits<UnitT>::BasePassT;
@@ -33,16 +36,16 @@ namespace ola
 			passes.emplace_back(new PassT(std::forward<Args>(args)...));
 		}
 
-		bool Run(UnitT& U)
+		bool Run(UnitT& U, AnalysisManager<UnitT>& AM)
 		{
 			bool changed = false;
 			for (auto& pass : passes)
 			{
-				changed |= pass->RunOn(U);
+				changed |= pass->RunOn(U, AM);
 			}
 			return changed;
 		}
-		bool Run(UnitT& U, ParentUnitT& PU)
+		bool Run(UnitT& U, ParentUnitT& PU, AnalysisManager<UnitT>& AM)
 		{
 			bool changed = false;
 			for (auto& pass : passes)
@@ -51,13 +54,18 @@ namespace ola
 			}
 			for (auto& pass : passes)
 			{
-				changed |= pass->RunOn(U);
+				changed |= pass->RunOn(U, AM);
 			}
 			for (auto& pass : passes)
 			{
 				pass->Deinit(PU);
 			}
 			return changed;
+		}
+
+		bool IsEmpty() const
+		{
+			return passes.empty();
 		}
 
 	private:

@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	bool CFGAnalysisPass::RunOn(Function& F)
+	bool CFGAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		for (auto& block : F.Blocks()) 
 		{

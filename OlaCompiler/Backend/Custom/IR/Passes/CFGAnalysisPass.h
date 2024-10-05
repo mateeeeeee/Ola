@@ -22,7 +22,7 @@ namespace ola
 	public:
 		CFGAnalysisPass() : FunctionPass(id) {}
 
-		virtual bool RunOn(Function& F) override;
+		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 		Result const& GetResult() const { return info; }
 		static void const* ID() { return &id; }

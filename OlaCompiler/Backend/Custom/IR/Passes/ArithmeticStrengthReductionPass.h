@@ -14,7 +14,7 @@ namespace ola
 	public:
 		ArithmeticStrengthReductionPass() : FunctionPass(ID) {}
 
-		virtual bool RunOn(Function& F) override;
+		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 	};
 	OLA_REGISTER_PASS(ArithmeticStrengthReductionPass, "ASR Pass");
 }

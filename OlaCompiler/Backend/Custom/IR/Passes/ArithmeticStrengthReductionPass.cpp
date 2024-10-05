@@ -60,7 +60,7 @@ namespace ola
 		}
 	}
 
-	bool ArithmeticStrengthReductionPass::RunOn(Function& F)
+	bool ArithmeticStrengthReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		bool changed = false;
 		std::vector<Instruction*> instructions_to_remove;

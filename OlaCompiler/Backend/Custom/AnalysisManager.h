@@ -36,9 +36,9 @@ namespace ola
 		void RegisterPass(UnitT& U, Args&&... args)
 		{
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
-			if (!analysis_info.analysis_passes.contains(Pass::ID()))
+			if (!analysis_info.analysis_passes.contains(PassT::ID()))
 			{
-				analysis_info.analysis_passes[Pass::ID()] = std::make_unique<PassT>(std::forward<Args>(args)...);
+				analysis_info.analysis_passes[PassT::ID()] = std::make_unique<PassT>(std::forward<Args>(args)...);
 			}
 		}
 
@@ -52,19 +52,30 @@ namespace ola
 				OLA_ASSERT_MSG(false, "Pass was not registered! Did you forget to call RegisterPass?");
 				return ResultT{};
 			}
-			if (!analysis_info.analysis_results.contains(Pass::ID()))
+			if (!analysis_info.analysis_results.contains(PassT::ID()))
 			{
 				BasePassT* pass = analysis_info.analysis_passes[PassT::ID()];
 				pass->RunOn(U);
-				analysis_info.analysis_results[Pass::ID()] = static_cast<PassT*>(pass)->GetResult();
+				analysis_info.analysis_results[PassT::ID()] = static_cast<PassT*>(pass)->GetResult();
 			}
-			return *static_cast<ResultT const*>(analysis_info.analysis_results[Pass::ID()]);
+			return *static_cast<ResultT const*>(analysis_info.analysis_results[PassT::ID()]);
+		}
+
+		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
+		void InvalidateCache(UnitT& U) const
+		{
+			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
+			analysis_info.analysis_results.erase(PassT::ID());
+		}
+
+		void InvalidateCache(UnitT& U) const
+		{
+			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
+			analysis_info.analysis_results.clear();
 		}
 
 	private:
 		std::unordered_map<UnitT*, UnitAnalysisInfo> unit_analysis_info_map;
-
-	private:
 	};
 
 }
