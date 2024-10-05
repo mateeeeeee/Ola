@@ -9,6 +9,7 @@ namespace ola
 	Value* TryConstantFold_UnaryInst(Opcode opcode, Value* val);
 	Value* TryConstantFold_CompareInst(Opcode opcode, Value* lhs, Value* rhs);
 	Value* TryConstantFold_GetElementPtrInst(Value* base, std::span<Value*> indices);
+	Value* TryConstantFold_SelectInst(Value* predicate, Value* lhs, Value* rhs);
 
 	template <typename InstructionT, typename... Args> requires std::is_constructible_v<InstructionT, Args...>
 	constexpr Value* TryConstantFold(Args&&... args)
@@ -28,6 +29,10 @@ namespace ola
 		else if constexpr (std::is_same_v<InstructionT, GetElementPtrInst>)
 		{
 			return TryConstantFold_GetElementPtrInst(std::forward<Args>(args)...);
+		}
+		else if constexpr (std::is_same_v<InstructionT, SelectInst>)
+		{
+			return TryConstantFold_SelectInst(std::forward<Args>(args)...);
 		}
 		return nullptr;
 	}

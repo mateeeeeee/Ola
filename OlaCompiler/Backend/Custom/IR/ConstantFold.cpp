@@ -130,4 +130,17 @@ namespace ola
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
 		return new PtrAddInst(base, ctx.GetInt(int_type, offset), current_type);
 	}
+
+	Value* TryConstantFold_SelectInst(Value* predicate, Value* lhs, Value* rhs)
+	{
+		if (!predicate) return nullptr;
+		IRContext& ctx = predicate->GetContext();
+		ConstantInt* CI = dyn_cast<ConstantInt>(predicate);
+		if (CI)
+		{
+			return CI->GetValue() != 0 ? lhs : rhs;
+		}
+		return nullptr;
+	}
+
 }

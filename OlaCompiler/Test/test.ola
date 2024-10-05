@@ -1,7 +1,6 @@
 
 public int main()
 {
-    int b = 5;
-    int a = b / 4;
-    return a;
+    int c = false ? 5 : 2;
+    return c;
 }
