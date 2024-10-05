@@ -8,9 +8,4 @@ namespace ola
 	{
 		return g_PassRegistry.GetInfo(ID)->GetName();
 	}
-
-	bool Pass::IsAnalysis() const
-	{
-		return g_PassRegistry.GetInfo(ID)->IsAnalysis();
-	}
 }

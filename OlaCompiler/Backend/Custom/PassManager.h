@@ -1,6 +1,8 @@
 #pragma once
 #include <concepts>
-#include "PassManagerBase.h"
+#include <vector>
+#include <memory>
+#include "PassRegistry.h"
 #include "Pass.h"
 
 namespace ola
@@ -9,7 +11,7 @@ namespace ola
 	struct UnitTraits;
 
 	template<typename UnitT>
-	class PassManager : public PassManagerBase
+	class PassManager 
 	{
 		using BasePassT = typename UnitTraits<UnitT>::BasePassT;
 		using ParentUnitT = typename UnitTraits<UnitT>::ParentUnitT;
@@ -20,18 +22,15 @@ namespace ola
 		void AddPass(PassT&& pass)
 		{
 			passes.emplace_back(new PassT(std::forward<PassT>(pass)));
-			passes.back()->SetPassManager(this);
 		}
 		void AddPass(BasePassT* pass)
 		{
 			passes.emplace_back(pass);
-			passes.back()->SetPassManager(this);
 		}
 		template<typename PassT, typename... Args> requires std::is_base_of_v<BasePassT, PassT>
 		void AddPass(Args&&... args)
 		{
 			passes.emplace_back(new PassT(std::forward<Args>(args)...));
-			passes.back()->SetPassManager(this);
 		}
 
 		bool Run(UnitT& U)
@@ -39,7 +38,7 @@ namespace ola
 			bool changed = false;
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass).RunOn(U);
+				changed |= pass->RunOn(U);
 			}
 			return changed;
 		}
@@ -48,18 +47,21 @@ namespace ola
 			bool changed = false;
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass).Init(PU);
+				pass->Init(PU);
 			}
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass).RunOn(U);
+				changed |= pass->RunOn(U);
 			}
 			for (auto& pass : passes)
 			{
-				static_cast<BasePassT&>(*pass).Deinit(PU);
+				pass->Deinit(PU);
 			}
 			return changed;
 		}
+
+	private:
+		std::vector<std::unique_ptr<BasePassT>> passes;
 	};
 
 

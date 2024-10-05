@@ -57,12 +57,25 @@ namespace ola
 	class RegisterPass : public PassInfo
 	{
 	public:
-		RegisterPass(std::string_view name, bool analysis) : PassInfo(name, &PassT::ID, analysis)
+		explicit RegisterPass(std::string_view name) : PassInfo(name, &PassT::ID, false)
 		{
 			g_PassRegistry.RegisterPass(*this);
 		}
 	};
 
-	#define OLA_REGISTER_PASS(type, name, analysis) \
-	static RegisterPass<type> OLA_CONCAT(_pass,__COUNTER__)(name, analysis)
+	template<typename PassT>
+	class RegisterAnalysisPass : public PassInfo
+	{
+	public:
+		explicit RegisterAnalysisPass(std::string_view name) : PassInfo(name, &PassT::ID, true)
+		{
+			g_PassRegistry.RegisterPass(*this);
+		}
+	};
+
+	#define OLA_REGISTER_PASS(type, name) \
+	static RegisterPass<type> OLA_CONCAT(_pass,__COUNTER__)(name)
+
+	#define OLA_REGISTER_ANALYSIS_PASS(type, name) \
+	static RegisterAnalysisPass<type> OLA_CONCAT(_analysis_pass,__COUNTER__)(name)
 }

@@ -146,10 +146,10 @@ set(BACKEND_FILES
 
   Backend/Custom/Pass.h
   Backend/Custom/Pass.cpp
-  Backend/Custom/PassManagerBase.h
-  Backend/Custom/PassManagerBase.cpp
   Backend/Custom/PassManager.h
   Backend/Custom/PassRegistry.h
+  Backend/Custom/AnalysisManager.h
+
 )
 
 set(COMPILER_FILES

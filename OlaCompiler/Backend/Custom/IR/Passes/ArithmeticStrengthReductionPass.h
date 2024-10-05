@@ -16,5 +16,5 @@ namespace ola
 
 		virtual bool RunOn(Function& F) override;
 	};
-	OLA_REGISTER_PASS(ArithmeticStrengthReductionPass, "ASR Pass", false);
+	OLA_REGISTER_PASS(ArithmeticStrengthReductionPass, "ASR Pass");
 }

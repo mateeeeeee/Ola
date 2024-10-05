@@ -2,7 +2,6 @@
 #include <concepts>
 #include <string>
 #include <string_view>
-#include "PassManagerBase.h"
 
 namespace ola
 {
@@ -20,31 +19,16 @@ namespace ola
 	class Pass
 	{
 	public:
-		Pass(char pass_id, PassKind kind) : ID(&pass_id), kind(kind), PM(nullptr) {}
+		Pass(char pass_id, PassKind kind) : ID(&pass_id), kind(kind) {}
 		virtual ~Pass() = default;
-
-		void SetPassManager(PassManagerBase* PM)
-		{
-			this->PM = PM;
-		}
 
 		PassID GetPassID() const { return ID; }
 		PassKind GetPassKind() const { return kind; }
 		std::string_view GetPassName() const;
-		bool IsAnalysis() const;
-
-		template<typename PassT> requires std::is_base_of_v<Pass, PassT>
-		PassT& GetAnalysis()
-		{
-			PassT& pass = PM->GetPass<PassT>();
-			OLA_ASSERT(static_cast<Pass&>(pass).IsAnalysis());
-			return pass;
-		}
 
 	private:
 		PassID ID;
 		PassKind kind; 
-		PassManagerBase* PM;
 	};
 
 }

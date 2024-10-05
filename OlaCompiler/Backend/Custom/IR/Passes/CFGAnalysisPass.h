@@ -13,20 +13,22 @@ namespace ola
 		std::vector<BasicBlock const*> successors;
 	};
 
-	using CFGResult = std::unordered_map<BasicBlock const*, BasicBlockCFGInfo>;
 	class CFGAnalysisPass : public FunctionPass
 	{
 	public:
-		inline static char ID = 0;
+		inline static char id = 0;
+		using Result = std::unordered_map<BasicBlock const*, BasicBlockCFGInfo>;
+
 	public:
-		CFGAnalysisPass() : FunctionPass(ID) {}
+		CFGAnalysisPass() : FunctionPass(id) {}
 
 		virtual bool RunOn(Function& F) override;
 
-		CFGResult const& GetResult() const { return info; }
+		Result const& GetResult() const { return info; }
+		static void const* ID() { return &id; }
 
 	private:
-		CFGResult info;
+		Result info;
 	};
-	OLA_REGISTER_PASS(CFGAnalysisPass, "CFG Analysis", true);
+	OLA_REGISTER_ANALYSIS_PASS(CFGAnalysisPass, "CFG Analysis");
 }
