@@ -134,7 +134,6 @@ namespace ola
 	Value* TryConstantFold_SelectInst(Value* predicate, Value* lhs, Value* rhs)
 	{
 		if (!predicate) return nullptr;
-		IRContext& ctx = predicate->GetContext();
 		ConstantInt* CI = dyn_cast<ConstantInt>(predicate);
 		if (CI)
 		{
