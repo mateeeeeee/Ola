@@ -101,6 +101,7 @@ set(BACKEND_FILES
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
   
+  Backend/Custom/IR/Passes/DominatorTree.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
