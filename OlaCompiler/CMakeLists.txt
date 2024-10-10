@@ -16,7 +16,6 @@ set(UTILITY_FILES
   Utility/IntrusiveList.h
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
-  Utility/VoidPointerMap.h
   Utility/Attribute.h
 )
 
@@ -101,7 +100,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
   
-  Backend/Custom/IR/Passes/DominatorTree.h
+  Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h
+  Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.cpp
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h

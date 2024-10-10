@@ -2,7 +2,11 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <utility>
 #include "Utility/IteratorRange.h"
+#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/BasicBlock.h"
+#include "Backend/Custom/IR/FunctionPass.h"
 
 namespace ola
 {
@@ -20,12 +24,12 @@ namespace ola
 	class DominatorTreeBase;
 
 	template <typename NodeT> 
-	class DomTreeNodeBase
+	class DominatorTreeNodeBase
 	{
 		friend class DominatorTreeBase<NodeT>;
 
 	public:
-		DomTreeNodeBase(NodeT* BB, DomTreeNodeBase* iDom)
+		DominatorTreeNodeBase(NodeT* BB, DominatorTreeNodeBase* iDom)
 			: node(BB), idom(iDom), level(idom ? idom->level + 1 : 0) {}
 
 		auto begin() { return children.begin(); }
@@ -35,10 +39,10 @@ namespace ola
 		auto const& Children() const { return children; }
 
 		NodeT* GetBlock() const { return node; }
-		DomTreeNodeBase* GetIDom() const { return idom; }
+		DominatorTreeNodeBase* GetIDom() const { return idom; }
 		uint32 GetLevel() const { return level; }
 
-		void AddChild(DomTreeNodeBase* C) { children.push_back(C); }
+		void AddChild(DominatorTreeNodeBase* C) { children.push_back(C); }
 		bool IsLeaf() const { return children.empty(); }
 		uint64 GetNumChildren() const { return children.size(); }
 		void ClearAllChildren() { children.clear(); }
@@ -46,7 +50,7 @@ namespace ola
 		uint32 GetDFSNumIn() const { return dfs_num_in; }
 		uint32 GetDFSNumOut() const { return dfs_num_out; }
 
-		void SetIDom(DomTreeNodeBase* NewIDom) 
+		void SetIDom(DominatorTreeNodeBase* NewIDom) 
 		{
 			OLA_ASSERT_MSG(idom, "No immediate dominator?");
 			if (idom == NewIDom) return;
@@ -62,14 +66,14 @@ namespace ola
 
 	private:
 		NodeT* node;
-		DomTreeNodeBase* idom;
+		DominatorTreeNodeBase* idom;
 		uint32 level;
-		std::vector<DomTreeNodeBase*> children;
+		std::vector<DominatorTreeNodeBase*> children;
 		mutable uint32 dfs_num_in = ~0;
 		mutable uint32 dfs_num_out = ~0;
 
 	private:
-		bool DominatedBy(const DomTreeNodeBase* other) const 
+		bool DominatedBy(const DominatorTreeNodeBase* other) const 
 		{
 			return this->dfs_num_in >= other->dfs_num_in &&
 				   this->dfs_num_out <= other->dfs_num_out;
@@ -79,13 +83,13 @@ namespace ola
 			OLA_ASSERT(idom);
 			if (level == idom->level + 1) return;
 
-			std::vector<DomTreeNodeBase*> WorkStack = { this };
+			std::vector<DominatorTreeNodeBase*> WorkStack = { this };
 			while (!WorkStack.empty()) 
 			{
-				DomTreeNodeBase* Current = WorkStack.back();
+				DominatorTreeNodeBase* Current = WorkStack.back();
 				WorkStack.pop_back();
 				Current->level = Current->idom->level + 1;
-				for (DomTreeNodeBase* C : *Current) 
+				for (DominatorTreeNodeBase* C : *Current) 
 				{
 					OLA_ASSERT(C->idom);
 					if (C->level != C->idom->level + 1) WorkStack.push_back(C);
@@ -117,7 +121,7 @@ namespace ola
 		static_assert(std::is_pointer_v<ParentPtr>, "Currently NodeT's parent must be a pointer type");
 		using ParentType = std::remove_pointer_t<ParentPtr>;
 
-		using DomTreeNodeStorage = std::vector<std::unique_ptr<DomTreeNodeBase<NodeT>>>;
+		using DomTreeNodeStorage = std::vector<std::unique_ptr<DominatorTreeNodeBase<NodeT>>>;
 		using NodeNumberStorage = std::unordered_map<NodeT const*, uint32>;
 		static constexpr uint32 INVALID_NODE_NUMBER = uint32(-1);
 
@@ -127,42 +131,42 @@ namespace ola
 		OLA_DEFAULT_MOVABLE(DominatorTreeBase)
 		~DominatorTreeBase() = default;
 
-		DomTreeNodeBase<NodeT>* GetNode(NodeT const* BB) const
+		DominatorTreeNodeBase<NodeT>* GetNode(NodeT const* BB) const
 		{
 			OLA_ASSERT_MSG((!BB || parent == NodeTrait::GetParent(BB)), "cannot get DomTreeNode of block with different parent");
 			if (auto Idx = GetNodeIndex(BB); Idx != INVALID_NODE_NUMBER && Idx < dom_tree_nodes.size())
 				return dom_tree_nodes[Idx].get();
 			return nullptr;
 		}
-		DomTreeNodeBase<NodeT>* operator[](NodeT const* BB) const
+		DominatorTreeNodeBase<NodeT>* operator[](NodeT const* BB) const
 		{
 			return GetNode(BB);
 		}
 
-		DomTreeNodeBase<NodeT>* GetRootNode() { return root_node; }
-		const DomTreeNodeBase<NodeT>* GetRootNode() const { return root_node; }
+		DominatorTreeNodeBase<NodeT>* GetRootNode() { return root_node; }
+		const DominatorTreeNodeBase<NodeT>* GetRootNode() const { return root_node; }
 
 		void GetDescendants(NodeT* R, std::vector<NodeT*>& Result) const 
 		{
 			Result.clear();
-			DomTreeNodeBase<NodeT> const* RN = GetNode(R);
+			DominatorTreeNodeBase<NodeT> const* RN = GetNode(R);
 			if (!RN)
 			{
 				return;
 			}
 
-			std::vector<DomTreeNodeBase<NodeT> const*> WL;
+			std::vector<DominatorTreeNodeBase<NodeT> const*> WL;
 			WL.push_back(RN);
 			while (!WL.empty()) 
 			{
-				DomTreeNodeBase<NodeT> const* N = WL.back();
+				DominatorTreeNodeBase<NodeT> const* N = WL.back();
 				WL.pop_back();
 				Result.push_back(N->GetBlock());
 				WL.insert(WL.back(),  N->begin(), N->end());
 			}
 		}
 
-		bool ProperlyDominates(DomTreeNodeBase<NodeT> const* A, DomTreeNodeBase<NodeT> const* B) const
+		bool ProperlyDominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
 		{
 			if (!A || !B)
 				return false;
@@ -176,13 +180,13 @@ namespace ola
 				return false;
 			return Dominates(GetNode(A), GetNode(B));
 		}
-		bool IsReachableFromEntry(DomTreeNodeBase<NodeT> const* A) const { return A != nullptr; }
+		bool IsReachableFromEntry(DominatorTreeNodeBase<NodeT> const* A) const { return A != nullptr; }
 		bool IsReachableFromEntry(NodeT const* A) const 
 		{
 			return IsReachableFromEntry(GetNode(A));
 		}
 
-		bool Dominates(DomTreeNodeBase<NodeT> const* A, DomTreeNodeBase<NodeT> const* B) const
+		bool Dominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
 		{
 			// A node trivially dominates itself.
 			if (B == A)
@@ -227,8 +231,8 @@ namespace ola
 			if (A == &Entry || B == &Entry)
 				return &Entry;
 
-			DomTreeNodeBase<NodeT>* NodeA = GetNode(A);
-			DomTreeNodeBase<NodeT>* NodeB = GetNode(B);
+			DominatorTreeNodeBase<NodeT>* NodeA = GetNode(A);
+			DominatorTreeNodeBase<NodeT>* NodeB = GetNode(B);
 			OLA_ASSERT_MSG(NodeA, "A must be in the tree");
 			OLA_ASSERT_MSG(NodeB, "B must be in the tree");
 
@@ -254,10 +258,10 @@ namespace ola
 			{
 				return;
 			}
-			using DomTreeNodeBaseIteratorType = decltype(std::declval<DomTreeNodeBase<NodeT>*>()->begin());
-			std::vector<std::pair<DomTreeNodeBase<NodeT> const*, DomTreeNodeBaseIteratorType> WorkStack;
+			using DomTreeNodeBaseIteratorType = decltype(std::declval<DominatorTreeNodeBase<NodeT>*>()->begin());
+			std::vector<std::pair<DominatorTreeNodeBase<NodeT> const*, DomTreeNodeBaseIteratorType>> WorkStack;
 
-			DomTreeNodeBase<NodeT> const* this_root = GetRootNode();
+			DominatorTreeNodeBase<NodeT> const* this_root = GetRootNode();
 			OLA_ASSERT_MSG((!parent || this_root), "Empty constructed DomTree");
 			if (!this_root)
 			{
@@ -270,7 +274,7 @@ namespace ola
 
 			while (!WorkStack.empty()) 
 			{
-				const DomTreeNodeBase<NodeT>* Node = WorkStack.back().first;
+				const DominatorTreeNodeBase<NodeT>* Node = WorkStack.back().first;
 				const auto ChildIt = WorkStack.back().second;
 
 				// If we visited all of the children of this node, "recurse" back up the
@@ -283,7 +287,7 @@ namespace ola
 				else 
 				{
 					// Otherwise, recursively visit this child.
-					const DomTreeNodeBase<NodeT>* Child = *ChildIt;
+					const DominatorTreeNodeBase<NodeT>* Child = *ChildIt;
 					++WorkStack.back().second;
 
 					WorkStack.push_back({ Child, Child->begin() });
@@ -293,7 +297,7 @@ namespace ola
 			dfs_info_valid = true;
 		}
 
-		void ChangeImmediateDominator(DomTreeNodeBase<NodeT>* N, DomTreeNodeBase<NodeT>* NewIDom) 
+		void ChangeImmediateDominator(DominatorTreeNodeBase<NodeT>* N, DominatorTreeNodeBase<NodeT>* NewIDom) 
 		{
 			OLA_ASSERT_MSG(N && NewIDom, "Cannot change null node pointers!");
 			dfs_info_valid = false;
@@ -312,11 +316,11 @@ namespace ola
 		{
 			uint32 Idx = GetNodeIndex(BB);
 			OLA_ASSERT_MSG(Idx != INVALID_NODE_NUMBER && dom_tree_nodes[Idx], "Removing node that isn't in dominator tree.");
-			DomTreeNodeBase<NodeT>* Node = dom_tree_nodes[Idx].get();
+			DominatorTreeNodeBase<NodeT>* Node = dom_tree_nodes[Idx].get();
 			OLA_ASSERT_MSG(Node->IsLeaf(), "Node is not a leaf node.");
 
 			dfs_info_valid = false;
-			DomTreeNodeBase<NodeT>* idom = Node->GetIDom();
+			DominatorTreeNodeBase<NodeT>* idom = Node->GetIDom();
 			if (idom) 
 			{
 				const auto I = find(idom->children.begin(), idom->children.end(), Node);
@@ -329,20 +333,20 @@ namespace ola
 			node_number_map.erase(BB);
 		}
 
-		DomTreeNodeBase<NodeT>* AddNewBlock(NodeT* BB, NodeT* DomBB) 
+		DominatorTreeNodeBase<NodeT>* AddNewBlock(NodeT* BB, NodeT* DomBB) 
 		{
 			OLA_ASSERT_MSG(GetNode(BB) == nullptr, "Block already in dominator tree!");
-			DomTreeNodeBase<NodeT>* idom_node = GetNode(DomBB);
+			DominatorTreeNodeBase<NodeT>* idom_node = GetNode(DomBB);
 			OLA_ASSERT_MSG(idom_node, "Not immediate dominator specified for block!");
 			dfs_info_valid = false;
 			return CreateNode(BB, idom_node);
 		}
 
-		DomTreeNodeBase<NodeT>* SetNewRoot(NodeT* BB) 
+		DominatorTreeNodeBase<NodeT>* SetNewRoot(NodeT* BB) 
 		{
 			OLA_ASSERT_MSG(GetNode(BB) == nullptr, "Block already in dominator tree!");
 			dfs_info_valid = false;
-			DomTreeNodeBase<NodeT>* new_node = CreateNode(BB);
+			DominatorTreeNodeBase<NodeT>* new_node = CreateNode(BB);
 			if (!root)
 			{
 				SetRoot(BB);
@@ -350,7 +354,7 @@ namespace ola
 			else 
 			{
 				NodeT* old_root = root;
-				DomTreeNodeBase<NodeT>* old_node = GetNode(old_root);
+				DominatorTreeNodeBase<NodeT>* old_node = GetNode(old_root);
 				new_node->AddChild(old_node);
 				old_node->idom = new_node;
 				old_node->UpdateLevel();
@@ -361,7 +365,7 @@ namespace ola
 
 	private:
 		NodeT* root;
-		DomTreeNodeBase<NodeT>* root_node = nullptr;
+		DominatorTreeNodeBase<NodeT>* root_node = nullptr;
 		ParentPtr parent = nullptr;
 		DomTreeNodeStorage dom_tree_nodes;
 		NodeNumberStorage node_number_map;
@@ -380,14 +384,14 @@ namespace ola
 			return Idx;
 		}
 
-		bool DominatedBySlowTreeWalk(DomTreeNodeBase<NodeT> const* A, DomTreeNodeBase<NodeT> const* B) const 
+		bool DominatedBySlowTreeWalk(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const 
 		{
 			OLA_ASSERT(A != B);
 			OLA_ASSERT(IsReachableFromEntry(B));
 			OLA_ASSERT(IsReachableFromEntry(A));
 
 			uint32 const a_level = A->GetLevel();
-			DomTreeNodeBase<NodeT> const* idom = nullptr;
+			DominatorTreeNodeBase<NodeT> const* idom = nullptr;
 			// Don't walk nodes above A's subtree. When we reach A's level, we must
 			// either find A or be in some other subtree not dominated by A.
 			while ((idom = B->GetIDom()) != nullptr && idom->GetIDom() >= a_level) B = idom;  // Walk up the tree
@@ -396,9 +400,9 @@ namespace ola
 
 	protected:
 		void SetRoot(NodeT* BB) { root = BB; }
-		DomTreeNodeBase<NodeT>* CreateNode(NodeT* BB, DomTreeNodeBase<NodeT>* idom = nullptr) 
+		DominatorTreeNodeBase<NodeT>* CreateNode(NodeT* BB, DominatorTreeNodeBase<NodeT>* idom = nullptr) 
 		{
-			auto node = std::make_unique<DomTreeNodeBase<NodeT>>(BB, idom);
+			auto node = std::make_unique<DominatorTreeNodeBase<NodeT>>(BB, idom);
 			auto* node_ptr = node.get();
 			uint32 node_idx = GetNodeIndexForInsert(BB);
 			dom_tree_nodes[node_idx] = std::move(node);
@@ -406,4 +410,69 @@ namespace ola
 			return node_ptr;
 		}
 	};
+
+	class BasicBlockEdge 
+	{
+		const BasicBlock* Start;
+		const BasicBlock* End;
+
+	public:
+		BasicBlockEdge(BasicBlock const* Start_, BasicBlock const* End_) : Start(Start_), End(End_) {}
+
+		BasicBlock const* GetStart() const { return Start; }
+
+		BasicBlock const* GetEnd() const { return End; }
+
+		bool isSingleEdge() const
+		{
+			unsigned NumEdgesToEnd = 0;
+			for (BasicBlock* Succ : Start->Successors())
+			{
+				if (Succ == End) ++NumEdgesToEnd;
+				if (NumEdgesToEnd >= 2) return false;
+			}
+			OLA_ASSERT(NumEdgesToEnd == 1);
+			return true;
+		}
+	};
+	class DominatorTree : public DominatorTreeBase<BasicBlock>
+	{
+		using Super = DominatorTreeBase<BasicBlock>;
+	public:
+		DominatorTree() = default;
+		explicit DominatorTree(Function& F) {  }
+
+		using Super::Dominates;
+
+		bool Dominates(const BasicBlock* BB, const Use& U) const;
+		bool Dominates(const Value* Def, const Use& U) const;
+		bool Dominates(const Value* Def, const Instruction* User) const;
+		bool Dominates(const Instruction* Def, const BasicBlock* BB) const;
+		bool Dominates(const BasicBlockEdge& BBE, const Use& U) const;
+		bool Dominates(const BasicBlockEdge& BBE, const BasicBlock* BB) const;
+		bool Dominates(const BasicBlockEdge& BBE1, const BasicBlockEdge& BBE2) const;
+
+		using Super::IsReachableFromEntry;
+		bool IsReachableFromEntry(const Use& U) const;
+
+		using Super::FindNearestCommonDominator;
+		Instruction* FindNearestCommonDominator(Instruction* I1, Instruction* I2) const;
+	};
+
+	class DominatorTreeAnalysisPass : public FunctionPass
+	{
+	public:
+		inline static char id = 0;
+		using Result = DominatorTree;
+	public:
+		DominatorTreeAnalysisPass() : FunctionPass(id) {}
+
+		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		Result const& GetResult() const { return info; }
+		static void const* ID() { return &id; }
+
+	private:
+		Result info;
+	};
+	OLA_REGISTER_ANALYSIS_PASS(DominatorTreeAnalysisPass, "Dominator Tree Analysis");
 }

@@ -41,6 +41,14 @@ namespace ola
 		{
 			function = func;
 		}
+		Function* GetParent() const
+		{
+			return function;
+		}
+		void SetParent(Function* func)
+		{
+			function = func;
+		}
 
 		uint32 GetIndex() const
 		{
@@ -52,6 +60,7 @@ namespace ola
 		}
 
 		bool IsEntryBlock() const;
+
 		void AddPredecessor(BasicBlock* BB)
 		{
 			predecessors.push_back(BB);
@@ -59,6 +68,14 @@ namespace ola
 		std::vector<BasicBlock*> const& Predecessors() const
 		{
 			return predecessors;
+		}
+		void AddSuccessor(BasicBlock* BB)
+		{
+			successors.push_back(BB);
+		}
+		std::vector<BasicBlock*> const& Successors() const
+		{
+			return successors;
 		}
 
 		static bool ClassOf(Value const* V)
@@ -71,5 +88,6 @@ namespace ola
 		uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<BasicBlock*> predecessors;
+		std::vector<BasicBlock*> successors;
 	};
 }
