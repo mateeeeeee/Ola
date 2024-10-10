@@ -330,41 +330,20 @@ namespace ola
 
 			MachineOperand const& cond_op = lowering_ctx.GetOperand(condition);
 
-			if (!cond_op.IsImmediate())
-			{
-				MachineInstruction testMI(InstTest);
-				testMI.SetOp<0>(cond_op);
-				testMI.SetOp<1>(cond_op);
-				lowering_ctx.EmitInst(testMI);
+			MachineInstruction testMI(InstTest);
+			testMI.SetOp<0>(cond_op);
+			testMI.SetOp<1>(cond_op);
+			lowering_ctx.EmitInst(testMI);
 
-				MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
-				MachineInstruction jmp_true(InstJNE);
-				jmp_true.SetOp<0>(true_operand);
-				lowering_ctx.EmitInst(jmp_true);
+			MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
+			MachineInstruction jmp_true(InstJNE);
+			jmp_true.SetOp<0>(true_operand);
+			lowering_ctx.EmitInst(jmp_true);
 
-				MachineOperand false_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(false_target));
-				MachineInstruction jmp_false(InstJump);
-				jmp_false.SetOp<0>(false_operand);
-				lowering_ctx.EmitInst(jmp_false);
-			}
-			else
-			{
-				int64 imm = cond_op.GetImmediate();
-				if (imm != 0)
-				{
-					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
-					MachineInstruction jmp_true(InstJump);
-					jmp_true.SetOp<0>(true_operand);
-					lowering_ctx.EmitInst(jmp_true);
-				}
-				else
-				{
-					MachineOperand false_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(false_target));
-					MachineInstruction jmp_false(InstJump);
-					jmp_false.SetOp<0>(false_operand);
-					lowering_ctx.EmitInst(jmp_false);
-				}
-			}
+			MachineOperand false_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(false_target));
+			MachineInstruction jmp_false(InstJump);
+			jmp_false.SetOp<0>(false_operand);
+			lowering_ctx.EmitInst(jmp_false);
 		}
 	}
 

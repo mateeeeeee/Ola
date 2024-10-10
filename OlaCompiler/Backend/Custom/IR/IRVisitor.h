@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Utility/VoidPointerMap.h"
+#include <unordered_map>
 #include "Frontend/AST/ASTVisitor.h"
 
 namespace ola
@@ -29,9 +29,12 @@ namespace ola
 	{
 		friend class IRGenContext;
 
+		template<typename V>
+		using VoidPointerMap = std::unordered_map<void const*, V>;
+
 		using ValueMap = VoidPointerMap<Value*>;
 		using VTableMap = VoidPointerMap<GlobalVariable*>;
-		using EmptyBlockSuccessorMap = std::unordered_map<BasicBlock*, BasicBlock*, VoidPointerHash>;
+		using EmptyBlockSuccessorMap = std::unordered_map<BasicBlock*, BasicBlock*>;
 
 	public:
 

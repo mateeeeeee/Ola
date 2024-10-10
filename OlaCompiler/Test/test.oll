@@ -3,15 +3,21 @@ Module ID : test.ola
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = alloca i64
-store 2, ptr %1
-%2 = load i64, ptr %1
-store i64 %2, ptr %0
+br 1, label if.then, label if.else
+if.then:
+store 10, ptr %0
 br label exit
 return:
 br label exit
+if.else:
+store 15, ptr %0
+br label exit
+return1:
+br label exit
+if.end:
+br label exit
 exit:
-%3 = load i64, ptr %0
-ret i64 %3
+%1 = load i64, ptr %0
+ret i64 %1
 }
 

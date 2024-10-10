@@ -1,6 +1,12 @@
 
 public int main()
 {
-    int c = false ? 5 : 2;
-    return c;
+    if(5)
+    {
+        return 10;
+    }
+    else
+    {
+        return 15;
+    }
 }

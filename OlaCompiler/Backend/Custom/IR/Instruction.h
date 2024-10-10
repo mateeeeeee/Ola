@@ -7,7 +7,6 @@
 #include "Compiler/RTTI.h"
 #include "Utility/IntrusiveList.h"
 #include "Utility/IteratorRange.h"
-#include "Utility/VoidPointerMap.h"
 
 namespace ola
 {
@@ -532,7 +531,7 @@ namespace ola
 	private:
 	};
 
-	class BranchInst : public Instruction
+	class BranchInst final : public Instruction
 	{
 	public:
 		BranchInst(IRContext& C, BasicBlock* target);
@@ -848,6 +847,6 @@ namespace ola
 		}
 
 	private:
-		VoidPointerMap<Use> incomings;
+		std::unordered_map<void const*, Use> incomings;
 	};
 }

@@ -1338,7 +1338,7 @@ namespace ola
 
 	IRType* IRVisitor::ConvertClassDecl(ClassDecl const* class_decl)
 	{
-		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, IRStructType*, VoidPointerHash>;
+		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, IRStructType*>;
 		static LLVMStructTypeMap struct_type_map;
 
 		if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];

@@ -1,6 +1,7 @@
 #include "ConstantFold.h"
 #include "Constant.h"
 #include "IRContext.h"
+#include "BasicBlock.h"
 
 namespace ola
 {
@@ -138,6 +139,18 @@ namespace ola
 		if (CI)
 		{
 			return CI->GetValue() != 0 ? lhs : rhs;
+		}
+		return nullptr;
+	}
+
+	Value* TryConstantFold_BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target)
+	{
+		if (!condition) return nullptr;
+		ConstantInt* CI = dyn_cast<ConstantInt>(condition);
+		if (CI)
+		{
+			IRContext& ctx = CI->GetContext();
+			return CI->GetValue() != 0 ? new BranchInst(ctx, true_target) : new BranchInst(ctx, false_target);
 		}
 		return nullptr;
 	}
