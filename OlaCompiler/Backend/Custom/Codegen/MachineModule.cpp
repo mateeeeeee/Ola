@@ -44,8 +44,7 @@ namespace ola
 					OLA_ASSERT(isa<Constant>(init_value));
 					Constant* C = cast<Constant>(init_value);
 
-					bool const read_only = V->IsReadOnly();
-					MachineDataStorage* data = new MachineDataStorage(V->GetName(), read_only);
+					MachineDataStorage* data = new MachineDataStorage(V->GetName(), V->IsReadOnly());
 
 					auto ExpandValue = [&](auto&& self, Value* V) -> void
 						{
