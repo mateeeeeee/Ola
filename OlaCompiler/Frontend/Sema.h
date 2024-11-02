@@ -11,7 +11,7 @@ namespace ola
 {
 	namespace diag
 	{
-		enum DiagCode : uint32;
+		enum DiagCode : Uint32;
 	}
 
 	class Parser;
@@ -44,8 +44,8 @@ namespace ola
 			class QualType const* current_func  = nullptr;
 			bool return_stmt_encountered = false;
 
-			uint32 stmts_using_break_count = 0; 
-			uint32 stmts_using_continue_count = 0;
+			Uint32 stmts_using_break_count = 0; 
+			Uint32 stmts_using_continue_count = 0;
 			std::vector<CaseStmtCallback> case_callback_stack;
 
 			std::unordered_set<std::string> labels;
@@ -74,7 +74,7 @@ namespace ola
 													  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
-		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value);
+		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, Sint64 enum_value);
 		UniqueAliasDeclPtr ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 
 		ClassDecl const* ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc);
@@ -102,7 +102,7 @@ namespace ola
 		UniqueBinaryExprPtr ActOnBinaryExpr(BinaryExprKind op, SourceLocation const& loc, UniqueExprPtr&& lhs, UniqueExprPtr&& rhs);
 		UniqueTernaryExprPtr ActOnTernaryExpr(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueExprPtr&& true_expr, UniqueExprPtr&& false_expr);
 		UniqueCallExprPtr ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args);
-		UniqueIntLiteralPtr ActOnIntLiteral(int64 value, SourceLocation const& loc);
+		UniqueIntLiteralPtr ActOnIntLiteral(Sint64 value, SourceLocation const& loc);
 		UniqueIntLiteralPtr ActOnLengthOperator(QualType const& type, SourceLocation const& loc);
 		UniqueCharLiteralPtr ActOnCharLiteral(std::string_view str, SourceLocation const& loc);
 		UniqueStringLiteralPtr ActOnStringLiteral(std::string_view str, SourceLocation const& loc);

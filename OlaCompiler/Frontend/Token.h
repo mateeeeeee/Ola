@@ -7,7 +7,7 @@
 namespace ola
 {
 
-	enum TokenFlag : uint32
+	enum TokenFlag : Uint32
 	{
 		TokenFlag_None = 0x0,
 		TokenFlag_LeadingSpace = 0x1,
@@ -19,7 +19,7 @@ namespace ola
 	{
 		static constexpr bool enable = true;
 	};
-	using TokenFlags = uint32;
+	using TokenFlags = Uint32;
 
 	class Token
 	{
@@ -99,7 +99,7 @@ namespace ola
 			flags = _flags;
 		}
 		
-		void SetData(char const* p_data, uint64 count)
+		void SetData(char const* p_data, Uint64 count)
 		{
 			data = std::string(p_data, count);
 		}

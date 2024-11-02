@@ -12,7 +12,7 @@ namespace ola
 {
 	class Context;
 
-	enum QualifierFlag : uint8
+	enum QualifierFlag : Uint8
 	{
 		Qualifier_None = 0x0,
 		Qualifier_Const = 0x1
@@ -22,7 +22,7 @@ namespace ola
 	{
 		static constexpr bool enable = true;
 	};
-	using Qualifiers = uint8;
+	using Qualifiers = Uint8;
 
 	class Type;
 	class QualType
@@ -62,7 +62,7 @@ namespace ola
 		Qualifiers qualifiers = Qualifier_None;
 	};
 
-	enum class TypeKind : uint8
+	enum class TypeKind : Uint8
 	{
 		Invalid,
 		Void,
@@ -80,24 +80,24 @@ namespace ola
 	{
 	public:
 		constexpr Type() {}
-		constexpr uint32 GetSize() const { return size; }
-		constexpr uint32 GetAlign() const { return align; }
+		constexpr Uint32 GetSize() const { return size; }
+		constexpr Uint32 GetAlign() const { return align; }
 		TypeKind GetKind() const { return kind; }
 
-		void* operator new(uint64) = delete;
-		void* operator new(uint64 sz, Context*) { return ::operator new(sz); }
+		void* operator new(Uint64) = delete;
+		void* operator new(Uint64 sz, Context*) { return ::operator new(sz); }
 
 		virtual bool IsAssignableFrom(Type const*) const { return true; }
 
 	private:
 		TypeKind kind = TypeKind::Invalid;
-		uint32 size = 0;
-		uint32 align = 0;
+		Uint32 size = 0;
+		Uint32 align = 0;
 
 	protected:
-		constexpr Type(TypeKind kind, uint32 size = 0, uint32 align = 0) : kind(kind), size(size), align(align) {}
-		constexpr void SetAlign(uint32 _align) { align = _align; }
-		constexpr void SetSize(uint32 _size)   { size = _size; }
+		constexpr Type(TypeKind kind, Uint32 size = 0, Uint32 align = 0) : kind(kind), size(size), align(align) {}
+		constexpr void SetAlign(Uint32 _align) { align = _align; }
+		constexpr void SetSize(Uint32 _size)   { size = _size; }
 	};
 
 	class RefType : public Type
@@ -185,16 +185,16 @@ namespace ola
 		virtual bool IsAssignableFrom(Type const*) const override;
 
 		QualType const& GetElementType() const { return element_type; }
-		uint32 GetArraySize() const { return array_size; }
+		Uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Array; }
-		static ArrayType* Get(Context* ctx, QualType const& type, uint32 array_size = 0);
+		static ArrayType* Get(Context* ctx, QualType const& type, Uint32 array_size = 0);
 	private:
 		QualType element_type;
-		uint32 array_size;
+		Uint32 array_size;
 
 	private:
-		ArrayType(QualType const& type, uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
+		ArrayType(QualType const& type, Uint32 array_size) : Type{ TypeKind::Array, array_size * type->GetSize(), type->GetAlign() },
 			element_type(type), array_size(array_size) {}
 	};
 
@@ -207,8 +207,8 @@ namespace ola
 
 		QualType const& GetReturnType() const { return return_type; }
 		std::span<QualType const> GetParams() const { return param_types; }
-		uint64 GetParamCount() const { return param_types.size(); }
-		QualType const& GetParamType(uint64 i) const { return param_types[i]; }
+		Uint64 GetParamCount() const { return param_types.size(); }
+		QualType const& GetParamType(Uint64 i) const { return param_types[i]; }
 
 		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Function; }
 		static FuncType* Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types = {});

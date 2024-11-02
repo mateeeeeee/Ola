@@ -29,14 +29,14 @@ namespace ola
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}
-		MachineOperand& AllocateStack(uint32 size)
+		MachineOperand& AllocateStack(Uint32 size)
 		{
 			stack_offset += size;
 			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineType::Ptr);
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}
-		int32 GetStackAllocationSize() const
+		Sint32 GetStackAllocationSize() const
 		{
 			return stack_offset;
 		}
@@ -50,7 +50,7 @@ namespace ola
 		bool is_declaration;
 		std::list<std::unique_ptr<MachineBasicBlock>> blocks;
 		std::vector<MachineOperand> args;
-		int32 stack_offset = 0;
+		Sint32 stack_offset = 0;
 		std::vector<MachineOperand> stack_objects;
 	};
 }

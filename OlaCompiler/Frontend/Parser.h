@@ -12,9 +12,9 @@ namespace ola
 	class Parser;
 	class Diagnostics;
 	
-	enum DiagCode : uint32;
-	enum class BinaryExprKind : uint8;
-	enum class DeclVisibility : uint8;
+	enum DiagCode : Uint32;
+	enum class BinaryExprKind : Uint8;
+	enum class DeclVisibility : Uint8;
 	using ExprParseFn = UniqueExprPtr(Parser::*)();
 
 	class Parser
@@ -113,8 +113,8 @@ namespace ola
 		OLA_NODISCARD UniqueIdentifierExprPtr ParseMemberIdentifier();
 		OLA_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
-		void ParseFunctionAttributes(uint8& attrs);
-		void ParseMethodAttributes(uint8& attrs);
+		void ParseFunctionAttributes(Uint8& attrs);
+		void ParseMethodAttributes(Uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
 		void ParseTypeSpecifier(QualType& type, bool array_size_forbidden = false, bool allow_ref = true);
 

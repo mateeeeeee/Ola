@@ -42,13 +42,13 @@ namespace ola
 			{
 				if (LI.is_float)
 				{
-					uint32 reg = fp_registers.back();
+					Uint32 reg = fp_registers.back();
 					fp_registers.pop_back();
 					LI.reg = reg;
 				}
 				else
 				{
-					uint32 reg = registers.back();
+					Uint32 reg = registers.back();
 					registers.pop_back();
 					LI.reg = reg;
 				}
@@ -69,7 +69,7 @@ namespace ola
 	//			add register[j] to pool of free registers
 	void LinearScanRegisterAllocator::ExpireOldIntervals(LiveInterval& LI)
 	{
-		uint32 i = 0;
+		Uint32 i = 0;
 		for (; i < active.size(); ++i)
 		{
 			LiveInterval* interval = active[i];
@@ -100,7 +100,7 @@ namespace ola
 		auto spill = active.back();
 		if (spill->end > LI.end)
 		{
-			uint32 vreg = LI.vreg;
+			Uint32 vreg = LI.vreg;
 			LI.reg = spill->reg;
 			vreg2reg_map[LI.vreg] = LI.reg;
 			spill->spilled = true;
@@ -123,24 +123,24 @@ namespace ola
 			for (MachineInstruction& MI : MBB->Instructions())
 			{
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
-				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
+				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
-					uint32 vreg_id = MO.GetReg().reg;
+					Uint32 vreg_id = MO.GetReg().reg;
 
 					//spilling
 					if (!vreg2reg_map.contains(vreg_id))
 					{
 						MachineOperand& MO = MF.AllocateStack(MachineType::Int64);
-						int32 stack_offset = MO.GetStackOffset();
-						uint32 frame_reg = frame_register;
+						Sint32 stack_offset = MO.GetStackOffset();
+						Uint32 frame_reg = frame_register;
 
 						//todo
 					}
 					else
 					{
-						uint32 reg_id = vreg2reg_map[vreg_id];
+						Uint32 reg_id = vreg2reg_map[vreg_id];
 						MO = MachineOperand::ISAReg(reg_id, MO.GetType());
 					}
 				}

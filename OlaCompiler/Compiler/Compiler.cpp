@@ -87,7 +87,7 @@ namespace ola
 		}
 	}
 
-	int32 Compile(CompileRequest const& compile_request)
+	Sint32 Compile(CompileRequest const& compile_request)
 	{
 		InitLogger();
 		
@@ -111,7 +111,7 @@ namespace ola
 		}
 
 		Context context{};
-		for (uint64 i = 0; i < source_files.size(); ++i)
+		for (Uint64 i = 0; i < source_files.size(); ++i)
 		{
 			std::string file_name = fs::path(source_files[i]).stem().string();
 			std::string file_ext = fs::path(source_files[i]).extension().string();
@@ -138,7 +138,7 @@ namespace ola
 		system(link_cmd.c_str());
 		
 		std::string const& exe_cmd = output_file;
-		int64 res = system(exe_cmd.c_str());
+		Sint64 res = system(exe_cmd.c_str());
 
 		fs::current_path(cur_path);
 		return res;

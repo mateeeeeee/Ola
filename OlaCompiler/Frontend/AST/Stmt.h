@@ -8,7 +8,7 @@
 
 namespace ola
 {
-	enum class StmtKind : uint8
+	enum class StmtKind : Uint8
 	{
 		Compound,
 		Expr,
@@ -32,7 +32,7 @@ namespace ola
 	public:
 		StmtKind GetStmtKind() const { return kind; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt)
@@ -58,7 +58,7 @@ namespace ola
 			statements.insert(std::begin(statements), std::move(stmt));
 		}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Compound; }
@@ -77,7 +77,7 @@ namespace ola
 
 		UniqueDeclPtrList const& GetDecls() const { return declarations; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Decl; }
@@ -102,7 +102,7 @@ namespace ola
 			return expr.release();
 		}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Expr || stmt->GetStmtKind() == StmtKind::Null; }
@@ -115,7 +115,7 @@ namespace ola
 	public:
 		NullStmt() : ExprStmt(nullptr) {}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Null; }
@@ -129,7 +129,7 @@ namespace ola
 
 		ExprStmt const* GetExprStmt() const { return ret_expr.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Return; }
@@ -159,7 +159,7 @@ namespace ola
 		Stmt const* GetThenStmt() const { return then_stmt.get(); }
 		Stmt const* GetElseStmt() const { return else_stmt.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::If; }
@@ -174,7 +174,7 @@ namespace ola
 	public:
 		BreakStmt() : Stmt(StmtKind::Break) {}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Break; }
@@ -185,7 +185,7 @@ namespace ola
 	public:
 		ContinueStmt() : Stmt(StmtKind::Continue) {}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Continue; }
@@ -218,7 +218,7 @@ namespace ola
 		Expr const* GetIterExpr() const { return iter_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::For; }
@@ -246,7 +246,7 @@ namespace ola
 		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::While; }
@@ -272,7 +272,7 @@ namespace ola
 		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::DoWhile; }
@@ -285,17 +285,17 @@ namespace ola
 	{
 	public:
 		CaseStmt() : Stmt(StmtKind::Case), is_default(true), value(0) {}
-		explicit CaseStmt(int64 value) : Stmt(StmtKind::Case), is_default(false), value(value) {}
+		explicit CaseStmt(Sint64 value) : Stmt(StmtKind::Case), is_default(false), value(value) {}
 
 		bool IsDefault() const { return is_default; }
-		int64 GetValue() const { return value; }
+		Sint64 GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Case; }
 	private:
-		int64 value;
+		Sint64 value;
 		bool is_default;
 	};
 
@@ -316,7 +316,7 @@ namespace ola
 		Expr const* GetCondExpr() const { return cond_expr.get(); }
 		Stmt const* GetBodyStmt() const { return body_stmt.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Switch; }
@@ -331,7 +331,7 @@ namespace ola
 		LabelStmt(std::string_view label) : Stmt(StmtKind::Label), label_name(label) {}
 		std::string_view GetName() const { return label_name; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Label; }
@@ -345,7 +345,7 @@ namespace ola
 		explicit GotoStmt(std::string_view label) : Stmt(StmtKind::Label), label_name(label) {}
 		std::string_view GetLabelName() const { return label_name; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Goto; }

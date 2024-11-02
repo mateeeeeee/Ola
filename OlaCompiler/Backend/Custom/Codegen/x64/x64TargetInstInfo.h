@@ -7,7 +7,7 @@ namespace ola
 	class x64TargetInstInfo : public TargetInstInfo
 	{
 	public:
-		virtual InstInfo GetInstInfo(uint32 opcode) const override;
+		virtual InstInfo GetInstInfo(Uint32 opcode) const override;
 	};
 
 }

@@ -5,7 +5,7 @@
 namespace ola
 {
 
-	BasicBlock::BasicBlock(IRContext& C, Function* function, uint32 idx /*= -1*/) : Value(ValueKind::BasicBlock, IRLabelType::Get(C)), function(function), block_idx(idx)
+	BasicBlock::BasicBlock(IRContext& C, Function* function, Uint32 idx /*= -1*/) : Value(ValueKind::BasicBlock, IRLabelType::Get(C)), function(function), block_idx(idx)
 	{
 
 	}

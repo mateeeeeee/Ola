@@ -5,19 +5,19 @@
 
 namespace ola
 {
-	constexpr uint32 VIRTUAL_REG_BEGIN = 0b0101U << 28;
-	constexpr uint32 INVALID_REG = 0b1100U << 28;
+	constexpr Uint32 VIRTUAL_REG_BEGIN = 0b0101U << 28;
+	constexpr Uint32 INVALID_REG = 0b1100U << 28;
 
-	inline constexpr bool IsISAReg(uint32 r) 
+	inline constexpr bool IsISAReg(Uint32 r) 
 	{
 		return r < VIRTUAL_REG_BEGIN;
 	}
-	inline constexpr bool IsVirtualReg(uint32 r) 
+	inline constexpr bool IsVirtualReg(Uint32 r) 
 	{
 		return (r & VIRTUAL_REG_BEGIN) == VIRTUAL_REG_BEGIN;
 	}
 
-	enum class MachineType : uint32
+	enum class MachineType : Uint32
 	{
 		Unknown,
 		Int8,
@@ -35,7 +35,7 @@ namespace ola
 	{
 		return type == MachineType::Float64;
 	}
-	inline constexpr uint32 GetOperandSize(MachineType type)
+	inline constexpr Uint32 GetOperandSize(MachineType type)
 	{
 		switch (type)
 		{
@@ -55,7 +55,7 @@ namespace ola
 
 	struct MachineRegister
 	{
-		uint32 reg;
+		Uint32 reg;
 
 		bool operator==(const MachineRegister& rhs) const 
 		{
@@ -69,7 +69,7 @@ namespace ola
 
 	struct MachineStackObject
 	{
-		int32 offset;
+		Sint32 offset;
 
 		bool operator==(MachineStackObject const& rhs) const
 		{
@@ -118,15 +118,15 @@ namespace ola
 		{
 			return std::holds_alternative<MachineStackObject>(storage);
 		}
-		int32 GetStackOffset() const
+		Sint32 GetStackOffset() const
 		{
 			return std::get<MachineStackObject>(storage).offset;
 		}
 
-		bool IsImmediate() const { return std::holds_alternative<int64>(storage); }
-		int64 GetImmediate() const
+		bool IsImmediate() const { return std::holds_alternative<Sint64>(storage); }
+		Sint64 GetImmediate() const
 		{
-			return std::get<int64>(storage);
+			return std::get<Sint64>(storage);
 		}
 
 		bool IsRelocable() const { return std::holds_alternative<MachineRelocable*>(storage); }
@@ -161,20 +161,20 @@ namespace ola
 			if constexpr (std::is_floating_point_v<T>)
 			{
 				static_assert(std::is_same_v<T, double>);
-				return MachineOperand(std::bit_cast<int64>(val), type);
+				return MachineOperand(std::bit_cast<Sint64>(val), type);
 			}
-			else return MachineOperand(static_cast<int64>(val), type);
+			else return MachineOperand(static_cast<Sint64>(val), type);
 		}
-		static MachineOperand ISAReg(uint32 reg, MachineType type)
+		static MachineOperand ISAReg(Uint32 reg, MachineType type)
 		{
 			OLA_ASSERT(IsISAReg(reg));
 			return MachineOperand(MachineRegister{ reg }, type);
 		}
-		static MachineOperand VirtualReg(uint32 reg, MachineType type)
+		static MachineOperand VirtualReg(Uint32 reg, MachineType type)
 		{
 			return MachineOperand(MachineRegister{ reg + VIRTUAL_REG_BEGIN }, type);
 		}
-		static MachineOperand StackObject(int32 offset, MachineType type) 
+		static MachineOperand StackObject(Sint32 offset, MachineType type) 
 		{
 			return MachineOperand(MachineStackObject{ offset }, type);
 		}
@@ -187,10 +187,10 @@ namespace ola
 			return MachineOperand(val, MachineType::Other);
 		}
 
-		uint64 GetHash() const;
+		Uint64 GetHash() const;
 
 	private:
-		std::variant<std::monostate, MachineRelocable*, int64, MachineRegister, MachineStackObject> storage;
+		std::variant<std::monostate, MachineRelocable*, Sint64, MachineRegister, MachineStackObject> storage;
 		MachineType type = MachineType::Unknown;
 	};
 

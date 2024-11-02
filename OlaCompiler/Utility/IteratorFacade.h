@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	template <typename DerivedT, typename IteratorCategoryT, typename T, typename DifferenceTypeT = int64, typename PointerT = T*, typename ReferenceT = T&>
+	template <typename DerivedT, typename IteratorCategoryT, typename T, typename DifferenceTypeT = Sint64, typename PointerT = T*, typename ReferenceT = T&>
 	class IteratorFacade 
 	{
 	public:

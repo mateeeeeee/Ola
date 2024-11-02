@@ -9,7 +9,7 @@ namespace ola
 	{
 	public:
 		explicit LabelVisitor(std::vector<LabelStmt const*>& labels) : labels(labels) {}
-		virtual void Visit(LabelStmt const& label, uint32) override
+		virtual void Visit(LabelStmt const& label, Uint32) override
 		{
 			labels.push_back(&label);
 		}
@@ -21,7 +21,7 @@ namespace ola
 	{
 	public:
 		explicit ThisVisitor(QualType const& this_type) : this_type(this_type) {}
-		virtual void Visit(ThisExpr const& this_expr, uint32) override
+		virtual void Visit(ThisExpr const& this_expr, Uint32) override
 		{
 			ThisExpr& mut_this_expr = const_cast<ThisExpr&>(this_expr);
 			if (this_expr.GetType().IsConst()) this_type.AddConst();
@@ -47,8 +47,8 @@ namespace ola
 	void ClassDecl::SetFields(UniqueFieldDeclPtrList&& _fields)
 	{
 		fields = std::move(_fields);
-		uint64 field_index_offset = base_class ? base_class->GetFieldCount() : 0;
-		for (uint32 i = 0; i < fields.size(); ++i)
+		Uint64 field_index_offset = base_class ? base_class->GetFieldCount() : 0;
+		for (Uint32 i = 0; i < fields.size(); ++i)
 		{
 			auto& field = fields[i];
 			field->SetParentDecl(this);
@@ -68,7 +68,7 @@ namespace ola
 	std::vector<ConstructorDecl const*> ClassDecl::FindConstructors() const
 	{
 		std::vector<ConstructorDecl const*> found_decls;
-		for (uint32 i = 0; i < methods.size(); ++i)
+		for (Uint32 i = 0; i < methods.size(); ++i)
 		{
 			if (methods[i]->IsConstructor())
 			{
@@ -80,7 +80,7 @@ namespace ola
 	std::vector<MethodDecl const*> ClassDecl::FindMethodDecls(std::string_view name) const
 	{
 		std::vector<MethodDecl const*> found_decls;
-		for (uint32 i = 0; i < methods.size(); ++i)
+		for (Uint32 i = 0; i < methods.size(); ++i)
 		{
 			if (methods[i]->GetName().compare(name) == 0)
 			{
@@ -92,7 +92,7 @@ namespace ola
 	}
 	FieldDecl* ClassDecl::FindFieldDecl(std::string_view name) const
 	{
-		for (uint32 i = 0; i < fields.size(); ++i)
+		for (Uint32 i = 0; i < fields.size(); ++i)
 		{
 			if (fields[i]->GetName().compare(name) == 0)
 			{
@@ -111,7 +111,7 @@ namespace ola
 		{
 			std::vector<MethodDecl const*> base_vtable = base_class->GetVTable();
 			vtable.reserve(base_vtable.size());
-			for (uint64 i = 0; i < base_vtable.size(); ++i)
+			for (Uint64 i = 0; i < base_vtable.size(); ++i)
 			{
 				base_vtable[i]->SetVTableIndex(vtable.size());
 				vtable.push_back(base_vtable[i]);
@@ -130,7 +130,7 @@ namespace ola
 						FuncType const* method_type = method->GetFuncType();
 						if (entry_type->GetReturnType() != method_type->GetReturnType()) return false;
 						if (entry_type->GetParamCount() != method_type->GetParamCount()) return false;
-						for (uint32 i = 0; i < entry_type->GetParamCount(); ++i)
+						for (Uint32 i = 0; i < entry_type->GetParamCount(); ++i)
 						{
 							if (entry_type->GetParams()[i] != method_type->GetParams()[i]) return false;
 						}
@@ -216,55 +216,55 @@ namespace ola
 		return mangled_name;
 	}
 
-	void Decl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void Decl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(false);
 	}
-	void VarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void VarDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		if (init_expr) init_expr->Accept(visitor, depth + 1);
 	}
-	void ParamVarDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ParamVarDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void FieldDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void FieldDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void FunctionDecl::Accept(ASTVisitor& visitor, uint32 depth) const
-	{
-		visitor.Visit(*this, depth);
-		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
-		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
-	}
-	void MethodDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void FunctionDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
-	void EnumMemberDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void MethodDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
+		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
+	}
+	void EnumMemberDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void EnumDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void EnumDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& enum_member : enum_members) enum_member->Accept(visitor, depth + 1);
 	}
-	void AliasDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void AliasDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ClassDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ClassDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto const& field : fields) field->Accept(visitor, depth + 1);
 		for (auto const& method : methods) method->Accept(visitor, depth + 1);
 	}
-	void ConstructorDecl::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ConstructorDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);

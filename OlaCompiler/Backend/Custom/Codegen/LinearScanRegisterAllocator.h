@@ -15,10 +15,10 @@ namespace ola
 
 	private:
 		std::vector<LiveInterval*> active;
-		std::vector<uint32> registers;
-		std::vector<uint32> fp_registers;
-		uint32 frame_register;
-		std::unordered_map<uint32, uint32> vreg2reg_map;
+		std::vector<Uint32> registers;
+		std::vector<Uint32> fp_registers;
+		Uint32 frame_register;
+		std::unordered_map<Uint32, Uint32> vreg2reg_map;
 
 	private:
 		void ExpireOldIntervals(LiveInterval& LI);

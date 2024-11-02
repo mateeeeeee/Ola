@@ -29,7 +29,7 @@ namespace ola
 		IntType*   GetIntType()   const  { return int_type;   }
 		FloatType* GetFloatType() const  { return float_type; }
 
-		ArrayType* GetArrayType(QualType const& type, uint32 array_size);
+		ArrayType* GetArrayType(QualType const& type, Uint32 array_size);
 		RefType* GetRefType(QualType const& type);
 		FuncType* GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types);
 		ClassType* GetClassType(ClassDecl const* class_decl);

@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	int32 CompileRequest::Parse(int argc, char** argv)
+	Sint32 CompileRequest::Parse(int argc, char** argv)
 	{
 		CLI::App cli_parser{ "Ola compiler" };
 		CLI::Option* ast_dump = cli_parser.add_flag("--astdump", "Dump AST to output/log");

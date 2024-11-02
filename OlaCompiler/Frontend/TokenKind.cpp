@@ -26,7 +26,7 @@ namespace ola
 
 	std::string_view GetTokenName(TokenKind t)
 	{
-		return token_names[(uint16)t];
+		return token_names[(Uint16)t];
 	}
 
 	bool IsKeyword(std::string_view identifer)

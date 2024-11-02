@@ -108,7 +108,7 @@ namespace ola
 		}
 
 		Value* base_address = base;
-		uint32 offset = 0;
+		Uint32 offset = 0;
 		IRType* current_type = base->GetType();
 		for (ConstantInt* idx : constant_indices)
 		{
@@ -125,7 +125,7 @@ namespace ola
 			}
 			else return nullptr;
 
-			int64 index_value = idx->GetValue();
+			Sint64 index_value = idx->GetValue();
 			offset += index_value * current_type->GetSize();
 		}
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);

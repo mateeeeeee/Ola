@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	enum class RelocableKind : uint8
+	enum class RelocableKind : Uint8
 	{
 		Function,
 		ZeroStorage,

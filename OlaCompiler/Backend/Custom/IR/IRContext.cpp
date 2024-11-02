@@ -40,7 +40,7 @@ namespace ola
 		delete void_type;
 	}
 
-	IRIntType* IRContext::GetIntegerType(uint32 width)
+	IRIntType* IRContext::GetIntegerType(Uint32 width)
 	{
 		switch (width)
 		{
@@ -63,7 +63,7 @@ namespace ola
 		return new_type;
 	}
 
-	IRArrayType* IRContext::GetArrayType(IRType* base_type, uint32 array_size)
+	IRArrayType* IRContext::GetArrayType(IRType* base_type, Uint32 array_size)
 	{
 		for (auto const& array_type : array_types)
 		{
@@ -80,9 +80,9 @@ namespace ola
 		{
 			if (function_type->GetReturnType() != ret_type) continue;
 			if (function_type->GetParamCount() != param_types.size()) continue;
-			uint64 const param_count = function_type->GetParamCount();
+			Uint64 const param_count = function_type->GetParamCount();
 			bool incompatible = false;
-			for (uint64 i = 0; i < param_count; ++i)
+			for (Uint64 i = 0; i < param_count; ++i)
 			{
 				if (function_type->GetParamType(i) != param_types[i])
 				{
@@ -102,9 +102,9 @@ namespace ola
 		{
 			if (struct_type->GetName() != name) continue;
 			if (struct_type->GetMemberCount() != member_types.size()) continue;
-			uint64 const member_count = struct_type->GetMemberCount();
+			Uint64 const member_count = struct_type->GetMemberCount();
 			bool incompatible = false;
-			for (uint64 i = 0; i < member_count; ++i)
+			for (Uint64 i = 0; i < member_count; ++i)
 			{
 				if (struct_type->GetMemberType(i) != member_types[i])
 				{
@@ -125,14 +125,14 @@ namespace ola
 		return constant_strings[str];
 	}
 
-	ConstantInt* IRContext::GetInt64(int64 value)
+	ConstantInt* IRContext::GetInt64(Sint64 value)
 	{
 		if (constant_ints64.contains(value)) return constant_ints64[value];
 		constant_ints64[value] = new ConstantInt(int8_type, value);
 		return constant_ints64[value];
 	}
 
-	ConstantInt* IRContext::GetInt8(int8 value)
+	ConstantInt* IRContext::GetInt8(Sint8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
 		constant_ints8[value] = new ConstantInt(int1_type, value);
@@ -140,7 +140,7 @@ namespace ola
 	}
 
 
-	ConstantInt* IRContext::GetInt(IRType* type, int64 value)
+	ConstantInt* IRContext::GetInt(IRType* type, Sint64 value)
 	{
 		OLA_ASSERT(type->IsInteger());
 		IRIntType* int_type = cast<IRIntType>(type);
@@ -160,7 +160,7 @@ namespace ola
 		if (!constant_null_arrays.contains(array_type))
 		{
 			IRType* element_type = array_type->GetElementType();
-			uint32 array_size = array_type->GetArraySize();
+			Uint32 array_size = array_type->GetArraySize();
 
 			Constant* element_null_value = Constant::GetNullValue(element_type);
 			std::vector<Constant*> elements(array_size, element_null_value);

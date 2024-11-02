@@ -194,7 +194,7 @@ namespace ola
 			{
 				if (Consume(TokenKind::semicolon)) return nullptr;
 
-				int32 brace_count = 0;
+				Sint32 brace_count = 0;
 				Expect(TokenKind::left_brace); ++brace_count;
 				while (brace_count != 0)
 				{
@@ -245,7 +245,7 @@ namespace ola
 			{
 				if (Consume(TokenKind::semicolon)) return nullptr;
 
-				int32 brace_count = 0;
+				Sint32 brace_count = 0;
 				Expect(TokenKind::left_brace); ++brace_count;
 				while (brace_count != 0)
 				{
@@ -395,7 +395,7 @@ namespace ola
 
 		UniqueEnumMemberDeclPtrList enum_members;
 		Expect(TokenKind::left_brace);
-		int64 val = 0;
+		Sint64 val = 0;
 		while (true)
 		{
 			std::string enum_value_name;
@@ -1161,7 +1161,7 @@ namespace ola
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::int_number));
 		std::string_view string_number = current_token->GetData();
-		int64 value = std::stoll(current_token->GetData().data(), nullptr, 0);
+		Sint64 value = std::stoll(current_token->GetData().data(), nullptr, 0);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnIntLiteral(value, loc);
@@ -1257,7 +1257,7 @@ namespace ola
 		return sema->ActOnInitializerListExpr(loc, std::move(expr_list));
 	}
 
-	void Parser::ParseFunctionAttributes(uint8& attrs)
+	void Parser::ParseFunctionAttributes(Uint8& attrs)
 	{
 		while (current_token->IsFunctionAttribute())
 		{
@@ -1300,7 +1300,7 @@ namespace ola
 		}
 	}
 
-	void Parser::ParseMethodAttributes(uint8& attrs)
+	void Parser::ParseMethodAttributes(Uint8& attrs)
 	{
 		while (current_token->IsMethodAttribute())
 		{
@@ -1433,7 +1433,7 @@ namespace ola
 						Diag(array_size_not_constexpr);
 						return;
 					}
-					int64 array_size = array_size_expr->EvaluateConstexpr();
+					Sint64 array_size = array_size_expr->EvaluateConstexpr();
 					if (array_size <= 0)
 					{
 						Diag(array_size_not_positive);

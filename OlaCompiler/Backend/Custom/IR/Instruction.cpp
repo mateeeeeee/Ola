@@ -75,7 +75,7 @@ namespace ola
 		"call",
 		"phi"
 	};
-	static_assert((uint32)Opcode::Count == std::size(OpcodeNames));
+	static_assert((Uint32)Opcode::Count == std::size(OpcodeNames));
 
 	Use::Use(Value* val, Instruction* user) : value(val), user(user)
 	{
@@ -102,7 +102,7 @@ namespace ola
 
 	char const* Instruction::GetOpcodeName() const
 	{
-		return OpcodeNames[(uint32)GetOpcode()];
+		return OpcodeNames[(Uint32)GetOpcode()];
 	}
 
 	IListIterator<Instruction> Instruction::InsertBefore(BasicBlock* BB, Instruction* I)
@@ -246,9 +246,9 @@ namespace ola
 
 	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
 	{
-		uint32 id_int = (uint32)id;
-		OLA_ASSERT(id_int >= (uint32)Opcode::CompareOpBegin && id_int <= (uint32)Opcode::CompareOpEnd);
-		cmp = (CompareOp)(id_int - (uint32)Opcode::CompareOpBegin);
+		Uint32 id_int = (Uint32)id;
+		OLA_ASSERT(id_int >= (Uint32)Opcode::CompareOpBegin && id_int <= (Uint32)Opcode::CompareOpEnd);
+		cmp = (CompareOp)(id_int - (Uint32)Opcode::CompareOpBegin);
 	}
 
 	PtrAddInst::PtrAddInst(Value* base, Value* offset, IRType* result_element_type) : Instruction(Opcode::PtrAdd, base->GetType(), { base, offset }),

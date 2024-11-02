@@ -9,9 +9,7 @@ label0:
 push rbp
 mov rbp, rsp
 sub rsp, 8
-test 1, 1
-jne label1
-jmp label3
+jmp label1
 label1:
 mov qword ptr [rbp - 8], 10
 jmp label6

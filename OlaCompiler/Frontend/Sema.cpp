@@ -264,7 +264,7 @@ namespace ola
 		return ActOnEnumMemberDecl(name, loc, enum_value_expr->EvaluateConstexpr());
 	}
 
-	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, int64 enum_value)
+	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, Sint64 enum_value)
 	{
 		if (name.empty())
 		{
@@ -455,7 +455,7 @@ namespace ola
 			return nullptr;
 		}
 
-		static uint64 foreach_id = 0;
+		static Uint64 foreach_id = 0;
 		std::string foreach_index_name = "__foreach_index" + std::to_string(foreach_id++);
 		UniqueVarDeclPtr foreach_index_decl = ActOnVariableDecl(foreach_index_name, loc, IntType::Get(ctx), ActOnIntLiteral(0, loc), DeclVisibility::None);
 
@@ -536,7 +536,7 @@ namespace ola
 	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, std::vector<CaseStmt*>&& case_stmts)
 	{
 		bool default_found = false;
-		std::unordered_map<int64, bool> case_value_found;
+		std::unordered_map<Sint64, bool> case_value_found;
 		for (CaseStmt* case_stmt : case_stmts)
 		{
 			if (case_stmt->IsDefault())
@@ -550,7 +550,7 @@ namespace ola
 			}
 			else
 			{
-				int64 case_value = case_stmt->GetValue();
+				Sint64 case_value = case_stmt->GetValue();
 				if (case_value_found[case_value])
 				{
 					diagnostics.Report(loc, duplicate_case_value, case_value);
@@ -872,7 +872,7 @@ namespace ola
 			FuncType const* match_func_type = match_decl->GetFuncType();
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
-			for (uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -939,7 +939,7 @@ namespace ola
 			FuncType const* match_func_type = match_decl->GetFuncType();
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
-			for (uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -991,7 +991,7 @@ namespace ola
 			FuncType const* match_func_type = match_decl->GetFuncType();
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
-			for (uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -1017,7 +1017,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueIntLiteralPtr Sema::ActOnIntLiteral(int64 value, SourceLocation const& loc)
+	UniqueIntLiteralPtr Sema::ActOnIntLiteral(Sint64 value, SourceLocation const& loc)
 	{
 		UniqueIntLiteralPtr int_literal = MakeUnique<IntLiteral>(value, loc);
 		int_literal->SetType(IntType::Get(ctx));
@@ -1222,7 +1222,7 @@ namespace ola
 		ArrayType const* array_type = cast<ArrayType>(array_expr->GetType());
 		if (index_expr->IsConstexpr())
 		{
-			int64 bracket_value = index_expr->EvaluateConstexpr();
+			Sint64 bracket_value = index_expr->EvaluateConstexpr();
 			if (array_type->GetArraySize() > 0 && (bracket_value < 0 || bracket_value >= array_type->GetArraySize()))
 			{
 				diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);
@@ -1328,7 +1328,7 @@ namespace ola
 		}
 
 		std::span<QualType const> param_types = match_decl_type->GetParams();
-		for (uint64 i = 0; i < param_types.size(); ++i)
+		for (Uint64 i = 0; i < param_types.size(); ++i)
 		{
 			UniqueExprPtr& arg = args[i];
 			QualType const& func_param_type = param_types[i];
@@ -1407,7 +1407,7 @@ namespace ola
 
 		ConstructorDecl const* match_ctor = match_ctors[0];
 		std::span<QualType const> param_types = match_ctor->GetFuncType()->GetParams();
-		for (uint64 i = 0; i < param_types.size(); ++i)
+		for (Uint64 i = 0; i < param_types.size(); ++i)
 		{
 			UniqueExprPtr& arg = args[i];
 			QualType const& func_param_type = param_types[i];
@@ -1539,8 +1539,8 @@ namespace ola
 				if (has_type_specifier && isoneof<InitializerListExpr, StringLiteral>(array_init_expr))
 				{
 					ArrayType const* arr_type = cast<ArrayType>(type);
-					uint64 const arr_type_size = arr_type->GetArraySize();
-					uint64 const init_arr_size = init_expr_type->GetArraySize();
+					Uint64 const arr_type_size = arr_type->GetArraySize();
+					Uint64 const init_arr_size = init_expr_type->GetArraySize();
 					if (arr_type_size && arr_type_size < init_arr_size)
 					{
 						diagnostics.Report(loc, invalid_init_list_expression);
@@ -1632,7 +1632,7 @@ namespace ola
 	std::vector<DeclType const*> Sema::ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList& args)
 	{
 		std::vector<DeclType const*> match_decls{};
-		uint32 match_conversions_needed = UINT32_MAX;
+		Uint32 match_conversions_needed = UINT32_MAX;
 		for (DeclType const* decl : candidate_decls)
 		{
 			FuncType const* func_type = decl->GetFuncType();
@@ -1640,7 +1640,7 @@ namespace ola
 			if (args.size() != param_types.size()) continue;
 
 			bool incompatible_arg = false;
-			for (uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -1657,8 +1657,8 @@ namespace ola
 			}
 			if (incompatible_arg) continue;
 
-			uint32 current_conversions_needed = 0;
-			for (uint64 i = 0; i < param_types.size(); ++i)
+			Uint32 current_conversions_needed = 0;
+			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];

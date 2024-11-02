@@ -35,7 +35,7 @@ namespace ola
 
 			if (global_slot_map.contains(prefixed_name))
 			{
-				uint32 slot = global_slot_map[prefixed_name]++;
+				Uint32 slot = global_slot_map[prefixed_name]++;
 				global_name_map[V] = prefixed_name + std::to_string(slot);
 			}
 			else
@@ -52,7 +52,7 @@ namespace ola
 
 			if (local_slot_map.contains(prefixed_name))
 			{
-				uint32 slot = local_slot_map[prefixed_name]++;
+				Uint32 slot = local_slot_map[prefixed_name]++;
 				local_name_map[V] = prefixed_name + std::to_string(slot);
 			}
 			else
@@ -303,8 +303,8 @@ namespace ola
 			IRFuncType* func_type = cast<IRFuncType>(type);
 			PrintType(func_type->GetReturnType());
 			Emit("(");
-			uint32 const param_count = func_type->GetParamCount();
-			for (uint32 i = 0; i < param_count; ++i)
+			Uint32 const param_count = func_type->GetParamCount();
+			for (Uint32 i = 0; i < param_count; ++i)
 			{
 				PrintType(func_type->GetParamType(i));
 				Emit(",");

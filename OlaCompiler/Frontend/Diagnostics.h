@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	enum DiagCode : uint32
+	enum DiagCode : Uint32
 	{
 		#define DIAG(diag_code, diag_kind, diag_msg) diag_code,
 		#include "Diagnostics.def"
@@ -14,7 +14,7 @@ namespace ola
 
 	class Diagnostics
 	{
-		enum class DiagKind : uint32
+		enum class DiagKind : Uint32
 		{
 			info,
 			warning,

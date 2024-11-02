@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	void TranslationUnit::Accept(ASTVisitor& visitor, uint32 depth) const
+	void TranslationUnit::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& decl : declarations) decl->Accept(visitor, depth + 1);

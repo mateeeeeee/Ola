@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	enum MachineOpcode : uint32
+	enum MachineOpcode : Uint32
 	{
 		InstUnknown,
 		// control-flow
@@ -70,7 +70,7 @@ namespace ola
 		ISASpecificBegin,
 	};
 
-	enum MachineInstFlag : uint32
+	enum MachineInstFlag : Uint32
 	{
 		MachineInstFlag_None = 0x0,
 		MachineInstFlag_IgnoreDef = 0x1,
@@ -78,18 +78,18 @@ namespace ola
 
 	class MachineInstruction
 	{
-		static constexpr uint32 MAX_OPERANDS = 7;
+		static constexpr Uint32 MAX_OPERANDS = 7;
 
 	public:
-		explicit MachineInstruction(uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) 
+		explicit MachineInstruction(Uint32 opcode) : opcode(opcode), flags(MachineInstFlag_None) 
 		{}
 
-		MachineInstruction& SetOpcode(uint32 _opcode)
+		MachineInstruction& SetOpcode(Uint32 _opcode)
 		{
 			opcode = _opcode;
 			return *this;
 		}
-		uint32 GetOpcode() const { return opcode; }
+		Uint32 GetOpcode() const { return opcode; }
 
 
 		bool operator==(MachineInstruction const& rhs) const
@@ -97,17 +97,17 @@ namespace ola
 			return opcode == rhs.opcode && operands == rhs.operands;
 		}
 
-		template<uint32 Idx>
+		template<Uint32 Idx>
 		MachineOperand const& GetOp() const
 		{
 			return operands[Idx];
 		}
-		template<uint32 Idx>
+		template<Uint32 Idx>
 		MachineOperand& GetOp()
 		{
 			return operands[Idx];
 		}
-		template<uint32 Idx>
+		template<Uint32 Idx>
 		MachineInstruction& SetOp(MachineOperand const& operand)
 		{
 			static_assert(Idx < MAX_OPERANDS);
@@ -115,15 +115,15 @@ namespace ola
 			return* this;
 		}
 
-		MachineOperand& GetOperand(uint32 idx)
+		MachineOperand& GetOperand(Uint32 idx)
 		{
 			return operands[idx];
 		}
-		MachineOperand const& GetOperand(uint32 idx) const
+		MachineOperand const& GetOperand(Uint32 idx) const
 		{
 			return operands[idx];
 		}
-		void SetOperand(uint32 idx, MachineOperand const& operand)
+		void SetOperand(Uint32 idx, MachineOperand const& operand)
 		{
 			operands[idx] = operand;
 		}
@@ -148,8 +148,8 @@ namespace ola
 		}
 
 	private:
-		uint32 opcode;
-		uint32 flags;
+		Uint32 opcode;
+		Uint32 flags;
 		std::array<MachineOperand, MAX_OPERANDS> operands;
 	};
 }

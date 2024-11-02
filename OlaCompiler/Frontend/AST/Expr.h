@@ -7,7 +7,7 @@
 
 namespace ola
 {
-	enum class ExprKind : uint8
+	enum class ExprKind : Uint8
 	{
 		Unary,
 		Binary,
@@ -29,14 +29,14 @@ namespace ola
 		This,
 		Super
 	};
-	enum class UnaryExprKind : uint8
+	enum class UnaryExprKind : Uint8
 	{
 		PreIncrement, PreDecrement,
 		PostIncrement, PostDecrement,
 		Plus, Minus, BitNot,
 		LogicalNot
 	};
-	enum class BinaryExprKind : uint8
+	enum class BinaryExprKind : Uint8
 	{
 		Add, Subtract, Multiply, Divide, Modulo,
 		ShiftLeft, ShiftRight, BitAnd, BitOr, BitXor,
@@ -66,9 +66,9 @@ namespace ola
 		QualType const& GetType() const { return type; }
 
 		virtual bool IsConstexpr() const { return false; }
-		virtual int64 EvaluateConstexpr() const { return 0; }
+		virtual Sint64 EvaluateConstexpr() const { return 0; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return true; }
@@ -100,7 +100,7 @@ namespace ola
 			return operand->IsConstexpr(); 
 		}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Unary; }
@@ -124,7 +124,7 @@ namespace ola
 		{
 			return lhs->IsConstexpr() && rhs->IsConstexpr();
 		}
-		virtual int64 EvaluateConstexpr() const
+		virtual Sint64 EvaluateConstexpr() const
 		{
 			switch (op)
 			{
@@ -154,7 +154,7 @@ namespace ola
 			return 0;
 		}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Binary; }
@@ -177,7 +177,7 @@ namespace ola
 		Expr const* GetTrueExpr() const { return true_expr.get(); }
 		Expr const* GetFalseExpr() const { return false_expr.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Ternary; }
@@ -196,7 +196,7 @@ namespace ola
 		}
 		std::string_view GetName() const { return name; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Identifier || expr->GetExprKind() == ExprKind::DeclRef; }
@@ -217,11 +217,11 @@ namespace ola
 		DeclRefExpr(Decl const* decl, SourceLocation const& loc);
 
 		Decl const* GetDecl() const { return decl; }
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		virtual bool IsConstexpr() const;
-		virtual int64 EvaluateConstexpr() const;
+		virtual Sint64 EvaluateConstexpr() const;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::DeclRef; }
 	private:
@@ -231,21 +231,21 @@ namespace ola
 	class IntLiteral final : public Expr
 	{
 	public:
-		IntLiteral(int64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value) 
+		IntLiteral(Sint64 value, SourceLocation const& loc) : Expr(ExprKind::IntLiteral, loc), value(value) 
 		{
 			SetValueCategory(ExprValueCategory::RValue);
 		}
-		int64 GetValue() const { return value; }
+		Sint64 GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		virtual bool IsConstexpr() const { return true; }
-		virtual int64 EvaluateConstexpr() const { return value; }
+		virtual Sint64 EvaluateConstexpr() const { return value; }
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::IntLiteral; }
 	private:
-		int64 value;
+		Sint64 value;
 	};
 
 	class CharLiteral final : public Expr
@@ -259,7 +259,7 @@ namespace ola
 
 		virtual bool IsConstexpr() const { return true; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::CharLiteral; }
@@ -278,7 +278,7 @@ namespace ola
 
 		virtual bool IsConstexpr() const { return true; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::StringLiteral; }
@@ -295,7 +295,7 @@ namespace ola
 		}
 		bool GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		virtual bool IsConstexpr() const { return true; }
@@ -311,7 +311,7 @@ namespace ola
 		FloatLiteral(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value) {}
 		double GetValue() const { return value; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		virtual bool IsConstexpr() const { return true; }
@@ -336,7 +336,7 @@ namespace ola
 		}
 		Expr const* GetOperand() const { return operand.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::ImplicitCast; }
@@ -367,7 +367,7 @@ namespace ola
 		}
 		FunctionDecl const* GetFunctionDecl() const { return func_decl; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Call || expr->GetExprKind() == ExprKind::MethodCall; }
@@ -398,7 +398,7 @@ namespace ola
 			return true;
 		}
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::InitializerList; }
@@ -426,7 +426,7 @@ namespace ola
 		Expr const* GetArrayExpr() const { return array_expr.get(); }
 		Expr const* GetIndexExpr() const { return bracket_expr.get(); }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::ArrayAccess; }
@@ -455,7 +455,7 @@ namespace ola
 		}
 		Decl const* GetMemberDecl() const { return decl; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Member; }
@@ -469,7 +469,7 @@ namespace ola
 	public:
 		MethodCallExpr(SourceLocation const& loc, MethodDecl const* method_decl);
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::MethodCall; }
@@ -486,7 +486,7 @@ namespace ola
 		}
 		bool IsImplicit() const { return implicit; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::This; }
@@ -505,7 +505,7 @@ namespace ola
 		}
 		bool IsImplicit() const { return implicit; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Super; }
@@ -525,7 +525,7 @@ namespace ola
 		UniqueExprPtrList const& GetArgs() const { return ctor_args; }
 		ConstructorDecl const* GetCtorDecl() const { return ctor_decl; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Ctor; }

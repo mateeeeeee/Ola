@@ -8,7 +8,7 @@ namespace ola
 	class IRType;
 	class BasicBlock;
 
-	enum class ValueKind : uint8
+	enum class ValueKind : Uint8
 	{
 		Instruction,
 		Constant,

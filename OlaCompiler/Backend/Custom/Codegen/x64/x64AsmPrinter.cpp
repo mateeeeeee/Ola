@@ -49,7 +49,7 @@ namespace ola
 		}
 		else if (MO.IsStackObject())
 		{
-			int32 stack_offset = MO.GetStackOffset();
+			Sint32 stack_offset = MO.GetStackOffset();
 			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), stack_offset);
 			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), -stack_offset);
 			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr));
@@ -85,7 +85,7 @@ namespace ola
 					EmitText("{}:", MBB->GetSymbol());
 					for (MachineInstruction& MI : MBB->Instructions())
 					{
-						uint32 opcode = MI.GetOpcode();
+						Uint32 opcode = MI.GetOpcode();
 						char const* opcode_string = x64::GetOpcodeString(opcode);
 						switch (opcode)
 						{
@@ -206,7 +206,7 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsImmediate())
 							{
-								int64 imm = op2.GetImmediate();
+								Sint64 imm = op2.GetImmediate();
 								std::string entry = GetFPConstantPoolEntry(imm);
 								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
 							}
@@ -222,7 +222,7 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsImmediate())
 							{
-								int64 imm = op2.GetImmediate();
+								Sint64 imm = op2.GetImmediate();
 								std::string entry = GetIntConstantPoolEntry(imm);
 								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
 							}
@@ -252,10 +252,10 @@ namespace ola
 						std::visit([&](auto&& arg)
 							{
 								using T = std::decay_t<decltype(arg)>;
-								if constexpr (std::is_same_v<T, uint8>)				EmitReadOnly(".byte {}", arg);
-								else if constexpr (std::is_same_v<T, uint16>)		EmitReadOnly(".word {}", arg);
-								else if constexpr (std::is_same_v<T, uint32>)		EmitReadOnly(".long {}", arg);
-								else if constexpr (std::is_same_v<T, uint64>)		EmitReadOnly(".quad {}", arg);
+								if constexpr (std::is_same_v<T, Uint8>)				EmitReadOnly(".byte {}", arg);
+								else if constexpr (std::is_same_v<T, Uint16>)		EmitReadOnly(".word {}", arg);
+								else if constexpr (std::is_same_v<T, Uint32>)		EmitReadOnly(".long {}", arg);
+								else if constexpr (std::is_same_v<T, Uint64>)		EmitReadOnly(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)	EmitReadOnly(".string \"{}\"", arg);
 								else static_assert(false, "non-exhaustive visitor!");
 							}, element);
@@ -270,10 +270,10 @@ namespace ola
 						std::visit([&](auto&& arg)
 							{
 								using T = std::decay_t<decltype(arg)>;
-								if constexpr (std::is_same_v<T, uint8>)				EmitData(".byte {}", arg);
-								else if constexpr (std::is_same_v<T, uint16>)		EmitData(".word {}", arg);
-								else if constexpr (std::is_same_v<T, uint32>)		EmitData(".long {}", arg);
-								else if constexpr (std::is_same_v<T, uint64>)		EmitData(".quad {}", arg);
+								if constexpr (std::is_same_v<T, Uint8>)				EmitData(".byte {}", arg);
+								else if constexpr (std::is_same_v<T, Uint16>)		EmitData(".word {}", arg);
+								else if constexpr (std::is_same_v<T, Uint32>)		EmitData(".long {}", arg);
+								else if constexpr (std::is_same_v<T, Uint64>)		EmitData(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)	EmitData(".string \"{}\"", arg);
 								else static_assert(false, "non-exhaustive visitor!");
 							}, element);
@@ -293,12 +293,12 @@ namespace ola
 	}
 
 
-	std::string x64AsmPrinter::GetFPConstantPoolEntry(int64 value)
+	std::string x64AsmPrinter::GetFPConstantPoolEntry(Sint64 value)
 	{
-		static std::unordered_map<int64, std::string> fp_constant_pool;
+		static std::unordered_map<Sint64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
 		{
-			static uint32 entry_index = 0;
+			static Uint32 entry_index = 0;
 			fp_constant_pool[value] = "_FP" + std::to_string(entry_index++);
 			EmitReadOnly("{}:", fp_constant_pool[value]);
 			EmitReadOnly(".quad {}", value);
@@ -307,12 +307,12 @@ namespace ola
 		return fp_constant_pool[value];
 	}
 
-	std::string x64AsmPrinter::GetIntConstantPoolEntry(int64 value)
+	std::string x64AsmPrinter::GetIntConstantPoolEntry(Sint64 value)
 	{
-		static std::unordered_map<int64, std::string> int_constant_pool;
+		static std::unordered_map<Sint64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))
 		{
-			static uint32 entry_index = 0;
+			static Uint32 entry_index = 0;
 			int_constant_pool[value] = "_INT" + std::to_string(entry_index++);
 			EmitReadOnly("{}:", int_constant_pool[value]);
 			EmitReadOnly(".quad {}", value);

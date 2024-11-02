@@ -45,7 +45,7 @@ namespace ola
 
 		void UpdatePointersAndLocation()
 		{
-			loc.NewChars(static_cast<int32>(cur_ptr - buf_ptr));
+			loc.NewChars(static_cast<Sint32>(cur_ptr - buf_ptr));
 			buf_ptr = cur_ptr;
 		}
 

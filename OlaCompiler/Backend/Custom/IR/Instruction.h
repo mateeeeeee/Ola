@@ -16,7 +16,7 @@ namespace ola
 	class IRType;
 	class IRPtrType;
 
-	enum class Opcode : uint32
+	enum class Opcode : Uint32
 	{
 		None,
 
@@ -208,7 +208,7 @@ namespace ola
 			return !users.empty();
 		}
 		bool HasOneUse() const { return users.size() == 1; }
-		bool HasNUses(uint32 N) const { return users.size() == N; }
+		bool HasNUses(Uint32 N) const { return users.size() == N; }
 		bool HasNUsesOrMore(unsigned N) const { return users.size() >= N; }
 
 		static bool ClassOf(Value const* V)
@@ -291,23 +291,23 @@ namespace ola
 		{
 			return operands.data();
 		}
-		uint32 GetNumOperands() const
+		Uint32 GetNumOperands() const
 		{
-			return (uint32)operands.size();
+			return (Uint32)operands.size();
 		}
-		Value* GetOperand(uint32 i) const
+		Value* GetOperand(Uint32 i) const
 		{
 			return GetOperandList()[i];
 		}
-		void SetOperand(uint32 i, Value* val)
+		void SetOperand(Uint32 i, Value* val)
 		{
 			GetOperandList()[i] = val;
 		}
-		Use const& GetOperandUse(uint32 i) const
+		Use const& GetOperandUse(Uint32 i) const
 		{
 			return GetOperandList()[i];
 		}
-		Use& GetOperandUse(uint32 i)
+		Use& GetOperandUse(Uint32 i)
 		{
 			return GetOperandList()[i];
 		}
@@ -355,12 +355,12 @@ namespace ola
 			operands.emplace_back(op, this);
 		}
 
-		template <uint32 Idx>
+		template <Uint32 Idx>
 		Use& Op()
 		{
 			return operands[Idx];
 		}
-		template <uint32 Idx>
+		template <Uint32 Idx>
 		Use const& Op() const
 		{
 			return operands[Idx];
@@ -595,7 +595,7 @@ namespace ola
 	public:
 		SwitchInst(Value* val, BasicBlock* default_block);
 
-		void AddCase(int64 key, BasicBlock* label)
+		void AddCase(Sint64 key, BasicBlock* label)
 		{
 			cases.emplace_back(key, label);
 		}
@@ -613,12 +613,12 @@ namespace ola
 			return default_block;
 		}
 
-		BasicBlock* GetCaseBlock(uint32 case_idx) const
+		BasicBlock* GetCaseBlock(Uint32 case_idx) const
 		{
 			if (case_idx >= cases.size()) return nullptr;
 			return cases[case_idx].second;
 		}
-		int64 GetCaseValue(uint32 case_idx) const
+		Sint64 GetCaseValue(Uint32 case_idx) const
 		{
 			if (case_idx >= cases.size()) return INT64_MAX;
 			return cases[case_idx].first;
@@ -627,7 +627,7 @@ namespace ola
 		Value* GetCondition() const { return GetOperand(0); }
 		void SetCondition(Value* V) { SetOperand(0, V); }
 
-		uint32 GetNumCases() const
+		Uint32 GetNumCases() const
 		{
 			return cases.size();
 		}
@@ -643,7 +643,7 @@ namespace ola
 
 	private:
 		BasicBlock* default_block;
-		std::vector<std::pair<int64, BasicBlock*>> cases;
+		std::vector<std::pair<Sint64, BasicBlock*>> cases;
 	};
 
 	class CallInst final : public Instruction
@@ -658,14 +658,14 @@ namespace ola
 		IteratorRange<OpIterator> Args() { return MakeRange(ArgBegin(), ArgEnd()); }
 		IteratorRange<ConstOpIterator> Args() const { return MakeRange(ArgBegin(), ArgEnd()); }
 		bool ArgEmpty() const { return ArgEnd() == ArgBegin(); }
-		uint32 ArgSize() const { return ArgEnd() - ArgBegin(); }
+		Uint32 ArgSize() const { return ArgEnd() - ArgBegin(); }
 
-		Value const* GetArgOp(uint32 i) const
+		Value const* GetArgOp(Uint32 i) const
 		{
 			OLA_ASSERT_MSG(i < ArgSize(), "Out of bounds!");
 			return GetOperand(i);
 		}
-		void SetArgOp(uint32 i, Value* v)
+		void SetArgOp(Uint32 i, Value* v)
 		{
 			OLA_ASSERT_MSG(i < ArgSize(), "Out of bounds!");
 			SetOperand(i, v);
@@ -755,7 +755,7 @@ namespace ola
 
 		GetElementPtrInst(Value* base, std::span<Value*> indices);
 
-		uint32 GetNumIndices() const { return GetNumOperands() - 1; }
+		Uint32 GetNumIndices() const { return GetNumOperands() - 1; }
 		bool HasIndices() const { return GetNumIndices() > 0; }
 
 		OpIterator       IdxBegin() { return OpBegin() + 1; }

@@ -18,7 +18,7 @@ namespace ola
 		return ctx.GetPointerType(pointee_type);
 	}
 
-	IRIntType* IRIntType::Get(IRContext& ctx, uint32 width)
+	IRIntType* IRIntType::Get(IRContext& ctx, Uint32 width)
 	{
 		return ctx.GetIntegerType(width);
 	}
@@ -28,12 +28,12 @@ namespace ola
 		return ctx.GetFloatType();
 	}
 
-	IRArrayType* IRArrayType::Get(IRContext& ctx, IRType* base_type, uint32 array_size)
+	IRArrayType* IRArrayType::Get(IRContext& ctx, IRType* base_type, Uint32 array_size)
 	{
 		return ctx.GetArrayType(base_type, array_size);
 	}
 
-	IRArrayType* IRArrayType::Get(IRType* base_type, uint32 array_size)
+	IRArrayType* IRArrayType::Get(IRType* base_type, Uint32 array_size)
 	{
 		return base_type->GetContext().GetArrayType(base_type, array_size);
 	}
@@ -56,7 +56,7 @@ namespace ola
 	IRStructType::IRStructType(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types) : IRType(ctx, IRTypeKind::Struct, 0, 0), name(name), member_types(member_types)
 	{
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
-		uint32 offset = 0;
+		Uint32 offset = 0;
 
 		for (IRType* member_type : this->member_types)
 		{

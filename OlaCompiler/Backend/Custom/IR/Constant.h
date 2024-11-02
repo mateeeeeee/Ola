@@ -7,7 +7,7 @@
 
 namespace ola
 {
-	enum class ConstantID : uint8
+	enum class ConstantID : Uint8
 	{ 
 		Global, Integer, Float, String, Offset, Array, Struct, Undef
 	};
@@ -37,18 +37,18 @@ namespace ola
 	class ConstantInt final : public Constant
 	{
 	public:
-		ConstantInt(IRType* type, int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
+		ConstantInt(IRType* type, Sint64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
 		{
 			OLA_ASSERT(isa<IRIntType>(type));
 		}
-		ConstantInt(IRIntType* type, int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth() * 8) {}
+		ConstantInt(IRIntType* type, Sint64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth() * 8) {}
 
 		IRIntType* GetIntegerType() const
 		{
 			return cast<IRIntType>(GetType());
 		}
-		int64 GetValue() const { return value; }
-		uint32 GetBitWidth() const { return bitwidth; }
+		Sint64 GetValue() const { return value; }
+		Uint32 GetBitWidth() const { return bitwidth; }
 
 		static bool ClassOf(Value const* V)
 		{
@@ -59,8 +59,8 @@ namespace ola
 			return C->GetConstantID() == ConstantID::Integer;
 		}
 	private:
-		int64 value;
-		uint32 bitwidth;
+		Sint64 value;
+		Uint32 bitwidth;
 	};
 
 	class ConstantFloat final : public Constant
@@ -135,7 +135,7 @@ namespace ola
 		ConstantAggregate(ConstantID constant_id, IRType* type, std::span<Constant*> values) : Constant(constant_id, type)
 		{
 			aggregate_values.resize(values.size());
-			for (uint32 i = 0; i < values.size(); ++i)
+			for (Uint32 i = 0; i < values.size(); ++i)
 			{
 				if (IRStructType* ST = dyn_cast<IRStructType>(type))
 				{

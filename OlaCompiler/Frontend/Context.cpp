@@ -26,7 +26,7 @@ namespace ola
 		delete void_type;
 	}
 
-	ArrayType* Context::GetArrayType(QualType const& type, uint32 array_size)
+	ArrayType* Context::GetArrayType(QualType const& type, Uint32 array_size)
 	{
 		for (auto const& array_type : array_types)
 		{
@@ -53,9 +53,9 @@ namespace ola
 		{
 			if (function_type->GetReturnType() != return_type) continue;
 			if (function_type->GetParamCount() != param_types.size()) continue;
-			uint64 const param_count = function_type->GetParamCount();
+			Uint64 const param_count = function_type->GetParamCount();
 			bool incompatible = false;
-			for (uint64 i = 0; i < param_count; ++i)
+			for (Uint64 i = 0; i < param_count; ++i)
 			{
 				if (function_type->GetParamType(i) != param_types[i])
 				{

@@ -11,21 +11,21 @@ namespace ola
 
 		OLA_NODISCARD bool HasAttr(Attr attr) const 
 		{
-			return static_cast<uint32>(attribute) & static_cast<uint32>(attr);
+			return static_cast<Uint32>(attribute) & static_cast<Uint32>(attr);
 		}
 		Attribute& AddAttr(Attr attr) 
 		{
-			attribute = static_cast<Attr>(static_cast<uint32>(attribute) | static_cast<uint32>(attr));
+			attribute = static_cast<Attr>(static_cast<Uint32>(attribute) | static_cast<Uint32>(attr));
 			return *this;
 		}
 		Attribute& RemoveAttr(Attr attr)
 		{
-			attribute = static_cast<Attr>(static_cast<uint32>(attribute) & (~static_cast<uint32>(attr)));
+			attribute = static_cast<Attr>(static_cast<Uint32>(attribute) & (~static_cast<Uint32>(attr)));
 			return *this;
 		}
 		OLA_NODISCARD bool Empty() const  
 		{
-			return !static_cast<uint32>(attribute);
+			return !static_cast<Uint32>(attribute);
 		}
 
 	private:

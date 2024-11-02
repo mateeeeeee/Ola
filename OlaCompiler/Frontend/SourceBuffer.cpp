@@ -16,7 +16,7 @@ namespace ola
 		data_buffer.push_back('\0');
 	}
 
-	SourceBuffer::SourceBuffer(char const* buffer_start, uint64 buffer_size, std::string_view refname)
+	SourceBuffer::SourceBuffer(char const* buffer_start, Uint64 buffer_size, std::string_view refname)
 		: ref_name(refname), data_buffer(buffer_start, buffer_size)
 	{}
 

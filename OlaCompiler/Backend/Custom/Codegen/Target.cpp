@@ -22,7 +22,7 @@ namespace ola
 		return GetInstInfo(inst.GetOpcode());
 	}
 
-	void InstInfo::SetOpFlag(uint32 idx, OperandFlag flag)
+	void InstInfo::SetOpFlag(Uint32 idx, OperandFlag flag)
 	{
 		operand_flags[idx] |= flag;
 	}

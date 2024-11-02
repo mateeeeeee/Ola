@@ -35,22 +35,22 @@ namespace ola
 		ast->translation_unit->Accept(*this);
 	}
 
-	void IRVisitor::Visit(ASTNode const&, uint32)
+	void IRVisitor::Visit(ASTNode const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(TranslationUnit const& translation_unit, uint32)
+	void IRVisitor::Visit(TranslationUnit const& translation_unit, Uint32)
 	{
 		for (auto&& decl : translation_unit.GetDecls()) decl->Accept(*this);
 	}
 
-	void IRVisitor::Visit(Decl const&, uint32)
+	void IRVisitor::Visit(Decl const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(FunctionDecl const& function_decl, uint32)
+	void IRVisitor::Visit(FunctionDecl const& function_decl, Uint32)
 	{
 		FuncType const* type = function_decl.GetFuncType();
 		IRFuncType* function_type = cast<IRFuncType>(ConvertToIRType(type));
@@ -58,7 +58,7 @@ namespace ola
 		Function* ir_function = new Function(function_decl.GetMangledName(), function_type, linkage);
 		module.AddGlobal(ir_function);
 
-		uint32 arg_index = 0;
+		Uint32 arg_index = 0;
 		Argument* param_arg = ir_function->GetArg(arg_index);
 		if (isa<ClassType>(type->GetReturnType()))
 		{
@@ -79,17 +79,17 @@ namespace ola
 		VisitFunctionDeclCommon(function_decl, ir_function);
 	}
 
-	void IRVisitor::Visit(MethodDecl const&, uint32)
+	void IRVisitor::Visit(MethodDecl const&, Uint32)
 	{
 
 	}
 
-	void IRVisitor::Visit(ParamVarDecl const&, uint32)
+	void IRVisitor::Visit(ParamVarDecl const&, Uint32)
 	{
 
 	}
 
-	void IRVisitor::Visit(FieldDecl const& field_decl, uint32)
+	void IRVisitor::Visit(FieldDecl const& field_decl, Uint32)
 	{
 		QualType const& var_type = field_decl.GetType();
 		IRType* ir_type = ConvertToIRType(var_type);
@@ -107,7 +107,7 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(VarDecl const& var_decl, uint32)
+	void IRVisitor::Visit(VarDecl const& var_decl, Uint32)
 	{
 		Type const* var_type = var_decl.GetType().GetTypePtr();
 		bool const is_const = var_decl.GetType().IsConst();
@@ -191,7 +191,7 @@ namespace ola
 					}
 					curr_class_decl = base_class_decl;
 				}
-				for (uint64 i = 0; i < fields.size(); ++i)
+				for (Uint64 i = 0; i < fields.size(); ++i)
 				{
 					initializers.push_back(cast<Constant>(value_map[fields[i].get()]));
 				}
@@ -231,14 +231,14 @@ namespace ola
 						Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
 						UniqueExprPtrList const& init_list = init_list_expr->GetInitList();
 
-						for (uint64 i = 0; i < init_list.size(); ++i)
+						for (Uint64 i = 0; i < init_list.size(); ++i)
 						{
 							ConstantInt* index = context.GetInt64(i);
 							Value* indices[] = { zero, index };
 							Value* ptr = builder->MakeInst<GetElementPtrInst>(alloc, indices);
 							Store(value_map[init_list[i].get()], ptr);
 						}
-						for (uint64 i = init_list.size(); i < array_type->GetArraySize(); ++i)
+						for (Uint64 i = init_list.size(); i < array_type->GetArraySize(); ++i)
 						{
 							ConstantInt* index = context.GetInt64(i);
 							Value* indices[] = { zero, index };
@@ -251,7 +251,7 @@ namespace ola
 					{
 						Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
 						std::string_view str = string->GetString();
-						for (uint64 i = 0; i < str.size(); ++i)
+						for (Uint64 i = 0; i < str.size(); ++i)
 						{
 							ConstantInt* index = context.GetInt64(i);
 							Value* indices[] = { zero, index };
@@ -314,27 +314,27 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(TagDecl const&, uint32)
+	void IRVisitor::Visit(TagDecl const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(EnumDecl const& enum_decl, uint32)
+	void IRVisitor::Visit(EnumDecl const& enum_decl, Uint32)
 	{
 		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
 	}
 
-	void IRVisitor::Visit(EnumMemberDecl const& enum_member_decl, uint32)
+	void IRVisitor::Visit(EnumMemberDecl const& enum_member_decl, Uint32)
 	{
 		ConstantInt* constant = context.GetInt64(enum_member_decl.GetValue());
 		value_map[&enum_member_decl] = constant;
 	}
 
-	void IRVisitor::Visit(AliasDecl const&, uint32)
+	void IRVisitor::Visit(AliasDecl const&, Uint32)
 	{
 	}
 
-	void IRVisitor::Visit(ClassDecl const& class_decl, uint32)
+	void IRVisitor::Visit(ClassDecl const& class_decl, Uint32)
 	{
 		for (auto& field : class_decl.GetFields()) field->Accept(*this);
 		for (auto& method : class_decl.GetMethods()) method->Accept(*this);
@@ -367,32 +367,32 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(Stmt const&, uint32)
+	void IRVisitor::Visit(Stmt const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(CompoundStmt const& compound_stmt, uint32)
+	void IRVisitor::Visit(CompoundStmt const& compound_stmt, Uint32)
 	{
 		for (auto const& stmt : compound_stmt.GetStmts()) stmt->Accept(*this);
 	}
 
-	void IRVisitor::Visit(DeclStmt const& decl_stmt, uint32)
+	void IRVisitor::Visit(DeclStmt const& decl_stmt, Uint32)
 	{
 		for (auto const& decl : decl_stmt.GetDecls())  decl->Accept(*this);
 	}
 
-	void IRVisitor::Visit(ExprStmt const& expr_stmt, uint32)
+	void IRVisitor::Visit(ExprStmt const& expr_stmt, Uint32)
 	{
 		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
 	}
 
-	void IRVisitor::Visit(NullStmt const&, uint32)
+	void IRVisitor::Visit(NullStmt const&, Uint32)
 	{
 
 	}
 
-	void IRVisitor::Visit(ReturnStmt const& return_stmt, uint32)
+	void IRVisitor::Visit(ReturnStmt const& return_stmt, Uint32)
 	{
 		BasicBlock* current_block = builder->GetCurrentBlock();
 		Function* current_function = current_block->GetFunction();
@@ -409,7 +409,7 @@ namespace ola
 		builder->SetCurrentBlock(return_block);
 	}
 
-	void IRVisitor::Visit(IfStmt const& if_stmt, uint32)
+	void IRVisitor::Visit(IfStmt const& if_stmt, Uint32)
 	{
 		Expr const* cond_expr = if_stmt.GetCondExpr();
 		Stmt const* then_stmt = if_stmt.GetThenStmt();
@@ -442,7 +442,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(BreakStmt const& break_stmt, uint32)
+	void IRVisitor::Visit(BreakStmt const& break_stmt, Uint32)
 	{
 		OLA_ASSERT(!break_blocks.empty());
 		builder->MakeInst<BranchInst>(context, break_blocks.back());
@@ -451,7 +451,7 @@ namespace ola
 		builder->SetCurrentBlock(break_block);
 	}
 
-	void IRVisitor::Visit(ContinueStmt const& continue_stmt, uint32)
+	void IRVisitor::Visit(ContinueStmt const& continue_stmt, Uint32)
 	{
 		OLA_ASSERT(!continue_blocks.empty());
 
@@ -461,7 +461,7 @@ namespace ola
 		builder->SetCurrentBlock(continue_block);
 	}
 
-	void IRVisitor::Visit(ForStmt const& for_stmt, uint32)
+	void IRVisitor::Visit(ForStmt const& for_stmt, Uint32)
 	{
 		Stmt const* init_stmt = for_stmt.GetInitStmt();
 		Expr const* cond_expr = for_stmt.GetCondExpr();
@@ -507,7 +507,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(WhileStmt const& while_stmt, uint32)
+	void IRVisitor::Visit(WhileStmt const& while_stmt, Uint32)
 	{
 		Expr const* cond_expr = while_stmt.GetCondExpr();
 		Stmt const* body_stmt = while_stmt.GetBodyStmt();
@@ -540,7 +540,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(DoWhileStmt const& do_while_stmt, uint32)
+	void IRVisitor::Visit(DoWhileStmt const& do_while_stmt, Uint32)
 	{
 		Expr const* cond_expr = do_while_stmt.GetCondExpr();
 		Stmt const* body_stmt = do_while_stmt.GetBodyStmt();
@@ -573,7 +573,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(CaseStmt const& case_stmt, uint32)
+	void IRVisitor::Visit(CaseStmt const& case_stmt, Uint32)
 	{
 		OLA_ASSERT(!switch_instructions.empty());
 		SwitchInst* switch_inst = switch_instructions.back();
@@ -583,7 +583,7 @@ namespace ola
 		}
 		else
 		{
-			int64 case_value = case_stmt.GetValue();
+			Sint64 case_value = case_stmt.GetValue();
 			Function* function = builder->GetCurrentFunction();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
 			BasicBlock* case_block = builder->AddBlock(function, exit_block);
@@ -593,7 +593,7 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(SwitchStmt const& switch_stmt, uint32)
+	void IRVisitor::Visit(SwitchStmt const& switch_stmt, Uint32)
 	{
 		Expr const* cond_expr = switch_stmt.GetCondExpr();
 		Stmt const* body_stmt = switch_stmt.GetBodyStmt();
@@ -621,11 +621,11 @@ namespace ola
 		switch_instructions.pop_back();
 
 		std::vector<BasicBlock*> case_blocks;
-		for (uint32 i = 0; i < switch_inst->GetNumCases(); ++i)
+		for (Uint32 i = 0; i < switch_inst->GetNumCases(); ++i)
 		{
 			case_blocks.push_back(switch_inst->GetCaseBlock(i));
 		}
-		for (uint32 i = 0; i < case_blocks.size(); ++i)
+		for (Uint32 i = 0; i < case_blocks.size(); ++i)
 		{
 			BasicBlock* case_block = case_blocks[i];
 			if (!case_block->GetTerminator())
@@ -639,7 +639,7 @@ namespace ola
 		empty_block_successors[end_block] = end_blocks.empty() ? exit_block : end_blocks.back();
 	}
 
-	void IRVisitor::Visit(GotoStmt const& goto_stmt, uint32)
+	void IRVisitor::Visit(GotoStmt const& goto_stmt, Uint32)
 	{
 		std::string label_name(goto_stmt.GetLabelName());
 		builder->MakeInst<BranchInst>(context, label_blocks[label_name]);
@@ -649,7 +649,7 @@ namespace ola
 		builder->SetCurrentBlock(goto_block);
 	}
 
-	void IRVisitor::Visit(LabelStmt const& label_stmt, uint32)
+	void IRVisitor::Visit(LabelStmt const& label_stmt, Uint32)
 	{
 		std::string label_name(label_stmt.GetName());
 		BasicBlock* label_block = label_blocks[label_name];
@@ -657,12 +657,12 @@ namespace ola
 		builder->SetCurrentBlock(label_block);
 	}
 
-	void IRVisitor::Visit(Expr const&, uint32)
+	void IRVisitor::Visit(Expr const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(UnaryExpr const& unary_expr, uint32)
+	void IRVisitor::Visit(UnaryExpr const& unary_expr, Uint32)
 	{
 		Expr const* operand_expr = unary_expr.GetOperand();
 		operand_expr->Accept(*this);
@@ -748,7 +748,7 @@ namespace ola
 		value_map[&unary_expr] = result;
 	}
 
-	void IRVisitor::Visit(BinaryExpr const& binary_expr, uint32)
+	void IRVisitor::Visit(BinaryExpr const& binary_expr, Uint32)
 	{
 		Expr const* lhs_expr = binary_expr.GetLHS();
 		lhs_expr->Accept(*this);
@@ -893,7 +893,7 @@ namespace ola
 		value_map[&binary_expr] = result;
 	}
 
-	void IRVisitor::Visit(TernaryExpr const& ternary_expr, uint32)
+	void IRVisitor::Visit(TernaryExpr const& ternary_expr, Uint32)
 	{
 		Expr const* cond_expr = ternary_expr.GetCondExpr();
 		Expr const* true_expr = ternary_expr.GetTrueExpr();
@@ -918,37 +918,37 @@ namespace ola
 		value_map[&ternary_expr] = builder->MakeInst<SelectInst>(condition_value, true_value, false_value);
 	}
 
-	void IRVisitor::Visit(IdentifierExpr const&, uint32)
+	void IRVisitor::Visit(IdentifierExpr const&, Uint32)
 	{
 		OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(DeclRefExpr const& decl_ref, uint32)
+	void IRVisitor::Visit(DeclRefExpr const& decl_ref, Uint32)
 	{
 		Value* value = value_map[decl_ref.GetDecl()];
 		OLA_ASSERT(value);
 		value_map[&decl_ref] = value;
 	}
 
-	void IRVisitor::Visit(IntLiteral const& int_constant, uint32)
+	void IRVisitor::Visit(IntLiteral const& int_constant, Uint32)
 	{
 		ConstantInt* constant = context.GetInt64(int_constant.GetValue()); 
 		value_map[&int_constant] = constant;
 	}
 
-	void IRVisitor::Visit(CharLiteral const& char_constant, uint32)
+	void IRVisitor::Visit(CharLiteral const& char_constant, Uint32)
 	{
 		ConstantInt* constant = context.GetInt8(char_constant.GetChar());
 		value_map[&char_constant] = constant;
 	}
 
-	void IRVisitor::Visit(StringLiteral const& string_constant, uint32)
+	void IRVisitor::Visit(StringLiteral const& string_constant, Uint32)
 	{
 		context.GetString(string_constant.GetString());
 
 		Constant* constant = context.GetString(string_constant.GetString());
 
-		static uint32 counter = 0;
+		static Uint32 counter = 0;
 		std::string name = "__StringLiteral"; name += std::to_string(counter++);
 
 		Linkage linkage = Linkage::Internal;
@@ -958,19 +958,19 @@ namespace ola
 		value_map[&string_constant] = global_string;
 	}
 
-	void IRVisitor::Visit(BoolLiteral const& bool_constant, uint32)
+	void IRVisitor::Visit(BoolLiteral const& bool_constant, Uint32)
 	{
 		ConstantInt* constant = context.GetInt8(bool_constant.GetValue()); 
 		value_map[&bool_constant] = constant;
 	}
 
-	void IRVisitor::Visit(FloatLiteral const& float_constant, uint32)
+	void IRVisitor::Visit(FloatLiteral const& float_constant, Uint32)
 	{
 		ConstantFloat* constant = context.GetFloat(float_constant.GetValue());
 		value_map[&float_constant] = constant;
 	}
 
-	void IRVisitor::Visit(ImplicitCastExpr const& cast_expr, uint32)
+	void IRVisitor::Visit(ImplicitCastExpr const& cast_expr, Uint32)
 	{
 		Expr const* cast_operand_expr = cast_expr.GetOperand();
 		cast_operand_expr->Accept(*this);
@@ -1049,13 +1049,13 @@ namespace ola
 		else OLA_ASSERT(value_map[&cast_expr] != nullptr);
 	}
 
-	void IRVisitor::Visit(CallExpr const& call_expr, uint32)
+	void IRVisitor::Visit(CallExpr const& call_expr, Uint32)
 	{
 		Function* called_function = module.GetFunctionByName(call_expr.GetFunctionDecl()->GetMangledName());
 		OLA_ASSERT(called_function);
 
 		std::vector<Value*> args;
-		uint32 arg_index = 0;
+		Uint32 arg_index = 0;
 		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
 		Value* return_alloc = nullptr;
 		if (return_struct)
@@ -1080,7 +1080,7 @@ namespace ola
 		value_map[&call_expr] = return_alloc ? return_alloc : call_result;
 	}
 
-	void IRVisitor::Visit(InitializerListExpr const& initializer_list_expr, uint32)
+	void IRVisitor::Visit(InitializerListExpr const& initializer_list_expr, Uint32)
 	{
 		UniqueExprPtrList const& init_expr_list = initializer_list_expr.GetInitList();
 		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
@@ -1092,7 +1092,7 @@ namespace ola
 			OLA_ASSERT(isa<IRArrayType>(ir_array_type));
 
 			std::vector<Constant*> array_init_list(array_type->GetArraySize());
-			for (uint64 i = 0; i < array_type->GetArraySize(); ++i)
+			for (Uint64 i = 0; i < array_type->GetArraySize(); ++i)
 			{
 				if (i < init_expr_list.size())  array_init_list[i] = dyn_cast<Constant>(value_map[init_expr_list[i].get()]);
 				else array_init_list[i] = context.GetNullValue(ir_element_type); 
@@ -1102,7 +1102,7 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(ArrayAccessExpr const& array_access, uint32)
+	void IRVisitor::Visit(ArrayAccessExpr const& array_access, Uint32)
 	{
 		Expr const* array_expr = array_access.GetArrayExpr();
 		Expr const* index_expr = array_access.GetIndexExpr();
@@ -1140,7 +1140,7 @@ namespace ola
 			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
 			if (isa<ArrayType>(array_type->GetElementType()))
 			{
-				uint32 array_size = array_type->GetArraySize();
+				Uint32 array_size = array_type->GetArraySize();
 				index_value = builder->MakeInst<BinaryInst>(Opcode::SMul, index_value, context.GetInt64(array_size));
 			}
 			std::vector<Value*> indices = { zero, index_value };
@@ -1149,22 +1149,22 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(MemberExpr const&, uint32)
+	void IRVisitor::Visit(MemberExpr const&, Uint32)
 	{
 
 	}
 
-	void IRVisitor::Visit(MethodCallExpr const&, uint32)
+	void IRVisitor::Visit(MethodCallExpr const&, Uint32)
 	{
 
 	}
 
-	void IRVisitor::Visit(ThisExpr const& this_expr, uint32)
+	void IRVisitor::Visit(ThisExpr const& this_expr, Uint32)
 	{
 		value_map[&this_expr] = this_value;
 	}
 
-	void IRVisitor::Visit(SuperExpr const& super_expr, uint32)
+	void IRVisitor::Visit(SuperExpr const& super_expr, Uint32)
 	{
 		value_map[&super_expr] = this_value;
 	}

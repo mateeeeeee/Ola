@@ -4,7 +4,7 @@
 namespace ola
 {
 
-	enum x64Section : uint32
+	enum x64Section : Uint32
 	{
 		x64Section_Preamble,
 		x64Section_ReadOnly,
@@ -39,8 +39,8 @@ namespace ola
 			}
 		}
 
-		std::string GetFPConstantPoolEntry(int64 value);
-		std::string GetIntConstantPoolEntry(int64 value);
+		std::string GetFPConstantPoolEntry(Sint64 value);
+		std::string GetIntConstantPoolEntry(Sint64 value);
 
 		template<typename... Args>
 		void EmitPreamble(char const* fmt, Args&&... args)

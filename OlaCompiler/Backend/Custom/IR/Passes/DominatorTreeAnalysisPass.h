@@ -40,15 +40,15 @@ namespace ola
 
 		NodeT* GetBlock() const { return node; }
 		DominatorTreeNodeBase* GetIDom() const { return idom; }
-		uint32 GetLevel() const { return level; }
+		Uint32 GetLevel() const { return level; }
 
 		void AddChild(DominatorTreeNodeBase* C) { children.push_back(C); }
 		bool IsLeaf() const { return children.empty(); }
-		uint64 GetNumChildren() const { return children.size(); }
+		Uint64 GetNumChildren() const { return children.size(); }
 		void ClearAllChildren() { children.clear(); }
 
-		uint32 GetDFSNumIn() const { return dfs_num_in; }
-		uint32 GetDFSNumOut() const { return dfs_num_out; }
+		Uint32 GetDFSNumIn() const { return dfs_num_in; }
+		Uint32 GetDFSNumOut() const { return dfs_num_out; }
 
 		void SetIDom(DominatorTreeNodeBase* NewIDom) 
 		{
@@ -67,10 +67,10 @@ namespace ola
 	private:
 		NodeT* node;
 		DominatorTreeNodeBase* idom;
-		uint32 level;
+		Uint32 level;
 		std::vector<DominatorTreeNodeBase*> children;
-		mutable uint32 dfs_num_in = ~0;
-		mutable uint32 dfs_num_out = ~0;
+		mutable Uint32 dfs_num_in = ~0;
+		mutable Uint32 dfs_num_out = ~0;
 
 	private:
 		bool DominatedBy(const DominatorTreeNodeBase* other) const 
@@ -122,8 +122,8 @@ namespace ola
 		using ParentType = std::remove_pointer_t<ParentPtr>;
 
 		using DomTreeNodeStorage = std::vector<std::unique_ptr<DominatorTreeNodeBase<NodeT>>>;
-		using NodeNumberStorage = std::unordered_map<NodeT const*, uint32>;
-		static constexpr uint32 INVALID_NODE_NUMBER = uint32(-1);
+		using NodeNumberStorage = std::unordered_map<NodeT const*, Uint32>;
+		static constexpr Uint32 INVALID_NODE_NUMBER = Uint32(-1);
 
 	public:
 		DominatorTreeBase() = default;
@@ -269,7 +269,7 @@ namespace ola
 			}
 			WorkStack.push_back({ this_root, this_root->begin() });
 
-			uint32 dfs_num = 0;
+			Uint32 dfs_num = 0;
 			this_root->dfs_num_in = dfs_num++;
 
 			while (!WorkStack.empty()) 
@@ -314,7 +314,7 @@ namespace ola
 		/// children list. Deletes dominator node associated with basic block BB.
 		void EraseNode(NodeT* BB) 
 		{
-			uint32 Idx = GetNodeIndex(BB);
+			Uint32 Idx = GetNodeIndex(BB);
 			OLA_ASSERT_MSG(Idx != INVALID_NODE_NUMBER && dom_tree_nodes[Idx], "Removing node that isn't in dominator tree.");
 			DominatorTreeNodeBase<NodeT>* Node = dom_tree_nodes[Idx].get();
 			OLA_ASSERT_MSG(Node->IsLeaf(), "Node is not a leaf node.");
@@ -372,14 +372,14 @@ namespace ola
 		mutable bool dfs_info_valid = false;
 
 	private:
-		uint32 GetNodeIndex(NodeT const* BB) const
+		Uint32 GetNodeIndex(NodeT const* BB) const
 		{
 			if (auto It = node_number_map.find(BB); It != node_number_map.end()) return It->second;
 			else return INVALID_NODE_NUMBER;
 		}
-		uint32 GetNodeIndexForInsert(NodeT const* BB)
+		Uint32 GetNodeIndexForInsert(NodeT const* BB)
 		{
-			uint32 Idx = node_number_map.try_emplace(BB, dom_tree_nodes.size()).first->second;
+			Uint32 Idx = node_number_map.try_emplace(BB, dom_tree_nodes.size()).first->second;
 			if (Idx >= dom_tree_nodes.size()) dom_tree_nodes.resize(Idx + 1);
 			return Idx;
 		}
@@ -390,7 +390,7 @@ namespace ola
 			OLA_ASSERT(IsReachableFromEntry(B));
 			OLA_ASSERT(IsReachableFromEntry(A));
 
-			uint32 const a_level = A->GetLevel();
+			Uint32 const a_level = A->GetLevel();
 			DominatorTreeNodeBase<NodeT> const* idom = nullptr;
 			// Don't walk nodes above A's subtree. When we reach A's level, we must
 			// either find A or be in some other subtree not dominated by A.
@@ -404,7 +404,7 @@ namespace ola
 		{
 			auto node = std::make_unique<DominatorTreeNodeBase<NodeT>>(BB, idom);
 			auto* node_ptr = node.get();
-			uint32 node_idx = GetNodeIndexForInsert(BB);
+			Uint32 node_idx = GetNodeIndexForInsert(BB);
 			dom_tree_nodes[node_idx] = std::move(node);
 			if (idom) idom->AddChild(node_ptr);
 			return node_ptr;

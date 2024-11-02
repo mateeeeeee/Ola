@@ -16,12 +16,12 @@ namespace ola
 		OLA_ASSERT(callee);
 		MachineGlobal const* global = ctx.GetGlobal(callee);
 
-		static constexpr uint32 PASS_BY_REG_OFFSET = 1 << 16;
-		std::vector<int32> offsets;  
-		uint32 const arg_count = CI->ArgSize();
+		static constexpr Uint32 PASS_BY_REG_OFFSET = 1 << 16;
+		std::vector<Sint32> offsets;  
+		Uint32 const arg_count = CI->ArgSize();
 		offsets.reserve(arg_count);
-		uint32 gprs = 0;
-		uint32 current_stack_offset = 0;
+		Uint32 gprs = 0;
+		Uint32 current_stack_offset = 0;
 		for (auto& arg : CI->Args())
 		{
 			if (!arg.GetValue()->GetType()->IsFloat())
@@ -37,8 +37,8 @@ namespace ola
 				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
 			}
 
-			uint32 size = arg.GetValue()->GetType()->GetSize();
-			uint32 alignment = size;
+			Uint32 size = arg.GetValue()->GetType()->GetSize();
+			Uint32 alignment = size;
 
 			current_stack_offset = (current_stack_offset + alignment - 1) / alignment * alignment;
 			offsets.push_back(current_stack_offset);
@@ -48,15 +48,15 @@ namespace ola
 		MachineGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
 		MachineFunction& caller = *static_cast<MachineFunction*>(global->GetRelocable());
 
-		for (int32 idx = arg_count - 1; idx >= 0; --idx)
+		for (Sint32 idx = arg_count - 1; idx >= 0; --idx)
 		{
-			int32 offset = offsets[idx];
+			Sint32 offset = offsets[idx];
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
-			uint32 size = arg->GetType()->GetSize();
-			uint32 alignment = size;
+			Uint32 size = arg->GetType()->GetSize();
+			Uint32 alignment = size;
 
-			uint32 opcode = (arg_operand.IsMemoryOperand() && arg_operand.GetType() == MachineType::Ptr) ? InstLoadGlobalAddress : InstMove;
+			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg_operand.GetType() == MachineType::Ptr) ? InstLoadGlobalAddress : InstMove;
 			if (offset < PASS_BY_REG_OFFSET)
 			{
 				MachineOperand& argument_stack = caller.AllocateStack(arg_operand.GetType());
@@ -66,7 +66,7 @@ namespace ola
 			}
 			else
 			{
-				uint32 gpr = offset - PASS_BY_REG_OFFSET;
+				Uint32 gpr = offset - PASS_BY_REG_OFFSET;
 				static constexpr x64::Register arg_regs[] = {x64::RCX, x64::RDX, x64::R8, x64::R9 };
 				MachineInstruction copy_arg_to_reg(opcode);
 				copy_arg_to_reg.SetOp<0>(MachineOperand::ISAReg(arg_regs[gpr], arg_operand.GetType())).SetOp<1>(arg_operand);
@@ -109,20 +109,20 @@ namespace ola
 		set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
 		ctx.EmitInst(set_rbp);
 
-		int32 stack_allocation = MF.GetStackAllocationSize();
+		Sint32 stack_allocation = MF.GetStackAllocationSize();
 		if (stack_allocation > 0)
 		{
 			MachineInstruction allocate_stack(InstSub);
 			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(stack_allocation, Int64));
 			ctx.EmitInst(allocate_stack);
 		}
-		static constexpr uint32 PASS_BY_REG_OFFSET = 1 << 16;
+		static constexpr Uint32 PASS_BY_REG_OFFSET = 1 << 16;
 
 		std::vector<MachineOperand> const& args = MF.Args();
-		std::vector<uint32> offsets; 
+		std::vector<Uint32> offsets; 
 		offsets.reserve(args.size());
-		uint32 gprs = 0;
-		uint32 current_offset = 0;
+		Uint32 gprs = 0;
+		Uint32 current_offset = 0;
 		for (MachineOperand const& arg : args)
 		{
 			if (arg.GetType() != MachineType::Float64) 
@@ -137,8 +137,8 @@ namespace ola
 			{
 				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
 			}
-			uint32 size = GetOperandSize(arg.GetType());
-			uint32 alignment = size;
+			Uint32 size = GetOperandSize(arg.GetType());
+			Uint32 alignment = size;
 			current_offset = (current_offset + alignment - 1) / alignment * alignment;
 			offsets.push_back(current_offset);
 			current_offset += size;
@@ -146,23 +146,23 @@ namespace ola
 
 		for (uint32_t idx = 0; idx < args.size(); ++idx) 
 		{
-			uint32 offset = offsets[idx];
+			Uint32 offset = offsets[idx];
 			MachineOperand const& arg = args[idx];
 			if (offset >= PASS_BY_REG_OFFSET)
 			{
-				uint32 gpr = offset - PASS_BY_REG_OFFSET;
+				Uint32 gpr = offset - PASS_BY_REG_OFFSET;
 				static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
 				MachineInstruction copy_arg_to_reg(InstMove);
 				copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[gpr], arg.GetType())).SetOp<0>(arg);
 				ctx.EmitInst(copy_arg_to_reg);
 			}
 		}
-		for (uint32 idx = 0; idx < args.size(); ++idx) 
+		for (Uint32 idx = 0; idx < args.size(); ++idx) 
 		{
-			uint32 offset = offsets[idx];
+			Uint32 offset = offsets[idx];
 			MachineOperand const& arg = args[idx];
-			uint32 size = GetOperandSize(arg.GetType());
-			uint32 alignment = size;
+			Uint32 size = GetOperandSize(arg.GetType());
+			Uint32 alignment = size;
 
 			if (offset < PASS_BY_REG_OFFSET)
 			{
@@ -191,7 +191,7 @@ namespace ola
 		if (RI->GetNumOperands() > 0)
 		{
 			Value const* V = RI->GetOperand(0);
-			uint32 const size = V->GetType()->GetSize();
+			Uint32 const size = V->GetType()->GetSize();
 			if (size <= 8)
 			{
 				MachineOperand return_register;

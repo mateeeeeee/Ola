@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	using SectionId = uint32;
+	using SectionId = Uint32;
 	class MachineModule;
 
 	class AsmPrinter

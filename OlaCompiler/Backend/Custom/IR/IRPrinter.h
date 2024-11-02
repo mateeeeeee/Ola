@@ -18,8 +18,8 @@ namespace ola
 	class NameManager
 	{
 		using ValueStringMap = std::unordered_map<Value const*, std::string>;
-		using StringSlotMap  = std::unordered_map<std::string, uint32>;
-		enum class NamePrefix : uint32
+		using StringSlotMap  = std::unordered_map<std::string, Uint32>;
+		enum class NamePrefix : Uint32
 		{
 			None,
 			Global,
@@ -94,10 +94,10 @@ namespace ola
 			EmitLn("");
 		}
 
-		template<uint32 N>
+		template<Uint32 N>
 		void PopOutput()
 		{
-			for (uint32 i = 0; i < N; ++i) output.pop_back();
+			for (Uint32 i = 0; i < N; ++i) output.pop_back();
 		}
 	};
 }

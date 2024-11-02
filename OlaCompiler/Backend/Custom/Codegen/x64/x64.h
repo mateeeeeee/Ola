@@ -3,7 +3,7 @@
 
 namespace ola::x64
 {
-	enum Register : uint32
+	enum Register : Uint32
 	{
 		GPRBegin,
 		RAX = GPRBegin, RSP, RBP, RCX, RDX, RBX, RSI, RDI,
@@ -17,15 +17,15 @@ namespace ola::x64
 		FFLAGS,
 	};
 
-	inline constexpr bool IsGPRReg(uint32 r)
+	inline constexpr bool IsGPRReg(Uint32 r)
 	{
 		return r >= GPRBegin && r <= GPREnd;
 	}
-	inline constexpr bool IsFPRReg(uint32 r)
+	inline constexpr bool IsFPRReg(Uint32 r)
 	{
 		return r >= FPRBegin && r <= FPREnd;
 	}
-	inline constexpr bool IsCallerSaved(uint32 r)
+	inline constexpr bool IsCallerSaved(Uint32 r)
 	{
 		switch (r) 
 		{
@@ -57,7 +57,7 @@ namespace ola::x64
 			return false;
 		}
 	}
-	inline constexpr bool IsCalleeSaved(uint32 r) 
+	inline constexpr bool IsCalleeSaved(Uint32 r) 
 	{
 		switch (r)
 		{
@@ -75,7 +75,7 @@ namespace ola::x64
 		}
 	}
 
-	enum x64Inst : uint32
+	enum x64Inst : Uint32
 	{
 		x64InstBegin = ISASpecificBegin,
 		InstSetE,
@@ -97,7 +97,7 @@ namespace ola::x64
 		InstXorFP
 	};
 
-	inline char const* GetOpcodeString(uint32 opcode)
+	inline char const* GetOpcodeString(Uint32 opcode)
 	{
 		switch (opcode)
 		{
@@ -154,7 +154,7 @@ namespace ola::x64
 		return "";
 	}
 
-	inline char const* GetRegisterString(uint32 r, MachineType type)
+	inline char const* GetRegisterString(Uint32 r, MachineType type)
 	{
 		using enum MachineType;
 		switch (type) 

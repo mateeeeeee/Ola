@@ -4,5 +4,5 @@ namespace ola
 {
 
 	class CompileRequest;
-	int32 Compile(CompileRequest const&);
+	Sint32 Compile(CompileRequest const&);
 }

@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	enum class TokenKind : uint16
+	enum class TokenKind : Uint16
 	{
 		#define TOKEN(X) X,
 		#include "Tokens.def"

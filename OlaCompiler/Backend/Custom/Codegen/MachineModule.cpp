@@ -36,8 +36,8 @@ namespace ola
 			{
 				GlobalVariable* V = cast<GlobalVariable>(GV);
 				IRType* type = V->GetValueType();
-				uint32 size = type->GetSize();
-				uint32 alignment = type->GetAlign();
+				Uint32 size = type->GetSize();
+				Uint32 alignment = type->GetAlign();
 
 				if (Value* init_value = V->GetInitValue())
 				{
@@ -50,17 +50,17 @@ namespace ola
 						{
 							if (ConstantInt* CI = dyn_cast<ConstantInt>(V))
 							{
-								int64 value = CI->GetValue();
+								Sint64 value = CI->GetValue();
 								switch (CI->GetBitWidth())
 								{
 								case 8:
 								{
-									data->AppendByte((uint8)value);
+									data->AppendByte((Uint8)value);
 									break;
 								}
 								case 64:
 								{
-									data->AppendQWord((uint64)value);
+									data->AppendQWord((Uint64)value);
 									break;
 								}
 								}
@@ -69,7 +69,7 @@ namespace ola
 							{
 								double value = CF->GetValue();
 								void* value_ptr = static_cast<void*>(&value);
-								data->AppendQWord(*static_cast<uint64*>(value_ptr));
+								data->AppendQWord(*static_cast<Uint64*>(value_ptr));
 							}
 							else if (ConstantString* CS = dyn_cast<ConstantString>(V))
 							{
@@ -81,11 +81,11 @@ namespace ola
 								auto const& values = CA->Values();
 								for (auto sub : values) self(self, sub);
 
-								uint32 const remaining_count = array_type->GetArraySize() - values.size();
+								Uint32 const remaining_count = array_type->GetArraySize() - values.size();
 								if (remaining_count)
 								{
 									const auto rem_size = array_type->GetElementType()->GetSize() * remaining_count;
-									for (uint32 i = 0; i < remaining_count; ++i)
+									for (Uint32 i = 0; i < remaining_count; ++i)
 									{
 										data->AppendByte(0);
 									}
@@ -169,7 +169,7 @@ namespace ola
 		if (!is_leaf) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
 
 		auto& args = MF.Args();
-		for (uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
+		for (Uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)
 		{
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
@@ -291,7 +291,7 @@ namespace ola
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->LHS()))
 			.SetOp<2>(lowering_ctx.GetOperand(CI->RHS()))
-			.SetOp<3>(MachineOperand::Immediate((uint32)CI->GetCompareOp(), MachineType::Other));
+			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(CI, ret);
 	}
@@ -406,7 +406,7 @@ namespace ola
 
 			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
 			{
-				uint32 element_size = array_type->GetElementType()->GetSize();
+				Uint32 element_size = array_type->GetElementType()->GetSize();
 
 				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
 				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
@@ -429,7 +429,7 @@ namespace ola
 			}
 			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 			{
-				uint32 pointer_size = pointer_type->GetPointeeType()->GetSize();
+				Uint32 pointer_size = pointer_type->GetPointeeType()->GetSize();
 
 				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
 				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
@@ -501,7 +501,7 @@ namespace ola
 
 		for (auto& case_pair : SI->Cases())
 		{
-			int64 case_value = case_pair.first;
+			Sint64 case_value = case_pair.first;
 			BasicBlock* case_block = case_pair.second;
 
 			if (!cond_op.IsImmediate())
@@ -518,7 +518,7 @@ namespace ola
 			}
 			else
 			{
-				int64 imm = cond_op.GetImmediate();
+				Sint64 imm = cond_op.GetImmediate();
 				if (imm != 0)
 				{
 					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));

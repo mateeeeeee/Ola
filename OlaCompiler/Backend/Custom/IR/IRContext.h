@@ -33,16 +33,16 @@ namespace ola
 		IRFloatType* GetFloatType() const { return float_type; }
 		IRLabelType* GetLabelType() const { return label_type; }
 
-		IRIntType*	GetIntegerType(uint32 width);
+		IRIntType*	GetIntegerType(Uint32 width);
 		IRPtrType*	GetPointerType(IRType* pointee_type);
-		IRArrayType*		GetArrayType(IRType* base_type, uint32 array_size);
+		IRArrayType*		GetArrayType(IRType* base_type, Uint32 array_size);
 		IRFuncType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
 		IRStructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
 
 		ConstantString* GetString(std::string_view str);
-		ConstantInt* GetInt64(int64 value);
-		ConstantInt* GetInt8(int8 value);
-		ConstantInt* GetInt(IRType* type, int64 value);
+		ConstantInt* GetInt64(Sint64 value);
+		ConstantInt* GetInt8(Sint8 value);
+		ConstantInt* GetInt(IRType* type, Sint64 value);
 		ConstantInt* GetTrueValue()  const { return true_value; }
 		ConstantInt* GetFalseValue() const { return false_value; }
 		ConstantFloat* GetZeroFloat() const { return zero_float; }
@@ -67,8 +67,8 @@ namespace ola
 		ConstantInt* false_value;
 		ConstantFloat* zero_float;
 		std::unordered_map<std::string_view, ConstantString*> constant_strings;
-		std::unordered_map<int64, ConstantInt*> constant_ints64;
-		std::unordered_map<int8, ConstantInt*> constant_ints8;
+		std::unordered_map<Sint64, ConstantInt*> constant_ints64;
+		std::unordered_map<Sint8, ConstantInt*> constant_ints8;
 		std::unordered_map<double, ConstantFloat*> constant_floats;
 		std::unordered_map<IRArrayType*, ConstantArray*> constant_null_arrays;
 	};

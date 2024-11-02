@@ -5,35 +5,35 @@
 
 namespace ola
 {
-	void Stmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void Stmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(false);
 	}
-	void CompoundStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void CompoundStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto&& stmt : statements) stmt->Accept(visitor, depth + 1);
 	}
-	void ExprStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ExprStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		if (expr) expr->Accept(visitor, depth + 1);
 	}
-	void NullStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void NullStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void DeclStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void DeclStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		for (auto const& decl : declarations) decl->Accept(visitor, depth + 1);
 	}
-	void ReturnStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ReturnStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		if (ret_expr) ret_expr->Accept(visitor, depth + 1);
 	}
-	void IfStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void IfStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(cond_expr && then_stmt);
 		visitor.Visit(*this, depth);
@@ -41,15 +41,15 @@ namespace ola
 		then_stmt->Accept(visitor, depth + 1);
 		if (else_stmt) else_stmt->Accept(visitor, depth + 1);
 	}
-	void BreakStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void BreakStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ContinueStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ContinueStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void ForStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void ForStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(body_stmt);
 		visitor.Visit(*this, depth);
@@ -58,36 +58,36 @@ namespace ola
 		if (iter_expr) iter_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
 	}
-	void WhileStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void WhileStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, depth);
 		cond_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
 	}
-	void DoWhileStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void DoWhileStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, depth);
 		cond_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
 	}
-	void CaseStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void CaseStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void SwitchStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void SwitchStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		OLA_ASSERT(cond_expr && body_stmt);
 		visitor.Visit(*this, depth);
 		cond_expr->Accept(visitor, depth + 1);
 		body_stmt->Accept(visitor, depth + 1);
 	}
-	void LabelStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void LabelStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}
-	void GotoStmt::Accept(ASTVisitor& visitor, uint32 depth) const
+	void GotoStmt::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 	}

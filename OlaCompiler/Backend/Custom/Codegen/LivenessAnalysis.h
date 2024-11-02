@@ -8,10 +8,10 @@ namespace ola
 
 	struct LiveInterval
 	{
-		uint64 begin, end;
-		uint32 vreg;
-		uint32 reg;
-		int32  stack_offset;
+		Uint64 begin, end;
+		Uint32 vreg;
+		Uint32 reg;
+		Sint32  stack_offset;
 		bool spilled;
 		bool is_float;
 	};
@@ -31,7 +31,7 @@ namespace ola
 	struct LivenessAnalysisResult
 	{
 		std::vector<LiveInterval> live_intervals;
-		std::unordered_map<MachineInstruction*, uint64> instruction_numbering_map;
+		std::unordered_map<MachineInstruction*, Uint64> instruction_numbering_map;
 	};
 
 	LivenessAnalysisResult DoLivenessAnalysis(MachineModule& M, MachineFunction& MF);

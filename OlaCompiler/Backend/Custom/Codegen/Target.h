@@ -18,19 +18,19 @@ namespace ola
 		virtual ~TargetDataLayout() = default;
 
 		virtual bool   IsLittleEndian() const = 0;
-		virtual uint64 GetBuiltinAlignment(IRType const* type) const = 0;
-		virtual uint64 GetPointerSize() const = 0;
-		virtual uint64 GetCodeAlignment() const = 0;
-		virtual uint64 GetStorageAlignment() const = 0;
+		virtual Uint64 GetBuiltinAlignment(IRType const* type) const = 0;
+		virtual Uint64 GetPointerSize() const = 0;
+		virtual Uint64 GetCodeAlignment() const = 0;
+		virtual Uint64 GetStorageAlignment() const = 0;
 	};
 
-	enum OperandFlag : uint32
+	enum OperandFlag : Uint32
 	{
 		OperandFlagNone = 0,
 		OperandFlagUse = 1 << 0,
 		OperandFlagDef = 1 << 1
 	};
-	enum InstFlag : uint32
+	enum InstFlag : Uint32
 	{
 		InstFlagNone = 0,
 		InstFlagTerminator = 1 << 0,
@@ -39,11 +39,11 @@ namespace ola
 	};
 	class InstInfo
 	{
-		static constexpr uint32 MAX_OPERANDS = 7;
+		static constexpr Uint32 MAX_OPERANDS = 7;
 	public:
 		InstInfo() = default;
 
-		bool HasOpFlag(uint32 idx, OperandFlag flag) const
+		bool HasOpFlag(Uint32 idx, OperandFlag flag) const
 		{
 			OLA_ASSERT(idx < operand_count);
 			return (operand_flags[idx] & flag) == flag;
@@ -52,16 +52,16 @@ namespace ola
 		{
 			return (instruction_flag & flag) == flag;
 		}
-		uint32 GetOperandCount() const { return operand_count; }
+		Uint32 GetOperandCount() const { return operand_count; }
 
-		void SetOperandCount(uint32 _operand_count)
+		void SetOperandCount(Uint32 _operand_count)
 		{
 			operand_count = _operand_count;
 		}
-		void SetOpFlag(uint32 idx, OperandFlag flag);
+		void SetOpFlag(Uint32 idx, OperandFlag flag);
 		void SetInstFlag(InstFlag inst_flag);
 	private:
-		uint32 operand_count = 0;
+		Uint32 operand_count = 0;
 		OperandFlag operand_flags[MAX_OPERANDS] = {};
 		InstFlag instruction_flag = InstFlagNone;
 	};
@@ -70,7 +70,7 @@ namespace ola
 	{
 	public:
 		virtual ~TargetInstInfo() = default;
-		virtual InstInfo GetInstInfo(uint32 opcode) const = 0;
+		virtual InstInfo GetInstInfo(Uint32 opcode) const = 0;
 		InstInfo GetInstInfo(MachineInstruction const& inst) const;
 	};
 
@@ -79,13 +79,13 @@ namespace ola
 	public:
 		virtual ~TargetRegisterInfo() = default;
 
-		virtual uint32 GetStackPointerRegister() const = 0;
-		virtual uint32 GetFramePointerRegister() const = 0;
-		virtual uint32 GetReturnRegister() const = 0;
-		virtual std::vector<uint32> const& GetIntegerRegisters() const = 0;
-		virtual std::vector<uint32> const& GetFPRegisters() const = 0;
-		virtual bool IsCallerSaved(uint32) const = 0;
-		virtual bool IsCalleeSaved(uint32) const = 0;
+		virtual Uint32 GetStackPointerRegister() const = 0;
+		virtual Uint32 GetFramePointerRegister() const = 0;
+		virtual Uint32 GetReturnRegister() const = 0;
+		virtual std::vector<Uint32> const& GetIntegerRegisters() const = 0;
+		virtual std::vector<Uint32> const& GetFPRegisters() const = 0;
+		virtual bool IsCallerSaved(Uint32) const = 0;
+		virtual bool IsCalleeSaved(Uint32) const = 0;
 	};
 
 	class LoweringContext;

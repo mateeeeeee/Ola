@@ -7,10 +7,10 @@ namespace ola
 	struct SourceLocation
 	{
 		std::string filename = "";
-		uint32 line = 1;
-		uint32 column = 1;
+		Uint32 line = 1;
+		Uint32 column = 1;
 
-		SourceLocation operator+(int32 i)
+		SourceLocation operator+(Sint32 i)
 		{
 			return SourceLocation
 			{
@@ -24,7 +24,7 @@ namespace ola
 		{
 			++column;
 		}
-		void NewChars(int32 i)
+		void NewChars(Sint32 i)
 		{
 			column += i;
 		}

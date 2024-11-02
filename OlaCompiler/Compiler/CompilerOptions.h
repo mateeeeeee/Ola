@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	enum CompilerFlags : uint32
+	enum CompilerFlags : Uint32
 	{
 		CompilerFlag_None = 0x00,
 		CompilerFlag_DumpAST = 0x01,
@@ -15,7 +15,7 @@ namespace ola
 		static constexpr bool enable = true;
 	};
 
-	enum class OptimizationLevel : uint8
+	enum class OptimizationLevel : Uint8
 	{
 		Od = 0,
 		O0 = Od,
@@ -24,7 +24,7 @@ namespace ola
 		O3
 	};
 
-	enum class CompilerOutput : uint8
+	enum class CompilerOutput : Uint8
 	{
 		Exe,
 		Dll,

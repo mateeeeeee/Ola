@@ -84,7 +84,7 @@ namespace ola
 		ArrayType const* other_array_type = cast<ArrayType>(other);
 		return element_type.GetTypePtr() == other_array_type->element_type.GetTypePtr();
 	}
-	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, uint32 array_size)
+	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, Uint32 array_size)
 	{
 		return ctx->GetArrayType(type, array_size);
 	}
@@ -103,7 +103,7 @@ namespace ola
 		if (!class_decl) return;
 
 		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
-		uint32 offset = 0;
+		Uint32 offset = 0;
 
 		if (class_decl->IsPolymorphic()) offset += 8;
 

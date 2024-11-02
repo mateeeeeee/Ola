@@ -5,7 +5,7 @@
 namespace ola
 {
 
-	InstInfo x64TargetInstInfo::GetInstInfo(uint32 opcode) const
+	InstInfo x64TargetInstInfo::GetInstInfo(Uint32 opcode) const
 	{
 		InstInfo inst_info{};
 		switch (opcode)

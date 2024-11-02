@@ -16,19 +16,19 @@ namespace ola
 	{
 	public:
 		virtual bool   IsLittleEndian() const override { return true; }
-		virtual uint64 GetBuiltinAlignment(IRType const* type) const override
+		virtual Uint64 GetBuiltinAlignment(IRType const* type) const override
 		{
 			return type->GetSize();
 		}
-		virtual uint64 GetPointerSize() const override
+		virtual Uint64 GetPointerSize() const override
 		{
 			return 8u;
 		}
-		virtual uint64 GetCodeAlignment() const override
+		virtual Uint64 GetCodeAlignment() const override
 		{
 			return 8u;
 		}
-		virtual uint64 GetStorageAlignment() const override
+		virtual Uint64 GetStorageAlignment() const override
 		{
 			return 8u;
 		}
@@ -221,7 +221,7 @@ namespace ola
 
 					MI.SetOp<0>(op1).SetOp<1>(op2);
 
-					auto GetSetCondition = [](MachineOperand compare_op) -> uint32
+					auto GetSetCondition = [](MachineOperand compare_op) -> Uint32
 						{
 							OLA_ASSERT(compare_op.IsImmediate());
 							CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
@@ -328,7 +328,7 @@ namespace ola
 
 				MI.SetOp<0>(op1).SetOp<1>(op2);
 
-				auto GetSetCondition = [](MachineOperand compare_op) -> uint32
+				auto GetSetCondition = [](MachineOperand compare_op) -> Uint32
 					{
 						OLA_ASSERT(compare_op.IsImmediate());
 						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
@@ -424,59 +424,59 @@ namespace ola
 		x64TargetRegisterInfo()
 		{
 			gp_registers.reserve(x64::GPREnd - x64::GPRBegin + 1);
-			for (uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
+			for (Uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
 			{
 				gp_registers.push_back(r);
 			}
 
 			fp_registers.reserve(x64::FPREnd - x64::FPRBegin + 1);
-			for (uint32 r = x64::FPRBegin; r < x64::FPREnd; ++r)
+			for (Uint32 r = x64::FPRBegin; r < x64::FPREnd; ++r)
 			{
 				fp_registers.push_back(r);
 			}
 		}
 
-		virtual uint32 GetStackPointerRegister() const override
+		virtual Uint32 GetStackPointerRegister() const override
 		{
 			return x64::RSP;
 		}
 
-		virtual uint32 GetFramePointerRegister() const override
+		virtual Uint32 GetFramePointerRegister() const override
 		{
 			return x64::RBP;
 		}
 
 
-		virtual uint32 GetReturnRegister() const override
+		virtual Uint32 GetReturnRegister() const override
 		{
 			return x64::RAX;
 		}
 
-		virtual std::vector<uint32> const& GetIntegerRegisters() const override
+		virtual std::vector<Uint32> const& GetIntegerRegisters() const override
 		{
 			return gp_registers;
 		}
 
-		virtual std::vector<uint32> const& GetFPRegisters() const override
+		virtual std::vector<Uint32> const& GetFPRegisters() const override
 		{
 			return fp_registers;
 		}
 
 
-		virtual bool IsCallerSaved(uint32 r) const override
+		virtual bool IsCallerSaved(Uint32 r) const override
 		{
 			return x64::IsCallerSaved(r);
 		}
 
 
-		virtual bool IsCalleeSaved(uint32 r) const override
+		virtual bool IsCalleeSaved(Uint32 r) const override
 		{
 			return x64::IsCalleeSaved(r);
 		}
 
 	private:
-		std::vector<uint32> gp_registers;
-		std::vector<uint32> fp_registers;
+		std::vector<Uint32> gp_registers;
+		std::vector<Uint32> fp_registers;
 	};
 
 	TargetDataLayout const& x64Target::GetDataLayout() const

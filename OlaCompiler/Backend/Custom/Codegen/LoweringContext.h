@@ -14,8 +14,8 @@ namespace ola
 	class BasicBlock;
 	class Value;
 	class IRType;
-	enum MachineOpcode : uint32;
-	enum class Opcode : uint32;
+	enum MachineOpcode : Uint32;
+	enum class Opcode : Uint32;
 
 	MachineType GetOperandType(IRType const* type);
 	MachineOpcode GetMachineOpcode(Opcode opcode);
@@ -85,7 +85,7 @@ namespace ola
 		mutable std::unordered_map<BasicBlock const*, MachineBasicBlock*> block_map;
 		mutable std::unordered_map<Value const*, MachineOperand> value_map;
 		mutable std::unordered_map<Value const*, MachineOperand> storage_map;
-		mutable uint32 virt_reg_id = 0;
-		mutable uint32 label_id = 0;
+		mutable Uint32 virt_reg_id = 0;
+		mutable Uint32 label_id = 0;
 	};
 }

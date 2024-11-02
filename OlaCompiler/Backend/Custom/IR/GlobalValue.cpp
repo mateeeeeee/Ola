@@ -7,7 +7,7 @@ namespace ola
 	{
 		IRFuncType* function_type = GetFunctionType();
 		arguments.resize(function_type->GetParamCount());
-		for (uint32 i = 0; i < arguments.size(); ++i)
+		for (Uint32 i = 0; i < arguments.size(); ++i)
 		{
 			arguments[i] = new Argument(function_type->GetParamType(i), i);
 		}
@@ -15,15 +15,15 @@ namespace ola
 
 	Function::~Function()
 	{
-		for (uint32 i = 0; i < arguments.size(); ++i)
+		for (Uint32 i = 0; i < arguments.size(); ++i)
 		{
 			delete arguments[i];
 		}
 	}
 
-	uint64 Function::GetInstructionCount() const
+	Uint64 Function::GetInstructionCount() const
 	{
-		uint64 instruction_count = 0;
+		Uint64 instruction_count = 0;
 		for (auto const& bb : block_list) instruction_count += bb.Instructions().Size();
 		return instruction_count;
 	}
@@ -43,7 +43,7 @@ namespace ola
 		block_list.Insert(before->GetIterator(), BB);
 	}
 
-	uint64 Function::Size() const
+	Uint64 Function::Size() const
 	{
 		return block_list.Size();
 	}

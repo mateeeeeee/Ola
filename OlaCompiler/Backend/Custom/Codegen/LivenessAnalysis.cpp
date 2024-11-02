@@ -7,15 +7,15 @@
 
 namespace ola
 {
-	static inline uint32 GetRegAsUint(MachineOperand const& operand)
+	static inline Uint32 GetRegAsUint(MachineOperand const& operand)
 	{
 		OLA_ASSERT(operand.IsReg() && (IsVirtualReg(operand.GetReg().reg) || IsISAReg(operand.GetReg().reg)));
-		return static_cast<uint32>(operand.GetReg().reg);
+		return static_cast<Uint32>(operand.GetReg().reg);
 	}
 
-	static void AssignInstNum(MachineFunction& MF, std::unordered_map<MachineInstruction*, uint64>& inst_number_map)
+	static void AssignInstNum(MachineFunction& MF, std::unordered_map<MachineInstruction*, Uint64>& inst_number_map)
 	{
-		uint64 current = 0;
+		Uint64 current = 0;
 		for (auto& block : MF.Blocks())
 		{
 			for (MachineInstruction& inst : block->Instructions()) 
@@ -34,18 +34,18 @@ namespace ola
 
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 
-		std::unordered_map<uint32, LiveInterval> live_interval_map;
+		std::unordered_map<Uint32, LiveInterval> live_interval_map;
 		for (auto& MBB : MF.Blocks())
 		{
 			for (MachineInstruction& MI : MBB->Instructions())
 			{
-				uint64 const instruction_idx = result.instruction_numbering_map[&MI];
+				Uint64 const instruction_idx = result.instruction_numbering_map[&MI];
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
-				for (uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
+				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
-					uint32 reg_id = GetRegAsUint(MO);
+					Uint32 reg_id = GetRegAsUint(MO);
 					bool is_float_reg = MO.GetType() == MachineType::Float64;
 
 					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())

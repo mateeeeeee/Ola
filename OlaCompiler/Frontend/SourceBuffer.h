@@ -8,7 +8,7 @@ namespace ola
 	public:
 
 		explicit SourceBuffer(std::string_view source_file);
-		SourceBuffer(char const* buffer_start, uint64 buffer_size, std::string_view refname = "");
+		SourceBuffer(char const* buffer_start, Uint64 buffer_size, std::string_view refname = "");
 		OLA_NONCOPYABLE(SourceBuffer)
 		OLA_DEFAULT_MOVABLE(SourceBuffer)
 		~SourceBuffer() = default;
@@ -17,7 +17,7 @@ namespace ola
 
 		char const* GetBufferStart() const { return data_buffer.c_str(); }
 		char const* GetBufferEnd() const { return GetBufferStart() + data_buffer.size(); }
-		uint64		GetBufferSize() const {	return data_buffer.size(); }
+		Uint64		GetBufferSize() const {	return data_buffer.size(); }
 		std::string_view GetBuffer() const
 		{
 			return std::string_view{ data_buffer };

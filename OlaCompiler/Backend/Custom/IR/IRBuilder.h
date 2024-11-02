@@ -66,6 +66,6 @@ namespace ola
 		BasicBlock* current_block;
 		IListIterator<Instruction> insert_point;
 
-		uint32 bb_label_counter = 0;
+		Uint32 bb_label_counter = 0;
 	};
 }

@@ -24,18 +24,18 @@ namespace ola
 	public:
 		IRTypeKind GetKind() const { return kind; }
 
-		uint32 GetAlign() const
+		Uint32 GetAlign() const
 		{
 			return align;
 		}
-		uint32 GetSize() const
+		Uint32 GetSize() const
 		{
 			return size;
 		}
 		IRContext& GetContext() const { return ctx; }
 
-		void* operator new(uint64) = delete;
-		void* operator new(uint64 sz, IRContext*) { return ::operator new(sz); }
+		void* operator new(Uint64) = delete;
+		void* operator new(Uint64 sz, IRContext*) { return ::operator new(sz); }
 
 		bool IsVoid() const { return kind == IRTypeKind::Void; }
 		bool IsStruct() const { return kind == IRTypeKind::Struct; }
@@ -50,16 +50,16 @@ namespace ola
 
 	private:
 		IRTypeKind kind;
-		uint32 align;
-		uint32 size;
+		Uint32 align;
+		Uint32 size;
 		IRContext& ctx;
 
 	protected:
 		IRType(IRContext& ctx, IRTypeKind kind)   : ctx(ctx), kind(kind), align(), size() {}
-		IRType(IRContext& ctx, IRTypeKind kind, uint32 align, uint32 size) : ctx(ctx), kind(kind), align(align), size(size) {}
+		IRType(IRContext& ctx, IRTypeKind kind, Uint32 align, Uint32 size) : ctx(ctx), kind(kind), align(align), size(size) {}
 
-		void SetAlign(uint32 _align) { align = _align; }
-		void SetSize(uint32 _size) { size = _size; }
+		void SetAlign(Uint32 _align) { align = _align; }
+		void SetSize(Uint32 _size) { size = _size; }
 	};
 
 	class IRVoidType : public IRType
@@ -95,16 +95,16 @@ namespace ola
 		friend class IRContext;
 	public:
 
-		uint32 GetWidth() const { return width; }
+		Uint32 GetWidth() const { return width; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Integer; }
-		static IRIntType* Get(IRContext& ctx, uint32 width);
+		static IRIntType* Get(IRContext& ctx, Uint32 width);
 
 	private:
-		uint32 width; 
+		Uint32 width; 
 
 	private:
-		explicit IRIntType(IRContext& ctx, uint32 width) : IRType(ctx, IRTypeKind::Integer, width, width), width(width) {}
+		explicit IRIntType(IRContext& ctx, Uint32 width) : IRType(ctx, IRTypeKind::Integer, width, width), width(width) {}
 	};
 
 	class IRFloatType : public IRType
@@ -124,18 +124,18 @@ namespace ola
 		friend class IRContext;
 	public:
 		IRType* GetElementType() const { return element_type; }
-		uint32 GetArraySize() const { return array_size; }
+		Uint32 GetArraySize() const { return array_size; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
-		static IRArrayType* Get(IRType* base_type, uint32 array_size);
-		static IRArrayType* Get(IRContext& ctx, IRType* base_type, uint32 array_size);
+		static IRArrayType* Get(IRType* base_type, Uint32 array_size);
+		static IRArrayType* Get(IRContext& ctx, IRType* base_type, Uint32 array_size);
 
 	private:
 		IRType* element_type;
-		uint32 array_size;
+		Uint32 array_size;
 
 	private:
-		IRArrayType(IRContext& ctx, IRType* element_type, uint32 array_size) : IRType(ctx, IRTypeKind::Array, element_type->GetAlign(), element_type->GetSize() * array_size), element_type(element_type), array_size(array_size) {}
+		IRArrayType(IRContext& ctx, IRType* element_type, Uint32 array_size) : IRType(ctx, IRTypeKind::Array, element_type->GetAlign(), element_type->GetSize() * array_size), element_type(element_type), array_size(array_size) {}
 	};
 
 	class IRFuncType : public IRType
@@ -145,8 +145,8 @@ namespace ola
 
 		IRType* GetReturnType() const { return return_type; }
 		std::vector<IRType*> const& GetParamTypes() const { return param_types; }
-		uint32 GetParamCount() const { return (uint32)param_types.size(); }
-		IRType* GetParamType(uint32 i) const { return param_types[i]; }
+		Uint32 GetParamCount() const { return (Uint32)param_types.size(); }
+		IRType* GetParamType(Uint32 i) const { return param_types[i]; }
 
 		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
 		static IRFuncType* Get(IRType* return_type, std::vector<IRType*> const& param_types);
@@ -168,10 +168,10 @@ namespace ola
 
 		std::string_view GetName() const { return name; }
 		std::vector<IRType*> const& GetMemberTypes() const { return member_types; }
-		uint64 GetMemberCount() const { return member_types.size(); }
-		IRType* GetMemberType(uint32 i) const { return member_types[i]; }
+		Uint64 GetMemberCount() const { return member_types.size(); }
+		IRType* GetMemberType(Uint32 i) const { return member_types[i]; }
 
-		uint32 GetFieldOffset(uint32 i) const
+		Uint32 GetFieldOffset(Uint32 i) const
 		{
 			OLA_ASSERT(false);
 			return 0; 

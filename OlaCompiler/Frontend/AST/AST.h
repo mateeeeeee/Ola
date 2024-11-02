@@ -15,7 +15,7 @@ namespace ola
 		}
 		UniqueDeclPtrList const& GetDecls() const { return declarations; }
 
-		virtual void Accept(ASTVisitor&, uint32) const override;
+		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 	private:

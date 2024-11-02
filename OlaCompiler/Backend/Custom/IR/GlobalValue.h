@@ -91,15 +91,15 @@ namespace ola
 	{
 		friend class Function;
 	private:
-		Argument(IRType* type, uint32 index) : Value(ValueKind::Argument, type), index(index) {}
-		uint32  GetIndex() const { return index; }
+		Argument(IRType* type, Uint32 index) : Value(ValueKind::Argument, type), index(index) {}
+		Uint32  GetIndex() const { return index; }
 		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
 
 	private:
-		uint32 index;
+		Uint32 index;
 	};
 
-	enum FunctionAttribute : uint8
+	enum FunctionAttribute : Uint8
 	{
 		Attribute_None = 0x00,
 		Attribute_NoInline = 0x01,
@@ -114,7 +114,7 @@ namespace ola
 		OLA_NONCOPYABLE(Function)
 		~Function();
 
-		uint64 GetInstructionCount() const;
+		Uint64 GetInstructionCount() const;
 		IRFuncType* GetFunctionType() const;
 		IRType* GetReturnType() const
 		{
@@ -149,7 +149,7 @@ namespace ola
 		bool IsNoInline() const { return attr.HasAttr(Attribute_NoInline); }
 		void SetNoInline() { attr.AddAttr(Attribute_NoInline); }
 
-		uint64	Size() const;
+		Uint64	Size() const;
 		bool    Empty() const { return block_list.Empty(); }
 
 		auto begin() { return block_list.begin(); }
@@ -172,15 +172,15 @@ namespace ola
 		auto Arguments()		{ return IteratorRange(ArgBegin(), ArgEnd()); }
 		auto Arguments() const	{ return IteratorRange(ArgBegin(), ArgEnd()); }
 
-		IRType* GetArgType(uint32 i) const
+		IRType* GetArgType(Uint32 i) const
 		{
 			return GetFunctionType()->GetParamType(i);
 		}
-		Argument* GetArg(uint32 i) const
+		Argument* GetArg(Uint32 i) const
 		{
 			return i < arguments.size() ? arguments[i] : nullptr;
 		}
-		uint64 GetArgCount() const
+		Uint64 GetArgCount() const
 		{
 			return GetFunctionType()->GetParamCount();
 		}

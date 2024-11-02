@@ -13,7 +13,7 @@ namespace ola
 	{
 	public:
 		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1) {}
-		explicit BasicBlock(IRContext& C, Function* function, uint32 idx = -1);
+		explicit BasicBlock(IRContext& C, Function* function, Uint32 idx = -1);
 		~BasicBlock() {}
 		auto& Instructions()
 		{
@@ -50,11 +50,11 @@ namespace ola
 			function = func;
 		}
 
-		uint32 GetIndex() const
+		Uint32 GetIndex() const
 		{
 			return block_idx;
 		}
-		void SetIndex(uint32 idx)
+		void SetIndex(Uint32 idx)
 		{
 			block_idx = idx;
 		}
@@ -85,7 +85,7 @@ namespace ola
 	private:
 		Function* function;
 		std::string label;
-		uint32 block_idx;
+		Uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<BasicBlock*> predecessors;
 		std::vector<BasicBlock*> successors;

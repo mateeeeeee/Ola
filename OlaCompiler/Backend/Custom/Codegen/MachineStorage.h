@@ -8,9 +8,9 @@ namespace ola
 	class MachineZeroStorage final : public MachineRelocable
 	{
 	public:
-		explicit MachineZeroStorage(std::string_view symbol, uint64 size) : MachineRelocable(symbol), size(size) {}
+		explicit MachineZeroStorage(std::string_view symbol, Uint64 size) : MachineRelocable(symbol), size(size) {}
 
-		uint64 GetSize() const { return size; }
+		Uint64 GetSize() const { return size; }
 
 		virtual RelocableKind GetRelocableKind() const override
 		{
@@ -18,13 +18,13 @@ namespace ola
 		}
 
 	private:
-		uint64 size;
+		Uint64 size;
 	};
 
 	class MachineDataStorage final : public MachineRelocable
 	{
 	public:
-		using Storage = std::vector<std::variant<uint8, uint16, uint32, uint64, std::string>>;
+		using Storage = std::vector<std::variant<Uint8, Uint16, Uint32, Uint64, std::string>>;
 	public:
 		MachineDataStorage(std::string_view symbol, bool read_only) : MachineRelocable(symbol), read_only(read_only) {}
 
@@ -34,24 +34,24 @@ namespace ola
 		}
 		Storage const& GetStorage() const { return data; }
 
-		uint32 AppendByte(uint8 val)
+		Uint32 AppendByte(Uint8 val)
 		{
 			return Append(val);
 		}
-		uint32 AppendWord(uint16 val)
+		Uint32 AppendWord(Uint16 val)
 		{
 			return Append(val);
 		}
-		uint32 AppendDWord(uint32 val)
+		Uint32 AppendDWord(Uint32 val)
 		{
 			return Append(val);
 		}
-		uint32 AppendQWord(uint64 val)
+		Uint32 AppendQWord(Uint64 val)
 		{
 			return Append(val);
 		}
 
-		uint32 AppendString(std::string_view str)
+		Uint32 AppendString(std::string_view str)
 		{
 			return Append(std::string(str));
 		}
@@ -67,9 +67,9 @@ namespace ola
 
 	private:
 		template<typename T>
-		uint32 Append(T val)
+		Uint32 Append(T val)
 		{
-			uint32 idx = (uint32)data.size();
+			Uint32 idx = (Uint32)data.size();
 			data.push_back(val);
 			return idx;
 		}
