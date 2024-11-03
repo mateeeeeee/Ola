@@ -66,14 +66,14 @@ namespace ola
 	class ConstantFloat final : public Constant
 	{
 	public:
-		ConstantFloat(IRFloatType* type, double V) : Constant(ConstantID::Float, type), value(V) {}
-		ConstantFloat(IRType* type, double V) : Constant(ConstantID::Float, type), value(V)
+		ConstantFloat(IRFloatType* type, Float64 V) : Constant(ConstantID::Float, type), value(V) {}
+		ConstantFloat(IRType* type, Float64 V) : Constant(ConstantID::Float, type), value(V)
 		{
 			OLA_ASSERT(isa<IRFloatType>(type));
 		}
 		~ConstantFloat() = default;
 
-		double GetValue() const { return value; }
+		Float64 GetValue() const { return value; }
 
 		static bool ClassOf(Value const* V)
 		{
@@ -85,7 +85,7 @@ namespace ola
 		}
 
 	private:
-		double value;
+		Float64 value;
 	};
 
 	class ConstantString final : public Constant

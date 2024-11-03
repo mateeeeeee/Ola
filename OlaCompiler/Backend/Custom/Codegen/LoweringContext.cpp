@@ -132,7 +132,7 @@ namespace ola
 		else if (C->GetConstantID() == ConstantID::Float)
 		{
 			ConstantFloat const* CF = cast<ConstantFloat>(C);
-			double value = CF->GetValue();
+			Float64 value = CF->GetValue();
 			MachineOperand imm = MachineOperand::Immediate(value, MachineType::Float64);
 			return imm;
 		}

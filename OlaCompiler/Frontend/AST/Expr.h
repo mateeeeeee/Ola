@@ -308,8 +308,8 @@ namespace ola
 	class FloatLiteral final : public Expr
 	{
 	public:
-		FloatLiteral(double value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value) {}
-		double GetValue() const { return value; }
+		FloatLiteral(Float64 value, SourceLocation const& loc) : Expr(ExprKind::FloatLiteral, loc), value(value) {}
+		Float64 GetValue() const { return value; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -318,7 +318,7 @@ namespace ola
 
 		static bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::FloatLiteral; }
 	private:
-		double value;
+		Float64 value;
 	};
 
 	class ImplicitCastExpr final : public Expr

@@ -1066,7 +1066,7 @@ namespace ola
 		return bool_literal;
 	}
 
-	UniqueFloatLiteralPtr Sema::ActOnFloatLiteral(double value, SourceLocation const& loc)
+	UniqueFloatLiteralPtr Sema::ActOnFloatLiteral(Float64 value, SourceLocation const& loc)
 	{
 		UniqueFloatLiteralPtr float_literal = MakeUnique<FloatLiteral>(value, loc);
 		float_literal->SetType(FloatType::Get(ctx));

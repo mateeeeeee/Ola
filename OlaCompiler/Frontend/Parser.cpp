@@ -1200,7 +1200,7 @@ namespace ola
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::float_number));
 		std::string_view string_number = current_token->GetData();
-		double value = std::stod(current_token->GetData().data(), nullptr);
+		Float64 value = std::stod(current_token->GetData().data(), nullptr);
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnFloatLiteral(value, loc);

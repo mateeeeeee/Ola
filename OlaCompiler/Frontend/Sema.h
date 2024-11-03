@@ -107,7 +107,7 @@ namespace ola
 		UniqueCharLiteralPtr ActOnCharLiteral(std::string_view str, SourceLocation const& loc);
 		UniqueStringLiteralPtr ActOnStringLiteral(std::string_view str, SourceLocation const& loc);
 		UniqueBoolLiteralPtr ActOnBoolLiteral(bool value, SourceLocation const& loc);
-		UniqueFloatLiteralPtr ActOnFloatLiteral(double value, SourceLocation const& loc);
+		UniqueFloatLiteralPtr ActOnFloatLiteral(Float64 value, SourceLocation const& loc);
 		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
 		UniqueIdentifierExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list);

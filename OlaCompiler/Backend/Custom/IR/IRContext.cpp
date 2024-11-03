@@ -148,7 +148,7 @@ namespace ola
 		else return GetInt8(value);
 	}
 
-	ConstantFloat* IRContext::GetFloat(double value)
+	ConstantFloat* IRContext::GetFloat(Float64 value)
 	{
 		if (constant_floats.contains(value)) return constant_floats[value];
 		constant_floats[value] = new ConstantFloat(float_type, value);

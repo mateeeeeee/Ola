@@ -67,7 +67,7 @@ namespace ola
 							}
 							else if (ConstantFloat* CF = dyn_cast<ConstantFloat>(V))
 							{
-								double value = CF->GetValue();
+								Float64 value = CF->GetValue();
 								void* value_ptr = static_cast<void*>(&value);
 								data->AppendQWord(*static_cast<Uint64*>(value_ptr));
 							}

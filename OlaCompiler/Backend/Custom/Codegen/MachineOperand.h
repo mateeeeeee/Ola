@@ -160,7 +160,7 @@ namespace ola
 			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>);
 			if constexpr (std::is_floating_point_v<T>)
 			{
-				static_assert(std::is_same_v<T, double>);
+				static_assert(std::is_same_v<T, Float64>);
 				return MachineOperand(std::bit_cast<Sint64>(val), type);
 			}
 			else return MachineOperand(static_cast<Sint64>(val), type);
