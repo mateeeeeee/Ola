@@ -25,7 +25,7 @@ namespace ola
 		llvm::Module module;
 
 	private:
-		static bool VerifyModule(llvm::Module&);
+		static Bool VerifyModule(llvm::Module&);
 	};
 
 }

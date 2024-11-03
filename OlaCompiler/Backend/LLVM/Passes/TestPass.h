@@ -8,11 +8,11 @@ namespace ola
 {
 	struct TestPass : public llvm::FunctionPass 
 	{
-		static char ID;
+		static Char ID;
 
 		TestPass() : llvm::FunctionPass(ID) {}
 
-		bool runOnFunction(llvm::Function& F) override 
+		Bool runOnFunction(llvm::Function& F) override 
 		{
 			llvm::errs() << "Test: ";
 			llvm::errs().write_escaped(F.getName()) << '\n';
@@ -20,7 +20,7 @@ namespace ola
 		}
 	}; 
 
-	char TestPass::ID = 0;
+	Char TestPass::ID = 0;
 	static llvm::RegisterPass<TestPass> X("Test", "Test Pass", false /* Only looks at CFG */,
 															   false /* Analysis Pass */);
 }

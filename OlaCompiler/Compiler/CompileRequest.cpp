@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	Sint32 CompileRequest::Parse(int argc, char** argv)
+	Sint32 CompileRequest::Parse(int argc, Char** argv)
 	{
 		CLI::App cli_parser{ "Ola compiler" };
 		CLI::Option* ast_dump = cli_parser.add_flag("--astdump", "Dump AST to output/log");
@@ -25,7 +25,7 @@ namespace ola
 
 		if (*test)
 		{
-			bool test_debug_flag = (bool)*test_debug;
+			Bool test_debug_flag = (Bool)*test_debug;
 			if (!source_files.empty())
 			{
 				if (output_file.empty()) output_file = source_files[0];

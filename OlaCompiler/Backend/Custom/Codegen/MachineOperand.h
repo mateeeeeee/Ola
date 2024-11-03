@@ -8,11 +8,11 @@ namespace ola
 	constexpr Uint32 VIRTUAL_REG_BEGIN = 0b0101U << 28;
 	constexpr Uint32 INVALID_REG = 0b1100U << 28;
 
-	inline constexpr bool IsISAReg(Uint32 r) 
+	inline constexpr Bool IsISAReg(Uint32 r) 
 	{
 		return r < VIRTUAL_REG_BEGIN;
 	}
-	inline constexpr bool IsVirtualReg(Uint32 r) 
+	inline constexpr Bool IsVirtualReg(Uint32 r) 
 	{
 		return (r & VIRTUAL_REG_BEGIN) == VIRTUAL_REG_BEGIN;
 	}
@@ -27,11 +27,11 @@ namespace ola
 		Other
 	};
 
-	inline constexpr bool IsIntegerType(MachineType type)
+	inline constexpr Bool IsIntegerType(MachineType type)
 	{
 		return type <= MachineType::Int64;
 	}
-	inline constexpr bool IsFPType(MachineType type)
+	inline constexpr Bool IsFPType(MachineType type)
 	{
 		return type == MachineType::Float64;
 	}
@@ -57,11 +57,11 @@ namespace ola
 	{
 		Uint32 reg;
 
-		bool operator==(const MachineRegister& rhs) const 
+		Bool operator==(const MachineRegister& rhs) const 
 		{
 			return reg == rhs.reg;
 		}
-		bool operator!=(const MachineRegister& rhs) const 
+		Bool operator!=(const MachineRegister& rhs) const 
 		{
 			return reg != rhs.reg;
 		}
@@ -71,11 +71,11 @@ namespace ola
 	{
 		Sint32 offset;
 
-		bool operator==(MachineStackObject const& rhs) const
+		Bool operator==(MachineStackObject const& rhs) const
 		{
 			return offset == rhs.offset;
 		}
-		bool operator!=(MachineStackObject const& rhs) const
+		Bool operator!=(MachineStackObject const& rhs) const
 		{
 			return offset != rhs.offset;
 		}
@@ -104,7 +104,7 @@ namespace ola
 			type = _type;
 		}
 
-		bool IsReg() const { return std::holds_alternative<MachineRegister>(storage); }
+		Bool IsReg() const { return std::holds_alternative<MachineRegister>(storage); }
 		MachineRegister GetReg() const
 		{
 			return std::get<MachineRegister>(storage);
@@ -114,7 +114,7 @@ namespace ola
 			return std::get<MachineRegister>(storage); 
 		}
 
-		bool IsStackObject() const
+		Bool IsStackObject() const
 		{
 			return std::holds_alternative<MachineStackObject>(storage);
 		}
@@ -123,33 +123,33 @@ namespace ola
 			return std::get<MachineStackObject>(storage).offset;
 		}
 
-		bool IsImmediate() const { return std::holds_alternative<Sint64>(storage); }
+		Bool IsImmediate() const { return std::holds_alternative<Sint64>(storage); }
 		Sint64 GetImmediate() const
 		{
 			return std::get<Sint64>(storage);
 		}
 
-		bool IsRelocable() const { return std::holds_alternative<MachineRelocable*>(storage); }
+		Bool IsRelocable() const { return std::holds_alternative<MachineRelocable*>(storage); }
 		MachineRelocable* GetRelocable() const
 		{
 			return std::get<MachineRelocable*>(storage);
 		}
 
-		bool IsUnused() const 
+		Bool IsUnused() const 
 		{
 			return std::holds_alternative<std::monostate>(storage);
 		}
 
-		bool IsMemoryOperand() const
+		Bool IsMemoryOperand() const
 		{
 			return IsStackObject() || IsRelocable();
 		}
 
-		bool operator==(MachineOperand const& rhs) const
+		Bool operator==(MachineOperand const& rhs) const
 		{
 			return storage == rhs.storage;
 		}
-		bool operator!=(MachineOperand const& rhs) const
+		Bool operator!=(MachineOperand const& rhs) const
 		{
 			return storage != rhs.storage;
 		}
@@ -194,7 +194,7 @@ namespace ola
 		MachineType type = MachineType::Unknown;
 	};
 
-	inline bool IsOperandVReg(MachineOperand const& operand)
+	inline Bool IsOperandVReg(MachineOperand const& operand)
 	{
 		return operand.IsReg() && IsVirtualReg(operand.GetReg().reg);
 	}

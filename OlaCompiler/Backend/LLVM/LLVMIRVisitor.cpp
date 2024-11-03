@@ -112,11 +112,11 @@ namespace ola
 	void LLVMIRVisitor::Visit(VarDecl const& var_decl, Uint32)
 	{
 		Type const* var_type = var_decl.GetType().GetTypePtr();
-		bool const is_const  = var_decl.GetType().IsConst();
+		Bool const is_const  = var_decl.GetType().IsConst();
 		llvm::Type* llvm_type = ConvertToIRType(var_type);
-		bool const is_array = isa<ArrayType>(var_type); 
-		bool const is_class = isa<ClassType>(var_type); 
-		bool const is_ref   = isa<RefType>(var_type);   
+		Bool const is_array = isa<ArrayType>(var_type); 
+		Bool const is_class = isa<ClassType>(var_type); 
+		Bool const is_ref   = isa<RefType>(var_type);   
 
 		if (var_decl.IsGlobal())
 		{
@@ -326,7 +326,7 @@ namespace ola
 					llvm::AllocaInst* struct_alloc = builder.CreateAlloca(llvm_type, nullptr);
 					value_map[&var_decl] = struct_alloc;
 
-					bool const is_polymorphic = class_decl->IsPolymorphic();
+					Bool const is_polymorphic = class_decl->IsPolymorphic();
 					if (is_polymorphic)
 					{
 						llvm::Value* field_ptr = builder.CreateStructGEP(llvm_type, struct_alloc, 0);
@@ -755,7 +755,7 @@ namespace ola
 		OLA_ASSERT(operand_value);
 		llvm::Value* operand = Load(operand_expr->GetType(), operand_value);
 
-		bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
+		Bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
 		llvm::Value* result = nullptr;
 		switch (unary_expr.GetUnaryKind())
 		{
@@ -833,7 +833,7 @@ namespace ola
 
 		llvm::Value* lhs = Load(lhs_expr->GetType(), lhs_value);
 		llvm::Value* rhs = Load(rhs_expr->GetType(), rhs_value);
-		bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
+		Bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
 
 		llvm::Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
@@ -1108,7 +1108,7 @@ namespace ola
 
 		std::vector<llvm::Value*> args;
 		Uint32 arg_index = 0;
-		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
+		Bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
 		llvm::AllocaInst* return_alloc = nullptr;
 		if (return_struct)
 		{
@@ -1247,7 +1247,7 @@ namespace ola
 			
 			std::vector<llvm::Value*> args;
 			Uint32 arg_index = 0;
-			bool return_struct = IsStruct(function_type->getReturnType());
+			Bool return_struct = IsStruct(function_type->getReturnType());
 			llvm::AllocaInst* return_alloc = nullptr; 
 			if (return_struct)
 			{
@@ -1278,7 +1278,7 @@ namespace ola
 
 			std::vector<llvm::Value*> args;
 			Uint32 arg_index = 0;
-			bool return_struct = isa<ClassType>(member_call_expr.GetCalleeType()->GetReturnType());
+			Bool return_struct = isa<ClassType>(member_call_expr.GetCalleeType()->GetReturnType());
 			llvm::AllocaInst* return_alloc = nullptr;
 			if (return_struct)
 			{
@@ -1444,7 +1444,7 @@ namespace ola
 			std::span<QualType const> function_params = function_type->GetParams();
 
 			llvm::Type* return_type = ConvertToIRType(function_type->GetReturnType());
-			bool return_type_struct = return_type->isStructTy();
+			Bool return_type_struct = return_type->isStructTy();
 
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
 			if (return_type_struct) param_types.push_back(return_type->getPointerTo());
@@ -1504,7 +1504,7 @@ namespace ola
 		std::span<QualType const> function_params = type->GetParams();
 
 		llvm::Type* return_type = ConvertToIRType(type->GetReturnType());
-		bool return_type_struct = return_type->isStructTy();
+		Bool return_type_struct = return_type->isStructTy();
 
 		std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
 		if (return_type_struct) param_types.push_back(return_type->getPointerTo());
@@ -1579,32 +1579,32 @@ namespace ola
 		return builder.CreateStore(load, ptr);
 	}
 
-	bool LLVMIRVisitor::IsPointer(llvm::Type* type)
+	Bool LLVMIRVisitor::IsPointer(llvm::Type* type)
 	{
 		return type->isPointerTy();
 	}
 
-	bool LLVMIRVisitor::IsBoolean(llvm::Type* type)
+	Bool LLVMIRVisitor::IsBoolean(llvm::Type* type)
 	{
 		return type->isIntegerTy() && type->getIntegerBitWidth() == 1;
 	}
 
-	bool LLVMIRVisitor::IsInteger(llvm::Type* type)
+	Bool LLVMIRVisitor::IsInteger(llvm::Type* type)
 	{
 		return type->isIntegerTy() && type->getIntegerBitWidth() == 64;
 	}
 
-	bool LLVMIRVisitor::IsFloat(llvm::Type* type)
+	Bool LLVMIRVisitor::IsFloat(llvm::Type* type)
 	{
 		return type->isDoubleTy();
 	}
 
-	bool LLVMIRVisitor::IsStruct(llvm::Type* type)
+	Bool LLVMIRVisitor::IsStruct(llvm::Type* type)
 	{
 		return type->isStructTy();
 	}
 
-	bool LLVMIRVisitor::IsRef(llvm::Type* type)
+	Bool LLVMIRVisitor::IsRef(llvm::Type* type)
 	{
 		return type->isPointerTy();
 	}

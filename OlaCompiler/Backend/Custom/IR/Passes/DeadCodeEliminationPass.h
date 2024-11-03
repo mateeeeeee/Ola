@@ -8,14 +8,14 @@ namespace ola
 	class DeadCodeEliminationPass : public FunctionPass
 	{
 	public:
-		inline static char ID = 0;
+		inline static Char ID = 0;
 	public:
 		DeadCodeEliminationPass() : FunctionPass(ID) {}
 
-		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 	private:
-		static bool IsInstructionDead(Instruction const* I);
+		static Bool IsInstructionDead(Instruction const* I);
 	};
 	using DCEPass = DeadCodeEliminationPass;
 }

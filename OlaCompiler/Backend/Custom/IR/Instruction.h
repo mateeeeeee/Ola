@@ -99,31 +99,31 @@ namespace ola
 		Count
 	};
 
-	inline bool IsOpcodeTerminator(Opcode opcode)
+	inline Bool IsOpcodeTerminator(Opcode opcode)
 	{
 		return Opcode::TerminatorBegin <= opcode && opcode <= Opcode::TerminatorEnd;
 	}
-	inline bool IsOpcodeMemoryOp(Opcode opcode) 
+	inline Bool IsOpcodeMemoryOp(Opcode opcode) 
 	{
 		return Opcode::MemoryOpBegin <= opcode && opcode <= Opcode::MemoryOpEnd;
 	}
-	inline bool IsOpcodeIntegerOp(Opcode opcode) 
+	inline Bool IsOpcodeIntegerOp(Opcode opcode) 
 	{
 		return Opcode::IntegerOpBegin <= opcode && opcode <= Opcode::IntegerOpEnd;
 	}
-	inline bool IsOpcodeFloatOp(Opcode opcode) 
+	inline Bool IsOpcodeFloatOp(Opcode opcode) 
 	{
 		return Opcode::FloatOpBegin <= opcode && opcode <= Opcode::FloatOpEnd;
 	}
-	inline bool IsOpcodeCastOp(Opcode opcode) 
+	inline Bool IsOpcodeCastOp(Opcode opcode) 
 	{
 		return Opcode::CastOpBegin <= opcode && opcode <= Opcode::CastOpEnd;
 	}
-	inline bool IsOpcodeCompareOp(Opcode opcode) 
+	inline Bool IsOpcodeCompareOp(Opcode opcode) 
 	{
 		return Opcode::CompareOpBegin <= opcode && opcode <= Opcode::CompareOpEnd;
 	}
-	inline bool IsOpcodeBinaryOp(Opcode opcode)
+	inline Bool IsOpcodeBinaryOp(Opcode opcode)
 	{
 		switch (opcode)
 		{
@@ -148,7 +148,7 @@ namespace ola
 			return false;
 		}
 	}
-	inline bool IsOpcodeUnaryOp(Opcode opcode)
+	inline Bool IsOpcodeUnaryOp(Opcode opcode)
 	{
 		switch (opcode)
 		{
@@ -203,15 +203,15 @@ namespace ola
 		}
 		void ReplaceAllUseWith(Value* V);
 
-		bool IsUsed() const
+		Bool IsUsed() const
 		{
 			return !users.empty();
 		}
-		bool HasOneUse() const { return users.size() == 1; }
-		bool HasNUses(Uint32 N) const { return users.size() == N; }
-		bool HasNUsesOrMore(unsigned N) const { return users.size() >= N; }
+		Bool HasOneUse() const { return users.size() == 1; }
+		Bool HasNUses(Uint32 N) const { return users.size() == N; }
+		Bool HasNUsesOrMore(unsigned N) const { return users.size() >= N; }
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant;
 		}
@@ -231,7 +231,7 @@ namespace ola
 		{
 			return opcode;
 		}
-		char const* GetOpcodeName() const;
+		Char const* GetOpcodeName() const;
 
 		BasicBlock* GetBasicBlock() const
 		{
@@ -244,44 +244,44 @@ namespace ola
 		void RemoveFromParent();
 		IListIterator<Instruction> EraseFromParent();
 
-		bool IsTerminator() const 
+		Bool IsTerminator() const 
 		{
 			return IsOpcodeTerminator(opcode);
 		}
-		bool IsMemoryOp() const 
+		Bool IsMemoryOp() const 
 		{
 			return IsOpcodeMemoryOp(opcode);
 		}
-		bool IsIntegerOp() const 
+		Bool IsIntegerOp() const 
 		{
 			return IsOpcodeIntegerOp(opcode);
 		}
-		bool IsFloatOp() const
+		Bool IsFloatOp() const
 		{
 			return IsOpcodeFloatOp(opcode);
 		}
-		bool IsCastOp() const 
+		Bool IsCastOp() const 
 		{
 			return IsOpcodeCastOp(opcode);
 		}
-		bool IsUnaryOp() const
+		Bool IsUnaryOp() const
 		{
 			return IsOpcodeUnaryOp(opcode);
 		}
-		bool IsBinaryOp() const
+		Bool IsBinaryOp() const
 		{
 			return IsOpcodeBinaryOp(opcode);
 		}
-		bool IsCompareOp() const
+		Bool IsCompareOp() const
 		{
 			return IsOpcodeCompareOp(opcode);
 		}
 
-		bool IsBranch() const 
+		Bool IsBranch() const 
 		{
 			return opcode == Opcode::Branch || opcode == Opcode::Switch;
 		}
-		bool CanBeOperand() const;
+		Bool CanBeOperand() const;
 
 		Use const* GetOperandList() const
 		{
@@ -324,7 +324,7 @@ namespace ola
 		OpRange			Operands() { return OpRange(OpBegin(), OpEnd()); }
 		ConstOpRange	Operands() const { return ConstOpRange(OpBegin(), OpEnd()); }
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Instruction;
 		}
@@ -384,11 +384,11 @@ namespace ola
 			return Op<1>();
 		}
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsBinaryOp();
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -404,11 +404,11 @@ namespace ola
 			return Op<0>();
 		}
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsUnaryOp();
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -457,11 +457,11 @@ namespace ola
 
 		CompareOp GetCompareOp() const { return cmp; }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsCompareOp();
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -480,11 +480,11 @@ namespace ola
 		IRType* GetSrcType() const { return Op<0>()->GetType(); }
 		IRType* GetDestType() const { return GetType(); }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsCastOp();
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -499,11 +499,11 @@ namespace ola
 		Value* GetAddressOp() { return GetOperand(0); }
 		Value const* GetAddressOp() const { return GetOperand(0); }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Load;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -520,11 +520,11 @@ namespace ola
 		Value* GetAddressOp() { return GetOperand(1); }
 		Value const* GetAddressOp() const { return GetOperand(1); }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Store;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -537,8 +537,8 @@ namespace ola
 		BranchInst(IRContext& C, BasicBlock* target);
 		BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target);
 
-		bool IsUnconditional() const { return !IsConditional(); }
-		bool IsConditional()   const { return false_target != nullptr; }
+		Bool IsUnconditional() const { return !IsConditional(); }
+		Bool IsConditional()   const { return false_target != nullptr; }
 
 		BasicBlock* GetTrueTarget() const { return true_target; }
 		BasicBlock* GetFalseTarget() const { return false_target; }
@@ -554,11 +554,11 @@ namespace ola
 			Op<2>() = C;
 		}
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Branch;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -574,17 +574,17 @@ namespace ola
 		explicit ReturnInst(IRContext& C);
 		explicit ReturnInst(Value* ret_value);
 
-		bool IsVoid() const { return !GetReturnValue(); }
+		Bool IsVoid() const { return !GetReturnValue(); }
 		Value* GetReturnValue() const
 		{
 			return GetNumOperands() > 0 ? GetOperand(0) : nullptr;
 		}
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Ret;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -632,11 +632,11 @@ namespace ola
 			return cases.size();
 		}
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Switch;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -657,7 +657,7 @@ namespace ola
 		auto ArgEnd() const { return OpEnd() - 1; }
 		IteratorRange<OpIterator> Args() { return MakeRange(ArgBegin(), ArgEnd()); }
 		IteratorRange<ConstOpIterator> Args() const { return MakeRange(ArgBegin(), ArgEnd()); }
-		bool ArgEmpty() const { return ArgEnd() == ArgBegin(); }
+		Bool ArgEmpty() const { return ArgEnd() == ArgBegin(); }
 		Uint32 ArgSize() const { return ArgEnd() - ArgBegin(); }
 
 		Value const* GetArgOp(Uint32 i) const
@@ -689,11 +689,11 @@ namespace ola
 		Function* GetCalleeAsFunction() const;
 		Function* GetCaller() const;
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Call;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -718,11 +718,11 @@ namespace ola
 		void SetTrueValue(Value* V) { Op<1>() = V; }
 		void SetFalseValue(Value* V) { Op<2>() = V; }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Select;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -736,11 +736,11 @@ namespace ola
 		IRPtrType* GetPtrType() const;
 		IRType* GetAllocatedType() const { return allocated_type; }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Alloca;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -756,7 +756,7 @@ namespace ola
 		GetElementPtrInst(Value* base, std::span<Value*> indices);
 
 		Uint32 GetNumIndices() const { return GetNumOperands() - 1; }
-		bool HasIndices() const { return GetNumIndices() > 0; }
+		Bool HasIndices() const { return GetNumIndices() > 0; }
 
 		OpIterator       IdxBegin() { return OpBegin() + 1; }
 		ConstOpIterator  IdxBegin() const { return OpBegin() + 1; }
@@ -775,11 +775,11 @@ namespace ola
 		IRType* GetSourceElementType() const { return source_element_type; }
 		IRType* GetResultElementType() const { return result_element_type; }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::GetElementPtr;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
@@ -798,11 +798,11 @@ namespace ola
 		Value* GetOffset() const { return Op<1>(); }
 		IRType* GetResultElementType() const { return result_element_type; }
 
-		static bool ClassOf(Instruction const* I)
+		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::PtrAdd;
 		}
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}

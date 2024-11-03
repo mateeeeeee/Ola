@@ -8,7 +8,7 @@
 
 namespace ola
 {
-	enum class Linkage : bool
+	enum class Linkage : Bool
 	{
 		Internal,
 		External
@@ -32,17 +32,17 @@ namespace ola
 
 		IRType* GetValueType() const { return value_type; }
 
-		virtual bool IsFunction() const
+		virtual Bool IsFunction() const
 		{
 			return false;
 		}
-		virtual bool IsDeclaration() const = 0;
+		virtual Bool IsDeclaration() const = 0;
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Constant && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Global;
 		}
@@ -69,18 +69,18 @@ namespace ola
 
 		auto& Attributes() { return attr; }
 		auto const& Attributes() const { return attr; }
-		bool IsReadOnly() const { return attr.HasAttr(GlobalVariableAttribute::ReadOnly); }
+		Bool IsReadOnly() const { return attr.HasAttr(GlobalVariableAttribute::ReadOnly); }
 		void SetReadOnly() { attr.AddAttr(GlobalVariableAttribute::ReadOnly); }
 
 		Value* GetInitValue() const { return init; }
 
-		virtual bool IsDeclaration() const override
+		virtual Bool IsDeclaration() const override
 		{
 			return init == nullptr && linkage == Linkage::External;
 		}
 
-		static bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }
-		static bool ClassOf(GlobalValue const* GV) { return !GV->IsFunction(); }
+		static Bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }
+		static Bool ClassOf(GlobalValue const* GV) { return !GV->IsFunction(); }
 
 	private:
 		Value* init;
@@ -93,7 +93,7 @@ namespace ola
 	private:
 		Argument(IRType* type, Uint32 index) : Value(ValueKind::Argument, type), index(index) {}
 		Uint32  GetIndex() const { return index; }
-		static bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
+		static Bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
 
 	private:
 		Uint32 index;
@@ -144,13 +144,13 @@ namespace ola
 
 		auto& Attributes() { return attr; }
 		auto const& Attributes() const { return attr; }
-		bool IsForceInline() const { return attr.HasAttr(Attribute_ForceInline); }
+		Bool IsForceInline() const { return attr.HasAttr(Attribute_ForceInline); }
 		void SetForceInline() { attr.AddAttr(Attribute_ForceInline); }
-		bool IsNoInline() const { return attr.HasAttr(Attribute_NoInline); }
+		Bool IsNoInline() const { return attr.HasAttr(Attribute_NoInline); }
 		void SetNoInline() { attr.AddAttr(Attribute_NoInline); }
 
 		Uint64	Size() const;
-		bool    Empty() const { return block_list.Empty(); }
+		Bool    Empty() const { return block_list.Empty(); }
 
 		auto begin() { return block_list.begin(); }
 		auto begin() const { return block_list.begin(); }
@@ -185,17 +185,17 @@ namespace ola
 			return GetFunctionType()->GetParamCount();
 		}
 
-		virtual bool IsFunction() const override
+		virtual Bool IsFunction() const override
 		{
 			return true;
 		}
-		virtual bool IsDeclaration() const override
+		virtual Bool IsDeclaration() const override
 		{
 			return Empty();
 		}
 
-		static bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }
-		static bool ClassOf(GlobalValue const* GV) { return GV->IsFunction(); }
+		static Bool ClassOf(Value const* V) { return isa<GlobalValue>(V) && ClassOf(cast<GlobalValue>(V)); }
+		static Bool ClassOf(GlobalValue const* GV) { return GV->IsFunction(); }
 
 	private:
 		std::vector<Argument*> arguments;

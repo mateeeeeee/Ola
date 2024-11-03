@@ -26,9 +26,9 @@ namespace ola
 	public:
 		using Storage = std::vector<std::variant<Uint8, Uint16, Uint32, Uint64, std::string>>;
 	public:
-		MachineDataStorage(std::string_view symbol, bool read_only) : MachineRelocable(symbol), read_only(read_only) {}
+		MachineDataStorage(std::string_view symbol, Bool read_only) : MachineRelocable(symbol), read_only(read_only) {}
 
-		bool IsReadOnly() const
+		Bool IsReadOnly() const
 		{
 			return read_only;
 		}
@@ -63,7 +63,7 @@ namespace ola
 
 	private:
 		Storage data;
-		bool read_only;
+		Bool read_only;
 
 	private:
 		template<typename T>

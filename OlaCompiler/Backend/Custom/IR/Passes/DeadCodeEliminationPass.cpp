@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
+	Bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		std::set<Instruction*> alive;
 		std::vector<Instruction*> worklist;
@@ -52,7 +52,7 @@ namespace ola
 		return !worklist.empty();
 	}
 
-	bool DeadCodeEliminationPass::IsInstructionDead(Instruction const* I)
+	Bool DeadCodeEliminationPass::IsInstructionDead(Instruction const* I)
 	{
 		if (I->IsUsed())
 			return false;

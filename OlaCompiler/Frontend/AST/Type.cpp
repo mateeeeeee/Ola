@@ -4,12 +4,12 @@
 
 namespace ola
 {
-	bool QualType::operator==(QualType const& o) const
+	Bool QualType::operator==(QualType const& o) const
 	{
 		return type == o.type && qualifiers == o.qualifiers;
 	}
 
-	bool RefType::IsAssignableFrom(Type const* other) const
+	Bool RefType::IsAssignableFrom(Type const* other) const
 	{
 		return this == other || type->IsAssignableFrom(other);
 	}
@@ -18,7 +18,7 @@ namespace ola
 		return ctx->GetRefType(type);
 	}
 
-	bool VoidType::IsAssignableFrom(Type const* other) const
+	Bool VoidType::IsAssignableFrom(Type const* other) const
 	{
 		return isa<VoidType>(other); 
 	}
@@ -27,7 +27,7 @@ namespace ola
 		return ctx->GetVoidType();
 	}
 
-	bool BoolType::IsAssignableFrom(Type const* other) const
+	Bool BoolType::IsAssignableFrom(Type const* other) const
 	{
 		return isoneof<BoolType,IntType,FloatType>(other);
 	}
@@ -36,7 +36,7 @@ namespace ola
 		return ctx->GetBoolType();
 	}
 
-	bool CharType::IsAssignableFrom(Type const* other) const
+	Bool CharType::IsAssignableFrom(Type const* other) const
 	{
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
@@ -50,7 +50,7 @@ namespace ola
 		return ctx->GetCharType();
 	}
 
-	bool IntType::IsAssignableFrom(Type const* other) const
+	Bool IntType::IsAssignableFrom(Type const* other) const
 	{
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
@@ -64,7 +64,7 @@ namespace ola
 		return ctx->GetIntType();
 	}
 
-	bool FloatType::IsAssignableFrom(Type const* other) const
+	Bool FloatType::IsAssignableFrom(Type const* other) const
 	{
 		if (RefType const* ref_other = dyn_cast<RefType>(other))
 		{
@@ -78,7 +78,7 @@ namespace ola
 		return ctx->GetFloatType();
 	}
 
-	bool ArrayType::IsAssignableFrom(Type const* other) const
+	Bool ArrayType::IsAssignableFrom(Type const* other) const
 	{
 		if (!isa<ArrayType>(other)) return false;
 		ArrayType const* other_array_type = cast<ArrayType>(other);
@@ -89,7 +89,7 @@ namespace ola
 		return ctx->GetArrayType(type, array_size);
 	}
 
-	bool FuncType::IsAssignableFrom(Type const* other) const
+	Bool FuncType::IsAssignableFrom(Type const* other) const
 	{
 		return false;
 	}
@@ -130,7 +130,7 @@ namespace ola
 		if (GetAlign()) offset = AlignTo(offset, GetAlign());
 		SetSize(offset);
 	}
-	bool ClassType::IsAssignableFrom(Type const* other) const
+	Bool ClassType::IsAssignableFrom(Type const* other) const
 	{
 		if (this != other)
 		{

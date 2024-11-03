@@ -11,11 +11,11 @@ namespace ola
 	class MachineModulePass : public Pass
 	{
 	public:
-		explicit MachineModulePass(char pid) : Pass(pid, PassKind::MachineModule) {}
+		explicit MachineModulePass(Char pid) : Pass(pid, PassKind::MachineModule) {}
 
 		virtual void Init(MachineModule&) {}
 		virtual void Deinit(MachineModule&) {}
-		virtual bool RunOn(MachineModule&, MachineModuleAnalysisManager&) = 0;
+		virtual Bool RunOn(MachineModule&, MachineModuleAnalysisManager&) = 0;
 	};
 
 	template<>

@@ -23,14 +23,14 @@ namespace ola
 	{
 		LLVMIRVisitor llvm_visitor(context, module);
 		llvm_visitor.VisitAST(ast);
-		bool verified = VerifyModule(module);
+		Bool verified = VerifyModule(module);
 	}
 
 	void LLVMIRGenContext::Optimize(OptimizationLevel level)
 	{
 		LLVMOptimizer optimizer(module);
 		optimizer.Optimize(level);
-		bool verified = VerifyModule(module);
+		Bool verified = VerifyModule(module);
 	}
 
 	void LLVMIRGenContext::EmitIR(std::string_view output_file)
@@ -45,7 +45,7 @@ namespace ola
 		module.print(llvm_ir_file, nullptr);
 	}
 
-	bool LLVMIRGenContext::VerifyModule(llvm::Module& module)
+	Bool LLVMIRGenContext::VerifyModule(llvm::Module& module)
 	{
 		std::string error_msg;
 		llvm::raw_string_ostream error_stream(error_msg);

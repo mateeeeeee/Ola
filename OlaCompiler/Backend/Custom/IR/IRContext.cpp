@@ -81,7 +81,7 @@ namespace ola
 			if (function_type->GetReturnType() != ret_type) continue;
 			if (function_type->GetParamCount() != param_types.size()) continue;
 			Uint64 const param_count = function_type->GetParamCount();
-			bool incompatible = false;
+			Bool incompatible = false;
 			for (Uint64 i = 0; i < param_count; ++i)
 			{
 				if (function_type->GetParamType(i) != param_types[i])
@@ -103,7 +103,7 @@ namespace ola
 			if (struct_type->GetName() != name) continue;
 			if (struct_type->GetMemberCount() != member_types.size()) continue;
 			Uint64 const member_count = struct_type->GetMemberCount();
-			bool incompatible = false;
+			Bool incompatible = false;
 			for (Uint64 i = 0; i < member_count; ++i)
 			{
 				if (struct_type->GetMemberType(i) != member_types[i])

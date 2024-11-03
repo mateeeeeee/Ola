@@ -17,7 +17,7 @@ namespace ola
 	public:
 		virtual ~TargetDataLayout() = default;
 
-		virtual bool   IsLittleEndian() const = 0;
+		virtual Bool   IsLittleEndian() const = 0;
 		virtual Uint64 GetBuiltinAlignment(IRType const* type) const = 0;
 		virtual Uint64 GetPointerSize() const = 0;
 		virtual Uint64 GetCodeAlignment() const = 0;
@@ -43,12 +43,12 @@ namespace ola
 	public:
 		InstInfo() = default;
 
-		bool HasOpFlag(Uint32 idx, OperandFlag flag) const
+		Bool HasOpFlag(Uint32 idx, OperandFlag flag) const
 		{
 			OLA_ASSERT(idx < operand_count);
 			return (operand_flags[idx] & flag) == flag;
 		}
-		bool HasInstFlag(InstFlag flag) const
+		Bool HasInstFlag(InstFlag flag) const
 		{
 			return (instruction_flag & flag) == flag;
 		}
@@ -84,8 +84,8 @@ namespace ola
 		virtual Uint32 GetReturnRegister() const = 0;
 		virtual std::vector<Uint32> const& GetIntegerRegisters() const = 0;
 		virtual std::vector<Uint32> const& GetFPRegisters() const = 0;
-		virtual bool IsCallerSaved(Uint32) const = 0;
-		virtual bool IsCalleeSaved(Uint32) const = 0;
+		virtual Bool IsCallerSaved(Uint32) const = 0;
+		virtual Bool IsCalleeSaved(Uint32) const = 0;
 	};
 
 	class LoweringContext;
@@ -100,7 +100,7 @@ namespace ola
 	public:
 		virtual ~TargetISelInfo() = default;
 
-		virtual bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
+		virtual Bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
 		virtual void LegalizeInstruction(InstLegalizeContext&, LoweringContext&) const = 0;
 		virtual void PostLegalizeInstruction(InstLegalizeContext&) const = 0;
 	};

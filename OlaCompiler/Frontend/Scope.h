@@ -20,14 +20,14 @@ namespace ola
 	public:
 		SymbolScope() {}
 		
-		bool Insert(SymType* symbol)
+		Bool Insert(SymType* symbol)
 		{
 			if (sym_map.contains(symbol->GetName())) return false;
 			if (overload_sym_map.contains(symbol->GetName())) return false;
 			sym_map[symbol->GetName()] = symbol;
 			return true;
 		}
-		bool Insert_Overload(SymType* symbol)
+		Bool Insert_Overload(SymType* symbol)
 		{
 			if (sym_map.contains(symbol->GetName())) return false;
 			overload_sym_map[symbol->GetName()].push_back(symbol);
@@ -77,11 +77,11 @@ namespace ola
 			scopes.pop_back();
 		}
 
-		bool Insert(SymType* symbol)
+		Bool Insert(SymType* symbol)
 		{
 			return scopes.back().Insert(symbol);
 		}
-		bool Insert_Overload(SymType* symbol)
+		Bool Insert_Overload(SymType* symbol)
 		{
 			return scopes.back().Insert_Overload(symbol);
 		}
@@ -135,7 +135,7 @@ namespace ola
 			return scopes.back().LookUp_Overload(sym_name);
 		}
 
-		bool IsGlobal() const { return scopes.size() == 1; }
+		Bool IsGlobal() const { return scopes.size() == 1; }
 
 	private:
 		std::vector<SymbolScope<SymType>> scopes;

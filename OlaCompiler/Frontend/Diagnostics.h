@@ -26,7 +26,7 @@ namespace ola
 		static void PrintMessage(DiagKind diag_kind, std::string const& msg);
 
 	public:
-		explicit Diagnostics(bool warnings_as_errors = false, bool exit_on_error = true);
+		explicit Diagnostics(Bool warnings_as_errors = false, Bool exit_on_error = true);
 
 		void SetDefaultLocation(SourceLocation const& loc);
 		void Report(DiagCode code);
@@ -46,9 +46,9 @@ namespace ola
 		}
 
 	private:
-		bool warnings_as_errors = false;
-		bool exit_on_error = false;
+		Bool warnings_as_errors = false;
+		Bool exit_on_error = false;
 		SourceLocation loc;
-		bool error_reported = false;
+		Bool error_reported = false;
 	};
 }

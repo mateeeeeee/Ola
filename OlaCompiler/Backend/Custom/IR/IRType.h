@@ -37,16 +37,16 @@ namespace ola
 		void* operator new(Uint64) = delete;
 		void* operator new(Uint64 sz, IRContext*) { return ::operator new(sz); }
 
-		bool IsVoid() const { return kind == IRTypeKind::Void; }
-		bool IsStruct() const { return kind == IRTypeKind::Struct; }
-		bool IsPointer() const { return kind == IRTypeKind::Pointer; }
-		bool IsInteger() const { return kind == IRTypeKind::Integer; }
-		bool IsFloat() const { return kind == IRTypeKind::Float; }
-		bool IsArray() const { return kind == IRTypeKind::Array; }
-		bool IsFunction() const { return kind == IRTypeKind::Function; }
-		bool IsLabel() const { return kind == IRTypeKind::Label; }
+		Bool IsVoid() const { return kind == IRTypeKind::Void; }
+		Bool IsStruct() const { return kind == IRTypeKind::Struct; }
+		Bool IsPointer() const { return kind == IRTypeKind::Pointer; }
+		Bool IsInteger() const { return kind == IRTypeKind::Integer; }
+		Bool IsFloat() const { return kind == IRTypeKind::Float; }
+		Bool IsArray() const { return kind == IRTypeKind::Array; }
+		Bool IsFunction() const { return kind == IRTypeKind::Function; }
+		Bool IsLabel() const { return kind == IRTypeKind::Label; }
 
-		static bool ClassOf(IRType const* T) { return false; }
+		static Bool ClassOf(IRType const* T) { return false; }
 
 	private:
 		IRTypeKind kind;
@@ -66,7 +66,7 @@ namespace ola
 	{
 		friend class IRContext;
 	public:
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Void; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Void; }
 		static IRVoidType* Get(IRContext& ctx);
 
 	private:
@@ -79,7 +79,7 @@ namespace ola
 	public:
 		IRType* GetPointeeType() const { return pointee_type; }
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Pointer; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Pointer; }
 		static IRPtrType* Get(IRType* pointee_type = nullptr);
 		static IRPtrType* Get(IRContext& ctx, IRType* pointee_type = nullptr);
 
@@ -97,7 +97,7 @@ namespace ola
 
 		Uint32 GetWidth() const { return width; }
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Integer; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Integer; }
 		static IRIntType* Get(IRContext& ctx, Uint32 width);
 
 	private:
@@ -112,7 +112,7 @@ namespace ola
 		friend class IRContext;
 	public:
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Float; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Float; }
 		static IRFloatType* Get(IRContext& ctx);
 
 	private:
@@ -126,7 +126,7 @@ namespace ola
 		IRType* GetElementType() const { return element_type; }
 		Uint32 GetArraySize() const { return array_size; }
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Array; }
 		static IRArrayType* Get(IRType* base_type, Uint32 array_size);
 		static IRArrayType* Get(IRContext& ctx, IRType* base_type, Uint32 array_size);
 
@@ -148,7 +148,7 @@ namespace ola
 		Uint32 GetParamCount() const { return (Uint32)param_types.size(); }
 		IRType* GetParamType(Uint32 i) const { return param_types[i]; }
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Function; }
 		static IRFuncType* Get(IRType* return_type, std::vector<IRType*> const& param_types);
 		static IRFuncType* Get(IRContext& ctx, IRType* return_type, std::vector<IRType*> const& param_types);
 
@@ -177,7 +177,7 @@ namespace ola
 			return 0; 
 		}
 
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Struct; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Struct; }
 		static IRStructType* Get(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types);
 
 	private:
@@ -191,7 +191,7 @@ namespace ola
 	{
 		friend class IRContext;
 	public:
-		static bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Label; }
+		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Label; }
 		static IRLabelType* Get(IRContext& ctx);
 
 	private:

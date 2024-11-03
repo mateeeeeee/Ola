@@ -114,7 +114,7 @@ namespace ola
 			sema_ctx.return_stmt_encountered = false;
 		}
 
-		bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
+		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
 		OLA_ASSERT(result);
 		return function_decl;
 	}
@@ -129,7 +129,7 @@ namespace ola
 			return nullptr;
 		}
 
-		bool is_const = HasAttribute(method_attrs, MethodAttribute_Const);
+		Bool is_const = HasAttribute(method_attrs, MethodAttribute_Const);
 		FuncType const* func_type = dyn_cast<FuncType>(type);
 		OLA_ASSERT(func_type);
 
@@ -203,7 +203,7 @@ namespace ola
 			sema_ctx.return_stmt_encountered = false;
 		}
 
-		bool result = sema_ctx.decl_sym_table.Insert_Overload(member_function_decl.get());
+		Bool result = sema_ctx.decl_sym_table.Insert_Overload(member_function_decl.get());
 		return member_function_decl;
 	}
 
@@ -237,7 +237,7 @@ namespace ola
 			sema_ctx.labels.clear();
 		}
 
-		bool result = sema_ctx.decl_sym_table.Insert_Overload(constructor_decl.get());
+		Bool result = sema_ctx.decl_sym_table.Insert_Overload(constructor_decl.get());
 		return constructor_decl;
 	}
 
@@ -331,7 +331,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, bool final)
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, Bool final)
 	{
 		if (sema_ctx.tag_sym_table.LookUpCurrentScope(name))
 		{
@@ -535,8 +535,8 @@ namespace ola
 
 	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, std::vector<CaseStmt*>&& case_stmts)
 	{
-		bool default_found = false;
-		std::unordered_map<Sint64, bool> case_value_found;
+		Bool default_found = false;
+		std::unordered_map<Sint64, Bool> case_value_found;
 		for (CaseStmt* case_stmt : case_stmts)
 		{
 			if (case_stmt->IsDefault())
@@ -1059,7 +1059,7 @@ namespace ola
 		return string_literal;
 	}
 
-	UniqueBoolLiteralPtr Sema::ActOnBoolLiteral(bool value, SourceLocation const& loc)
+	UniqueBoolLiteralPtr Sema::ActOnBoolLiteral(Bool value, SourceLocation const& loc)
 	{
 		UniqueBoolLiteralPtr bool_literal = MakeUnique<BoolLiteral>(value, loc);
 		bool_literal->SetType(BoolType::Get(ctx));
@@ -1073,7 +1073,7 @@ namespace ola
 		return float_literal;
 	}
 
-	UniqueExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol)
+	UniqueExprPtr Sema::ActOnIdentifier(std::string_view name, SourceLocation const& loc, Bool overloaded_symbol)
 	{
 		if (overloaded_symbol)
 		{
@@ -1107,7 +1107,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueIdentifierExprPtr Sema::ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol)
+	UniqueIdentifierExprPtr Sema::ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, Bool overloaded_symbol)
 	{
 		if (!sema_ctx.current_class_expr_stack.empty())
 		{
@@ -1266,7 +1266,7 @@ namespace ola
 			return nullptr;
 		}
 
-		bool const class_type_is_const = class_expr->GetType().IsConst();
+		Bool const class_type_is_const = class_expr->GetType().IsConst();
 		QualType expr_type = field_name->GetType();
 		if (class_type_is_const) expr_type.AddConst();
 
@@ -1338,7 +1338,7 @@ namespace ola
 			}
 		}
 
-		bool is_method_const = match_decl->IsConst();
+		Bool is_method_const = match_decl->IsConst();
 		if (!is_method_const)
 		{
 			if (class_expr->GetType().IsConst())
@@ -1361,7 +1361,7 @@ namespace ola
 		return method_call_expr;
 	}
 
-	UniqueThisExprPtr Sema::ActOnThisExpr(SourceLocation const& loc, bool implicit)
+	UniqueThisExprPtr Sema::ActOnThisExpr(SourceLocation const& loc, Bool implicit)
 	{
 		UniqueThisExprPtr this_expr = MakeUnique<ThisExpr>(loc);
 		this_expr->SetImplicit(implicit);
@@ -1370,7 +1370,7 @@ namespace ola
 		return this_expr;
 	}
 
-	UniqueSuperExprPtr Sema::ActOnSuperExpr(SourceLocation const& loc, bool implicit)
+	UniqueSuperExprPtr Sema::ActOnSuperExpr(SourceLocation const& loc, Bool implicit)
 	{
 		if (!sema_ctx.current_base_class)
 		{
@@ -1451,16 +1451,16 @@ namespace ola
 	template<typename DeclType> requires std::is_base_of_v<VarDecl, DeclType>
 	UniquePtr<DeclType> Sema::ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
 	{
-		bool const has_init = (init_expr != nullptr);
-		bool has_type_specifier = !type.IsNull();
-		bool is_ref_type = has_type_specifier && isa<RefType>(type);
+		Bool const has_init = (init_expr != nullptr);
+		Bool has_type_specifier = !type.IsNull();
+		Bool is_ref_type = has_type_specifier && isa<RefType>(type);
 		if (has_type_specifier && is_ref_type)
 		{
 			RefType const* ref_type = cast<RefType>(type);
 			has_type_specifier = !ref_type->GetReferredType().IsNull();
 		}
-		bool const init_expr_is_decl_ref = has_init && isa<DeclRefExpr>(init_expr.get());
-		bool const init_expr_const_ref = has_init && isa<RefType>(init_expr->GetType()) && init_expr->GetType().IsConst();
+		Bool const init_expr_is_decl_ref = has_init && isa<DeclRefExpr>(init_expr.get());
+		Bool const init_expr_const_ref = has_init && isa<RefType>(init_expr->GetType()) && init_expr->GetType().IsConst();
 
 		if (sema_ctx.decl_sym_table.LookUpCurrentScope(name))
 		{
@@ -1508,7 +1508,7 @@ namespace ola
 			return nullptr;
 		}
 
-		bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(init_expr->GetType()));
+		Bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(init_expr->GetType()));
 		if (is_array)
 		{
 			if (is_ref_type)
@@ -1520,7 +1520,7 @@ namespace ola
 			{
 				ArrayType const* init_expr_type = cast<ArrayType>(array_init_expr->GetType());
 
-				bool is_multidimensional_array = isa<ArrayType>(init_expr_type->GetElementType());
+				Bool is_multidimensional_array = isa<ArrayType>(init_expr_type->GetElementType());
 				if (is_multidimensional_array && init_expr_is_decl_ref)
 				{
 					diagnostics.Report(loc, multidimensional_arrays_cannot_alias);
@@ -1639,7 +1639,7 @@ namespace ola
 			std::span<QualType const> param_types = func_type->GetParams();
 			if (args.size() != param_types.size()) continue;
 
-			bool incompatible_arg = false;
+			Bool incompatible_arg = false;
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];

@@ -20,7 +20,7 @@ namespace ola
 
 		ConstantID GetConstantID() const { return constant_id; }
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Constant;
 		}
@@ -50,11 +50,11 @@ namespace ola
 		Sint64 GetValue() const { return value; }
 		Uint32 GetBitWidth() const { return bitwidth; }
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Integer;
 		}
@@ -75,11 +75,11 @@ namespace ola
 
 		Float64 GetValue() const { return value; }
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Float;
 		}
@@ -95,11 +95,11 @@ namespace ola
 
 		std::string_view GetValue() const { return value; }
 		
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::String;
 		}
@@ -110,11 +110,11 @@ namespace ola
 	class ConstantAggregate : public Constant
 	{
 	public:
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Struct || C->GetConstantID() == ConstantID::Array;
 		}
@@ -165,11 +165,11 @@ namespace ola
 			return cast<IRArrayType>(GetType());
 		}
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Array;
 		}
@@ -191,11 +191,11 @@ namespace ola
 			return cast<IRStructType>(GetType());
 		}
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Struct;
 		}
@@ -206,11 +206,11 @@ namespace ola
 	public:
 		explicit UndefValue(IRType* type) : Constant(ConstantID::Undef, type) {}
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
 		}
-		static bool ClassOf(Constant const* C)
+		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Undef;
 		}

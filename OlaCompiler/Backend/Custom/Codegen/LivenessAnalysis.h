@@ -12,11 +12,11 @@ namespace ola
 		Uint32 vreg;
 		Uint32 reg;
 		Sint32  stack_offset;
-		bool spilled;
-		bool is_float;
+		Bool spilled;
+		Bool is_float;
 	};
 
-	inline bool operator<(LiveInterval const& lhs, LiveInterval const& rhs)
+	inline Bool operator<(LiveInterval const& lhs, LiveInterval const& rhs)
 	{
 		return lhs.begin < rhs.begin;
 	}

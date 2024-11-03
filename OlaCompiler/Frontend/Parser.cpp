@@ -155,7 +155,7 @@ namespace ola
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs);
 	}
 
-	UniqueMethodDeclPtr Parser::ParseMethodDefinition(bool first_pass)
+	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
 		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
@@ -218,7 +218,7 @@ namespace ola
 		return first_pass ? nullptr : sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
 	}
 
-	UniqueConstructorDeclPtr Parser::ParseConstructorDefinition(bool first_pass)
+	UniqueConstructorDeclPtr Parser::ParseConstructorDefinition(Bool first_pass)
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -329,7 +329,7 @@ namespace ola
 		return var_decl_list;
 	}
 
-	UniqueFieldDeclPtrList Parser::ParseFieldDeclaration(bool first_pass)
+	UniqueFieldDeclPtrList Parser::ParseFieldDeclaration(Bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
 		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
@@ -451,7 +451,7 @@ namespace ola
 		}
 		else Expect(TokenKind::identifier);
 		
-		bool const final = Consume(TokenKind::KW_final);
+		Bool const final = Consume(TokenKind::KW_final);
 		ClassDecl const* base_class = nullptr;
 		if (Consume(TokenKind::colon))
 		{
@@ -483,7 +483,7 @@ namespace ola
 			sema->sema_ctx.current_base_class = base_class;
 			sema->sema_ctx.current_class_name = class_name;
 			{
-				auto ParseClassMembers = [&](bool first_pass)
+				auto ParseClassMembers = [&](Bool first_pass)
 					{
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
@@ -495,7 +495,7 @@ namespace ola
 								continue;
 							}
 
-							bool is_function_declaration = IsFunctionDeclaration();
+							Bool is_function_declaration = IsFunctionDeclaration();
 							if (is_function_declaration)
 							{
 								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
@@ -1188,7 +1188,7 @@ namespace ola
 	UniqueBoolLiteralPtr Parser::ParseConstantBool()
 	{
 		OLA_ASSERT(current_token->IsOneOf(TokenKind::KW_true, TokenKind::KW_false));
-		bool value = false;
+		Bool value = false;
 		if (current_token->Is(TokenKind::KW_false)) value = false;
 		else if (current_token->Is(TokenKind::KW_true)) value = true;
 		SourceLocation loc = current_token->GetLocation();
@@ -1360,9 +1360,9 @@ namespace ola
 		if (Consume(TokenKind::KW_const)) type.AddConst();
 	}
 
-	void Parser::ParseTypeSpecifier(QualType& type, bool array_size_forbidden, bool allow_ref)
+	void Parser::ParseTypeSpecifier(QualType& type, Bool array_size_forbidden, Bool allow_ref)
 	{
-		bool is_ref = false;
+		Bool is_ref = false;
 		if(allow_ref) is_ref = Consume(TokenKind::KW_ref);
 
 		switch (current_token->GetKind())
@@ -1384,7 +1384,7 @@ namespace ola
 				}
 				else if (isa<AliasDecl>(tag_decl))
 				{
-					bool const is_const = type.IsConst();
+					Bool const is_const = type.IsConst();
 					type = tag_decl->GetType();
 					if (is_const) type.AddConst();
 				}
@@ -1448,13 +1448,13 @@ namespace ola
 
 		if (is_ref)
 		{
-			bool is_const = type.IsConst();
+			Bool is_const = type.IsConst();
 			type.RemoveConst();
 			type = QualType(RefType::Get(context, type), is_const ? Qualifier_Const : Qualifier_None);
 		}
 	}
 
-	bool Parser::IsFunctionDeclaration()
+	Bool Parser::IsFunctionDeclaration()
 	{
 		TokenPtr token = current_token;
 
@@ -1480,18 +1480,18 @@ namespace ola
 		ParseTypeSpecifier(tmp);
 		Expect(TokenKind::identifier);
 
-		bool is_function = false;
+		Bool is_function = false;
 		if (Consume(TokenKind::left_round)) is_function = true;
 		current_token = token;
 		return is_function;
 	}
 
-	bool Parser::IsCurrentTokenTypename()
+	Bool Parser::IsCurrentTokenTypename()
 	{
 		return current_token->IsTypename() || sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
 	}
 
-	bool Parser::Consume(TokenKind k)
+	Bool Parser::Consume(TokenKind k)
 	{
 		if (current_token->Is(k))
 		{
@@ -1500,7 +1500,7 @@ namespace ola
 		else return false;
 	}
 	template<typename... Ts>
-	bool Parser::Consume(TokenKind k, Ts... ts)
+	Bool Parser::Consume(TokenKind k, Ts... ts)
 	{
 		if (current_token->IsOneOf(k, ts...))
 		{
@@ -1509,7 +1509,7 @@ namespace ola
 		else return false;
 	}
 
-	bool Parser::Expect(TokenKind k)
+	Bool Parser::Expect(TokenKind k)
 	{
 		if (!Consume(k))
 		{
@@ -1519,7 +1519,7 @@ namespace ola
 		return true;
 	}
 	template<typename... Ts>
-	bool Parser::Expect(TokenKind k, Ts... ts)
+	Bool Parser::Expect(TokenKind k, Ts... ts)
 	{
 		if (!Consume(k, ts...))
 		{

@@ -36,18 +36,18 @@ namespace ola
 			passes.emplace_back(new PassT(std::forward<Args>(args)...));
 		}
 
-		bool Run(UnitT& U, AnalysisManager<UnitT>& AM)
+		Bool Run(UnitT& U, AnalysisManager<UnitT>& AM)
 		{
-			bool changed = false;
+			Bool changed = false;
 			for (auto& pass : passes)
 			{
 				changed |= pass->RunOn(U, AM);
 			}
 			return changed;
 		}
-		bool Run(UnitT& U, ParentUnitT& PU, AnalysisManager<UnitT>& AM)
+		Bool Run(UnitT& U, ParentUnitT& PU, AnalysisManager<UnitT>& AM)
 		{
-			bool changed = false;
+			Bool changed = false;
 			for (auto& pass : passes)
 			{
 				pass->Init(PU);
@@ -63,7 +63,7 @@ namespace ola
 			return changed;
 		}
 
-		bool IsEmpty() const
+		Bool IsEmpty() const
 		{
 			return passes.empty();
 		}

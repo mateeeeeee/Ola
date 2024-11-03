@@ -42,7 +42,7 @@ namespace ola
 		}
 	}
 
-	Diagnostics::Diagnostics(bool _warnings_as_errors, bool _exit_on_error)
+	Diagnostics::Diagnostics(Bool _warnings_as_errors, Bool _exit_on_error)
 	{
 		warnings_as_errors = _warnings_as_errors;
 		exit_on_error = _exit_on_error;

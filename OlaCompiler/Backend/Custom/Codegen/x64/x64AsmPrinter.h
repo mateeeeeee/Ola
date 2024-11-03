@@ -43,27 +43,27 @@ namespace ola
 		std::string GetIntConstantPoolEntry(Sint64 value);
 
 		template<typename... Args>
-		void EmitPreamble(char const* fmt, Args&&... args)
+		void EmitPreamble(Char const* fmt, Args&&... args)
 		{
 			Emit<x64Section_Preamble>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		void EmitText(char const* fmt, Args&&... args)
+		void EmitText(Char const* fmt, Args&&... args)
 		{
 			Emit<x64Section_Text>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		void EmitData(char const* fmt, Args&&... args)
+		void EmitData(Char const* fmt, Args&&... args)
 		{
 			Emit<x64Section_Data>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		void EmitReadOnly(char const* fmt, Args&&... args)
+		void EmitReadOnly(Char const* fmt, Args&&... args)
 		{
 			Emit<x64Section_ReadOnly>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
-		void EmitBSS(char const* fmt, Args&&... args)
+		void EmitBSS(Char const* fmt, Args&&... args)
 		{
 			Emit<x64Section_BSS>(fmt, std::forward<Args>(args)...);
 		}

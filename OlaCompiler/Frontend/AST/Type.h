@@ -20,7 +20,7 @@ namespace ola
 	template<>
 	struct EnumBitmaskOperators<QualifierFlag>
 	{
-		static constexpr bool enable = true;
+		static constexpr Bool enable = true;
 	};
 	using Qualifiers = Uint8;
 
@@ -35,11 +35,11 @@ namespace ola
 			type = _type;
 		}
 
-		bool IsConst() const { return qualifiers & Qualifier_Const; }
+		Bool IsConst() const { return qualifiers & Qualifier_Const; }
 		void AddConst() { qualifiers |= Qualifier_Const; }
 		void RemoveConst() { qualifiers &= ~Qualifier_Const; }
 
-		bool IsNull() const { return type == nullptr; }
+		Bool IsNull() const { return type == nullptr; }
 
 		const Type& operator* () const { return *type; }
 		operator Type const* ()  const { return type; }
@@ -51,8 +51,8 @@ namespace ola
 			type = _type;
 		}
 
-		bool operator==(QualType const& o) const;
-		bool operator!=(QualType const& o) const
+		Bool operator==(QualType const& o) const;
+		Bool operator!=(QualType const& o) const
 		{
 			return !(*this == o);
 		}
@@ -87,7 +87,7 @@ namespace ola
 		void* operator new(Uint64) = delete;
 		void* operator new(Uint64 sz, Context*) { return ::operator new(sz); }
 
-		virtual bool IsAssignableFrom(Type const*) const { return true; }
+		virtual Bool IsAssignableFrom(Type const*) const { return true; }
 
 	private:
 		TypeKind kind = TypeKind::Invalid;
@@ -106,9 +106,9 @@ namespace ola
 	public:
 		QualType const& GetReferredType() const { return type; }
 
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Ref; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Ref; }
 		static RefType* Get(Context* ctx, QualType const& type);
 	private:
 		QualType type;
@@ -121,9 +121,9 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Void; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Void; }
 		static VoidType* Get(Context* ctx);
 	private:
 		constexpr VoidType() : Type{ TypeKind::Void } {}
@@ -133,9 +133,9 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Bool; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Bool; }
 		static BoolType* Get(Context* ctx);
 	private:
 		constexpr BoolType() : Type{ TypeKind::Bool, 1, 1 } {}
@@ -145,9 +145,9 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Char; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Char; }
 		static CharType* Get(Context* ctx);
 	private:
 		constexpr CharType() : Type{ TypeKind::Char, 1, 1 } {}
@@ -157,9 +157,9 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Int; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Int; }
 		static IntType* Get(Context* ctx);
 	private:
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
@@ -169,9 +169,9 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Float; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Float; }
 		static FloatType* Get(Context* ctx);
 	private:
 		constexpr FloatType() : Type{ TypeKind::Float, 8, 8 } {}
@@ -182,12 +182,12 @@ namespace ola
 		friend class Context;
 	public:
 
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		QualType const& GetElementType() const { return element_type; }
 		Uint32 GetArraySize() const { return array_size; }
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Array; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Array; }
 		static ArrayType* Get(Context* ctx, QualType const& type, Uint32 array_size = 0);
 	private:
 		QualType element_type;
@@ -203,14 +203,14 @@ namespace ola
 		friend class Context;
 	public:
 		
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		QualType const& GetReturnType() const { return return_type; }
 		std::span<QualType const> GetParams() const { return param_types; }
 		Uint64 GetParamCount() const { return param_types.size(); }
 		QualType const& GetParamType(Uint64 i) const { return param_types[i]; }
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Function; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Function; }
 		static FuncType* Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types = {});
 	private:
 		QualType return_type;
@@ -226,11 +226,11 @@ namespace ola
 	{
 		friend class Context;
 	public:
-		virtual bool IsAssignableFrom(Type const*) const override;
+		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		ClassDecl const* GetClassDecl() const { return class_decl; }
 
-		static bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Class; }
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Class; }
 		static ClassType* Get(Context* ctx, ClassDecl const* class_decl);
 	private:
 		ClassDecl const* class_decl;
@@ -241,13 +241,13 @@ namespace ola
 
 
 	template<typename T> requires std::derived_from<T, Type>
-	inline bool isa(QualType const& qtype)
+	inline Bool isa(QualType const& qtype)
 	{
 		return isa<T>(qtype.GetTypePtr());
 	}
 
 	template <typename... Ts> requires (std::derived_from<Ts, Type> && ...)
-	inline bool isoneof(QualType const& qtype) { return (bool(isa<Ts>(qtype)) || ...); }
+	inline Bool isoneof(QualType const& qtype) { return (Bool(isa<Ts>(qtype)) || ...); }
 
 	template<typename T> requires std::derived_from<T, Type>
 	inline auto cast(QualType& qtype)

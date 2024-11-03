@@ -11,8 +11,8 @@ namespace ola
 	class ImportProcessor
 	{
 		using TokenPtr = std::vector<Token>::iterator;
-		static char const* ola_extension; 
-		static char const* ola_lib_path; 
+		static Char const* ola_extension; 
+		static Char const* ola_lib_path; 
 
 	public:
 		ImportProcessor(Context* context, Diagnostics& diagnostics);
@@ -30,8 +30,8 @@ namespace ola
 		TokenPtr current_token;
 
 	private:
-		bool Consume(TokenKind k);
-		bool Expect(TokenKind k);
+		Bool Consume(TokenKind k);
+		Bool Expect(TokenKind k);
 
 		void PreFilterTokens();
 		void PostFilterTokens();

@@ -13,8 +13,8 @@ namespace fs = std::filesystem;
 
 namespace ola
 {
-	char const* ImportProcessor::ola_extension = ".ola";
-	char const* ImportProcessor::ola_lib_path = OLA_COMPILER_PATH;
+	Char const* ImportProcessor::ola_extension = ".ola";
+	Char const* ImportProcessor::ola_lib_path = OLA_COMPILER_PATH;
 
 	ImportProcessor::ImportProcessor(Context* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 
@@ -73,7 +73,7 @@ namespace ola
 		PostFilterTokens();
 	}
 
-	bool ImportProcessor::Consume(TokenKind k)
+	Bool ImportProcessor::Consume(TokenKind k)
 	{
 		if (current_token->Is(k))
 		{
@@ -82,7 +82,7 @@ namespace ola
 		else return false;
 	}
 
-	bool ImportProcessor::Expect(TokenKind k)
+	Bool ImportProcessor::Expect(TokenKind k)
 	{
 		if (!Consume(k))
 		{

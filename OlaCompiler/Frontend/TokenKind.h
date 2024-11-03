@@ -10,6 +10,6 @@ namespace ola
 	};
 	std::string_view GetTokenName(TokenKind t);
 
-	bool IsKeyword(std::string_view identifer);
+	Bool IsKeyword(std::string_view identifer);
 	TokenKind GetKeywordType(std::string_view identifer);
 }

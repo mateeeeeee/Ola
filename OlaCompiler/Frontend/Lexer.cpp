@@ -17,7 +17,7 @@ namespace ola
 		do
 		{
 			current_token.Reset();
-			bool result = LexToken(current_token);
+			Bool result = LexToken(current_token);
 
 			if (!result)
 			{
@@ -34,7 +34,7 @@ namespace ola
 		} while (current_token.IsNot(TokenKind::eof));
 	}
 
-	bool Lexer::LexToken(Token& token)
+	Bool Lexer::LexToken(Token& token)
 	{
 		UpdatePointersAndLocation();
 		if ((*cur_ptr == ' ') || (*cur_ptr == '\t'))
@@ -45,14 +45,14 @@ namespace ola
 			UpdatePointersAndLocation();
 		}
 
-		char c = *cur_ptr++;
+		Char c = *cur_ptr++;
 		switch (c)
 		{
 		case '\0':
 			return LexEndOfFile(token);
 		case '\n':
 		{
-			bool ret = LexNewLine(token);
+			Bool ret = LexNewLine(token);
 			loc.NewLine();
 			buf_ptr = cur_ptr;
 			token.ClearFlag(TokenFlag_LeadingSpace);
@@ -120,14 +120,14 @@ namespace ola
 		return false;
 	}
 
-	bool Lexer::LexNumber(Token& t)
+	Bool Lexer::LexNumber(Token& t)
 	{
-		char const* tmp_ptr = cur_ptr;
-		Consume(tmp_ptr, [](char c) -> bool { return std::isdigit(c); });
+		Char const* tmp_ptr = cur_ptr;
+		Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c); });
 		if (*tmp_ptr == '.')
 		{
 			tmp_ptr++;
-			Consume(tmp_ptr, [](char c) -> bool { return std::isdigit(c); });
+			Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c); });
 			if (std::isalpha(*tmp_ptr)) return false;
 			FillToken(t, TokenKind::float_number, tmp_ptr);
 			UpdatePointersAndLocation();
@@ -148,9 +148,9 @@ namespace ola
 		return true;
 	}
 
-	bool Lexer::LexIdentifier(Token& t)
+	Bool Lexer::LexIdentifier(Token& t)
 	{
-		FillToken(t, TokenKind::identifier, [](char c) -> bool { return std::isalnum(c) || c == '_'; });
+		FillToken(t, TokenKind::identifier, [](Char c) -> Bool { return std::isalnum(c) || c == '_'; });
 		std::string_view identifier = t.GetData();
 		if (IsKeyword(identifier))
 		{
@@ -160,46 +160,46 @@ namespace ola
 		return true;
 	}
 
-	bool Lexer::LexChar(Token& t)
+	Bool Lexer::LexChar(Token& t)
 	{
-		FillToken(t, TokenKind::char_literal, [](char c) -> bool { return c != '\''; });
+		FillToken(t, TokenKind::char_literal, [](Char c) -> Bool { return c != '\''; });
 		++cur_ptr;
 		UpdatePointersAndLocation();
 		return true;
 	}
 
-	bool Lexer::LexString(Token& t)
+	Bool Lexer::LexString(Token& t)
 	{
-		FillToken(t, TokenKind::string_literal, [](char c) -> bool { return c != '"'; });
+		FillToken(t, TokenKind::string_literal, [](Char c) -> Bool { return c != '"'; });
 		++cur_ptr;
 		UpdatePointersAndLocation();
 		return true;
 	}
 
-	bool Lexer::LexEndOfFile(Token& t)
+	Bool Lexer::LexEndOfFile(Token& t)
 	{
 		t.SetKind(TokenKind::eof);
 		t.SetLocation(loc);
 		return true;
 	}
 
-	bool Lexer::LexNewLine(Token& t)
+	Bool Lexer::LexNewLine(Token& t)
 	{
 		t.SetKind(TokenKind::newline);
 		t.SetLocation(loc);
 		return true;
 	}
 
-	bool Lexer::LexComment(Token& t)
+	Bool Lexer::LexComment(Token& t)
 	{
-		FillToken(t, TokenKind::comment, [](char c) -> bool { return c != '\n' && c != '\0'; });
+		FillToken(t, TokenKind::comment, [](Char c) -> Bool { return c != '\n' && c != '\0'; });
 		UpdatePointersAndLocation();
 		return true;
 	}
 
-	bool Lexer::LexPunctuator(Token& t)
+	Bool Lexer::LexPunctuator(Token& t)
 	{
-		char c = *cur_ptr++;
+		Char c = *cur_ptr++;
 		switch (c)
 		{
 		case '=':

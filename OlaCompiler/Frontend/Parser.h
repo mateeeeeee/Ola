@@ -39,12 +39,12 @@ namespace ola
 		std::unique_ptr<AST> ast;
 
 	private:
-		bool Consume(TokenKind k);
+		Bool Consume(TokenKind k);
 		template<typename... Ts>
-		bool Consume(TokenKind k, Ts... ts);
-		bool Expect(TokenKind k);
+		Bool Consume(TokenKind k, Ts... ts);
+		Bool Expect(TokenKind k);
 		template<typename... Ts>
-		bool Expect(TokenKind k, Ts... ts);
+		Bool Expect(TokenKind k, Ts... ts);
 		void Diag(DiagCode);
 		template<typename... Ts>
 		void Diag(DiagCode code, Ts&&... args);
@@ -55,11 +55,11 @@ namespace ola
 		OLA_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
-		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(bool first_pass);
-		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(bool first_pass);
+		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(Bool first_pass);
+		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(Bool first_pass);
 		OLA_NODISCARD UniqueParamVarDeclPtr ParseParamVariableDeclaration();
 		OLA_NODISCARD UniqueVarDeclPtrList ParseVariableDeclaration(DeclVisibility visibility);
-		OLA_NODISCARD UniqueFieldDeclPtrList ParseFieldDeclaration(bool first_pass);
+		OLA_NODISCARD UniqueFieldDeclPtrList ParseFieldDeclaration(Bool first_pass);
 		OLA_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 		OLA_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		OLA_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();
@@ -116,10 +116,10 @@ namespace ola
 		void ParseFunctionAttributes(Uint8& attrs);
 		void ParseMethodAttributes(Uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
-		void ParseTypeSpecifier(QualType& type, bool array_size_forbidden = false, bool allow_ref = true);
+		void ParseTypeSpecifier(QualType& type, Bool array_size_forbidden = false, Bool allow_ref = true);
 
-		bool IsFunctionDeclaration();
-		bool IsCurrentTokenTypename();
+		Bool IsFunctionDeclaration();
+		Bool IsCurrentTokenTypename();
 	};
 
 }

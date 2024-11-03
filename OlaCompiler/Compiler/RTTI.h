@@ -11,7 +11,7 @@ namespace ola
 		template<typename To, typename From>
 		using MergeConstT = std::conditional_t<std::is_const_v<From>, std::add_const_t<To>, To>;
 
-		template <bool checked, typename To, typename From>
+		template <Bool checked, typename To, typename From>
 		auto cast_impl(From&& value)
 		{
 			static_assert(std::is_same_v<std::remove_cvref_t<To>, std::remove_const_t<To>>, "Target type of class may at most be const-qualified");
@@ -43,10 +43,10 @@ namespace ola
 						   std::is_class_v<std::remove_pointer_t<std::remove_reference_t<Type>>>;
 
 	template <typename To, typename From> requires ClassPointer<From>
-	inline bool isa(From&& value) { return rtti::cast_impl<false, To>(std::forward<From>(value)) != nullptr; }
+	inline Bool isa(From&& value) { return rtti::cast_impl<false, To>(std::forward<From>(value)) != nullptr; }
 
 	template <typename... Ts, typename From> requires ClassPointer<From>
-	inline bool isoneof(From&& value) { return (bool(isa<Ts>(value)) || ...); }
+	inline Bool isoneof(From&& value) { return (Bool(isa<Ts>(value)) || ...); }
 
 	template<typename To, typename From> requires ClassPointer<From>
 	inline auto cast(From&& value)

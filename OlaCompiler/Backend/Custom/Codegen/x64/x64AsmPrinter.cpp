@@ -24,7 +24,7 @@ namespace ola
 		return "";
 	}
 
-	static std::string GetOperandString(MachineOperand const& MO, bool dereference = false)
+	static std::string GetOperandString(MachineOperand const& MO, Bool dereference = false)
 	{
 		if (MO.IsReg())
 		{
@@ -86,7 +86,7 @@ namespace ola
 					for (MachineInstruction& MI : MBB->Instructions())
 					{
 						Uint32 opcode = MI.GetOpcode();
-						char const* opcode_string = x64::GetOpcodeString(opcode);
+						Char const* opcode_string = x64::GetOpcodeString(opcode);
 						switch (opcode)
 						{
 						case InstPush:

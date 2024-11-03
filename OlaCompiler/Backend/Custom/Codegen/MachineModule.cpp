@@ -136,7 +136,7 @@ namespace ola
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 
-		bool is_leaf = true;
+		Bool is_leaf = true;
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));

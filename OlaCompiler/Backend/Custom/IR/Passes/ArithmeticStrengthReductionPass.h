@@ -10,11 +10,11 @@ namespace ola
 	class ArithmeticStrengthReductionPass : public FunctionPass
 	{
 	public:
-		inline static char ID = 0;
+		inline static Char ID = 0;
 	public:
 		ArithmeticStrengthReductionPass() : FunctionPass(ID) {}
 
-		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 	};
 	OLA_REGISTER_PASS(ArithmeticStrengthReductionPass, "ASR Pass");
 }

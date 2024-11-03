@@ -9,9 +9,9 @@ namespace ola
 	class Diagnostics;
 
 	template<typename P>
-	concept CharPredicate = requires(P p, char a)
+	concept CharPredicate = requires(P p, Char a)
 	{
-		{ p(a) } -> std::convertible_to<bool>;
+		{ p(a) } -> std::convertible_to<Bool>;
 	};
 
 	class Lexer
@@ -26,22 +26,22 @@ namespace ola
 
 	private:
 		Diagnostics& diagnostics;
-		char const* buf_ptr = nullptr;
-		char const* cur_ptr = nullptr;
+		Char const* buf_ptr = nullptr;
+		Char const* cur_ptr = nullptr;
 
 		SourceLocation loc;
 		std::vector<Token> tokens;
 	private:
 
-		bool LexToken(Token&);
-		bool LexNumber(Token&);
-		bool LexIdentifier(Token&);
-		bool LexChar(Token&);
-		bool LexString(Token&);
-		bool LexEndOfFile(Token&);
-		bool LexNewLine(Token&);
-		bool LexComment(Token&);
-		bool LexPunctuator(Token&);
+		Bool LexToken(Token&);
+		Bool LexNumber(Token&);
+		Bool LexIdentifier(Token&);
+		Bool LexChar(Token&);
+		Bool LexString(Token&);
+		Bool LexEndOfFile(Token&);
+		Bool LexNewLine(Token&);
+		Bool LexComment(Token&);
+		Bool LexPunctuator(Token&);
 
 		void UpdatePointersAndLocation()
 		{
@@ -49,7 +49,7 @@ namespace ola
 			buf_ptr = cur_ptr;
 		}
 
-		void FillToken(Token& t, TokenKind type, char const* end)
+		void FillToken(Token& t, TokenKind type, Char const* end)
 		{
 			t.SetLocation(loc);
 			t.SetKind(type);
@@ -57,7 +57,7 @@ namespace ola
 			cur_ptr = end;
 		}
 		template<CharPredicate P>
-		void Consume(char const*& start, P&& predicate)
+		void Consume(Char const*& start, P&& predicate)
 		{
 			for (; predicate(*start); ++start);
 		}
@@ -66,7 +66,7 @@ namespace ola
 		{
 			t.SetLocation(loc);
 			t.SetKind(type);
-			char const* tmp_ptr = cur_ptr;
+			Char const* tmp_ptr = cur_ptr;
 			Consume(tmp_ptr, std::forward<P>(predicate));
 			t.SetData(cur_ptr, tmp_ptr);
 			cur_ptr = tmp_ptr;

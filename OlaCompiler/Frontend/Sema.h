@@ -36,13 +36,13 @@ namespace ola
 			SymbolTable<TagDecl> tag_sym_table;
 
 			std::vector<Expr const*> current_class_expr_stack;
-			bool is_method_const = false;
-			bool is_constructor = false;
+			Bool is_method_const = false;
+			Bool is_constructor = false;
 			ClassDecl const* current_base_class = nullptr;
 			std::string current_class_name;
 
 			class QualType const* current_func  = nullptr;
-			bool return_stmt_encountered = false;
+			Bool return_stmt_encountered = false;
 
 			Uint32 stmts_using_break_count = 0; 
 			Uint32 stmts_using_continue_count = 0;
@@ -79,7 +79,7 @@ namespace ola
 
 		ClassDecl const* ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc);
 		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc,
-										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, bool final);
+										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, Bool final);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);
@@ -106,16 +106,16 @@ namespace ola
 		UniqueIntLiteralPtr ActOnLengthOperator(QualType const& type, SourceLocation const& loc);
 		UniqueCharLiteralPtr ActOnCharLiteral(std::string_view str, SourceLocation const& loc);
 		UniqueStringLiteralPtr ActOnStringLiteral(std::string_view str, SourceLocation const& loc);
-		UniqueBoolLiteralPtr ActOnBoolLiteral(bool value, SourceLocation const& loc);
+		UniqueBoolLiteralPtr ActOnBoolLiteral(Bool value, SourceLocation const& loc);
 		UniqueFloatLiteralPtr ActOnFloatLiteral(Float64 value, SourceLocation const& loc);
-		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
-		UniqueIdentifierExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, bool overloaded_symbol);
+		UniqueExprPtr ActOnIdentifier(std::string_view name, SourceLocation const& loc, Bool overloaded_symbol);
+		UniqueIdentifierExprPtr ActOnMemberIdentifier(std::string_view name, SourceLocation const& loc, Bool overloaded_symbol);
 		UniqueInitializerListExprPtr ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list);
 		UniqueArrayAccessExprPtr ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr);
 		UniqueMemberExprPtr ActOnFieldAccess(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueIdentifierExprPtr&& field_name);
 		UniqueMethodCallExprPtr ActOnMethodCall(SourceLocation const& loc, UniqueExprPtr&& class_expr, UniqueIdentifierExprPtr&& method_name, UniqueExprPtrList&& args);
-		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, bool implicit);
-		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, bool implicit);
+		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, Bool implicit);
+		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, Bool implicit);
 		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
 
 	private:

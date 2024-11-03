@@ -110,11 +110,11 @@ namespace ola
 	void IRVisitor::Visit(VarDecl const& var_decl, Uint32)
 	{
 		Type const* var_type = var_decl.GetType().GetTypePtr();
-		bool const is_const = var_decl.GetType().IsConst();
+		Bool const is_const = var_decl.GetType().IsConst();
 		IRType* ir_type = ConvertToIRType(var_type);
-		bool const is_array = isa<ArrayType>(var_type);
-		bool const is_class = isa<ClassType>(var_type);
-		bool const is_ref = isa<RefType>(var_type);
+		Bool const is_array = isa<ArrayType>(var_type);
+		Bool const is_class = isa<ClassType>(var_type);
+		Bool const is_ref = isa<RefType>(var_type);
 
 		if (var_decl.IsGlobal())
 		{
@@ -670,7 +670,7 @@ namespace ola
 		OLA_ASSERT(operand_value);
 		Value* operand = Load(operand_expr->GetType(), operand_value);
 
-		bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
+		Bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
 		Value* result = nullptr;
 		Constant* zero = nullptr;
 		Constant* one = nullptr;
@@ -765,7 +765,7 @@ namespace ola
 			lhs = Load(lhs_expr->GetType(), lhs_value);
 			rhs = Load(rhs_expr->GetType(), rhs_value);
 		}
-		bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
+		Bool const is_float_expr = isa<FloatType>(lhs_expr->GetType()) || isa<FloatType>(rhs_expr->GetType());
 
 		Value* result = nullptr;
 		switch (binary_expr.GetBinaryKind())
@@ -1056,7 +1056,7 @@ namespace ola
 
 		std::vector<Value*> args;
 		Uint32 arg_index = 0;
-		bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
+		Bool return_struct = isa<ClassType>(call_expr.GetCalleeType()->GetReturnType());
 		Value* return_alloc = nullptr;
 		if (return_struct)
 		{
@@ -1308,7 +1308,7 @@ namespace ola
 			std::span<QualType const> function_params = function_type->GetParams();
 
 			IRType* return_type = ConvertToIRType(function_type->GetReturnType());
-			bool return_type_struct = return_type->IsStruct();
+			Bool return_type_struct = return_type->IsStruct();
 
 			std::vector<IRType*> param_types; param_types.reserve(function_params.size());
 			if (return_type_struct) param_types.push_back(GetPointerType(return_type));
@@ -1367,7 +1367,7 @@ namespace ola
 		std::span<QualType const> function_params = type->GetParams();
 
 		IRType* return_type = ConvertToIRType(type->GetReturnType());
-		bool return_type_struct = return_type->IsStruct();
+		Bool return_type_struct = return_type->IsStruct();
 
 		std::vector<IRType*> param_types; param_types.reserve(function_params.size());
 		if (return_type_struct) param_types.push_back(IRPtrType::Get(return_type));

@@ -13,11 +13,11 @@ namespace ola
 	class MachineFunctionPass : public Pass
 	{
 	public:
-		explicit MachineFunctionPass(char pid) : Pass(pid, PassKind::MachineFunction) {}
+		explicit MachineFunctionPass(Char pid) : Pass(pid, PassKind::MachineFunction) {}
 
 		virtual void Init(MachineModule&) {}
 		virtual void Deinit(IRModule&) {}
-		virtual bool RunOn(MachineFunction&, MachineFunctionAnalysisManager&) = 0;
+		virtual Bool RunOn(MachineFunction&, MachineFunctionAnalysisManager&) = 0;
 	};
 
 	class IRModule;

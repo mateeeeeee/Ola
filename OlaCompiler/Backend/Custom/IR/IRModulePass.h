@@ -11,11 +11,11 @@ namespace ola
 	class IRModulePass : public Pass
 	{
 	public:
-		explicit IRModulePass(char pid) : Pass(pid, PassKind::Module) {}
+		explicit IRModulePass(Char pid) : Pass(pid, PassKind::Module) {}
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}
-		virtual bool RunOn(IRModule&, IRModuleAnalysisManager&) = 0;
+		virtual Bool RunOn(IRModule&, IRModuleAnalysisManager&) = 0;
 	};
 
 	template<>

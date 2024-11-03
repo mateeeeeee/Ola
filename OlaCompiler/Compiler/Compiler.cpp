@@ -28,9 +28,9 @@ namespace ola
 	namespace
 	{
 #if DEBUG
-		static char const* olalib = OLA_BINARY_PATH"Debug/olalib.lib";
+		static Char const* olalib = OLA_BINARY_PATH"Debug/olalib.lib";
 #else 
-		static char const* olalib = OLA_BINARY_PATH"Release/olalib.lib";
+		static Char const* olalib = OLA_BINARY_PATH"Release/olalib.lib";
 #endif
 		void InitLogger()
 		{
@@ -47,7 +47,7 @@ namespace ola
 			src.Prepend("");
 		}
 
-		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, bool use_llvm, bool ast_dump)
+		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, Bool use_llvm, Bool ast_dump)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -91,8 +91,8 @@ namespace ola
 	{
 		InitLogger();
 		
-		bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
-		bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
+		Bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
+		Bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();

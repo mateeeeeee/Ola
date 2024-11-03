@@ -12,7 +12,7 @@ namespace ola
 	template<>
 	struct EnumBitmaskOperators<CompilerFlags>
 	{
-		static constexpr bool enable = true;
+		static constexpr Bool enable = true;
 	};
 
 	enum class OptimizationLevel : Uint8

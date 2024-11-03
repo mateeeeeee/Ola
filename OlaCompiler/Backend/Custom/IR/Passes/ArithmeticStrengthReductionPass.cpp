@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	inline bool IsPowerOfTwo(Sint64 n)
+	inline Bool IsPowerOfTwo(Sint64 n)
 	{
 		return (n > 0) && ((n & (n - 1)) == 0);
 	}
@@ -60,9 +60,9 @@ namespace ola
 		}
 	}
 
-	bool ArithmeticStrengthReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
+	Bool ArithmeticStrengthReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		bool changed = false;
+		Bool changed = false;
 		std::vector<Instruction*> instructions_to_remove;
 
 		for (BasicBlock& BB : F)

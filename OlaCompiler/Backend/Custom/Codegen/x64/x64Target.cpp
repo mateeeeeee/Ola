@@ -15,7 +15,7 @@ namespace ola
 	class x64TargetDataLayout : public TargetDataLayout
 	{
 	public:
-		virtual bool   IsLittleEndian() const override { return true; }
+		virtual Bool   IsLittleEndian() const override { return true; }
 		virtual Uint64 GetBuiltinAlignment(IRType const* type) const override
 		{
 			return type->GetSize();
@@ -37,7 +37,7 @@ namespace ola
 	class x64TargetISelInfo : public TargetISelInfo
 	{
 	public:
-		virtual bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
+		virtual Bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
 		{
 			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
 			{
@@ -463,13 +463,13 @@ namespace ola
 		}
 
 
-		virtual bool IsCallerSaved(Uint32 r) const override
+		virtual Bool IsCallerSaved(Uint32 r) const override
 		{
 			return x64::IsCallerSaved(r);
 		}
 
 
-		virtual bool IsCalleeSaved(Uint32 r) const override
+		virtual Bool IsCalleeSaved(Uint32 r) const override
 		{
 			return x64::IsCalleeSaved(r);
 		}

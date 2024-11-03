@@ -43,7 +43,7 @@ namespace ola
 		Uint32 GetLevel() const { return level; }
 
 		void AddChild(DominatorTreeNodeBase* C) { children.push_back(C); }
-		bool IsLeaf() const { return children.empty(); }
+		Bool IsLeaf() const { return children.empty(); }
 		Uint64 GetNumChildren() const { return children.size(); }
 		void ClearAllChildren() { children.clear(); }
 
@@ -73,7 +73,7 @@ namespace ola
 		mutable Uint32 dfs_num_out = ~0;
 
 	private:
-		bool DominatedBy(const DominatorTreeNodeBase* other) const 
+		Bool DominatedBy(const DominatorTreeNodeBase* other) const 
 		{
 			return this->dfs_num_in >= other->dfs_num_in &&
 				   this->dfs_num_out <= other->dfs_num_out;
@@ -166,7 +166,7 @@ namespace ola
 			}
 		}
 
-		bool ProperlyDominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
+		Bool ProperlyDominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
 		{
 			if (!A || !B)
 				return false;
@@ -174,19 +174,19 @@ namespace ola
 				return false;
 			return Dominates(A, B);
 		}
-		bool ProperlyDominates(NodeT const* A, NodeT const* B) const
+		Bool ProperlyDominates(NodeT const* A, NodeT const* B) const
 		{
 			if (A == B)
 				return false;
 			return Dominates(GetNode(A), GetNode(B));
 		}
-		bool IsReachableFromEntry(DominatorTreeNodeBase<NodeT> const* A) const { return A != nullptr; }
-		bool IsReachableFromEntry(NodeT const* A) const 
+		Bool IsReachableFromEntry(DominatorTreeNodeBase<NodeT> const* A) const { return A != nullptr; }
+		Bool IsReachableFromEntry(NodeT const* A) const 
 		{
 			return IsReachableFromEntry(GetNode(A));
 		}
 
-		bool Dominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
+		Bool Dominates(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const
 		{
 			// A node trivially dominates itself.
 			if (B == A)
@@ -208,7 +208,7 @@ namespace ola
 
 			return DominatedBySlowTreeWalk(A, B);
 		}
-		bool Dominates(NodeT const* A, NodeT const* B) const
+		Bool Dominates(NodeT const* A, NodeT const* B) const
 		{
 			if (A == B)
 				return true;
@@ -369,7 +369,7 @@ namespace ola
 		ParentPtr parent = nullptr;
 		DomTreeNodeStorage dom_tree_nodes;
 		NodeNumberStorage node_number_map;
-		mutable bool dfs_info_valid = false;
+		mutable Bool dfs_info_valid = false;
 
 	private:
 		Uint32 GetNodeIndex(NodeT const* BB) const
@@ -384,7 +384,7 @@ namespace ola
 			return Idx;
 		}
 
-		bool DominatedBySlowTreeWalk(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const 
+		Bool DominatedBySlowTreeWalk(DominatorTreeNodeBase<NodeT> const* A, DominatorTreeNodeBase<NodeT> const* B) const 
 		{
 			OLA_ASSERT(A != B);
 			OLA_ASSERT(IsReachableFromEntry(B));
@@ -423,7 +423,7 @@ namespace ola
 
 		BasicBlock const* GetEnd() const { return End; }
 
-		bool isSingleEdge() const
+		Bool isSingleEdge() const
 		{
 			unsigned NumEdgesToEnd = 0;
 			for (BasicBlock* Succ : Start->Successors())
@@ -444,16 +444,16 @@ namespace ola
 
 		using Super::Dominates;
 
-		bool Dominates(const BasicBlock* BB, const Use& U) const;
-		bool Dominates(const Value* Def, const Use& U) const;
-		bool Dominates(const Value* Def, const Instruction* User) const;
-		bool Dominates(const Instruction* Def, const BasicBlock* BB) const;
-		bool Dominates(const BasicBlockEdge& BBE, const Use& U) const;
-		bool Dominates(const BasicBlockEdge& BBE, const BasicBlock* BB) const;
-		bool Dominates(const BasicBlockEdge& BBE1, const BasicBlockEdge& BBE2) const;
+		Bool Dominates(const BasicBlock* BB, const Use& U) const;
+		Bool Dominates(const Value* Def, const Use& U) const;
+		Bool Dominates(const Value* Def, const Instruction* User) const;
+		Bool Dominates(const Instruction* Def, const BasicBlock* BB) const;
+		Bool Dominates(const BasicBlockEdge& BBE, const Use& U) const;
+		Bool Dominates(const BasicBlockEdge& BBE, const BasicBlock* BB) const;
+		Bool Dominates(const BasicBlockEdge& BBE1, const BasicBlockEdge& BBE2) const;
 
 		using Super::IsReachableFromEntry;
-		bool IsReachableFromEntry(const Use& U) const;
+		Bool IsReachableFromEntry(const Use& U) const;
 
 		using Super::FindNearestCommonDominator;
 		Instruction* FindNearestCommonDominator(Instruction* I1, Instruction* I2) const;
@@ -462,12 +462,12 @@ namespace ola
 	class DominatorTreeAnalysisPass : public FunctionPass
 	{
 	public:
-		inline static char id = 0;
+		inline static Char id = 0;
 		using Result = DominatorTree;
 	public:
 		DominatorTreeAnalysisPass() : FunctionPass(id) {}
 
-		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 		Result const& GetResult() const { return info; }
 		static void const* ID() { return &id; }
 

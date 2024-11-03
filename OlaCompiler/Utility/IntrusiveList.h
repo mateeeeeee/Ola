@@ -165,11 +165,11 @@ namespace ola
 		}
 		pointer operator->() const { return &operator*(); }
 
-		bool operator==(const IListIterator& RHS) const
+		Bool operator==(const IListIterator& RHS) const
 		{
 			return node_ptr == RHS.node_ptr;
 		}
-		bool operator!=(const IListIterator& RHS) const
+		Bool operator!=(const IListIterator& RHS) const
 		{
 			return node_ptr != RHS.node_ptr;
 		}
@@ -217,22 +217,22 @@ namespace ola
 	// operator!=/operator== - Allow mixed comparisons without dereferencing
 	// the iterator, which could very likely be pointing to end().
 	template<typename T>
-	bool operator!=(const T* LHS, const IListIterator<const T>& RHS)
+	Bool operator!=(const T* LHS, const IListIterator<const T>& RHS)
 	{
 		return LHS != RHS.GetNodePtrUnchecked();
 	}
 	template<typename T>
-	bool operator==(const T* LHS, const IListIterator<const T>& RHS)
+	Bool operator==(const T* LHS, const IListIterator<const T>& RHS)
 	{
 		return LHS == RHS.GetNodePtrUnchecked();
 	}
 	template<typename T>
-	bool operator!=(T* LHS, const IListIterator<T>& RHS)
+	Bool operator!=(T* LHS, const IListIterator<T>& RHS)
 	{
 		return LHS != RHS.GetNodePtrUnchecked();
 	}
 	template<typename T>
-	bool operator==(T* LHS, const IListIterator<T>& RHS)
+	Bool operator==(T* LHS, const IListIterator<T>& RHS)
 	{
 		return LHS == RHS.GetNodePtrUnchecked();
 	}
@@ -300,8 +300,8 @@ namespace ola
 			this->EnsureHead(head);
 		}
 
-		static bool OpLess(NodeTy& L, NodeTy& R) { return L < R; }
-		static bool OpEqual(NodeTy& L, NodeTy& R) { return L == R; }
+		static Bool OpLess(NodeTy& L, NodeTy& R) { return L < R; }
+		static Bool OpEqual(NodeTy& L, NodeTy& R) { return L == R; }
 
 		// No fundamental reason why iplist can't be copyable, but the default
 		// copy/copy-assign won't do.
@@ -360,7 +360,7 @@ namespace ola
 
 		// Miscellaneous inspection routines.
 		size_type MaxSize() const { return size_type(-1); }
-		bool Empty() const
+		Bool Empty() const
 		{
 			return !head || head == GetTail();
 		}

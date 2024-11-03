@@ -16,13 +16,13 @@ namespace ola
 	class CFGAnalysisPass : public FunctionPass
 	{
 	public:
-		inline static char id = 0;
+		inline static Char id = 0;
 		using Result = std::unordered_map<BasicBlock const*, BasicBlockCFGInfo>;
 
 	public:
 		CFGAnalysisPass() : FunctionPass(id) {}
 
-		virtual bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 		Result const& GetResult() const { return info; }
 		static void const* ID() { return &id; }

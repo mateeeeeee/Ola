@@ -131,11 +131,11 @@ namespace ola
 		OLA_MAYBE_UNUSED llvm::Value* Load(llvm::Type*, llvm::Value*);
 		OLA_MAYBE_UNUSED llvm::Value* Store(llvm::Value*, llvm::Value*);
 
-		static bool IsPointer(llvm::Type*);
-		static bool IsBoolean(llvm::Type*);
-		static bool IsInteger(llvm::Type*);
-		static bool IsFloat(llvm::Type*);
-		static bool IsStruct(llvm::Type*);
-		static bool IsRef(llvm::Type*);
+		static Bool IsPointer(llvm::Type*);
+		static Bool IsBoolean(llvm::Type*);
+		static Bool IsInteger(llvm::Type*);
+		static Bool IsFloat(llvm::Type*);
+		static Bool IsStruct(llvm::Type*);
+		static Bool IsRef(llvm::Type*);
 	};
 }

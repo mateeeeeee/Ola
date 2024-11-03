@@ -17,15 +17,15 @@ namespace ola::x64
 		FFLAGS,
 	};
 
-	inline constexpr bool IsGPRReg(Uint32 r)
+	inline constexpr Bool IsGPRReg(Uint32 r)
 	{
 		return r >= GPRBegin && r <= GPREnd;
 	}
-	inline constexpr bool IsFPRReg(Uint32 r)
+	inline constexpr Bool IsFPRReg(Uint32 r)
 	{
 		return r >= FPRBegin && r <= FPREnd;
 	}
-	inline constexpr bool IsCallerSaved(Uint32 r)
+	inline constexpr Bool IsCallerSaved(Uint32 r)
 	{
 		switch (r) 
 		{
@@ -57,7 +57,7 @@ namespace ola::x64
 			return false;
 		}
 	}
-	inline constexpr bool IsCalleeSaved(Uint32 r) 
+	inline constexpr Bool IsCalleeSaved(Uint32 r) 
 	{
 		switch (r)
 		{
@@ -97,7 +97,7 @@ namespace ola::x64
 		InstXorFP
 	};
 
-	inline char const* GetOpcodeString(Uint32 opcode)
+	inline Char const* GetOpcodeString(Uint32 opcode)
 	{
 		switch (opcode)
 		{
@@ -154,7 +154,7 @@ namespace ola::x64
 		return "";
 	}
 
-	inline char const* GetRegisterString(Uint32 r, MachineType type)
+	inline Char const* GetRegisterString(Uint32 r, MachineType type)
 	{
 		using enum MachineType;
 		switch (type) 

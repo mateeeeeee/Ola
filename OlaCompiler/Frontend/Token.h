@@ -17,7 +17,7 @@ namespace ola
 	template<>
 	struct EnumBitmaskOperators<TokenFlag>
 	{
-		static constexpr bool enable = true;
+		static constexpr Bool enable = true;
 	};
 	using TokenFlags = Uint32;
 
@@ -38,20 +38,20 @@ namespace ola
 		TokenKind GetKind() const { return kind; }
 		void SetKind(TokenKind t) { kind = t; }
 
-		bool Is(TokenKind t) const { return kind == t; }
-		bool IsNot(TokenKind t) const { return kind != t; }
+		Bool Is(TokenKind t) const { return kind == t; }
+		Bool IsNot(TokenKind t) const { return kind != t; }
 		template <typename... Ts>
-		bool IsOneOf(TokenKind t1, Ts... ts) const
+		Bool IsOneOf(TokenKind t1, Ts... ts) const
 		{
 			if constexpr (sizeof...(Ts) == 0) return Is(t1);
 			else return Is(t1) || IsOneOf(ts...);
 		}
 
-		bool IsTypename() const
+		Bool IsTypename() const
 		{
 			return IsTypeSpecifier() || IsTypeQualifier() || IsOneOf(TokenKind::KW_auto, TokenKind::KW_alias, TokenKind::KW_ref);
 		}
-		bool IsTypeSpecifier() const
+		Bool IsTypeSpecifier() const
 		{
 			return IsOneOf(
 				TokenKind::KW_enum,
@@ -61,19 +61,19 @@ namespace ola
 				TokenKind::KW_float,
 				TokenKind::KW_void);
 		}
-		bool IsTypeQualifier() const
+		Bool IsTypeQualifier() const
 		{
 			return Is(TokenKind::KW_const);
 		}
-		bool IsVisibilitySpecifier() const
+		Bool IsVisibilitySpecifier() const
 		{
 			return IsOneOf(TokenKind::KW_private, TokenKind::KW_public);
 		}
-		bool IsFunctionAttribute() const
+		Bool IsFunctionAttribute() const
 		{
 			return IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline, TokenKind::KW_nomangle);
 		}
-		bool IsMethodAttribute() const
+		Bool IsMethodAttribute() const
 		{
 			return IsOneOf(TokenKind::KW_const, TokenKind::KW_virtual, TokenKind::KW_pure, TokenKind::KW_final);
 		}
@@ -86,7 +86,7 @@ namespace ola
 		{
 			flags &= ~flag;
 		}
-		bool HasFlag(TokenFlag flag) const
+		Bool HasFlag(TokenFlag flag) const
 		{
 			return (flags & flag) != 0;
 		}
@@ -99,11 +99,11 @@ namespace ola
 			flags = _flags;
 		}
 		
-		void SetData(char const* p_data, Uint64 count)
+		void SetData(Char const* p_data, Uint64 count)
 		{
 			data = std::string(p_data, count);
 		}
-		void SetData(char const* start, char const* end)
+		void SetData(Char const* start, Char const* end)
 		{
 			data = std::string(start, end - start);
 		}

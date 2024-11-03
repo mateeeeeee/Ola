@@ -64,7 +64,7 @@ namespace ola
 		void PrintBasicBlock(BasicBlock const&);
 		void PrintInstruction(Instruction const&);
 		void PrintConstant(Constant const*);
-		void PrintOperand(Value const*, bool print_type = true);
+		void PrintOperand(Value const*, Bool print_type = true);
 
 		std::string_view GetUniqueName(Value const* V)
 		{
@@ -73,14 +73,14 @@ namespace ola
 		void PrintType(IRType*);
 
 		template<typename... Args>
-		void EmitLn(char const* fmt, Args&&... args)
+		void EmitLn(Char const* fmt, Args&&... args)
 		{
 			std::string str = std::vformat(fmt, std::make_format_args(args...));
 			str += "\n";
 			output += str;
 		}
 		template<typename... Args>
-		void Emit(char const* fmt, Args&&... args)
+		void Emit(Char const* fmt, Args&&... args)
 		{
 			std::string str = std::vformat(fmt, std::make_format_args(args...));
 			output += str;

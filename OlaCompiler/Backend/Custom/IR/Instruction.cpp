@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	static char const* OpcodeNames[] =
+	static Char const* OpcodeNames[] =
 	{
 		"none",
 
@@ -100,7 +100,7 @@ namespace ola
 		}
 	}
 
-	char const* Instruction::GetOpcodeName() const
+	Char const* Instruction::GetOpcodeName() const
 	{
 		return OpcodeNames[(Uint32)GetOpcode()];
 	}
@@ -130,7 +130,7 @@ namespace ola
 		return basic_block->Instructions().Erase(this);
 	}
 
-	bool Instruction::CanBeOperand() const
+	Bool Instruction::CanBeOperand() const
 	{
 		return true;
 	}

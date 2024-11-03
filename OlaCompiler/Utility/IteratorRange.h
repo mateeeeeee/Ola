@@ -13,7 +13,7 @@ namespace ola
 
 		Iterator begin() const { return begin_iterator; }
 		Iterator end() const { return end_iterator; }
-		bool empty() const { return begin_iterator == end_iterator; }
+		Bool empty() const { return begin_iterator == end_iterator; }
 
 	private:
 		Iterator begin_iterator, end_iterator;

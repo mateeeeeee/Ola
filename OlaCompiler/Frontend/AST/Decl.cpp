@@ -170,7 +170,7 @@ namespace ola
 		OLA_ASSERT(IsPolymorphic());
 		return vtable;
 	}
-	bool ClassDecl::IsPolymorphicImpl() const
+	Bool ClassDecl::IsPolymorphicImpl() const
 	{
 		for (auto const& method : methods) if (method->IsVirtual()) return true;
 		return base_class ? base_class->IsPolymorphic() : false;

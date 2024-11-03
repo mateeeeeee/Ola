@@ -92,7 +92,7 @@ namespace ola
 		Uint32 GetOpcode() const { return opcode; }
 
 
-		bool operator==(MachineInstruction const& rhs) const
+		Bool operator==(MachineInstruction const& rhs) const
 		{
 			return opcode == rhs.opcode && operands == rhs.operands;
 		}
@@ -138,11 +138,11 @@ namespace ola
 			return SetFlag(MachineInstFlag_IgnoreDef);
 		}
 
-		bool HasFlag(MachineInstFlag flag) const
+		Bool HasFlag(MachineInstFlag flag) const
 		{
 			return (flags & flag) != 0;
 		}
-		bool HasIgnoreDef() const
+		Bool HasIgnoreDef() const
 		{
 			return HasFlag(MachineInstFlag_IgnoreDef);
 		}

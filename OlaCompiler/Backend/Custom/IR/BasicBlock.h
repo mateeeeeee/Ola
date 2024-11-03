@@ -59,7 +59,7 @@ namespace ola
 			block_idx = idx;
 		}
 
-		bool IsEntryBlock() const;
+		Bool IsEntryBlock() const;
 
 		void AddPredecessor(BasicBlock* BB)
 		{
@@ -78,7 +78,7 @@ namespace ola
 			return successors;
 		}
 
-		static bool ClassOf(Value const* V)
+		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::BasicBlock;
 		}

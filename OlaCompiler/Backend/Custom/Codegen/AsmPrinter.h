@@ -24,7 +24,7 @@ namespace ola
 		virtual std::string GetSectionLabel(SectionId) const = 0;
 
 		template<SectionId Section, typename... Args>
-		void Emit(char const* fmt, Args&&... args)
+		void Emit(Char const* fmt, Args&&... args)
 		{
 			std::string output = std::vformat(fmt, std::make_format_args(args...));
 			output += "\n";

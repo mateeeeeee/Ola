@@ -201,7 +201,7 @@ namespace ola
 				Emit(", ");
 			}
 
-			bool print_all_types = false;
+			Bool print_all_types = false;
 			if (isa<SelectInst>(&I) || isa<StoreInst>(&I)) 
 			{
 				print_all_types = true;
@@ -222,7 +222,7 @@ namespace ola
 		EmitNewline();
 	}
 
-	void IRPrinter::PrintOperand(Value const* V, bool print_type)
+	void IRPrinter::PrintOperand(Value const* V, Bool print_type)
 	{
 		if (!V)
 		{

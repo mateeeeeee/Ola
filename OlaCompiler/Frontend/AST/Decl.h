@@ -43,17 +43,17 @@ namespace ola
 		{
 			visibility = _visibility;
 		}
-		bool IsPublic()  const { return  visibility == DeclVisibility::Public; }
-		bool IsPrivate() const { return visibility == DeclVisibility::Private; }
-		bool IsExtern()  const { return  visibility == DeclVisibility::Extern; }
+		Bool IsPublic()  const { return  visibility == DeclVisibility::Public; }
+		Bool IsPrivate() const { return visibility == DeclVisibility::Private; }
+		Bool IsExtern()  const { return  visibility == DeclVisibility::Extern; }
 
-		virtual bool IsTag() const { return false; }
-		virtual bool IsMember() const { return false; }
+		virtual Bool IsTag() const { return false; }
+		virtual Bool IsMember() const { return false; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return true; }
+		static Bool ClassOf(Decl const* decl) { return true; }
 
 	private:
 		DeclKind const decl_kind;
@@ -72,11 +72,11 @@ namespace ola
 	public:
 		VarDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::Var, name, loc) {}
 
-		void SetGlobal(bool _is_global)
+		void SetGlobal(Bool _is_global)
 		{
 			is_global = _is_global;
 		}
-		bool IsGlobal() const { return is_global; }
+		Bool IsGlobal() const { return is_global; }
 
 		void SetInitExpr(UniqueExprPtr&& expr)
 		{
@@ -87,7 +87,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) 
+		static Bool ClassOf(Decl const* decl) 
 		{ 
 			switch (decl->GetDeclKind())
 			{
@@ -100,7 +100,7 @@ namespace ola
 		}
 	private:
 		UniqueExprPtr init_expr = nullptr;
-		bool is_global = false;
+		Bool is_global = false;
 
 	protected:
 		VarDecl(DeclKind kind, std::string_view name, SourceLocation const& loc) : Decl(kind, name, loc) {}
@@ -120,7 +120,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::ParamVar; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::ParamVar; }
 	private:
 		FunctionDecl const* parent = nullptr;
 	};
@@ -141,18 +141,18 @@ namespace ola
 		}
 		Uint32 GetFieldIndex() const { return index; }
 
-		virtual bool IsMember() const override { return true; }
+		virtual Bool IsMember() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Field; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Field; }
 	private:
 		ClassDecl const* parent = nullptr;
 		Uint32 index = -1;
 	};
 
-	inline bool HasAttribute(Uint8 attrs, Uint8 attr)
+	inline Bool HasAttribute(Uint8 attrs, Uint8 attr)
 	{
 		return (attrs & attr) == attr;
 	}
@@ -180,13 +180,13 @@ namespace ola
 		{
 			func_attributes = attrs;
 		}
-		bool HasFuncAttribute(FuncAttribute attr) const
+		Bool HasFuncAttribute(FuncAttribute attr) const
 		{
 			return HasAttribute(func_attributes, attr);
 		}
-		bool IsInline()   const { return HasFuncAttribute(FuncAttribute_Inline); }
-		bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
-		bool NoMangle() const { return HasFuncAttribute(FuncAttribute_NoMangle); }
+		Bool IsInline()   const { return HasFuncAttribute(FuncAttribute_Inline); }
+		Bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
+		Bool NoMangle() const { return HasFuncAttribute(FuncAttribute_NoMangle); }
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_decls; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }
@@ -200,7 +200,7 @@ namespace ola
 			OLA_ASSERT(isa<FuncType>(GetType()));
 			return cast<FuncType>(GetType());
 		}
-		bool HasDefinition() const
+		Bool HasDefinition() const
 		{
 			return body_stmt != nullptr;
 		}
@@ -209,7 +209,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) 
+		static Bool ClassOf(Decl const* decl) 
 		{ 
 			switch (decl->GetDeclKind())
 			{
@@ -256,24 +256,24 @@ namespace ola
 		{
 			method_attrs = attrs;
 		}
-		bool HasMethodAttribute(MethodAttribute attr) const
+		Bool HasMethodAttribute(MethodAttribute attr) const
 		{
 			return HasAttribute(method_attrs, attr);
 		}
-		bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
-		bool IsPure() const { return HasMethodAttribute(MethodAttribute_Pure); }
-		bool IsFinal() const { return HasMethodAttribute(MethodAttribute_Final); }
-		bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
+		Bool IsVirtual() const { return HasMethodAttribute(MethodAttribute_Virtual); }
+		Bool IsPure() const { return HasMethodAttribute(MethodAttribute_Pure); }
+		Bool IsFinal() const { return HasMethodAttribute(MethodAttribute_Final); }
+		Bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
 
 		void SetVTableIndex(Uint32 i) const { vtable_index = i; }
 		Uint32 GetVTableIndex() const { return vtable_index; }
-		virtual bool IsConstructor() const { return false; }
-		virtual bool IsMember() const override { return true; }
+		virtual Bool IsConstructor() const { return false; }
+		virtual Bool IsMember() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl)
+		static Bool ClassOf(Decl const* decl)
 		{
 			switch (decl->GetDeclKind())
 			{
@@ -299,19 +299,19 @@ namespace ola
 	public:
 		ConstructorDecl(std::string_view name, SourceLocation const& loc) : MethodDecl(DeclKind::Constructor, name, loc) {}
 
-		virtual bool IsConstructor() const { return true; }
+		virtual Bool IsConstructor() const { return true; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Constructor; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Constructor; }
 	};
 
 	class TagDecl : public Decl
 	{
 	public:
-		virtual bool IsTag() const override { return true; }
+		virtual Bool IsTag() const override { return true; }
 
-		static bool ClassOf(Decl const* decl)
+		static Bool ClassOf(Decl const* decl)
 		{
 			switch (decl->GetDeclKind())
 			{
@@ -341,7 +341,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Enum; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Enum; }
 
 	private:
 		UniqueEnumMemberDeclPtrList enum_members;
@@ -362,7 +362,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::EnumMember; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::EnumMember; }
 	private:
 		Sint64 value = 0;
 	};
@@ -379,7 +379,7 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Alias; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Alias; }
 	};
 
 	enum class BuildVTableResult
@@ -410,7 +410,7 @@ namespace ola
 		{
 			return base_class ? base_class->GetFieldCount() + fields.size() : fields.size();
 		}
-		bool IsDerivedFrom(ClassDecl const* base) const
+		Bool IsDerivedFrom(ClassDecl const* base) const
 		{
 			ClassDecl const* curr_base_class = base_class;
 			while (curr_base_class)
@@ -420,16 +420,16 @@ namespace ola
 			}
 			return false;
 		}
-		bool IsPolymorphic() const
+		Bool IsPolymorphic() const
 		{
 			return polymorphic;
 		}
-		bool IsAbstract() const
+		Bool IsAbstract() const
 		{
 			return abstract;
 		}
-		bool IsFinal() const { return final; }
-		void SetFinal(bool _final) { final = _final; }
+		Bool IsFinal() const { return final; }
+		void SetFinal(Bool _final) { final = _final; }
 
 		BuildVTableResult BuildVTable(MethodDecl const*& error_decl);
 		std::vector<MethodDecl const*> const& GetVTable() const;
@@ -437,19 +437,19 @@ namespace ola
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
-		static bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
+		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::Class; }
 
 	private:
 		ClassDecl const* base_class = nullptr;
 		UniqueFieldDeclPtrList fields;
 		UniqueMethodDeclPtrList methods;
 		std::vector<MethodDecl const*> vtable;
-		bool abstract = false;
-		bool polymorphic = false;
-		bool final = false;
+		Bool abstract = false;
+		Bool polymorphic = false;
+		Bool final = false;
 
 	private:
-		bool IsPolymorphicImpl() const;
+		Bool IsPolymorphicImpl() const;
 	};
 }
 

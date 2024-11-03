@@ -16,8 +16,8 @@ namespace ola
 		using reference = ReferenceT;
 
 	protected:
-		static constexpr bool IsRandomAccess = std::is_base_of_v<std::random_access_iterator_tag, IteratorCategoryT>;
-		static constexpr bool IsBidirectional = std::is_base_of_v<std::bidirectional_iterator_tag, IteratorCategoryT>;
+		static constexpr Bool IsRandomAccess = std::is_base_of_v<std::random_access_iterator_tag, IteratorCategoryT>;
+		static constexpr Bool IsBidirectional = std::is_base_of_v<std::bidirectional_iterator_tag, IteratorCategoryT>;
 
 		class ReferenceProxy 
 		{
@@ -85,23 +85,23 @@ namespace ola
 		}
 
 #ifndef __cpp_impl_three_way_comparison
-		bool operator!=(const DerivedT& RHS) const 
+		Bool operator!=(const DerivedT& RHS) const 
 		{
 			return !(static_cast<const DerivedT&>(*this) == RHS);
 		}
 #endif
 
-		bool operator>(const DerivedT& RHS) const 
+		Bool operator>(const DerivedT& RHS) const 
 		{
 			static_assert(IsRandomAccess, "Relational operators are only defined for random access iterators.");
 			return !(static_cast<const DerivedT&>(*this) < RHS) && !(static_cast<const DerivedT&>(*this) == RHS);
 		}
-		bool operator<=(const DerivedT& RHS) const 
+		Bool operator<=(const DerivedT& RHS) const 
 		{
 			static_assert(IsRandomAccess, "Relational operators are only defined for random access iterators.");
 			return !(static_cast<const DerivedT&>(*this) > RHS);
 		}
-		bool operator>=(const DerivedT& RHS) const 
+		Bool operator>=(const DerivedT& RHS) const 
 		{
 			static_assert(IsRandomAccess, "Relational operators are only defined for random access iterators.");
 			return !(static_cast<const DerivedT&>(*this) < RHS);

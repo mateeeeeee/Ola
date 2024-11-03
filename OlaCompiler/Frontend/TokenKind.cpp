@@ -29,7 +29,7 @@ namespace ola
 		return token_names[(Uint16)t];
 	}
 
-	bool IsKeyword(std::string_view identifer)
+	Bool IsKeyword(std::string_view identifer)
 	{
 		return keywords.contains(identifer);
 	}

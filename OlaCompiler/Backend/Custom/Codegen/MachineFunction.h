@@ -10,10 +10,10 @@ namespace ola
 	class MachineFunction final : public MachineRelocable
 	{
 	public:
-		explicit MachineFunction(std::string_view symbol, bool is_declaration);
+		explicit MachineFunction(std::string_view symbol, Bool is_declaration);
 		~MachineFunction();
 
-		bool IsDeclaration() const { return is_declaration; }
+		Bool IsDeclaration() const { return is_declaration; }
 
 		auto& Blocks() { return blocks; }
 		auto const& Blocks() const { return blocks; }
@@ -47,7 +47,7 @@ namespace ola
 		}
 
 	private:
-		bool is_declaration;
+		Bool is_declaration;
 		std::list<std::unique_ptr<MachineBasicBlock>> blocks;
 		std::vector<MachineOperand> args;
 		Sint32 stack_offset = 0;

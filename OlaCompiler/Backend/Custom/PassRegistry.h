@@ -10,15 +10,15 @@ namespace ola
 	public:
 		std::string_view GetName() const { return pass_name; }
 		void const* GetID() const { return pass_id; }
-		bool IsAnalysis() const { return is_analysis; }
+		Bool IsAnalysis() const { return is_analysis; }
 
 	private:		
 		   std::string pass_name;
 		   void const* pass_id;
-		   bool is_analysis;
+		   Bool is_analysis;
 
 	protected:
-		PassInfo(std::string_view name, void const* id, bool analysis)
+		PassInfo(std::string_view name, void const* id, Bool analysis)
 			: pass_name(name), pass_id(id), is_analysis(analysis) {}
 	};
 

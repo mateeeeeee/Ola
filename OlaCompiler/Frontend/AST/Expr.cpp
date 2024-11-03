@@ -8,7 +8,7 @@ namespace ola
 	{
 		SetType(decl->GetType());
 	}
-	bool DeclRefExpr::IsConstexpr() const
+	Bool DeclRefExpr::IsConstexpr() const
 	{
 		return isa<EnumMemberDecl>(decl);
 	}

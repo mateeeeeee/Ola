@@ -7,13 +7,13 @@ namespace ola
 	template <>
 	struct EnumBitmaskOperators<InstFlag>
 	{
-		static constexpr bool enable = true;
+		static constexpr Bool enable = true;
 	};
 
 	template <>
 	struct EnumBitmaskOperators<OperandFlag>
 	{
-		static constexpr bool enable = true;
+		static constexpr Bool enable = true;
 	};
 
 
