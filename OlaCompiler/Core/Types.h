@@ -14,6 +14,7 @@ namespace ola
 	using Bool32	= std::int32_t;
 	using Bool		= bool;
 	using Char		= char;
+	using Wchar		= wchar_t;
 	using Float		= float;
 	using Float64   = double;
 }
