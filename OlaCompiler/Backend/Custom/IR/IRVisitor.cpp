@@ -164,7 +164,7 @@ namespace ola
 					OLA_ASSERT(constant_init_value);
 
 					Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
-					GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, init_value);
+					GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, linkage, init_value);
 					if (is_const) global_var->SetReadOnly();
 					module.AddGlobal(global_var);
 					value_map[&var_decl] = global_var;
@@ -197,7 +197,8 @@ namespace ola
 				}
 
 				IRStructType* llvm_struct_type = cast<IRStructType>(ir_type);
-				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr); // ConstantStruct::get(llvm_struct_type, initializers));
+				Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
+				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, linkage, nullptr);
 				if (is_const) global_var->SetReadOnly();
 				module.AddGlobal(global_var);
 				value_map[&var_decl] = global_var;
@@ -210,7 +211,7 @@ namespace ola
 			{
 				Constant* constant_init_value = Constant::GetNullValue(ir_type); 
 				Linkage linkage = var_decl.IsPublic() || var_decl.IsExtern() ? Linkage::External : Linkage::Internal;
-				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, Linkage::External, nullptr);
+				GlobalVariable* global_var = new GlobalVariable(var_decl.GetName(), ir_type, linkage, nullptr);
 				if (is_const) global_var->SetReadOnly();
 				module.AddGlobal(global_var);
 				value_map[&var_decl] = global_var;

@@ -1,5 +1,5 @@
 #include <vector>
-#include "ArithmeticStrengthReductionPass.h"
+#include "ArithmeticReductionPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
@@ -60,7 +60,7 @@ namespace ola
 		}
 	}
 
-	Bool ArithmeticStrengthReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
+	Bool ArithmeticReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		Bool changed = false;
 		std::vector<Instruction*> instructions_to_remove;

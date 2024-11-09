@@ -190,9 +190,9 @@ namespace ola
 					initializers.push_back(cast<llvm::Constant>(value_map[fields[i].get()]));
 				}
 
+				llvm::GlobalValue::LinkageTypes linkage = var_decl.IsPublic() || var_decl.IsExtern() ? llvm::GlobalValue::ExternalLinkage : llvm::GlobalValue::InternalLinkage;
 				llvm::StructType* llvm_struct_type = cast<llvm::StructType>(llvm_type);
-				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, false, llvm::GlobalValue::ExternalLinkage, 
-																		    llvm::ConstantStruct::get(llvm_struct_type, initializers), var_decl.GetName());
+				llvm::GlobalVariable* global_var = new llvm::GlobalVariable(module, llvm_type, false, linkage, llvm::ConstantStruct::get(llvm_struct_type, initializers), var_decl.GetName());
 				value_map[&var_decl] = global_var;
 			}
 			else if (is_ref)

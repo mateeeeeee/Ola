@@ -7,14 +7,14 @@ namespace ola
 	class Instruction;
 	class BinaryInst;
 
-	class ArithmeticStrengthReductionPass : public FunctionPass
+	class ArithmeticReductionPass : public FunctionPass
 	{
 	public:
 		inline static Char ID = 0;
 	public:
-		ArithmeticStrengthReductionPass() : FunctionPass(ID) {}
+		ArithmeticReductionPass() : FunctionPass(ID) {}
 
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 	};
-	OLA_REGISTER_PASS(ArithmeticStrengthReductionPass, "ASR Pass");
+	OLA_REGISTER_PASS(ArithmeticReductionPass, "Arithmetic Reduction Pass");
 }

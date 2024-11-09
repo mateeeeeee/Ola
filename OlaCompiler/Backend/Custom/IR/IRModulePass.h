@@ -11,7 +11,7 @@ namespace ola
 	class IRModulePass : public Pass
 	{
 	public:
-		explicit IRModulePass(Char pid) : Pass(pid, PassKind::Module) {}
+		explicit IRModulePass(Char& pid) : Pass(pid, PassKind::Module) {}
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}
@@ -21,7 +21,7 @@ namespace ola
 	template<>
 	struct UnitTraits<IRModule>
 	{
-		using BasePassT = IRModule;
-		using ParentUnitT = IRModule;
+		using BasePassT		= IRModulePass;
+		using ParentUnitT	= IRModule;
 	};
 }

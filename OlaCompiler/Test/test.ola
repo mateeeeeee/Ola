@@ -1,12 +1,8 @@
 
+private int x = 10;
+
 public int main()
 {
-    if(5)
-    {
-        return 10;
-    }
-    else
-    {
-        return 15;
-    }
+    int a = 5;
+    return x + a;
 }

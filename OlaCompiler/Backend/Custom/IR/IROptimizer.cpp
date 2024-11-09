@@ -1,9 +1,10 @@
 #include "IROptimizer.h"
 #include "IRModule.h"
 #include "GlobalValue.h"
-#include "Passes/ArithmeticStrengthReductionPass.h"
+#include "Passes/ArithmeticReductionPass.h"
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/CFGAnalysisPass.h"
+#include "Passes/GlobalAttributeInferPass.h"
 
 namespace ola
 {
@@ -14,6 +15,7 @@ namespace ola
 
 	void IROptimizer::Optimize(OptimizationLevel level)
 	{
+		IRModulePassManager MPM;
 		FunctionPassManager FPM;
 		switch (level)
 		{
@@ -22,10 +24,14 @@ namespace ola
 		case OptimizationLevel::O2:
 			[[fallthrough]];
 		case OptimizationLevel::O1:
-			FPM.AddPass(new ArithmeticStrengthReductionPass());
+			FPM.AddPass(new ArithmeticReductionPass());
 			FPM.AddPass(new DeadCodeEliminationPass());
+			MPM.AddPass(new GlobalAttributeInferPass());
 		}
-		if (FPM.IsEmpty()) return;
+		if (FPM.IsEmpty() && MPM.IsEmpty()) return;
+
+		IRModuleAnalysisManager MAM;
+		MPM.Run(M, MAM);
 
 		FunctionAnalysisManager FAM;
 		for (auto& G : M.Globals())
