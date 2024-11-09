@@ -2,7 +2,7 @@
 <br/><br/>
 
 # Ola
-Ola is a toy programming language with LLVM backend. 
+Ola is a toy programming language with LLVM backend. Custom backend is still work in progress.
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -46,8 +46,7 @@ Ola is a toy programming language with LLVM backend.
 	- todo:
 		- references
 		- classes
-		- stack layout 
-		- IR optimization passes
+		- stack layout
 
 ## Structure
 Ola consists of three parts: 
