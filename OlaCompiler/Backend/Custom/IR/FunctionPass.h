@@ -11,7 +11,7 @@ namespace ola
 	class FunctionPass : public Pass
 	{
 	public:
-		explicit FunctionPass(Char pid) : Pass(pid, PassKind::Function) {}
+		explicit FunctionPass(Char& pid) : Pass(pid, PassKind::Function) {}
 
 		virtual void Init(IRModule&) {}
 		virtual void Deinit(IRModule&) {}

@@ -19,7 +19,7 @@ namespace ola
 	class Pass
 	{
 	public:
-		Pass(Char pass_id, PassKind kind) : ID(&pass_id), kind(kind) {}
+		Pass(Char& pass_id, PassKind kind) : ID(&pass_id), kind(kind) {}
 		virtual ~Pass() = default;
 
 		PassID GetPassID() const { return ID; }
