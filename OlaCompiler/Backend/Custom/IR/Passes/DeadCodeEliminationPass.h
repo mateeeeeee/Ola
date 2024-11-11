@@ -18,4 +18,5 @@ namespace ola
 		static Bool IsInstructionDead(Instruction const* I);
 	};
 	using DCEPass = DeadCodeEliminationPass;
+	OLA_REGISTER_PASS(DeadCodeEliminationPass, "Dead Code Elimination Pass");
 }
