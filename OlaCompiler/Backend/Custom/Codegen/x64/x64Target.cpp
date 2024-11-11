@@ -138,6 +138,21 @@ namespace ola
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
 				}
+				else if (dst.GetType() == MachineType::Ptr && src.IsMemoryOperand())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
+					MI.SetOp<0>(tmp);
+					MI.SetOp<1>(src); 
+					MI.SetIgnoreDef();
+					MI.SetOpcode(InstLoadGlobalAddress);
+
+					MachineInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+
+					++instruction_iter;
+					instructions.insert(instruction_iter, MI2);
+				}
 			}
 			break;
 			case InstAdd:

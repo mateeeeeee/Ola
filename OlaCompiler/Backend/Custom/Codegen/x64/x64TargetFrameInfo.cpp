@@ -46,8 +46,8 @@ namespace ola
 		}
 
 		MachineGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
-		MachineFunction& caller = *static_cast<MachineFunction*>(global->GetRelocable());
-
+		MachineFunction& machine_callee = *static_cast<MachineFunction*>(global->GetRelocable());
+		std::vector<MachineOperand> const& machine_arguments = machine_callee.Args();
 		for (Sint32 idx = arg_count - 1; idx >= 0; --idx)
 		{
 			Sint32 offset = offsets[idx];
@@ -55,11 +55,11 @@ namespace ola
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			Uint32 size = arg->GetType()->GetSize();
 			Uint32 alignment = size;
-
-			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg_operand.GetType() == MachineType::Ptr) ? InstLoadGlobalAddress : InstMove;
+															
+			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
 			if (offset < PASS_BY_REG_OFFSET)
 			{
-				MachineOperand& argument_stack = caller.AllocateStack(arg_operand.GetType());
+				MachineOperand& argument_stack = machine_callee.AllocateStack(arg_operand.GetType());
 				MachineInstruction copy_arg_to_stack(opcode);
 				copy_arg_to_stack.SetOp<0>(argument_stack).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);

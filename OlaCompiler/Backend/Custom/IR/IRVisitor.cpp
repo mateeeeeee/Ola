@@ -290,7 +290,11 @@ namespace ola
 				}
 				else if (is_ref)
 				{
-					
+					Value* alloc = builder->MakeInst<AllocaInst>(ir_type);
+					Value* init_value = value_map[init_expr];
+					builder->MakeInst<StoreInst>(init_value, alloc);
+					Value* ref = builder->MakeInst<LoadInst>(alloc, ir_type); 
+					value_map[&var_decl] = ref;
 				}
 				else
 				{
@@ -992,10 +996,10 @@ namespace ola
 			{
 				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::F2S, int_type, cast_operand);
 			}
-			//else if (IsRef(cast_operand_type))
-			//{
-			//	value_map[&cast_expr] = builder.CreateLoad(int_type, cast_operand_value);
-			//}
+			else if (cast_operand_type->IsPointer())
+			{
+				value_map[&cast_expr] = builder->MakeInst<LoadInst>(cast_operand_value, int_type);
+			}
 			else OLA_ASSERT(false);
 		}
 		else if (cast_type == bool_type)
@@ -1008,10 +1012,10 @@ namespace ola
 			{
 				value_map[&cast_expr] = builder->MakeInst<CompareInst>(Opcode::FCmpONE, cast_operand, context.GetFloat(0.0));
 			}
-			//else if (IsRef(cast_operand_type))
-			//{
-			//	value_map[&cast_expr] = builder.CreateLoad(bool_type, cast_operand);
-			//}
+			else if (cast_operand_type->IsPointer())
+			{
+				value_map[&cast_expr] = builder->MakeInst<LoadInst>(cast_operand_value, bool_type);
+			}
 			else OLA_ASSERT(false);
 		}
 		else if (cast_type == float_type)
@@ -1024,10 +1028,10 @@ namespace ola
 			{
 				value_map[&cast_expr] = builder->MakeInst<CastInst>(Opcode::S2F, float_type, cast_operand);
 			}
-			//else if (IsRef(cast_operand_type))
-			//{
-			//	value_map[&cast_expr] = builder.CreateLoad(float_type, cast_operand);
-			//}
+			else if (cast_operand_type->IsPointer())
+			{
+				value_map[&cast_expr] = builder->MakeInst<LoadInst>(cast_operand_value, float_type);
+			}
 			else OLA_ASSERT(false);
 		}
 		else if (cast_type->IsStruct())

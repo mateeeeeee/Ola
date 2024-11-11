@@ -1,4 +1,50 @@
+import std.assert;
+
+void IntByValue(int a)
+{
+	++a;
+}
+
+void IntByRef(ref int a)
+{
+	++a;
+}
+
+void TestRefSimple()
+{
+	//passing T variable to ref T function parameter
+	int a = 9;
+	IntByRef(a);
+	Assert(a == 10);
+	
+	//assigning T to ref T variable 
+	ref int b = a;
+	++b;
+	Assert(a == 11);
+	
+	//assigning ref T to T variable
+	int c = b;
+	++c;
+	Assert(c == 12);
+	Assert(a == 11);
+	
+	//assigning ref T to ref T variable 
+	ref int d = b; 
+	++d;
+	Assert(a == 12);
+	
+	//passing ref T variable to ref T function parameter
+	IntByRef(d);
+	Assert(a == 13);
+	
+	//passing ref T variable to T function parameter
+	IntByValue(d);
+	Assert(a == 13);
+}
+
+
 public int main()
 {
-    return 0;
+	TestRefSimple();
+	return 0;
 }

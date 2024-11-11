@@ -46,7 +46,7 @@ Ola is a toy programming language designed with a focus on modularity and learni
 		- Custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR).
 		- IR optimization passes
 		- Early support for x86-64 code generation.
-		- Roadmap for missing features: proper stack layout, class support, and reference handling.
+		- Roadmap for missing features: proper stack layout and class support.
 
 ## Structure
 Ola consists of three main parts:

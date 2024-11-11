@@ -1,14 +1,33 @@
 import std.assert;
 
-//void IntByRef(ref int a)
-//{
-//	++a;
-//}
+
+int g = 9;
+ref int ReturnRef()
+{
+	return g;
+}
+int ReturnValue()
+{
+	return g;
+}
+
+void TestRefReturnSimple()
+{
+	ref int gRef = ReturnRef();
+	gRef++;
+	Assert(g == 10);
+
+	int gRefCopy = ReturnRef();
+	gRefCopy++;
+	Assert(g == 10);
+
+	int gValue = ReturnValue();
+	gValue++;
+	Assert(g == 10);
+}
 
 public int main()
 {
-    int a = 9;
-	//IntByRef(a);
-	Assert(a == 10);
-	return a;
-}	
+	TestRefReturnSimple();
+	return 0;
+}

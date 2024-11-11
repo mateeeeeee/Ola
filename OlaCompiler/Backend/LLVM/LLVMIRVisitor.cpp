@@ -304,8 +304,8 @@ namespace ola
 					llvm::AllocaInst* alloc = builder.CreateAlloca(llvm_type, nullptr);
 					llvm::Value* init_value = value_map[init_expr];
 					builder.CreateStore(init_value, alloc);
-					llvm::Value* arg_ref = builder.CreateLoad(llvm_type, alloc);
-					value_map[&var_decl] = arg_ref;
+					llvm::Value* ref = builder.CreateLoad(llvm_type, alloc);
+					value_map[&var_decl] = ref;
 				}
 				else
 				{
