@@ -10,6 +10,7 @@ namespace ola
 		info = DominatorTree{};  
 		CalculateImmediateDominators(F, cfgResult);
 		ComputeDominanceFrontiers(F, cfgResult);
+		info.SetImmediatelyDominatedBlocks();
 		return false; 
 	}
 

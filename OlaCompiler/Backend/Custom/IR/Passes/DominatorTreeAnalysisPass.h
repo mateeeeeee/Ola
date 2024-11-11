@@ -37,9 +37,29 @@ namespace ola
 			return dominanceFrontierMap.at(block);
 		}
 
+		void SetImmediatelyDominatedBlocks() 
+		{
+			immediatelyDominatedBlocksMap.clear();
+			for (const auto& [block, immediateDominator] : immediateDominatorMap) 
+			{
+				if (immediateDominator) 
+				{ 
+					immediatelyDominatedBlocksMap[immediateDominator].insert(block);
+				}
+			}
+		}
+
+		std::unordered_set<BasicBlock const*> const& GetImmediatelyDominatedBlocks(BasicBlock const* block) const 
+		{
+			static const std::unordered_set<BasicBlock const*> emptySet;
+			auto it = immediatelyDominatedBlocksMap.find(block);
+			return it != immediatelyDominatedBlocksMap.end() ? it->second : emptySet;
+		}
+
 	private:
 		std::unordered_map<BasicBlock const*, BasicBlock const*> immediateDominatorMap;
 		std::unordered_map<BasicBlock const*, std::unordered_set<BasicBlock const*>> dominanceFrontierMap;
+		std::unordered_map<BasicBlock const*, std::unordered_set<BasicBlock const*>> immediatelyDominatedBlocksMap; 
 	};
 
 	class DominatorTreeAnalysisPass : public FunctionPass
