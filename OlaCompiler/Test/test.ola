@@ -1,8 +1,14 @@
+import std.assert;
 
-private int x = 10;
+//void IntByRef(ref int a)
+//{
+//	++a;
+//}
 
 public int main()
 {
-    int a = 5;
-    return x + a;
-}
+    int a = 9;
+	//IntByRef(a);
+	Assert(a == 10);
+	return a;
+}	

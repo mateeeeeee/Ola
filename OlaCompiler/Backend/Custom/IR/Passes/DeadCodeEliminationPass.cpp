@@ -12,7 +12,7 @@ namespace ola
 		{
 			for (Instruction& I : BB.Instructions())
 			{
-				if (I.IsTerminator() || isa<StoreInst>(&I))
+				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I))
 				{
 					alive.insert(&I);
 					worklist.push_back(&I);
@@ -51,17 +51,5 @@ namespace ola
 
 		return !worklist.empty();
 	}
-
-	Bool DeadCodeEliminationPass::IsInstructionDead(Instruction const* I)
-	{
-		if (I->IsUsed())
-			return false;
-		if (I->IsTerminator())
-			return false;
-		if (isa<StoreInst>(I))
-			return false;
-		return true;
-	}
-
 }
 

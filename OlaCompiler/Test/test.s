@@ -1,12 +1,10 @@
 .intel_syntax noprefix
 
-.section .rodata
-
-x:
-.quad 10
-
-
 .section .text
+
+.extern Assert
+
+.extern AssertMsg
 
 .globl main
 
@@ -14,19 +12,22 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 16
-mov qword ptr [rbp - 16], 5
-mov r15, qword ptr x[rip]
-mov r14, qword ptr [rbp - 16]
-mov r13, r15
-add r13, r14
-mov qword ptr [rbp - 8], r13
+sub rsp, 48
+mov qword ptr [rbp - 16], 9
+mov r15, qword ptr [rbp - 16]
+cmp r15, 10
+sete r15b
+and r15b, 1
+mov cl, r15b
+call Assert
+mov r15, qword ptr [rbp - 16]
+mov qword ptr [rbp - 8], r15
 jmp label2
 label1:
 jmp label2
 label2:
-mov r13, qword ptr [rbp - 8]
-mov rax, r13
+mov r15, qword ptr [rbp - 8]
+mov rax, r15
 mov rsp, rbp
 pop rbp
 ret

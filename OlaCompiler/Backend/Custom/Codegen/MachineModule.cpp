@@ -45,7 +45,6 @@ namespace ola
 					Constant* C = cast<Constant>(init_value);
 
 					MachineDataStorage* data = new MachineDataStorage(V->GetName(), V->IsReadOnly());
-
 					auto ExpandValue = [&](auto&& self, Value* V) -> void
 						{
 							if (ConstantInt* CI = dyn_cast<ConstantInt>(V))

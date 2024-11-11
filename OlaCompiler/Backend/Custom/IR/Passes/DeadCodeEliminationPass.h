@@ -13,9 +13,6 @@ namespace ola
 		DeadCodeEliminationPass() : FunctionPass(ID) {}
 
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
-
-	private:
-		static Bool IsInstructionDead(Instruction const* I);
 	};
 	using DCEPass = DeadCodeEliminationPass;
 	OLA_REGISTER_PASS(DeadCodeEliminationPass, "Dead Code Elimination Pass");
