@@ -58,36 +58,17 @@ namespace ola
 		{
 			block_idx = idx;
 		}
-
 		Bool IsEntryBlock() const;
-
-		void AddPredecessor(BasicBlock* BB)
-		{
-			predecessors.push_back(BB);
-		}
-		std::vector<BasicBlock*> const& Predecessors() const
-		{
-			return predecessors;
-		}
-		void AddSuccessor(BasicBlock* BB)
-		{
-			successors.push_back(BB);
-		}
-		std::vector<BasicBlock*> const& Successors() const
-		{
-			return successors;
-		}
 
 		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::BasicBlock;
 		}
+
 	private:
 		Function* function;
 		std::string label;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
-		std::vector<BasicBlock*> predecessors;
-		std::vector<BasicBlock*> successors;
 	};
 }

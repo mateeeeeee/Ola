@@ -17,6 +17,7 @@ namespace ola
 	{
 		using BasePassT = typename UnitTraits<UnitT>::BasePassT;
 		using ParentUnitT = typename UnitTraits<UnitT>::ParentUnitT;
+		using AnalysisManagerT = typename UnitTraits<UnitT>::AnalysisManagerT;
 		static_assert(std::is_base_of_v<Pass, BasePassT>);
 
 		using AnalysisPassMapT = std::unordered_map<PassID, std::unique_ptr<BasePassT>>;
@@ -43,20 +44,20 @@ namespace ola
 		}
 
 		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
-		auto const& GetResult(UnitT& U) const
+		auto const& GetResult(UnitT& U)
 		{
 			using ResultT = typename PassT::Result;
-			UnitAnalysisInfo const& analysis_info = unit_analysis_info_map[&U];
+			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
 			if (!analysis_info.analysis_passes.contains(PassT::ID()))
 			{
 				OLA_ASSERT_MSG(false, "Pass was not registered! Did you forget to call RegisterPass?");
-				return ResultT{};
+				OLA_UNREACHABLE();
 			}
 			if (!analysis_info.analysis_results.contains(PassT::ID()))
 			{
-				BasePassT* pass = analysis_info.analysis_passes[PassT::ID()];
-				pass->RunOn(U);
-				analysis_info.analysis_results[PassT::ID()] = static_cast<PassT*>(pass)->GetResult();
+				BasePassT* pass = analysis_info.analysis_passes[PassT::ID()].get();
+				pass->RunOn(U, static_cast<AnalysisManagerT&>(*this));
+				analysis_info.analysis_results[PassT::ID()] = &static_cast<PassT*>(pass)->GetResult();
 			}
 			return *static_cast<ResultT const*>(analysis_info.analysis_results[PassT::ID()]);
 		}
@@ -75,7 +76,7 @@ namespace ola
 		}
 
 	private:
-		std::unordered_map<UnitT*, UnitAnalysisInfo> unit_analysis_info_map;
+		mutable std::unordered_map<UnitT*, UnitAnalysisInfo> unit_analysis_info_map;
 	};
 
 }

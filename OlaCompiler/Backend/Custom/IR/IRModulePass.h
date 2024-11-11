@@ -23,5 +23,6 @@ namespace ola
 	{
 		using BasePassT		= IRModulePass;
 		using ParentUnitT	= IRModule;
+		using AnalysisManagerT = IRModuleAnalysisManager;
 	};
 }

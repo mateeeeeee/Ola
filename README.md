@@ -2,7 +2,7 @@
 <br/><br/>
 
 # Ola
-Ola is a toy programming language with LLVM backend. Custom backend is still work in progress.
+Ola is a toy programming language designed with a focus on modularity and learning, offering both an LLVM-based backend and a work-in-progress custom backend. 
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
@@ -40,27 +40,41 @@ Ola is a toy programming language with LLVM backend. Custom backend is still wor
   * scopes
   * import statement
   * standard library
-  * Custom backend
-	- Custom IR and MIR 
-	- x86-64 code generation
-	- todo:
-		- references
-		- classes
-		- stack layout
+  * Backend architecture
+	- LLVM Backend: Emits LLVM IR and supports LLVM optimization passes.
+	- Custom Backend (Work in Progress):
+		- Custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR).
+		- IR optimization passes
+		- Early support for x86-64 code generation.
+		- Roadmap for missing features: proper stack layout, class support, and reference handling.
 
 ## Structure
-Ola consists of three parts: 
-1. __Ola library__ - standard library for Ola language implemented in C and built as static library to be used by the compiler.  Currently it contains 5 files: 
-	olaio.h, olamath.h, olaassert.h, olastring.h, olamemory.h.
-2. __Ola compiler__ - consists of the following parts:
-   * __Lexer__ - turns source file into a sequence of tokens
-   * __Import Processor__ - receives tokens from previous phase and processes import statements. 
-   * __Parser__ - recursive descent parser that receives processed tokens and constructs Abstract Syntax Tree (AST) of a translation unit. 
-   * __Sema__ - does semantic analysis of a translation unit. 
-   * __LLVM Visitor__ - traverses AST and emits LLVM IR.
-   * __LLVM Optimizer__ - applies optimizations to the generated LLVM IR produced by LLVM Visitor based on the optimization level used.
-4. __Ola tests__
-   * UnitTest framework for testing existing Ola features. Uses GoogleTest.
+Ola consists of three main parts:
+
+1. **Ola Library**: 
+   - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. Currently, it includes the following files: 
+     - `olaio.h`
+     - `olamath.h`
+     - `olaassert.h`
+     - `olastring.h`
+     - `olamemory.h`
+
+2. **Ola Compiler**:
+   - The core of the Ola project, divided into various stages for flexibility and modularity:
+     - **Lexer**: Tokenizes the source code.
+     - **Import Processor**: Processes `import` statements from the tokenized input.
+     - **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
+     - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
+     - **Backend**: After the frontend processing completes, the compilation process diverges into two backend paths:
+       - **LLVM Path**:
+         - **LLVM Visitor**: Transforms the AST into LLVM IR.
+         - **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
+       - **Custom Backend Path**:
+         - **IRVisitor**: Generates Ola's custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR) for the custom backend.
+         - **IROptimizer**: Applies custom optimizations at the IR level.
+
+3. **Ola Tests**:
+   - A set of unit tests built with GoogleTest, covering Ola language features and verifying the correctness of compiler passes and backend components.
 
 
 ## Usage

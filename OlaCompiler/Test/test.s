@@ -1,6 +1,6 @@
 .intel_syntax noprefix
 
-.section .data
+.section .rodata
 
 x:
 .quad 10
@@ -16,7 +16,6 @@ push rbp
 mov rbp, rsp
 sub rsp, 16
 mov qword ptr [rbp - 16], 5
-mov qword ptr x[rip], 5
 mov r15, qword ptr x[rip]
 mov r14, qword ptr [rbp - 16]
 mov r13, r15
