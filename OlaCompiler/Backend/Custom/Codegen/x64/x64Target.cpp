@@ -116,7 +116,7 @@ namespace ola
 					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
-					instructions.insert(instruction_iter, MI2);
+					instructions.insert(++instruction_iter, MI2);
 				}
 			}
 			break;
@@ -145,6 +145,21 @@ namespace ola
 					MI.SetOp<1>(src); 
 					MI.SetIgnoreDef();
 					MI.SetOpcode(InstLoadGlobalAddress);
+
+					MachineInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+
+					++instruction_iter;
+					instructions.insert(instruction_iter, MI2);
+				}
+				else if (src.IsRelocable())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
+					MI.SetOp<0>(tmp);
+					MI.SetOp<1>(src);
+					MI.SetIgnoreDef();
+					MI.SetOpcode(InstLoad);
 
 					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);

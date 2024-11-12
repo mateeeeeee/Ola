@@ -34,7 +34,8 @@ label3:
 push rbp
 mov rbp, rsp
 sub rsp, 8
-mov qword ptr [rbp - 8], qword ptr g[rip]
+mov r15, qword ptr g[rip]
+mov qword ptr [rbp - 8], r15
 jmp label5
 label4:
 jmp label5
