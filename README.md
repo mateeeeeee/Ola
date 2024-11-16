@@ -46,7 +46,7 @@ Ola is a toy programming language designed with a focus on modularity and learni
 		- Custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR).
 		- IR optimization passes
 		- Early support for x86-64 code generation.
-		- Roadmap for missing features: proper stack layout and class support.
+		- Missing features: proper stack layout and class support.
 
 ## Structure
 Ola consists of three main parts:
@@ -60,22 +60,23 @@ Ola consists of three main parts:
      - `olamemory.h`
 
 2. **Ola Compiler**:
-   - The core of the Ola project, divided into various stages for flexibility and modularity:
-     - **Lexer**: Tokenizes the source code.
-     - **Import Processor**: Processes `import` statements from the tokenized input.
-     - **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
-     - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
-     - **Backend**: After the frontend processing completes, the compilation process diverges into two backend paths:
-       - **LLVM Path**:
-         - **LLVM Visitor**: Transforms the AST into LLVM IR.
-         - **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
-       - **Custom Backend Path**:
-         - **IRVisitor**: Generates Ola's custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR) for the custom backend.
-         - **IROptimizer**: Applies custom optimizations at the IR level.
-
+- The core of the Ola project, divided into various stages for flexibility and modularity:
+- **Lexer**: Tokenizes the source code.
+- **Import Processor**: Processes `import` statements from the tokenized input.
+- **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
+- **Sema**: Performs semantic analysis on the AST to ensure code correctness.
+- **Backend**: After the frontend processing completes, the compilation process diverges into two backend paths:
+	- **LLVM Path**:
+		- **LLVM Visitor**: Transforms the AST into LLVM IR.
+		- **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
+		- Compilation to assembly is done using `clang -S` command 
+	- **Custom Backend Path**:
+		- **IRVisitor**: Transforms the AST into Ola's custom IR.
+		- **IROptimizer**: Applies custom optimizations at the IR level.
+		- **MachineModule**: responsible for lowering IR to MIR and finally to assembly.
+     
 3. **Ola Tests**:
-   - A set of unit tests built with GoogleTest, covering Ola language features and verifying the correctness of compiler passes and backend components.
-
+   - A set of unit tests built with GoogleTest, covering Ola language features. They rely on `Assert` funtion from the `std.assert` import. Currently, two folder are maintained: LLVM tests and Custom backend tests with a goal of unifying them once the custom backend reaches the same capabilities as LLVM backend.
 
 ## Usage
 ### Command line options
