@@ -1502,6 +1502,12 @@ namespace ola
 		var_decl->SetVisibility(visibility);
 		OLA_ASSERT(var_decl->IsGlobal() || !var_decl->IsExtern());
 
+		if (var_decl->IsGlobal() && isa<RefType>(type))
+		{
+			diagnostics.Report(loc, global_ref_not_allowed);
+			return nullptr;
+		}
+
 		if (var_decl->IsGlobal() && init_expr && !init_expr->IsConstexpr())
 		{
 			diagnostics.Report(loc, global_variable_initializer_not_constexpr, name);
