@@ -65,7 +65,7 @@ namespace ola
 			static_assert(std::is_base_of_v<IteratorFacade, DerivedT>, "Must pass the derived type to this template!");
 			return static_cast<DerivedT*>(this)->operator+=(1);
 		}
-		DerivedT operator++(int) 
+		DerivedT operator++(Sint)
 		{
 			DerivedT tmp = *static_cast<DerivedT*>(this);
 			++*static_cast<DerivedT*>(this);
@@ -76,7 +76,7 @@ namespace ola
 			static_assert(IsBidirectional, "The decrement operator is only defined for bidirectional iterators.");
 			return static_cast<DerivedT*>(this)->operator-=(1);
 		}
-		DerivedT operator--(int) 
+		DerivedT operator--(Sint)
 		{
 			static_assert(IsBidirectional, "The decrement operator is only defined for bidirectional iterators.");
 			DerivedT tmp = *static_cast<DerivedT*>(this);

@@ -847,6 +847,6 @@ namespace ola
 		}
 
 	private:
-		std::unordered_map<void const*, Use> incomings;
+		std::unordered_map<BasicBlock*, Use> incomings;
 	};
 }
