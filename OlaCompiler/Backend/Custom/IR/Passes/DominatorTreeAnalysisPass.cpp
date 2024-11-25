@@ -16,14 +16,14 @@ namespace ola
 
 	void DominatorTreeAnalysisPass::CalculateImmediateDominators(Function& F, CFGAnalysisPass::Result const& cfgAnalysis)
 	{
-		std::unordered_map<BasicBlock const*, Sint32> semiDominatorNumbers;
+		std::unordered_map<BasicBlock const*, Int32> semiDominatorNumbers;
 		std::unordered_map<BasicBlock const*, BasicBlock const*> parent, ancestor, best;
 		std::vector<BasicBlock const*> dfsOrder;  
 
 		BasicBlock* entryBlock = &F.GetEntryBlock();
 		DFS(entryBlock, semiDominatorNumbers, parent, dfsOrder, cfgAnalysis);
 
-		for (Sint64 i = dfsOrder.size() - 1; i >= 1; --i)
+		for (Int64 i = dfsOrder.size() - 1; i >= 1; --i)
 		{
 			BasicBlock const* w = dfsOrder[i];
 			std::vector<BasicBlock const*> predecessors = cfgAnalysis.at(w).predecessors;
@@ -69,26 +69,26 @@ namespace ola
 	}
 
 	BasicBlock const* DominatorTreeAnalysisPass::Evaluate(BasicBlock const* block,
-		std::unordered_map<BasicBlock const*, Sint32>& semiDominatorNumbers,
+		std::unordered_map<BasicBlock const*, Int32>& semiDominatorNumbers,
 		std::unordered_map<BasicBlock const*, BasicBlock const*>& ancestor,
 		std::unordered_map<BasicBlock const*, BasicBlock const*>& best)
 	{
-		if (!ancestor.count(block)) return block;  
+		if (!ancestor.contains(block)) return block;
 		if (ancestor[block] != ancestor[ancestor[block]]) 
 		{
 			BasicBlock const* tmp = Evaluate(ancestor[block], semiDominatorNumbers, ancestor, best);
 			best[block] = tmp;
 			ancestor[block] = ancestor[ancestor[block]];
 		}
-		return best.count(block) ? best[block] : block;
+		return best.contains(block) ? best[block] : block;
 	}
 
 	void DominatorTreeAnalysisPass::DFS(BasicBlock const* startBlock,
-		std::unordered_map<BasicBlock const*, Sint32>& semiDominatorNumbers,
+		std::unordered_map<BasicBlock const*, Int32>& semiDominatorNumbers,
 		std::unordered_map<BasicBlock const*, BasicBlock const*>& parent,
 		std::vector<BasicBlock const*>& dfsOrder, CFGAnalysisPass::Result const& cfgAnalysis)
 	{
-		Sint32 currentDFSNumber = 0;  
+		Int32 currentDFSNumber = 0;  
 		std::function<void(BasicBlock const*)> visit = [&](BasicBlock const* block) 
 			{
 				if (semiDominatorNumbers.count(block)) return;

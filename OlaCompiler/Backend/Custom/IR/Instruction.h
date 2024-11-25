@@ -595,7 +595,7 @@ namespace ola
 	public:
 		SwitchInst(Value* val, BasicBlock* default_block);
 
-		void AddCase(Sint64 key, BasicBlock* label)
+		void AddCase(Int64 key, BasicBlock* label)
 		{
 			cases.emplace_back(key, label);
 		}
@@ -618,7 +618,7 @@ namespace ola
 			if (case_idx >= cases.size()) return nullptr;
 			return cases[case_idx].second;
 		}
-		Sint64 GetCaseValue(Uint32 case_idx) const
+		Int64 GetCaseValue(Uint32 case_idx) const
 		{
 			if (case_idx >= cases.size()) return INT64_MAX;
 			return cases[case_idx].first;
@@ -643,7 +643,7 @@ namespace ola
 
 	private:
 		BasicBlock* default_block;
-		std::vector<std::pair<Sint64, BasicBlock*>> cases;
+		std::vector<std::pair<Int64, BasicBlock*>> cases;
 	};
 
 	class CallInst final : public Instruction

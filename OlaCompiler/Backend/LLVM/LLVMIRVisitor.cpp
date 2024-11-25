@@ -667,7 +667,7 @@ namespace ola
 		}
 		else
 		{
-			Sint64 case_value = case_stmt.GetValue();
+			Int64 case_value = case_stmt.GetValue();
 			llvm::ConstantInt* llvm_case_value = builder.getInt64(case_value);
 
 			llvm::Function* function = builder.GetInsertBlock()->getParent();

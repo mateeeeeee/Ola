@@ -10,7 +10,7 @@ namespace ola
 		Uint32 line = 1;
 		Uint32 column = 1;
 
-		SourceLocation operator+(Sint32 i)
+		SourceLocation operator+(Int32 i)
 		{
 			return SourceLocation
 			{
@@ -24,7 +24,7 @@ namespace ola
 		{
 			++column;
 		}
-		void NewChars(Sint32 i)
+		void NewChars(Int32 i)
 		{
 			column += i;
 		}

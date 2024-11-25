@@ -133,7 +133,7 @@ namespace ola
 					if (!vreg2reg_map.contains(vreg_id))
 					{
 						MachineOperand& MO = MF.AllocateStack(MachineType::Int64);
-						Sint32 stack_offset = MO.GetStackOffset();
+						Int32 stack_offset = MO.GetStackOffset();
 						Uint32 frame_reg = frame_register;
 
 						//todo

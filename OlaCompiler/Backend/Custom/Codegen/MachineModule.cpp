@@ -49,7 +49,7 @@ namespace ola
 						{
 							if (ConstantInt* CI = dyn_cast<ConstantInt>(V))
 							{
-								Sint64 value = CI->GetValue();
+								Int64 value = CI->GetValue();
 								switch (CI->GetBitWidth())
 								{
 								case 8:
@@ -500,7 +500,7 @@ namespace ola
 
 		for (auto& case_pair : SI->Cases())
 		{
-			Sint64 case_value = case_pair.first;
+			Int64 case_value = case_pair.first;
 			BasicBlock* case_block = case_pair.second;
 
 			if (!cond_op.IsImmediate())
@@ -517,7 +517,7 @@ namespace ola
 			}
 			else
 			{
-				Sint64 imm = cond_op.GetImmediate();
+				Int64 imm = cond_op.GetImmediate();
 				if (imm != 0)
 				{
 					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));

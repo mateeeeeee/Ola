@@ -353,18 +353,18 @@ namespace ola
 		EnumMemberDecl(std::string_view name, SourceLocation const& loc) : Decl(DeclKind::EnumMember, name, loc)
 		{}
 
-		void SetValue(Sint64 _value)
+		void SetValue(Int64 _value)
 		{
 			value = _value;
 		}
-		Sint64 GetValue() const { return value; }
+		Int64 GetValue() const { return value; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static Bool ClassOf(Decl const* decl) { return decl->GetDeclKind() == DeclKind::EnumMember; }
 	private:
-		Sint64 value = 0;
+		Int64 value = 0;
 	};
 
 	class AliasDecl final : public TagDecl

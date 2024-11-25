@@ -264,7 +264,7 @@ namespace ola
 		return ActOnEnumMemberDecl(name, loc, enum_value_expr->EvaluateConstexpr());
 	}
 
-	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, Sint64 enum_value)
+	UniqueEnumMemberDeclPtr Sema::ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, Int64 enum_value)
 	{
 		if (name.empty())
 		{
@@ -536,7 +536,7 @@ namespace ola
 	UniqueSwitchStmtPtr Sema::ActOnSwitchStmt(SourceLocation const& loc, UniqueExprPtr&& cond_expr, UniqueStmtPtr body_stmt, std::vector<CaseStmt*>&& case_stmts)
 	{
 		Bool default_found = false;
-		std::unordered_map<Sint64, Bool> case_value_found;
+		std::unordered_map<Int64, Bool> case_value_found;
 		for (CaseStmt* case_stmt : case_stmts)
 		{
 			if (case_stmt->IsDefault())
@@ -550,7 +550,7 @@ namespace ola
 			}
 			else
 			{
-				Sint64 case_value = case_stmt->GetValue();
+				Int64 case_value = case_stmt->GetValue();
 				if (case_value_found[case_value])
 				{
 					diagnostics.Report(loc, duplicate_case_value, case_value);
@@ -1017,7 +1017,7 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueIntLiteralPtr Sema::ActOnIntLiteral(Sint64 value, SourceLocation const& loc)
+	UniqueIntLiteralPtr Sema::ActOnIntLiteral(Int64 value, SourceLocation const& loc)
 	{
 		UniqueIntLiteralPtr int_literal = MakeUnique<IntLiteral>(value, loc);
 		int_literal->SetType(IntType::Get(ctx));
@@ -1222,7 +1222,7 @@ namespace ola
 		ArrayType const* array_type = cast<ArrayType>(array_expr->GetType());
 		if (index_expr->IsConstexpr())
 		{
-			Sint64 bracket_value = index_expr->EvaluateConstexpr();
+			Int64 bracket_value = index_expr->EvaluateConstexpr();
 			if (array_type->GetArraySize() > 0 && (bracket_value < 0 || bracket_value >= array_type->GetArraySize()))
 			{
 				diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);

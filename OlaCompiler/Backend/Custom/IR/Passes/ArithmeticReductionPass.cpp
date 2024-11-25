@@ -6,13 +6,13 @@
 
 namespace ola
 {
-	inline Bool IsPowerOfTwo(Sint64 n)
+	inline Bool IsPowerOfTwo(Int64 n)
 	{
 		return (n > 0) && ((n & (n - 1)) == 0);
 	}
-	inline Sint64 FindPowerOfTwo(Sint64 value)
+	inline Int64 FindPowerOfTwo(Int64 value)
 	{
-		Sint64 num = 0;
+		Int64 num = 0;
 		while (value > 1)
 		{
 			value /= 2;
@@ -31,14 +31,14 @@ namespace ola
 		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
 		if (left_op && IsPowerOfTwo(left_op->GetValue()))
 		{
-			Sint64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
+			Int64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->RHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 		else if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
-			Sint64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
+			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
@@ -53,7 +53,7 @@ namespace ola
 		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
 		if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
-			Sint64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
+			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);

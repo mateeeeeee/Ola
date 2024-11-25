@@ -11,7 +11,7 @@ namespace ola
 		Uint64 begin, end;
 		Uint32 vreg;
 		Uint32 reg;
-		Sint32  stack_offset;
+		Int32  stack_offset;
 		Bool spilled;
 		Bool is_float;
 	};

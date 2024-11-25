@@ -12,7 +12,7 @@ namespace ola
 		CompileRequest() = default;
 		~CompileRequest() = default;
 
-		Sint Parse(Sint argc, Char** argv);
+		Int Parse(Int argc, Char** argv);
 
 		CompilerFlags GetCompilerFlags() const { return compiler_flags; }
 		OptimizationLevel GetOptimizationLevel() const { return opt_level; }

@@ -12,7 +12,7 @@ namespace ola
 	{
 		return isa<EnumMemberDecl>(decl);
 	}
-	Sint64 DeclRefExpr::EvaluateConstexpr() const
+	Int64 DeclRefExpr::EvaluateConstexpr() const
 	{
 		EnumMemberDecl const* enum_member_decl = static_cast<EnumMemberDecl const*>(decl);
 		return enum_member_decl->GetValue();

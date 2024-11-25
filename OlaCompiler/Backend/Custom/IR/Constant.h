@@ -37,17 +37,17 @@ namespace ola
 	class ConstantInt final : public Constant
 	{
 	public:
-		ConstantInt(IRType* type, Sint64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
+		ConstantInt(IRType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
 		{
 			OLA_ASSERT(isa<IRIntType>(type));
 		}
-		ConstantInt(IRIntType* type, Sint64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth() * 8) {}
+		ConstantInt(IRIntType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth() * 8) {}
 
 		IRIntType* GetIntegerType() const
 		{
 			return cast<IRIntType>(GetType());
 		}
-		Sint64 GetValue() const { return value; }
+		Int64 GetValue() const { return value; }
 		Uint32 GetBitWidth() const { return bitwidth; }
 
 		static Bool ClassOf(Value const* V)
@@ -59,7 +59,7 @@ namespace ola
 			return C->GetConstantID() == ConstantID::Integer;
 		}
 	private:
-		Sint64 value;
+		Int64 value;
 		Uint32 bitwidth;
 	};
 

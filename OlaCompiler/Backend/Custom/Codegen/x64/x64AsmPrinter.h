@@ -39,8 +39,8 @@ namespace ola
 			}
 		}
 
-		std::string GetFPConstantPoolEntry(Sint64 value);
-		std::string GetIntConstantPoolEntry(Sint64 value);
+		std::string GetFPConstantPoolEntry(Int64 value);
+		std::string GetIntConstantPoolEntry(Int64 value);
 
 		template<typename... Args>
 		void EmitPreamble(Char const* fmt, Args&&... args)

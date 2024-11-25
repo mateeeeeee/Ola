@@ -36,7 +36,7 @@ namespace ola
 			stack_objects.push_back(stack_object);
 			return stack_objects.back();
 		}
-		Sint32 GetStackAllocationSize() const
+		Int32 GetStackAllocationSize() const
 		{
 			return stack_offset;
 		}
@@ -50,7 +50,7 @@ namespace ola
 		Bool is_declaration;
 		std::list<std::unique_ptr<MachineBasicBlock>> blocks;
 		std::vector<MachineOperand> args;
-		Sint32 stack_offset = 0;
+		Int32 stack_offset = 0;
 		std::vector<MachineOperand> stack_objects;
 	};
 }

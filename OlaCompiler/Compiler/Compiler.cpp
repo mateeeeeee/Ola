@@ -87,7 +87,7 @@ namespace ola
 		}
 	}
 
-	Sint32 Compile(CompileRequest const& compile_request)
+	Int32 Compile(CompileRequest const& compile_request)
 	{
 		InitLogger();
 		
@@ -138,7 +138,7 @@ namespace ola
 		system(link_cmd.c_str());
 		
 		std::string const& exe_cmd = output_file;
-		Sint64 res = system(exe_cmd.c_str());
+		Int64 res = system(exe_cmd.c_str());
 
 		fs::current_path(cur_path);
 		return res;

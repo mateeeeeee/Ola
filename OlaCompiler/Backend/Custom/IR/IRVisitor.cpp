@@ -588,7 +588,7 @@ namespace ola
 		}
 		else
 		{
-			Sint64 case_value = case_stmt.GetValue();
+			Int64 case_value = case_stmt.GetValue();
 			Function* function = builder->GetCurrentFunction();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
 			BasicBlock* case_block = builder->AddBlock(function, exit_block);

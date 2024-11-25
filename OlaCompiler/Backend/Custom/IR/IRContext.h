@@ -40,9 +40,9 @@ namespace ola
 		IRStructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
 
 		ConstantString* GetString(std::string_view str);
-		ConstantInt* GetInt64(Sint64 value);
-		ConstantInt* GetInt8(Sint8 value);
-		ConstantInt* GetInt(IRType* type, Sint64 value);
+		ConstantInt* GetInt64(Int64 value);
+		ConstantInt* GetInt8(Int8 value);
+		ConstantInt* GetInt(IRType* type, Int64 value);
 		ConstantInt* GetTrueValue()  const { return true_value; }
 		ConstantInt* GetFalseValue() const { return false_value; }
 		ConstantFloat* GetZeroFloat() const { return zero_float; }
@@ -67,8 +67,8 @@ namespace ola
 		ConstantInt* false_value;
 		ConstantFloat* zero_float;
 		std::unordered_map<std::string_view, ConstantString*> constant_strings;
-		std::unordered_map<Sint64, ConstantInt*> constant_ints64;
-		std::unordered_map<Sint8, ConstantInt*> constant_ints8;
+		std::unordered_map<Int64, ConstantInt*> constant_ints64;
+		std::unordered_map<Int8, ConstantInt*> constant_ints8;
 		std::unordered_map<Float64, ConstantFloat*> constant_floats;
 		std::unordered_map<IRArrayType*, ConstantArray*> constant_null_arrays;
 	};

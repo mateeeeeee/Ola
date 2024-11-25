@@ -69,7 +69,7 @@ namespace ola
 
 	struct MachineStackObject
 	{
-		Sint32 offset;
+		Int32 offset;
 
 		Bool operator==(MachineStackObject const& rhs) const
 		{
@@ -118,15 +118,15 @@ namespace ola
 		{
 			return std::holds_alternative<MachineStackObject>(storage);
 		}
-		Sint32 GetStackOffset() const
+		Int32 GetStackOffset() const
 		{
 			return std::get<MachineStackObject>(storage).offset;
 		}
 
-		Bool IsImmediate() const { return std::holds_alternative<Sint64>(storage); }
-		Sint64 GetImmediate() const
+		Bool IsImmediate() const { return std::holds_alternative<Int64>(storage); }
+		Int64 GetImmediate() const
 		{
-			return std::get<Sint64>(storage);
+			return std::get<Int64>(storage);
 		}
 
 		Bool IsRelocable() const { return std::holds_alternative<MachineRelocable*>(storage); }
@@ -161,9 +161,9 @@ namespace ola
 			if constexpr (std::is_floating_point_v<T>)
 			{
 				static_assert(std::is_same_v<T, Float64>);
-				return MachineOperand(std::bit_cast<Sint64>(val), type);
+				return MachineOperand(std::bit_cast<Int64>(val), type);
 			}
-			else return MachineOperand(static_cast<Sint64>(val), type);
+			else return MachineOperand(static_cast<Int64>(val), type);
 		}
 		static MachineOperand ISAReg(Uint32 reg, MachineType type)
 		{
@@ -174,7 +174,7 @@ namespace ola
 		{
 			return MachineOperand(MachineRegister{ reg + VIRTUAL_REG_BEGIN }, type);
 		}
-		static MachineOperand StackObject(Sint32 offset, MachineType type) 
+		static MachineOperand StackObject(Int32 offset, MachineType type) 
 		{
 			return MachineOperand(MachineStackObject{ offset }, type);
 		}
@@ -190,7 +190,7 @@ namespace ola
 		Uint64 GetHash() const;
 
 	private:
-		std::variant<std::monostate, MachineRelocable*, Sint64, MachineRegister, MachineStackObject> storage;
+		std::variant<std::monostate, MachineRelocable*, Int64, MachineRegister, MachineStackObject> storage;
 		MachineType type = MachineType::Unknown;
 	};
 

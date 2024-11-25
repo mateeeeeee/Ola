@@ -125,7 +125,7 @@ namespace ola
 			}
 			else return nullptr;
 
-			Sint64 index_value = idx->GetValue();
+			Int64 index_value = idx->GetValue();
 			offset += index_value * current_type->GetSize();
 		}
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);

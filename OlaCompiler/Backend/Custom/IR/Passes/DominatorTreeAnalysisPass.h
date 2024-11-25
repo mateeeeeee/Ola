@@ -81,9 +81,9 @@ namespace ola
 		void CalculateImmediateDominators(Function& F, CFGAnalysisPass::Result const& cfgAnalysis);
 		void ComputeDominanceFrontiers(Function& F, CFGAnalysisPass::Result const& cfgAnalysis);
 
-		BasicBlock const* Evaluate(BasicBlock const* block, std::unordered_map<BasicBlock const*, Sint32>& semiDominatorNumbers,
+		BasicBlock const* Evaluate(BasicBlock const* block, std::unordered_map<BasicBlock const*, Int32>& semiDominatorNumbers,
 			std::unordered_map<BasicBlock const*, BasicBlock const*>& ancestor, std::unordered_map<BasicBlock const*, BasicBlock const*>& best);
-		void DFS(BasicBlock const* startBlock, std::unordered_map<BasicBlock const*, Sint32>& semiDominatorNumbers, 
+		void DFS(BasicBlock const* startBlock, std::unordered_map<BasicBlock const*, Int32>& semiDominatorNumbers, 
 			std::unordered_map<BasicBlock const*, BasicBlock const*>& parent, std::vector<BasicBlock const*>& dfsOrder, CFGAnalysisPass::Result const& cfgAnalysis);
 	};
 	OLA_REGISTER_ANALYSIS_PASS(DominatorTreeAnalysisPass, "Dominator Tree Analysis");

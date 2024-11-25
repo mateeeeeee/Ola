@@ -125,14 +125,14 @@ namespace ola
 		return constant_strings[str];
 	}
 
-	ConstantInt* IRContext::GetInt64(Sint64 value)
+	ConstantInt* IRContext::GetInt64(Int64 value)
 	{
 		if (constant_ints64.contains(value)) return constant_ints64[value];
 		constant_ints64[value] = new ConstantInt(int8_type, value);
 		return constant_ints64[value];
 	}
 
-	ConstantInt* IRContext::GetInt8(Sint8 value)
+	ConstantInt* IRContext::GetInt8(Int8 value)
 	{
 		if (constant_ints8.contains(value)) return constant_ints8[value];
 		constant_ints8[value] = new ConstantInt(int1_type, value);
@@ -140,7 +140,7 @@ namespace ola
 	}
 
 
-	ConstantInt* IRContext::GetInt(IRType* type, Sint64 value)
+	ConstantInt* IRContext::GetInt(IRType* type, Int64 value)
 	{
 		OLA_ASSERT(type->IsInteger());
 		IRIntType* int_type = cast<IRIntType>(type);

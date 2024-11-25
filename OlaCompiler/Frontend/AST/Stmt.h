@@ -285,17 +285,17 @@ namespace ola
 	{
 	public:
 		CaseStmt() : Stmt(StmtKind::Case), is_default(true), value(0) {}
-		explicit CaseStmt(Sint64 value) : Stmt(StmtKind::Case), is_default(false), value(value) {}
+		explicit CaseStmt(Int64 value) : Stmt(StmtKind::Case), is_default(false), value(value) {}
 
 		Bool IsDefault() const { return is_default; }
-		Sint64 GetValue() const { return value; }
+		Int64 GetValue() const { return value; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
 
 		static Bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Case; }
 	private:
-		Sint64 value;
+		Int64 value;
 		Bool is_default;
 	};
 

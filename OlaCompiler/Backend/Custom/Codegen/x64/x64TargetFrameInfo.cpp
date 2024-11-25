@@ -17,7 +17,7 @@ namespace ola
 		MachineGlobal const* global = ctx.GetGlobal(callee);
 
 		static constexpr Uint32 PASS_BY_REG_OFFSET = 1 << 16;
-		std::vector<Sint32> offsets;  
+		std::vector<Int32> offsets;  
 		Uint32 const arg_count = CI->ArgSize();
 		offsets.reserve(arg_count);
 		Uint32 gprs = 0;
@@ -48,9 +48,9 @@ namespace ola
 		MachineGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
 		MachineFunction& machine_callee = *static_cast<MachineFunction*>(global->GetRelocable());
 		std::vector<MachineOperand> const& machine_arguments = machine_callee.Args();
-		for (Sint32 idx = arg_count - 1; idx >= 0; --idx)
+		for (Int32 idx = arg_count - 1; idx >= 0; --idx)
 		{
-			Sint32 offset = offsets[idx];
+			Int32 offset = offsets[idx];
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			Uint32 size = arg->GetType()->GetSize();
@@ -109,7 +109,7 @@ namespace ola
 		set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
 		ctx.EmitInst(set_rbp);
 
-		Sint32 stack_allocation = MF.GetStackAllocationSize();
+		Int32 stack_allocation = MF.GetStackAllocationSize();
 		if (stack_allocation > 0)
 		{
 			MachineInstruction allocate_stack(InstSub);

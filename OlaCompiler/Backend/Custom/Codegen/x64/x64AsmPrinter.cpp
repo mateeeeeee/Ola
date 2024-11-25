@@ -49,7 +49,7 @@ namespace ola
 		}
 		else if (MO.IsStackObject())
 		{
-			Sint32 stack_offset = MO.GetStackOffset();
+			Int32 stack_offset = MO.GetStackOffset();
 			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), stack_offset);
 			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), -stack_offset);
 			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr));
@@ -206,7 +206,7 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsImmediate())
 							{
-								Sint64 imm = op2.GetImmediate();
+								Int64 imm = op2.GetImmediate();
 								std::string entry = GetFPConstantPoolEntry(imm);
 								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
 							}
@@ -222,7 +222,7 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsImmediate())
 							{
-								Sint64 imm = op2.GetImmediate();
+								Int64 imm = op2.GetImmediate();
 								std::string entry = GetIntConstantPoolEntry(imm);
 								EmitText("{} {}, {} [rip + {}]", opcode_string, GetOperandString(op1), GetOperandPrefix(op2), entry);
 							}
@@ -293,9 +293,9 @@ namespace ola
 	}
 
 
-	std::string x64AsmPrinter::GetFPConstantPoolEntry(Sint64 value)
+	std::string x64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
 	{
-		static std::unordered_map<Sint64, std::string> fp_constant_pool;
+		static std::unordered_map<Int64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
 		{
 			static Uint32 entry_index = 0;
@@ -307,9 +307,9 @@ namespace ola
 		return fp_constant_pool[value];
 	}
 
-	std::string x64AsmPrinter::GetIntConstantPoolEntry(Sint64 value)
+	std::string x64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
 	{
-		static std::unordered_map<Sint64, std::string> int_constant_pool;
+		static std::unordered_map<Int64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))
 		{
 			static Uint32 entry_index = 0;
