@@ -528,7 +528,6 @@ namespace ola
 		{
 			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
-	private:
 	};
 
 	class BranchInst final : public Instruction
@@ -592,6 +591,7 @@ namespace ola
 
 	class SwitchInst final : public Instruction 
 	{
+		using Case = std::pair<Int64, BasicBlock*>;
 	public:
 		SwitchInst(Value* val, BasicBlock* default_block);
 
@@ -599,14 +599,18 @@ namespace ola
 		{
 			cases.emplace_back(key, label);
 		}
-		auto& Cases() 
-		{
-			return cases;
-		}
-		auto const& Cases() const
-		{
-			return cases;
-		}
+
+		using CaseIterator = std::vector<Case>::iterator;
+		using ConstCaseIterator = std::vector<Case>::const_iterator;
+		using CaseRange = IteratorRange<CaseIterator>;
+		using ConstCaseRange = IteratorRange<ConstCaseIterator>;
+
+		CaseIterator      CaseBegin()		{ return cases.begin(); }
+		ConstCaseIterator CaseBegin() const { return cases.begin(); }
+		CaseIterator      CaseEnd()			{ return cases.end(); }
+		ConstCaseIterator CaseEnd()   const	{ return cases.end(); }
+		CaseRange		  Cases()			{ return CaseRange(CaseBegin(), CaseEnd()); }
+		ConstCaseRange	  Cases()	  const { return ConstCaseRange(CaseBegin(), CaseEnd()); }
 
 		BasicBlock* GetDefaultCase() const
 		{
@@ -643,7 +647,7 @@ namespace ola
 
 	private:
 		BasicBlock* default_block;
-		std::vector<std::pair<Int64, BasicBlock*>> cases;
+		std::vector<Case> cases;
 	};
 
 	class CallInst final : public Instruction
@@ -811,42 +815,91 @@ namespace ola
 		IRType* result_element_type;
 	};
 
-
-	class PhiInst final : public Instruction 
+	class PhiNode final : public Instruction 
 	{
 	public:
-		explicit PhiInst(IRType* type) : Instruction( Opcode::Phi, type, {} ) {}
+		explicit PhiNode(IRType* type) : Instruction( Opcode::Phi, type, {} ) {}
 
-		void AddIncoming(BasicBlock* block, Value* value);
-
-		auto& Incomings()  
+		void AddIncoming(Value* V, BasicBlock* BB) 
 		{
-			return incomings;
-		}
-		auto const& Incomings() const
-		{
-			return incomings;
+			AddIncomingValue(V);
+			AddIncomingBlock(BB);
 		}
 
-		void Clear()
-		{
-			incomings.clear();
-			ClearOperands();
-		}
-		void RemoveSource(BasicBlock* block)
-		{
+		using ConstBlockIterator = std::vector<BasicBlock*>::const_iterator;
+		using ConstBlockRange = IteratorRange<ConstBlockIterator>;
 
-		}
-		void ReplaceSource(BasicBlock* old_block, BasicBlock* new_block)
-		{
+		ConstBlockIterator BlockBegin() const { return incoming_blocks.begin(); }
+		ConstBlockIterator BlockEnd() const { return incoming_blocks.end(); }
+		IteratorRange<ConstBlockIterator> Blocks() const { return MakeRange(BlockBegin(), BlockEnd()); }
 
-		}
-		void KeepOneIncoming(BasicBlock* block)
+		OpRange IncomingValues() { return Operands(); }
+		ConstOpRange IncomingValues() const { return Operands(); }
+		Uint32 GetNumIncomingValues() const { return GetNumOperands(); }
+		Value* GetIncomingValue(Uint32 i) const { return GetOperand(i);}
+		void SetIncomingValue(Uint32 i, Value* V) 
 		{
+			OLA_ASSERT_MSG(V, "PHI node got a null value!");
+			OLA_ASSERT_MSG(GetType() == V->GetType(), "All operands to PHI node must be the same type as the PHI node!");
+			SetOperand(i, V);
+		}
 
+		BasicBlock* GetIncomingBlock(Uint32 i) const { return incoming_blocks[i]; }
+		void SetIncomingBlock(Uint32 i, BasicBlock* BB) 
+		{
+			incoming_blocks[i] = BB;
+		}
+		void ReplaceIncomingBlockWith(BasicBlock const* Old, BasicBlock* New)
+		{
+			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			{
+				if (GetIncomingBlock(Op) == Old) SetIncomingBlock(Op, New);
+			}
+		}
+		Int GetBasicBlockIndex(BasicBlock const* BB) const
+		{
+			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			{
+				if (incoming_blocks[Op] == BB) return Op;
+			}
+			return -1;
+		}
+		Value* GetIncomingValueForBlock(BasicBlock const* BB) const
+		{
+			Int Idx = GetBasicBlockIndex(BB);
+			assert(Idx >= 0 && "Invalid basic block argument!");
+			return GetIncomingValue(Idx);
+		}
+		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V) 
+		{
+			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			{
+				if (GetIncomingBlock(Op) == BB) SetIncomingValue(Op, V);
+			}
+		}
+
+		static Bool ClassOf(Instruction const* I)
+		{
+			return I->GetOpcode() == Opcode::Phi;
+		}
+		static Bool ClassOf(Value const* V)
+		{
+			return isa<Instruction>(V) && ClassOf(cast<Instruction>(V));
 		}
 
 	private:
-		std::unordered_map<BasicBlock*, Use> incomings;
+		std::vector<BasicBlock*> incoming_blocks;
+
+	private:
+		void AddIncomingValue(Value* V)
+		{
+			OLA_ASSERT(V->GetType() == GetType());
+			AddOperand(V);
+		}
+		void AddIncomingBlock(BasicBlock* BB)
+		{
+			incoming_blocks.push_back(BB);
+			OLA_ASSERT(GetNumOperands() == incoming_blocks.size());
+		}
 	};
 }

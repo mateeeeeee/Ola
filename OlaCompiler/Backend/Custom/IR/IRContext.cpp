@@ -25,6 +25,7 @@ namespace ola
 		for (IRPtrType* ref_type : pointer_types)			delete ref_type;
 		for (IRFuncType* function_type : function_types)	delete function_type;
 
+		for (auto& [_, v] : undef_values) delete v;
 		for (auto& [_, v] : constant_strings) delete v;
 		for (auto& [_, v] : constant_ints64) delete v;
 		for (auto& [_, v] : constant_ints8) delete v;
@@ -187,6 +188,15 @@ namespace ola
 			return GetNullArray(cast<IRArrayType>(type));
 		}
 		return nullptr;
+	}
+
+	UndefValue* IRContext::GetUndefValue(IRType* type)
+	{
+		if (!undef_values.contains(type))
+		{
+			undef_values[type] = new UndefValue(type);
+		}
+		return undef_values[type];
 	}
 
 }

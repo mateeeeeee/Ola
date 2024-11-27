@@ -235,15 +235,6 @@ namespace ola
 		for (Value* index : indices) AddOperand(index);
 	}
 
-	void PhiInst::AddIncoming(BasicBlock* block, Value* value)
-	{
-		OLA_ASSERT(GetType() == value->GetType());
-		OLA_ASSERT(!incomings.contains(block));
-		incomings.emplace(block, Use(value, nullptr));
-		AddOperand(value);
-	}
-
-
 	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
 	{
 		Uint32 id_int = (Uint32)id;
