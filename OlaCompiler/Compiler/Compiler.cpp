@@ -25,16 +25,30 @@ namespace ola
 	namespace
 	{
 #if DEBUG
-		static Char const* olalib = OLA_BINARY_PATH"Debug/olalib.lib";
+		static Char const* OlaLib = OLA_BINARY_PATH"Debug/olalib.lib";
 #else 
-		static Char const* olalib = OLA_BINARY_PATH"Release/olalib.lib";
+		static Char const* OlaLib = OLA_BINARY_PATH"Release/olalib.lib";
 #endif
 		void AddBuiltins(SourceBuffer& src)
 		{
 			src.Prepend("");
 		}
 
-		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, Bool use_llvm, Bool ast_dump)
+		void GenerateGraphVizImages(std::string const& folder_path, Bool is_llvm)
+		{
+			for (auto const& entry : fs::directory_iterator(folder_path))
+			{
+				if (entry.path().extension() == ".dot") 
+				{
+					std::string dot_file = entry.path().string();
+					std::string output_image = dot_file.substr(0, dot_file.find_last_of('.')) + ".png";
+					std::string command = std::format("dot -Tpng {} -o {}", dot_file, output_image);
+					Int result = std::system(command.c_str());
+				}
+			}
+		}
+
+		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, Bool use_llvm, Bool ast_dump, Bool cfg_dump)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -55,6 +69,12 @@ namespace ola
 				llvm_ir_gen.Generate(ast);
 				llvm_ir_gen.Optimize(opt_level);
 				llvm_ir_gen.EmitIR(ir_file);
+				
+				if (cfg_dump)
+				{
+					std::string dot_cfg_cmd = std::format("opt -passes=dot-cfg -disable-output {}", ir_file);
+					system(dot_cfg_cmd.c_str());
+				}
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				system(compile_cmd.c_str());
@@ -65,6 +85,11 @@ namespace ola
 				ir_gen.Generate(ast);
 				ir_gen.Optimize(opt_level);
 				ir_gen.EmitIR(ir_file);
+
+				if (cfg_dump)
+				{
+					OLA_ASSERT_MSG(false, "DumpCFG not implemented yet for custom backend");
+				}
 
 				IRModule& module = ir_gen.GetModule();
 				x64Target x64_target{};
@@ -77,11 +102,13 @@ namespace ola
 	Int Compile(CompileRequest const& compile_request)
 	{
 		Bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
+		Bool const cfg_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCFG;
 		Bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
-		fs::current_path(compile_request.GetInputDirectory());
+		std::string input_directory(compile_request.GetInputDirectory());
+		fs::current_path(input_directory);
 
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
@@ -107,17 +134,21 @@ namespace ola
 			else ir_file = file_name + ".oll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, use_llvm, ast_dump);
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, use_llvm, ast_dump, cfg_dump);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
 			system(assembly_cmd.c_str());
 		}
+		if (cfg_dump)
+		{
+			GenerateGraphVizImages(input_directory, use_llvm);
+		}
 		
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
-		link_cmd += olalib;
+		link_cmd += OlaLib;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
 		system(link_cmd.c_str());

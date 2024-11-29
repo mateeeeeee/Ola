@@ -16,20 +16,42 @@
 main:                                   # @main
 .seh_proc main
 # %bb.0:                                # %entry
-	push	rax
-	.seh_stackalloc 8
+	push	rbp
+	.seh_pushreg rbp
+	sub	rsp, 32
+	.seh_stackalloc 32
+	lea	rbp, [rsp + 32]
+	.seh_setframe rbp, 32
 	.seh_endprologue
-	lea	rax, [rip + g]
-	mov	qword ptr [rsp], rax
-	mov	rax, qword ptr [rsp]
-	pop	rcx
+	mov	qword ptr [rbp - 16], 5
+	mov	rax, qword ptr [rbp - 16]
+	add	rax, 6
+	mov	qword ptr [rbp - 24], rax
+	cmp	qword ptr [rbp - 24], 10
+	jle	.LBB0_2
+# %bb.1:                                # %if.then
+	mov	rax, qword ptr [rbp - 16]
+	mov	qword ptr [rbp - 32], rax       # 8-byte Spill
+	mov	eax, 16
+	call	__chkstk
+	sub	rsp, rax
+	mov	rax, qword ptr [rbp - 32]       # 8-byte Reload
+	mov	rcx, rsp
+	mov	qword ptr [rcx], rax
+	add	rax, 1
+	mov	qword ptr [rbp - 16], rax
+	jmp	.LBB0_3
+.LBB0_2:                                # %if.else
+	mov	qword ptr [rbp - 8], 2
+	jmp	.LBB0_4
+.LBB0_3:                                # %if.end
+	mov	rax, qword ptr [rbp - 16]
+	mov	qword ptr [rbp - 8], rax
+.LBB0_4:                                # %exit
+	mov	rax, qword ptr [rbp - 8]
+	mov	rsp, rbp
+	pop	rbp
 	ret
 	.seh_endproc
                                         # -- End function
-	.data
-	.p2align	3, 0x0                          # @g
-g:
-	.quad	9                               # 0x9
-
 	.addrsig
-	.addrsig_sym g

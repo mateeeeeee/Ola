@@ -7,7 +7,8 @@ namespace ola
 	{
 		CompilerFlag_None = 0x00,
 		CompilerFlag_DumpAST = 0x01,
-		CompilerFlag_NoLLVM = 0x02
+		CompilerFlag_NoLLVM = 0x02,
+		CompilerFlag_DumpCFG = 0x04
 	};
 	template<>
 	struct EnumBitmaskOperators<CompilerFlags>

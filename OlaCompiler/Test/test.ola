@@ -1,9 +1,15 @@
-import std.assert;
-
-
-ref int h = 5;
 
 public int main()
 {
-	return h;
+	int a = 5;
+	int b = a + 6;
+	if(b > 10)
+	{
+		a++;
+	}
+	else
+	{
+		return 2;
+	}
+	return a;
 }

@@ -10,6 +10,7 @@ namespace ola
 		CLIParser cli_parser{};
 		{
 			cli_parser.AddArg(false, "--astdump");
+			cli_parser.AddArg(false, "--cfgdump");
 			cli_parser.AddArg(false, "--nollvm");
 			cli_parser.AddArg(false, "--test");
 			cli_parser.AddArg(false, "--Od");
@@ -51,8 +52,9 @@ namespace ola
 		if (output_file.empty()) output_file = input_files[0];
 		if (input_directory.empty()) input_directory = OLA_COMPILER_PATH"Test";
 
-		if (cli_result["--astdump"]) compiler_flags |= ola::CompilerFlag_DumpAST;
-		if (cli_result["--nollvm"])  compiler_flags |= ola::CompilerFlag_NoLLVM;
+		if (cli_result["--astdump"])  compiler_flags |= ola::CompilerFlag_DumpAST;
+		if (cli_result["--nollvm"])   compiler_flags |= ola::CompilerFlag_NoLLVM;
+		if (cli_result["--cfgdump"])  compiler_flags |= ola::CompilerFlag_DumpCFG;
 
 		if (cli_result["--O0"] || cli_result["--Od"]) opt_level = OptimizationLevel::O0;
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;
