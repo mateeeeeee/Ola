@@ -6,7 +6,8 @@ configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/a
 set(CORE_FILES
   Core/Types.h
   Core/Macros.h
-  Core/Logger.h
+  Core/Log.h
+  Core/Log.cpp
 )
 
 set(UTILITY_FILES
@@ -17,6 +18,8 @@ set(UTILITY_FILES
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
   Utility/Attribute.h
+  Utility/CLIParser.h
+  Utility/CLIParser.cpp
 )
 
 
@@ -106,8 +109,12 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.cpp
-  Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.h
-  Backend/Custom/IR/Passes/ArithmeticStrengthReductionPass.cpp
+  Backend/Custom/IR/Passes/ArithmeticReductionPass.h
+  Backend/Custom/IR/Passes/ArithmeticReductionPass.cpp
+  Backend/Custom/IR/Passes/GlobalAttributeInferPass.h
+  Backend/Custom/IR/Passes/GlobalAttributeInferPass.cpp
+  Backend/Custom/IR/Passes/Mem2RegPass.h
+  Backend/Custom/IR/Passes/Mem2RegPass.cpp
 
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
@@ -178,8 +185,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES  main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 target_include_directories(OlaCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(OlaCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/spdlog/include)
-target_include_directories(OlaCompiler PRIVATE ${CMAKE_SOURCE_DIR}/Libraries/CLI11/include)
 target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
 #target_compile_definitions(OlaCompiler PRIVATE ${LLVM_DEFINITIONS})
 

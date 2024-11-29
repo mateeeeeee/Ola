@@ -1,4 +1,4 @@
-<img align="left" src="OlaCompiler/olalogo.png" width="120px"/>
+<img align="left" src="docs/olalogo.png" width="120px"/>
 <br/><br/>
 
 # Ola
@@ -6,8 +6,6 @@ Ola is a toy programming language designed with a focus on modularity and learni
 
 ## Dependencies
   * [LLVM 17.0.1](https://github.com/llvm/llvm-project) for compiler backend.
-  * [spdlog](https://github.com/gabime/spdlog) for logging.
-  * [CLI11](https://github.com/CLIUtils/CLI11) for command line parsing.
 
 ## Features
   * classes
@@ -53,11 +51,7 @@ Ola consists of three main parts:
 
 1. **Ola Library**: 
    - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. Currently, it includes the following files: 
-     - `olaio.h`
-     - `olamath.h`
-     - `olaassert.h`
-     - `olastring.h`
-     - `olamemory.h`
+     `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olamemory.h`
 
 2. **Ola Compiler**:
 - The core of the Ola project, divided into various stages for flexibility and modularity:
@@ -80,10 +74,9 @@ Ola consists of three main parts:
 
 ## Usage
 ### Command line options
-  * -h,--help: Print this help message and exit
   * --astdump: Dump AST to output/log
-  * --testdebug: Print debug information during tests
-  * --test : used for running g-tests
+  * --nollvm: Use custom IR instead of LLVM IR
+  * --test : Used for running g-tests
   * --Od : No optimizations
   * --O0 : Same as --Od
   * --O1 : Optimize
@@ -91,8 +84,7 @@ Ola consists of three main parts:
   * --O3 : Optimize even more
   * -i ... : Input files
   * -o     : Output file
-  * --directory : Directory of project files
-  * --simple : input code in the form of a string
+  * --directory : Directory of input files
 
 ### Samples
 Currently to see the samples you can check the test folder: OlaTests/Tests/.

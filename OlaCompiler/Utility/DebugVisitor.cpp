@@ -1,6 +1,6 @@
 #include "DebugVisitor.h"
 #include "Frontend/AST/AST.h"
-#include "Core/Logger.h"
+#include "Core/Log.h"
 
 namespace ola
 {

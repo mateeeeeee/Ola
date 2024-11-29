@@ -1,7 +1,7 @@
 #include "LLVMIRGenContext.h"
 #include "LLVMIRVisitor.h"
 #include "LLVMOptimizer.h"
-#include "Core/Logger.h"
+#include "Core/Log.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"

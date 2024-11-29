@@ -1,6 +1,6 @@
 #include <string_view>
 #include "Diagnostics.h"
-#include "Core/Logger.h"
+#include "Core/Log.h"
 
 namespace ola
 {
@@ -31,13 +31,13 @@ namespace ola
 		switch (diag_kind)
 		{
 		case DiagKind::info:
-			OLA_INFO(msg);
+			OLA_INFO("{}", msg);
 			break;
 		case DiagKind::warning:
-			OLA_WARN(msg);
+			OLA_WARN("{}", msg);
 			break;
 		case DiagKind::error:
-			OLA_ERROR(msg);
+			OLA_ERROR("{}", msg);
 			break;
 		}
 	}

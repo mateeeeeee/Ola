@@ -17,9 +17,6 @@
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/basic_file_sink.h"
 
 namespace fs = std::filesystem;
 
@@ -32,16 +29,6 @@ namespace ola
 #else 
 		static Char const* olalib = OLA_BINARY_PATH"Release/olalib.lib";
 #endif
-		void InitLogger()
-		{
-			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-			console_sink->set_level(spdlog::level::trace);
-			console_sink->set_pattern("[%^%l%$] %v");
-
-			std::shared_ptr<spdlog::logger> ola_logger = std::make_shared<spdlog::logger>(std::string("ola logger"), spdlog::sinks_init_list{ console_sink });
-			ola_logger->set_level(spdlog::level::trace);
-			spdlog::set_default_logger(ola_logger);
-		}
 		void AddBuiltins(SourceBuffer& src)
 		{
 			src.Prepend("");
@@ -87,10 +74,8 @@ namespace ola
 		}
 	}
 
-	Int32 Compile(CompileRequest const& compile_request)
+	Int Compile(CompileRequest const& compile_request)
 	{
-		InitLogger();
-		
 		Bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
 		Bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
