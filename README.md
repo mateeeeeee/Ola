@@ -92,17 +92,17 @@ For this code sample:
 ```cpp
 public int main()
 {
-	int a = 5;
-	int b = a + 6;
-	if(b > 10)
-	{
-		a++;
-	}
-	else
-	{
-		return 2;
-	}
-	return a;
+    int a = 5;
+    int b = a + 6;
+    if(b > 10)
+    {
+        a++;
+    }
+    else
+    {
+        return 2;
+    }
+    return a;
 }
 ```
 CFG visualization using --cfgdump (without optimizations) looks like this:
