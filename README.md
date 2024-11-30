@@ -74,18 +74,18 @@ Ola consists of three main parts:
 
 ## Usage
 ### Command line options
-  * --astdump: Dump AST to output/log
-  * --cfgdump: Dump CFGs to .dot files and run graphviz
-  * --nollvm: Use custom IR instead of LLVM IR
-  * --test : Used for running g-tests
-  * --Od : No optimizations
-  * --O0 : Same as --Od
-  * --O1 : Optimize
-  * --O2 : Optimize more
-  * --O3 : Optimize even more
-  * -i ... : Input files
-  * -o     : Output file
-  * --directory : Directory of input files
+  * `--astdump`: Dump AST to output/log
+  * `--cfgdump`: Dump CFGs to .dot files and visualize them
+  * `--nollvm`: Use custom IR instead of LLVM IR
+  * `--test`: Used for running g-tests
+  * `--Od`: No optimizations
+  * `--O0`: Same as `--Od`
+  * `--O1`: Optimize
+  * `--O2`: Optimize more
+  * `--O3`: Optimize even more
+  * `-i` ... : Input files
+  * `-o`     : Output file
+  * `--directory`: Directory of input files
   
 ## CFG example
 For this code sample:
@@ -105,12 +105,12 @@ public int main()
     return a;
 }
 ```
-CFG visualization using --cfgdump (without optimizations) looks like this:
+CFG visualization using `--cfgdump` (without optimizations) looks like this:
 ### LLVM IR using dot-cfg pass
-![](docs/.main.png "LLVM backend") 
+<img src="docs/.main.png" alt="LLVM backend" style="width:75%;">
 
 ### Custom IR using custom CFG printer
-![](docs/main.png "Custom backend") 
+<img src="docs/main.png" alt="Custom backend" style="width:75%;">
 
 ## Samples
 Currently to see the samples you can check the test folder: OlaTests/Tests/.
