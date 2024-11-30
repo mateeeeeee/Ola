@@ -7,7 +7,6 @@
 	- GVN
 	- DCE
 - Add support for:
-	- References
 	- Classes
 	- Stack Layout/Call Conventions
 	

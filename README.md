@@ -75,6 +75,7 @@ Ola consists of three main parts:
 ## Usage
 ### Command line options
   * --astdump: Dump AST to output/log
+  * --cfgdump: Dump CFGs to .dot files and run graphviz
   * --nollvm: Use custom IR instead of LLVM IR
   * --test : Used for running g-tests
   * --Od : No optimizations
@@ -85,7 +86,32 @@ Ola consists of three main parts:
   * -i ... : Input files
   * -o     : Output file
   * --directory : Directory of input files
+  
+## CFG example
+For this code sample:
+```cpp
+public int main()
+{
+	int a = 5;
+	int b = a + 6;
+	if(b > 10)
+	{
+		a++;
+	}
+	else
+	{
+		return 2;
+	}
+	return a;
+}
+```
+CFG visualization using --cfgdump (without optimizations) looks like this:
+### LLVM IR using dot-cfg pass
+![](docs/.main.png "LLVM backend") 
 
-### Samples
+### Custom IR using custom CFG printer
+![](docs/main.png "Custom backend") 
+
+## Samples
 Currently to see the samples you can check the test folder: OlaTests/Tests/.
 

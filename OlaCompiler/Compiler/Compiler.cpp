@@ -86,12 +86,9 @@ namespace ola
 				ir_gen.Optimize(opt_level);
 				ir_gen.EmitIR(ir_file);
 
-				if (cfg_dump)
-				{
-					OLA_ASSERT_MSG(false, "DumpCFG not implemented yet for custom backend");
-				}
-
 				IRModule& module = ir_gen.GetModule();
+				if (cfg_dump) module.EmitCFG();
+
 				x64Target x64_target{};
 				MachineModule machine_module(module, x64_target);
 				machine_module.EmitAssembly(assembly_file.data());

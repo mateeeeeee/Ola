@@ -85,6 +85,10 @@ set(BACKEND_FILES
   Backend/Custom/IR/IROptimizer.cpp
   Backend/Custom/IR/IRPrinter.h
   Backend/Custom/IR/IRPrinter.cpp
+  Backend/Custom/IR/IRModulePrinter.h
+  Backend/Custom/IR/IRModulePrinter.cpp
+  Backend/Custom/IR/CFGPrinter.h
+  Backend/Custom/IR/CFGPrinter.cpp
   Backend/Custom/IR/IRType.h
   Backend/Custom/IR/IRType.cpp
   Backend/Custom/IR/IRVisitor.h

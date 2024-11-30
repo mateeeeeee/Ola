@@ -6,11 +6,16 @@ namespace ola
 {
 	Bool CFGAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		for (auto& block : F.Blocks()) 
+		return RunOn(F);
+	}
+
+	Bool CFGAnalysisPass::RunOn(Function const& F)
+	{
+		for (auto& block : F.Blocks())
 		{
 			BasicBlockCFGInfo& self_info = info[&block];
 			Instruction const* terminator = block.GetTerminator();
-			if (terminator->IsBranch()) 
+			if (terminator->IsBranch())
 			{
 				if (terminator->GetOpcode() == Opcode::Switch)
 				{
@@ -28,14 +33,14 @@ namespace ola
 						info[target].predecessors.push_back(&block);
 					}
 				}
-				else 
+				else
 				{
 					BranchInst const* branch_inst = cast<BranchInst>(terminator);
 					BasicBlock const* true_target = branch_inst->GetTrueTarget();
 					BasicBlock const* false_target = branch_inst->GetFalseTarget();
 					self_info.successors.push_back(true_target);
 					info[true_target].predecessors.push_back(&block);
-					if (false_target && false_target != true_target) 
+					if (false_target && false_target != true_target)
 					{
 						self_info.successors.push_back(false_target);
 						info[false_target].predecessors.push_back(&block);
@@ -46,5 +51,6 @@ namespace ola
 		OLA_ASSERT(info[&F.GetEntryBlock()].predecessors.empty());
 		return true;
 	}
+
 }
 
