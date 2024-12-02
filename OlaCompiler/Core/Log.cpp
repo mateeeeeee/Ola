@@ -23,15 +23,15 @@ namespace ola
 		auto in_time_t = std::chrono::system_clock::to_time_t(now);
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
 
-		std::tm* localTime = std::localtime(&in_time_t);
+		std::tm* local_time = std::localtime(&in_time_t);
 		Char timestamp[64];
 		std::snprintf(timestamp, sizeof(timestamp), "[%04d-%02d-%02d %02d:%02d:%02d.%03d]",
-			localTime->tm_year + 1900,
-			localTime->tm_mon + 1,
-			localTime->tm_mday,
-			localTime->tm_hour,
-			localTime->tm_min,
-			localTime->tm_sec,
+			local_time->tm_year + 1900,
+			local_time->tm_mon + 1,
+			local_time->tm_mday,
+			local_time->tm_hour,
+			local_time->tm_min,
+			local_time->tm_sec,
 			static_cast<Int>(ms.count()));
 
 		return timestamp;

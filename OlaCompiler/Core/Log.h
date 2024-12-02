@@ -32,7 +32,7 @@ namespace ola
 #if defined(DEBUG)
 #define OLA_DEBUG(fmt, ...)		ola::Log(ola::LogLevel::Debug, fmt, __VA_ARGS__)
 #define OLA_INFO(fmt, ...)		ola::Log(ola::LogLevel::Info, fmt, __VA_ARGS__)
-#define OLA_WARN(fmt, ...)	ola::Log(ola::LogLevel::Warning, fmt, __VA_ARGS__)
+#define OLA_WARN(fmt, ...)		ola::Log(ola::LogLevel::Warning, fmt, __VA_ARGS__)
 #else 
 #define OLA_DEBUG(fmt, ...)		
 #define OLA_INFO(fmt, ...)		

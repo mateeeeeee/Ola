@@ -119,7 +119,7 @@ namespace ola
 			}
 			return arg_index;
 		}
-		CLIParseResult Parse(Int argc, Char** argv);
+		OLA_NODISCARD CLIParseResult Parse(Int argc, Char** argv);
 
 	private:
 		std::vector<CLIArg> args;

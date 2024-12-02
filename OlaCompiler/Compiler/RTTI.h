@@ -17,24 +17,27 @@ namespace ola
 			static_assert(std::is_same_v<std::remove_cvref_t<To>, std::remove_const_t<To>>, "Target type of class may at most be const-qualified");
 			static_assert(std::is_class_v<To>, "Target type of cast must be a (const-qualified) class type");
 			static_assert(std::is_pointer_v<std::remove_cvref_t<From>>, "Argument of cast function must be a pointer to a class type");
-			using ClassType = std::remove_pointer_t<std::remove_reference_t<From>>;
-			static_assert(std::is_class_v<ClassType>, "Value type of cast must be a (const-qualified) pointer or to a class type");
-			using ResultType = MergeConstT<To, ClassType>*;
+			using ClassT = std::remove_pointer_t<std::remove_reference_t<From>>;
+			static_assert(std::is_class_v<ClassT>, "Value type of cast must be a (const-qualified) pointer or to a class type");
+			using ResultT = MergeConstT<To, ClassT>*;
 
-			if constexpr (std::is_same_v<ClassType, To> || std::is_base_of_v<To, ClassType>) return static_cast<ResultType>(value);
-			else if constexpr (std::is_base_of_v<ClassType, To>)
+			if constexpr (std::is_same_v<ClassT, To> || std::is_base_of_v<To, ClassT>)
 			{
-				if(!value) return static_cast<ResultType>(nullptr);
+				return static_cast<ResultT>(value);
+			}
+			else if constexpr (std::is_base_of_v<ClassT, To>)
+			{
+				if (!value) return static_cast<ResultT>(nullptr);
+				if (To::ClassOf(value)) return static_cast<ResultT>(value);
 
-				if (To::ClassOf(value)) return static_cast<ResultType>(value);
 				if constexpr (checked) OLA_ASSERT_MSG(false, "Unexpected dynamic type");
-				return static_cast<ResultType>(nullptr);
+				return static_cast<ResultT>(nullptr);
 			}
 			else
 			{
 				static_assert(AlwaysFalse<To>, "Cannot cast between unrelated types");
 			}
-			return static_cast<ResultType>(nullptr);
+			return static_cast<ResultT>(nullptr);
 		}
 	}
 
