@@ -7,8 +7,8 @@ namespace ola
 {
 	Bool DominatorTreeAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		CFGAnalysisPass::Result const& cfgResult = FAM.GetResult<CFGAnalysisPass>(F);
-		result = DominatorTree{};  
+		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
+		dom_tree.Initialize(cfg);
 		return false; 
 	}
 }

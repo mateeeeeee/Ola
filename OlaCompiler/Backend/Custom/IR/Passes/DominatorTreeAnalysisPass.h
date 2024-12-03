@@ -17,11 +17,11 @@ namespace ola
 		DominatorTreeAnalysisPass() : FunctionPass(id) {}
 
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
-		Result const& GetResult() const { return result; }
+		Result const& GetResult() const { return dom_tree; }
 		static void const* ID() { return &id; }
 
 	private:
-		Result result;
+		Result dom_tree;
 	};
 	OLA_REGISTER_ANALYSIS_PASS(DominatorTreeAnalysisPass, "Dominator Tree Analysis");
 }
