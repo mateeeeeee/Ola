@@ -20,6 +20,7 @@ set(UTILITY_FILES
   Utility/Attribute.h
   Utility/CLIParser.h
   Utility/CLIParser.cpp
+  Utility/TreeIterator.h
 )
 
 

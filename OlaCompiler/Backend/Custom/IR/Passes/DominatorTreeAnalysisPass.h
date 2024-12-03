@@ -1,19 +1,12 @@
 #pragma once
-#include <vector>
-#include <unordered_map>
 #include <memory>
 #include <utility>
-#include "Utility/IteratorRange.h"
 #include "Backend/Custom/PassRegistry.h"
-#include "Backend/Custom/IR/BasicBlock.h"
+#include "Backend/Custom/IR/DominatorTree.h"
 #include "Backend/Custom/IR/FunctionPass.h"
-#include "CFGAnalysisPass.h"
 
 namespace ola
 {
-	class DominatorTree
-	{
-	};
 
 	class DominatorTreeAnalysisPass : public FunctionPass
 	{

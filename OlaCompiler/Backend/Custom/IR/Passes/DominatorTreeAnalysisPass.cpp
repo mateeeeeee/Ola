@@ -1,5 +1,6 @@
 #include <functional>
 #include "DominatorTreeAnalysisPass.h"
+#include "CFGAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
