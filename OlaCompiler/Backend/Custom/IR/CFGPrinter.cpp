@@ -42,7 +42,7 @@ namespace ola
 	{
 		CFGAnalysisPass cfg_analysis_pass;
 		cfg_analysis_pass.RunOn(*F);
-		auto cfg_result = cfg_analysis_pass.GetResult();
+		CFG const& cfg = cfg_analysis_pass.GetResult();
 
 		for (BasicBlock const& BB : F->Blocks())
 		{
@@ -52,7 +52,7 @@ namespace ola
 			use_line_break = false;
 			EmitLn("}}\"];\n");
 
-			for (BasicBlock const* succ : cfg_result[&BB].successors)
+			for (BasicBlock const* succ : cfg.GetSuccessors(&BB))
 			{
 				EmitLn(R"(Node{}->Node{})", static_cast<const void*>(&BB), static_cast<const void*>(succ));
 			}

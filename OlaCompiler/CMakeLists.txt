@@ -88,6 +88,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRPrinter.cpp
   Backend/Custom/IR/IRModulePrinter.h
   Backend/Custom/IR/IRModulePrinter.cpp
+  Backend/Custom/IR/CFG.h
+  Backend/Custom/IR/CFG.cpp
   Backend/Custom/IR/CFGPrinter.h
   Backend/Custom/IR/CFGPrinter.cpp
   Backend/Custom/IR/IRType.h
@@ -107,6 +109,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Constant.cpp
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
+  Backend/Custom/IR/DominatorTree.h
+  Backend/Custom/IR/DominatorTree.cpp
   
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.cpp

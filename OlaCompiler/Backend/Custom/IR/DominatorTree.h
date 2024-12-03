@@ -41,7 +41,7 @@ namespace ola
 		Int dfs_postorder_index;
 	};
 
-
+	class CFG;
 	class DominatorTree
 	{
 		using DominatorTreeNodeMap = std::unordered_map<Uint32, DominatorTreeNode>;
@@ -52,10 +52,7 @@ namespace ola
 	public:
 		DominatorTree() : root(nullptr), nodes() {}
 
-		void Initialize(Function* F)
-		{
-			//todo
-		}
+		void Initialize(CFG& cfg);
 
 		DominatorTreeNode* GetRoot()
 		{
@@ -188,6 +185,11 @@ namespace ola
 			return node;
 		}
 
+		void ResetDepthFirstIndices()
+		{
+
+		}
+
 		iterator begin() { return iterator(GetRoot()); }
 		iterator end() { return iterator(); }
 		const_iterator begin() const { return cbegin(); }
@@ -198,6 +200,12 @@ namespace ola
 	private:
 		DominatorTreeNode* root;
 		DominatorTreeNodeMap nodes;
+
+	private:
+		void GetImmediateDominators()
+		{
+
+		}
 	};
 
 }
