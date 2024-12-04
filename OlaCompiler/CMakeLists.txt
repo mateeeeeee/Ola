@@ -173,106 +173,99 @@ set(COMPILER_FILES
   Compiler/Compiler.h
   Compiler/Compiler.cpp
   Compiler/CompileRequest.h
+  Compiler/CompilerMacros.h
   Compiler/CompileRequest.cpp
   Compiler/CompilerOptions.h
   Compiler/RTTI.h
 )
 
-set(TEST_FILES
-	Test/test.ola
-	Test/test.ll
-	Test/test.s
-	Test/test.oll
-	Test/Test2/test2.ola
-	Test/Test2/test2.ll
+add_library(OlaCompiler STATIC
+  ${CORE_FILES}
+  ${UTILITY_FILES}
+  ${FRONTEND_FILES}
+  ${BACKEND_FILES}
+  ${COMPILER_FILES}
 )
-
-add_executable(OlaCompiler main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
-
-set_target_properties(OlaCompiler PROPERTIES OUTPUT_NAME Ola)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES  main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES} ${TEST_FILES})
 
 target_include_directories(OlaCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
-#target_compile_definitions(OlaCompiler PRIVATE ${LLVM_DEFINITIONS})
 
 set(LLVM_LIBRARIES
-LLVMAnalysis
-LLVMCore
-LLVMExecutionEngine
-LLVMInstCombine
-LLVMObject
-LLVMSupport
-LLVMOrcJIT
-LLVMRuntimeDyld
-LLVMScalarOpts
-LLVMX86CodeGen
-LLVMX86AsmParser
-LLVMX86Desc
-LLVMX86Disassembler
-LLVMX86Info
-LLVMAArch64AsmParser
-LLVMAArch64CodeGen
-LLVMAArch64Desc
-LLVMAArch64Disassembler
-LLVMAArch64Info
-LLVMAArch64Utils
-LLVMARMAsmParser
-LLVMARMCodeGen
-LLVMARMDesc
-LLVMARMDisassembler
-LLVMARMInfo
-LLVMARMUtils
-LLVMWebAssemblyAsmParser
-LLVMWebAssemblyCodeGen
-LLVMWebAssemblyDesc
-LLVMWebAssemblyDisassembler
-LLVMWebAssemblyInfo
-LLVMWebAssemblyUtils
-LLVMPasses
-LLVMCoroutines
-LLVMipo
-LLVMFrontendOpenMP
-LLVMLinker
-LLVMIRPrinter
-LLVMVectorize
-LLVMJITLink
-LLVMOrcTargetProcess
-LLVMOrcShared
-LLVMWindowsDriver
-LLVMOption
-LLVMAsmPrinter
-LLVMCFGuard
-LLVMGlobalISel
-LLVMInstrumentation
-LLVMSelectionDAG
-LLVMCodeGen
-LLVMAggressiveInstCombine
-LLVMTarget
-LLVMBitWriter
-LLVMObjCARCOpts
-LLVMTransformUtils
-LLVMProfileData
-LLVMSymbolize
-LLVMDebugInfoPDB
-LLVMDebugInfoMSF
-LLVMDebugInfoBTF
-LLVMDebugInfoDWARF
-LLVMIRReader
-LLVMBitReader
-LLVMAsmParser
-LLVMTextAPI
-LLVMRemarks
-LLVMBitstreamReader
-LLVMCodeGenTypes
-LLVMMCParser
-LLVMMCDisassembler
-LLVMMC
-LLVMBinaryFormat
-LLVMTargetParser
-LLVMDebugInfoCodeView
-LLVMDemangle
+	LLVMAnalysis
+	LLVMCore
+	LLVMExecutionEngine
+	LLVMInstCombine
+	LLVMObject
+	LLVMSupport
+	LLVMOrcJIT
+	LLVMRuntimeDyld
+	LLVMScalarOpts
+	LLVMX86CodeGen
+	LLVMX86AsmParser
+	LLVMX86Desc
+	LLVMX86Disassembler
+	LLVMX86Info
+	LLVMAArch64AsmParser
+	LLVMAArch64CodeGen
+	LLVMAArch64Desc
+	LLVMAArch64Disassembler
+	LLVMAArch64Info
+	LLVMAArch64Utils
+	LLVMARMAsmParser
+	LLVMARMCodeGen
+	LLVMARMDesc
+	LLVMARMDisassembler
+	LLVMARMInfo
+	LLVMARMUtils
+	LLVMWebAssemblyAsmParser
+	LLVMWebAssemblyCodeGen
+	LLVMWebAssemblyDesc
+	LLVMWebAssemblyDisassembler
+	LLVMWebAssemblyInfo
+	LLVMWebAssemblyUtils
+	LLVMPasses
+	LLVMCoroutines
+	LLVMipo
+	LLVMFrontendOpenMP
+	LLVMLinker
+	LLVMIRPrinter
+	LLVMVectorize
+	LLVMJITLink
+	LLVMOrcTargetProcess
+	LLVMOrcShared
+	LLVMWindowsDriver
+	LLVMOption
+	LLVMAsmPrinter
+	LLVMCFGuard
+	LLVMGlobalISel
+	LLVMInstrumentation
+	LLVMSelectionDAG
+	LLVMCodeGen
+	LLVMAggressiveInstCombine
+	LLVMTarget
+	LLVMBitWriter
+	LLVMObjCARCOpts
+	LLVMTransformUtils
+	LLVMProfileData
+	LLVMSymbolize
+	LLVMDebugInfoPDB
+	LLVMDebugInfoMSF
+	LLVMDebugInfoBTF
+	LLVMDebugInfoDWARF
+	LLVMIRReader
+	LLVMBitReader
+	LLVMAsmParser
+	LLVMTextAPI
+	LLVMRemarks
+	LLVMBitstreamReader
+	LLVMCodeGenTypes
+	LLVMMCParser
+	LLVMMCDisassembler
+	LLVMMC
+	LLVMBinaryFormat
+	LLVMTargetParser
+	LLVMDebugInfoCodeView
+	LLVMDemangle
 )
 
 target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
@@ -324,4 +317,10 @@ else()
     add_definitions(-include Core/Types.h -include Core/Macros.h)
 endif()
 
-install(TARGETS OlaCompiler DESTINATION bin)
+add_executable(OlaDriver main.cpp autogen/OlaConfig.h)
+target_link_libraries(OlaDriver PRIVATE OlaCompiler)
+set_target_properties(OlaDriver PROPERTIES OUTPUT_NAME Ola)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES})
+install(TARGETS OlaDriver DESTINATION bin)

@@ -8,9 +8,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(OLA_COMPILER_PATH ${CMAKE_CURRENT_SOURCE_DIR}/OlaCompiler/)
-set(OLA_TESTS_PATH    ${CMAKE_CURRENT_SOURCE_DIR}/OlaTests/)
-set(OLA_BINARY_PATH   ${CMAKE_BINARY_DIR}/bin/)
+set(OLA_COMPILER_PATH 		${CMAKE_CURRENT_SOURCE_DIR}/OlaCompiler/)
+set(OLA_TESTS_PATH    		${CMAKE_CURRENT_SOURCE_DIR}/OlaTests/)
+set(OLA_PLAYGROUND_PATH   	${CMAKE_CURRENT_SOURCE_DIR}/OlaPlayground/)
+set(OLA_BINARY_PATH   		${CMAKE_BINARY_DIR}/bin/)
+
 
 if(MSVC)
 	add_compile_options(/MP)
@@ -34,6 +36,12 @@ add_compile_definitions(
 add_subdirectory(OlaLib)
 add_subdirectory(OlaCompiler)
 add_subdirectory(OlaTests)
+add_subdirectory(OlaPlayground)
 
 add_dependencies(OlaCompiler OlaLib)
-add_dependencies(OlaTests OlaCompiler)
+add_dependencies(OlaDriver OlaCompiler)
+add_dependencies(OlaTests OlaDriver)
+add_dependencies(OlaPlayground OlaCompiler)
+
+
+set_target_properties(omp_gen PROPERTIES EXCLUDE_FROM_ALL TRUE)

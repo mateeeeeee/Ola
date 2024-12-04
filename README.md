@@ -107,10 +107,10 @@ public int main()
 ```
 CFG visualization using `--cfgdump` (without optimizations) looks like this:
 ### LLVM IR using dot-cfg pass
-<img src="docs/.main.png" alt="LLVM backend" style="width:75%;">
+<img src="OlaDocs/.main.png" alt="LLVM backend" style="width:75%;">
 
 ### Custom IR using custom CFG printer
-<img src="docs/main.png" alt="Custom backend" style="width:75%;">
+<img src="OlaDocs/main.png" alt="Custom backend" style="width:75%;">
 
 ## Samples
 Currently to see the samples you can check the test folder: OlaTests/Tests/.

@@ -2,8 +2,9 @@
 #include <format>
 
 #include "Compiler.h"
+#include "CompilerMacros.h"
 #include "CompileRequest.h"
-
+#include "Core/Log.h"
 #include "Frontend/Context.h"
 #include "Frontend/Diagnostics.h"
 #include "Frontend/SourceBuffer.h"
@@ -24,16 +25,6 @@ namespace ola
 {
 	namespace
 	{
-#if DEBUG
-		static Char const* OlaLib = OLA_BINARY_PATH"Debug/olalib.lib";
-#else 
-		static Char const* OlaLib = OLA_BINARY_PATH"Release/olalib.lib";
-#endif
-		void AddBuiltins(SourceBuffer& src)
-		{
-			src.Prepend("");
-		}
-
 		void GenerateGraphVizImages(std::string const& folder_path, Bool is_llvm)
 		{
 			for (auto const& entry : fs::directory_iterator(folder_path))
@@ -52,7 +43,6 @@ namespace ola
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
-			AddBuiltins(src);
 			Lexer lex(diagnostics);
 			lex.Lex(src);
 
@@ -105,7 +95,7 @@ namespace ola
 
 		fs::path cur_path = fs::current_path();
 		std::string input_directory(compile_request.GetInputDirectory());
-		fs::current_path(input_directory);
+		if(!input_directory.empty()) fs::current_path(input_directory);
 
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
@@ -136,7 +126,7 @@ namespace ola
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
-			system(assembly_cmd.c_str());
+			std::system(assembly_cmd.c_str());
 		}
 		if (cfg_dump)
 		{
@@ -145,13 +135,13 @@ namespace ola
 		
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
-		link_cmd += OlaLib;
+		link_cmd += OLA_LIB_PATH;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
-		system(link_cmd.c_str());
-		
+		std::system(link_cmd.c_str());
+
 		std::string const& exe_cmd = output_file;
-		Int64 res = system(exe_cmd.c_str());
+		Int64 res = std::system(exe_cmd.c_str());
 
 		fs::current_path(cur_path);
 		return res;

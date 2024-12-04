@@ -1,12 +1,9 @@
-configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
-
 set(SOURCE
   Tests.cpp
 )
 
 set(HEADERS
-  TestMacros.h
-  autogen/OlaConfig.h
+  Tests.h
 )
 
 set(OLA_LLVM_TESTS

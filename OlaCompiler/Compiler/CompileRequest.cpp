@@ -27,7 +27,7 @@ namespace ola
 		std::string input_file = cli_result["-i"].AsStringOr("");
 		if(!input_file.empty()) input_files.push_back(input_file); //#todo add support for multiple input files
 		output_file = cli_result["-o"].AsStringOr("");
-		input_directory = cli_result["--directory"].AsStringOr(OLA_COMPILER_PATH"Test");
+		input_directory = cli_result["--directory"].AsStringOr("");
 
 		if (cli_result["--test"])
 		{
@@ -50,7 +50,6 @@ namespace ola
 			return -1;
 		}
 		if (output_file.empty()) output_file = input_files[0];
-		if (input_directory.empty()) input_directory = OLA_COMPILER_PATH"Test";
 
 		if (cli_result["--astdump"])  compiler_flags |= ola::CompilerFlag_DumpAST;
 		if (cli_result["--nollvm"])   compiler_flags |= ola::CompilerFlag_NoLLVM;
