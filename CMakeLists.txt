@@ -43,5 +43,7 @@ add_dependencies(OlaDriver OlaCompiler)
 add_dependencies(OlaTests OlaDriver)
 add_dependencies(OlaPlayground OlaCompiler)
 
-
-set_target_properties(omp_gen PROPERTIES EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET intrinsics_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET omp_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET acc_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET RISCVTargetParserTableGen PROPERTY EXCLUDE_FROM_ALL TRUE)

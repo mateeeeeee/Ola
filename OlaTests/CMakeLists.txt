@@ -76,18 +76,8 @@ source_group(" " FILES ${SOURCE} ${HEADERS})
 source_group("Tests/LLVM" FILES ${OLA_LLVM_TESTS})
 source_group("Tests/Custom" FILES ${OLA_CUSTOM_TESTS})
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
-		cmake_policy(SET CMP0135 NEW)
-endif()
-
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
-)
-set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+set(GOOGLETEST_PATH ${CMAKE_CURRENT_SOURCE_DIR}/googletest)
+add_subdirectory(${GOOGLETEST_PATH} ${CMAKE_BINARY_DIR}/googletest)
 
 target_link_libraries(OlaTests PRIVATE gtest_main)
 
