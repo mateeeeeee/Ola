@@ -1,4 +1,4 @@
-<img align="left" src="docs/olalogo.png" width="120px"/>
+<img align="left" src="OlaDocs/olalogo.png" width="120px"/>
 <br/><br/>
 
 # Ola
@@ -117,7 +117,7 @@ public int main()
     return a;
 }
 ```
-CFG visualization for the code above using `--cfgdump` (without optimizations):
+CFG visualization for the code above using `--cfg` (without optimizations):
 ### LLVM IR using dot-cfg pass
 <img src="OlaDocs/.main.png" alt="LLVM backend" style="width:75%;">
 
@@ -125,5 +125,5 @@ CFG visualization for the code above using `--cfgdump` (without optimizations):
 <img src="OlaDocs/main.png" alt="Custom backend" style="width:75%;">
 
 ## Samples
-Currently to see the samples you can check the test folder: OlaTests/Tests/.
+Currently to see the samples you can check the test folder: `OlaTests/Tests/`.
 
