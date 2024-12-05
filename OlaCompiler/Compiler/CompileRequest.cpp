@@ -9,8 +9,11 @@ namespace ola
 	{
 		CLIParser cli_parser{};
 		{
-			cli_parser.AddArg(false, "--astdump");
-			cli_parser.AddArg(false, "--cfgdump");
+			cli_parser.AddArg(false, "--ast");
+			cli_parser.AddArg(false, "--cfg");
+			cli_parser.AddArg(false, "--callgraph");
+			cli_parser.AddArg(false, "--emit-ir");
+			cli_parser.AddArg(false, "--emit-asm");
 			cli_parser.AddArg(false, "--nollvm");
 			cli_parser.AddArg(false, "--test");
 			cli_parser.AddArg(false, "--Od");
@@ -28,7 +31,6 @@ namespace ola
 		if(!input_file.empty()) input_files.push_back(input_file); //#todo add support for multiple input files
 		output_file = cli_result["-o"].AsStringOr("");
 		input_directory = cli_result["--directory"].AsStringOr("");
-
 		if (cli_result["--test"])
 		{
 			if (!input_files.empty())
@@ -51,9 +53,12 @@ namespace ola
 		}
 		if (output_file.empty()) output_file = input_files[0];
 
-		if (cli_result["--astdump"])  compiler_flags |= ola::CompilerFlag_DumpAST;
-		if (cli_result["--nollvm"])   compiler_flags |= ola::CompilerFlag_NoLLVM;
-		if (cli_result["--cfgdump"])  compiler_flags |= ola::CompilerFlag_DumpCFG;
+		if (cli_result["--ast"])	compiler_flags |= ola::CompilerFlag_DumpAST;
+		if (cli_result["--nollvm"]) compiler_flags |= ola::CompilerFlag_NoLLVM;
+		if (cli_result["--cfg"])	compiler_flags |= ola::CompilerFlag_DumpCFG;
+		if (cli_result["--callgraph"])	compiler_flags |= ola::CompilerFlag_DumpCallGraph;
+		if (cli_result["--emit-ir"])	compiler_flags |= ola::CompilerFlag_EmitIR;
+		if (cli_result["--emit-asm"])	compiler_flags |= ola::CompilerFlag_EmitASM;
 
 		if (cli_result["--O0"] || cli_result["--Od"]) opt_level = OptimizationLevel::O0;
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;

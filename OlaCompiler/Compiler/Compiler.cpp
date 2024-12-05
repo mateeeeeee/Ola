@@ -39,7 +39,8 @@ namespace ola
 			}
 		}
 
-		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file, OptimizationLevel opt_level, Bool use_llvm, Bool ast_dump, Bool cfg_dump)
+		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
+			OptimizationLevel opt_level, Bool no_llvm, Bool ast_dump, Bool cfg_dump, Bool callgraph_dump)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -53,7 +54,8 @@ namespace ola
 			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
 			if (ast_dump) DebugVisitor debug_ast(ast);
-			if (use_llvm)
+
+			if (!no_llvm)
 			{
 				LLVMIRGenContext llvm_ir_gen(source_file);
 				llvm_ir_gen.Generate(ast);
@@ -64,6 +66,10 @@ namespace ola
 				{
 					std::string dot_cfg_cmd = std::format("opt -passes=dot-cfg -disable-output {}", ir_file);
 					system(dot_cfg_cmd.c_str());
+				}
+				if (callgraph_dump)
+				{
+					OLA_ASSERT_MSG(false, "Not implemented yet");
 				}
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
@@ -78,6 +84,7 @@ namespace ola
 
 				IRModule& module = ir_gen.GetModule();
 				if (cfg_dump) module.EmitCFG();
+				if (callgraph_dump) OLA_ASSERT_MSG(false, "Not implemented yet");
 
 				x64Target x64_target{};
 				MachineModule machine_module(module, x64_target);
@@ -90,7 +97,10 @@ namespace ola
 	{
 		Bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
 		Bool const cfg_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCFG;
-		Bool const use_llvm = !(compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM);
+		Bool const callgraph_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCallGraph;
+		Bool const no_llvm = compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM;
+		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
+		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -117,20 +127,31 @@ namespace ola
 
 			std::string source_file = source_files[i]; source_file += ".ola";
 			std::string ir_file;
-			if (use_llvm) ir_file = file_name + ".ll";
-			else		  ir_file = file_name + ".oll";
+			if (no_llvm) ir_file = file_name + ".oll";
+			else		 ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, use_llvm, ast_dump, cfg_dump);
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, no_llvm, ast_dump, cfg_dump, callgraph_dump);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
 			std::system(assembly_cmd.c_str());
+
+			if (!emit_ir)
+			{
+				Bool deleted = fs::remove(ir_file);
+				OLA_ASSERT(deleted);
+			}
+			if (!emit_asm)
+			{
+				Bool deleted = fs::remove(assembly_file);
+				OLA_ASSERT(deleted);
+			}
 		}
-		if (cfg_dump)
+		if (cfg_dump || callgraph_dump)
 		{
-			GenerateGraphVizImages(input_directory, use_llvm);
+			GenerateGraphVizImages(input_directory, !no_llvm);
 		}
 		
 		std::string link_cmd = "clang "; 

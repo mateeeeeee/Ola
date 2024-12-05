@@ -6,9 +6,12 @@ namespace ola
 	enum CompilerFlags : Uint32
 	{
 		CompilerFlag_None = 0x00,
-		CompilerFlag_DumpAST = 0x01,
-		CompilerFlag_NoLLVM = 0x02,
-		CompilerFlag_DumpCFG = 0x04
+		CompilerFlag_NoLLVM = 0x01,
+		CompilerFlag_DumpAST = 0x02,
+		CompilerFlag_DumpCFG = 0x04,
+		CompilerFlag_DumpCallGraph = 0x08,
+		CompilerFlag_EmitIR = 0x10,
+		CompilerFlag_EmitASM = 0x20
 	};
 	template<>
 	struct EnumBitmaskOperators<CompilerFlags>

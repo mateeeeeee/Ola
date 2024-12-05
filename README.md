@@ -47,35 +47,48 @@ Ola is a toy programming language designed with a focus on modularity and learni
 		- Missing features: proper stack layout and class support.
 
 ## Structure
-Ola consists of three main parts:
+Ola consists of the following parts:
 
-1. **Ola Library**: 
-   - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. Currently, it includes the following files: 
-     `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olamemory.h`
-
+1. **Ola Library**:
+   - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. It includes essential components like:
+     - `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olamemory.h`
+   
 2. **Ola Compiler**:
-- The core of the Ola project, divided into various stages for flexibility and modularity:
-- **Lexer**: Tokenizes the source code.
-- **Import Processor**: Processes `import` statements from the tokenized input.
-- **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
-- **Sema**: Performs semantic analysis on the AST to ensure code correctness.
-- **Backend**: After the frontend processing completes, the compilation process diverges into two backend paths:
-	- **LLVM Path**:
-		- **LLVM Visitor**: Transforms the AST into LLVM IR.
-		- **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
-		- Compilation to assembly is done using `clang -S` command 
-	- **Custom Backend Path**:
-		- **IRVisitor**: Transforms the AST into Ola's custom IR.
-		- **IROptimizer**: Applies custom optimizations at the IR level.
-		- **MachineModule**: responsible for lowering IR to MIR and finally to assembly.
-     
-3. **Ola Tests**:
-   - A set of unit tests built with GoogleTest, covering Ola language features. They rely on `Assert` funtion from the `std.assert` import. Currently, two folder are maintained: LLVM tests and Custom backend tests with a goal of unifying them once the custom backend reaches the same capabilities as LLVM backend.
+   - The core of the Ola project, implemented as a **static library** (`OlaCompiler`) with the following components:
+     - **Lexer**: Tokenizes the source code.
+     - **Import Processor**: Processes `import` statements from the tokenized input.
+     - **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
+     - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
+     - **Backend**: After frontend processing, the compilation process diverges into two backend paths:
+       - **LLVM Path**:
+         - **LLVM Visitor**: Transforms the AST into LLVM IR.
+         - **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
+         - Compilation to assembly is done using the `clang -S` command.
+       - **Custom Backend Path**:
+         - **IRVisitor**: Transforms the AST into Ola's custom IR.
+         - **IROptimizer**: Applies custom optimizations at the IR level.
+         - **MachineModule**: Responsible for lowering IR to MIR and finally to assembly.
+
+3. **Ola Driver**:
+   - An **executable** (`OlaDriver`) that serves as the main entry point for compiling Ola code. It links to the `OlaCompiler` library and calls compiler's API, handling the entire compilation pipeline.
+
+4. **Ola Playground**:
+   - A separate **executable** that links to the `OlaCompiler` static library. It provides a development environment for experimenting with the compiler and Ola code, without directly invoking the `OlaDriver`.
+
+5. **Ola Tests**:
+   - A set of unit tests built with GoogleTest, covering Ola language features. These tests are organized into two main folders:
+     - **LLVM Tests**: Unit tests that use the LLVM backend of the compiler.
+     - **Custom Backend Tests**: Unit tests that use the custom backend.
+     - The tests rely on the `Assert` function from the `std.assert` import.
+     - **OlaDriver** executable is used in the tests via system calls, allowing the tests to invoke the compiled executable to verify correct behavior.
 
 ## Usage
 ### Command line options
-  * `--astdump`: Dump AST to output/log
-  * `--cfgdump`: Dump CFGs to .dot files and visualize them
+  * `--ast`: Dump AST to output/log
+  * `--cfg`: Dump CFGs to .dot files and visualize them
+  * `--callgraph`: Dump Call Graphs to .dot files and visualize them
+  * `--emit-ir`: Emit (i.e. don't delete) IR file
+  * `--emit-asm`: Emit (i.e. don't delete) ASM file
   * `--nollvm`: Use custom IR instead of LLVM IR
   * `--test`: Used for running g-tests
   * `--Od`: No optimizations
@@ -88,7 +101,6 @@ Ola consists of three main parts:
   * `--directory`: Directory of input files
   
 ## CFG example
-For this code sample:
 ```cpp
 public int main()
 {
@@ -105,7 +117,7 @@ public int main()
     return a;
 }
 ```
-CFG visualization using `--cfgdump` (without optimizations) looks like this:
+CFG visualization for the code above using `--cfgdump` (without optimizations):
 ### LLVM IR using dot-cfg pass
 <img src="OlaDocs/.main.png" alt="LLVM backend" style="width:75%;">
 

@@ -1,3 +1,3 @@
 #pragma once
-#define OLA_NOLLVM 0
+#define OLA_NOLLVM 1
 #include "Compiler/CompilerMacros.h"
