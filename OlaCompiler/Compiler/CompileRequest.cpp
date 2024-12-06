@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	Int CompileRequest::Parse(Int argc, Char** argv)
+	Bool CompileRequest::Parse(Int argc, Char** argv)
 	{
 		CLIParser cli_parser{};
 		{
@@ -42,14 +42,14 @@ namespace ola
 			else
 			{
 				OLA_WARN("No test input files provided!");
-				return -1;
+				return false;
 			}
 		}
 
 		if (input_files.empty())
 		{
 			OLA_WARN("No input files provided!");
-			return -1;
+			return false;
 		}
 		if (output_file.empty()) output_file = input_files[0];
 
@@ -64,6 +64,6 @@ namespace ola
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;
 		if (cli_result["--O2"]) opt_level = OptimizationLevel::O2;
 		if (cli_result["--O3"]) opt_level = OptimizationLevel::O3;
-		return 0;
+		return true;
 	}
 }

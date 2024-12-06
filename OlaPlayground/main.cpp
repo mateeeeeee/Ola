@@ -15,14 +15,14 @@ constexpr Uint32 ArraySize(T(&arr)[N])
 
 int main()
 {
-	ola::LogInit();
-	ola::CompileRequest compile_request{};
+	LogInit();
+	CompileRequest compile_request{};
 	Char const* argv[] = { "-i", "test", "--nollvm", "--directory", OLA_PLAYGROUND_PATH"Test" };
-	if (compile_request.Parse(ArraySize(argv), const_cast<Char**>(argv)) >= 0)
+	if (compile_request.Parse(ArraySize(argv), const_cast<Char**>(argv)))
 	{
-		ola::Int compile_result = ola::Compile(compile_request);
+		Int compile_result = Compile(compile_request);
 		return compile_result;
 	}
-	ola::LogDestroy();
+	LogDestroy();
 	return 0;
 }
