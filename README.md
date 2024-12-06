@@ -119,14 +119,15 @@ public int main()
 }
 ```
 CFG visualization for the code above using `--cfg` (without optimizations):
-### LLVM IR using dot-cfg pass
-<img src="OlaDocs/.main.png" alt="LLVM backend" style="width:75%;">
+### CFG visualization (LLVM backend)
+<img src="OlaDocs/.main.png" alt="LLVM backend">
 
-### Custom IR using custom CFG printer
-<img src="OlaDocs/main.png" alt="Custom backend" style="width:75%;">
+### CFG visualization (Custom backend)
+<img src="OlaDocs/main.png" alt="Custom backend">
 
 Dominator Tree visualization for the code above using `--domtree` (more or less the same in both backends):
-<img src="OlaDocs/main_domtree.png" alt="Custom backend" style="width:75%;">
+### Dominator Tree visualization (Custom backend)
+<img src="OlaDocs/main_domtree.png" alt="Custom backend">
 
 ## Samples
 Currently to see the samples you can check the test folder: `OlaTests/Tests/`.

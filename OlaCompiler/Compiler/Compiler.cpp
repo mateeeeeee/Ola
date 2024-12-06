@@ -89,7 +89,6 @@ namespace ola
 				}
 				if (domtree_dump)
 				{
-					//dot-dom-only
 					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
 					system(dot_domtree_cmd.c_str());
 				}
@@ -101,14 +100,11 @@ namespace ola
 			{
 				IRGenContext ir_gen_ctx(source_file);
 				ir_gen_ctx.Generate(ast);
-
 				IRModule& module = ir_gen_ctx.GetModule();
-
 				IROptimizer optimizer(module);
 				if (cfg_dump) optimizer.PrintCFG();
 				if (domtree_dump) optimizer.PrintDomTree();
 				optimizer.Optimize(opt_level);
-
 				module.Print(ir_file);
 
 				x64Target x64_target{};
