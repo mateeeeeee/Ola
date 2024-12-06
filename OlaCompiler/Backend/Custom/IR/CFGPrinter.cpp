@@ -20,7 +20,7 @@ namespace ola
 			EmitLn("}}");
 
 			std::string file_name(F->GetName());
-			file_name += ".dot";
+			file_name += "_cfg.dot";
 			std::ofstream dot_stream(file_name);
 			dot_stream << output;
 		}

@@ -194,10 +194,10 @@ namespace ola
 		iterator end() { return iterator(); }
 		const_iterator begin() const { return cbegin(); }
 		const_iterator end() const { return cend(); }
-		const_iterator cbegin() const { return ++const_iterator(GetRoot()); }
+		const_iterator cbegin() const { return const_iterator(GetRoot()); }
 		const_iterator cend() const { return const_iterator(); }
 
-		void Print(std::string const& dot_file);
+		void Print(std::string const& function_name) const;
 
 	private:
 		DominatorTreeNode* root;
@@ -206,7 +206,7 @@ namespace ola
 	private:
 		void ResetDepthFirstIndicesRecursive(DominatorTreeNode* node, Int& index);
 		std::vector<DominatorTreeEdge> GetImmediateDominators(CFG const& cfg);
-		void PrintNode(std::ostream& os, DominatorTreeNode const* node);
+		void PrintNode(std::ostream& os, DominatorTreeNode const* node) const;
 	};
 
 }

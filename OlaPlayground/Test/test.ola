@@ -1,5 +1,15 @@
 
 public int main()
 {
-	return 5;
+    int a = 5;
+    int b = a + 6;
+    if(b > 10)
+    {
+        a++;
+    }
+    else
+    {
+        return 2;
+    }
+    return a;
 }

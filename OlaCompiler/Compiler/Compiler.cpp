@@ -44,7 +44,7 @@ namespace ola
 		}
 
 		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
-			OptimizationLevel opt_level, Bool no_llvm, Bool ast_dump, Bool cfg_dump, Bool callgraph_dump)
+			OptimizationLevel opt_level, Bool no_llvm, Bool ast_dump, Bool cfg_dump, Bool callgraph_dump, Bool domtree_dump)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -87,6 +87,12 @@ namespace ola
 					std::string dot_allgraph_cmd = std::format("opt -passes=dot-callgraph -disable-output {}", ir_file);
 					system(dot_allgraph_cmd.c_str());
 				}
+				if (domtree_dump)
+				{
+					//dot-dom-only
+					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
+					system(dot_domtree_cmd.c_str());
+				}
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				system(compile_cmd.c_str());
@@ -100,6 +106,7 @@ namespace ola
 
 				IROptimizer optimizer(module);
 				if (cfg_dump) optimizer.PrintCFG();
+				if (domtree_dump) optimizer.PrintDomTree();
 				optimizer.Optimize(opt_level);
 
 				module.Print(ir_file);
@@ -116,6 +123,7 @@ namespace ola
 		Bool const ast_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpAST;
 		Bool const cfg_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCFG;
 		Bool const callgraph_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCallGraph;
+		Bool const domtree_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpDomTree;
 		Bool const no_llvm = compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM;
 		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
@@ -149,7 +157,8 @@ namespace ola
 			else		 ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, no_llvm, ast_dump, cfg_dump, callgraph_dump);
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, no_llvm, 
+								   ast_dump, cfg_dump, callgraph_dump, domtree_dump);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;

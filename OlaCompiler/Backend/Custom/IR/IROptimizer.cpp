@@ -54,6 +54,7 @@ namespace ola
 			{
 				Function& F = *cast<Function>(G);
 				FAM.RegisterPass<CFGAnalysisPass>(F);
+				FAM.RegisterPass<DominatorTreeAnalysisPass>(F);
 				FPM.Run(F, FAM);
 			}
 		}

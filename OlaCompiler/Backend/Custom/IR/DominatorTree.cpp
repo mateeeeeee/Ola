@@ -167,30 +167,29 @@ namespace ola
 		return CalculateDominators(cfg, postorder);
 	}
 
-	void DominatorTree::PrintNode(std::ostream& os, DominatorTreeNode const* node)
+	void DominatorTree::PrintNode(std::ostream& os, DominatorTreeNode const* node) const
 	{
-		if (node) 
+		if (node && node->bb) 
 		{
-			os << node->bb->GetIndex() << "[label=\"" << node->bb->GetIndex() << "\"];\n";
-		}
-		if (node->parent) 
-		{
-			os << node->parent->bb->GetIndex() << " -> " << node->bb->GetIndex() << ";\n";
+			os << node->bb->GetIndex() << " [shape=record, label=\"" << node->bb->GetName() << "\"];\n";
+
+			if (node->parent && node->parent->bb)
+			{
+				os << node->parent->bb->GetIndex() << " -> " << node->bb->GetIndex() << ";\n";
+			}
 		}
 	}
-
-	void DominatorTree::Print(std::string const& dot_file)
+	 
+	void DominatorTree::Print(std::string const& function_name) const
 	{
-		std::ofstream dot_stream(dot_file);
-
-		dot_stream << "digraph {\n";
-
+		std::ofstream dot_stream(function_name + "_domtree.dot");
+		dot_stream << "digraph \"Dominator tree for " << function_name <<" function\"{\n";
+		dot_stream << "\tlabel = \"Dominator tree for " << function_name << " function\";\n";
 		Visit([this, &dot_stream](DominatorTreeNode const* node)
 			{
 				PrintNode(dot_stream, node);
 				return true;
 			});
-
 		dot_stream << "}\n";
 	}
 

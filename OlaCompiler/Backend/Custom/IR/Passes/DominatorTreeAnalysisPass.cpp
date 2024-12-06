@@ -14,6 +14,9 @@ namespace ola
 
 	Bool DominatorTreePrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
+		DominatorTree const& dom_tree = FAM.GetResult<DominatorTreeAnalysisPass>(F);
+		std::string function_name(F.GetName());
+		dom_tree.Print(function_name);
 		return false;
 	}
 

@@ -87,9 +87,10 @@ Ola consists of the following parts:
   * `--ast`: Dump AST to output/log
   * `--cfg`: Dump CFGs to .dot files and visualize them
   * `--callgraph`: Dump Call Graphs to .dot files and visualize them
+  * `--domtree`: Dump Dominator Trees to .dot files and visualize them
   * `--emit-ir`: Emit (i.e. don't delete) IR file
   * `--emit-asm`: Emit (i.e. don't delete) ASM file
-  * `--nollvm`: Use custom IR instead of LLVM IR
+  * `--nollvm`: Use custom backend instead of LLVM backend
   * `--test`: Used for running g-tests
   * `--Od`: No optimizations
   * `--O0`: Same as `--Od`
@@ -123,6 +124,9 @@ CFG visualization for the code above using `--cfg` (without optimizations):
 
 ### Custom IR using custom CFG printer
 <img src="OlaDocs/main.png" alt="Custom backend" style="width:75%;">
+
+Dominator Tree visualization for the code above using `--domtree` (more or less the same in both backends):
+<img src="OlaDocs/main_domtree.png" alt="Custom backend" style="width:75%;">
 
 ## Samples
 Currently to see the samples you can check the test folder: `OlaTests/Tests/`.

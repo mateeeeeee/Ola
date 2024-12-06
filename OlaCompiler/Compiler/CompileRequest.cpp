@@ -12,6 +12,7 @@ namespace ola
 			cli_parser.AddArg(false, "--ast");
 			cli_parser.AddArg(false, "--cfg");
 			cli_parser.AddArg(false, "--callgraph");
+			cli_parser.AddArg(false, "--domtree");
 			cli_parser.AddArg(false, "--emit-ir");
 			cli_parser.AddArg(false, "--emit-asm");
 			cli_parser.AddArg(false, "--nollvm");
@@ -53,10 +54,11 @@ namespace ola
 		}
 		if (output_file.empty()) output_file = input_files[0];
 
-		if (cli_result["--ast"])	compiler_flags |= ola::CompilerFlag_DumpAST;
-		if (cli_result["--nollvm"]) compiler_flags |= ola::CompilerFlag_NoLLVM;
-		if (cli_result["--cfg"])	compiler_flags |= ola::CompilerFlag_DumpCFG;
+		if (cli_result["--ast"])		compiler_flags |= ola::CompilerFlag_DumpAST;
+		if (cli_result["--nollvm"])		compiler_flags |= ola::CompilerFlag_NoLLVM;
+		if (cli_result["--cfg"])		compiler_flags |= ola::CompilerFlag_DumpCFG;
 		if (cli_result["--callgraph"])	compiler_flags |= ola::CompilerFlag_DumpCallGraph;
+		if (cli_result["--domtree"])	compiler_flags |= ola::CompilerFlag_DumpDomTree;
 		if (cli_result["--emit-ir"])	compiler_flags |= ola::CompilerFlag_EmitIR;
 		if (cli_result["--emit-asm"])	compiler_flags |= ola::CompilerFlag_EmitASM;
 
