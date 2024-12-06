@@ -31,8 +31,7 @@ namespace ola
 		void AddGlobal(GlobalValue* GV);
 		std::vector<GlobalValue*> const& Globals() const { return globals; }
 
-		void EmitIR(std::string_view filename) const;
-		void EmitCFG();
+		void Print(std::string_view filename) const;
 
 	private:
 		IRContext& context;

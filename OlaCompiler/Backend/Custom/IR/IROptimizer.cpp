@@ -4,19 +4,33 @@
 #include "Passes/ArithmeticReductionPass.h"
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/CFGAnalysisPass.h"
+#include "Passes/DominatorTreeAnalysisPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 
 namespace ola
 {
 
-	IROptimizer::IROptimizer(IRModule& M) : M(M)
+	IROptimizer::IROptimizer(IRModule& M) : M(M), cfg_print(false), domtree_print(false)
 	{
+	}
+
+	void IROptimizer::PrintCFG()
+	{
+		cfg_print = true;
+	}
+
+	void IROptimizer::PrintDomTree()
+	{
+		domtree_print = true;
 	}
 
 	void IROptimizer::Optimize(OptimizationLevel level)
 	{
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
+
+		if (cfg_print)		FPM.AddPass(new CFGPrinterPass());
+		if (domtree_print)  FPM.AddPass(new DominatorTreePrinterPass());
 		switch (level)
 		{
 		case OptimizationLevel::O3:

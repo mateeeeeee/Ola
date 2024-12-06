@@ -8,12 +8,15 @@ namespace ola
 
 	class IROptimizer
 	{
-		friend class IRGenContext;
-	private:
+	public:
 		explicit IROptimizer(IRModule& M);
+		void PrintCFG();
+		void PrintDomTree();
 		void Optimize(OptimizationLevel);
 
 	private:
 		IRModule& M;
+		Bool cfg_print;
+		Bool domtree_print;
 	};
 }

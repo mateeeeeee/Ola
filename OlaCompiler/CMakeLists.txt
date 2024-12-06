@@ -70,6 +70,8 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMIRVisitor.cpp
   Backend/LLVM/LLVMOptimizer.h
   Backend/LLVM/LLVMOptimizer.cpp
+  Backend/LLVM/LLVMOptimizer.h
+  Backend/LLVM/LLVMUtils.cpp
   Backend/LLVM/Passes/TestPass.h
 
   Backend/Custom/IR/IRBuilder.h
@@ -86,8 +88,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IROptimizer.cpp
   Backend/Custom/IR/IRPrinter.h
   Backend/Custom/IR/IRPrinter.cpp
-  Backend/Custom/IR/IRModulePrinter.h
-  Backend/Custom/IR/IRModulePrinter.cpp
+  Backend/Custom/IR/PrinterBase.h
+  Backend/Custom/IR/PrinterBase.cpp
   Backend/Custom/IR/CFG.h
   Backend/Custom/IR/CFG.cpp
   Backend/Custom/IR/CFGPrinter.h

@@ -1,17 +1,18 @@
 #pragma once
-#include "IRModulePrinter.h"
+#include "PrinterBase.h"
 
 namespace ola
 {
-	class CFGPrinter final : public IRModulePrinter
+	class CFG;
+
+	class CFGPrinter final : public PrinterBase
 	{
 	public:
 		CFGPrinter() { }
-		virtual void PrintModule(IRModule const& M) override;
+		void Print(Function const*, CFG const&);
 
 	private:
-		void PrintCFGPreamble(std::string_view function_name);
-		void PrintFunction(Function const*);
+		void PrintFunction(Function const*, CFG const&);
 	};
 }
 

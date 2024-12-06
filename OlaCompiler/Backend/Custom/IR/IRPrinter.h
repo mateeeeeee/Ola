@@ -1,13 +1,13 @@
 #pragma once
-#include "IRModulePrinter.h"
+#include "PrinterBase.h"
 
 namespace ola
 {
-	class IRPrinter final : public IRModulePrinter
+	class IRPrinter final : public PrinterBase
 	{
 	public:
 		explicit IRPrinter(std::ostream& os) : os(os) {}
-		virtual void PrintModule(IRModule const& M) override;
+		void PrintModule(IRModule const& M);
 
 	private:
 		std::ostream& os;

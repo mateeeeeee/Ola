@@ -1,5 +1,6 @@
 #include <unordered_set>
 #include "CFGAnalysisPass.h"
+#include "Backend/Custom/IR/CFGPrinter.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
@@ -47,6 +48,14 @@ namespace ola
 		OLA_ASSERT(cfg.GetPredecessors(&F.GetEntryBlock()).empty());
 		cfg.SetEntryBlock(&F.GetEntryBlock());
 		return true;
+	}
+
+	Bool CFGPrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
+	{
+		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
+		CFGPrinter cfg_printer;
+		cfg_printer.Print(&F, cfg);
+		return false;
 	}
 
 }

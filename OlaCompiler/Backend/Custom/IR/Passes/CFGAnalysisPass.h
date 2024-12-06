@@ -27,4 +27,18 @@ namespace ola
 		Result cfg;
 	};
 	OLA_REGISTER_ANALYSIS_PASS(CFGAnalysisPass, "CFG Analysis");
+
+	class CFGPrinterPass : public FunctionPass
+	{
+	public:
+		inline static Char id = 0;
+		using Result = void;
+
+	public:
+		CFGPrinterPass() : FunctionPass(id) {}
+		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+
+		static void const* ID() { return &id; }
+	};
+	OLA_REGISTER_PASS(CFGPrinterPass, "CFG Printer");
 }

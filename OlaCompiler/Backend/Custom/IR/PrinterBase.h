@@ -47,18 +47,15 @@ namespace ola
 		std::string GetPrefixedName(Value const*);
 	};
 
-	class IRModulePrinter
+	class PrinterBase
 	{
-	public:
-		virtual void PrintModule(IRModule const& M) = 0;
-
 	protected:
 		std::string output;
 		NameManager name_manager;
 		Bool use_line_break;
-	protected:
-		IRModulePrinter() : use_line_break(false){}
 
+	protected:
+		PrinterBase() : use_line_break(false){}
 		std::string_view GetUniqueName(Value const* V)
 		{
 			return name_manager.GetUniqueName(V);

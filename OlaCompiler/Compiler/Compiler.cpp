@@ -13,11 +13,15 @@
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 #include "Backend/LLVM/LLVMIRGenContext.h"
+#include "Backend/LLVM/LLVMOptimizer.h"
 #include "Backend/Custom/IR/IRGenContext.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
+
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace fs = std::filesystem;
 
@@ -57,10 +61,21 @@ namespace ola
 
 			if (!no_llvm)
 			{
-				LLVMIRGenContext llvm_ir_gen(source_file);
-				llvm_ir_gen.Generate(ast);
-				llvm_ir_gen.Optimize(opt_level);
-				llvm_ir_gen.EmitIR(ir_file);
+				LLVMIRGenContext llvm_ir_gen_ctx(source_file);
+				llvm_ir_gen_ctx.Generate(ast);
+
+				llvm::Module& module = llvm_ir_gen_ctx.GetModule();
+				LLVMOptimizer optimizer(module);
+				optimizer.Optimize(opt_level);
+
+				std::error_code error;
+				llvm::raw_fd_ostream llvm_ir_stream(ir_file, error, llvm::sys::fs::OF_None);
+				if (error)
+				{
+					OLA_ERROR("Error when creating llvm::raw_fd_ostream: {}", error.message());
+					return;
+				}
+				module.print(llvm_ir_stream, nullptr);
 				
 				if (cfg_dump)
 				{
@@ -69,7 +84,8 @@ namespace ola
 				}
 				if (callgraph_dump)
 				{
-					OLA_ASSERT_MSG(false, "Not implemented yet");
+					std::string dot_allgraph_cmd = std::format("opt -passes=dot-callgraph -disable-output {}", ir_file);
+					system(dot_allgraph_cmd.c_str());
 				}
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
@@ -77,18 +93,20 @@ namespace ola
 			}
 			else
 			{
-				IRGenContext ir_gen(source_file);
-				ir_gen.Generate(ast);
-				ir_gen.Optimize(opt_level);
-				ir_gen.EmitIR(ir_file);
+				IRGenContext ir_gen_ctx(source_file);
+				ir_gen_ctx.Generate(ast);
 
-				IRModule& module = ir_gen.GetModule();
-				if (cfg_dump) module.EmitCFG();
-				if (callgraph_dump) OLA_ASSERT_MSG(false, "Not implemented yet");
+				IRModule& module = ir_gen_ctx.GetModule();
+
+				IROptimizer optimizer(module);
+				if (cfg_dump) optimizer.PrintCFG();
+				optimizer.Optimize(opt_level);
+
+				module.Print(ir_file);
 
 				x64Target x64_target{};
 				MachineModule machine_module(module, x64_target);
-				machine_module.EmitAssembly(assembly_file.data());
+				machine_module.EmitAssembly(assembly_file);
 			}
 		}
 	}

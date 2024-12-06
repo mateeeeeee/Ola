@@ -3,7 +3,6 @@
 #include "IRType.h"
 #include "GlobalValue.h"
 #include "IRPrinter.h"
-#include "CFGPrinter.h"
 
 namespace ola
 {
@@ -27,18 +26,11 @@ namespace ola
 		}
 	}
 
-	void IRModule::EmitIR(std::string_view filename) const
+	void IRModule::Print(std::string_view filename) const
 	{
 		std::ofstream ir_stream(filename.data());
 		IRPrinter ir_printer(ir_stream);
 		ir_printer.PrintModule(*this);
 	}
-
-	void IRModule::EmitCFG()
-	{
-		CFGPrinter cfg_printer{};
-		cfg_printer.PrintModule(*this);
-	}
-
 }
 

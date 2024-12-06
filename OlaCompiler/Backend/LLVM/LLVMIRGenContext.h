@@ -17,15 +17,11 @@ namespace ola
 		~LLVMIRGenContext();
 
 		void Generate(AST const* ast);
-		void Optimize(OptimizationLevel);
-		void EmitIR(std::string_view output_file);
+		llvm::Module& GetModule() { return module; }
 
 	private:
 		llvm::LLVMContext context;
 		llvm::Module module;
-
-	private:
-		static Bool VerifyModule(llvm::Module&);
 	};
 
 }

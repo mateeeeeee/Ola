@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <unordered_map>
+#include <iosfwd>
 #include "BasicBlock.h"
 #include "Utility/TreeIterator.h"
 
@@ -142,7 +144,7 @@ namespace ola
 		}
 
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
-		void Visit(F&& f)
+		Bool Visit(F&& f)
 		{
 			for (auto& n : *this)
 			{
@@ -151,7 +153,7 @@ namespace ola
 			return true;
 		}
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode const*>
-		void Visit(F&& f) const
+		Bool Visit(F&& f) const
 		{
 			for (auto const& n : *this)
 			{
@@ -160,7 +162,7 @@ namespace ola
 			return true;
 		}
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
-		void VisitChildrenIf(F&& f, iterator node)
+		Bool VisitChildrenIf(F&& f, iterator node)
 		{
 			if (f(&*node)) 
 			{
@@ -195,6 +197,8 @@ namespace ola
 		const_iterator cbegin() const { return ++const_iterator(GetRoot()); }
 		const_iterator cend() const { return const_iterator(); }
 
+		void Print(std::string const& dot_file);
+
 	private:
 		DominatorTreeNode* root;
 		DominatorTreeNodeMap nodes;
@@ -202,6 +206,7 @@ namespace ola
 	private:
 		void ResetDepthFirstIndicesRecursive(DominatorTreeNode* node, Int& index);
 		std::vector<DominatorTreeEdge> GetImmediateDominators(CFG const& cfg);
+		void PrintNode(std::ostream& os, DominatorTreeNode const* node);
 	};
 
 }

@@ -1,5 +1,6 @@
 #include <functional>
 #include <set>
+#include <fstream>
 #include "DominatorTree.h"
 #include "CFG.h"
 
@@ -78,14 +79,12 @@ namespace ola
 		std::vector<std::pair<BasicBlock const*, BasicBlock const*>> out;
 		for (auto const& idom : idoms) 
 		{
-			// At this point if there is no dominator for the node, just make it
-			// reflexive.
+			// At this point if there is no dominator for the node, just make it reflexive.
 			auto dominator = std::get<1>(idom).dominator;
 			if (dominator == invalid_dom) {
 				dominator = std::get<1>(idom).postorder_index;
 			}
-			// NOTE: performing a const cast for convenient usage with
-			// UpdateImmediateDominators
+			// NOTE: performing a const cast for convenient usage with UpdateImmediateDominators
 			out.push_back({ std::get<0>(idom), postorder[dominator] });
 		}
 
@@ -95,15 +94,15 @@ namespace ola
 			[&idoms](const std::pair<BasicBlock const*, BasicBlock const*>& lhs,
 				const std::pair<BasicBlock const*, BasicBlock const*>& rhs) 
 			{
-					assert(lhs.first);
-					assert(lhs.second);
-					assert(rhs.first);
-					assert(rhs.second);
-					auto lhs_indices = std::make_pair(idoms[lhs.first].postorder_index,
-						idoms[lhs.second].postorder_index);
-					auto rhs_indices = std::make_pair(idoms[rhs.first].postorder_index,
-						idoms[rhs.second].postorder_index);
-					return lhs_indices < rhs_indices;
+				OLA_ASSERT(lhs.first);
+				OLA_ASSERT(lhs.second);
+				OLA_ASSERT(rhs.first);
+				OLA_ASSERT(rhs.second);
+				auto lhs_indices = std::make_pair(idoms[lhs.first].postorder_index,
+					idoms[lhs.second].postorder_index);
+				auto rhs_indices = std::make_pair(idoms[rhs.first].postorder_index,
+					idoms[rhs.second].postorder_index);
+				return lhs_indices < rhs_indices;
 			});
 		return out;
 	}
@@ -166,6 +165,33 @@ namespace ola
 		std::set<BasicBlock const*> visited;
 		DFSPostOrder(cfg.GetEntryBlock(), visited);
 		return CalculateDominators(cfg, postorder);
+	}
+
+	void DominatorTree::PrintNode(std::ostream& os, DominatorTreeNode const* node)
+	{
+		if (node) 
+		{
+			os << node->bb->GetIndex() << "[label=\"" << node->bb->GetIndex() << "\"];\n";
+		}
+		if (node->parent) 
+		{
+			os << node->parent->bb->GetIndex() << " -> " << node->bb->GetIndex() << ";\n";
+		}
+	}
+
+	void DominatorTree::Print(std::string const& dot_file)
+	{
+		std::ofstream dot_stream(dot_file);
+
+		dot_stream << "digraph {\n";
+
+		Visit([this, &dot_stream](DominatorTreeNode const* node)
+			{
+				PrintNode(dot_stream, node);
+				return true;
+			});
+
+		dot_stream << "}\n";
 	}
 
 }

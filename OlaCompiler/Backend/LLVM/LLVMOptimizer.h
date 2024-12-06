@@ -10,9 +10,7 @@ namespace ola
 {
 	class LLVMOptimizer
 	{
-		friend class LLVMIRGenContext;
-
-	private:
+	public:
 		explicit LLVMOptimizer(llvm::Module& module);
 		void Optimize(OptimizationLevel level);
 

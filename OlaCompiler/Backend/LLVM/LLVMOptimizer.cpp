@@ -1,4 +1,5 @@
 #include "LLVMOptimizer.h"
+#include "LLVMUtils.h"
 #include "Passes/TestPass.h"
 #include "llvm/Pass.h" 
 #include "llvm/IR/LegacyPassManager.h" 
@@ -45,6 +46,7 @@ namespace ola
 			break;
 		}
 		pass_manager.run(module);
-	}
 
+		Bool verified = VerifyLLVMModule(module);
+	}
 }

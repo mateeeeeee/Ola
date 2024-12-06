@@ -1,4 +1,4 @@
-#include "IRModulePrinter.h"
+#include "PrinterBase.h"
 #include "IRModule.h"
 #include "GlobalValue.h"
 
@@ -90,7 +90,7 @@ namespace ola
 		return str_prefix + std::string(name);
 	}
 
-	void IRModulePrinter::PrintGlobalVariable(GlobalVariable const* GV)
+	void PrinterBase::PrintGlobalVariable(GlobalVariable const* GV)
 	{
 		if (GV->IsDeclaration())
 		{
@@ -107,7 +107,7 @@ namespace ola
 		EmitNewline();
 	}
 
-	void IRModulePrinter::PrintFunction(Function const* F)
+	void PrinterBase::PrintFunction(Function const* F)
 	{
 		if (F->IsDeclaration())
 		{
@@ -127,7 +127,7 @@ namespace ola
 		EmitLn("}}");
 	}
 
-	void IRModulePrinter::PrintBasicBlock(BasicBlock const& BB)
+	void PrinterBase::PrintBasicBlock(BasicBlock const& BB)
 	{
 		EmitLn("{}:", GetUniqueName(&BB));
 		for (Instruction const& I : BB.Instructions())
@@ -136,7 +136,7 @@ namespace ola
 		}
 	}
 
-	void IRModulePrinter::PrintInstruction(Instruction const& I)
+	void PrinterBase::PrintInstruction(Instruction const& I)
 	{
 		IRType* type = I.GetType();
 		if (!type->IsVoid())
@@ -196,7 +196,7 @@ namespace ola
 		EmitNewline();
 	}
 
-	void IRModulePrinter::PrintOperand(Value const* V, Bool print_type)
+	void PrinterBase::PrintOperand(Value const* V, Bool print_type)
 	{
 		if (!V)
 		{
@@ -219,7 +219,7 @@ namespace ola
 		Emit("{}", GetUniqueName(V));
 	}
 
-	void IRModulePrinter::PrintConstant(Constant const* V)
+	void PrinterBase::PrintConstant(Constant const* V)
 	{
 		if (!V) return;
 		OLA_ASSERT(isa<Constant>(V));
@@ -246,7 +246,7 @@ namespace ola
 		}
 	}
 
-	void IRModulePrinter::PrintType(IRType* type)
+	void PrinterBase::PrintType(IRType* type)
 	{
 		std::string type_string;
 		switch (type->GetKind())

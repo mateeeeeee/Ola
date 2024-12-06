@@ -11,5 +11,11 @@ namespace ola
 		dom_tree.Initialize(cfg);
 		return false; 
 	}
+
+	Bool DominatorTreePrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
+	{
+		return false;
+	}
+
 }
 
