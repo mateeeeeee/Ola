@@ -16,7 +16,7 @@ namespace ola
 
 	class Parser;
 	class Diagnostics;
-	class Context;
+	class FrontendContext;
 	struct SourceLocation;
 
 	enum TagKind
@@ -53,7 +53,7 @@ namespace ola
 		};
 
 	public:
-		Sema(Context* context, Diagnostics& diagnostics);
+		Sema(FrontendContext* context, Diagnostics& diagnostics);
 		OLA_NONCOPYABLE(Sema)
 		OLA_DEFAULT_MOVABLE(Sema)
 		~Sema();
@@ -119,7 +119,7 @@ namespace ola
 		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
 
 	private:
-		Context* ctx;
+		FrontendContext* ctx;
 		Diagnostics& diagnostics;
 		SemaContext sema_ctx;
 

@@ -31,8 +31,6 @@ add_compile_definitions(
   "$<$<CONFIG:RELEASE>:RELEASE>"
 )
 
-
-
 add_subdirectory(OlaLib)
 add_subdirectory(OlaCompiler)
 add_subdirectory(OlaTests)
@@ -42,8 +40,3 @@ add_dependencies(OlaCompiler OlaLib)
 add_dependencies(OlaDriver OlaCompiler)
 add_dependencies(OlaTests OlaDriver)
 add_dependencies(OlaPlayground OlaCompiler)
-
-set_property(TARGET intrinsics_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
-set_property(TARGET omp_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
-set_property(TARGET acc_gen PROPERTY EXCLUDE_FROM_ALL TRUE)
-set_property(TARGET RISCVTargetParserTableGen PROPERTY EXCLUDE_FROM_ALL TRUE)

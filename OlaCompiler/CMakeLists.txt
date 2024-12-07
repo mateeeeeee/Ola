@@ -28,8 +28,8 @@ set(FRONTEND_FILES
   Frontend/Diagnostics.cpp
   Frontend/Diagnostics.def
   Frontend/Diagnostics.h
-  Frontend/Context.h
-  Frontend/Context.cpp
+  Frontend/FrontendContext.h
+  Frontend/FrontendContext.cpp
   Frontend/ImportProcessor.cpp
   Frontend/ImportProcessor.h
   Frontend/Lexer.cpp
@@ -70,7 +70,7 @@ set(BACKEND_FILES
   Backend/LLVM/LLVMIRVisitor.cpp
   Backend/LLVM/LLVMOptimizer.h
   Backend/LLVM/LLVMOptimizer.cpp
-  Backend/LLVM/LLVMOptimizer.h
+  Backend/LLVM/LLVMUtils.h
   Backend/LLVM/LLVMUtils.cpp
   Backend/LLVM/Passes/TestPass.h
 

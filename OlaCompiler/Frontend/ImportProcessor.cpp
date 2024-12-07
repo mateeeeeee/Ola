@@ -16,7 +16,7 @@ namespace ola
 	Char const* ImportProcessor::ola_extension = ".ola";
 	Char const* ImportProcessor::ola_lib_path = OLA_COMPILER_PATH;
 
-	ImportProcessor::ImportProcessor(Context* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
+	ImportProcessor::ImportProcessor(FrontendContext* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 
 	void ImportProcessor::ProcessImports(std::vector<Token>&& _tokens)
 	{

@@ -5,7 +5,7 @@
 #include "CompilerMacros.h"
 #include "CompileRequest.h"
 #include "Core/Log.h"
-#include "Frontend/Context.h"
+#include "Frontend/FrontendContext.h"
 #include "Frontend/Diagnostics.h"
 #include "Frontend/SourceBuffer.h"
 #include "Frontend/Lexer.h"
@@ -43,7 +43,7 @@ namespace ola
 			}
 		}
 
-		void CompileTranslationUnit(Context& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
+		void CompileTranslationUnit(FrontendContext& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
 			OptimizationLevel opt_level, Bool no_llvm, Bool ast_dump, Bool cfg_dump, Bool callgraph_dump, Bool domtree_dump)
 		{
 			Diagnostics diagnostics{};
@@ -141,7 +141,7 @@ namespace ola
 			OLA_ASSERT_MSG(false, "DLL and LIB outputs are not yet supported!");
 		}
 
-		Context context{};
+		FrontendContext context{};
 		for (Uint64 i = 0; i < source_files.size(); ++i)
 		{
 			std::string file_name = fs::path(source_files[i]).stem().string();

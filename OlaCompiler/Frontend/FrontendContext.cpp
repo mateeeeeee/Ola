@@ -1,9 +1,9 @@
-#include "Context.h"
+#include "FrontendContext.h"
 #include "Frontend/AST/Type.h"
 
 namespace ola
 {
-	Context::Context()
+	FrontendContext::FrontendContext()
 	{
 		void_type	= new(this) VoidType();
 		bool_type	= new(this) BoolType();
@@ -12,7 +12,7 @@ namespace ola
 		float_type	= new(this) FloatType();
 	}
 
-	Context::~Context()
+	FrontendContext::~FrontendContext()
 	{
 		for (ArrayType* array_type	 : array_types)		delete array_type;
 		for (ClassType* class_type	 : class_types)		delete class_type;
@@ -26,7 +26,7 @@ namespace ola
 		delete void_type;
 	}
 
-	ArrayType* Context::GetArrayType(QualType const& type, Uint32 array_size)
+	ArrayType* FrontendContext::GetArrayType(QualType const& type, Uint32 array_size)
 	{
 		for (auto const& array_type : array_types)
 		{
@@ -37,7 +37,7 @@ namespace ola
 		return new_type;
 	}
 
-	RefType* Context::GetRefType(QualType const& type)
+	RefType* FrontendContext::GetRefType(QualType const& type)
 	{
 		for (auto const& ref_type : ref_types)
 		{
@@ -47,7 +47,7 @@ namespace ola
 		return ref_types.back();
 	}
 
-	FuncType* Context::GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types)
+	FuncType* FrontendContext::GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types)
 	{
 		for (auto const& function_type : function_types)
 		{
@@ -69,7 +69,7 @@ namespace ola
 		return function_types.back();
 	}
 
-	ClassType* Context::GetClassType(ClassDecl const* class_decl)
+	ClassType* FrontendContext::GetClassType(ClassDecl const* class_decl)
 	{
 		for (auto const& class_type : class_types)
 		{

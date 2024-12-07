@@ -6,7 +6,7 @@
 namespace ola
 {
 
-	Parser::Parser(Context* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
+	Parser::Parser(FrontendContext* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 	Parser::~Parser() = default;
 
 	void Parser::Parse(std::vector<Token>&& _tokens)

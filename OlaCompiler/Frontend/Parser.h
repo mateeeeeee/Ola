@@ -8,7 +8,7 @@ namespace ola
 {
 	class QualType;
 	class Sema;
-	class Context;
+	class FrontendContext;
 	class Parser;
 	class Diagnostics;
 	
@@ -22,7 +22,7 @@ namespace ola
 		using TokenPtr = std::vector<Token>::iterator;
 	public:
 
-		Parser(Context* context, Diagnostics& diagnostics);
+		Parser(FrontendContext* context, Diagnostics& diagnostics);
 		~Parser();
 
 		void Parse(std::vector<Token>&& tokens);
@@ -30,7 +30,7 @@ namespace ola
 		AST const* GetAST() const { return ast.get(); }
 
 	private:
-		Context* context;
+		FrontendContext* context;
 		Diagnostics& diagnostics;
 		std::vector<Token> tokens;
 		TokenPtr current_token;

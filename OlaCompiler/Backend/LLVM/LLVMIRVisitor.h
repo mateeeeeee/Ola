@@ -7,7 +7,7 @@
 
 namespace llvm
 {
-	class Context;
+	class FrontendContext;
 	class Module;
 	class DataLayout;
 	class Value;

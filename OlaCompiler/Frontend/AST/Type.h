@@ -10,7 +10,7 @@
 
 namespace ola
 {
-	class Context;
+	class FrontendContext;
 
 	enum QualifierFlag : Uint8
 	{
@@ -85,7 +85,7 @@ namespace ola
 		TypeKind GetKind() const { return kind; }
 
 		void* operator new(Uint64) = delete;
-		void* operator new(Uint64 sz, Context*) { return ::operator new(sz); }
+		void* operator new(Uint64 sz, FrontendContext*) { return ::operator new(sz); }
 
 		virtual Bool IsAssignableFrom(Type const*) const { return true; }
 
@@ -102,14 +102,14 @@ namespace ola
 
 	class RefType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		QualType const& GetReferredType() const { return type; }
 
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Ref; }
-		static RefType* Get(Context* ctx, QualType const& type);
+		static RefType* Get(FrontendContext* ctx, QualType const& type);
 	private:
 		QualType type;
 
@@ -119,67 +119,67 @@ namespace ola
 
 	class VoidType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Void; }
-		static VoidType* Get(Context* ctx);
+		static VoidType* Get(FrontendContext* ctx);
 	private:
 		constexpr VoidType() : Type{ TypeKind::Void } {}
 	};
 
 	class BoolType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Bool; }
-		static BoolType* Get(Context* ctx);
+		static BoolType* Get(FrontendContext* ctx);
 	private:
 		constexpr BoolType() : Type{ TypeKind::Bool, 1, 1 } {}
 	};
 
 	class CharType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Char; }
-		static CharType* Get(Context* ctx);
+		static CharType* Get(FrontendContext* ctx);
 	private:
 		constexpr CharType() : Type{ TypeKind::Char, 1, 1 } {}
 	};
 
 	class IntType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Int; }
-		static IntType* Get(Context* ctx);
+		static IntType* Get(FrontendContext* ctx);
 	private:
 		constexpr IntType() : Type{ TypeKind::Int, 8, 8 } {}
 	};
 
 	class FloatType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Float; }
-		static FloatType* Get(Context* ctx);
+		static FloatType* Get(FrontendContext* ctx);
 	private:
 		constexpr FloatType() : Type{ TypeKind::Float, 8, 8 } {}
 	};
 
 	class ArrayType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 
 		virtual Bool IsAssignableFrom(Type const*) const override;
@@ -188,7 +188,7 @@ namespace ola
 		Uint32 GetArraySize() const { return array_size; }
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Array; }
-		static ArrayType* Get(Context* ctx, QualType const& type, Uint32 array_size = 0);
+		static ArrayType* Get(FrontendContext* ctx, QualType const& type, Uint32 array_size = 0);
 	private:
 		QualType element_type;
 		Uint32 array_size;
@@ -200,7 +200,7 @@ namespace ola
 
 	class FuncType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		
 		virtual Bool IsAssignableFrom(Type const*) const override;
@@ -211,7 +211,7 @@ namespace ola
 		QualType const& GetParamType(Uint64 i) const { return param_types[i]; }
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Function; }
-		static FuncType* Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types = {});
+		static FuncType* Get(FrontendContext* ctx, QualType const& return_type, std::vector<QualType> const& param_types = {});
 	private:
 		QualType return_type;
 		std::vector<QualType> param_types;
@@ -224,14 +224,14 @@ namespace ola
 	class ClassDecl;
 	class ClassType : public Type
 	{
-		friend class Context;
+		friend class FrontendContext;
 	public:
 		virtual Bool IsAssignableFrom(Type const*) const override;
 
 		ClassDecl const* GetClassDecl() const { return class_decl; }
 
 		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Class; }
-		static ClassType* Get(Context* ctx, ClassDecl const* class_decl);
+		static ClassType* Get(FrontendContext* ctx, ClassDecl const* class_decl);
 	private:
 		ClassDecl const* class_decl;
 

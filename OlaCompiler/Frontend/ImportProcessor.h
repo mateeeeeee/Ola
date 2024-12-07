@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	class Context;
+	class FrontendContext;
 	class Diagnostics;
 
 	class ImportProcessor
@@ -15,7 +15,7 @@ namespace ola
 		static Char const* ola_lib_path; 
 
 	public:
-		ImportProcessor(Context* context, Diagnostics& diagnostics);
+		ImportProcessor(FrontendContext* context, Diagnostics& diagnostics);
 		void ProcessImports(std::vector<Token>&& tokens);
 		void RemoveImports(std::vector<Token>&& tokens);
 		std::vector<Token>&& GetProcessedTokens()  
@@ -24,7 +24,7 @@ namespace ola
 		}
 
 	private:
-		Context* context;
+		FrontendContext* context;
 		Diagnostics& diagnostics;
 		std::vector<Token> tokens;
 		TokenPtr current_token;

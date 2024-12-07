@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	Sema::Sema(Context* context, Diagnostics& diagnostics) : ctx(context), diagnostics(diagnostics) {}
+	Sema::Sema(FrontendContext* context, Diagnostics& diagnostics) : ctx(context), diagnostics(diagnostics) {}
 	Sema::~Sema() = default;
 
 	UniqueVarDeclPtr Sema::ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type,

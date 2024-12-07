@@ -1,6 +1,6 @@
 #include "Type.h"
 #include "AST.h"
-#include "Frontend/Context.h"
+#include "Frontend/FrontendContext.h"
 
 namespace ola
 {
@@ -13,7 +13,7 @@ namespace ola
 	{
 		return this == other || type->IsAssignableFrom(other);
 	}
-	RefType* RefType::Get(Context* ctx, QualType const& type)
+	RefType* RefType::Get(FrontendContext* ctx, QualType const& type)
 	{
 		return ctx->GetRefType(type);
 	}
@@ -22,7 +22,7 @@ namespace ola
 	{
 		return isa<VoidType>(other); 
 	}
-	VoidType* VoidType::Get(Context* ctx)
+	VoidType* VoidType::Get(FrontendContext* ctx)
 	{
 		return ctx->GetVoidType();
 	}
@@ -31,7 +31,7 @@ namespace ola
 	{
 		return isoneof<BoolType,IntType,FloatType>(other);
 	}
-	BoolType* BoolType::Get(Context* ctx)
+	BoolType* BoolType::Get(FrontendContext* ctx)
 	{
 		return ctx->GetBoolType();
 	}
@@ -45,7 +45,7 @@ namespace ola
 		}
 		else return isa<CharType>(other);
 	}
-	CharType* CharType::Get(Context* ctx)
+	CharType* CharType::Get(FrontendContext* ctx)
 	{
 		return ctx->GetCharType();
 	}
@@ -59,7 +59,7 @@ namespace ola
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
-	IntType* IntType::Get(Context* ctx)
+	IntType* IntType::Get(FrontendContext* ctx)
 	{
 		return ctx->GetIntType();
 	}
@@ -73,7 +73,7 @@ namespace ola
 		}
 		else return isoneof<BoolType, IntType, FloatType>(other);
 	}
-	FloatType* FloatType::Get(Context* ctx)
+	FloatType* FloatType::Get(FrontendContext* ctx)
 	{
 		return ctx->GetFloatType();
 	}
@@ -84,7 +84,7 @@ namespace ola
 		ArrayType const* other_array_type = cast<ArrayType>(other);
 		return element_type.GetTypePtr() == other_array_type->element_type.GetTypePtr();
 	}
-	ArrayType* ArrayType::Get(Context* ctx, QualType const& type, Uint32 array_size)
+	ArrayType* ArrayType::Get(FrontendContext* ctx, QualType const& type, Uint32 array_size)
 	{
 		return ctx->GetArrayType(type, array_size);
 	}
@@ -93,7 +93,7 @@ namespace ola
 	{
 		return false;
 	}
-	FuncType* FuncType::Get(Context* ctx, QualType const& return_type, std::vector<QualType> const& param_types)
+	FuncType* FuncType::Get(FrontendContext* ctx, QualType const& return_type, std::vector<QualType> const& param_types)
 	{
 		return ctx->GetFuncType(return_type, param_types);
 	}
@@ -149,7 +149,7 @@ namespace ola
 		}
 		return true;
 	}
-	ClassType* ClassType::Get(Context* ctx, ClassDecl const* class_decl)
+	ClassType* ClassType::Get(FrontendContext* ctx, ClassDecl const* class_decl)
 	{
 		return ctx->GetClassType(class_decl);
 	}

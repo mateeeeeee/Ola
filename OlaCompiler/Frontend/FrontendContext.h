@@ -16,12 +16,12 @@ namespace ola
 	class FloatType;
 	class ClassDecl;
 
-	class Context
+	class FrontendContext
 	{
 	public:
 
-		Context();
-		~Context();
+		FrontendContext();
+		~FrontendContext();
 
 		VoidType*  GetVoidType()  const  { return void_type;  }
 		BoolType*  GetBoolType()  const  { return bool_type;  }
