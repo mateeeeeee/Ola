@@ -179,7 +179,7 @@ namespace ola
 		
 		std::string link_cmd = "clang "; 
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
-		link_cmd += OLA_LIB_PATH;
+		link_cmd += OLA_STATIC_LIB_PATH;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
 		std::system(link_cmd.c_str());

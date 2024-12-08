@@ -29,7 +29,7 @@
 #endif
 
 #if DEBUG
-#define OLA_LIB_PATH OLA_CONCAT(OLA_BINARY_PATH, "Debug/olalib.lib")
+#define OLA_STATIC_LIB_PATH OLA_CONCAT(OLA_BINARY_PATH, "Debug/olalib.lib")
 #else 
-#define OLA_LIB_PATH OLA_CONCAT(OLA_BINARY_PATH, "Release/olalib.lib")
+#define OLA_STATIC_LIB_PATH OLA_CONCAT(OLA_BINARY_PATH, "Release/olalib.lib")
 #endif

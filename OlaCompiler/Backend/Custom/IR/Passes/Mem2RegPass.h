@@ -13,10 +13,6 @@ namespace ola
 		Mem2RegPass() : FunctionPass(ID) {}
 
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
-
-	private:
-		void PlacePhiNodes(Function& F, DominatorTree const& DomTree);
-		void RenameVariables(Function& F, DominatorTree const& DomTree);
 	};
 
 	OLA_REGISTER_PASS(Mem2RegPass, "Memory to Register Pass");

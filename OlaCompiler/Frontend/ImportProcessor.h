@@ -11,9 +11,6 @@ namespace ola
 	class ImportProcessor
 	{
 		using TokenPtr = std::vector<Token>::iterator;
-		static Char const* ola_extension; 
-		static Char const* ola_lib_path; 
-
 	public:
 		ImportProcessor(FrontendContext* context, Diagnostics& diagnostics);
 		void ProcessImports(std::vector<Token>&& tokens);

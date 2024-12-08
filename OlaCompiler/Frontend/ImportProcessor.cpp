@@ -13,8 +13,8 @@ namespace fs = std::filesystem;
 
 namespace ola
 {
-	Char const* ImportProcessor::ola_extension = ".ola";
-	Char const* ImportProcessor::ola_lib_path = OLA_COMPILER_PATH;
+	static constexpr Char const* ola_extension = ".ola";
+	static constexpr Char const* ola_lib_path = OLA_LIB_PATH;
 
 	ImportProcessor::ImportProcessor(FrontendContext* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 

@@ -7,8 +7,8 @@
 
 using namespace ola;
 
-template<typename T, Uint32 N>
-constexpr Uint32 ArraySize(T(&arr)[N])
+template<typename T, Uint N>
+constexpr Uint ArraySize(T(&arr)[N])
 {
 	return N;
 }
