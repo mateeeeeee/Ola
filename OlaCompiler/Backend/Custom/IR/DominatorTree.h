@@ -48,6 +48,7 @@ namespace ola
 	class DominatorTree
 	{
 		using DominatorTreeNodeMap = std::unordered_map<Uint32, DominatorTreeNode>;
+		using ImmediateDominatorsMap = std::unordered_map<DominatorTreeNode const*, DominatorTreeNode const*>;
 		using DominatorTreeEdge = std::pair<BasicBlock*, BasicBlock*>;
 	public:
 		using iterator = DominatorTreeNode::df_iterator;
@@ -138,6 +139,19 @@ namespace ola
 			return GetTreeNode(a) != nullptr;
 		}
 
+		BasicBlock* GetImmediateDominator(BasicBlock* bb) const
+		{
+			return GetImmediateDominator(GetTreeNode(bb))->GetBasicBlock();
+		}
+		DominatorTreeNode const* GetImmediateDominator(DominatorTreeNode const* node) const
+		{
+			if (auto it = immediate_dominators.find(node); it != immediate_dominators.end())
+			{
+				return it->second;
+			}
+			return nullptr;
+		}
+
 		void ClearTree()
 		{
 			nodes.clear();
@@ -202,6 +216,7 @@ namespace ola
 
 	private:
 		DominatorTreeNode* root;
+		ImmediateDominatorsMap immediate_dominators;
 		DominatorTreeNodeMap nodes;
 
 	private:

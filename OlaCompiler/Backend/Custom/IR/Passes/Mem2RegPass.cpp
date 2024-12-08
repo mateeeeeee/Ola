@@ -15,9 +15,9 @@ namespace ola
 		}
 
 		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
-		InsertPhiFunctions(F, cfg, Allocas);
-
 		DT = &FAM.GetResult<DominatorTreeAnalysisPass>(F);
+
+		InsertPhiFunctions(F, cfg, Allocas);
 		for (AllocaInst* AI : Allocas) 
 		{
 			ValueStacks[AI] = std::stack<Value*>();
@@ -63,15 +63,7 @@ namespace ola
 
 			for (BasicBlock const* DefBlock : DefiningBlocks) 
 			{
-				for (BasicBlock* BB : cfg.GetSuccessors(DefBlock))
-				{
-					if (WorkList.insert(BB).second) 
-					{
-						PhiNode* Phi = new PhiNode(AI->GetAllocatedType());
-						BB->Instructions().Insert(BB->Instructions().begin(), Phi);
-						PhiNodes[AI].push_back(Phi);
-					}
-				}
+				//#todo
 			}
 		}
 	}
@@ -80,45 +72,7 @@ namespace ola
 	{
 		BasicBlock* BB = Node->GetBasicBlock();
 
-		auto& Instructions = BB->Instructions();
-		for (auto I = Instructions.begin(), E = Instructions.end(); I != E;)
-		{
-			Instruction* Inst = &*I++;
-			if (LoadInst* LI = dyn_cast<LoadInst>(Inst))
-			{
-				if (LI->GetAddressOp() == AI)
-				{
-					if (!ValueStacks[AI].empty())
-					{
-						LI->ReplaceAllUseWith(ValueStacks[AI].top());
-						LI->EraseFromParent();
-					}
-				}
-			}
-			else if (StoreInst* SI = dyn_cast<StoreInst>(Inst))
-			{
-				if (SI->GetAddressOp() == AI)
-				{
-					ValueStacks[AI].push(SI->GetValueOp());
-					SI->EraseFromParent();
-				}
-			}
-		}
-
-		for (PhiNode* Phi : PhiNodes[AI]) 
-		{
-			Phi->AddIncoming(ValueStacks[AI].empty() ? new UndefValue(AI->GetAllocatedType()) : ValueStacks[AI].top(), BB);
-		}
-
-		for (DominatorTreeNode* Child : *Node) 
-		{
-			RenameVariables(AI, Child);
-		}
-
-		if (!ValueStacks[AI].empty()) 
-		{
-			ValueStacks[AI].pop();
-		}
+		//#todo
 	}
 
 }

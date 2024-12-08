@@ -125,6 +125,7 @@ namespace ola
 				DominatorTreeNode* second = GetOrInsertNode(edge.second);
 				first->parent = second;
 				second->children.push_back(first);
+				immediate_dominators[first] = second;
 			}
 		}
 		ResetDepthFirstIndices();
