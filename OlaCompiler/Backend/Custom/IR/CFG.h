@@ -10,20 +10,20 @@ namespace ola
 	public:
 		CFG() = default;
 
-		void SetEntryBlock(BasicBlock const* bb)
+		void SetEntryBlock(BasicBlock* bb)
 		{
 			entry_block = bb;
 		}
-		BasicBlock const* GetEntryBlock() const { return entry_block; }
-		void AddPredecessor(BasicBlock const* bb, BasicBlock const* pred);
-		void AddSuccessor(BasicBlock const* bb, BasicBlock const* succ);
+		BasicBlock* GetEntryBlock() const { return entry_block; }
+		void AddPredecessor(BasicBlock* bb, BasicBlock* pred);
+		void AddSuccessor(BasicBlock* bb, BasicBlock* succ);
 
-		std::vector<BasicBlock const*> const& GetPredecessors(BasicBlock const* bb) const;
-		std::vector<BasicBlock const*> const& GetSuccessors(BasicBlock const* bb) const;
+		std::vector<BasicBlock*> const& GetPredecessors(BasicBlock const* bb) const;
+		std::vector<BasicBlock*> const& GetSuccessors(BasicBlock const* bb) const;
 
 	private:
-		BasicBlock const* entry_block = nullptr;
-		std::unordered_map<BasicBlock const*, std::vector<BasicBlock const*>> predecessors;
-		std::unordered_map<BasicBlock const*, std::vector<BasicBlock const*>> successors;
+		BasicBlock* entry_block = nullptr;
+		std::unordered_map<BasicBlock const*, std::vector<BasicBlock*>> predecessors;
+		std::unordered_map<BasicBlock const*, std::vector<BasicBlock*>> successors;
 	};
 }

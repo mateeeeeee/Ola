@@ -19,7 +19,8 @@ namespace ola
 		using df_iterator = DFTreeIterator<DominatorTreeNode>;
 		using const_df_iterator = DFTreeIterator<const DominatorTreeNode>;
 
-		explicit DominatorTreeNode(BasicBlock const* BB) : bb(BB), parent(nullptr), children(), dfs_preorder_index(-1), dfs_postorder_index(-1) {}
+		explicit DominatorTreeNode(BasicBlock* BB) : bb(BB), parent(nullptr), children(), dfs_preorder_index(-1), dfs_postorder_index(-1) {}
+		BasicBlock* GetBasicBlock() const { return bb; }
 
 		iterator	   begin()			{ return children.begin(); }
 		iterator	   end()			{ return children.end(); }
@@ -36,7 +37,7 @@ namespace ola
 		const_df_iterator df_cend()		const	{ return const_df_iterator(); }
 
 	private:
-		BasicBlock const* bb;
+		BasicBlock* bb;
 		DominatorTreeNode* parent;
 		std::vector<DominatorTreeNode*> children;
 		Int dfs_preorder_index;
@@ -47,7 +48,7 @@ namespace ola
 	class DominatorTree
 	{
 		using DominatorTreeNodeMap = std::unordered_map<Uint32, DominatorTreeNode>;
-		using DominatorTreeEdge = std::pair<BasicBlock const*, BasicBlock const*>;
+		using DominatorTreeEdge = std::pair<BasicBlock*, BasicBlock*>;
 	public:
 		using iterator = DominatorTreeNode::df_iterator;
 		using const_iterator = DominatorTreeNode::const_df_iterator;
@@ -173,7 +174,7 @@ namespace ola
 			}
 		}
 
-		DominatorTreeNode* GetOrInsertNode(BasicBlock const* bb) 
+		DominatorTreeNode* GetOrInsertNode(BasicBlock* bb) 
 		{
 			DominatorTreeNode* node = nullptr;
 			auto node_iter = nodes.find(bb->GetIndex());

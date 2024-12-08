@@ -192,6 +192,7 @@ namespace ola
 
 	class TrackableValue : public Value
 	{
+		using UserSet = std::unordered_set<Use*>;
 	public:
 		void AddUse(Use* u)
 		{
@@ -209,7 +210,19 @@ namespace ola
 		}
 		Bool HasOneUse() const { return users.size() == 1; }
 		Bool HasNUses(Uint32 N) const { return users.size() == N; }
-		Bool HasNUsesOrMore(unsigned N) const { return users.size() >= N; }
+		Bool HasNUsesOrMore(Uint32 N) const { return users.size() >= N; }
+
+		using UserIterator = UserSet::iterator;
+		using ConstUserIterator = UserSet::const_iterator;
+		using UserRange = IteratorRange<UserIterator>;
+		using ConstUserRange = IteratorRange<ConstUserIterator>;
+
+		UserIterator	  UserBegin()		{ return users.begin(); }
+		ConstUserIterator UserBegin() const	{ return users.begin(); }
+		UserIterator      UserEnd()			{ return users.end(); }
+		ConstUserIterator UserEnd() const	{ return users.end(); }
+		UserRange		  Users()			{ return UserRange(UserBegin(), UserEnd()); }
+		ConstUserRange	  Users() const		{ return ConstUserRange(UserBegin(), UserEnd()); }
 
 		static Bool ClassOf(Value const* V)
 		{

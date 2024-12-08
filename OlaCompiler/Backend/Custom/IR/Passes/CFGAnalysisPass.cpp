@@ -7,11 +7,6 @@ namespace ola
 {
 	Bool CFGAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		return RunOn(F);
-	}
-
-	Bool CFGAnalysisPass::RunOn(Function const& F)
-	{
 		for (auto& block : F.Blocks())
 		{
 			Instruction const* terminator = block.GetTerminator();
@@ -20,14 +15,14 @@ namespace ola
 				if (terminator->GetOpcode() == Opcode::Switch)
 				{
 					SwitchInst const* switch_inst = cast<SwitchInst>(terminator);
-					std::unordered_set<BasicBlock const*> switch_targets;
+					std::unordered_set<BasicBlock*> switch_targets;
 					switch_targets.insert(switch_inst->GetDefaultCase());
 					for (auto&& [_, target] : switch_inst->Cases())
 					{
 						switch_targets.insert(target);
 					}
 
-					for (BasicBlock const* target : switch_targets)
+					for (BasicBlock* target : switch_targets)
 					{
 						cfg.AddSuccessor(&block, target);
 					}
@@ -35,8 +30,8 @@ namespace ola
 				else
 				{
 					BranchInst const* branch_inst = cast<BranchInst>(terminator);
-					BasicBlock const* true_target = branch_inst->GetTrueTarget();
-					BasicBlock const* false_target = branch_inst->GetFalseTarget();
+					BasicBlock* true_target = branch_inst->GetTrueTarget();
+					BasicBlock* false_target = branch_inst->GetFalseTarget();
 					cfg.AddSuccessor(&block, true_target);
 					if (false_target && false_target != true_target)
 					{
@@ -47,7 +42,7 @@ namespace ola
 		}
 		OLA_ASSERT(cfg.GetPredecessors(&F.GetEntryBlock()).empty());
 		cfg.SetEntryBlock(&F.GetEntryBlock());
-		return true;
+		return false;
 	}
 
 	Bool CFGPrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)

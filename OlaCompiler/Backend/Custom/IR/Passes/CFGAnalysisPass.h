@@ -16,8 +16,6 @@ namespace ola
 
 	public:
 		CFGAnalysisPass() : FunctionPass(id) {}
-
-		Bool RunOn(Function const& F);
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 		Result const& GetResult() const { return cfg; }

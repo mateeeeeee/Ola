@@ -7,7 +7,7 @@
 namespace ola
 {
 	//https://github.com/KhronosGroup/SPIRV-Tools/blob/main/source/cfa.h: template <class BB> std::vector<std::pair<BB*, BB*>> CFA<BB>::CalculateDominators simplified
-	static std::vector<std::pair<BasicBlock const*, BasicBlock const*>> CalculateDominators(CFG const& cfg, std::vector<BasicBlock const*> const& postorder)
+	static std::vector<std::pair<BasicBlock*, BasicBlock*>> CalculateDominators(CFG const& cfg, std::vector<BasicBlock*> const& postorder)
 	{
 		struct BasicBlockDomInfo 
 		{
@@ -16,7 +16,7 @@ namespace ola
 		};
 		Uint64 const invalid_dom = postorder.size();
 
-		std::unordered_map<BasicBlock const*, BasicBlockDomInfo> idoms;
+		std::unordered_map<BasicBlock*, BasicBlockDomInfo> idoms;
 		for (Uint64 i = 0; i < postorder.size(); i++) 
 		{
 			idoms[postorder[i]] = { invalid_dom, i };
@@ -29,21 +29,21 @@ namespace ola
 			changed = false;
 			for (auto b = postorder.rbegin() + 1; b != postorder.rend(); ++b) 
 			{
-				std::vector<BasicBlock const*> const& predecessors = cfg.GetPredecessors(*b);
+				std::vector<BasicBlock*> const& predecessors = cfg.GetPredecessors(*b);
 
 				// Find the first processed/reachable predecessor that is reachable in the forward traversal.
 				auto res = std::find_if(std::begin(predecessors), std::end(predecessors),
-					[&idoms, invalid_dom](BasicBlock const* pred)
+					[&idoms, invalid_dom](BasicBlock* pred)
 					{
 						return idoms.contains(pred) && idoms[pred].dominator != invalid_dom;
 					});
 				if (res == end(predecessors)) continue;
 
-				BasicBlock const* idom = *res;
+				BasicBlock* idom = *res;
 				Uint64 idom_idx = idoms[idom].postorder_index;
 
 				// all other predecessors
-				for (const auto* p : predecessors) 
+				for (auto* p : predecessors) 
 				{
 					if (idom == p) continue;
 					// Only consider nodes reachable in the forward traversal.
@@ -76,7 +76,7 @@ namespace ola
 			}
 		}
 
-		std::vector<std::pair<BasicBlock const*, BasicBlock const*>> out;
+		std::vector<std::pair<BasicBlock*, BasicBlock*>> out;
 		for (auto const& idom : idoms) 
 		{
 			// At this point if there is no dominator for the node, just make it reflexive.
@@ -91,8 +91,8 @@ namespace ola
 		// Sort by postorder index to generate a deterministic ordering of edges.
 		std::sort(
 			out.begin(), out.end(),
-			[&idoms](const std::pair<BasicBlock const*, BasicBlock const*>& lhs,
-				const std::pair<BasicBlock const*, BasicBlock const*>& rhs) 
+			[&idoms](const std::pair<BasicBlock*, BasicBlock*>& lhs,
+				const std::pair<BasicBlock*, BasicBlock*>& rhs) 
 			{
 				OLA_ASSERT(lhs.first);
 				OLA_ASSERT(lhs.second);
@@ -150,13 +150,13 @@ namespace ola
 
 	std::vector<DominatorTree::DominatorTreeEdge> DominatorTree::GetImmediateDominators(CFG const& cfg)
 	{
-		std::vector<BasicBlock const*> postorder;
-		std::function<void(BasicBlock const*, std::set<BasicBlock const*>&)> DFSPostOrder =
-			[&](BasicBlock const* node, std::set<BasicBlock const*>& visited)
+		std::vector<BasicBlock*> postorder;
+		std::function<void(BasicBlock*, std::set<BasicBlock const*>&)> DFSPostOrder =
+			[&](BasicBlock* node, std::set<BasicBlock const*>& visited)
 			{
 				if (!node || visited.count(node)) return;
 				visited.insert(node);
-				for (auto const* succ : cfg.GetSuccessors(node))
+				for (auto* succ : cfg.GetSuccessors(node))
 				{ 
 					DFSPostOrder(succ, visited);
 				}

@@ -3,27 +3,27 @@
 
 namespace ola
 {
-	static const std::vector<BasicBlock const*> empty;
+	static const std::vector<BasicBlock*> empty;
 
-	void CFG::AddPredecessor(BasicBlock const* bb, BasicBlock const* pred)
+	void CFG::AddPredecessor(BasicBlock* bb, BasicBlock* pred)
 	{
 		predecessors[bb].push_back(pred);
 		successors[pred].push_back(bb);
 	}
 
-	void CFG::AddSuccessor(BasicBlock const* bb, BasicBlock const* succ)
+	void CFG::AddSuccessor(BasicBlock* bb, BasicBlock* succ)
 	{
 		successors[bb].push_back(succ);
 		predecessors[succ].push_back(bb);
 	}
 
-	std::vector<BasicBlock const*> const& CFG::GetPredecessors(BasicBlock const* bb) const
+	std::vector<BasicBlock*> const& CFG::GetPredecessors(BasicBlock const* bb) const
 	{
 		auto it = predecessors.find(bb);
 		return (it != predecessors.end()) ? it->second : empty;
 	}
 
-	std::vector<BasicBlock const*> const& CFG::GetSuccessors(BasicBlock const* bb) const
+	std::vector<BasicBlock*> const& CFG::GetSuccessors(BasicBlock const* bb) const
 	{
 		auto it = successors.find(bb);
 		return (it != successors.end()) ? it->second : empty;
