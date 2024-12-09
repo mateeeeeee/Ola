@@ -2,11 +2,11 @@
 <br/><br/>
 
 # Ola
-Ola is a toy programming language designed with a focus on modularity and learning, offering both an LLVM-based backend and a work-in-progress custom backend. 
+Ola is a toy programming language offering both an LLVM-based backend and a work-in-progress custom backend. 
 
 ## Dependencies
 * [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
-  * _Note: disable the LLVM backend even though you might have LLVM 17.0 installed by generating project with `ENABLE_LLVM=OFF`:_  
+  * _Note: You can disable the LLVM backend even though you might have LLVM 17.0 installed by generating project with `ENABLE_LLVM=OFF`:_  
     ```bash
     cmake -DENABLE_LLVM=OFF -B build
     ```
