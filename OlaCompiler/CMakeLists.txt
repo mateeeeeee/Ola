@@ -1,5 +1,16 @@
+option(ENABLE_LLVM "Enable LLVM backend" ON)
 
-find_package(LLVM 17.0 REQUIRED CONFIG)
+if(ENABLE_LLVM)
+    message(STATUS "LLVM backend is enabled.")
+    find_package(LLVM 17 QUIET CONFIG)
+    if(LLVM_FOUND)
+        message(STATUS "LLVM 17.0 found.")
+    else()
+        message(FATAL_ERROR "LLVM backend was enabled, but LLVM 17.0 installation was not found!")
+    endif()
+else()
+    message(STATUS "LLVM backend is disabled.")
+endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
 
@@ -64,16 +75,6 @@ set(FRONTEND_FILES
 
 
 set(BACKEND_FILES
-  Backend/LLVM/LLVMIRGenContext.h
-  Backend/LLVM/LLVMIRGenContext.cpp
-  Backend/LLVM/LLVMIRVisitor.h
-  Backend/LLVM/LLVMIRVisitor.cpp
-  Backend/LLVM/LLVMOptimizer.h
-  Backend/LLVM/LLVMOptimizer.cpp
-  Backend/LLVM/LLVMUtils.h
-  Backend/LLVM/LLVMUtils.cpp
-  Backend/LLVM/Passes/TestPass.h
-
   Backend/Custom/IR/IRBuilder.h
   Backend/Custom/IR/IRBuilder.cpp
   Backend/Custom/IR/ConstantFold.h
@@ -168,8 +169,21 @@ set(BACKEND_FILES
   Backend/Custom/PassManager.h
   Backend/Custom/PassRegistry.h
   Backend/Custom/AnalysisManager.h
-
 )
+
+if(LLVM_FOUND)
+    list(APPEND BACKEND_FILES 
+	  Backend/LLVM/LLVMIRGenContext.h
+	  Backend/LLVM/LLVMIRGenContext.cpp
+	  Backend/LLVM/LLVMIRVisitor.h
+	  Backend/LLVM/LLVMIRVisitor.cpp
+	  Backend/LLVM/LLVMOptimizer.h
+	  Backend/LLVM/LLVMOptimizer.cpp
+	  Backend/LLVM/LLVMUtils.h
+	  Backend/LLVM/LLVMUtils.cpp
+	  Backend/LLVM/Passes/TestPass.h
+)
+endif()
 
 set(COMPILER_FILES
   Compiler/Compiler.h
@@ -188,90 +202,90 @@ add_library(OlaCompiler STATIC
   ${BACKEND_FILES}
   ${COMPILER_FILES}
 )
-
 target_include_directories(OlaCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
 
-set(LLVM_LIBRARIES
-	LLVMAnalysis
-	LLVMCore
-	LLVMExecutionEngine
-	LLVMInstCombine
-	LLVMObject
-	LLVMSupport
-	LLVMOrcJIT
-	LLVMRuntimeDyld
-	LLVMScalarOpts
-	LLVMX86CodeGen
-	LLVMX86AsmParser
-	LLVMX86Desc
-	LLVMX86Disassembler
-	LLVMX86Info
-	LLVMAArch64AsmParser
-	LLVMAArch64CodeGen
-	LLVMAArch64Desc
-	LLVMAArch64Disassembler
-	LLVMAArch64Info
-	LLVMAArch64Utils
-	LLVMARMAsmParser
-	LLVMARMCodeGen
-	LLVMARMDesc
-	LLVMARMDisassembler
-	LLVMARMInfo
-	LLVMARMUtils
-	LLVMWebAssemblyAsmParser
-	LLVMWebAssemblyCodeGen
-	LLVMWebAssemblyDesc
-	LLVMWebAssemblyDisassembler
-	LLVMWebAssemblyInfo
-	LLVMWebAssemblyUtils
-	LLVMPasses
-	LLVMCoroutines
-	LLVMipo
-	LLVMFrontendOpenMP
-	LLVMLinker
-	LLVMIRPrinter
-	LLVMVectorize
-	LLVMJITLink
-	LLVMOrcTargetProcess
-	LLVMOrcShared
-	LLVMWindowsDriver
-	LLVMOption
-	LLVMAsmPrinter
-	LLVMCFGuard
-	LLVMGlobalISel
-	LLVMInstrumentation
-	LLVMSelectionDAG
-	LLVMCodeGen
-	LLVMAggressiveInstCombine
-	LLVMTarget
-	LLVMBitWriter
-	LLVMObjCARCOpts
-	LLVMTransformUtils
-	LLVMProfileData
-	LLVMSymbolize
-	LLVMDebugInfoPDB
-	LLVMDebugInfoMSF
-	LLVMDebugInfoBTF
-	LLVMDebugInfoDWARF
-	LLVMIRReader
-	LLVMBitReader
-	LLVMAsmParser
-	LLVMTextAPI
-	LLVMRemarks
-	LLVMBitstreamReader
-	LLVMCodeGenTypes
-	LLVMMCParser
-	LLVMMCDisassembler
-	LLVMMC
-	LLVMBinaryFormat
-	LLVMTargetParser
-	LLVMDebugInfoCodeView
-	LLVMDemangle
-)
-
-target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
-target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
+if(LLVM_FOUND)
+	target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
+	set(LLVM_LIBRARIES
+		LLVMAnalysis
+		LLVMCore
+		LLVMExecutionEngine
+		LLVMInstCombine
+		LLVMObject
+		LLVMSupport
+		LLVMOrcJIT
+		LLVMRuntimeDyld
+		LLVMScalarOpts
+		LLVMX86CodeGen
+		LLVMX86AsmParser
+		LLVMX86Desc
+		LLVMX86Disassembler
+		LLVMX86Info
+		LLVMAArch64AsmParser
+		LLVMAArch64CodeGen
+		LLVMAArch64Desc
+		LLVMAArch64Disassembler
+		LLVMAArch64Info
+		LLVMAArch64Utils
+		LLVMARMAsmParser
+		LLVMARMCodeGen
+		LLVMARMDesc
+		LLVMARMDisassembler
+		LLVMARMInfo
+		LLVMARMUtils
+		LLVMWebAssemblyAsmParser
+		LLVMWebAssemblyCodeGen
+		LLVMWebAssemblyDesc
+		LLVMWebAssemblyDisassembler
+		LLVMWebAssemblyInfo
+		LLVMWebAssemblyUtils
+		LLVMPasses
+		LLVMCoroutines
+		LLVMipo
+		LLVMFrontendOpenMP
+		LLVMLinker
+		LLVMIRPrinter
+		LLVMVectorize
+		LLVMJITLink
+		LLVMOrcTargetProcess
+		LLVMOrcShared
+		LLVMWindowsDriver
+		LLVMOption
+		LLVMAsmPrinter
+		LLVMCFGuard
+		LLVMGlobalISel
+		LLVMInstrumentation
+		LLVMSelectionDAG
+		LLVMCodeGen
+		LLVMAggressiveInstCombine
+		LLVMTarget
+		LLVMBitWriter
+		LLVMObjCARCOpts
+		LLVMTransformUtils
+		LLVMProfileData
+		LLVMSymbolize
+		LLVMDebugInfoPDB
+		LLVMDebugInfoMSF
+		LLVMDebugInfoBTF
+		LLVMDebugInfoDWARF
+		LLVMIRReader
+		LLVMBitReader
+		LLVMAsmParser
+		LLVMTextAPI
+		LLVMRemarks
+		LLVMBitstreamReader
+		LLVMCodeGenTypes
+		LLVMMCParser
+		LLVMMCDisassembler
+		LLVMMC
+		LLVMBinaryFormat
+		LLVMTargetParser
+		LLVMDebugInfoCodeView
+		LLVMDemangle
+	)
+	target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
+	target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
+endif()
 
 if(MSVC)
 	set(DISABLED_WARNINGS
@@ -322,6 +336,15 @@ endif()
 add_executable(OlaDriver main.cpp autogen/OlaConfig.h)
 target_link_libraries(OlaDriver PRIVATE OlaCompiler)
 set_target_properties(OlaDriver PROPERTIES OUTPUT_NAME Ola)
+
+
+if(LLVM_FOUND)
+    target_compile_definitions(OlaCompiler PRIVATE HAS_LLVM=1)
+    target_compile_definitions(OlaDriver PRIVATE HAS_LLVM=1)
+else()
+    target_compile_definitions(OlaCompiler PRIVATE HAS_LLVM=0)
+    target_compile_definitions(OlaDriver PRIVATE HAS_LLVM=0)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES})

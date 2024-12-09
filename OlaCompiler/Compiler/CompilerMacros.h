@@ -2,7 +2,7 @@
 #include "Core/Macros.h"
 #include "autogen/OlaConfig.h"
 
-#if OLA_NOLLVM
+#if !LLVM_BACKEND
 
 #ifdef DEBUG
 #define OLA_EXE_PATH OLA_CONCAT(OLA_BINARY_PATH, "Debug/Ola.exe")

@@ -12,16 +12,17 @@
 #include "Frontend/ImportProcessor.h"
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
-#include "Backend/LLVM/LLVMIRGenContext.h"
-#include "Backend/LLVM/LLVMOptimizer.h"
 #include "Backend/Custom/IR/IRGenContext.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
-
+#if HAS_LLVM
+#include "Backend/LLVM/LLVMIRGenContext.h"
+#include "Backend/LLVM/LLVMOptimizer.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
+#endif
 
 namespace fs = std::filesystem;
 
@@ -61,6 +62,7 @@ namespace ola
 
 			if (!no_llvm)
 			{
+#if HAS_LLVM
 				LLVMIRGenContext llvm_ir_gen_ctx(source_file);
 				llvm_ir_gen_ctx.Generate(ast);
 
@@ -95,6 +97,9 @@ namespace ola
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				system(compile_cmd.c_str());
+#else
+				OLA_ASSERT_MSG(false, "LLVM backend is disabled. Use --nollvm or generate project with -DENABLE_LLVM=ON assuming you have LLVM 17.0 installed");
+#endif
 			}
 			else
 			{
