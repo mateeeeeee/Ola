@@ -5,7 +5,7 @@
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/CFGAnalysisPass.h"
 #include "Passes/DominatorTreeAnalysisPass.h"
-#include "Passes/DominanceFrontierPrinterPass.h"
+#include "Passes/DominanceFrontierAnalysisPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 
 namespace ola

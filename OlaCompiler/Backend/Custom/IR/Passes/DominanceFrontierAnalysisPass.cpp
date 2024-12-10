@@ -1,5 +1,5 @@
 #include <iostream>
-#include "DominanceFrontierPrinterPass.h"
+#include "DominanceFrontierAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
 #include "CFGAnalysisPass.h"
 
