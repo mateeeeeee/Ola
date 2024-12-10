@@ -94,6 +94,7 @@ Ola consists of the following parts:
   * `--domtree`: Dump Dominator Trees to .dot files and visualize them
   * `--emit-ir`: Emit (i.e. don't delete) IR file
   * `--emit-asm`: Emit (i.e. don't delete) ASM file
+  *  `--print-domfrontier`: Print dominance frontiers to standard output
   * `--nollvm`: Use custom backend instead of LLVM backend
   * `--test`: Used for running g-tests
   * `--Od`: No optimizations

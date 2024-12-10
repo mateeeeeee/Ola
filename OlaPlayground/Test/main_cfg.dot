@@ -1,7 +1,7 @@
 digraph "CFG for 'main function" {
 			label="CFG for 'main function";
 			
-Node0x272abf02eb0[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82cf0[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 entry:\l
 %0 = alloca i64\l
 %1 = alloca i64\l
@@ -15,10 +15,10 @@ store i64 %3, ptr %4\l
 br i8 %6, label if.then, label if.else\l
 }"];
 
-Node0x272abf02eb0->Node0x272abf02e40
-Node0x272abf02eb0->Node0x272abf02f20
+Node0x1ab87e82cf0->Node0x1ab87e82f90
+Node0x1ab87e82cf0->Node0x1ab87e82c80
 
-Node0x272abf02e40[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82f90[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 if.then:\l
 %7 = load i64, ptr %1\l
 %8 = alloca ptr\l
@@ -28,40 +28,40 @@ store i64 %9, ptr %1\l
 br label if.end\l
 }"];
 
-Node0x272abf02e40->Node0x272abf02f90
+Node0x1ab87e82f90->Node0x1ab87e830e0
 
-Node0x272abf02f20[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82c80[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 if.else:\l
 store 2, ptr %0\l
 br label exit\l
 }"];
 
-Node0x272abf02f20->Node0x272abf02ba0
+Node0x1ab87e82c80->Node0x1ab87e82f20
 
-Node0x272abf03000[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82ac0[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 return:\l
 br label exit\l
 }"];
 
-Node0x272abf03000->Node0x272abf02ba0
+Node0x1ab87e82ac0->Node0x1ab87e82f20
 
-Node0x272abf02f90[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e830e0[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 if.end:\l
 %10 = load i64, ptr %1\l
 store i64 %10, ptr %0\l
 br label exit\l
 }"];
 
-Node0x272abf02f90->Node0x272abf02ba0
+Node0x1ab87e830e0->Node0x1ab87e82f20
 
-Node0x272abf03070[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82b30[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 return1:\l
 br label exit\l
 }"];
 
-Node0x272abf03070->Node0x272abf02ba0
+Node0x1ab87e82b30->Node0x1ab87e82f20
 
-Node0x272abf02ba0[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
+Node0x1ab87e82f20[shape = record, color = "#b70d28ff", style = filled,  fillcolor = "#b70d2870", label = "{ 
 exit:\l
 %11 = load i64, ptr %0\l
 ret i64 %11\l

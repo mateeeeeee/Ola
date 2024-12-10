@@ -3,6 +3,7 @@
 #include "DominanceFrontierAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
 #include "CFGAnalysisPass.h"
+#include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
 {
@@ -18,9 +19,11 @@ namespace ola
 	{
 		auto const& DF = FAM.GetResult<DominanceFrontierAnalysisPass>(F);
 		Uint MaxBBNameLength = GetMaxBasicBlockNameLength(DF);
+
+		std::cout << "Dominance Frontiers for Function " << F.GetName() << ":\n";
 		for (auto I = DF.begin(), E = DF.end(); I != E; ++I) 
 		{
-			std::cout << "Dominance Frontier for BB ";
+			std::cout << "\tDominance Frontier for BB ";
 			std::cout << std::left << std::setw(MaxBBNameLength) << I->first->GetName();
 			std::cout << " is:\t";
 			auto const& Frontier = I->second;
@@ -31,6 +34,7 @@ namespace ola
 			}
 			std::cout << '\n';
 		}
+		std::cout << '\n';
 		return false;
 	}
 
