@@ -10,10 +10,9 @@ namespace ola
 	class BasicBlock;
 	class CFGAnalysisPass : public FunctionPass
 	{
-	public:
 		inline static Char id = 0;
+	public:
 		using Result = CFG;
-
 	public:
 		CFGAnalysisPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
@@ -28,10 +27,9 @@ namespace ola
 
 	class CFGPrinterPass : public FunctionPass
 	{
-	public:
 		inline static Char id = 0;
+	public:
 		using Result = void;
-
 	public:
 		CFGPrinterPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;

@@ -33,6 +33,9 @@ namespace ola
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 		static void const* ID() { return &id; }
+
+	private:
+		static Uint GetMaxBasicBlockNameLength(DominanceFrontier const& DF);
 	};
 	OLA_REGISTER_PASS(DominanceFrontierPrinterPass, "Dominance Frontier Printer");
 }

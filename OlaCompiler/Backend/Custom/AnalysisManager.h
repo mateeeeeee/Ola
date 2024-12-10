@@ -1,9 +1,8 @@
 #pragma once
-#include <string_view>
 #include <vector>
 #include <memory>
-#include <unordered_map>
 #include "Pass.h"
+#include "PassRegistry.h"
 
 namespace ola
 {
@@ -39,6 +38,9 @@ namespace ola
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
 			if (!analysis_info.analysis_passes.contains(PassT::ID()))
 			{
+				PassInfo const* pass_info = g_PassRegistry.GetInfo(PassT::ID());
+				OLA_ASSERT_MSG(pass_info, "Pass was not registered! Did you forget to declare OLA_REGISTER_PASS or OLA_REGISTER_ANALYSIS_PASS? ");
+				OLA_ASSERT_MSG(pass_info->IsAnalysis(), "Cannot register non-analysis pass to analysis manager!");
 				analysis_info.analysis_passes[PassT::ID()] = std::make_unique<PassT>(std::forward<Args>(args)...);
 			}
 		}

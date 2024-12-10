@@ -6,17 +6,19 @@ namespace ola
 {
 	class IRModule;
 
-	class IROptimizer
+	class IRPassManager
 	{
 	public:
-		explicit IROptimizer(IRModule& M);
+		explicit IRPassManager(IRModule& M);
 		void PrintCFG();
 		void PrintDomTree();
-		void Optimize(OptimizationLevel);
+		void PrintDomFrontier();
+		void Run(OptimizationLevel);
 
 	private:
 		IRModule& M;
 		Bool cfg_print;
 		Bool domtree_print;
+		Bool domfrontier_print;
 	};
 }

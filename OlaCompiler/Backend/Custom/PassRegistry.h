@@ -57,7 +57,7 @@ namespace ola
 	class RegisterPass : public PassInfo
 	{
 	public:
-		explicit RegisterPass(std::string_view name) : PassInfo(name, &PassT::ID, false)
+		explicit RegisterPass(std::string_view name) : PassInfo(name, PassT::ID(), false)
 		{
 			g_PassRegistry.RegisterPass(*this);
 		}
@@ -67,7 +67,7 @@ namespace ola
 	class RegisterAnalysisPass : public PassInfo
 	{
 	public:
-		explicit RegisterAnalysisPass(std::string_view name) : PassInfo(name, &PassT::ID, true)
+		explicit RegisterAnalysisPass(std::string_view name) : PassInfo(name, PassT::ID(), true)
 		{
 			g_PassRegistry.RegisterPass(*this);
 		}

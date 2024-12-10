@@ -8,11 +8,11 @@ namespace llvm
 
 namespace ola
 {
-	class LLVMOptimizer
+	class LLVMIRPassManager
 	{
 	public:
-		explicit LLVMOptimizer(llvm::Module& module);
-		void Optimize(OptimizationLevel level);
+		explicit LLVMIRPassManager(llvm::Module& module);
+		void Run(OptimizationLevel level);
 
 	private:
 		llvm::Module& module;

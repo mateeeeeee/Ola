@@ -1,7 +1,6 @@
 #pragma once
 #include "IRContext.h"
 #include "IRModule.h"
-#include "IROptimizer.h"
 
 namespace ola
 {

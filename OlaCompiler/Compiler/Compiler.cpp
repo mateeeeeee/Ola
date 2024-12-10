@@ -13,13 +13,14 @@
 #include "Frontend/Parser.h"
 #include "Frontend/Sema.h"
 #include "Backend/Custom/IR/IRGenContext.h"
+#include "Backend/Custom/IR/IRPassManager.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "autogen/OlaConfig.h"
 #if HAS_LLVM
 #include "Backend/LLVM/LLVMIRGenContext.h"
-#include "Backend/LLVM/LLVMOptimizer.h"
+#include "Backend/LLVM/LLVMIRPassManager.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #endif
@@ -44,8 +45,19 @@ namespace ola
 			}
 		}
 
+		struct TUCompilationOptions
+		{
+			OptimizationLevel opt_level;
+			Bool use_llvm_backend;
+			Bool dump_ast;
+			Bool dump_cfg;
+			Bool dump_callgraph;
+			Bool dump_domtree;
+			Bool print_domfrontier;
+		};
+
 		void CompileTranslationUnit(FrontendContext& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
-			OptimizationLevel opt_level, Bool no_llvm, Bool ast_dump, Bool cfg_dump, Bool callgraph_dump, Bool domtree_dump)
+			TUCompilationOptions const& opts)
 		{
 			Diagnostics diagnostics{};
 			SourceBuffer src(source_file);
@@ -58,17 +70,17 @@ namespace ola
 			Parser parser(&context, diagnostics);
 			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
-			if (ast_dump) DebugVisitor debug_ast(ast);
+			if (opts.dump_ast) DebugVisitor debug_ast(ast);
 
-			if (!no_llvm)
+			if (opts.use_llvm_backend)
 			{
 #if HAS_LLVM
-				LLVMIRGenContext llvm_ir_gen_ctx(source_file);
-				llvm_ir_gen_ctx.Generate(ast);
+				LLVMIRGenContext llvmir_gen_ctx(source_file);
+				llvmir_gen_ctx.Generate(ast);
 
-				llvm::Module& module = llvm_ir_gen_ctx.GetModule();
-				LLVMOptimizer optimizer(module);
-				optimizer.Optimize(opt_level);
+				llvm::Module& llvm_module = llvmir_gen_ctx.GetModule();
+				LLVMIRPassManager llvmir_pass_manager(llvm_module);
+				llvmir_pass_manager.Run(opts.opt_level);
 
 				std::error_code error;
 				llvm::raw_fd_ostream llvm_ir_stream(ir_file, error, llvm::sys::fs::OF_None);
@@ -77,22 +89,27 @@ namespace ola
 					OLA_ERROR("Error when creating llvm::raw_fd_ostream: {}", error.message());
 					return;
 				}
-				module.print(llvm_ir_stream, nullptr);
+				llvm_module.print(llvm_ir_stream, nullptr);
 				
-				if (cfg_dump)
+				if (opts.dump_cfg)
 				{
 					std::string dot_cfg_cmd = std::format("opt -passes=dot-cfg -disable-output {}", ir_file);
 					system(dot_cfg_cmd.c_str());
 				}
-				if (callgraph_dump)
+				if (opts.dump_callgraph)
 				{
 					std::string dot_allgraph_cmd = std::format("opt -passes=dot-callgraph -disable-output {}", ir_file);
 					system(dot_allgraph_cmd.c_str());
 				}
-				if (domtree_dump)
+				if (opts.dump_domtree)
 				{
 					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
 					system(dot_domtree_cmd.c_str());
+				}
+				if (opts.print_domfrontier)
+				{
+					std::string print_domfrontier_cmd = std::format("opt -passes=\"print<domfrontier>\" -disable-output {}", ir_file);
+					system(print_domfrontier_cmd.c_str());
 				}
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
@@ -105,15 +122,18 @@ namespace ola
 			{
 				IRGenContext ir_gen_ctx(source_file);
 				ir_gen_ctx.Generate(ast);
-				IRModule& module = ir_gen_ctx.GetModule();
-				IROptimizer optimizer(module);
-				if (cfg_dump) optimizer.PrintCFG();
-				if (domtree_dump) optimizer.PrintDomTree();
-				optimizer.Optimize(opt_level);
-				module.Print(ir_file);
+				IRModule& ir_module = ir_gen_ctx.GetModule();
+
+				IRPassManager ir_pass_manager(ir_module);
+				if (opts.dump_cfg) ir_pass_manager.PrintCFG();
+				if (opts.dump_domtree) ir_pass_manager.PrintDomTree();
+				if (opts.print_domfrontier) ir_pass_manager.PrintDomFrontier();
+				ir_pass_manager.Run(opts.opt_level);
+
+				ir_module.Print(ir_file);
 
 				x64Target x64_target{};
-				MachineModule machine_module(module, x64_target);
+				MachineModule machine_module(ir_module, x64_target);
 				machine_module.EmitAssembly(assembly_file);
 			}
 		}
@@ -128,6 +148,7 @@ namespace ola
 		Bool const no_llvm = compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM;
 		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
+		Bool const print_domfrontier = compile_request.GetCompilerFlags() & CompilerFlag_PrintDomFrontier;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -158,8 +179,17 @@ namespace ola
 			else		 ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
 
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, opt_level, no_llvm, 
-								   ast_dump, cfg_dump, callgraph_dump, domtree_dump);
+			TUCompilationOptions tu_comp_opts
+			{
+				.opt_level = opt_level,
+				.use_llvm_backend = !no_llvm,
+				.dump_ast = ast_dump,
+				.dump_cfg = cfg_dump,
+				.dump_callgraph = callgraph_dump,
+				.dump_domtree = domtree_dump,
+				.print_domfrontier = print_domfrontier
+			};
+			CompileTranslationUnit(context, source_file, ir_file, assembly_file, tu_comp_opts);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
@@ -190,7 +220,7 @@ namespace ola
 		std::system(link_cmd.c_str());
 
 		std::string const& exe_cmd = output_file;
-		Int64 res = std::system(exe_cmd.c_str());
+		Int res = std::system(exe_cmd.c_str());
 
 		fs::current_path(cur_path);
 		return res;

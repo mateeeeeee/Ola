@@ -14,13 +14,12 @@ namespace ola
 
 	class Mem2RegPass : public FunctionPass
 	{
+		inline static Char id = 0;
 	public:
-		inline static Char ID = 0;
-	public:
-		Mem2RegPass() : FunctionPass(ID) {}
-
+		Mem2RegPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
-
+		
+		static void const* ID() { return &id; }
 	private:
 		std::unordered_map<AllocaInst*, std::stack<Value*>>		ValueStacks;
 		std::unordered_map<AllocaInst*, std::vector<PhiNode*>>	PhiNodes;

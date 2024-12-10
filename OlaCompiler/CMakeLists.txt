@@ -85,8 +85,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRGenContext.cpp
   Backend/Custom/IR/IRModule.h
   Backend/Custom/IR/IRModule.cpp
-  Backend/Custom/IR/IROptimizer.h
-  Backend/Custom/IR/IROptimizer.cpp
+  Backend/Custom/IR/IRPassManager.h
+  Backend/Custom/IR/IRPassManager.cpp
   Backend/Custom/IR/IRPrinter.h
   Backend/Custom/IR/IRPrinter.cpp
   Backend/Custom/IR/PrinterBase.h
@@ -181,8 +181,8 @@ if(LLVM_FOUND)
 	  Backend/LLVM/LLVMIRGenContext.cpp
 	  Backend/LLVM/LLVMIRVisitor.h
 	  Backend/LLVM/LLVMIRVisitor.cpp
-	  Backend/LLVM/LLVMOptimizer.h
-	  Backend/LLVM/LLVMOptimizer.cpp
+	  Backend/LLVM/LLVMIRPassManager.h
+	  Backend/LLVM/LLVMIRPassManager.cpp
 	  Backend/LLVM/LLVMUtils.h
 	  Backend/LLVM/LLVMUtils.cpp
 	  Backend/LLVM/Passes/TestPass.h

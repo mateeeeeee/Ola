@@ -19,6 +19,7 @@ namespace ola
 	void DominanceFrontier::Initialize(DominatorTree const& DT, CFG const& cfg)
 	{
 		dominance_frontier_map.clear();
+		dominance_frontier_map[cfg.GetEntryBlock()] = {};
 		DT.VisitPostOrder([this, &DT, &cfg](DominatorTreeNode const* node) -> Bool
 			{
 				BasicBlock* X = node->GetBasicBlock();

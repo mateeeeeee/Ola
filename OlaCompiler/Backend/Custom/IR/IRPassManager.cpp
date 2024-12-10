@@ -1,4 +1,4 @@
-#include "IROptimizer.h"
+#include "IRPassManager.h"
 #include "IRModule.h"
 #include "GlobalValue.h"
 #include "Passes/ArithmeticReductionPass.h"
@@ -11,27 +11,33 @@
 namespace ola
 {
 
-	IROptimizer::IROptimizer(IRModule& M) : M(M), cfg_print(false), domtree_print(false)
+	IRPassManager::IRPassManager(IRModule& M) : M(M), cfg_print(false), domtree_print(false), domfrontier_print(false)
 	{
 	}
 
-	void IROptimizer::PrintCFG()
+	void IRPassManager::PrintCFG()
 	{
 		cfg_print = true;
 	}
 
-	void IROptimizer::PrintDomTree()
+	void IRPassManager::PrintDomTree()
 	{
 		domtree_print = true;
 	}
 
-	void IROptimizer::Optimize(OptimizationLevel level)
+	void IRPassManager::PrintDomFrontier()
+	{
+		domfrontier_print = true;
+	}
+
+	void IRPassManager::Run(OptimizationLevel level)
 	{
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
 
-		if (cfg_print)		FPM.AddPass(new CFGPrinterPass());
-		if (domtree_print)  FPM.AddPass(new DominatorTreePrinterPass());
+		if (cfg_print)			FPM.AddPass(new CFGPrinterPass());
+		if (domtree_print)		FPM.AddPass(new DominatorTreePrinterPass());
+		if (domfrontier_print)  FPM.AddPass(new DominanceFrontierPrinterPass());
 		switch (level)
 		{
 		case OptimizationLevel::O3:
@@ -56,7 +62,7 @@ namespace ola
 				Function& F = *cast<Function>(G);
 				FAM.RegisterPass<CFGAnalysisPass>(F);
 				FAM.RegisterPass<DominatorTreeAnalysisPass>(F);
-				FAM.RegisterPass<DominanceFrontierPrinterPass>(F);
+				FAM.RegisterPass<DominanceFrontierAnalysisPass>(F);
 				FPM.Run(F, FAM);
 			}
 		}

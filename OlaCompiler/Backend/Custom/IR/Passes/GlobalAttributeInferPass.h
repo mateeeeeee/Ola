@@ -6,12 +6,12 @@ namespace ola
 {
 	class GlobalAttributeInferPass : public IRModulePass
 	{
+		inline static Char id = 0;
 	public:
-		inline static Char ID = 0;
-	public:
-		explicit GlobalAttributeInferPass() : IRModulePass(ID) {}
-
+		explicit GlobalAttributeInferPass() : IRModulePass(id) {}
 		virtual Bool RunOn(IRModule&, IRModuleAnalysisManager&) override;
+
+		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(GlobalAttributeInferPass, "Global Attribute Infer Pass");
 }

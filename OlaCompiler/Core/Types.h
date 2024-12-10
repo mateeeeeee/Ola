@@ -22,4 +22,6 @@ namespace ola
 	using Uint		= unsigned int;
 	using Float		= float;
 	using Float64   = double;
+	using Uintptr	= std::uintptr_t;
+	using Intptr	= std::intptr_t;
 }

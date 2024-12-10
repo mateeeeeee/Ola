@@ -11,8 +11,9 @@ namespace ola
 		CompilerFlag_DumpCFG = 0x04,
 		CompilerFlag_DumpCallGraph = 0x08,
 		CompilerFlag_DumpDomTree = 0x10,
-		CompilerFlag_EmitIR = 0x20,
-		CompilerFlag_EmitASM = 0x40
+		CompilerFlag_PrintDomFrontier = 0x20,
+		CompilerFlag_EmitASM = 0x40,
+		CompilerFlag_EmitIR = 0x80
 	};
 	template<>
 	struct EnumBitmaskOperators<CompilerFlags>

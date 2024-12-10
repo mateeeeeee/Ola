@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "LLVMOptimizer.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 

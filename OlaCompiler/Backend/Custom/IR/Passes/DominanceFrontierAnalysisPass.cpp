@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "DominanceFrontierAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
 #include "CFGAnalysisPass.h"
@@ -16,20 +17,35 @@ namespace ola
 	Bool DominanceFrontierPrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		auto const& DF = FAM.GetResult<DominanceFrontierAnalysisPass>(F);
+		Uint MaxBBNameLength = GetMaxBasicBlockNameLength(DF);
 		for (auto I = DF.begin(), E = DF.end(); I != E; ++I) 
 		{
-			std::cout << "  DomFrontier for BB ";
-			std::cout << I->first->GetName();
+			std::cout << "Dominance Frontier for BB ";
+			std::cout << std::left << std::setw(MaxBBNameLength) << I->first->GetName();
 			std::cout << " is:\t";
 			auto const& Frontier = I->second;
 			for (BasicBlock const* BB : Frontier)
 			{
 				std::cout << ' ';
-				if (BB) std::cout << BB->GetName();
+				if (BB) std::cout << std::left << std::setw(MaxBBNameLength) << BB->GetName();
 			}
 			std::cout << '\n';
 		}
 		return false;
+	}
+
+	Uint DominanceFrontierPrinterPass::GetMaxBasicBlockNameLength(DominanceFrontier const& DF)
+	{
+		Uint MaxBBNameLength = 0;
+		for (auto I = DF.begin(), E = DF.end(); I != E; ++I) 
+		{
+			Uint BBNameLength = I->first->GetName().size();
+			if (BBNameLength > MaxBBNameLength) 
+			{
+				MaxBBNameLength = BBNameLength;
+			}
+		}
+		return MaxBBNameLength;
 	}
 
 }

@@ -15,6 +15,7 @@ namespace ola
 		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1) {}
 		explicit BasicBlock(IRContext& C, Function* function, Uint32 idx);
 		~BasicBlock() {}
+
 		auto& Instructions()
 		{
 			return instructions;
@@ -67,7 +68,6 @@ namespace ola
 
 	private:
 		Function* function;
-		std::string label;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
 	};

@@ -9,12 +9,11 @@ namespace ola
 
 	class ArithmeticReductionPass : public FunctionPass
 	{
+		inline static Char id = 0;
 	public:
-		inline static Char ID = 0;
-	public:
-		ArithmeticReductionPass() : FunctionPass(ID) {}
-
+		ArithmeticReductionPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(ArithmeticReductionPass, "Arithmetic Reduction Pass");
 }

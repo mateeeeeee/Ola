@@ -1,4 +1,4 @@
-#include "LLVMOptimizer.h"
+#include "LLVMIRPassManager.h"
 #include "LLVMUtils.h"
 #include "Passes/TestPass.h"
 #include "llvm/Pass.h" 
@@ -14,9 +14,9 @@
 namespace ola
 {
 	
-	LLVMOptimizer::LLVMOptimizer(llvm::Module& module) : module(module) {}
+	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module) {}
 
-	void LLVMOptimizer::Optimize(OptimizationLevel level)
+	void LLVMIRPassManager::Run(OptimizationLevel level)
 	{
 		llvm::legacy::PassManager pass_manager;
 
@@ -46,7 +46,6 @@ namespace ola
 			break;
 		}
 		pass_manager.run(module);
-
 		Bool verified = VerifyLLVMModule(module);
 	}
 }
