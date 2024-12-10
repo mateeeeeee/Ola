@@ -71,7 +71,6 @@ namespace ola
 	void Mem2RegPass::RenameVariables(AllocaInst* AI, DominatorTreeNode const* Node)
 	{
 		BasicBlock* BB = Node->GetBasicBlock();
-
 		//#todo
 	}
 

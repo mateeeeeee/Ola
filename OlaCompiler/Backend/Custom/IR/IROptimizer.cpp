@@ -5,6 +5,7 @@
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/CFGAnalysisPass.h"
 #include "Passes/DominatorTreeAnalysisPass.h"
+#include "Passes/DominanceFrontierPrinterPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 
 namespace ola
@@ -55,6 +56,7 @@ namespace ola
 				Function& F = *cast<Function>(G);
 				FAM.RegisterPass<CFGAnalysisPass>(F);
 				FAM.RegisterPass<DominatorTreeAnalysisPass>(F);
+				FAM.RegisterPass<DominanceFrontierPrinterPass>(F);
 				FPM.Run(F, FAM);
 			}
 		}

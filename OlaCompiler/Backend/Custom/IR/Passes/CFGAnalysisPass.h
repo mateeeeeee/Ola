@@ -18,11 +18,11 @@ namespace ola
 		CFGAnalysisPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
-		Result const& GetResult() const { return cfg; }
+		CFG const& GetResult() const { return cfg; }
 		static void const* ID() { return &id; }
 
 	private:
-		Result cfg;
+		CFG cfg;
 	};
 	OLA_REGISTER_ANALYSIS_PASS(CFGAnalysisPass, "CFG Analysis");
 

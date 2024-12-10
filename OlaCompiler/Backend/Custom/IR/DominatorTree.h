@@ -177,6 +177,19 @@ namespace ola
 			return true;
 		}
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
+		Bool VisitPostOrder(F&& f) 
+		{
+			if (!root) return true;
+			return VisitPostOrderImpl(root, std::forward<F>(f));
+		}
+		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode const*>
+		Bool VisitPostOrder(F&& f) const 
+		{
+			if (!root) return true; // No nodes to traverse
+
+			return VisitPostOrderImpl(root, std::forward<F>(f));
+		}
+		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
 		Bool VisitChildrenIf(F&& f, iterator node)
 		{
 			if (f(&*node)) 
@@ -223,6 +236,32 @@ namespace ola
 		void ResetDepthFirstIndicesRecursive(DominatorTreeNode* node, Int& index);
 		std::vector<DominatorTreeEdge> GetImmediateDominators(CFG const& cfg);
 		void PrintNode(std::ostream& os, DominatorTreeNode const* node) const;
+
+	private:
+		template<typename F>
+		Bool VisitPostOrderImpl(DominatorTreeNode* node, F&& f) 
+		{
+			for (DominatorTreeNode* child : *node)
+			{
+				if (!VisitPostOrderImpl(child, std::forward<F>(f))) 
+				{
+					return false; 
+				}
+			}
+			return std::invoke(std::forward<F>(f), node);
+		}
+		template<typename F>
+		Bool VisitPostOrderImpl(DominatorTreeNode const* node, F&& f) const 
+		{
+			for (DominatorTreeNode const* child : *node) 
+			{
+				if (!VisitPostOrderImpl(child, std::forward<F>(f)))
+				{
+					return false;
+				}
+			}
+			return std::invoke(std::forward<F>(f), node);
+		}
 	};
 
 }

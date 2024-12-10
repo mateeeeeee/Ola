@@ -6,7 +6,7 @@ if(ENABLE_LLVM)
     if(LLVM_FOUND)
         message(STATUS "LLVM 17.0 found.")
     else()
-        message(FATAL_ERROR "LLVM backend was enabled, but LLVM 17.0 installation was not found!")
+        message(STATUS "LLVM backend was enabled, but LLVM 17.0 was not found! Disabling LLVM backend...")
     endif()
 else()
     message(STATUS "LLVM backend is disabled.")
@@ -114,9 +114,13 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRModulePass.h
   Backend/Custom/IR/DominatorTree.h
   Backend/Custom/IR/DominatorTree.cpp
+  Backend/Custom/IR/DominanceFrontier.h
+  Backend/Custom/IR/DominanceFrontier.cpp
   
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.cpp
+  Backend/Custom/IR/Passes/DominanceFrontierPrinterPass.h
+  Backend/Custom/IR/Passes/DominanceFrontierPrinterPass.cpp
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h

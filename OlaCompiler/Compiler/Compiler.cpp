@@ -177,7 +177,7 @@ namespace ola
 				OLA_ASSERT(deleted);
 			}
 		}
-		if (cfg_dump || callgraph_dump)
+		if (cfg_dump || callgraph_dump || domtree_dump)
 		{
 			GenerateGraphVizImages(input_directory, !no_llvm);
 		}

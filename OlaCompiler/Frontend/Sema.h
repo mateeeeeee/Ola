@@ -126,11 +126,11 @@ namespace ola
 	private:
 		UniqueExprPtr ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr);
 
-		template<typename DeclType> requires std::is_base_of_v<VarDecl, DeclType>
-		UniquePtr<DeclType> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		template<typename DeclT> requires std::is_base_of_v<VarDecl, DeclT>
+		UniquePtr<DeclT> ActOnVariableDeclCommon(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
 
-		template<typename DeclType> requires std::is_base_of_v<FunctionDecl, DeclType>
-		std::vector<DeclType const*> ResolveCall(std::vector<DeclType const*> const& candidate_decls, UniqueExprPtrList& args);
+		template<typename DeclT> requires std::is_base_of_v<FunctionDecl, DeclT>
+		std::vector<DeclT const*> ResolveCall(std::vector<DeclT const*> const& candidate_decls, UniqueExprPtrList& args);
 	};
 
 

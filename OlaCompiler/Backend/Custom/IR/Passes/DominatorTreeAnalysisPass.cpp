@@ -8,15 +8,15 @@ namespace ola
 	Bool DominatorTreeAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
-		dom_tree.Initialize(cfg);
+		DT.Initialize(cfg);
 		return false; 
 	}
 
 	Bool DominatorTreePrinterPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		DominatorTree const& dom_tree = FAM.GetResult<DominatorTreeAnalysisPass>(F);
+		DominatorTree const& DT = FAM.GetResult<DominatorTreeAnalysisPass>(F);
 		std::string function_name(F.GetName());
-		dom_tree.Print(function_name);
+		DT.Print(function_name);
 		return false;
 	}
 

@@ -12,6 +12,7 @@ namespace ola
 		static_assert(!std::is_pointer_v<NodeT> && !std::is_reference_v<NodeT>,"NodeTy should be a class");
 		using NodeIterator = std::conditional_t<std::is_const_v<NodeT>, typename NodeT::const_iterator, typename NodeT::iterator>;
 		using NodeIteratorPairStack = std::stack<std::pair<NodeT*, NodeIterator>>;
+
 	public:
 		DepthFirstTreeIterator() : DepthFirstTreeIterator(nullptr) {}
 		explicit DepthFirstTreeIterator(NodeT* node) : current(node)
