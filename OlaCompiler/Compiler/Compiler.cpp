@@ -80,17 +80,7 @@ namespace ola
 
 				llvm::Module& llvm_module = llvmir_gen_ctx.GetModule();
 				LLVMIRPassManager llvmir_pass_manager(llvm_module);
-				llvmir_pass_manager.Run(opts.opt_level);
 
-				std::error_code error;
-				llvm::raw_fd_ostream llvm_ir_stream(ir_file, error, llvm::sys::fs::OF_None);
-				if (error)
-				{
-					OLA_ERROR("Error when creating llvm::raw_fd_ostream: {}", error.message());
-					return;
-				}
-				llvm_module.print(llvm_ir_stream, nullptr);
-				
 				if (opts.dump_cfg)
 				{
 					std::string dot_cfg_cmd = std::format("opt -passes=dot-cfg -disable-output {}", ir_file);
@@ -103,14 +93,26 @@ namespace ola
 				}
 				if (opts.dump_domtree)
 				{
-					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
-					system(dot_domtree_cmd.c_str());
+					llvmir_pass_manager.PrintDomTree();
+					//std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
+					//system(dot_domtree_cmd.c_str());
 				}
 				if (opts.print_domfrontier)
 				{
-					std::string print_domfrontier_cmd = std::format("opt -passes=\"print<domfrontier>\" -disable-output {}", ir_file);
-					system(print_domfrontier_cmd.c_str());
+					llvmir_pass_manager.PrintDomFrontier();
+					//std::string print_domfrontier_cmd = std::format("opt -passes=\"print<domfrontier>\" -disable-output {}", ir_file);
+					//system(print_domfrontier_cmd.c_str());
 				}
+				llvmir_pass_manager.Run(opts.opt_level);
+
+				std::error_code error;
+				llvm::raw_fd_ostream llvm_ir_stream(ir_file, error, llvm::sys::fs::OF_None);
+				if (error)
+				{
+					OLA_ERROR("Error when creating llvm::raw_fd_ostream: {}", error.message());
+					return;
+				}
+				llvm_module.print(llvm_ir_stream, nullptr);
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				system(compile_cmd.c_str());

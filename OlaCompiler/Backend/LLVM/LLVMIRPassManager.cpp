@@ -1,51 +1,88 @@
 #include "LLVMIRPassManager.h"
 #include "LLVMUtils.h"
 #include "Passes/TestPass.h"
-#include "llvm/Pass.h" 
-#include "llvm/IR/LegacyPassManager.h" 
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Dominators.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Scalar.h"
-#include "llvm/Transforms/IPO.h" 
-#include <llvm/Transforms/Scalar.h>       
-#include <llvm/Transforms/Vectorize.h>    
-#include <llvm/Transforms/Utils.h>   
-#include <llvm/Transforms/InstCombine/InstCombine.h>  
+#include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/Utils/Mem2Reg.h"
+#include "llvm/Transforms/Scalar/InstSimplifyPass.h"       
+#include "llvm/Transforms/Scalar/SimplifyCFG.h"            
+#include "llvm/Transforms/Scalar/DCE.h"                    
+#include "llvm/Transforms/Scalar/Reassociate.h"            
+#include "llvm/Transforms/Scalar/SROA.h"                   
+#include "llvm/Transforms/Scalar/ADCE.h"    
+#include "llvm/Analysis/DominanceFrontier.h"
+#include "llvm/Analysis/DomPrinter.h"
+#include "llvm/Analysis/DOTGraphTraitsPass.h"
+#include "llvm/Analysis/DOTGraphTraitsPass.h"
+#include "llvm/Analysis/PostDominators.h"
+#include "llvm/InitializePasses.h"
 
 
 namespace ola
 {
-	
-	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module) {}
+	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module), domtree_print(false), domfrontier_print(false) {}
+
+	void LLVMIRPassManager::PrintDomFrontier()
+	{
+		domfrontier_print = true;
+	}
+
+	void LLVMIRPassManager::PrintDomTree()
+	{
+		domtree_print = true;
+	}
 
 	void LLVMIRPassManager::Run(OptimizationLevel level)
 	{
-		llvm::legacy::PassManager pass_manager;
+		llvm::PassBuilder PB;
 
+		llvm::LoopAnalysisManager LAM;
+		llvm::FunctionAnalysisManager FAM;
+		llvm::CGSCCAnalysisManager CGAM;
+		llvm::ModuleAnalysisManager MAM;
+
+		PB.registerModuleAnalyses(MAM);
+		PB.registerCGSCCAnalyses(CGAM);
+		PB.registerFunctionAnalyses(FAM);
+		PB.registerLoopAnalyses(LAM);
+		PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
+
+		llvm::ModulePassManager MPM;
+		llvm::FunctionPassManager FPM;
 		switch (level)
 		{
 		case OptimizationLevel::O3:
-			pass_manager.add(llvm::createDeadArgEliminationPass());
-			pass_manager.add(llvm::createTailCallEliminationPass());
-			pass_manager.add(llvm::createReassociatePass());
-			pass_manager.add(llvm::createLoopRotatePass());
-			pass_manager.add(llvm::createLICMPass());
-			[[fallthrough]];
+			MPM.addPass(PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3));
+			break;
 		case OptimizationLevel::O2:
-			pass_manager.add(llvm::createLoopSimplifyPass());
-			pass_manager.add(llvm::createLCSSAPass());
-			pass_manager.add(llvm::createEarlyCSEPass());
-			pass_manager.add(llvm::createLoopUnrollPass());
-			[[fallthrough]];
+			MPM.addPass(PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2));
+			break;
 		case OptimizationLevel::O1:
-			pass_manager.add(llvm::createPromoteMemoryToRegisterPass());
-			pass_manager.add(llvm::createInstructionCombiningPass());
-			pass_manager.add(llvm::createCFGSimplificationPass());
-			pass_manager.add(llvm::createDeadCodeEliminationPass());
-			[[fallthrough]];
+			FPM.addPass(llvm::PromotePass());
+			FPM.addPass(llvm::InstSimplifyPass());
+			FPM.addPass(llvm::SimplifyCFGPass());           
+			FPM.addPass(llvm::DCEPass());                   
+			FPM.addPass(llvm::ReassociatePass());           
+			FPM.addPass(llvm::SROAPass(llvm::SROAOptions::PreserveCFG));                  
+			FPM.addPass(llvm::ADCEPass());          
+			break;
 		case OptimizationLevel::O0:
 		default:
 			break;
 		}
-		pass_manager.run(module);
-		Bool verified = VerifyLLVMModule(module);
+		if(domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
+
+		MPM.addPass(llvm::createModuleToFunctionPassAdaptor(std::move(FPM)));
+		MPM.run(module, MAM);
+		if (!VerifyLLVMModule(module))
+		{
+			llvm::errs() << "LLVM Module verification failed!\n";
+		}
 	}
 }
