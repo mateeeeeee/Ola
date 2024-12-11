@@ -93,15 +93,12 @@ namespace ola
 				}
 				if (opts.dump_domtree)
 				{
-					llvmir_pass_manager.PrintDomTree();
-					//std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
-					//system(dot_domtree_cmd.c_str());
+					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
+					system(dot_domtree_cmd.c_str());
 				}
 				if (opts.print_domfrontier)
 				{
 					llvmir_pass_manager.PrintDomFrontier();
-					//std::string print_domfrontier_cmd = std::format("opt -passes=\"print<domfrontier>\" -disable-output {}", ir_file);
-					//system(print_domfrontier_cmd.c_str());
 				}
 				llvmir_pass_manager.Run(opts.opt_level);
 

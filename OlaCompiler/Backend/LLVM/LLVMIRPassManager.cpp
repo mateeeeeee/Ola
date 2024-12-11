@@ -17,25 +17,14 @@
 #include "llvm/Transforms/Scalar/SROA.h"                   
 #include "llvm/Transforms/Scalar/ADCE.h"    
 #include "llvm/Analysis/DominanceFrontier.h"
-#include "llvm/Analysis/DomPrinter.h"
-#include "llvm/Analysis/DOTGraphTraitsPass.h"
-#include "llvm/Analysis/DOTGraphTraitsPass.h"
-#include "llvm/Analysis/PostDominators.h"
-#include "llvm/InitializePasses.h"
-
 
 namespace ola
 {
-	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module), domtree_print(false), domfrontier_print(false) {}
+	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module), domfrontier_print(false) {}
 
 	void LLVMIRPassManager::PrintDomFrontier()
 	{
 		domfrontier_print = true;
-	}
-
-	void LLVMIRPassManager::PrintDomTree()
-	{
-		domtree_print = true;
 	}
 
 	void LLVMIRPassManager::Run(OptimizationLevel level)

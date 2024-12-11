@@ -14,6 +14,8 @@ endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
 
+
+
 set(CORE_FILES
   Core/Types.h
   Core/Macros.h
