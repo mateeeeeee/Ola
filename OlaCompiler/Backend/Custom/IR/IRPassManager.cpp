@@ -11,25 +11,10 @@
 namespace ola
 {
 
-	IRPassManager::IRPassManager(IRModule& M) : M(M), cfg_print(false), domtree_print(false), domfrontier_print(false)
+	IRPassManager::IRPassManager(IRModule& M) : M(M)
 	{}
 
-	void IRPassManager::PrintCFG()
-	{
-		cfg_print = true;
-	}
-
-	void IRPassManager::PrintDomTree()
-	{
-		domtree_print = true;
-	}
-
-	void IRPassManager::PrintDomFrontier()
-	{
-		domfrontier_print = true;
-	}
-
-	void IRPassManager::Run(OptimizationLevel level)
+	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
@@ -44,9 +29,9 @@ namespace ola
 			FPM.AddPass(new DeadCodeEliminationPass());
 			MPM.AddPass(new GlobalAttributeInferPass());
 		}
-		if (cfg_print)			FPM.AddPass(new CFGPrinterPass());
-		if (domtree_print)		FPM.AddPass(new DominatorTreePrinterPass());
-		if (domfrontier_print)  FPM.AddPass(new DominanceFrontierPrinterPass());
+		if (opts.cfg_print)			FPM.AddPass(new CFGPrinterPass());
+		if (opts.domtree_print)		FPM.AddPass(new DominatorTreePrinterPass());
+		if (opts.domfrontier_print)  FPM.AddPass(new DominanceFrontierPrinterPass());
 
 		if (FPM.IsEmpty() && MPM.IsEmpty()) return;
 

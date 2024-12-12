@@ -8,15 +8,17 @@ namespace llvm
 
 namespace ola
 {
+	struct LLVMIRPassOptions
+	{
+		Bool domfrontier_print;
+	};
 	class LLVMIRPassManager
 	{
 	public:
 		explicit LLVMIRPassManager(llvm::Module& module);
-		void PrintDomFrontier();
-		void Run(OptimizationLevel level);
+		void Run(OptimizationLevel level, LLVMIRPassOptions const& opts);
 
 	private:
 		llvm::Module& module;
-		Bool domfrontier_print;
 	};
 }

@@ -1,5 +1,5 @@
 digraph "CFG for 'main' function" {
 	label="CFG for 'main' function";
 
-	Node0x265c61557f0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{entry:\l  ret i64 6\l}"];
+	Node0x1e793257340 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{entry:\l  ret i64 6\l}"];
 }

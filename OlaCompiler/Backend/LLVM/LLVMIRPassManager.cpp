@@ -20,14 +20,9 @@
 
 namespace ola
 {
-	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module), domfrontier_print(false) {}
+	LLVMIRPassManager::LLVMIRPassManager(llvm::Module& module) : module(module) {}
 
-	void LLVMIRPassManager::PrintDomFrontier()
-	{
-		domfrontier_print = true;
-	}
-
-	void LLVMIRPassManager::Run(OptimizationLevel level)
+	void LLVMIRPassManager::Run(OptimizationLevel level, LLVMIRPassOptions const& opts)
 	{
 		llvm::PassBuilder PB;
 
@@ -65,7 +60,7 @@ namespace ola
 		default:
 			break;
 		}
-		if(domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
+		if(opts.domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
 
 		MPM.addPass(llvm::createModuleToFunctionPassAdaptor(std::move(FPM)));
 		MPM.run(module, MAM);
