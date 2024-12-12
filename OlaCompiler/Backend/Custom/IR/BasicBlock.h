@@ -24,6 +24,13 @@ namespace ola
 		{
 			return instructions;
 		}
+
+		void AddPhiNode(PhiNode* phi)
+		{
+			instructions.Insert(instructions.begin(), phi);
+			phi_nodes.push_back(phi);
+		}
+		auto const& PhiNodes() const { return phi_nodes; }
 		
 		Instruction const* GetTerminator() const 
 		{
@@ -70,5 +77,6 @@ namespace ola
 		Function* function;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
+		std::vector<PhiNode*> phi_nodes;
 	};
 }

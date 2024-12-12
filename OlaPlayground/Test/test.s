@@ -2,44 +2,60 @@
 
 .section .text
 
-.globl main
-
-main:
+f__I__I:
 label0:
 push rbp
 mov rbp, rsp
 sub rsp, 32
-mov qword ptr [rbp - 16], 5
+mov r15, rcx
+mov r14, rdx
+mov qword ptr [rbp - 8], r15
+mov qword ptr [rbp - 16], r14
+mov r14, qword ptr [rbp - 8]
 mov r15, qword ptr [rbp - 16]
-mov r14, r15
-add r14, 6
-mov qword ptr [rbp - 24], r14
-mov r14, qword ptr [rbp - 24]
-cmp r14, 10
-setg r14b
-and r14b, 1
-test r14b, r14b
+cmp r14, r15
+setl r15b
+and r15b, 1
+test r15b, r15b
 jne label1
 jmp label2
 label1:
-mov r14, qword ptr [rbp - 16]
-mov qword ptr [rbp - 32], r14
-mov r15, r14
-add r15, 1
-mov qword ptr [rbp - 16], r15
-jmp label4
+mov r15, qword ptr [rbp - 8]
+mov qword ptr [rbp - 32], r15
+jmp label3
 label2:
-mov qword ptr [rbp - 8], 2
-jmp label6
-label3:
-jmp label6
-label4:
 mov r15, qword ptr [rbp - 16]
-mov qword ptr [rbp - 8], r15
-jmp label6
+mov qword ptr [rbp - 32], r15
+jmp label3
+label3:
+mov r15, qword ptr [rbp - 32]
+mov qword ptr [rbp - 24], r15
+jmp label5
+label4:
+jmp label5
 label5:
-jmp label6
+mov r15, qword ptr [rbp - 24]
+mov rax, r15
+mov rsp, rbp
+pop rbp
+ret
+
+.globl main
+
+main:
 label6:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+mov rdx, 4
+mov rcx, 3
+call f__I__I
+mov r15, rax
+mov qword ptr [rbp - 8], r15
+jmp label8
+label7:
+jmp label8
+label8:
 mov r15, qword ptr [rbp - 8]
 mov rax, r15
 mov rsp, rbp

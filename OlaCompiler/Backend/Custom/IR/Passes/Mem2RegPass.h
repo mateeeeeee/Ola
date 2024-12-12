@@ -11,6 +11,7 @@ namespace ola
 	class PhiNode;
 	class Value;
 	class DominatorTreeNode;
+	class DominanceFrontier;
 
 	class Mem2RegPass : public FunctionPass
 	{
@@ -18,17 +19,15 @@ namespace ola
 	public:
 		Mem2RegPass() : FunctionPass(id) {}
 		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
-		
 		static void const* ID() { return &id; }
+
 	private:
-		std::unordered_map<AllocaInst*, std::stack<Value*>>		ValueStacks;
-		std::unordered_map<AllocaInst*, std::vector<PhiNode*>>	PhiNodes;
-		DominatorTree const* DT = nullptr;
+		DominanceFrontier const* DF = nullptr;
 
 	private:
 		std::vector<AllocaInst*> FindAllocaInstructions(Function& F);
-		void InsertPhiFunctions(Function& F, CFG const& cfg, std::vector<AllocaInst*> const& Allocas);
-		void RenameVariables(AllocaInst* AI, DominatorTreeNode const* Node);
+		void InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, DominanceFrontier const& DF);
+		void RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, Function& F);
 	};
 
 	OLA_REGISTER_PASS(Mem2RegPass, "Memory to Register Pass");

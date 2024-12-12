@@ -1,15 +1,20 @@
 
-public int main()
+
+private int f(int a, int b) 
 {
-    int a = 5;
-    int b = a + 6;
-    if(b > 10)
+    int c;
+    if (a < b) 
     {
-        a++;
-    }
+        c = a;
+    } 
     else
     {
-        return 2;
+        c = b;
     }
-    return a;
+    return c;
+}
+
+public int main()
+{
+    return f(3,4);
 }

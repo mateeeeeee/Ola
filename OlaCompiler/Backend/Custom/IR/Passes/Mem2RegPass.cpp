@@ -1,6 +1,8 @@
-﻿#include "Mem2RegPass.h"
+﻿#include <set>
+#include <functional>
+#include "Mem2RegPass.h"
 #include "CFGAnalysisPass.h"
-#include "DominatorTreeAnalysisPass.h"
+#include "DominanceFrontierAnalysisPass.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
@@ -15,15 +17,10 @@ namespace ola
 		}
 
 		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
-		DT = &FAM.GetResult<DominatorTreeAnalysisPass>(F);
+		DF = &FAM.GetResult<DominanceFrontierAnalysisPass>(F);
 
-		InsertPhiFunctions(F, cfg, Allocas);
-		for (AllocaInst* AI : Allocas) 
-		{
-			ValueStacks[AI] = std::stack<Value*>();
-			RenameVariables(AI, DT->GetRoot());
-			AI->EraseFromParent(); 
-		}
+		InsertPhiFunctions(Allocas, cfg, *DF);
+		RenameVariables(Allocas, cfg, F);
 		return true;
 	}
 
@@ -46,32 +43,128 @@ namespace ola
 		return Allocas;
 	}
 
-	void Mem2RegPass::InsertPhiFunctions(Function& F, CFG const& cfg, std::vector<AllocaInst*> const& Allocas)
+	void Mem2RegPass::InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, DominanceFrontier const& DF)
 	{
-		for (AllocaInst* AI : Allocas) 
+		std::unordered_map<AllocaInst*, std::set<BasicBlock*>> PhiPlacement;
+		for (AllocaInst* AI : Allocas)
 		{
-			std::unordered_set<BasicBlock const*> DefiningBlocks;
-			std::unordered_set<BasicBlock const*> WorkList;
-
-			for (Use* U : AI->Users()) 
+			std::set<BasicBlock*> DefBlocks; 
+			for (BasicBlock* BB : cfg)
 			{
-				if (StoreInst* SI = dyn_cast<StoreInst>(U->GetUser()))
+				for (Instruction& I : BB->Instructions())
 				{
-					DefiningBlocks.insert(SI->GetBasicBlock());
+					if (StoreInst* SI = dyn_cast<StoreInst>(&I))
+					{
+						if (SI->GetAddressOp() == AI)
+						{
+							DefBlocks.insert(BB);
+							break; 
+						}
+					}
 				}
 			}
 
-			for (BasicBlock const* DefBlock : DefiningBlocks) 
+			std::set<BasicBlock*> Worklist = DefBlocks;
+			while (!Worklist.empty())
 			{
-				//#todo
+				BasicBlock* BB = *Worklist.begin();
+				Worklist.erase(BB);
+				for (BasicBlock* DFBlock : DF.GetFrontier(BB))
+				{
+					if (PhiPlacement[AI].insert(DFBlock).second) 
+					{
+						if (DefBlocks.find(DFBlock) == DefBlocks.end())
+						{
+							Worklist.insert(DFBlock);
+						}
+					}
+				}
+			}
+		}
+
+		for (auto& [AI, Blocks] : PhiPlacement)
+		{
+			for (BasicBlock* BB : Blocks)
+			{
+				PhiNode* Phi = new PhiNode(AI->GetAllocatedType());
+				BB->AddPhiNode(Phi);
+				Phi->SetAlloca(AI);
 			}
 		}
 	}
 
-	void Mem2RegPass::RenameVariables(AllocaInst* AI, DominatorTreeNode const* Node)
+	void Mem2RegPass::RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, Function& F)
 	{
-		BasicBlock* BB = Node->GetBasicBlock();
-		//#todo
+		std::unordered_map<AllocaInst*, std::stack<Value*>> ValueStacks;
+		for (AllocaInst* AI : Allocas)
+		{
+			ValueStacks[AI].push(nullptr);
+		}
+
+		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
+			{
+				std::unordered_map<AllocaInst*, Value*> IncomingValues;
+				for (Instruction& I : BB->Instructions())
+				{
+					if (PhiNode* Phi = dyn_cast<PhiNode>(&I))
+					{
+						AllocaInst* AI = Phi->GetAlloca();
+						IncomingValues[AI] = Phi;
+						ValueStacks[AI].push(Phi);
+					}
+				}
+
+				std::vector<Instruction*> InstructionRemoveQueue;
+				for (Instruction& I : BB->Instructions())
+				{
+					if (LoadInst* LI = dyn_cast<LoadInst>(&I))
+					{
+						AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp());
+						if (AI)
+						{
+							Value* CurrentValue = ValueStacks[AI].top();
+							LI->ReplaceAllUseWith(CurrentValue);
+							InstructionRemoveQueue.push_back(LI);
+						}
+					}
+					else if (StoreInst* SI = dyn_cast<StoreInst>(&I))
+					{
+						AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp());
+						if (AI)
+						{
+							ValueStacks[AI].push(SI->GetValueOp());
+							InstructionRemoveQueue.push_back(SI);
+						}
+					}
+				}
+				for (Instruction* I : InstructionRemoveQueue) I->EraseFromParent();
+
+				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
+				{
+					for (PhiNode* Phi : Successor->PhiNodes())
+					{
+						AllocaInst* AI = Phi->GetAlloca();
+						if (AI)
+						{
+							Phi->AddIncoming(ValueStacks[AI].top(), BB);
+						}
+					}
+				}
+
+				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
+				{
+					RenameBlock(Successor);
+				}
+
+				for (auto& [AI, Stack] : ValueStacks)
+				{
+					if (!Stack.empty() && IncomingValues.count(AI))
+					{
+						Stack.pop();
+					}
+				}
+			};
+		RenameBlock(&F.GetEntryBlock());
 	}
 
 }

@@ -831,7 +831,13 @@ namespace ola
 	class PhiNode final : public Instruction 
 	{
 	public:
-		explicit PhiNode(IRType* type) : Instruction( Opcode::Phi, type, {} ) {}
+		explicit PhiNode(IRType* type) : Instruction( Opcode::Phi, type, {} ), alloca_inst(nullptr) {}
+
+		void SetAlloca(AllocaInst* AI)
+		{
+			alloca_inst = AI;
+		}
+		AllocaInst* GetAlloca() const { return alloca_inst; }
 
 		void AddIncoming(Value* V, BasicBlock* BB) 
 		{
@@ -902,6 +908,7 @@ namespace ola
 
 	private:
 		std::vector<BasicBlock*> incoming_blocks;
+		AllocaInst* alloca_inst;
 
 	private:
 		void AddIncomingValue(Value* V)

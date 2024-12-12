@@ -39,6 +39,7 @@ namespace ola
 					}
 				}
 			}
+			cfg.AddBasicBlock(&block);
 		}
 		OLA_ASSERT(cfg.GetPredecessors(&F.GetEntryBlock()).empty());
 		cfg.SetEntryBlock(&F.GetEntryBlock());
