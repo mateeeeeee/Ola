@@ -118,7 +118,21 @@ namespace ola
 		}
 		std::string linkage = F->GetLinkage() == Linkage::External ? "external" : "internal";
 		Emit("define {} {} ", linkage, GetUniqueName(F));
-		PrintType(F->GetFunctionType());
+
+		IRFuncType* func_type = F->GetFunctionType();
+		{
+			PrintType(func_type->GetReturnType());
+			Emit("(");
+			Uint32 const param_count = func_type->GetParamCount();
+			for (Uint32 i = 0; i < param_count; ++i)
+			{
+				PrintType(func_type->GetParamType(i));
+				Emit(" %{}", F->GetArg(i)->GetName());
+				Emit(",");
+			}
+			if (param_count > 0) PopOutput<1>();
+			Emit(")");
+		}
 		EmitLn(" {{");
 		for (auto const& BB : F->Blocks())
 		{
