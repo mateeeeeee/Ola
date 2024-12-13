@@ -44,11 +44,7 @@ Ola is a toy programming language offering both an LLVM-based backend and a work
   * standard library
   * Backend architecture
 	- LLVM Backend: Emits LLVM IR and supports LLVM optimization passes.
-	- Custom Backend (Work in Progress):
-		- Custom Intermediate Representation (IR) and Machine Intermediate Representation (MIR).
-		- IR optimization passes
-		- Early support for x86-64 code generation.
-		- Missing features: proper stack layout and class support.
+	- Custom Backend (Work in Progress)
 
 ## Structure
 Ola consists of the following parts:
