@@ -180,6 +180,21 @@ namespace ola
 				PrintOperand(BI->GetTrueTarget());
 			}
 		}
+		else if (isa<PhiNode>(&I))
+		{
+			PhiNode const* Phi = cast<PhiNode>(&I);
+			Uint OpCount = Phi->GetNumOperands();
+			for (Uint i = 0; i < OpCount; ++i)
+			{
+				Emit("[ ");
+				PrintOperand(Phi->GetIncomingValue(i), false);
+				Emit(", ");
+				PrintOperand(Phi->GetIncomingBlock(i), false);
+				Emit(" ], ");
+			}
+			if (I.GetNumOperands() > 0) PopOutput<2>();
+
+		}
 		else if (I.GetNumOperands() > 0)
 		{
 			IRType* type = I.GetOperand(0)->GetType(); 

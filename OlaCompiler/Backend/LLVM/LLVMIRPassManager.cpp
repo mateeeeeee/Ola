@@ -49,12 +49,12 @@ namespace ola
 			break;
 		case OptimizationLevel::O1:
 			FPM.addPass(llvm::PromotePass());
-			FPM.addPass(llvm::InstSimplifyPass());
-			FPM.addPass(llvm::SimplifyCFGPass());           
-			FPM.addPass(llvm::DCEPass());                   
-			FPM.addPass(llvm::ReassociatePass());           
-			FPM.addPass(llvm::SROAPass(llvm::SROAOptions::PreserveCFG));                  
-			FPM.addPass(llvm::ADCEPass());          
+			//FPM.addPass(llvm::InstSimplifyPass());
+			//FPM.addPass(llvm::SimplifyCFGPass());           
+			//FPM.addPass(llvm::DCEPass());                   
+			//FPM.addPass(llvm::ReassociatePass());           
+			//FPM.addPass(llvm::SROAPass(llvm::SROAOptions::PreserveCFG));                  
+			//FPM.addPass(llvm::ADCEPass());          
 			break;
 		case OptimizationLevel::O0:
 		default:
