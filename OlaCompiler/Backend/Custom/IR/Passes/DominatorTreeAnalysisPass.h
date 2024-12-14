@@ -37,5 +37,5 @@ namespace ola
 		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(DominatorTreePrinterPass, "Dominator Tree Printer");
-
+	inline FunctionPass* CreateDominatorTreePrinterPass() { return new DominatorTreePrinterPass(); }
 }

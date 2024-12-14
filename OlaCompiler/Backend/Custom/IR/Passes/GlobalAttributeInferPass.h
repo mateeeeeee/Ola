@@ -14,4 +14,5 @@ namespace ola
 		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(GlobalAttributeInferPass, "Global Attribute Infer Pass");
+	inline IRModulePass* CreateGlobalAttributeInferPass() { return new GlobalAttributeInferPass(); }
 }

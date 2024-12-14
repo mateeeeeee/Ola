@@ -19,8 +19,8 @@ namespace ola
 		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
 		DF = &FAM.GetResult<DominanceFrontierAnalysisPass>(F);
 
-		InsertPhiFunctions(Allocas, cfg, *DF);
-		RenameVariables(Allocas, cfg, F);
+		InsertPhiFunctions(Allocas, cfg);
+		RenameVariables(Allocas, cfg);
 		return true;
 	}
 
@@ -43,8 +43,9 @@ namespace ola
 		return Allocas;
 	}
 
-	void Mem2RegPass::InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, DominanceFrontier const& DF)
+	void Mem2RegPass::InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg)
 	{
+		OLA_ASSERT(DF);
 		std::unordered_map<AllocaInst*, std::set<BasicBlock*>> PhiPlacement;
 		for (AllocaInst* AI : Allocas)
 		{
@@ -69,7 +70,7 @@ namespace ola
 			{
 				BasicBlock* BB = *Worklist.begin();
 				Worklist.erase(BB);
-				for (BasicBlock* DFBlock : DF.GetFrontier(BB))
+				for (BasicBlock* DFBlock : DF->GetFrontier(BB))
 				{
 					if (PhiPlacement[AI].insert(DFBlock).second) 
 					{
@@ -93,7 +94,7 @@ namespace ola
 		}
 	}
 
-	void Mem2RegPass::RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, Function& F)
+	void Mem2RegPass::RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg)
 	{
 		std::unordered_map<AllocaInst*, std::stack<Value*>> ValueStacks;
 		for (AllocaInst* AI : Allocas)
@@ -164,7 +165,7 @@ namespace ola
 					}
 				}
 			};
-		RenameBlock(&F.GetEntryBlock());
+		RenameBlock(cfg.GetEntryBlock());
 	}
 
 }

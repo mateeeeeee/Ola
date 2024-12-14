@@ -16,4 +16,5 @@ namespace ola
 	};
 	using DCEPass = DeadCodeEliminationPass;
 	OLA_REGISTER_PASS(DeadCodeEliminationPass, "Dead Code Elimination Pass");
+	inline FunctionPass* CreateDeadCodeEliminationPass() { return new DeadCodeEliminationPass(); }
 }

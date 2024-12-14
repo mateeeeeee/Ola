@@ -26,14 +26,14 @@ namespace ola
 		case OptimizationLevel::O2:
 			[[fallthrough]];
 		case OptimizationLevel::O1:
-			FPM.AddPass(new Mem2RegPass());
-			FPM.AddPass(new ArithmeticReductionPass());
-			FPM.AddPass(new DeadCodeEliminationPass());
-			MPM.AddPass(new GlobalAttributeInferPass());
+			FPM.AddPass(CreateMem2RegPass());
+			FPM.AddPass(CreateArithmeticReductionPass());
+			FPM.AddPass(CreateDeadCodeEliminationPass());
+			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
-		if (opts.cfg_print)			 FPM.AddPass(new CFGPrinterPass());
-		if (opts.domtree_print)		 FPM.AddPass(new DominatorTreePrinterPass());
-		if (opts.domfrontier_print)  FPM.AddPass(new DominanceFrontierPrinterPass());
+		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
+		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());
+		if (opts.domfrontier_print)  FPM.AddPass(CreateDominanceFrontierPrinterPass());
 
 		if (FPM.IsEmpty() && MPM.IsEmpty()) return;
 

@@ -38,4 +38,5 @@ namespace ola
 		static Uint GetMaxBasicBlockNameLength(DominanceFrontier const& DF);
 	};
 	OLA_REGISTER_PASS(DominanceFrontierPrinterPass, "Dominance Frontier Printer");
+	inline FunctionPass* CreateDominanceFrontierPrinterPass() { return new DominanceFrontierPrinterPass(); }
 }

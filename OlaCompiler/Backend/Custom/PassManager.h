@@ -20,13 +20,6 @@ namespace ola
 		using ParentUnitT = typename UnitTraits<UnitT>::ParentUnitT;
 		static_assert(std::is_base_of_v<Pass, BasePassT>);
 	public:
-
-		template<typename PassT> requires std::is_base_of_v<BasePassT, PassT>
-		void AddPass(PassT&& pass)
-		{
-			Verify(PassT::ID());
-			passes.emplace_back(new PassT(std::forward<PassT>(pass)));
-		}
 		void AddPass(BasePassT* pass)
 		{
 			Verify(pass->GetPassID());

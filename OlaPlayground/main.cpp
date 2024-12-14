@@ -17,7 +17,7 @@ int main()
 {
 	LogInit();
 	CompileRequest compile_request{};
-	Char const* argv[] = { "-i", "test", "--O1","--nollvm", "--print-domfrontier", "--emit-asm","--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test"};
+	Char const* argv[] = { "-i", "test", "--O1","--nollvm", "--domfrontier", "--emit-asm","--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test"};
 	//Char const* argv[] = { "-i", "test", "--O1", "--domtree","--cfg", "--print-domfrontier", "--emit-asm","--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test"};
 	if (compile_request.Parse(ArraySize(argv), const_cast<Char**>(argv)))
 	{

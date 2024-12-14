@@ -26,9 +26,10 @@ namespace ola
 
 	private:
 		std::vector<AllocaInst*> FindAllocaInstructions(Function& F);
-		void InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, DominanceFrontier const& DF);
-		void RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg, Function& F);
+		void InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg);
+		void RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg);
 	};
 
 	OLA_REGISTER_PASS(Mem2RegPass, "Memory to Register Pass");
+	inline FunctionPass* CreateMem2RegPass() { return new Mem2RegPass(); }
 }

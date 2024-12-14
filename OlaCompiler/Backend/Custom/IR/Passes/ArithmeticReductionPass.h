@@ -16,4 +16,5 @@ namespace ola
 		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(ArithmeticReductionPass, "Arithmetic Reduction Pass");
+	inline FunctionPass* CreateArithmeticReductionPass() { return new ArithmeticReductionPass(); }
 }

@@ -37,4 +37,5 @@ namespace ola
 		static void const* ID() { return &id; }
 	};
 	OLA_REGISTER_PASS(CFGPrinterPass, "CFG Printer");
+	inline FunctionPass* CreateCFGPrinterPass() { return new CFGPrinterPass(); }
 }
