@@ -151,6 +151,7 @@ public int main()
 
 #### Custom backend
 
+##### With and without optimizations
 <img src="OlaDocs/Images/custom_domtree.png" alt="Dominator tree in custom backend">
 
 ## Samples
