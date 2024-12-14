@@ -1,7 +1,4 @@
-<img align="left" src="OlaDocs/olalogo.png" width="120px"/>
-<br/><br/>
-
-# Ola
+<img align="center" padding="2" src="OlaDocs/olalogo_wide.png"/>
 Ola is a toy programming language offering both an LLVM-based backend and a work-in-progress custom backend. 
 
 ## Dependencies
