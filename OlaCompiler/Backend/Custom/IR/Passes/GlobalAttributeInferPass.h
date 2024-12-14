@@ -1,6 +1,5 @@
 #pragma once
 #include "Backend/Custom/IR/IRModulePass.h"
-#include "Backend/Custom/PassRegistry.h"
 
 namespace ola
 {
@@ -8,7 +7,7 @@ namespace ola
 	{
 		inline static Char id = 0;
 	public:
-		explicit GlobalAttributeInferPass() : IRModulePass(id) {}
+		GlobalAttributeInferPass() : IRModulePass(id) {}
 		virtual Bool RunOn(IRModule&, IRModuleAnalysisManager&) override;
 
 		static void const* ID() { return &id; }

@@ -133,6 +133,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/GlobalAttributeInferPass.cpp
   Backend/Custom/IR/Passes/Mem2RegPass.h
   Backend/Custom/IR/Passes/Mem2RegPass.cpp
+  Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.h
+  Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.cpp
 
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
