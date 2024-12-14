@@ -180,9 +180,9 @@ namespace ola
 				PrintOperand(BI->GetTrueTarget());
 			}
 		}
-		else if (isa<PhiNode>(&I))
+		else if (isa<PhiInst>(&I))
 		{
-			PhiNode const* Phi = cast<PhiNode>(&I);
+			PhiInst const* Phi = cast<PhiInst>(&I);
 			Uint OpCount = Phi->GetNumOperands();
 			for (Uint i = 0; i < OpCount; ++i)
 			{

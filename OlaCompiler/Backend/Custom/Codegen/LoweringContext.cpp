@@ -148,4 +148,13 @@ namespace ola
 		auto& minst_list = current_block->Instructions();
 		minst_list.emplace_back(MI);
 	}
+
+	void LoweringContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
+	{
+		auto& minst_list = current_block->Instructions();
+		auto it = minst_list.end();
+		it = std::prev(it, 1);
+		minst_list.insert(it, MI);
+	}
+
 }

@@ -266,9 +266,10 @@ namespace ola
 		case Opcode::Select:
 			LowerSelect(cast<SelectInst>(I));
 			break;
+		case Opcode::Phi:
+			LowerPhi(cast<PhiInst>(I));
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
-		case Opcode::Phi:
 			break;
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
@@ -556,6 +557,27 @@ namespace ola
 			.SetOp<0>(result_reg)    
 			.SetOp<1>(true_op).SetIgnoreDef());
 		lowering_ctx.AddOperand(SI, result_reg);
+	}
+
+	void MachineModule::LowerPhi(PhiInst* Phi)
+	{
+		MachineOperand const& phiMO = lowering_ctx.VirtualReg(Phi->GetType());
+		for (Uint i = 0; i < Phi->GetNumIncomingValues(); ++i)
+		{
+			Value* V = Phi->GetIncomingValue(i);
+			BasicBlock* BB = Phi->GetIncomingBlock(i);
+
+			MachineOperand const& val = lowering_ctx.GetOperand(V);
+			MachineInstruction MI(InstMove);
+			MI.SetFlag(MachineInstFlag_IgnoreDef);
+			MI.SetOp<0>(phiMO).SetOp<1>(val);
+
+			MachineBasicBlock* MBB = lowering_ctx.GetCurrentBasicBlock();
+			lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(BB));
+			lowering_ctx.EmitInstBeforeTerminator(MI);
+			lowering_ctx.SetCurrentBasicBlock(MBB);
+		}
+		lowering_ctx.AddOperand(Phi, phiMO);
 	}
 
 	void MachineModule::LegalizeInstructions(MachineFunction& MF)

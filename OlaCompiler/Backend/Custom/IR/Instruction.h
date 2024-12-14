@@ -828,10 +828,10 @@ namespace ola
 		IRType* result_element_type;
 	};
 
-	class PhiNode final : public Instruction 
+	class PhiInst final : public Instruction 
 	{
 	public:
-		explicit PhiNode(IRType* type) : Instruction( Opcode::Phi, type, {} ), alloca_inst(nullptr) {}
+		explicit PhiInst(IRType* type) : Instruction( Opcode::Phi, type, {} ), alloca_inst(nullptr) {}
 
 		void SetAlloca(AllocaInst* AI)
 		{

@@ -1,22 +1,20 @@
 
 
-private int f(int a, int b) 
+private int min(int a, int b) 
 {
-    int y = 5;
-    int x = 10;
-    int z = 15;
-    if (a > 5) 
+    int c;
+    if (a < b) 
     {
-    x = y + 1;
-    } else 
+        c = a;
+    } 
+    else
     {
-    x = y * 2;
+        c = b;
     }
-    z = x + 3;
-    return z;
+    return c;
 }
 
 public int main()
 {
-    return f(3,4);
+    return min(3,4);
 }

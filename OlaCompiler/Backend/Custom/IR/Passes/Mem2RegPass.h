@@ -8,7 +8,7 @@ namespace ola
 	class CFG;
 	class DominatorTree;
 	class AllocaInst;
-	class PhiNode;
+	class PhiInst;
 	class Value;
 	class DominatorTreeNode;
 	class DominanceFrontier;

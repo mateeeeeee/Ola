@@ -102,33 +102,59 @@ Ola consists of the following parts:
   * `-o`     : Output file
   * `--directory`: Directory of input files
   
-## CFG example
+## Visualizations 
 ```cpp
-public int main()
+private int min(int a, int b) 
 {
-    int a = 5;
-    int b = a + 6;
-    if(b > 10)
+    int c;
+    if (a < b) 
     {
-        a++;
-    }
+        c = a;
+    } 
     else
     {
-        return 2;
+        c = b;
     }
-    return a;
+    return c;
+}
+
+public int main()
+{
+    return min(3,4);
 }
 ```
-CFG visualization for the code above using `--cfg` (without optimizations):
-### CFG visualization (LLVM backend)
-<img src="OlaDocs/.main.png" alt="LLVM backend">
 
-### CFG visualization (Custom backend)
-<img src="OlaDocs/main.png" alt="Custom backend">
+### CFG
 
-Dominator Tree visualization for the code above using `--domtree` (more or less the same in both backends):
-### Dominator Tree visualization (Custom backend)
-<img src="OlaDocs/main_domtree.png" alt="Custom backend">
+#### LLVM backend
+
+##### Without optimizations
+<img src="OlaDocs/Images/llvm_cfg_O0.png" alt="CFG without optimizations in LLVM backend">
+
+##### With optimizations 
+<img src="OlaDocs/Images/llvm_cfg_O1.png" alt="CFG with optimizations in LLVM backend">
+
+#### Custom backend
+
+##### Without optimizations
+<img src="OlaDocs/Images/custom_cfg_O0.png" alt="CFG without optimizations in custom backend">
+
+##### With optimizations 
+<img src="OlaDocs/Images/custom_cfg_O1.png" alt="CFG with optimizations in custom backend">
+
+### Dominator Tree
+
+#### LLVM backend
+
+##### Without optimizations
+<img src="OlaDocs/Images/llvm_domtree_O0.png" alt="Dominator tree without optimizations in LLVM backend">
+
+##### With optimizations 
+<img src="OlaDocs/Images/llvm_domtree_O1.png" alt="Dominator tree with optimizations in LLVM backend">
+
+#### Custom backend
+
+<img src="OlaDocs/Images/custom_domtree.png" alt="Dominator tree in custom backend">
 
 ## Samples
 Currently to see the samples you can check the test folder: `OlaTests/Tests/`.

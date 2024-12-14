@@ -63,6 +63,7 @@ namespace ola
 		MachineOperand GetOperand(Value const* V);
 
 		void EmitInst(MachineInstruction const& MI);
+		void EmitInstBeforeTerminator(MachineInstruction const& MI);
 
 		MachineOperand VirtualReg(IRType const* type) const
 		{

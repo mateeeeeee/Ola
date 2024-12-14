@@ -1,5 +1,7 @@
 digraph "Dominator tree for 'main' function" {
 	label="Dominator tree for 'main' function";
 
-	Node0x289dab26700 [shape=record,label="{entry}"];
+	Node0x1cf35af6ca0 [shape=record,label="{entry}"];
+	Node0x1cf35af6ca0 -> Node0x1cf35af6e80;
+	Node0x1cf35af6e80 [shape=record,label="{exit}"];
 }

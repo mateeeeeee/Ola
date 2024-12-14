@@ -117,8 +117,8 @@ namespace ola
 		{
 			for (BasicBlock* BB : Blocks)
 			{
-				PhiNode* Phi = new PhiNode(AI->GetAllocatedType());
-				BB->AddPhiNode(Phi);
+				PhiInst* Phi = new PhiInst(AI->GetAllocatedType());
+				BB->AddPhiInst(Phi);
 				Phi->SetAlloca(AI);
 			}
 		}
@@ -137,7 +137,7 @@ namespace ola
 				std::unordered_map<AllocaInst*, Value*> IncomingValues;
 				for (Instruction& I : BB->Instructions())
 				{
-					if (PhiNode* Phi = dyn_cast<PhiNode>(&I))
+					if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
 					{
 						AllocaInst* AI = Phi->GetAlloca();
 						IncomingValues[AI] = Phi;
@@ -172,7 +172,7 @@ namespace ola
 
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
-					for (PhiNode* Phi : Successor->PhiNodes())
+					for (PhiInst* Phi : Successor->PhiInsts())
 					{
 						AllocaInst* AI = Phi->GetAlloca();
 						if (AI)

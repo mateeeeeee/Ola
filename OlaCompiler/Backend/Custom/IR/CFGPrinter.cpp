@@ -12,7 +12,7 @@ namespace ola
 			output.clear();
 			name_manager.ClearLocals();
 
-			EmitLn(R"(digraph "CFG for '{} function" {{
+			EmitLn(R"(digraph "CFG for '{}' function" {{
 			label="CFG for '{} function";
 			)", F->GetName(), F->GetName());
 

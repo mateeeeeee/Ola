@@ -22,6 +22,7 @@ namespace ola
 	class SwitchInst;
 	class PtrAddInst;
 	class SelectInst;
+	class PhiInst;
 
 	class MachineInstruction;
 	class MIRInstructionInfo;
@@ -63,6 +64,7 @@ namespace ola
 		void LowerPtrAdd(PtrAddInst*);
 		void LowerSwitch(SwitchInst*);
 		void LowerSelect(SelectInst*);
+		void LowerPhi(PhiInst*);
 
 		void LegalizeInstructions(MachineFunction& MF);
 		void PostLegalizeInstructions(MachineFunction& MF);
