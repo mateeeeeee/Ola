@@ -1,5 +1,8 @@
-<img align="center" padding="2" src="OlaDocs/olalogo_wide.png"/>
-Ola is a toy programming language offering both an LLVM-based backend and a work-in-progress custom backend. 
+<img align="left" src="OlaDocs/olalogo.png" width="120px"/>
+<br/><br/>
+
+# Ola
+Ola is a toy programming language offering both an LLVM backend and a work-in-progress custom backend. 
 
 ## Dependencies
 * [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
@@ -40,7 +43,7 @@ Ola is a toy programming language offering both an LLVM-based backend and a work
   * import statement
   * standard library
   * Backend architecture
-	- LLVM Backend: Emits LLVM IR and supports LLVM optimization passes.
+	- LLVM Backend
 	- Custom Backend (Work in Progress)
 
 ## Structure
@@ -58,16 +61,16 @@ Ola consists of the following parts:
      - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
      - **Backend**: After frontend processing, the compilation process diverges into two backend paths:
        - **LLVM Path**:
-         - **LLVM Visitor**: Transforms the AST into LLVM IR.
-         - **LLVM Optimizer**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
+         - **LLVMIR Visitor**: Transforms the AST into LLVM IR.
+         - **LLVMIR Pass Manager**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
          - Compilation to assembly is done using the `clang -S` command.
        - **Custom Backend Path**:
-         - **IRVisitor**: Transforms the AST into Ola's custom IR.
-         - **IROptimizer**: Applies custom optimizations at the IR level.
+         - **IR Visitor**: Transforms the AST into Ola's custom IR.
+         - **IR Pass Manager**: Applies custom optimizations at the IR level.
          - **MachineModule**: Responsible for lowering IR to MIR and finally to assembly.
 
 3. **Ola Driver**:
-   - An **executable** (`OlaDriver`) that serves as the main entry point for compiling Ola code. It links to the `OlaCompiler` library and calls compiler's API, handling the entire compilation pipeline.
+   - An **executable** (`OlaDriver`) that serves as the main entry point for compiling Ola code. It links to the `OlaCompiler` library and calls compiler's API.
 
 4. **Ola Playground**:
    - A separate **executable** that links to the `OlaCompiler` static library. It provides a development environment for experimenting with the compiler and Ola code, without directly invoking the `OlaDriver`.
