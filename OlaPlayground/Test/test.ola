@@ -2,16 +2,18 @@
 
 private int f(int a, int b) 
 {
-    int c;
-    if (a < b) 
+    int y = 5;
+    int x = 10;
+    int z = 15;
+    if (a > 5) 
     {
-        c = a;
-    } 
-    else
+    x = y + 1;
+    } else 
     {
-        c = b;
+    x = y * 2;
     }
-    return c;
+    z = x + 3;
+    return z;
 }
 
 public int main()

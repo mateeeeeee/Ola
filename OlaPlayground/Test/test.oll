@@ -2,19 +2,21 @@ Module ID : test.ola
 
 define internal @f__I__I i64(i64 %a,i64 %b) {
 entry:
-%0 = icmp slt i64 %a, %b
+%0 = icmp sgt i64 %a, 5
 br i8 %0, label if.then, label if.else
 if.then:
+%1 = add i64 5, 1
 br label if.end
 if.else:
 br label if.end
 if.end:
-%1 = phi [ %a, if.then ], [ %b, if.else ]
+%2 = phi [ %1, if.then ], [ 10, if.else ]
+%3 = add i64 %2, 3
 br label exit
 return:
 br label exit
 exit:
-ret i64 %1
+ret i64 %3
 }
 
 

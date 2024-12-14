@@ -25,7 +25,7 @@ namespace ola
 		DominanceFrontier const* DF = nullptr;
 
 	private:
-		std::vector<AllocaInst*> FindAllocaInstructions(Function& F);
+		std::vector<AllocaInst*> FindPromotableAllocaInstructions(Function& F);
 		void InsertPhiFunctions(std::vector<AllocaInst*> const& Allocas, CFG const& cfg);
 		void RenameVariables(std::vector<AllocaInst*> const& Allocas, CFG const& cfg);
 	};

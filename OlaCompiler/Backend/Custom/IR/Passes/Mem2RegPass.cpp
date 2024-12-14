@@ -10,7 +10,7 @@ namespace ola
 {
 	Bool Mem2RegPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		std::vector<AllocaInst*> Allocas = FindAllocaInstructions(F);
+		std::vector<AllocaInst*> Allocas = FindPromotableAllocaInstructions(F);
 		if (Allocas.empty()) 
 		{
 			return false; 
@@ -24,8 +24,34 @@ namespace ola
 		return true;
 	}
 
-	std::vector<AllocaInst*> Mem2RegPass::FindAllocaInstructions(Function& F)
+	std::vector<AllocaInst*> Mem2RegPass::FindPromotableAllocaInstructions(Function& F)
 	{
+		auto IsAllocaPromotable = [](AllocaInst const* AI)
+			{
+				if (AI->GetAllocatedType()->IsArray())
+				{
+					return false;
+				}
+				for (Use const* U : AI->Users())
+				{
+					if (LoadInst const* LI = dyn_cast<LoadInst>(U))
+					{
+						if (LI->GetType() != AI->GetAllocatedType()) return false;
+					}
+					else if (StoreInst const* SI = dyn_cast<StoreInst>(U))
+					{
+						if (SI->GetValueOp() == AI ||
+							SI->GetValueOp()->GetType() != AI->GetAllocatedType())
+							return false; 
+					}
+					else if (const GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(U))
+					{
+						return false;
+					}
+				}
+				return true;
+			};
+
 		std::vector<AllocaInst*> Allocas;
 		for (BasicBlock& BB : F) 
 		{
@@ -33,7 +59,7 @@ namespace ola
 			{
 				if (AllocaInst* AI = dyn_cast<AllocaInst>(&I))
 				{
-					if (!AI->GetAllocatedType()->IsArray()) 
+					if (IsAllocaPromotable(AI))
 					{
 						Allocas.push_back(AI);
 					}
