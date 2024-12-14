@@ -34,17 +34,21 @@ namespace ola
 				}
 				for (Use const* U : AI->Users())
 				{
-					if (LoadInst const* LI = dyn_cast<LoadInst>(U))
+					if (LoadInst const* LI = dyn_cast<LoadInst>(U->GetUser()))
 					{
 						if (LI->GetType() != AI->GetAllocatedType()) return false;
 					}
-					else if (StoreInst const* SI = dyn_cast<StoreInst>(U))
+					else if (StoreInst const* SI = dyn_cast<StoreInst>(U->GetUser()))
 					{
 						if (SI->GetValueOp() == AI ||
 							SI->GetValueOp()->GetType() != AI->GetAllocatedType())
 							return false; 
 					}
-					else if (const GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(U))
+					else if (const GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(U->GetUser()))
+					{
+						return false;
+					}
+					else if (CallInst* CI = dyn_cast<CallInst>(U->GetUser()))
 					{
 						return false;
 					}
