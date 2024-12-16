@@ -59,7 +59,19 @@ namespace ola
 			instructions_to_remove.push_back(BI);
 		}
 	}
-
+	static void TryReducingMod(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
+	{
+		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
+		IRContext& ctx = BI->GetContext();
+		IRBuilder builder(ctx);
+		if (right_op && IsPowerOfTwo(right_op->GetValue()))
+		{
+			Int64 mask = right_op->GetValue() - 1;
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::And, BI->GetLHS(), ctx.GetInt64(mask));
+			BI->ReplaceAllUseWith(new_inst);
+			instructions_to_remove.push_back(BI);
+		}
+	}
 	Bool ArithmeticReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		Bool changed = false;
@@ -78,6 +90,10 @@ namespace ola
 					else if (BI->GetOpcode() == Opcode::SDiv)
 					{
 						TryReducingDiv(BI, instructions_to_remove);
+					}
+					else if (BI->GetOpcode() == Opcode::SRem)
+					{
+						TryReducingMod(BI, instructions_to_remove);
 					}
 				}
 			}
