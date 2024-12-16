@@ -1,93 +1,48 @@
 import std.assert;
 
-void TestIfElseBasic()
-{
-    int x = 10;
-    int y = 20;
+// Global variables
+int GlobalIntX = 20;
+int GlobalIntY = 4;
+float GlobalFloatX = 7.5;
+float GlobalFloatY = 2.5;
 
-    if (x < y) Assert(true);
-    else Assert(false);
+void TestModulo()
+{
+    // 1. Local variables
+    int intA = 17;
+    int intB = 4;
+
+    // Modulo
+    int resultModulo = intA % intB;
+    Assert(resultModulo == 1);
+
+    // 2. Local and global variables
+    int resultModuloLocalGlobal = intA % GlobalIntY;
+    Assert(resultModuloLocalGlobal == 1);
+
+    // 3. Local variables and immediate values
+    int resultModuloImmediate = intA % 3;
+    Assert(resultModuloImmediate == 2);
+
+    // 4. Global variables
+    int resultModuloGlobal = GlobalIntX % GlobalIntY;
+    Assert(resultModuloGlobal == 0);
+
+    // 5. Global variables and immediate values
+    int resultModuloGlobalImmediate = GlobalIntX % 3;
+    Assert(resultModuloGlobalImmediate == 2);
+
+    // 6. Immediate values
+    Assert(10 % 3 == 1);
+
+    // Compound modulo
+    intA %= 3;
+    Assert(intA == 2);
 }
 
-void TestIfElseMultipleConditions()
-{
-    int a = 5;
-    int b = 5;
-
-    if (a > b)
-    {
-        Assert(false);
-    }
-    else if (a < b)
-    {
-        Assert(false);
-    }
-    else
-    {
-        Assert(true);
-    }
-}
-
-void TestNestedIfElse()
-{
-    int num = 42;
-
-    if (num % 2 == 0)
-    {
-        if (num > 0)  Assert(true);
-        else Assert(false);
-    }
-    else Assert(false);
-
-}
-
-void TestComplexNestedIfElse()
-{
-    int i = 1, j = 5, k = 5;
-
-    if (i > 0)
-    {
-        if (j < 10)
-        {
-            if (k == 5) Assert(true); // Condition met: i > 0, j < 10, k == 5
-            else  Assert(false); 
-        }
-        else
-        {
-            Assert(false);
-        }
-    }
-    else
-    {
-        if (j == 0)  Assert(false); 
-        else
-        {
-            if (k > 0) Assert(false); 
-            else  Assert(false); 
-        }
-    }
-}
-
-void TestIfElseLogicalOperators()
-{
-    int value = 15;
-    if (value > 10 && value < 20)
-    {
-        Assert(true);
-    }
-    else
-    {
-        Assert(false);
-    }
-}
 
 public int main()
 {
-    TestIfElseBasic();
-    TestIfElseMultipleConditions();
-    TestNestedIfElse();
-    TestComplexNestedIfElse();
-    TestIfElseLogicalOperators();
-
+    TestModulo();
     return 0;
 }

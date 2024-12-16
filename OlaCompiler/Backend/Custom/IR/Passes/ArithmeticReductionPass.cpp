@@ -64,6 +64,7 @@ namespace ola
 		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
 		IRContext& ctx = BI->GetContext();
 		IRBuilder builder(ctx);
+		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
 		if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
 			Int64 mask = right_op->GetValue() - 1;
@@ -93,8 +94,7 @@ namespace ola
 					}
 					else if (BI->GetOpcode() == Opcode::SRem)
 					{
-						//causes test_multiplicative to fail
-						//TryReducingMod(BI, instructions_to_remove);
+						TryReducingMod(BI, instructions_to_remove);
 					}
 				}
 			}
