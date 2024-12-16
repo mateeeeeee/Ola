@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide.png"/>
-Ola is a toy programming language offering both an LLVM backend and a work-in-progress custom backend. 
+Ola is a toy programming language with both LLVM backend and a work-in-progress custom backend. 
 
 ## Dependencies
 * [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
@@ -39,12 +39,11 @@ Ola is a toy programming language offering both an LLVM backend and a work-in-pr
   * scopes
   * import statement
   * standard library
-  * Backend architecture
-	- LLVM Backend
-	- Custom Backend (Work in Progress)
+  * LLVM Backend
+  * Custom Backend (Work in Progress)
 
 ## Structure
-Ola consists of the following parts:
+The project consists of the following parts:
 
 1. **Ola Library**:
    - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. It includes essential components like:
@@ -57,11 +56,11 @@ Ola consists of the following parts:
      - **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
      - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
      - **Backend**: After frontend processing, the compilation process diverges into two backend paths:
-       - **LLVM Path**:
+       - **LLVM**:
          - **LLVMIR Visitor**: Transforms the AST into LLVM IR.
-         - **LLVMIR Pass Manager**: Applies LLVM optimization passes to the IR, based on the specified optimization level.
+         - **LLVMIR Pass Manager**: Applies LLVM optimization passes to the IR.
          - Compilation to assembly is done using the `clang -S` command.
-       - **Custom Backend Path**:
+       - **Custom Backend**:
          - **IR Visitor**: Transforms the AST into Ola's custom IR.
          - **IR Pass Manager**: Applies custom optimizations at the IR level.
          - **MachineModule**: Responsible for lowering IR to MIR and finally to assembly.
