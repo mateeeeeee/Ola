@@ -249,7 +249,30 @@ namespace ola
 					MachineOperand op2 = MI.GetOperand(2);
 					MachineOperand compare_op = MI.GetOperand(3);
 
+					auto GetOppositeCondition = [](MachineOperand compare_op) -> CompareOp
+						{
+							OLA_ASSERT(compare_op.IsImmediate());
+							CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+							switch (cmp_op)
+							{
+							case CompareOp::ICmpEQ:  return CompareOp::ICmpEQ;
+							case CompareOp::ICmpNE:  return CompareOp::ICmpNE;
+							case CompareOp::ICmpSGT: return CompareOp::ICmpSLE;
+							case CompareOp::ICmpSGE: return CompareOp::ICmpSLT;
+							case CompareOp::ICmpSLT: return CompareOp::ICmpSGE;
+							case CompareOp::ICmpSLE: return CompareOp::ICmpSGT;
+							}
+							OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+							return CompareOp::ICmpEQ;
+						};
 					MI.SetOp<0>(op1).SetOp<1>(op2);
+					if (op1.IsImmediate())
+					{
+						OLA_ASSERT(!op2.IsImmediate());
+						MI.SetOp<0>(op2);
+						MI.SetOp<1>(op1);
+						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Int64);
+					}
 
 					auto GetSetCondition = [](MachineOperand compare_op) -> Uint32
 						{
@@ -357,6 +380,29 @@ namespace ola
 				MachineOperand compare_op = MI.GetOperand(3);
 
 				MI.SetOp<0>(op1).SetOp<1>(op2);
+				auto GetOppositeCondition = [](MachineOperand compare_op) -> CompareOp
+					{
+						OLA_ASSERT(compare_op.IsImmediate());
+						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+						switch (cmp_op)
+						{
+						case CompareOp::FCmpOEQ:  return CompareOp::FCmpOEQ;
+						case CompareOp::FCmpONE:  return CompareOp::FCmpONE;
+						case CompareOp::FCmpOGT:  return CompareOp::FCmpOLE;
+						case CompareOp::FCmpOGE:  return CompareOp::FCmpOLT;
+						case CompareOp::FCmpOLT:  return CompareOp::FCmpOGE;
+						case CompareOp::FCmpOLE:  return CompareOp::FCmpOGT;
+						}
+						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
+						return CompareOp::FCmpOEQ;
+					};
+				if (op1.IsImmediate())
+				{
+					OLA_ASSERT(!op2.IsImmediate());
+					MI.SetOp<0>(op2);
+					MI.SetOp<1>(op1);
+					compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Int64);
+				}
 
 				auto GetSetCondition = [](MachineOperand compare_op) -> Uint32
 					{

@@ -1,331 +1,168 @@
 .intel_syntax noprefix
 
-.section .rodata
-
-global_int_1:
-.quad 5
-
-
-global_int_2:
-.quad 10
-
-
-global_int_3:
-.quad 7
-
-
-global_int_4:
-.quad 20
-
-
-global_sub_1:
-.quad 15
-
-
-global_sub_2:
-.quad 7
-
-
-global_sub_3:
-.quad 3
-
-
-global_sub_4:
-.quad 30
-
-
-global_float_1:
-.quad 4615063718147915776
-
-
-global_float_2:
-.quad 4612811918334230528
-
-
-global_float_3:
-.quad 4608083138725491507
-
-
-global_float_4:
-.quad 4617315517961601024
-
-
-_FP0:
-.quad 4618441305278452964
-
-
-_FP1:
-.quad 4618441530458434332
-
-
-_FP2:
-.quad 4612811918334230528
-
-
-_FP3:
-.quad 4615063718147915776
-
-
-_FP4:
-.quad 4616977635399557553
-
-
-_FP5:
-.quad 4616977860579538921
-
-
-_FP6:
-.quad 4612811693154249159
-
-
-_FP7:
-.quad 4612812143514211897
-
-
-_FP8:
-.quad 4617315517961601024
-
-
-_FP9:
-.quad 4615739032912039982
-
-
-_FP10:
-.quad 4615739483272002719
-
-
 .section .text
 
 .extern Assert
 
 .extern AssertMsg
 
-TestIntAddition:
+TestIfElseBasic:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-mov rcx, 1
-call Assert
-mov rcx, 1
-call Assert
-mov r15, qword ptr global_int_1[rip]
-mov r14, qword ptr global_int_2[rip]
-mov r13, r15
-add r13, r14
-cmp r13, 15
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr global_int_1[rip]
-mov r14, r13
-add r14, 10
-cmp r14, 15
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr global_int_3[rip]
-mov r13, 5
-add r13, r14
-cmp r13, 12
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label1
+sub rsp, 48
 label1:
-mov rsp, rbp
-pop rbp
-ret
-
-TestIntSubtraction:
+mov rcx, 1
+call Assert
+jmp label3
 label2:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov rcx, 1
-call Assert
-mov rcx, 1
-call Assert
-mov r15, qword ptr global_sub_1[rip]
-mov r14, qword ptr global_sub_2[rip]
-mov r13, r15
-sub r13, r14
-cmp r13, 8
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr global_sub_4[rip]
-mov r14, r13
-sub r14, 7
-cmp r14, 23
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr global_sub_3[rip]
-mov r13, 15
-sub r13, r14
-cmp r13, 12
-sete r13b
-and r13b, 1
-mov cl, r13b
+mov rcx, 0
 call Assert
 jmp label3
 label3:
-mov rsp, rbp
-pop rbp
-ret
-
-TestFloatAddition:
+jmp label4
 label4:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov r15b, 1
-and r15b, 1
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-mov r15b, 1
-and r15b, 1
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-movsd xmm15, qword ptr global_float_1[rip]
-movsd xmm14, qword ptr global_float_2[rip]
-movsd xmm13, xmm15
-addsd xmm13, xmm14
-comisd xmm13, qword ptr [rip + _FP0]
-seta r15b
-and r15b, 1
-comisd xmm13, qword ptr [rip + _FP1]
-setb r14b
-and r14b, 1
-mov r13b, r15b
-and r13b, r14b
-cmp r13b, 0
-setne r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-movsd xmm13, qword ptr global_float_1[rip]
-movsd xmm14, xmm13
-movsd xmm13, qword ptr [rip + _FP2]
-addsd xmm14, xmm13
-comisd xmm14, qword ptr [rip + _FP0]
-seta r13b
-and r13b, 1
-comisd xmm14, qword ptr [rip + _FP1]
-setb r14b
-and r14b, 1
-mov r15b, r13b
-and r15b, r14b
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-movsd xmm14, qword ptr global_float_3[rip]
-movsd xmm13, qword ptr [rip + _FP3]
-addsd xmm13, xmm14
-comisd xmm13, qword ptr [rip + _FP4]
-seta r15b
-and r15b, 1
-comisd xmm13, qword ptr [rip + _FP5]
-setb r14b
-and r14b, 1
-mov r13b, r15b
-and r13b, r14b
-cmp r13b, 0
-setne r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label5
-label5:
 mov rsp, rbp
 pop rbp
 ret
 
-TestFloatSubtraction:
-label6:
+TestIfElseMultipleConditions:
+label5:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-mov r15b, 1
-and r15b, 1
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
+sub rsp, 48
+label6:
+mov rcx, 0
 call Assert
-mov r15b, 1
-and r15b, 1
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-movsd xmm15, qword ptr global_float_4[rip]
-movsd xmm14, qword ptr global_float_2[rip]
-movsd xmm13, xmm15
-subsd xmm13, xmm14
-comisd xmm13, qword ptr [rip + _FP6]
-seta r15b
-and r15b, 1
-comisd xmm13, qword ptr [rip + _FP7]
-setb r14b
-and r14b, 1
-mov r13b, r15b
-and r13b, r14b
-cmp r13b, 0
-setne r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-movsd xmm13, qword ptr global_float_4[rip]
-movsd xmm14, xmm13
-movsd xmm13, qword ptr [rip + _FP2]
-subsd xmm14, xmm13
-comisd xmm14, qword ptr [rip + _FP6]
-seta r13b
-and r13b, 1
-comisd xmm14, qword ptr [rip + _FP7]
-setb r14b
-and r14b, 1
-mov r15b, r13b
-and r15b, r14b
-cmp r15b, 0
-setne r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-movsd xmm14, qword ptr global_float_3[rip]
-movsd xmm13, qword ptr [rip + _FP8]
-subsd xmm13, xmm14
-comisd xmm13, qword ptr [rip + _FP9]
-seta r15b
-and r15b, 1
-comisd xmm13, qword ptr [rip + _FP10]
-setb r14b
-and r14b, 1
-mov r13b, r15b
-and r13b, r14b
-cmp r13b, 0
-setne r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label7
+jmp label8
 label7:
+label8:
+jmp label12
+label9:
+mov rcx, 0
+call Assert
+jmp label11
+label10:
+mov rcx, 1
+call Assert
+jmp label11
+label11:
+jmp label8
+label12:
+mov rsp, rbp
+pop rbp
+ret
+
+TestNestedIfElse:
+label13:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+mov rax, 42
+cqo
+mov r15, 2
+idiv r15
+mov r15, rdx
+cmp r15, 0
+sete r15b
+and r15b, 1
+test r15b, r15b
+jne label14
+jmp label15
+label14:
+label15:
+mov rcx, 0
+call Assert
+jmp label16
+label16:
+jmp label20
+label17:
+mov rcx, 1
+call Assert
+jmp label19
+label18:
+mov rcx, 0
+call Assert
+jmp label19
+label19:
+jmp label16
+label20:
+mov rsp, rbp
+pop rbp
+ret
+
+TestComplexNestedIfElse:
+label21:
+push rbp
+mov rbp, rsp
+sub rsp, 56
+label22:
+label23:
+label24:
+jmp label37
+label25:
+label26:
+mov rcx, 0
+call Assert
+jmp label27
+label27:
+jmp label24
+label28:
+mov rcx, 1
+call Assert
+jmp label30
+label29:
+mov rcx, 0
+call Assert
+jmp label30
+label30:
+jmp label27
+label31:
+mov rcx, 0
+call Assert
+jmp label33
+label32:
+label33:
+jmp label24
+label34:
+mov rcx, 0
+call Assert
+jmp label36
+label35:
+mov rcx, 0
+call Assert
+jmp label36
+label36:
+jmp label33
+label37:
+mov rsp, rbp
+pop rbp
+ret
+
+TestIfElseLogicalOperators:
+label38:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+mov r15b, 1
+and r15b, 1
+cmp r15b, 0
+setne r15b
+and r15b, 1
+test r15b, r15b
+jne label39
+jmp label40
+label39:
+mov rcx, 1
+call Assert
+jmp label41
+label40:
+mov rcx, 0
+call Assert
+jmp label41
+label41:
+jmp label42
+label42:
 mov rsp, rbp
 pop rbp
 ret
@@ -333,18 +170,19 @@ ret
 .globl main
 
 main:
-label8:
+label43:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-call TestIntAddition
-call TestIntSubtraction
-call TestFloatAddition
-call TestFloatSubtraction
-jmp label10
-label9:
-jmp label10
-label10:
+sub rsp, 40
+call TestIfElseBasic
+call TestIfElseMultipleConditions
+call TestNestedIfElse
+call TestComplexNestedIfElse
+call TestIfElseLogicalOperators
+jmp label45
+label44:
+jmp label45
+label45:
 mov rax, 0
 mov rsp, rbp
 pop rbp

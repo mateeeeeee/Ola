@@ -100,7 +100,30 @@ namespace ola
 			}
 			return nullptr;
 		}
-		Constant* ConstantFold_Instruction(Instruction* I)
+		Value* ConstantFold_SelectInst(SelectInst* SI)
+		{
+			ConstantInt* CI = dyn_cast<ConstantInt>(SI->GetPredicate());
+			if (CI)
+			{
+				return CI->GetValue() != 0 ? SI->GetTrueValue() : SI->GetFalseValue();
+			}
+			return nullptr;
+		}
+		Value* ConstantFold_BranchInst(BranchInst* BI)
+		{
+			if (Value* Condition = BI->GetCondition())
+			{
+				ConstantInt* CI = dyn_cast<ConstantInt>(Condition);
+				if (CI)
+				{
+					IRContext& ctx = CI->GetContext();
+					return CI->GetValue() != 0 ? new BranchInst(ctx, BI->GetTrueTarget()) : new BranchInst(ctx, BI->GetFalseTarget());
+				}
+			}
+			return nullptr;
+		}
+
+		Value* ConstantFold_Instruction(Instruction* I)
 		{
 			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
 			{
@@ -113,6 +136,14 @@ namespace ola
 			else if (CompareInst* CI = dyn_cast<CompareInst>(I))
 			{
 				return ConstantFold_CompareInst(CI);
+			}
+			else if (SelectInst* SI = dyn_cast<SelectInst>(I))
+			{
+				return ConstantFold_SelectInst(SI);
+			}
+			else if (BranchInst* BI = dyn_cast<BranchInst>(I))
+			{
+				return ConstantFold_BranchInst(BI);
 			}
 			return nullptr;
 		}
@@ -137,9 +168,9 @@ namespace ola
 			for (Instruction* I : WorkListVector)
 			{
 				WorkList.erase(I);
-				if (!I->HasNUsesOrMore(1)) continue;
+				if (!I->IsTerminator() && !I->HasNUsesOrMore(1)) continue;
 
-				if (Constant* C = ConstantFold_Instruction(I))
+				if (Value* V = ConstantFold_Instruction(I))
 				{
 					for (Use* U : I->Users())
 					{
@@ -147,7 +178,7 @@ namespace ola
 							NewWorkListVector.push_back(cast<Instruction>(U->GetUser()));
 					}
 
-					I->ReplaceAllUseWith(C);
+					I->ReplaceAllUseWith(V);
 					if (!I->HasNUsesOrMore(1))
 					{
 						I->EraseFromParent();

@@ -93,7 +93,8 @@ namespace ola
 					}
 					else if (BI->GetOpcode() == Opcode::SRem)
 					{
-						TryReducingMod(BI, instructions_to_remove);
+						//causes test_multiplicative to fail
+						//TryReducingMod(BI, instructions_to_remove);
 					}
 				}
 			}

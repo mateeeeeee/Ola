@@ -557,8 +557,7 @@ namespace ola
 
 		Value* GetCondition() const
 		{
-			OLA_ASSERT(IsConditional());
-			return Op<2>();
+			return IsConditional() ? Op<2>() : nullptr;
 		}
 		void SetCondition(Value* C)
 		{
