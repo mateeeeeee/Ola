@@ -45,8 +45,8 @@ namespace ola
 				if (opcode == Opcode::SDiv || opcode == Opcode::SRem)
 				{
 					MachineOperand dst = ctx.VirtualReg(BI->GetType());
-					MachineOperand op1 = ctx.GetOperand(BI->LHS());
-					MachineOperand op2 = ctx.GetOperand(BI->RHS());
+					MachineOperand op1 = ctx.GetOperand(BI->GetLHS());
+					MachineOperand op2 = ctx.GetOperand(BI->GetRHS());
 
 					MachineInstruction move_to_rax(InstMove);
 					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineType::Int64));

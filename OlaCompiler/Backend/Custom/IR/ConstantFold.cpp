@@ -44,14 +44,19 @@ namespace ola
 	Value* TryConstantFold_UnaryInst(Opcode opcode, Value* operand)
 	{
 		IRContext& ctx = operand->GetContext();
-		ConstantInt* C = dyn_cast<ConstantInt>(operand);
-		if (C)
+		ConstantInt* CI = dyn_cast<ConstantInt>(operand);
+		if (CI)
 		{
 			switch (opcode)
 			{
-			case Opcode::Neg:  return ctx.GetInt(operand->GetType(), -C->GetValue());
-			case Opcode::Not:  return ctx.GetInt(operand->GetType(), ~C->GetValue());
+			case Opcode::Neg:  return ctx.GetInt(operand->GetType(), -CI->GetValue());
+			case Opcode::Not:  return ctx.GetInt(operand->GetType(), ~CI->GetValue());
 			}
+		}
+		ConstantFloat* CF = dyn_cast<ConstantFloat>(operand);
+		if (CF && opcode == Opcode::Neg)
+		{
+			ctx.GetFloat(-CF->GetValue());
 		}
 		return nullptr;
 	}
@@ -59,7 +64,6 @@ namespace ola
 	Value* TryConstantFold_CompareInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
 		IRContext& ctx = lhs->GetContext();
-
 		IRType* bool_type = IRIntType::Get(ctx, 1);
 
 		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);

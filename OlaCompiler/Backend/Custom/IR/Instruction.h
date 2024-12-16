@@ -388,11 +388,11 @@ namespace ola
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
 
-		Value* LHS() const
+		Value* GetLHS() const
 		{
 			return Op<0>();
 		}
-		Value* RHS() const
+		Value* GetRHS() const
 		{
 			return Op<1>();
 		}
@@ -412,7 +412,7 @@ namespace ola
 	public:
 		UnaryInst(Opcode opcode, Value* val) : Instruction(opcode, val->GetType(), { val }) {}
 		
-		Value* Operand() const
+		Value* GetOperand() const
 		{
 			return Op<0>();
 		}
@@ -459,11 +459,11 @@ namespace ola
 	public:
 		CompareInst(Opcode id, Value* lhs, Value* rhs);
 
-		Value* LHS() const
+		Value* GetLHS() const
 		{
 			return Op<0>();
 		}
-		Value* RHS() const
+		Value* GetRHS() const
 		{
 			return Op<1>();
 		}

@@ -2,6 +2,7 @@
 #include "IRModule.h"
 #include "GlobalValue.h"
 #include "Passes/Mem2RegPass.h"
+#include "Passes/ConstantPropagationPass.h"
 #include "Passes/ArithmeticReductionPass.h"
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
@@ -27,9 +28,10 @@ namespace ola
 			[[fallthrough]];
 		case OptimizationLevel::O1:
 			FPM.AddPass(CreateMem2RegPass());
-			//FPM.AddPass(CreateArithmeticReductionPass());
-			//FPM.AddPass(CreateDeadCodeEliminationPass());
-			//MPM.AddPass(CreateGlobalAttributeInferPass());
+			FPM.AddPass(CreateConstantPropagationPass());
+			FPM.AddPass(CreateArithmeticReductionPass());
+			FPM.AddPass(CreateDeadCodeEliminationPass());
+			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());

@@ -23,8 +23,8 @@ namespace ola
 
 	static void TryReducingMul(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
 	{
-		ConstantInt* left_op = dyn_cast<ConstantInt>(BI->LHS());
-		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->RHS());
+		ConstantInt* left_op = dyn_cast<ConstantInt>(BI->GetLHS());
+		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
 		
 		IRContext& ctx = BI->GetContext();
 		IRBuilder builder(ctx);
@@ -32,21 +32,21 @@ namespace ola
 		if (left_op && IsPowerOfTwo(left_op->GetValue()))
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->RHS(), ctx.GetInt64(logOfPowerOf2));
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetRHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 		else if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 	}
 	static void TryReducingDiv(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
 	{
-		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->RHS());
+		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
 
 		IRContext& ctx = BI->GetContext();
 		IRBuilder builder(ctx);
@@ -54,7 +54,7 @@ namespace ola
 		if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->LHS(), ctx.GetInt64(logOfPowerOf2));
+			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
 			BI->ReplaceAllUseWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}

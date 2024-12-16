@@ -278,7 +278,7 @@ namespace ola
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(BI->GetType());
 		MachineInstruction MI(GetMachineOpcode(BI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(BI->LHS())).SetOp<2>(lowering_ctx.GetOperand(BI->RHS()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(BI->GetLHS())).SetOp<2>(lowering_ctx.GetOperand(BI->GetRHS()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(BI, ret);
 	}
@@ -287,8 +287,8 @@ namespace ola
 	{
 		MachineOperand ret = lowering_ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->LHS()))
-			.SetOp<2>(lowering_ctx.GetOperand(CI->RHS()))
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->GetLHS()))
+			.SetOp<2>(lowering_ctx.GetOperand(CI->GetRHS()))
 			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(CI, ret);
@@ -299,7 +299,7 @@ namespace ola
 		if (UI->GetName() == "nop") return;
 		MachineOperand ret = lowering_ctx.VirtualReg(UI->GetType());
 		MachineInstruction MI(GetMachineOpcode(UI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(UI->Operand()));
+		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(UI->GetOperand()));
 		lowering_ctx.EmitInst(MI);
 		lowering_ctx.AddOperand(UI, ret);
 	}
