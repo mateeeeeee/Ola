@@ -27,9 +27,9 @@ namespace ola
 			[[fallthrough]];
 		case OptimizationLevel::O1:
 			FPM.AddPass(CreateMem2RegPass());
-			FPM.AddPass(CreateArithmeticReductionPass());
-			FPM.AddPass(CreateDeadCodeEliminationPass());
-			MPM.AddPass(CreateGlobalAttributeInferPass());
+			//FPM.AddPass(CreateArithmeticReductionPass());
+			//FPM.AddPass(CreateDeadCodeEliminationPass());
+			//MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());

@@ -127,7 +127,7 @@ namespace ola
 		}
 		BasicBlock& GetEntryBlock()
 		{
-			return const_cast<BasicBlock&>(static_cast<const Function*>(this)->GetEntryBlock());
+			return block_list.Front();
 		}
 
 		auto& Blocks()
@@ -184,6 +184,7 @@ namespace ola
 		{
 			return GetFunctionType()->GetParamCount();
 		}
+		Bool HasCallInstruction() const;
 
 		virtual Bool IsFunction() const override
 		{

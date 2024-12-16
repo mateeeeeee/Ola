@@ -97,6 +97,7 @@ namespace ola
 	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const
 	{
 		using enum MachineType;
+		if (MF.HasCallInstructions()) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);

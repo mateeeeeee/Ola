@@ -68,6 +68,20 @@ namespace ola
 		}
 		Bool IsEntryBlock() const;
 
+		template<typename F> requires std::is_invocable_v<F, Instruction&>
+		void ForAllInstructions(F&& f)
+		{
+			for (Instruction& I : instructions) f(I);
+		}
+		template<typename F> requires std::is_invocable_r_v<Bool, F, Instruction&>
+		void ForAllInstructionsUntil(F&& f)
+		{
+			for (Instruction& I : instructions)
+			{
+				if (!f(I)) return;
+			}
+		}
+
 		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::BasicBlock;

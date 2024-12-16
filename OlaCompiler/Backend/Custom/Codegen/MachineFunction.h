@@ -40,6 +40,14 @@ namespace ola
 		{
 			return stack_offset;
 		}
+		void SetHasCallInstructions(Bool v)
+		{
+			has_call_instructions = v;
+		}
+		Bool HasCallInstructions() const
+		{
+			return has_call_instructions;
+		}
 
 		virtual RelocableKind GetRelocableKind() const override
 		{
@@ -52,5 +60,6 @@ namespace ola
 		std::vector<MachineOperand> args;
 		Int32 stack_offset = 0;
 		std::vector<MachineOperand> stack_objects;
+		Bool has_call_instructions = false;
 	};
 }

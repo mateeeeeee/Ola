@@ -135,37 +135,35 @@ namespace ola
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 
-		Bool is_leaf = true;
 		for (BasicBlock& BB : F->Blocks())
 		{
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
 			lowering_ctx.AddBlock(&BB, MBB.get());
-			for (auto& I : BB.Instructions())
-			{
-				if (I.GetOpcode() == Opcode::Alloca)
+			BB.ForAllInstructions([this, &MF](Instruction& I)
 				{
-					AllocaInst* AI = cast<AllocaInst>(&I);
-					IRType const* type = AI->GetAllocatedType();
-					if (type->IsArray())
+					if (I.GetOpcode() == Opcode::Alloca)
 					{
-						IRArrayType const* array_type = cast<IRArrayType>(type);
-						MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
-						lowering_ctx.AddOperand(AI, MO);
+						AllocaInst* AI = cast<AllocaInst>(&I);
+						IRType const* type = AI->GetAllocatedType();
+						if (type->IsArray())
+						{
+							IRArrayType const* array_type = cast<IRArrayType>(type);
+							MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
+							lowering_ctx.AddOperand(AI, MO);
+						}
+						else
+						{
+							MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
+							lowering_ctx.AddOperand(AI, MO);
+						}
 					}
-					else
+					else if (I.GetOpcode() == Opcode::Call)
 					{
-						MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
-						lowering_ctx.AddOperand(AI, MO);
+						MF.SetHasCallInstructions(true);
 					}
-				}
-				else if (I.GetOpcode() == Opcode::Call)
-				{
-					is_leaf = false;
-				}
-			}
+				});
 		}
-		if (!is_leaf) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
 
 		auto& args = MF.Args();
 		for (Uint32 arg_idx = 0; arg_idx < F->GetArgCount(); ++arg_idx)

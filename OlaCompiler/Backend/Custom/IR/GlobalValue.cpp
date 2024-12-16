@@ -48,5 +48,17 @@ namespace ola
 		return block_list.Size();
 	}
 
+	Bool Function::HasCallInstruction() const
+	{
+		for (BasicBlock const& bb : block_list)
+		{
+			for (Instruction const& I : bb.Instructions())
+			{
+				if (I.GetOpcode() == Opcode::Call) return true;
+			}
+		}
+		return false;
+	}
+
 }
 
