@@ -257,7 +257,6 @@ namespace ola
 								else if constexpr (std::is_same_v<T, Uint32>)		EmitReadOnly(".long {}", arg);
 								else if constexpr (std::is_same_v<T, Uint64>)		EmitReadOnly(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)	EmitReadOnly(".string \"{}\"", arg);
-								else static_assert(false, "non-exhaustive visitor!");
 							}, element);
 					}
 					EmitReadOnly("\n");
@@ -275,7 +274,6 @@ namespace ola
 								else if constexpr (std::is_same_v<T, Uint32>)		EmitData(".long {}", arg);
 								else if constexpr (std::is_same_v<T, Uint64>)		EmitData(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)	EmitData(".string \"{}\"", arg);
-								else static_assert(false, "non-exhaustive visitor!");
 							}, element);
 					}
 					EmitData("\n");
