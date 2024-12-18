@@ -555,6 +555,9 @@ namespace ola
 		BasicBlock* GetTrueTarget() const { return true_target; }
 		BasicBlock* GetFalseTarget() const { return false_target; }
 
+		void SetTrueTarget(BasicBlock* bb) { true_target = bb; }
+		void SetFalseTarget(BasicBlock* bb) { false_target = bb; }
+
 		Value* GetCondition() const
 		{
 			return IsConditional() ? Op<2>() : nullptr;

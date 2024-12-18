@@ -8,7 +8,7 @@ namespace ola
 {
 	namespace
 	{
-		Constant* ConstantFold_BinaryInst(BinaryInst* BI)
+		Constant* TryConstantFold_BinaryInst(BinaryInst* BI)
 		{
 			IRContext& ctx = BI->GetContext();
 
@@ -45,7 +45,7 @@ namespace ola
 			}
 			return nullptr;
 		}
-		Constant* ConstantFold_UnaryInst(UnaryInst* UI)
+		Constant* TryConstantFold_UnaryInst(UnaryInst* UI)
 		{
 			IRContext& ctx = UI->GetContext();
 			ConstantInt* CI = dyn_cast<ConstantInt>(UI->GetOperand());
@@ -64,7 +64,7 @@ namespace ola
 			}
 			return nullptr;
 		}
-		Constant* ConstantFold_CompareInst(CompareInst* CI)
+		Constant* TryConstantFold_CompareInst(CompareInst* CI)
 		{
 			IRContext& ctx = CI->GetContext();
 			IRType* bool_type = IRIntType::Get(ctx, 1);
@@ -100,7 +100,7 @@ namespace ola
 			}
 			return nullptr;
 		}
-		Value* ConstantFold_SelectInst(SelectInst* SI)
+		Value* TryConstantFold_SelectInst(SelectInst* SI)
 		{
 			ConstantInt* CI = dyn_cast<ConstantInt>(SI->GetPredicate());
 			if (CI)
@@ -109,7 +109,7 @@ namespace ola
 			}
 			return nullptr;
 		}
-		Value* ConstantFold_BranchInst(BranchInst* BI)
+		BranchInst* TryConstantFold_BranchInst(BranchInst* BI)
 		{
 			if (Value* Condition = BI->GetCondition())
 			{
@@ -122,28 +122,23 @@ namespace ola
 			}
 			return nullptr;
 		}
-
-		Value* ConstantFold_Instruction(Instruction* I)
+		Value* TryConstantFold_Instruction(Instruction* I)
 		{
 			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
 			{
-				return ConstantFold_BinaryInst(BI);
+				return TryConstantFold_BinaryInst(BI);
 			}
 			else if (UnaryInst* UI = dyn_cast<UnaryInst>(I))
 			{
-				return ConstantFold_UnaryInst(UI);
+				return TryConstantFold_UnaryInst(UI);
 			}
 			else if (CompareInst* CI = dyn_cast<CompareInst>(I))
 			{
-				return ConstantFold_CompareInst(CI);
+				return TryConstantFold_CompareInst(CI);
 			}
 			else if (SelectInst* SI = dyn_cast<SelectInst>(I))
 			{
-				return ConstantFold_SelectInst(SI);
-			}
-			else if (BranchInst* BI = dyn_cast<BranchInst>(I))
-			{
-				return ConstantFold_BranchInst(BI);
+				return TryConstantFold_SelectInst(SI);
 			}
 			return nullptr;
 		}
@@ -170,7 +165,7 @@ namespace ola
 				WorkList.erase(I);
 				if (!I->IsTerminator() && !I->HasNUsesOrMore(1)) continue;
 
-				if (Value* V = ConstantFold_Instruction(I))
+				if (Value* V = TryConstantFold_Instruction(I))
 				{
 					for (Use* U : I->Users())
 					{
@@ -184,6 +179,17 @@ namespace ola
 						I->EraseFromParent();
 					}
 					changed = true;
+				}
+				else if (BranchInst* BI = dyn_cast<BranchInst>(I))
+				{
+					if (BranchInst* BI2 = TryConstantFold_BranchInst(BI))
+					{
+						OLA_ASSERT(BI2->IsUnconditional());
+						BI->SetCondition(nullptr);
+						BI->SetTrueTarget(BI2->GetTrueTarget());
+						BI->SetFalseTarget(nullptr);
+						OLA_ASSERT(BI->IsUnconditional());
+					}
 				}
 			}
 			WorkListVector = std::move(NewWorkListVector);

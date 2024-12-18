@@ -1,105 +1,160 @@
 .intel_syntax noprefix
 
-.section .rodata
-
-GlobalIntX:
-.quad 20
-
-
-GlobalIntY:
-.quad 4
-
-
-GlobalFloatX:
-.quad 4620130267728707584
-
-
-GlobalFloatY:
-.quad 4612811918334230528
-
-
 .section .text
 
 .extern Assert
 
 .extern AssertMsg
 
-TestModulo:
+TestIfElseBasic:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 88
-mov r15, 17
-and r15, 3
-cmp r15, 1
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-mov r15, qword ptr GlobalIntY[rip]
-mov rax, 17
-cqo
-idiv r15
-mov r15, rdx
-cmp r15, 1
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-mov rax, 17
-cqo
-mov r15, 3
-idiv r15
-mov r15, rdx
-cmp r15, 2
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-mov r15, qword ptr GlobalIntX[rip]
-mov r14, qword ptr GlobalIntY[rip]
-mov rax, r15
-cqo
-idiv r14
-mov r14, rdx
-cmp r14, 0
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov rax, r14
-cqo
-mov r14, 3
-idiv r14
-mov r14, rdx
-cmp r14, 2
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov rax, 10
-cqo
-mov r14, 3
-idiv r14
-mov r14, rdx
-cmp r14, 1
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov rax, 17
-cqo
-mov r14, 3
-idiv r14
-mov r14, rdx
-cmp r14, 2
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
+sub rsp, 48
 jmp label1
 label1:
+mov rcx, 1
+call Assert
+jmp label3
+label2:
+mov rcx, 0
+call Assert
+jmp label3
+label3:
+jmp label4
+label4:
+mov rsp, rbp
+pop rbp
+ret
+
+TestIfElseMultipleConditions:
+label5:
+push rbp
+mov rbp, rsp
+sub rsp, 48
+jmp label7
+label6:
+mov rcx, 0
+call Assert
+jmp label8
+label7:
+jmp label10
+label8:
+jmp label12
+label9:
+mov rcx, 0
+call Assert
+jmp label11
+label10:
+mov rcx, 1
+call Assert
+jmp label11
+label11:
+jmp label8
+label12:
+mov rsp, rbp
+pop rbp
+ret
+
+TestNestedIfElse:
+label13:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+jmp label14
+label14:
+jmp label17
+label15:
+mov rcx, 0
+call Assert
+jmp label16
+label16:
+jmp label20
+label17:
+mov rcx, 1
+call Assert
+jmp label19
+label18:
+mov rcx, 0
+call Assert
+jmp label19
+label19:
+jmp label16
+label20:
+mov rsp, rbp
+pop rbp
+ret
+
+TestComplexNestedIfElse:
+label21:
+push rbp
+mov rbp, rsp
+sub rsp, 56
+jmp label22
+label22:
+jmp label25
+label23:
+jmp label32
+label24:
+jmp label37
+label25:
+jmp label28
+label26:
+mov rcx, 0
+call Assert
+jmp label27
+label27:
+jmp label24
+label28:
+mov rcx, 1
+call Assert
+jmp label30
+label29:
+mov rcx, 0
+call Assert
+jmp label30
+label30:
+jmp label27
+label31:
+mov rcx, 0
+call Assert
+jmp label33
+label32:
+jmp label34
+label33:
+jmp label24
+label34:
+mov rcx, 0
+call Assert
+jmp label36
+label35:
+mov rcx, 0
+call Assert
+jmp label36
+label36:
+jmp label33
+label37:
+mov rsp, rbp
+pop rbp
+ret
+
+TestIfElseLogicalOperators:
+label38:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+jmp label39
+label39:
+mov rcx, 1
+call Assert
+jmp label41
+label40:
+mov rcx, 0
+call Assert
+jmp label41
+label41:
+jmp label42
+label42:
 mov rsp, rbp
 pop rbp
 ret
@@ -107,15 +162,16 @@ ret
 .globl main
 
 main:
-label2:
+label43:
 push rbp
 mov rbp, rsp
 sub rsp, 40
-call TestModulo
-jmp label4
-label3:
-jmp label4
-label4:
+call TestIfElseBasic
+call TestIfElseMultipleConditions
+jmp label45
+label44:
+jmp label45
+label45:
 mov rax, 0
 mov rsp, rbp
 pop rbp
