@@ -1,28 +1,14 @@
 import std.assert;
 
-int TestIfElse()
+void IntByRef(ref int a)
 {
-	int a = 6;
-	if(a > 5) return 10;
-	else return 0;
-}
-
-int TestWhile()
-{
-	int a = 0;
-	while(a < 10)
-	{
-		if (a == 5) return a * 2;
-		++a;
-	}
-	return 0;
+	++a;
 }
 
 public int main()
 {
-	int r = TestIfElse();
-	Assert(r == 10);
-	r = TestWhile();
-	Assert(r == 10);
+	int a = 9;
+	IntByRef(a);
+	Assert(a == 10);
 	return 0;
 }

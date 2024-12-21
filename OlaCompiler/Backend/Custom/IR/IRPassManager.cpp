@@ -30,7 +30,7 @@ namespace ola
 			FPM.AddPass(CreateMem2RegPass());
 			FPM.AddPass(CreateConstantPropagationPass());
 			FPM.AddPass(CreateArithmeticReductionPass());
-			//FPM.AddPass(CreateDeadCodeEliminationPass());
+			FPM.AddPass(CreateDeadCodeEliminationPass());
 			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());

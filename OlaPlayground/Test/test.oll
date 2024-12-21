@@ -6,131 +6,12 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestIfElseBasic void() {
+define internal @IntByRef__Iref void(ptr %a) {
 entry:
-%0 = alloca i64
-%1 = alloca i64
-br label if.then
-if.then:
-call i8 1, @Assert
-br label if.end
-if.else:
-call i8 0, @Assert
-br label if.end
-if.end:
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestIfElseMultipleConditions void() {
-entry:
-%0 = alloca i64
-%1 = alloca i64
-br label if.else
-if.then:
-call i8 0, @Assert
-br label if.end
-if.else:
-br label if.else1
-if.end:
-br label exit
-if.then1:
-call i8 0, @Assert
-br label if.end1
-if.else1:
-call i8 1, @Assert
-br label if.end1
-if.end1:
-br label if.end
-exit:
-ret 
-}
-
-
-define internal @TestNestedIfElse void() {
-entry:
-%0 = alloca i64
-br label if.then
-if.then:
-br label if.then1
-if.else:
-call i8 0, @Assert
-br label if.end
-if.end:
-br label exit
-if.then1:
-call i8 1, @Assert
-br label if.end1
-if.else1:
-call i8 0, @Assert
-br label if.end1
-if.end1:
-br label if.end
-exit:
-ret 
-}
-
-
-define internal @TestComplexNestedIfElse void() {
-entry:
-%0 = alloca i64
-%1 = alloca i64
-%2 = alloca i64
-br label if.then
-if.then:
-br label if.then1
-if.else:
-br label if.else1
-if.end:
-br label exit
-if.then1:
-br label if.then2
-if.else2:
-call i8 0, @Assert
-br label if.end1
-if.end1:
-br label if.end
-if.then2:
-call i8 1, @Assert
-br label if.end2
-if.else3:
-call i8 0, @Assert
-br label if.end2
-if.end2:
-br label if.end1
-if.then3:
-call i8 0, @Assert
-br label if.end3
-if.else1:
-br label if.then4
-if.end3:
-br label if.end
-if.then4:
-call i8 0, @Assert
-br label if.end4
-if.else4:
-call i8 0, @Assert
-br label if.end4
-if.end4:
-br label if.end3
-exit:
-ret 
-}
-
-
-define internal @TestIfElseLogicalOperators void() {
-entry:
-%0 = alloca i64
-br label if.then
-if.then:
-call i8 1, @Assert
-br label if.end
-if.else:
-call i8 0, @Assert
-br label if.end
-if.end:
+%0 = alloca ptr
+%1 = load i64, ptr %a
+%2 = add i64 %1, 1
+store i64 %2, ptr %a
 br label exit
 exit:
 ret 
@@ -140,8 +21,10 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestIfElseBasic
-call ptr @TestIfElseMultipleConditions
+%1 = alloca i64
+call ptr %1, @IntByRef__Iref
+%2 = icmp eq i64 9, 10
+call i8 %2, @Assert
 br label exit
 return:
 br label exit

@@ -8,6 +8,7 @@ namespace ola
 {
 	namespace
 	{
+
 		Constant* TryConstantFold_BinaryInst(BinaryInst* BI)
 		{
 			IRContext& ctx = BI->GetContext();
@@ -156,7 +157,8 @@ namespace ola
 				WorkListVector.push_back(&I);
 			}
 		}
-		Bool changed = false;
+
+		Bool Changed = false;
 		while (!WorkList.empty())
 		{
 			std::vector<Instruction*> NewWorkListVector;
@@ -178,7 +180,7 @@ namespace ola
 					{
 						I->EraseFromParent();
 					}
-					changed = true;
+					Changed = true;
 				}
 				else if (BranchInst* BI = dyn_cast<BranchInst>(I))
 				{
@@ -194,6 +196,6 @@ namespace ola
 			}
 			WorkListVector = std::move(NewWorkListVector);
 		}
-		return changed;
+		return Changed;
 	}
 }

@@ -132,6 +132,7 @@ namespace ola
 			ValueStacks[AI].push(nullptr);
 		}
 
+		std::unordered_set<BasicBlock*> Visited;
 		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
 			{
 				std::unordered_map<AllocaInst*, Value*> IncomingValues;
@@ -184,7 +185,10 @@ namespace ola
 
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
-					RenameBlock(Successor);
+					if (Visited.insert(Successor).second) 
+					{
+						RenameBlock(Successor);
+					}
 				}
 
 				for (auto& [AI, Stack] : ValueStacks)

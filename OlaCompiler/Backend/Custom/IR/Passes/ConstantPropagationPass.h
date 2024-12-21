@@ -1,9 +1,11 @@
 #pragma once
+#include <unordered_set>
 #include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/PassRegistry.h"
 
 namespace ola
 {
+	class Value;
 	class ConstantPropagationPass : public FunctionPass
 	{
 		inline static Char id = 0;

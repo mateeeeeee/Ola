@@ -6,7 +6,6 @@ namespace ola
 {
 	Bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		return false;
 #if 0
 		std::set<Instruction*> AliveSet;
 		std::vector<Instruction*> WorkList;
@@ -52,6 +51,8 @@ namespace ola
 		}
 
 		return !WorkList.empty();
+#else 
+		return false;
 #endif
 	}
 }
