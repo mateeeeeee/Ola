@@ -6,25 +6,25 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @IntByRef__Iref void(ptr %a) {
-entry:
-%0 = alloca ptr
-%1 = load i64, ptr %a
-%2 = add i64 %1, 1
-store i64 %2, ptr %a
-br label exit
-exit:
-ret 
-}
-
-
 define external @main i64() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
-call ptr %1, @IntByRef__Iref
-%2 = icmp eq i64 9, 10
-call i8 %2, @Assert
+%2 = alloca i64
+br label dowhile.body
+dowhile.body:
+%3 = phi [ 1, entry ], [ %4, dowhile.cond ]
+%5 = phi [ 0, entry ], [ %6, dowhile.cond ]
+%6 = add i64 %5, %3
+%7 = alloca ptr
+%4 = add i64 %3, 1
+br label dowhile.cond
+dowhile.cond:
+%8 = icmp sle i64 %4, 5
+br i8 %8, label dowhile.body, label dowhile.end
+dowhile.end:
+%9 = icmp eq i64 %6, 15
+call i8 %9, @Assert
 br label exit
 return:
 br label exit

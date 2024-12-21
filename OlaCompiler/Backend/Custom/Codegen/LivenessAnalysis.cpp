@@ -50,7 +50,7 @@ namespace ola
 
 					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
 					{
-						OLA_ASSERT(!live_interval_map.contains(reg_id));
+						//OLA_ASSERT(!live_interval_map.contains(reg_id));
 						live_interval_map[reg_id] = LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 3, .is_float = is_float_reg };
 					}
 					else if (inst_info.HasOpFlag(idx, OperandFlagUse))

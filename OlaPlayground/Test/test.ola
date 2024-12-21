@@ -1,14 +1,16 @@
 import std.assert;
 
-void IntByRef(ref int a)
-{
-	++a;
-}
-
 public int main()
 {
-	int a = 9;
-	IntByRef(a);
-	Assert(a == 10);
-	return 0;
+    int sum = 0;
+    int i = 1;
+
+    do
+    {
+        sum += i;
+        i++;
+    } while (i <= 5);
+
+    Assert(sum == 15);
+    return 0;
 }

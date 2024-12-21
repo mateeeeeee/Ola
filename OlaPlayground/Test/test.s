@@ -6,37 +6,41 @@
 
 .extern AssertMsg
 
-IntByRef__Iref:
-label0:
-push rbp
-mov rbp, rsp
-sub rsp, 8
-mov r15, rcx
-mov r14, qword ptr [r15]
-mov r13, r14
-add r13, 1
-mov qword ptr [r15], r13
-jmp label1
-label1:
-mov rsp, rbp
-pop rbp
-ret
-
 .globl main
 
 main:
-label2:
+label0:
 push rbp
 mov rbp, rsp
-sub rsp, 48
-lea rcx, qword ptr [rbp - 16]
-call IntByRef__Iref
-mov rcx, 0
-call Assert
-jmp label4
+sub rsp, 64
+mov r14, 1
+mov r14, 0
+jmp label1
+label1:
+mov r15, r14
+add r15, r14
+mov r13, r14
+add r13, 1
+jmp label2
+label2:
+mov r14, r15
+mov r14, r13
+cmp r13, 5
+setle r13b
+and r13b, 1
+test r13b, r13b
+jne label1
+jmp label3
 label3:
-jmp label4
+cmp r15, 15
+sete r15b
+and r15b, 1
+mov cl, r15b
+call Assert
+jmp label5
 label4:
+jmp label5
+label5:
 mov rax, 0
 mov rsp, rbp
 pop rbp

@@ -19,7 +19,7 @@ namespace ola
 
 	enum class MachineType : Uint32
 	{
-		Unknown,
+		Undef,
 		Int8,
 		Int64,
 		Float64,
@@ -135,7 +135,7 @@ namespace ola
 			return std::get<MachineRelocable*>(storage);
 		}
 
-		Bool IsUnused() const 
+		Bool IsUndefined() const 
 		{
 			return std::holds_alternative<std::monostate>(storage);
 		}
@@ -154,6 +154,10 @@ namespace ola
 			return storage != rhs.storage;
 		}
 
+		static MachineOperand Undefined()
+		{
+			return MachineOperand(std::monostate{}, MachineType::Undef);
+		}
 		template <typename T>
 		static MachineOperand Immediate(T val, MachineType type)
 		{
@@ -191,7 +195,7 @@ namespace ola
 
 	private:
 		std::variant<std::monostate, MachineRelocable*, Int64, MachineRegister, MachineStackObject> storage;
-		MachineType type = MachineType::Unknown;
+		MachineType type = MachineType::Undef;
 	};
 
 	inline Bool IsOperandVReg(MachineOperand const& operand)

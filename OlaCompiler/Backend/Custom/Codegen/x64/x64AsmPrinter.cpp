@@ -21,6 +21,7 @@ namespace ola
 		case MachineType::Ptr:
 		case MachineType::Other: return "qword ptr";
 		}
+		OLA_ASSERT_MSG(false, "There should be no Undef operands at this point");
 		return "";
 	}
 

@@ -179,7 +179,7 @@ namespace ola
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op1 = MI.GetOperand(1);
 				MachineOperand op2 = MI.GetOperand(2);
-				if (!op2.IsUnused())
+				if (!op2.IsUndefined())
 				{
 					MI.SetOp<1>(op2);
 					MI.SetIgnoreDef();
@@ -242,7 +242,7 @@ namespace ola
 			break;
 			case InstICmp:
 			{
-				if (!MI.GetOperand(2).IsUnused())
+				if (!MI.GetOperand(2).IsUndefined())
 				{
 					MachineOperand dst = MI.GetOperand(0);
 					MachineOperand op1 = MI.GetOperand(1);
