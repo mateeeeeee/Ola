@@ -98,63 +98,65 @@ namespace ola
 	MachineOperand LoweringContext::GetOperand(Value const* V)
 	{
 		if (value_map.contains(V)) return value_map[V];
-		OLA_ASSERT(V->IsConstant());
-		Constant const* C = cast<Constant>(V);
-		if (C->GetConstantID() == ConstantID::Global)
+		if (Constant const* C = dyn_cast<Constant>(V))
 		{
-			GlobalValue const* GV = cast<GlobalValue>(C);
-			if (GV->GetValueType()->IsArray())
+			if (C->GetConstantID() == ConstantID::Global)
 			{
-				MachineInstruction MI(InstLoadGlobalAddress);
-				MachineGlobal* machine_global = global_map[GV];
-				OLA_ASSERT(machine_global);
-				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
-				MachineOperand ptr = VirtualReg(MachineType::Int64);
-				MI.SetOp<0>(ptr).SetOp<1>(global);
-				EmitInst(MI);
-				return ptr;
+				GlobalValue const* GV = cast<GlobalValue>(C);
+				if (GV->GetValueType()->IsArray())
+				{
+					MachineInstruction MI(InstLoadGlobalAddress);
+					MachineGlobal* machine_global = global_map[GV];
+					OLA_ASSERT(machine_global);
+					MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
+					MachineOperand ptr = VirtualReg(MachineType::Int64);
+					MI.SetOp<0>(ptr).SetOp<1>(global);
+					EmitInst(MI);
+					return ptr;
+				}
+				else
+				{
+					MachineInstruction MI(InstLoad);
+					MachineGlobal* machine_global = global_map[GV];
+					OLA_ASSERT(machine_global);
+					MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
+					return global;
+				}
+			}
+			else if (C->GetConstantID() == ConstantID::Integer)
+			{
+				ConstantInt const* CI = cast<ConstantInt>(C);
+				MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineType::Int64);
+				return imm;
+			}
+			else if (C->GetConstantID() == ConstantID::Float)
+			{
+				ConstantFloat const* CF = cast<ConstantFloat>(C);
+				Float64 value = CF->GetValue();
+				MachineOperand imm = MachineOperand::Immediate(value, MachineType::Float64);
+				return imm;
 			}
 			else
 			{
-				MachineInstruction MI(InstLoad);
-				MachineGlobal* machine_global = global_map[GV];
-				OLA_ASSERT(machine_global);
-				MachineOperand global = MachineOperand::Relocable(machine_global->GetRelocable());
-				return global;
+				OLA_ASSERT(false);
+				return MachineOperand::Undefined();
 			}
 		}
-		else if (C->GetConstantID() == ConstantID::Integer)
-		{
-			ConstantInt const* CI = cast<ConstantInt>(C);
-			MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineType::Int64);
-			return imm;
-		}
-		else if (C->GetConstantID() == ConstantID::Float)
-		{
-			ConstantFloat const* CF = cast<ConstantFloat>(C);
-			Float64 value = CF->GetValue();
-			MachineOperand imm = MachineOperand::Immediate(value, MachineType::Float64);
-			return imm;
-		}
-		else
-		{
-			OLA_ASSERT(false);
-			return MachineOperand();
-		}
+		return MachineOperand::Undefined();
 	}
 
-	void LoweringContext::EmitInst(MachineInstruction const& MI)
+	MachineInstruction& LoweringContext::EmitInst(MachineInstruction const& MI)
 	{
-		auto& minst_list = current_block->Instructions();
-		minst_list.emplace_back(MI);
+		auto& MachineInstList = current_block->Instructions();
+		return MachineInstList.emplace_back(MI);
 	}
 
-	void LoweringContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
+	MachineInstruction& LoweringContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
 	{
-		auto& minst_list = current_block->Instructions();
-		auto it = minst_list.end();
+		auto& MachineInstList = current_block->Instructions();
+		auto it = MachineInstList.end();
 		it = std::prev(it, 1);
-		minst_list.insert(it, MI);
+		return *MachineInstList.insert(it, MI);
 	}
 
 }

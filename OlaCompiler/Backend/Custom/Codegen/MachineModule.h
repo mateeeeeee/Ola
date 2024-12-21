@@ -50,6 +50,7 @@ namespace ola
 		void LowerModule(IRModule*);
 		void LowerFunction(Function*);
 		void LowerInstruction(Instruction*);
+		void ResolveUndefs(Function*);
 
 		void LowerUnary(UnaryInst*);
 		void LowerBinary(BinaryInst*);

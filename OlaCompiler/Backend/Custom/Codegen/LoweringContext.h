@@ -62,8 +62,17 @@ namespace ola
 		}
 		MachineOperand GetOperand(Value const* V);
 
-		void EmitInst(MachineInstruction const& MI);
-		void EmitInstBeforeTerminator(MachineInstruction const& MI);
+		Value const* GetValueForUndefMachineOperand(MachineOperand* MO) const
+		{
+			return undef_resolve_map[MO];
+		}
+		void AddValueForUndefMachineOperand(MachineOperand* MO, Value const* V) const
+		{
+			undef_resolve_map[MO] = V;
+		}
+
+		MachineInstruction& EmitInst(MachineInstruction const& MI);
+		MachineInstruction& EmitInstBeforeTerminator(MachineInstruction const& MI);
 
 		MachineOperand VirtualReg(IRType const* type) const
 		{
@@ -86,6 +95,7 @@ namespace ola
 		mutable std::unordered_map<BasicBlock const*, MachineBasicBlock*> block_map;
 		mutable std::unordered_map<Value const*, MachineOperand> value_map;
 		mutable std::unordered_map<Value const*, MachineOperand> storage_map;
+		mutable std::unordered_map<MachineOperand*, Value const*> undef_resolve_map;
 		mutable Uint32 virt_reg_id = 0;
 		mutable Uint32 label_id = 0;
 	};

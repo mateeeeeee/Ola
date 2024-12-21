@@ -181,14 +181,15 @@ namespace ola
 		{
 			MachineBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
 			lowering_ctx.SetCurrentBasicBlock(MBB);
-			for (Instruction& inst : BB.Instructions())
+			for (Instruction& I : BB.Instructions())
 			{
-				if (!isel_info.LowerInstruction(&inst, lowering_ctx))
+				if (!isel_info.LowerInstruction(&I, lowering_ctx))
 				{
-					LowerInstruction(&inst);
+					LowerInstruction(&I);
 				}
 			}
 		}
+		ResolveUndefs(F);
 		frame_info.EmitEpilogue(MF, lowering_ctx);
 	}
 
@@ -266,11 +267,35 @@ namespace ola
 			break;
 		case Opcode::Phi:
 			LowerPhi(cast<PhiInst>(I));
+			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
 			break;
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
+		}
+	}
+
+	void MachineModule::ResolveUndefs(Function* F)
+	{
+		TargetInstInfo const& inst_info = target.GetInstInfo();
+		for (BasicBlock& BB : F->Blocks())
+		{
+			MachineBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
+			for (MachineInstruction& MI : MBB->Instructions())
+			{
+				inst_info.GetInstInfo(MI).GetOperandCount();
+				for (Uint i = 0; i < MI.GetOpcode(); ++i)
+				{
+					if (MI.GetOperand(i).IsUndefined())
+					{
+						Value const* V = lowering_ctx.GetValueForUndefMachineOperand(&MI.GetOperand(i));
+						MachineOperand MO = lowering_ctx.GetOperand(V);
+						MI.SetOperand(i, MO);
+						MI.SetIgnoreDef();
+					}
+				}
+			}
 		}
 	}
 
@@ -330,7 +355,12 @@ namespace ola
 			MachineInstruction testMI(InstTest);
 			testMI.SetOp<0>(cond_op);
 			testMI.SetOp<1>(cond_op);
-			lowering_ctx.EmitInst(testMI);
+			MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
+			if (cond_op.IsUndefined())
+			{
+				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<0>(), condition);
+				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), condition);
+			}
 
 			MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
 			MachineInstruction jmp_true(InstJNE);
@@ -549,7 +579,12 @@ namespace ola
 		MachineInstruction testMI(InstTest);
 		testMI.SetOp<0>(predicate_op);
 		testMI.SetOp<1>(predicate_op);
-		lowering_ctx.EmitInst(testMI);
+		MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
+		if (predicate_op.IsUndefined())
+		{
+			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<0>(), predicate);
+			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), predicate);
+		}
 
 		lowering_ctx.EmitInst(MachineInstruction(InstCMoveNE)
 			.SetOp<0>(result_reg)    
@@ -567,12 +602,16 @@ namespace ola
 
 			MachineOperand const& val = lowering_ctx.GetOperand(V);
 			MachineInstruction MI(InstMove);
-			MI.SetFlag(MachineInstFlag_IgnoreDef);
+			MI.SetIgnoreDef();
 			MI.SetOp<0>(phiMO).SetOp<1>(val);
 
 			MachineBasicBlock* MBB = lowering_ctx.GetCurrentBasicBlock();
 			lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(BB));
-			lowering_ctx.EmitInstBeforeTerminator(MI);
+			MachineInstruction& inserted = lowering_ctx.EmitInstBeforeTerminator(MI);
+			if (val.IsUndefined())
+			{
+				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), V);
+			}
 			lowering_ctx.SetCurrentBasicBlock(MBB);
 		}
 		lowering_ctx.AddOperand(Phi, phiMO);
