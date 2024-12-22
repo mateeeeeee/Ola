@@ -1,6 +1,5 @@
 #include <filesystem>
 #include <format>
-
 #include "Compiler.h"
 #include "CompilerMacros.h"
 #include "CompileRequest.h"
@@ -17,6 +16,7 @@
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
+#include "Utility/Command.h"
 #include "autogen/OlaConfig.h"
 #if HAS_LLVM
 #include "Backend/LLVM/LLVMIRGenContext.h"
@@ -40,7 +40,7 @@ namespace ola
 					std::string dot_file = entry.path().string();
 					std::string output_image = dot_file.substr(0, dot_file.find_last_of('.')) + ".png";
 					std::string command = std::format("dot -Tpng {} -o {}", dot_file, output_image);
-					Int result = std::system(command.c_str());
+					Int result = ExecuteCommand(command.c_str());
 				}
 			}
 		}
@@ -86,17 +86,17 @@ namespace ola
 				if (opts.dump_cfg)
 				{
 					std::string dot_cfg_cmd = std::format("opt -passes=dot-cfg -disable-output {}", ir_file);
-					system(dot_cfg_cmd.c_str());
+					ExecuteCommand(dot_cfg_cmd.c_str());
 				}
 				if (opts.dump_callgraph)
 				{
 					std::string dot_allgraph_cmd = std::format("opt -passes=dot-callgraph -disable-output {}", ir_file);
-					system(dot_allgraph_cmd.c_str());
+					ExecuteCommand(dot_allgraph_cmd.c_str());
 				}
 				if (opts.dump_domtree)
 				{
 					std::string dot_domtree_cmd = std::format("opt -passes=dot-dom-only -disable-output {}", ir_file);
-					system(dot_domtree_cmd.c_str());
+					ExecuteCommand(dot_domtree_cmd.c_str());
 				}
 
 				std::error_code error;
@@ -109,7 +109,7 @@ namespace ola
 				llvm_module.print(llvm_ir_stream, nullptr);
 
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
-				system(compile_cmd.c_str());
+				ExecuteCommand(compile_cmd.c_str());
 #else
 				OLA_ASSERT_MSG(false, "LLVM backend is disabled. Use --nollvm or generate project with -DENABLE_LLVM=ON assuming you have LLVM 17.0 installed");
 #endif
@@ -148,6 +148,7 @@ namespace ola
 		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
 		Bool const print_domfrontier = compile_request.GetCompilerFlags() & CompilerFlag_PrintDomFrontier;
+		Bool const timeout_detection = compile_request.GetCompilerFlags() & CompilerFlag_TimeoutDetection;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -193,7 +194,7 @@ namespace ola
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;
 			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
-			std::system(assembly_cmd.c_str());
+			Int assembly_exit_code = ExecuteCommand(assembly_cmd.c_str());
 
 			if (!emit_ir)
 			{
@@ -205,7 +206,13 @@ namespace ola
 				Bool deleted = fs::remove(assembly_file);
 				OLA_ASSERT(deleted);
 			}
+
+			if (assembly_exit_code != 0)
+			{
+				return OLA_INVALID_ASSEMBLY_CODE;
+			}
 		}
+
 		if (cfg_dump || callgraph_dump || domtree_dump)
 		{
 			GenerateGraphVizImages(input_directory, !no_llvm);
@@ -216,12 +223,12 @@ namespace ola
 		link_cmd += OLA_STATIC_LIB_PATH;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
-		std::system(link_cmd.c_str());
+		ExecuteCommand(link_cmd.c_str());
 
 		std::string const& exe_cmd = output_file;
-		Int res = std::system(exe_cmd.c_str());
-
+		Int res = timeout_detection ? ExecuteCommand_NonBlocking(exe_cmd.c_str(), 1.0f) : ExecuteCommand(exe_cmd.c_str());
 		fs::current_path(cur_path);
 		return res;
+
 	}
 }

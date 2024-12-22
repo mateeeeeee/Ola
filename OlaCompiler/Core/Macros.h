@@ -53,6 +53,3 @@
 #define OLA_DEFAULT_COPYABLE_MOVABLE(Class) \
         OLA_DEFAULT_COPYABLE(Class)         \
         OLA_DEFAULT_MOVABLE(Class)
-
-
-#define OLA_COMPILATION_FAILED_EXIT_CODE -1

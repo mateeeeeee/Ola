@@ -1,16 +1,101 @@
 import std.assert;
 
-public int main()
+void TestWhileLoopInt()
 {
     int sum = 0;
     int i = 1;
 
-    do
+    while (i <= 5)
     {
         sum += i;
         i++;
-    } while (i <= 5);
+    }
 
     Assert(sum == 15);
+}
+
+void TestWhileLoopBool()
+{
+    bool condition = true;
+    int iterations = 0;
+
+    while (condition)
+    {
+        iterations++;
+        if (iterations == 3)
+        {
+            condition = false;
+        }
+    }
+
+    Assert(iterations == 3);
+}
+
+void TestNestedWhileLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    while (outerCounter < 3)
+    {
+        while (innerCounter < 2)
+        {
+            innerCounter++;
+        }
+
+        outerCounter++;
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+}
+
+void TestWhileLoopWithBreak()
+{
+    int sum = 0;
+    int i = 1;
+
+    while (true)
+    {
+        sum += i;
+        i++;
+
+        if (i > 5)
+        {
+            break;
+        }
+    }
+
+    Assert(sum == 15);
+}
+
+void TestWhileLoopWithContinue()
+{
+    //int sum = 0;
+    //int i = 0;
+    //
+    //while (i < 5)
+    //{
+    //    i++;
+    //
+    //    if (i % 2 == 0)
+    //    {
+    //        continue;
+    //    }
+    //
+    //    sum += i;
+    //}
+    //
+    //Assert(sum == 9);
+}
+
+public int main()
+{
+    TestWhileLoopInt();
+    TestWhileLoopBool();
+    TestNestedWhileLoops();
+    TestWhileLoopWithBreak();
+    TestWhileLoopWithContinue();
+
     return 0;
 }

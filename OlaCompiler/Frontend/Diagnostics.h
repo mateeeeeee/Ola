@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <format>
+#include "Compiler/CompilerMacros.h"
 #include "SourceLocation.h"
 
 
@@ -42,7 +43,7 @@ namespace ola
 			output += "\n";
 
 			PrintMessage(diag_kind, output);
-			if (exit_on_error && diag_kind == DiagKind::error) std::exit(OLA_COMPILATION_FAILED_EXIT_CODE);
+			if (exit_on_error && diag_kind == DiagKind::error) std::exit(OLA_INVALID_SOURCE_CODE);
 		}
 
 	private:
