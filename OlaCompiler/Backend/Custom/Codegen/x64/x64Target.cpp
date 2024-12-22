@@ -447,6 +447,16 @@ namespace ola
 					MI.SetOp<1>(tmp);
 				}
 			}
+			break;
+			case InstZExt:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				if (op1.IsImmediate())
+				{
+					MI.SetOpcode(InstMove);
+				}
+			}
 			}
 		}
 

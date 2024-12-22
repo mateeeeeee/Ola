@@ -1,101 +1,31 @@
 import std.assert;
 
-void TestWhileLoopInt()
+void TestImplicitCastAssignInit()
 {
-    int sum = 0;
-    int i = 1;
+    int intVal = 42;
+    float floatVal = intVal;
+    bool boolVal = intVal;
 
-    while (i <= 5)
-    {
-        sum += i;
-        i++;
-    }
+    Assert(floatVal == 42.0);
+    Assert(boolVal == true);
 
-    Assert(sum == 15);
-}
+    floatVal = 3.14;
+    intVal = floatVal;
+    boolVal = floatVal;
 
-void TestWhileLoopBool()
-{
-    bool condition = true;
-    int iterations = 0;
+    Assert(intVal == 3);
+    Assert(boolVal == true);
 
-    while (condition)
-    {
-        iterations++;
-        if (iterations == 3)
-        {
-            condition = false;
-        }
-    }
+    boolVal = true;
+    intVal = boolVal;
+    floatVal = boolVal;
 
-    Assert(iterations == 3);
-}
-
-void TestNestedWhileLoops()
-{
-    int outerCounter = 0;
-    int innerCounter = 0;
-
-    while (outerCounter < 3)
-    {
-        while (innerCounter < 2)
-        {
-            innerCounter++;
-        }
-
-        outerCounter++;
-    }
-
-    Assert(outerCounter == 3);
-    Assert(innerCounter == 2);
-}
-
-void TestWhileLoopWithBreak()
-{
-    int sum = 0;
-    int i = 1;
-
-    while (true)
-    {
-        sum += i;
-        i++;
-
-        if (i > 5)
-        {
-            break;
-        }
-    }
-
-    Assert(sum == 15);
-}
-
-void TestWhileLoopWithContinue()
-{
-    //int sum = 0;
-    //int i = 0;
-    //
-    //while (i < 5)
-    //{
-    //    i++;
-    //
-    //    if (i % 2 == 0)
-    //    {
-    //        continue;
-    //    }
-    //
-    //    sum += i;
-    //}
-    //
-    //Assert(sum == 9);
+    Assert(intVal == 1);
+    Assert(floatVal == 1.0);
 }
 
 public int main()
 {
-    TestWhileLoopInt();
-    TestWhileLoopBool();
-    TestNestedWhileLoops();
-    TestWhileLoopWithBreak();
-    TestWhileLoopWithContinue();
-
+    TestImplicitCastAssignInit();
     return 0;
 }

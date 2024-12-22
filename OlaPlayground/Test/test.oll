@@ -6,129 +6,25 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestWhileLoopInt void() {
+define internal @TestImplicitCastAssignInit void() {
 entry:
 %0 = alloca i64
-%1 = alloca i64
-br label while.cond
-while.cond:
-%2 = phi [ 1, entry ], [ %3, while.body ]
-%4 = phi [ 0, entry ], [ %5, while.body ]
-%6 = icmp sle i64 %2, 5
-br i8 %6, label while.body, label while.end
-while.body:
-%5 = add i64 %4, %2
-%7 = alloca ptr
-%3 = add i64 %2, 1
-br label while.cond
-while.end:
-%8 = icmp eq i64 %5, 15
-call i8 %8, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestWhileLoopBool void() {
-entry:
-%0 = alloca i8
-%1 = alloca i64
-br label while.cond
-while.cond:
-%2 = phi [ 0, entry ], [ %3, if.end ]
-%4 = phi [ 1, entry ], [ %5, if.end ]
-br i8 %4, label while.body, label while.end
-while.body:
-%6 = alloca ptr
-%3 = add i64 %2, 1
-%7 = icmp eq i64 %3, 3
-br i8 %7, label if.then, label if.end
-while.end:
-%8 = icmp eq i64 %3, 3
-call i8 %8, @Assert
-br label exit
-if.then:
-br label if.end
-if.else:
-br label exit
-if.end:
-%5 = phi [ %4, while.body ], [ 0, if.then ]
-br label while.cond
-exit:
-ret 
-}
-
-
-define internal @TestNestedWhileLoops void() {
-entry:
-%0 = alloca i64
-%1 = alloca i64
-br label while.cond
-while.cond:
-%2 = phi [ 0, entry ], [ %3, while.end ]
-%4 = phi [ 0, entry ], [ %5, while.end ]
-%6 = icmp slt i64 %4, 3
-br i8 %6, label while.body, label while.end1
-while.body:
-br label while.cond1
-while.end1:
-%7 = icmp eq i64 %5, 3
-call i8 %7, @Assert
-%8 = icmp eq i64 %9, 2
-call i8 %8, @Assert
-br label exit
-while.cond1:
-%9 = phi [ %2, while.body ], [ %3, while.body1 ]
-%10 = icmp slt i64 %9, 2
-br i8 %10, label while.body1, label while.end
-while.body1:
-%11 = alloca ptr
-%3 = add i64 %9, 1
-br label while.cond1
-while.end:
-%12 = alloca ptr
-%5 = add i64 %4, 1
-br label while.cond
-exit:
-ret 
-}
-
-
-define internal @TestWhileLoopWithBreak void() {
-entry:
-%0 = alloca i64
-%1 = alloca i64
-br label while.cond
-while.cond:
-%2 = phi [ 1, entry ], [ %3, if.end ]
-%4 = phi [ 0, entry ], [ %5, if.end ]
-br label while.body
-while.body:
-%5 = add i64 %4, %2
-%6 = alloca ptr
-%3 = add i64 %2, 1
-%7 = icmp sgt i64 %3, 5
-br i8 %7, label if.then, label if.end
-while.end:
-%8 = icmp eq i64 %5, 15
-call i8 %8, @Assert
-br label exit
-if.then:
-br label while.end
-if.else:
-br label exit
-if.end:
-br label while.cond
-break:
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestWhileLoopWithContinue void() {
-entry:
+%1 = s2f i64 42
+%2 = alloca f64
+%3 = alloca i8
+%4 = fcmp oeq f64 %1, 42
+call i8 %4, @Assert
+call i8 1, @Assert
+%5 = f2s f64 3.14
+%6 = icmp eq i64 %5, 3
+call i8 %6, @Assert
+call i8 1, @Assert
+%7 = zext i8 1
+%8 = s2f i8 1
+%9 = icmp eq i64 %7, 1
+call i8 %9, @Assert
+%10 = fcmp oeq f64 %8, 1
+call i8 %10, @Assert
 br label exit
 exit:
 ret 
@@ -138,11 +34,7 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestWhileLoopInt
-call ptr @TestWhileLoopBool
-call ptr @TestNestedWhileLoops
-call ptr @TestWhileLoopWithBreak
-call ptr @TestWhileLoopWithContinue
+call ptr @TestImplicitCastAssignInit
 br label exit
 return:
 br label exit
