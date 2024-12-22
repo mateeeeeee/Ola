@@ -31,14 +31,7 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
     - overloading
 	- attributes: `inline`, `noinline`, `nomangling` (equivalent to C++'s `extern "C"`)
   * arrays
-  * `sizeof`, `length` operators
-  * `alias`
-  * strings
-  * floats 
-  * implicit casts
-  * scopes
-  * import statement
-  * standard library
+  * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * LLVM Backend
   * Custom Backend (Work in Progress)
 
@@ -89,6 +82,7 @@ The project consists of the following parts:
   * `--domfrontier`: Print dominance frontiers to standard output
   * `--nollvm`: Use custom backend instead of LLVM backend
   * `--test`: Used for running g-tests
+  * `--timeout`: Used for detecting infinite loops during tests
   * `--Od`: No optimizations
   * `--O0`: Same as `--Od`
   * `--O1`: Optimize

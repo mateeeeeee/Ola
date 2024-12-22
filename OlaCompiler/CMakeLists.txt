@@ -34,6 +34,8 @@ set(UTILITY_FILES
   Utility/CLIParser.h
   Utility/CLIParser.cpp
   Utility/TreeIterator.h
+  Utility/Command.h
+  Utility/Command.cpp
 )
 
 
