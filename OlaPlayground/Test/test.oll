@@ -6,35 +6,27 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestImplicitCastAssignInit void() {
-entry:
-%0 = alloca i64
-%1 = s2f i64 42
-%2 = alloca f64
-%3 = alloca i8
-%4 = fcmp oeq f64 %1, 42
-call i8 %4, @Assert
-call i8 1, @Assert
-%5 = f2s f64 3.14
-%6 = icmp eq i64 %5, 3
-call i8 %6, @Assert
-call i8 1, @Assert
-%7 = zext i8 1
-%8 = s2f i8 1
-%9 = icmp eq i64 %7, 1
-call i8 %9, @Assert
-%10 = fcmp oeq f64 %8, 1
-call i8 %10, @Assert
-br label exit
-exit:
-ret 
-}
-
-
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestImplicitCastAssignInit
+%1 = alloca i64
+%2 = alloca i64
+br label for.cond
+for.body:
+%3 = add i64 %4, %5
+br label for.iter
+for.cond:
+%5 = phi [ 1, entry ], [ %6, for.iter ]
+%4 = phi [ 0, entry ], [ %3, for.iter ]
+%7 = icmp sle i64 %5, 5
+br i8 %7, label for.body, label for.end
+for.iter:
+%8 = alloca ptr
+%6 = add i64 %5, 1
+br label for.cond
+for.end:
+%9 = icmp eq i64 %3, 15
+call i8 %9, @Assert
 br label exit
 return:
 br label exit

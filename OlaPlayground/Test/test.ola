@@ -1,31 +1,12 @@
 import std.assert;
 
-void TestImplicitCastAssignInit()
-{
-    int intVal = 42;
-    float floatVal = intVal;
-    bool boolVal = intVal;
-
-    Assert(floatVal == 42.0);
-    Assert(boolVal == true);
-
-    floatVal = 3.14;
-    intVal = floatVal;
-    boolVal = floatVal;
-
-    Assert(intVal == 3);
-    Assert(boolVal == true);
-
-    boolVal = true;
-    intVal = boolVal;
-    floatVal = boolVal;
-
-    Assert(intVal == 1);
-    Assert(floatVal == 1.0);
-}
-
 public int main()
 {
-    TestImplicitCastAssignInit();
+    int sum = 0;
+    for (int i = 1; i <= 5; i++)
+    {
+        sum += i;
+    }
+    Assert(sum == 15);
     return 0;
 }

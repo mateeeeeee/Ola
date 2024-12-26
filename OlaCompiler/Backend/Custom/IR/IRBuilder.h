@@ -55,17 +55,16 @@ namespace ola
 			return I;
 		}
 
-		BasicBlock* AddBlock();
-		BasicBlock* AddBlock(BasicBlock* before);
-		BasicBlock* AddBlock(Function* F);
-		BasicBlock* AddBlock(Function* F, BasicBlock* before);
+		BasicBlock* AddBlock(std::string_view name = "");
+		BasicBlock* AddBlock(BasicBlock* before, std::string_view name);
+		BasicBlock* AddBlock(Function* F, std::string_view name);
+		BasicBlock* AddBlock(Function* F, BasicBlock* before, std::string_view name);
 
 	private:
 		IRContext& ctx;
 		Function* current_function;
 		BasicBlock* current_block;
 		IListIterator<Instruction> insert_point;
-
 		Uint32 bb_label_counter = 0;
 	};
 }

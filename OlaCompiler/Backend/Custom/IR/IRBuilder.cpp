@@ -33,49 +33,52 @@ namespace ola
 		++insert_point;
 	}
 
-	BasicBlock* IRBuilder::AddBlock()
+	BasicBlock* IRBuilder::AddBlock(std::string_view name)
 	{
-		auto& blocks = current_function->Blocks();
-		BasicBlock* block = new BasicBlock(ctx, current_function, blocks.Size());
-		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetName(label);
-		blocks.PushBack(block);
-		return block;
+		return AddBlock(current_function, name);
 	}
 
 
-	BasicBlock* IRBuilder::AddBlock(Function* F)
+	BasicBlock* IRBuilder::AddBlock(Function* F, std::string_view name)
 	{
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
-		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetName(label);
+		if (name.empty())
+		{
+			std::string label = "BB" + std::to_string(bb_label_counter++);
+			block->SetName(label);
+		}
+		else
+		{
+			block->SetName(name);
+		}
 		blocks.PushBack(block);
 		return block;
 	}
 
 
-	BasicBlock* IRBuilder::AddBlock(Function* F, BasicBlock* before)
+	BasicBlock* IRBuilder::AddBlock(Function* F, BasicBlock* before, std::string_view name)
 	{
 		OLA_ASSERT(before->GetFunction() == F);
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
-		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetName(label);
+		if (name.empty())
+		{
+			std::string label = "BB" + std::to_string(bb_label_counter++);
+			block->SetName(label);
+		}
+		else
+		{
+			block->SetName(name);
+		}
 		blocks.Insert(before->GetIterator(), block);
 		return block;
 	}
 
 
-	BasicBlock* IRBuilder::AddBlock(BasicBlock* before)
+	BasicBlock* IRBuilder::AddBlock(BasicBlock* before, std::string_view name)
 	{
-		Function* F = before->GetFunction();
-		auto& blocks = F->Blocks();
-		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
-		std::string label = "BB" + std::to_string(bb_label_counter++);
-		block->SetName(label);
-		blocks.Insert(before->GetIterator(), block);
-		return block;
+		return AddBlock(before->GetFunction(), before, name);
 	}
 
 }

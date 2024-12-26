@@ -409,8 +409,7 @@ namespace ola
 			Store(return_expr_value, return_value);
 		}
 		builder->MakeInst<BranchInst>(context, exit_block);
-		BasicBlock* return_block = builder->AddBlock(current_function, current_block->GetNextNode());
-		return_block->SetName("return");
+		BasicBlock* return_block = builder->AddBlock(current_function, current_block->GetNextNode(), "return");
 		builder->SetCurrentBlock(return_block);
 	}
 
@@ -421,9 +420,9 @@ namespace ola
 		Stmt const* else_stmt = if_stmt.GetElseStmt();
 
 		Function* function = builder->GetCurrentFunction();
-		BasicBlock* then_block = builder->AddBlock(function, exit_block); then_block->SetName("if.then");
-		BasicBlock* else_block = builder->AddBlock(function, exit_block); else_block->SetName("if.else");
-		BasicBlock* end_block  = builder->AddBlock(function, exit_block); end_block->SetName("if.end");
+		BasicBlock* then_block = builder->AddBlock(function, exit_block, "if.then");
+		BasicBlock* else_block = builder->AddBlock(function, exit_block, "if.else");
+		BasicBlock* end_block  = builder->AddBlock(function, exit_block, "if.end");
 
 		cond_expr->Accept(*this);
 		Value* condition_value = value_map[cond_expr];
@@ -451,8 +450,7 @@ namespace ola
 	{
 		OLA_ASSERT(!break_blocks.empty());
 		builder->MakeInst<BranchInst>(context, break_blocks.back());
-		BasicBlock* break_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block);
-		break_block->SetName("break");
+		BasicBlock* break_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block, "break");
 		builder->SetCurrentBlock(break_block);
 	}
 
@@ -461,8 +459,7 @@ namespace ola
 		OLA_ASSERT(!continue_blocks.empty());
 
 		builder->MakeInst<BranchInst>(context, continue_blocks.back());
-		BasicBlock* continue_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block);
-		continue_block->SetName("continue");
+		BasicBlock* continue_block = builder->AddBlock(builder->GetCurrentFunction(), exit_block, "continue");
 		builder->SetCurrentBlock(continue_block);
 	}
 
@@ -474,10 +471,10 @@ namespace ola
 		Stmt const* body_stmt = for_stmt.GetBodyStmt();
 
 		Function* function = builder->GetCurrentFunction();
-		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("for.body"); 
-		BasicBlock* cond_block = builder->AddBlock(function, exit_block); body_block->SetName("for.cond"); 
-		BasicBlock* iter_block = builder->AddBlock(function, exit_block); body_block->SetName("for.iter"); 
-		BasicBlock* end_block  = builder->AddBlock(function, exit_block); body_block->SetName("for.end");  
+		BasicBlock* body_block = builder->AddBlock(function, exit_block, "for.body");
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block, "for.cond");
+		BasicBlock* iter_block = builder->AddBlock(function, exit_block, "for.iter");
+		BasicBlock* end_block  = builder->AddBlock(function, exit_block, "for.end"); 
 
 		if (init_stmt) init_stmt->Accept(*this);
 		builder->MakeInst<BranchInst>(context, cond_block);
@@ -518,9 +515,9 @@ namespace ola
 		Stmt const* body_stmt = while_stmt.GetBodyStmt();
 
 		Function* function = builder->GetCurrentFunction();
-		BasicBlock* cond_block = builder->AddBlock(function, exit_block); cond_block->SetName("while.cond");
-		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("while.body");
-		BasicBlock* end_block = builder->AddBlock(function, exit_block);  end_block->SetName("while.end");
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block, "while.cond");
+		BasicBlock* body_block = builder->AddBlock(function, exit_block, "while.body");
+		BasicBlock* end_block = builder->AddBlock(function, exit_block, "while.end");
 
 		builder->MakeInst<BranchInst>(context, cond_block);
 		builder->SetCurrentBlock(cond_block);
@@ -551,9 +548,9 @@ namespace ola
 		Stmt const* body_stmt = do_while_stmt.GetBodyStmt();
 
 		Function* function = builder->GetCurrentFunction();
-		BasicBlock* body_block = builder->AddBlock(function, exit_block); body_block->SetName("dowhile.body");
-		BasicBlock* cond_block = builder->AddBlock(function, exit_block); cond_block->SetName("dowhile.cond");
-		BasicBlock* end_block = builder->AddBlock(function, exit_block);  end_block->SetName("dowhile.end");
+		BasicBlock* body_block = builder->AddBlock(function, exit_block, "dowhile.body");
+		BasicBlock* cond_block = builder->AddBlock(function, exit_block, "dowhile.cond");
+		BasicBlock* end_block = builder->AddBlock(function, exit_block, "dowhile.end");  
 
 		builder->MakeInst<BranchInst>(context, body_block);
 		builder->SetCurrentBlock(body_block);
@@ -591,8 +588,7 @@ namespace ola
 			Int64 case_value = case_stmt.GetValue();
 			Function* function = builder->GetCurrentFunction();
 			std::string block_name = "switch.case"; block_name += std::to_string(case_value);
-			BasicBlock* case_block = builder->AddBlock(function, exit_block);
-			case_block->SetName(block_name);
+			BasicBlock* case_block = builder->AddBlock(function, exit_block, block_name);
 			switch_inst->AddCase(case_value, case_block);
 			builder->SetCurrentBlock(case_block);
 		}
@@ -604,9 +600,9 @@ namespace ola
 		Stmt const* body_stmt = switch_stmt.GetBodyStmt();
 
 		Function* function = builder->GetCurrentFunction();
-		BasicBlock* header_block	= builder->AddBlock(function, exit_block); header_block->SetName("switch.header");
-		BasicBlock* default_block	= builder->AddBlock(function, exit_block); default_block->SetName("switch.default");
-		BasicBlock* end_block		= builder->AddBlock(function, exit_block); end_block->SetName("switch.end");
+		BasicBlock* header_block	= builder->AddBlock(function, exit_block, "switch.header");  
+		BasicBlock* default_block	= builder->AddBlock(function, exit_block, "switch.default"); 
+		BasicBlock* end_block		= builder->AddBlock(function, exit_block, "switch.end");     
 
 		builder->MakeInst<BranchInst>(context, header_block);
 		builder->SetCurrentBlock(header_block);
@@ -649,8 +645,7 @@ namespace ola
 		std::string label_name(goto_stmt.GetLabelName());
 		builder->MakeInst<BranchInst>(context, label_blocks[label_name]);
 
-		BasicBlock* goto_block = builder->AddBlock(exit_block);
-		goto_block->SetName("goto");
+		BasicBlock* goto_block = builder->AddBlock(exit_block, "goto");
 		builder->SetCurrentBlock(goto_block);
 	}
 
@@ -1179,8 +1174,7 @@ namespace ola
 		if (func_decl.IsInline()) func->SetForceInline();
 		else if (func_decl.IsNoInline()) func->SetNoInline();
 
-		BasicBlock* entry_block = builder->AddBlock(func); 
-		entry_block->SetName("entry");
+		BasicBlock* entry_block = builder->AddBlock(func, "entry");
 		builder->SetCurrentBlock(entry_block);
 
 		for (auto& param : func_decl.GetParamDecls())
@@ -1201,15 +1195,12 @@ namespace ola
 		}
 		if (!func->GetReturnType()->IsVoid()) return_value = builder->MakeInst<AllocaInst>(func->GetReturnType());
 		
-		exit_block = builder->AddBlock(func);
-		exit_block->SetName("exit");
-
+		exit_block = builder->AddBlock(func, "exit");
 		auto const& labels = func_decl.GetLabels();
 		for (LabelStmt const* label : labels)
 		{
 			std::string label_name = std::string(label->GetName());
-			BasicBlock* label_block = builder->AddBlock(func, exit_block); 
-			label_block->SetName(label_name);
+			BasicBlock* label_block = builder->AddBlock(func, exit_block, label_name);
 			label_blocks[label_name] = label_block;
 		}
 

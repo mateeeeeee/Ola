@@ -1,59 +1,29 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-define internal i64 @min__I__I(i64 %a, i64 %b) {
-entry:
-  %0 = alloca i64, align 8
-  store i64 %a, ptr %0, align 4
-  %1 = alloca i64, align 8
-  store i64 %b, ptr %1, align 4
-  %2 = alloca i64, align 8
-  %3 = alloca i64, align 8
-  %4 = load i64, ptr %0, align 4
-  %5 = load i64, ptr %1, align 4
-  %6 = icmp slt i64 %4, %5
-  br i1 %6, label %if.then, label %if.else
+declare void @Assert(i1)
 
-if.then:                                          ; preds = %entry
-  %7 = load i64, ptr %3, align 4
-  %8 = load i64, ptr %0, align 4
-  %9 = load i64, ptr %0, align 4
-  store i64 %9, ptr %3, align 4
-  br label %if.end
-
-if.else:                                          ; preds = %entry
-  %10 = load i64, ptr %3, align 4
-  %11 = load i64, ptr %1, align 4
-  %12 = load i64, ptr %1, align 4
-  store i64 %12, ptr %3, align 4
-  br label %if.end
-
-if.end:                                           ; preds = %if.else, %if.then
-  %13 = load i64, ptr %3, align 4
-  store i64 %13, ptr %2, align 4
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %if.end
-  %14 = load i64, ptr %2, align 4
-  ret i64 %14
-}
+declare void @AssertMsg(i1, ptr)
 
 define i64 @main() {
 entry:
-  %0 = alloca i64, align 8
-  %1 = call i64 @min__I__I(i64 3, i64 4)
-  store i64 %1, ptr %0, align 4
-  br label %exit
+  br label %for.cond
 
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
+for.body:                                         ; preds = %for.cond
+  %0 = add i64 %.0, %.01
+  %1 = alloca ptr, align 8
+  store i64 %.0, ptr %1, align 4
+  %2 = add i64 %.0, 1
+  br label %for.cond
 
-exit:                                             ; preds = %return, %entry
-  %2 = load i64, ptr %0, align 4
-  ret i64 %2
+for.cond:                                         ; preds = %for.body, %entry
+  %.01 = phi i64 [ 0, %entry ], [ %0, %for.body ]
+  %.0 = phi i64 [ 1, %entry ], [ %2, %for.body ]
+  %3 = icmp sle i64 %.0, 5
+  br i1 %3, label %for.body, label %for.end
+
+for.end:                                          ; preds = %for.cond
+  %4 = icmp eq i64 %.01, 15
+  call void @Assert(i1 %4)
+  ret i64 0
 }
