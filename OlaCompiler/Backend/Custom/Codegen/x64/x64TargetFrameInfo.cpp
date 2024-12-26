@@ -90,7 +90,7 @@ namespace ola
 			arch_return_reg = MachineOperand::ISAReg(x64::RAX, MachineType::Int64);
 		}
 		ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
-		ctx.AddOperand(CI, return_reg);
+		ctx.MapOperand(CI, return_reg);
 	}
 
 

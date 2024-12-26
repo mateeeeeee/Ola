@@ -6,27 +6,143 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @main i64() {
+define internal @TestDoWhileLoopInt void() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
-%2 = alloca i64
-br label for.cond
-for.body:
-%3 = add i64 %4, %5
-br label for.iter
-for.cond:
-%5 = phi [ 1, entry ], [ %6, for.iter ]
-%4 = phi [ 0, entry ], [ %3, for.iter ]
-%7 = icmp sle i64 %5, 5
-br i8 %7, label for.body, label for.end
-for.iter:
-%8 = alloca ptr
-%6 = add i64 %5, 1
-br label for.cond
-for.end:
-%9 = icmp eq i64 %3, 15
-call i8 %9, @Assert
+br label dowhile.body
+dowhile.body:
+%2 = phi [ 1, entry ], [ %3, dowhile.cond ]
+%4 = phi [ 0, entry ], [ %5, dowhile.cond ]
+%5 = add i64 %4, %2
+%6 = alloca ptr
+%3 = add i64 %2, 1
+br label dowhile.cond
+dowhile.cond:
+%7 = icmp sle i64 %3, 5
+br i8 %7, label dowhile.body, label dowhile.end
+dowhile.end:
+%8 = icmp eq i64 %5, 15
+call i8 %8, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestDoWhileLoopBool void() {
+entry:
+%0 = alloca i8
+%1 = alloca i64
+br label dowhile.body
+dowhile.body:
+%2 = phi [ 0, entry ], [ %3, dowhile.cond ]
+%4 = phi [ 1, entry ], [ %5, dowhile.cond ]
+%6 = alloca ptr
+%3 = add i64 %2, 1
+%7 = icmp eq i64 %3, 3
+br i8 %7, label if.then, label if.end
+dowhile.cond:
+br i8 %5, label dowhile.body, label dowhile.end
+dowhile.end:
+%8 = icmp eq i64 %3, 3
+call i8 %8, @Assert
+br label exit
+if.then:
+br label if.end
+if.else:
+br label exit
+if.end:
+%5 = phi [ %4, dowhile.body ], [ 0, if.then ]
+br label dowhile.cond
+exit:
+ret 
+}
+
+
+define internal @TestNestedDoWhileLoops void() {
+entry:
+%0 = alloca i64
+%1 = alloca i64
+br label dowhile.body
+dowhile.body:
+%2 = phi [ 0, entry ], [ %3, dowhile.cond ]
+%4 = phi [ 0, entry ], [ %5, dowhile.cond ]
+br label dowhile.body1
+dowhile.cond:
+%6 = icmp slt i64 %5, 3
+br i8 %6, label dowhile.body, label dowhile.end
+dowhile.end:
+%7 = icmp eq i64 %5, 3
+call i8 %7, @Assert
+%8 = icmp eq i64 %3, 4
+call i8 %8, @Assert
+br label exit
+dowhile.body1:
+%9 = phi [ %2, dowhile.body ], [ %3, dowhile.cond1 ]
+%10 = alloca ptr
+%3 = add i64 %9, 1
+br label dowhile.cond1
+dowhile.cond1:
+%11 = icmp slt i64 %3, 2
+br i8 %11, label dowhile.body1, label dowhile.end1
+dowhile.end1:
+%12 = alloca ptr
+%5 = add i64 %4, 1
+br label dowhile.cond
+exit:
+ret 
+}
+
+
+define internal @TestDoWhileLoopWithBreak void() {
+entry:
+%0 = alloca i64
+%1 = alloca i64
+br label dowhile.body
+dowhile.body:
+%2 = phi [ 1, entry ], [ %3, dowhile.cond ]
+%4 = phi [ 0, entry ], [ %5, dowhile.cond ]
+%5 = add i64 %4, %2
+%6 = alloca ptr
+%3 = add i64 %2, 1
+%7 = icmp sgt i64 %3, 5
+br i8 %7, label if.then, label if.end
+dowhile.cond:
+br label dowhile.body
+dowhile.end:
+%8 = icmp eq i64 %5, 15
+call i8 %8, @Assert
+br label exit
+if.then:
+br label dowhile.end
+if.else:
+br label exit
+if.end:
+br label dowhile.cond
+break:
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestDoWhileLoopWithContinue void() {
+entry:
+br label exit
+exit:
+ret 
+}
+
+
+define external @main i64() {
+entry:
+%0 = alloca i64
+call ptr @TestDoWhileLoopInt
+call ptr @TestDoWhileLoopBool
+call ptr @TestNestedDoWhileLoops
+call ptr @TestDoWhileLoopWithBreak
+call ptr @TestDoWhileLoopWithContinue
 br label exit
 return:
 br label exit

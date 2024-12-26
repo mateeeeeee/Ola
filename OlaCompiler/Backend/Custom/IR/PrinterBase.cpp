@@ -184,6 +184,7 @@ namespace ola
 		{
 			PhiInst const* Phi = cast<PhiInst>(&I);
 			Uint OpCount = Phi->GetNumOperands();
+			PrintType(Phi->GetType());
 			for (Uint i = 0; i < OpCount; ++i)
 			{
 				Emit("[ ");

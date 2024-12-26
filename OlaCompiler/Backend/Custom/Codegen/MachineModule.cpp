@@ -101,7 +101,7 @@ namespace ola
 					globals.emplace_back(new MachineZeroStorage(V->GetName(), size), V->GetLinkage(), alignment);
 				}
 			}
-			lowering_ctx.AddGlobal(GV, &globals.back());
+			lowering_ctx.MapGlobal(GV, &globals.back());
 		}
 
 		for (GlobalValue* GV : ir_globals)
@@ -139,7 +139,7 @@ namespace ola
 		{
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
-			lowering_ctx.AddBlock(&BB, MBB.get());
+			lowering_ctx.MapBlock(&BB, MBB.get());
 			BB.ForAllInstructions([this, &MF](Instruction& I)
 				{
 					if (I.GetOpcode() == Opcode::Alloca)
@@ -150,13 +150,18 @@ namespace ola
 						{
 							IRArrayType const* array_type = cast<IRArrayType>(type);
 							MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
-							lowering_ctx.AddOperand(AI, MO);
+							lowering_ctx.MapOperand(AI, MO);
 						}
 						else
 						{
 							MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
-							lowering_ctx.AddOperand(AI, MO);
+							lowering_ctx.MapOperand(AI, MO);
 						}
+					}
+					if (I.GetOpcode() == Opcode::Phi)
+					{
+						MachineOperand const& MO = lowering_ctx.VirtualReg(I.GetType());
+						lowering_ctx.MapOperand(&I, MO);
 					}
 					else if (I.GetOpcode() == Opcode::Call)
 					{
@@ -171,7 +176,7 @@ namespace ola
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
 			auto vreg = lowering_ctx.VirtualReg(arg_type);
-			lowering_ctx.AddOperand(arg, vreg);
+			lowering_ctx.MapOperand(arg, vreg);
 			args.push_back(vreg);
 		}
 		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
@@ -288,7 +293,7 @@ namespace ola
 				{
 					if (MI.GetOperand(i).IsUndefined())
 					{
-						Value const* V = lowering_ctx.GetValueForUndefMachineOperand(&MI.GetOperand(i));
+						Value const* V = lowering_ctx.GetValueForUndef(&MI.GetOperand(i));
 						MachineOperand MO = lowering_ctx.GetOperand(V);
 						MI.SetOperand(i, MO);
 						MI.SetIgnoreDef();
@@ -304,7 +309,7 @@ namespace ola
 		MachineInstruction MI(GetMachineOpcode(BI->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(BI->GetLHS())).SetOp<2>(lowering_ctx.GetOperand(BI->GetRHS()));
 		lowering_ctx.EmitInst(MI);
-		lowering_ctx.AddOperand(BI, ret);
+		lowering_ctx.MapOperand(BI, ret);
 	}
 
 	void MachineModule::LowerCompare(CompareInst* CI)
@@ -315,16 +320,17 @@ namespace ola
 			.SetOp<2>(lowering_ctx.GetOperand(CI->GetRHS()))
 			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));
 		MachineInstruction& inserted = lowering_ctx.EmitInst(MI);
+
 		if (inserted.GetOp<1>().IsUndefined())
 		{
-			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), CI->GetLHS());
+			lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), CI->GetLHS());
 		}
 		if (inserted.GetOp<2>().IsUndefined())
 		{
-			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<2>(), CI->GetRHS());
+			lowering_ctx.MapUndefWithValue(&inserted.GetOp<2>(), CI->GetRHS());
 
 		}
-		lowering_ctx.AddOperand(CI, ret);
+		lowering_ctx.MapOperand(CI, ret);
 	}
 
 	void MachineModule::LowerUnary(UnaryInst* UI)
@@ -334,7 +340,7 @@ namespace ola
 		MachineInstruction MI(GetMachineOpcode(UI->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(UI->GetOperand()));
 		lowering_ctx.EmitInst(MI);
-		lowering_ctx.AddOperand(UI, ret);
+		lowering_ctx.MapOperand(UI, ret);
 	}
 
 	void MachineModule::LowerRet(ReturnInst* RI)
@@ -366,8 +372,8 @@ namespace ola
 			MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
 			if (cond_op.IsUndefined())
 			{
-				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<0>(), condition);
-				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), condition);
+				lowering_ctx.MapUndefWithValue(&inserted.GetOp<0>(), condition);
+				lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), condition);
 			}
 
 			MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
@@ -390,7 +396,7 @@ namespace ola
 		MachineInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
 		lowering_ctx.EmitInst(MI);
-		lowering_ctx.AddOperand(LI, ret);
+		lowering_ctx.MapOperand(LI, ret);
 	}
 
 	void MachineModule::LowerStore(StoreInst* SI)
@@ -413,7 +419,7 @@ namespace ola
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
 		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->GetSrc()));
 		lowering_ctx.EmitInst(MI);
-		lowering_ctx.AddOperand(CI, ret);
+		lowering_ctx.MapOperand(CI, ret);
 	}
 
 	void MachineModule::LowerGEP(GetElementPtrInst* GEPI)
@@ -489,7 +495,7 @@ namespace ola
 		}
 
 		result.SetType(GetOperandType(GEPI->GetResultElementType()));
-		lowering_ctx.AddOperand(GEPI, result);
+		lowering_ctx.MapOperand(GEPI, result);
 	}
 
 	void MachineModule::LowerPtrAdd(PtrAddInst* PAI)
@@ -514,7 +520,7 @@ namespace ola
 
 		if (offset->GetValue() == 0)
 		{
-			lowering_ctx.AddOperand(PAI, base_register);
+			lowering_ctx.MapOperand(PAI, base_register);
 		}
 		else
 		{
@@ -524,7 +530,7 @@ namespace ola
 				.SetOp<1>(base_register)
 				.SetOp<2>(MachineOperand::Immediate(offset->GetValue(), MachineType::Int64)));
 			result.SetType(GetOperandType(PAI->GetResultElementType()));
-			lowering_ctx.AddOperand(PAI, result);
+			lowering_ctx.MapOperand(PAI, result);
 		}
 	}
 
@@ -590,14 +596,14 @@ namespace ola
 		MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
 		if (predicate_op.IsUndefined())
 		{
-			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<0>(), predicate);
-			lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), predicate);
+			lowering_ctx.MapUndefWithValue(&inserted.GetOp<0>(), predicate);
+			lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), predicate);
 		}
 
 		lowering_ctx.EmitInst(MachineInstruction(InstCMoveNE)
 			.SetOp<0>(result_reg)    
 			.SetOp<1>(true_op).SetIgnoreDef());
-		lowering_ctx.AddOperand(SI, result_reg);
+		lowering_ctx.MapOperand(SI, result_reg);
 	}
 
 	void MachineModule::LowerPhi(PhiInst* Phi)
@@ -618,11 +624,11 @@ namespace ola
 			MachineInstruction& inserted = lowering_ctx.EmitInstBeforeTerminator(MI);
 			if (val.IsUndefined())
 			{
-				lowering_ctx.AddValueForUndefMachineOperand(&inserted.GetOp<1>(), V);
+				lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), V);
 			}
 			lowering_ctx.SetCurrentBasicBlock(MBB);
 		}
-		lowering_ctx.AddOperand(Phi, phiMO);
+		lowering_ctx.MapOperand(Phi, phiMO);
 	}
 
 	void MachineModule::LegalizeInstructions(MachineFunction& MF)

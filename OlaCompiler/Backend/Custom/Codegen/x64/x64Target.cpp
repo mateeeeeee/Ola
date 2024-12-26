@@ -88,7 +88,7 @@ namespace ola
 						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineType::Int64));
 						ctx.EmitInst(move_remainder);
 					}
-					ctx.AddOperand(BI, dst);
+					ctx.MapOperand(BI, dst);
 					return true;
 				}
 			}

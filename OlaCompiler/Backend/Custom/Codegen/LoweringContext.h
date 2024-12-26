@@ -39,15 +39,15 @@ namespace ola
 			return module;
 		}
 
-		void AddGlobal(GlobalValue* GV, MachineGlobal* MG)
+		void MapGlobal(GlobalValue* GV, MachineGlobal* MG)
 		{
 			global_map[GV] = MG;
 		}
-		void AddBlock(BasicBlock* BB, MachineBasicBlock* MBB)
+		void MapBlock(BasicBlock* BB, MachineBasicBlock* MBB)
 		{
 			block_map[BB] = MBB;
 		}
-		void AddOperand(Value* V, MachineOperand MO)
+		void MapOperand(Value* V, MachineOperand MO)
 		{
 			value_map[V] = MO;
 		}
@@ -62,12 +62,13 @@ namespace ola
 		}
 		MachineOperand GetOperand(Value const* V);
 
-		Value const* GetValueForUndefMachineOperand(MachineOperand* MO) const
+		Value const* GetValueForUndef(MachineOperand* MO) const
 		{
 			return undef_resolve_map[MO];
 		}
-		void AddValueForUndefMachineOperand(MachineOperand* MO, Value const* V) const
+		void MapUndefWithValue(MachineOperand* MO, Value const* V) const
 		{
+			OLA_ASSERT_MSG(MO->IsUndefined(), "Machine Operand must be undefined");
 			undef_resolve_map[MO] = V;
 		}
 
