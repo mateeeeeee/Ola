@@ -11,7 +11,7 @@
 
 namespace ola
 {
-	MachineModule::MachineModule(IRModule& ir_module, Target const& target) : lowering_ctx(*this), target(target)
+	MachineModule::MachineModule(IRModule& ir_module, Target const& target) : machine_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
 	}
@@ -101,7 +101,7 @@ namespace ola
 					globals.emplace_back(new MachineZeroStorage(V->GetName(), size), V->GetLinkage(), alignment);
 				}
 			}
-			lowering_ctx.MapGlobal(GV, &globals.back());
+			machine_ctx.MapGlobal(GV, &globals.back());
 		}
 
 		for (GlobalValue* GV : ir_globals)
@@ -113,7 +113,7 @@ namespace ola
 				{
 					LowerFunction(F);
 
-					MachineGlobal* global = lowering_ctx.GetGlobal(F);
+					MachineGlobal* global = machine_ctx.GetGlobal(F);
 					MachineFunction& MF = *static_cast<MachineFunction*>(global->GetRelocable());
 
 					LegalizeInstructions(MF);
@@ -129,7 +129,7 @@ namespace ola
 
 	void MachineModule::LowerFunction(Function* F)
 	{
-		MachineGlobal* global = lowering_ctx.GetGlobal(F);
+		MachineGlobal* global = machine_ctx.GetGlobal(F);
 		MachineFunction& MF = *dynamic_cast<MachineFunction*>(global->GetRelocable());
 
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
@@ -137,9 +137,9 @@ namespace ola
 
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, lowering_ctx.GetLabel()));
+			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, machine_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
-			lowering_ctx.MapBlock(&BB, MBB.get());
+			machine_ctx.MapBlock(&BB, MBB.get());
 			BB.ForAllInstructions([this, &MF](Instruction& I)
 				{
 					if (I.GetOpcode() == Opcode::Alloca)
@@ -150,18 +150,18 @@ namespace ola
 						{
 							IRArrayType const* array_type = cast<IRArrayType>(type);
 							MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
-							lowering_ctx.MapOperand(AI, MO);
+							machine_ctx.MapOperand(AI, MO);
 						}
 						else
 						{
 							MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
-							lowering_ctx.MapOperand(AI, MO);
+							machine_ctx.MapOperand(AI, MO);
 						}
 					}
 					if (I.GetOpcode() == Opcode::Phi)
 					{
-						MachineOperand const& MO = lowering_ctx.VirtualReg(I.GetType());
-						lowering_ctx.MapOperand(&I, MO);
+						MachineOperand const& MO = machine_ctx.VirtualReg(I.GetType());
+						machine_ctx.MapOperand(&I, MO);
 					}
 					else if (I.GetOpcode() == Opcode::Call)
 					{
@@ -175,27 +175,26 @@ namespace ola
 		{
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
-			auto vreg = lowering_ctx.VirtualReg(arg_type);
-			lowering_ctx.MapOperand(arg, vreg);
+			auto vreg = machine_ctx.VirtualReg(arg_type);
+			machine_ctx.MapOperand(arg, vreg);
 			args.push_back(vreg);
 		}
-		lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(&F->GetEntryBlock()));
+		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));
 
-		frame_info.EmitPrologue(MF, lowering_ctx);
+		frame_info.EmitPrologue(MF, machine_ctx);
 		for (BasicBlock& BB : F->Blocks())
 		{
-			MachineBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
-			lowering_ctx.SetCurrentBasicBlock(MBB);
+			MachineBasicBlock* MBB = machine_ctx.GetBlock(&BB);
+			machine_ctx.SetCurrentBasicBlock(MBB);
 			for (Instruction& I : BB.Instructions())
 			{
-				if (!isel_info.LowerInstruction(&I, lowering_ctx))
+				if (!isel_info.LowerInstruction(&I, machine_ctx))
 				{
 					LowerInstruction(&I);
 				}
 			}
 		}
-		ResolveUndefs(F);
-		frame_info.EmitEpilogue(MF, lowering_ctx);
+		frame_info.EmitEpilogue(MF, machine_ctx);
 	}
 
 	void MachineModule::LowerInstruction(Instruction* I)
@@ -271,8 +270,6 @@ namespace ola
 			LowerSelect(cast<SelectInst>(I));
 			break;
 		case Opcode::Phi:
-			LowerPhi(cast<PhiInst>(I));
-			break;
 		case Opcode::Bitcast:
 		case Opcode::Alloca:
 			break;
@@ -281,82 +278,49 @@ namespace ola
 		}
 	}
 
-	void MachineModule::ResolveUndefs(Function* F)
-	{
-		TargetInstInfo const& inst_info = target.GetInstInfo();
-		for (BasicBlock& BB : F->Blocks())
-		{
-			MachineBasicBlock* MBB = lowering_ctx.GetBlock(&BB);
-			for (MachineInstruction& MI : MBB->Instructions())
-			{
-				for (Uint i = 0; i < inst_info.GetInstInfo(MI).GetOperandCount(); ++i)
-				{
-					if (MI.GetOperand(i).IsUndefined())
-					{
-						Value const* V = lowering_ctx.GetValueForUndef(&MI.GetOperand(i));
-						MachineOperand MO = lowering_ctx.GetOperand(V);
-						MI.SetOperand(i, MO);
-						MI.SetIgnoreDef();
-					}
-				}
-			}
-		}
-	}
-
 	void MachineModule::LowerBinary(BinaryInst* BI)
 	{
-		MachineOperand ret = lowering_ctx.VirtualReg(BI->GetType());
+		MachineOperand ret = machine_ctx.VirtualReg(BI->GetType());
 		MachineInstruction MI(GetMachineOpcode(BI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(BI->GetLHS())).SetOp<2>(lowering_ctx.GetOperand(BI->GetRHS()));
-		lowering_ctx.EmitInst(MI);
-		lowering_ctx.MapOperand(BI, ret);
+		MI.SetOp<0>(ret).SetOp<1>(machine_ctx.GetOperand(BI->GetLHS())).SetOp<2>(machine_ctx.GetOperand(BI->GetRHS()));
+		machine_ctx.EmitInst(MI);
+		machine_ctx.MapOperand(BI, ret);
 	}
 
 	void MachineModule::LowerCompare(CompareInst* CI)
 	{
-		MachineOperand ret = lowering_ctx.VirtualReg(CI->GetType());
+		MachineOperand ret = machine_ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->GetLHS()))
-			.SetOp<2>(lowering_ctx.GetOperand(CI->GetRHS()))
+		MI.SetOp<0>(ret).SetOp<1>(machine_ctx.GetOperand(CI->GetLHS()))
+			.SetOp<2>(machine_ctx.GetOperand(CI->GetRHS()))
 			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));
-		MachineInstruction& inserted = lowering_ctx.EmitInst(MI);
+		MachineInstruction& inserted = machine_ctx.EmitInst(MI);
 
-		if (inserted.GetOp<1>().IsUndefined())
-		{
-			lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), CI->GetLHS());
-		}
-		if (inserted.GetOp<2>().IsUndefined())
-		{
-			lowering_ctx.MapUndefWithValue(&inserted.GetOp<2>(), CI->GetRHS());
-
-		}
-		lowering_ctx.MapOperand(CI, ret);
+		machine_ctx.MapOperand(CI, ret);
 	}
 
 	void MachineModule::LowerUnary(UnaryInst* UI)
 	{
 		if (UI->GetName() == "nop") return;
-		MachineOperand ret = lowering_ctx.VirtualReg(UI->GetType());
+		MachineOperand ret = machine_ctx.VirtualReg(UI->GetType());
 		MachineInstruction MI(GetMachineOpcode(UI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(UI->GetOperand()));
-		lowering_ctx.EmitInst(MI);
-		lowering_ctx.MapOperand(UI, ret);
+		MI.SetOp<0>(ret).SetOp<1>(machine_ctx.GetOperand(UI->GetOperand()));
+		machine_ctx.EmitInst(MI);
+		machine_ctx.MapOperand(UI, ret);
 	}
 
 	void MachineModule::LowerRet(ReturnInst* RI)
 	{
-		target.GetFrameInfo().EmitReturn(RI, lowering_ctx);
+		target.GetFrameInfo().EmitReturn(RI, machine_ctx);
 	}
 
 	void MachineModule::LowerBranch(BranchInst* BI)
 	{
+		BasicBlock* src_block = BI->GetBasicBlock();
 		if (BI->IsUnconditional())
 		{
 			BasicBlock* target = BI->GetTrueTarget();
-			MachineOperand dst_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(target));
-			MachineInstruction MI(InstJump);
-			MI.SetOp<0>(dst_operand);
-			lowering_ctx.EmitInst(MI);
+			EmitJump(InstJump, target, src_block);
 		}
 		else
 		{
@@ -364,100 +328,87 @@ namespace ola
 			BasicBlock* true_target = BI->GetTrueTarget();
 			BasicBlock* false_target = BI->GetFalseTarget();
 
-			MachineOperand const& cond_op = lowering_ctx.GetOperand(condition);
+			MachineOperand const& cond_op = machine_ctx.GetOperand(condition);
 
 			MachineInstruction testMI(InstTest);
 			testMI.SetOp<0>(cond_op);
 			testMI.SetOp<1>(cond_op);
-			MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
-			if (cond_op.IsUndefined())
-			{
-				lowering_ctx.MapUndefWithValue(&inserted.GetOp<0>(), condition);
-				lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), condition);
-			}
-
-			MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(true_target));
-			MachineInstruction jmp_true(InstJNE);
-			jmp_true.SetOp<0>(true_operand);
-			lowering_ctx.EmitInst(jmp_true);
-
-			MachineOperand false_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(false_target));
-			MachineInstruction jmp_false(InstJump);
-			jmp_false.SetOp<0>(false_operand);
-			lowering_ctx.EmitInst(jmp_false);
+			machine_ctx.EmitInst(testMI);
+			EmitJump(InstJNE, true_target, src_block);
+			EmitJump(InstJump, false_target, src_block);
 		}
 	}
 
 	void MachineModule::LowerLoad(LoadInst* LI)
 	{
-		MachineOperand const& ret = lowering_ctx.VirtualReg(LI->GetType());
-		MachineOperand ptr = lowering_ctx.GetOperand(LI->GetAddressOp());
+		MachineOperand const& ret = machine_ctx.VirtualReg(LI->GetType());
+		MachineOperand ptr = machine_ctx.GetOperand(LI->GetAddressOp());
 		ptr.SetType(ret.GetType());
 		MachineInstruction MI(InstLoad);
 		MI.SetOp<0>(ret).SetOp<1>(ptr);
-		lowering_ctx.EmitInst(MI);
-		lowering_ctx.MapOperand(LI, ret);
+		machine_ctx.EmitInst(MI);
+		machine_ctx.MapOperand(LI, ret);
 	}
 
 	void MachineModule::LowerStore(StoreInst* SI)
 	{
-		MachineOperand const& ptr = lowering_ctx.GetOperand(SI->GetAddressOp());
-		MachineOperand const& val = lowering_ctx.GetOperand(SI->GetValueOp());
+		MachineOperand const& ptr = machine_ctx.GetOperand(SI->GetAddressOp());
+		MachineOperand const& val = machine_ctx.GetOperand(SI->GetValueOp());
 		MachineInstruction MI(InstStore);
 		MI.SetOp<0>(ptr).SetOp<1>(val);
-		lowering_ctx.EmitInst(MI);
+		machine_ctx.EmitInst(MI);
 	}
 
 	void MachineModule::LowerCall(CallInst* CI)
 	{
-		target.GetFrameInfo().EmitCall(CI, lowering_ctx);
+		target.GetFrameInfo().EmitCall(CI, machine_ctx);
 	}
 
 	void MachineModule::LowerCast(CastInst* CI)
 	{
-		MachineOperand ret = lowering_ctx.VirtualReg(CI->GetDestType());
+		MachineOperand ret = machine_ctx.VirtualReg(CI->GetDestType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
-		MI.SetOp<0>(ret).SetOp<1>(lowering_ctx.GetOperand(CI->GetSrc()));
-		lowering_ctx.EmitInst(MI);
-		lowering_ctx.MapOperand(CI, ret);
+		MI.SetOp<0>(ret).SetOp<1>(machine_ctx.GetOperand(CI->GetSrc()));
+		machine_ctx.EmitInst(MI);
+		machine_ctx.MapOperand(CI, ret);
 	}
 
 	void MachineModule::LowerGEP(GetElementPtrInst* GEPI)
 	{
 		Value* base = GEPI->GetBaseOperand();
-		MachineOperand base_op = lowering_ctx.GetOperand(base);  
-		MachineOperand result = lowering_ctx.VirtualReg(GEPI->GetType());  
+		MachineOperand base_op = machine_ctx.GetOperand(base);  
+		MachineOperand result = machine_ctx.VirtualReg(GEPI->GetType());  
 		IRType* current_type = GEPI->GetType();  
 
 		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
 		{
-			lowering_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+			machine_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(result)
 				.SetOp<1>(base_op));
 		}
 		else
 		{
-			lowering_ctx.EmitInst(MachineInstruction(InstMove)
+			machine_ctx.EmitInst(MachineInstruction(InstMove)
 				.SetOp<0>(result)
 				.SetOp<1>(base_op));
 		}
 
 		for (Value* index : GEPI->Indices())
 		{
-			MachineOperand index_op = lowering_ctx.GetOperand(index);
+			MachineOperand index_op = machine_ctx.GetOperand(index);
 
 			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
 			{
 				Uint32 element_size = array_type->GetElementType()->GetSize();
 
-				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
-				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
+				MachineOperand offset = machine_ctx.VirtualReg(index->GetType());
+				machine_ctx.EmitInst(MachineInstruction(InstSMul)
 					.SetOp<0>(offset)
 					.SetOp<1>(index_op)
 					.SetOp<2>(MachineOperand::Immediate(element_size, index_op.GetType())));
 
-				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
-				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+				MachineOperand new_result = machine_ctx.VirtualReg(GEPI->GetType());
+				machine_ctx.EmitInst(MachineInstruction(InstAdd)
 					.SetOp<0>(new_result)
 					.SetOp<1>(result)
 					.SetOp<2>(offset));
@@ -473,14 +424,14 @@ namespace ola
 			{
 				Uint32 pointer_size = pointer_type->GetPointeeType()->GetSize();
 
-				MachineOperand offset = lowering_ctx.VirtualReg(index->GetType());
-				lowering_ctx.EmitInst(MachineInstruction(InstSMul)
+				MachineOperand offset = machine_ctx.VirtualReg(index->GetType());
+				machine_ctx.EmitInst(MachineInstruction(InstSMul)
 					.SetOp<0>(offset)
 					.SetOp<1>(index_op)
 					.SetOp<2>(MachineOperand::Immediate(pointer_size, index_op.GetType())));
 
-				MachineOperand new_result = lowering_ctx.VirtualReg(GEPI->GetType());
-				lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+				MachineOperand new_result = machine_ctx.VirtualReg(GEPI->GetType());
+				machine_ctx.EmitInst(MachineInstruction(InstAdd)
 					.SetOp<0>(new_result)
 					.SetOp<1>(result)
 					.SetOp<2>(offset));
@@ -495,7 +446,7 @@ namespace ola
 		}
 
 		result.SetType(GetOperandType(GEPI->GetResultElementType()));
-		lowering_ctx.MapOperand(GEPI, result);
+		machine_ctx.MapOperand(GEPI, result);
 	}
 
 	void MachineModule::LowerPtrAdd(PtrAddInst* PAI)
@@ -503,43 +454,43 @@ namespace ola
 		Value* base = PAI->GetBase();
 		ConstantInt* offset = cast<ConstantInt>(PAI->GetOffset());
 
-		MachineOperand base_op = lowering_ctx.GetOperand(base);
-		MachineOperand base_register = lowering_ctx.VirtualReg(PAI->GetType());
+		MachineOperand base_op = machine_ctx.GetOperand(base);
+		MachineOperand base_register = machine_ctx.VirtualReg(PAI->GetType());
 		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
 		{
-			lowering_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+			machine_ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(base_register)
 				.SetOp<1>(base_op));
 		}
 		else
 		{
-			lowering_ctx.EmitInst(MachineInstruction(InstMove)
+			machine_ctx.EmitInst(MachineInstruction(InstMove)
 				.SetOp<0>(base_register)
 				.SetOp<1>(base_op));
 		}
 
 		if (offset->GetValue() == 0)
 		{
-			lowering_ctx.MapOperand(PAI, base_register);
+			machine_ctx.MapOperand(PAI, base_register);
 		}
 		else
 		{
-			MachineOperand result = lowering_ctx.VirtualReg(MachineType::Ptr);
-			lowering_ctx.EmitInst(MachineInstruction(InstAdd)
+			MachineOperand result = machine_ctx.VirtualReg(MachineType::Ptr);
+			machine_ctx.EmitInst(MachineInstruction(InstAdd)
 				.SetOp<0>(result)
 				.SetOp<1>(base_register)
 				.SetOp<2>(MachineOperand::Immediate(offset->GetValue(), MachineType::Int64)));
 			result.SetType(GetOperandType(PAI->GetResultElementType()));
-			lowering_ctx.MapOperand(PAI, result);
+			machine_ctx.MapOperand(PAI, result);
 		}
 	}
 
 	void MachineModule::LowerSwitch(SwitchInst* SI)
 	{
 		if (!SI || SI->GetNumCases() == 0) return;
-
+		BasicBlock* src_block = SI->GetBasicBlock();
 		Value* cond_value = SI->GetCondition();
-		MachineOperand cond_op = lowering_ctx.GetOperand(cond_value);
+		MachineOperand cond_op = machine_ctx.GetOperand(cond_value);
 
 		for (auto& case_pair : SI->Cases())
 		{
@@ -551,28 +502,23 @@ namespace ola
 				MachineInstruction testMI(InstICmp);
 				testMI.SetOp<0>(cond_op);
 				testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineType::Int64));
-				lowering_ctx.EmitInst(testMI);
+				machine_ctx.EmitInst(testMI);
 
-				MachineOperand case_label = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));
-				MachineInstruction case_jmp(InstJE);
-				case_jmp.SetOp<0>(case_label);
-				lowering_ctx.EmitInst(case_jmp);
+				EmitJump(InstJE, case_block, src_block);
 			}
 			else
 			{
 				Int64 imm = cond_op.GetImmediate();
 				if (imm != 0)
 				{
-					MachineOperand true_operand = MachineOperand::Relocable(lowering_ctx.GetBlock(case_block));
-					MachineInstruction jmp_true(InstJump);
-					jmp_true.SetOp<0>(true_operand);
-					lowering_ctx.EmitInst(jmp_true);
+					EmitJump(InstJump, case_block, src_block);
 				}
 			}
 		}
-
-		BasicBlock* default_block = SI->GetDefaultCase();
-		if(default_block) lowering_ctx.EmitInst(MachineInstruction(InstJump).SetOp<0>(MachineOperand::Relocable(lowering_ctx.GetBlock(default_block))));
+		if (BasicBlock* default_block = SI->GetDefaultCase())
+		{
+			EmitJump(InstJump, default_block, src_block);
+		}
 	}
 
 	void MachineModule::LowerSelect(SelectInst* SI)
@@ -581,54 +527,47 @@ namespace ola
 		Value* true_value = SI->GetTrueValue();
 		Value* false_value = SI->GetFalseValue();
 
-		MachineOperand result_reg = lowering_ctx.VirtualReg(SI->GetType());
-		MachineOperand true_op = lowering_ctx.GetOperand(true_value);
-		MachineOperand false_op = lowering_ctx.GetOperand(false_value);
-		MachineOperand predicate_op = lowering_ctx.GetOperand(predicate);
+		MachineOperand result_reg = machine_ctx.VirtualReg(SI->GetType());
+		MachineOperand true_op = machine_ctx.GetOperand(true_value);
+		MachineOperand false_op = machine_ctx.GetOperand(false_value);
+		MachineOperand predicate_op = machine_ctx.GetOperand(predicate);
 
-		lowering_ctx.EmitInst(MachineInstruction(InstMove)
+		machine_ctx.EmitInst(MachineInstruction(InstMove)
 			.SetOp<0>(result_reg)   
 			.SetOp<1>(false_op));
 
 		MachineInstruction testMI(InstTest);
 		testMI.SetOp<0>(predicate_op);
 		testMI.SetOp<1>(predicate_op);
-		MachineInstruction& inserted = lowering_ctx.EmitInst(testMI);
-		if (predicate_op.IsUndefined())
-		{
-			lowering_ctx.MapUndefWithValue(&inserted.GetOp<0>(), predicate);
-			lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), predicate);
-		}
+		MachineInstruction& inserted = machine_ctx.EmitInst(testMI);
 
-		lowering_ctx.EmitInst(MachineInstruction(InstCMoveNE)
+		machine_ctx.EmitInst(MachineInstruction(InstCMoveNE)
 			.SetOp<0>(result_reg)    
 			.SetOp<1>(true_op).SetIgnoreDef());
-		lowering_ctx.MapOperand(SI, result_reg);
+		machine_ctx.MapOperand(SI, result_reg);
 	}
 
-	void MachineModule::LowerPhi(PhiInst* Phi)
+	void MachineModule::EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
 	{
-		MachineOperand const& phiMO = lowering_ctx.VirtualReg(Phi->GetType());
-		for (Uint i = 0; i < Phi->GetNumIncomingValues(); ++i)
+		OLA_ASSERT(jump_opcode >= InstJump && jump_opcode <= InstJNE);
+		std::vector<MachineOperand> dst_operands;
+		std::vector<MachineOperand> src_operands;
+
+		for (auto const& Phi : dst->PhiInsts()) 
 		{
-			Value* V = Phi->GetIncomingValue(i);
-			BasicBlock* BB = Phi->GetIncomingBlock(i);
-
-			MachineOperand const& val = lowering_ctx.GetOperand(V);
-			MachineInstruction MI(InstMove);
-			MI.SetIgnoreDef();
-			MI.SetOp<0>(phiMO).SetOp<1>(val);
-
-			MachineBasicBlock* MBB = lowering_ctx.GetCurrentBasicBlock();
-			lowering_ctx.SetCurrentBasicBlock(lowering_ctx.GetBlock(BB));
-			MachineInstruction& inserted = lowering_ctx.EmitInstBeforeTerminator(MI);
-			if (val.IsUndefined())
+			Value* V = Phi->GetIncomingValueForBlock(src);
+			if (V)
 			{
-				lowering_ctx.MapUndefWithValue(&inserted.GetOp<1>(), V);
+				MachineInstruction MI(InstMove);
+				MI.SetOp<0>(machine_ctx.GetOperand(Phi)).SetOp<1>(machine_ctx.GetOperand(V));
+				machine_ctx.EmitInst(MI);
 			}
-			lowering_ctx.SetCurrentBasicBlock(MBB);
 		}
-		lowering_ctx.MapOperand(Phi, phiMO);
+
+		MachineOperand dst_operand = MachineOperand::Relocable(machine_ctx.GetBlock(dst));
+		MachineInstruction MI(jump_opcode);
+		MI.SetOp<0>(dst_operand);
+		machine_ctx.EmitInst(MI);
 	}
 
 	void MachineModule::LegalizeInstructions(MachineFunction& MF)
@@ -641,7 +580,7 @@ namespace ola
 			{
 				MachineInstruction& MI = *MIiterator;
 				InstLegalizeContext ctx{ MI, instructions, MIiterator };
-				isel_info.LegalizeInstruction(ctx, lowering_ctx);
+				isel_info.LegalizeInstruction(ctx, machine_ctx);
 			}
 		}
 	}

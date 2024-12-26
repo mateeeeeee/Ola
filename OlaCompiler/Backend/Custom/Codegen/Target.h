@@ -88,7 +88,7 @@ namespace ola
 		virtual Bool IsCalleeSaved(Uint32) const = 0;
 	};
 
-	class LoweringContext;
+	class MachineContext;
 	struct InstLegalizeContext
 	{
 		MachineInstruction& instruction;
@@ -100,8 +100,8 @@ namespace ola
 	public:
 		virtual ~TargetISelInfo() = default;
 
-		virtual Bool LowerInstruction(Instruction*, LoweringContext&) const = 0;
-		virtual void LegalizeInstruction(InstLegalizeContext&, LoweringContext&) const = 0;
+		virtual Bool LowerInstruction(Instruction*, MachineContext&) const = 0;
+		virtual void LegalizeInstruction(InstLegalizeContext&, MachineContext&) const = 0;
 		virtual void PostLegalizeInstruction(InstLegalizeContext&) const = 0;
 	};
 
@@ -110,10 +110,10 @@ namespace ola
 	public:
 		virtual ~TargetFrameInfo() = default;
 
-		virtual void EmitCall(CallInst* CI, LoweringContext& ctx) const = 0;
-		virtual void EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const = 0;
-		virtual void EmitEpilogue(MachineFunction& MF, LoweringContext& ctx) const = 0;
-		virtual void EmitReturn(ReturnInst* RI, LoweringContext& ctx) const = 0;
+		virtual void EmitCall(CallInst* CI, MachineContext& ctx) const = 0;
+		virtual void EmitPrologue(MachineFunction& MF, MachineContext& ctx) const = 0;
+		virtual void EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const = 0;
+		virtual void EmitReturn(ReturnInst* RI, MachineContext& ctx) const = 0;
 	};
 
 	class MachineModule;

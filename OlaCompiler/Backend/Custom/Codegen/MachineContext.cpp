@@ -1,4 +1,4 @@
-#include "LoweringContext.h"
+#include "MachineContext.h"
 #include "MachineBasicBlock.h"
 #include "MachineGlobal.h"
 #include "Backend/Custom/IR/IRType.h"
@@ -95,7 +95,7 @@ namespace ola
 		return InstUnknown;
 	}
 
-	MachineOperand LoweringContext::GetOperand(Value const* V)
+	MachineOperand MachineContext::GetOperand(Value const* V)
 	{
 		if (value_map.contains(V)) return value_map[V];
 		if (Constant const* C = dyn_cast<Constant>(V))
@@ -145,13 +145,13 @@ namespace ola
 		return MachineOperand::Undefined();
 	}
 
-	MachineInstruction& LoweringContext::EmitInst(MachineInstruction const& MI)
+	MachineInstruction& MachineContext::EmitInst(MachineInstruction const& MI)
 	{
 		auto& MachineInstList = current_block->Instructions();
 		return MachineInstList.emplace_back(MI);
 	}
 
-	MachineInstruction& LoweringContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
+	MachineInstruction& MachineContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
 	{
 		auto& MachineInstList = current_block->Instructions();
 		auto it = MachineInstList.end();

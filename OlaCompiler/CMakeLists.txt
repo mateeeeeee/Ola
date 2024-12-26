@@ -153,8 +153,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineModule.cpp
   Backend/Custom/Codegen/Target.h
   Backend/Custom/Codegen/Target.cpp
-  Backend/Custom/Codegen/LoweringContext.h
-  Backend/Custom/Codegen/LoweringContext.cpp
+  Backend/Custom/Codegen/MachineContext.h
+  Backend/Custom/Codegen/MachineContext.cpp
   Backend/Custom/Codegen/MachineModulePass.h
   Backend/Custom/Codegen/MachineFunctionPass.h
   Backend/Custom/Codegen/LivenessAnalysis.h

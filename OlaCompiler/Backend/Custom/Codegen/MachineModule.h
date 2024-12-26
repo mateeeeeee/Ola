@@ -1,7 +1,7 @@
 #pragma once
 #include <iosfwd>
 #include "MachineGlobal.h"
-#include "LoweringContext.h"
+#include "MachineContext.h"
 
 namespace ola
 {
@@ -43,14 +43,13 @@ namespace ola
 
 	protected:
 		std::vector<MachineGlobal> globals;
-		LoweringContext lowering_ctx;
+		MachineContext machine_ctx;
 		Target const& target;
 
 	private:
 		void LowerModule(IRModule*);
 		void LowerFunction(Function*);
 		void LowerInstruction(Instruction*);
-		void ResolveUndefs(Function*);
 
 		void LowerUnary(UnaryInst*);
 		void LowerBinary(BinaryInst*);
@@ -65,7 +64,7 @@ namespace ola
 		void LowerPtrAdd(PtrAddInst*);
 		void LowerSwitch(SwitchInst*);
 		void LowerSelect(SelectInst*);
-		void LowerPhi(PhiInst*);
+		void EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
 
 		void LegalizeInstructions(MachineFunction& MF);
 		void PostLegalizeInstructions(MachineFunction& MF);

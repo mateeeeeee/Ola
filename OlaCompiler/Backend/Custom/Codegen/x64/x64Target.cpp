@@ -7,7 +7,7 @@
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
-#include "Backend/Custom/Codegen/LoweringContext.h"
+#include "Backend/Custom/Codegen/MachineContext.h"
 
 namespace ola
 {
@@ -37,7 +37,7 @@ namespace ola
 	class x64TargetISelInfo : public TargetISelInfo
 	{
 	public:
-		virtual Bool LowerInstruction(Instruction* I, LoweringContext& ctx) const override
+		virtual Bool LowerInstruction(Instruction* I, MachineContext& ctx) const override
 		{
 			if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
 			{
@@ -95,7 +95,7 @@ namespace ola
 			return false;
 		}
 
-		virtual void LegalizeInstruction(InstLegalizeContext& legalize_ctx, LoweringContext& lowering_ctx) const override
+		virtual void LegalizeInstruction(InstLegalizeContext& legalize_ctx, MachineContext& lowering_ctx) const override
 		{
 			MachineInstruction& MI = legalize_ctx.instruction;
 			auto& instructions = legalize_ctx.instructions;

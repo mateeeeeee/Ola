@@ -2,7 +2,7 @@
 #include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
-#include "Backend/Custom/Codegen/LoweringContext.h"
+#include "Backend/Custom/Codegen/MachineContext.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineGlobal.h"
 #include "Backend/Custom/Codegen/MachineFunction.h"
@@ -10,7 +10,7 @@
 namespace ola
 {
 
-	void x64TargetFrameInfo::EmitCall(CallInst* CI, LoweringContext& ctx) const
+	void x64TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
 		Function* callee = CI->GetCalleeAsFunction();
 		OLA_ASSERT(callee);
@@ -94,7 +94,7 @@ namespace ola
 	}
 
 
-	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, LoweringContext& ctx) const
+	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
 		if (MF.HasCallInstructions()) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
@@ -171,7 +171,7 @@ namespace ola
 		}
 	}
 
-	void x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, LoweringContext& ctx) const
+	void x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
 
@@ -187,7 +187,7 @@ namespace ola
 		ctx.EmitInst(pop_rbp);
 	}
 
-	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, LoweringContext& ctx) const
+	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const
 	{
 		if (RI->GetNumOperands() > 0)
 		{

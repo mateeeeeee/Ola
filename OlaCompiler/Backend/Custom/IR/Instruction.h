@@ -888,8 +888,7 @@ namespace ola
 		Value* GetIncomingValueForBlock(BasicBlock const* BB) const
 		{
 			Int Idx = GetBasicBlockIndex(BB);
-			assert(Idx >= 0 && "Invalid basic block argument!");
-			return GetIncomingValue(Idx);
+			return Idx >= 0 ? GetIncomingValue(Idx) : nullptr;
 		}
 		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V) 
 		{
