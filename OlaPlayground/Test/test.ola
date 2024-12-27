@@ -1,6 +1,6 @@
 import std.assert;
 
-void TestDoWhileLoopInt()
+public int main()
 {
     int sum = 0;
     for (int i = 1; i <= 5; i++)
@@ -10,37 +10,3 @@ void TestDoWhileLoopInt()
     Assert(sum == 15);
     return 0;
 }
-
-
-//timeout fail
-
-//int sum = 0;
-//int i = 1;
-//while (i <= 5)
-//{
-//    sum += i;
-//    i++;
-//}
-//Assert(sum == 15);
-//return 0;
-
-
-//int sum = 0;
-//int i = 1;
-//
-//do
-//{
-//    sum += i;
-//    i++;
-//} while (i <= 5);
-//
-//Assert(sum == 15);
-
-//invalid assembly, issue with resolving phis in machinemodule?
-
-//int sum = 0;
-//for (int i = 1; i <= 5; i++)
-//{
-//    sum += i;
-//}
-//Assert(sum == 15);
