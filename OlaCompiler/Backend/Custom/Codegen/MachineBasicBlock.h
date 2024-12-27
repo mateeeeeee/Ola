@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <unordered_set>
 #include "MachineInstruction.h"
 #include "MachineGlobal.h"
 
@@ -27,14 +28,16 @@ namespace ola
 
 		void AddSuccessor(MachineBasicBlock* MBB)
 		{
-			successors.push_back(MBB);
+			successors.insert(MBB);
+			MBB->predecessors.insert(this);
 		}
 		void AddPredecessor(MachineBasicBlock* MBB)
 		{
-			predecessors.push_back(MBB);
+			predecessors.insert(MBB);
+			MBB->successors.insert(this);
 		}
-		std::vector<MachineBasicBlock*> const& Predecessors() const { return predecessors; }
-		std::vector<MachineBasicBlock*> const& Successors() const { return successors; }
+		std::unordered_set<MachineBasicBlock*> const& Predecessors() const { return predecessors; }
+		std::unordered_set<MachineBasicBlock*> const& Successors() const { return successors; }
 
 		virtual RelocableKind GetRelocableKind() const override
 		{
@@ -44,7 +47,7 @@ namespace ola
 	private:
 		MachineFunction* function;
 		std::list<MachineInstruction> instructions;
-		std::vector<MachineBasicBlock*> successors;
-		std::vector<MachineBasicBlock*> predecessors;
+		std::unordered_set<MachineBasicBlock*> successors;
+		std::unordered_set<MachineBasicBlock*> predecessors;
 	};
 }
