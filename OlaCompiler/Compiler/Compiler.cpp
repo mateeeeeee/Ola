@@ -56,7 +56,8 @@ namespace ola
 			Bool print_domfrontier;
 		};
 
-		void CompileTranslationUnit(FrontendContext& context, std::string_view source_file, std::string_view ir_file, std::string_view assembly_file,
+		void CompileTranslationUnit(FrontendContext& context, 
+			std::string_view source_file, std::string_view ir_file, std::string_view mir_file, std::string_view assembly_file,
 			TUCompilationOptions const& opts)
 		{
 			Diagnostics diagnostics{};
@@ -133,6 +134,10 @@ namespace ola
 
 				x64Target x64_target{};
 				MachineModule machine_module(ir_module, x64_target);
+				if(!mir_file.empty())
+				{
+					machine_module.EmitMIR(mir_file);
+				}
 				machine_module.EmitAssembly(assembly_file);
 			}
 		}
@@ -146,6 +151,7 @@ namespace ola
 		Bool const domtree_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpDomTree;
 		Bool const no_llvm = compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM;
 		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
+		Bool const emit_mir = compile_request.GetCompilerFlags() & CompilerFlag_EmitMIR;
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
 		Bool const print_domfrontier = compile_request.GetCompilerFlags() & CompilerFlag_PrintDomFrontier;
 		Bool const timeout_detection = compile_request.GetCompilerFlags() & CompilerFlag_TimeoutDetection;
@@ -178,6 +184,7 @@ namespace ola
 			if (no_llvm) ir_file = file_name + ".oll";
 			else		 ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
+			std::string mir_file = emit_asm ? file_name + ".omll" : "";
 
 			TUCompilationOptions tu_comp_opts
 			{
@@ -187,9 +194,9 @@ namespace ola
 				.dump_cfg = cfg_dump,
 				.dump_callgraph = callgraph_dump,
 				.dump_domtree = domtree_dump,
-				.print_domfrontier = print_domfrontier
+				.print_domfrontier = print_domfrontier,
 			};
-			CompileTranslationUnit(context, source_file, ir_file, assembly_file, tu_comp_opts);
+			CompileTranslationUnit(context, source_file, ir_file, mir_file, assembly_file, tu_comp_opts);
 
 			std::string object_file = file_name + ".obj";  
 			object_files[i] = object_file;

@@ -5,6 +5,7 @@
 #include "MachineFunction.h"
 #include "MachineStorage.h"
 #include "MachineBasicBlock.h"
+#include "MachineIRPrinter.h"
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -14,6 +15,13 @@ namespace ola
 	MachineModule::MachineModule(IRModule& ir_module, Target const& target) : machine_ctx(*this), target(target)
 	{
 		LowerModule(&ir_module);
+	}
+
+	void MachineModule::EmitMIR(std::string_view mir_file)
+	{
+		std::ofstream mir_stream(mir_file.data());
+		MachineIRPrinter mir_printer(target, mir_stream);
+		mir_printer.PrintModule(*this);
 	}
 
 	void MachineModule::EmitAssembly(std::string_view assembly_file)

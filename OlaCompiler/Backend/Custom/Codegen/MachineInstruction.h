@@ -90,7 +90,7 @@ namespace ola
 			return *this;
 		}
 		Uint32 GetOpcode() const { return opcode; }
-
+		Char const* GetOpcodeName() const;
 
 		Bool operator==(MachineInstruction const& rhs) const
 		{

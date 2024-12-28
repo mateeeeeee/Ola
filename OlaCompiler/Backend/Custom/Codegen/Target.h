@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <string>
 #include <string_view>
 
 namespace ola
@@ -71,6 +72,7 @@ namespace ola
 	public:
 		virtual ~TargetInstInfo() = default;
 		virtual InstInfo GetInstInfo(Uint32 opcode) const = 0;
+		virtual std::string GetInstName(Uint32 opcode) const = 0;
 		InstInfo GetInstInfo(MachineInstruction const& inst) const;
 	};
 

@@ -108,4 +108,29 @@ namespace ola
 		}
 		return inst_info;
 	}
+
+	std::string x64TargetInstInfo::GetInstName(Uint32 opcode) const
+	{
+		OLA_ASSERT(opcode > ISASpecificBegin);
+		switch (opcode)
+		{
+		case x64::InstSetE:		return "x64::SetE";
+		case x64::InstSetNE:	return "x64::SetNE";
+		case x64::InstSetGT:	return "x64::SetGT";
+		case x64::InstSetGE:	return "x64::SetGE";
+		case x64::InstSetLT:	return "x64::SetLT";
+		case x64::InstSetLE:	return "x64::SetLE";
+		case x64::InstSetA:		return "x64::SetA";
+		case x64::InstSetAE:	return "x64::SetAE";
+		case x64::InstSetB:		return "x64::SetB";
+		case x64::InstSetBE:	return "x64::SetBE";
+		case x64::InstCqo:		return "x64::Cqo";
+		case x64::InstMoveFP:	return "x64::MoveFP";
+		case x64::InstStoreFP:	return "x64::StoreFP";
+		case x64::InstLoadFP:	return "x64::LoadFP";
+		case x64::InstXorFP:	return "x64::XorFP";
+		}
+		return "";
+	}
+
 }

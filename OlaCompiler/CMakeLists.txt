@@ -143,6 +143,7 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
   Backend/Custom/Codegen/MachineInstruction.h
+  Backend/Custom/Codegen/MachineInstruction.cpp
   Backend/Custom/Codegen/MachineBasicBlock.h
   Backend/Custom/Codegen/MachineRelocable.h
   Backend/Custom/Codegen/MachineStorage.h

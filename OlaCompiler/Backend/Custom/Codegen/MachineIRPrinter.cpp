@@ -1,5 +1,6 @@
 #include <iostream>
 #include "MachineIRPrinter.h"
+#include "Target.h"
 #include "MachineModule.h"
 #include "MachineStorage.h"
 #include "MachineFunction.h"
@@ -72,7 +73,55 @@ namespace ola
 
 	void MachineIRPrinter::PrintInstruction(MachineInstruction const& MI)
 	{
+		Uint32 opcode = MI.GetOpcode();
+		TargetInstInfo const& target_inst_info = target.GetInstInfo();
+		std::string inst_name = MI.GetOpcodeName();
+		if (inst_name.empty())
+		{
+			inst_name = target_inst_info.GetInstName(opcode);
+		}
+		Emit("{} - ", inst_name);
 
+		InstInfo const& inst_info = target_inst_info.GetInstInfo(opcode);
+		for (Uint32 i = 0; i < inst_info.GetOperandCount(); ++i)
+		{
+			MachineOperand const& MO = MI.GetOperand(i);
+			PrintOperand(MO);
+			if (i != inst_info.GetOperandCount() - 1) Emit(", ");
+		}
+		EmitLn("");
+	}
+
+	void MachineIRPrinter::PrintOperand(MachineOperand const& MO)
+	{
+		MachineType machine_type = MO.GetType();
+		switch (machine_type)
+		{
+		case MachineType::Int64:	Emit("i64 "); break;
+		case MachineType::Int8:		Emit("i8 "); break;
+		case MachineType::Float64:	Emit("f64 "); break;
+		case MachineType::Ptr:		Emit("ptr "); break;
+		case MachineType::Other:	Emit("other "); break;
+		case MachineType::Undef:
+		default:
+			OLA_ASSERT(false);
+		}
+		
+		if (MO.IsReg())
+		{
+			MachineRegister machine_reg = MO.GetReg();
+			Emit("reg {} ", machine_reg.reg);
+		}
+		else if (MO.IsImmediate())
+		{
+			Int64 immediate = MO.GetImmediate();
+			Emit("imm {} ", immediate);
+		}
+		else if (MO.IsStackObject())
+		{
+			Int32 offset = MO.GetStackOffset();
+			Emit("stack {} ", offset);
+		}
 	}
 
 }

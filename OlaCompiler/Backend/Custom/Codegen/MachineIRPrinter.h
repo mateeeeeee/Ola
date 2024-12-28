@@ -5,18 +5,21 @@
 
 namespace ola
 {
+	class Target;
 	class MachineModule;
 	class MachineGlobal;
 	class MachineBasicBlock;
 	class MachineInstruction;
+	class MachineOperand;
 
 	class MachineIRPrinter
 	{
 	public:
-		explicit MachineIRPrinter(std::ostream& os) : os(os) {}
+		explicit MachineIRPrinter(Target const& target, std::ostream& os) : target(target), os(os) {}
 		void PrintModule(MachineModule const& M);
 
 	private:
+		Target const& target;
 		std::ostream& os;
 		std::string output;
 
@@ -37,6 +40,7 @@ namespace ola
 		void PrintFunction(MachineGlobal const&);
 		void PrintBlock(MachineBasicBlock const&);
 		void PrintInstruction(MachineInstruction const&);
+		void PrintOperand(MachineOperand const&);
 	};
 
 }

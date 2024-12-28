@@ -14,7 +14,8 @@ namespace ola
 		CompilerFlag_PrintDomFrontier = 0x20,
 		CompilerFlag_EmitASM = 0x40,
 		CompilerFlag_EmitIR = 0x80,
-		CompilerFlag_TimeoutDetection = 0x100
+		CompilerFlag_EmitMIR = 0x100,
+		CompilerFlag_TimeoutDetection = 0x200
 	};
 	template<>
 	struct EnumBitmaskOperators<CompilerFlags>

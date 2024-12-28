@@ -15,6 +15,7 @@ namespace ola
 			cli_parser.AddArg(false, "--domtree");
 			cli_parser.AddArg(false, "--domfrontier");
 			cli_parser.AddArg(false, "--emit-ir");
+			cli_parser.AddArg(false, "--emit-mir");
 			cli_parser.AddArg(false, "--emit-asm");
 			cli_parser.AddArg(false, "--nollvm");
 			cli_parser.AddArg(false, "--test");
@@ -62,6 +63,7 @@ namespace ola
 		if (cli_result["--callgraph"])			compiler_flags |= CompilerFlag_DumpCallGraph;
 		if (cli_result["--domtree"])			compiler_flags |= CompilerFlag_DumpDomTree;
 		if (cli_result["--emit-ir"])			compiler_flags |= CompilerFlag_EmitIR;
+		if (cli_result["--emit-mir"])			compiler_flags |= CompilerFlag_EmitMIR;
 		if (cli_result["--emit-asm"])			compiler_flags |= CompilerFlag_EmitASM;
 		if (cli_result["--domfrontier"])		compiler_flags |= CompilerFlag_PrintDomFrontier;
 		if (cli_result["--timeout"])			compiler_flags |= CompilerFlag_TimeoutDetection;

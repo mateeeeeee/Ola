@@ -1,0 +1,47 @@
+external Assert: 
+external AssertMsg: 
+external main: 
+label0: 
+InstPush - i64 reg 2 
+InstMove - i64 reg 2 , i64 reg 1 
+InstSub - i64 reg 1 , i64 imm 64 
+InstMove - i64 reg 15 , i64 imm 0 
+InstMove - i64 reg 14 , i64 imm 1 
+InstJump - other 
+
+label1: 
+InstMove - i64 reg 13 , i64 reg 15 
+InstAdd - i64 reg 13 , i64 reg 14 
+InstJump - other 
+
+label2: 
+InstICmp - i64 reg 14 , i64 imm 5 
+x64::SetLE - i8 reg 15 
+InstAnd - i8 reg 15 , i8 imm 1 
+InstTest - i8 reg 15 , i8 reg 15 
+InstJNE - 
+InstJump - other 
+
+label3: 
+InstMove - i64 reg 15 , i64 reg 14 
+InstAdd - i64 reg 15 , i64 imm 1 
+InstMove - i64 reg 15 , i64 reg 13 
+InstMove - i64 reg 14 , i64 reg 15 
+InstJump - other 
+
+label4: 
+InstICmp - i64 reg 13 , i64 imm 15 
+x64::SetE - i8 reg 13 
+InstAnd - i8 reg 13 , i8 imm 1 
+InstMove - i8 reg 3 , i8 reg 13 
+InstCall - 
+InstJump - other 
+
+label5: 
+InstJump - other 
+
+label6: 
+InstMove - i64 reg 0 , i64 imm 0 
+InstMove - i64 reg 1 , i64 reg 2 
+InstPop - i64 reg 2 
+
