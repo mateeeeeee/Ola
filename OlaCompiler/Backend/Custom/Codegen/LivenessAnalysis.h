@@ -27,19 +27,10 @@ namespace ola
 	class MachineFunction;
 	class MachineModule;
 
-	struct LivenessBlockInfo
-	{
-		std::unordered_set<Uint32> uses;
-		std::unordered_set<Uint32> defs;
-		std::unordered_set<Uint32> ins;
-		std::unordered_set<Uint32> outs;
-	};
-
 	struct LivenessAnalysisResult
 	{
 		std::vector<LiveInterval> live_intervals;
 		std::unordered_map<MachineInstruction*, Uint64> instruction_numbering_map;
-		std::unordered_map<MachineBasicBlock*, LivenessBlockInfo> block_info_map;
 	};
 
 	LivenessAnalysisResult DoLivenessAnalysis(MachineModule& M, MachineFunction& MF);

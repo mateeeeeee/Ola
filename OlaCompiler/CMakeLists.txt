@@ -151,6 +151,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/MachineGlobal.h
   Backend/Custom/Codegen/MachineModule.h
   Backend/Custom/Codegen/MachineModule.cpp
+  Backend/Custom/Codegen/MachineIRPrinter.h
+  Backend/Custom/Codegen/MachineIRPrinter.cpp
   Backend/Custom/Codegen/Target.h
   Backend/Custom/Codegen/Target.cpp
   Backend/Custom/Codegen/MachineContext.h

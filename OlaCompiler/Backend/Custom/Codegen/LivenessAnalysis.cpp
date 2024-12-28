@@ -4,6 +4,7 @@
 #include "MachineBasicBlock.h"
 #include "MachineModule.h"
 #include "Target.h"
+#include "Core/Log.h"
 
 namespace ola
 {
@@ -21,7 +22,7 @@ namespace ola
 			for (MachineInstruction& inst : block->Instructions()) 
 			{
 				inst_number_map[&inst] = current;
-				current += 4;
+				current += 2;
 			}
 		}
 	}
@@ -51,63 +52,6 @@ namespace ola
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 
 		CFGAnalysis(MF);
-		for (auto& block : MF.Blocks()) 
-		{
-			LivenessBlockInfo& block_info = result.block_info_map[block.get()];
-			for (auto& MI : block->Instructions()) 
-			{
-				auto const& inst_info = target_inst_info.GetInstInfo(MI);
-				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx) 
-				{
-					MachineOperand& operand = MI.GetOperand(idx);
-					if (!IsOperandVReg(operand)) continue;
-
-					Uint32 reg_id = GetRegAsUint(operand);
-					if (inst_info.HasOpFlag(idx, OperandFlagDef))
-					{
-						block_info.defs.insert(reg_id);
-					}
-					else if (inst_info.HasOpFlag(idx, OperandFlagUse))
-					{
-						if (!block_info.defs.contains(reg_id))
-							block_info.uses.insert(reg_id);
-					}
-				}
-			}
-		}
-
-		while (true) 
-		{
-			Bool modified = false;
-			for (auto& block : MF.Blocks()) 
-			{
-				auto b = block.get();
-				LivenessBlockInfo& block_info = result.block_info_map[b];
-				std::unordered_set<Uint32> outs;
-				for (auto succ : b->Successors())
-				{
-					for (Uint32 in : result.block_info_map[succ].ins) 
-					{
-						outs.insert(in);
-					}
-				}
-				std::swap(block_info.outs, outs);
-				std::unordered_set<Uint32> ins = block_info.uses;
-				for (auto out : block_info.outs)
-				{
-					if (!block_info.defs.count(out))
-					{
-						ins.insert(out);
-					}
-				}
-				if (ins != block_info.ins) 
-				{
-					std::swap(block_info.ins, ins);
-					modified = true;
-				}
-			}
-			if (!modified) break;
-		}
 
 		AssignInstNum(MF, result.instruction_numbering_map);
 		std::unordered_map<Uint32, LiveInterval> live_interval_map;
@@ -124,25 +68,28 @@ namespace ola
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float_reg = MO.GetType() == MachineType::Float64;
 
-					if (inst_info.HasOpFlag(idx, OperandFlagDef) && !MI.HasIgnoreDef())
+					if (inst_info.HasOpFlag(idx, OperandFlagDef))
 					{
-						//OLA_ASSERT(!live_interval_map.contains(reg_id));
 						if (!live_interval_map.contains(reg_id))
 						{
-							live_interval_map[reg_id] = LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 3, .is_float = is_float_reg };
+							live_interval_map[reg_id] = LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 1, .is_float = is_float_reg };
+						}
+						else
+						{
+							live_interval_map[reg_id].begin = std::min(live_interval_map[reg_id].begin, instruction_idx);
 						}
 					}
 					else if (inst_info.HasOpFlag(idx, OperandFlagUse))
 					{
-						if (!live_interval_map.contains(reg_id)) //double check this, why does this happen
+						if (!live_interval_map.contains(reg_id))
 						{
 							live_interval_map[reg_id].begin = instruction_idx;
-							live_interval_map[reg_id].end = instruction_idx + 3;
+							live_interval_map[reg_id].end = instruction_idx + 1;
 							live_interval_map[reg_id].is_float = is_float_reg;
 						}
 						else 
 						{
-							live_interval_map[reg_id].end = instruction_idx;
+							live_interval_map[reg_id].end = instruction_idx + 1;
 						}
 					}
 				}
