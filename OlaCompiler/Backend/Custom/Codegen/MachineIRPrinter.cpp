@@ -51,12 +51,18 @@ namespace ola
 		OLA_ASSERT(MG.GetRelocable()->IsFunction());
 		Emit(MG.GetLinkage() == Linkage::External ? "external " : "internal ");
 		MachineFunction& MF = *static_cast<MachineFunction*>(MG.GetRelocable());
-		EmitLn("{}: ", MF.GetSymbol());
-
 		auto const& blocks = MF.Blocks();
-		for (auto const& block : blocks)
+		if (!blocks.empty())
 		{
-			PrintBlock(*block);
+			EmitLn("{}: ", MF.GetSymbol());
+			for (auto const& block : blocks)
+			{
+				PrintBlock(*block);
+			}
+		}
+		else
+		{
+			EmitLn("{}\n", MF.GetSymbol());
 		}
 	}
 
@@ -101,7 +107,7 @@ namespace ola
 		case MachineType::Int8:		Emit("i8 "); break;
 		case MachineType::Float64:	Emit("f64 "); break;
 		case MachineType::Ptr:		Emit("ptr "); break;
-		case MachineType::Other:	Emit("other "); break;
+		case MachineType::Other:	break;
 		case MachineType::Undef:
 		default:
 			OLA_ASSERT(false);
@@ -110,17 +116,22 @@ namespace ola
 		if (MO.IsReg())
 		{
 			MachineRegister machine_reg = MO.GetReg();
-			Emit("reg {} ", machine_reg.reg);
+			Emit("reg {}", machine_reg.reg);
 		}
 		else if (MO.IsImmediate())
 		{
 			Int64 immediate = MO.GetImmediate();
-			Emit("imm {} ", immediate);
+			Emit("imm {}", immediate);
 		}
 		else if (MO.IsStackObject())
 		{
 			Int32 offset = MO.GetStackOffset();
-			Emit("stack {} ", offset);
+			Emit("stack {}", offset);
+		}
+		else if (MO.IsRelocable())
+		{
+			MachineRelocable* relocable = MO.GetRelocable();
+			Emit("{}", relocable->GetSymbol());
 		}
 	}
 
