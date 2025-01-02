@@ -6,6 +6,7 @@
 #include "MachineBasicBlock.h"
 #include "MachineFunction.h"
 #include "Target.h"
+#include "Core/Log.h"
 
 namespace ola
 {
@@ -24,6 +25,11 @@ namespace ola
 		//LivenessAnalysis should return what ISA registers are "taken" and in what interval
 		LivenessAnalysisResult liveness = DoLivenessAnalysis(M, MF);
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
+
+		for (auto& LI : live_intervals)
+		{
+			OLA_DEBUG("Live Interval: {} - {} for vreg {}", LI.begin, LI.end, LI.vreg);
+		}
 
 		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
 		registers = target_reg_info.GetIntegerRegisters();
@@ -53,6 +59,7 @@ namespace ola
 					LI.reg = reg;
 				}
 				vreg2reg_map[LI.vreg] = LI.reg;
+				OLA_DEBUG("Assigning reg {} to vreg {}", LI.reg, LI.vreg);
 
 				active.push_back(&LI);
 				std::sort(active.begin(), active.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });

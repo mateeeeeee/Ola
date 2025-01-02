@@ -7,28 +7,28 @@ label0:
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
 InstSub - i64 reg 1, i64 imm 64
-InstMove - i64 reg 15, i64 imm 0
-InstMove - i64 reg 14, i64 imm 1
+InstMove - i64 reg 15, i64 imm 1
+InstMove - i64 reg 14, i64 imm 0
 InstJump - label2
 
 label1: 
-InstMove - i64 reg 13, i64 reg 15
-InstAdd - i64 reg 13, i64 reg 14
+InstMove - i64 reg 13, i64 reg 14
+InstAdd - i64 reg 13, i64 reg 15
 InstJump - label3
 
 label2: 
-InstICmp - i64 reg 14, i64 imm 5
-x64::SetLE - i8 reg 15
-InstAnd - i8 reg 15, i8 imm 1
-InstTest - i8 reg 15, i8 reg 15
-InstJNE - 
+InstICmp - i64 reg 15, i64 imm 5
+x64::SetLE - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstTest - i8 reg 13, i8 reg 13
+InstJNE - label1
 InstJump - label4
 
 label3: 
-InstMove - i64 reg 15, i64 reg 14
-InstAdd - i64 reg 15, i64 imm 1
-InstMove - i64 reg 15, i64 reg 13
 InstMove - i64 reg 14, i64 reg 15
+InstAdd - i64 reg 14, i64 imm 1
+InstMove - i64 reg 15, i64 reg 14
+InstMove - i64 reg 14, i64 reg 13
 InstJump - label2
 
 label4: 

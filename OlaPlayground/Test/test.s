@@ -13,25 +13,25 @@ label0:
 push rbp
 mov rbp, rsp
 sub rsp, 64
-mov r15, 0
-mov r14, 1
+mov r15, 1
+mov r14, 0
 jmp label2
 label1:
-mov r13, r15
-add r13, r14
+mov r13, r14
+add r13, r15
 jmp label3
 label2:
-cmp r14, 5
-setle r15b
-and r15b, 1
-test r15b, r15b
+cmp r15, 5
+setle r13b
+and r13b, 1
+test r13b, r13b
 jne label1
 jmp label4
 label3:
-mov r15, r14
-add r15, 1
-mov r15, r13
 mov r14, r15
+add r14, 1
+mov r15, r14
+mov r14, r13
 jmp label2
 label4:
 cmp r13, 15

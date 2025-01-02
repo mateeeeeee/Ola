@@ -49,6 +49,8 @@ namespace ola
 		}
 		break;
 		case InstJump:
+		case InstJE:
+		case InstJNE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagNone);

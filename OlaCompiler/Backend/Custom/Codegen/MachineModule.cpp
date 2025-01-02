@@ -558,17 +558,51 @@ namespace ola
 	void MachineModule::EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
 	{
 		OLA_ASSERT(jump_opcode >= InstJump && jump_opcode <= InstJNE);
+
 		std::vector<MachineOperand> dst_operands;
 		std::vector<MachineOperand> src_operands;
-
-		for (auto const& Phi : dst->PhiInsts()) 
+		for (auto const& Phi : dst->PhiInsts())
 		{
 			Value* V = Phi->GetIncomingValueForBlock(src);
 			if (V)
 			{
-				MachineInstruction MI(InstMove);
-				MI.SetOp<0>(machine_ctx.GetOperand(Phi)).SetOp<1>(machine_ctx.GetOperand(V));
-				machine_ctx.EmitInst(MI);
+				src_operands.push_back(machine_ctx.GetOperand(V));
+				dst_operands.push_back(machine_ctx.GetOperand(Phi));
+			}
+		}
+
+		if (!src_operands.empty())
+		{
+			std::unordered_set<MachineOperand> needs_staging_set;
+			std::unordered_set<MachineOperand> dst_set(dst_operands.begin(), dst_operands.end());
+
+			for (MachineOperand const& src_op : src_operands)
+			{
+				if (dst_set.contains(src_op)) needs_staging_set.insert(src_op);
+			}
+
+			std::unordered_map<MachineOperand, MachineOperand> dirty_reg_map;
+			for (Int i = dst_operands.size() - 1; i >= 0; --i)
+			{
+				MachineOperand src_arg;
+				if (auto iter = dirty_reg_map.find(src_operands[i]); iter != dirty_reg_map.end()) src_arg = iter->second;
+				else src_arg = src_operands[i];
+
+				MachineOperand const& dst_arg = dst_operands[i];
+				if (src_arg == dst_arg) continue;
+	
+				if (needs_staging_set.count(dst_arg))
+				{
+					MachineOperand intermediate = machine_ctx.VirtualReg(dst_arg.GetType());
+					MachineInstruction tmp_copy(InstMove);
+					tmp_copy.SetOp<0>(intermediate).SetOp<1>(dst_arg);
+					machine_ctx.EmitInst(tmp_copy);
+					dirty_reg_map.emplace(dst_arg, intermediate);
+				}
+
+				MachineInstruction copy(InstMove);
+				copy.SetOp<0>(dst_arg).SetOp<1>(src_arg);
+				machine_ctx.EmitInst(copy);
 			}
 		}
 
