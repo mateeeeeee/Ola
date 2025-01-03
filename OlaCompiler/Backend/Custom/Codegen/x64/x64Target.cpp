@@ -124,10 +124,8 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (dst.GetType() == MachineType::Float64 && src.IsImmediate())
+				if (src.IsImmediate() && (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64))
 				{
-					OLA_ASSERT(src.GetType() == MachineType::Float64);
-					
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
 					MI.SetIgnoreDef();

@@ -43,6 +43,15 @@ namespace ola
 						if (SI->GetValueOp() == AI ||
 							SI->GetValueOp()->GetType() != AI->GetAllocatedType())
 							return false; 
+
+						if (SI->GetValueOp()->IsConstant())
+						{
+							Constant const* C = cast<Constant>(SI->GetValueOp());
+							if (C->GetConstantID() == ConstantID::Global)
+							{
+								return false;
+							}
+						}
 					}
 					else if (const GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(U->GetUser()))
 					{
@@ -131,7 +140,7 @@ namespace ola
 		{
 			ValueStacks[AI].push(nullptr);
 		}
-
+		std::unordered_set<AllocaInst*> AllocasSet(Allocas.begin(), Allocas.end());
 		std::unordered_set<BasicBlock*> Visited;
 		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
 			{
@@ -155,17 +164,19 @@ namespace ola
 				{
 					if (LoadInst* LI = dyn_cast<LoadInst>(&I))
 					{
-						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()))
+						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()); AI && AllocasSet.contains(AI))
 						{
 							Value* CurrentValue = ValueStacks[AI].top();
-							OLA_ASSERT(CurrentValue);
-							LI->ReplaceAllUsesWith(CurrentValue);
-							InstructionRemoveQueue.push_back(LI);
+							if (CurrentValue)
+							{
+								LI->ReplaceAllUsesWith(CurrentValue);
+								InstructionRemoveQueue.push_back(LI);
+							}
 						}
 					}
 					else if (StoreInst* SI = dyn_cast<StoreInst>(&I))
 					{
-						if (AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp()))
+						if (AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp()); AI && AllocasSet.contains(AI))
 						{
 							ValueStacks[AI].push(SI->GetValueOp());
 							InstructionRemoveQueue.push_back(SI);
@@ -183,7 +194,7 @@ namespace ola
 					for (PhiInst* Phi : Successor->PhiInsts())
 					{
 						AllocaInst* AI = Phi->GetAlloca();
-						if (AI && !ValueStacks[AI].empty())
+						if (AI && AllocasSet.contains(AI) && !ValueStacks[AI].empty())
 						{
 							if (Value* TopValue = ValueStacks[AI].top())
 							{
