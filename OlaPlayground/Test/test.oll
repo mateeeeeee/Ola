@@ -25,7 +25,8 @@ for.iter:
 %6 = add i64 %5, 1
 br label for.cond
 for.end:
-call i8 0, @Assert
+%9 = icmp eq i64 %4, 15
+call i8 %9, @Assert
 br label exit
 return:
 br label exit

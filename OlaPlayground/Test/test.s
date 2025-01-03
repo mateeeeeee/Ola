@@ -34,7 +34,10 @@ mov r15, r12
 mov r14, r13
 jmp label2
 label4:
-mov rcx, 0
+cmp r14, 15
+sete r13b
+and r13b, 1
+mov cl, r13b
 call Assert
 jmp label6
 label5:

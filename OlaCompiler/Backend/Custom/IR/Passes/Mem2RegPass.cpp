@@ -129,26 +129,28 @@ namespace ola
 		std::unordered_map<AllocaInst*, std::stack<Value*>> ValueStacks;
 		for (AllocaInst* AI : Allocas)
 		{
-			ValueStacks[AI].push(nullptr); 
+			ValueStacks[AI].push(nullptr);
 		}
 
 		std::unordered_set<BasicBlock*> Visited;
 		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
 			{
-				std::unordered_map<AllocaInst*, Value*> IncomingValues;
+				std::unordered_map<AllocaInst*, size_t> StackSizes;
+				for (auto& [AI, Stack] : ValueStacks)
+				{
+					StackSizes[AI] = Stack.size();
+				}
 
 				for (Instruction& I : BB->Instructions())
 				{
 					if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
 					{
 						AllocaInst* AI = Phi->GetAlloca();
-						IncomingValues[AI] = Phi;
 						ValueStacks[AI].push(Phi);
 					}
 				}
 
 				std::vector<Instruction*> InstructionRemoveQueue;
-
 				for (Instruction& I : BB->Instructions())
 				{
 					if (LoadInst* LI = dyn_cast<LoadInst>(&I))
@@ -156,7 +158,8 @@ namespace ola
 						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()))
 						{
 							Value* CurrentValue = ValueStacks[AI].top();
-							LI->ReplaceAllUsesWith(CurrentValue); 
+							assert(CurrentValue && "Load value cannot be null");
+							LI->ReplaceAllUsesWith(CurrentValue);
 							InstructionRemoveQueue.push_back(LI);
 						}
 					}
@@ -164,25 +167,33 @@ namespace ola
 					{
 						if (AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp()))
 						{
-							ValueStacks[AI].push(SI->GetValueOp()); 
+							ValueStacks[AI].push(SI->GetValueOp());
 							InstructionRemoveQueue.push_back(SI);
 						}
 					}
 				}
-				for (Instruction* I : InstructionRemoveQueue) I->EraseFromParent();
 
+				for (Instruction* I : InstructionRemoveQueue)
+				{
+					I->EraseFromParent();
+				}
+
+				// Update phi nodes in successors using current stack top
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
 					for (PhiInst* Phi : Successor->PhiInsts())
 					{
-						if (AllocaInst* AI = Phi->GetAlloca())
+						AllocaInst* AI = Phi->GetAlloca();
+						if (AI && !ValueStacks[AI].empty())
 						{
-							Value* CurrentValue = ValueStacks[AI].top();
-							Phi->AddIncoming(CurrentValue, BB);
+							Value* TopValue = ValueStacks[AI].top();
+							assert(TopValue && "Invalid value for PHI node");
+							Phi->AddIncoming(TopValue, BB);
 						}
 					}
 				}
 
+				// Process successor blocks
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
 					if (Visited.insert(Successor).second)
@@ -191,20 +202,17 @@ namespace ola
 					}
 				}
 
+				// Restore stack state
 				for (auto& [AI, Stack] : ValueStacks)
 				{
-					if (IncomingValues.contains(AI))
+					while (Stack.size() > StackSizes[AI])
 					{
-						if (!Stack.empty() && Stack.top() == IncomingValues[AI])
-						{
-							Stack.pop(); 
-						}
+						Stack.pop();
 					}
 				}
 			};
 
 		RenameBlock(cfg.GetEntryBlock());
 	}
-
 }
 
