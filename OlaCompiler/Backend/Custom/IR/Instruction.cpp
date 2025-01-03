@@ -249,7 +249,7 @@ namespace ola
 		OLA_ASSERT(isa<ConstantInt>(offset));
 	}
 
-	void TrackableValue::ReplaceAllUseWith(Value* V)
+	void TrackableValue::ReplaceAllUsesWith(Value* V)
 	{
 		while (!users.empty())
 		{

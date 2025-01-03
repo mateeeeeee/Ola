@@ -175,7 +175,7 @@ namespace ola
 							NewWorkListVector.push_back(cast<Instruction>(U->GetUser()));
 					}
 
-					I->ReplaceAllUseWith(V);
+					I->ReplaceAllUsesWith(V);
 					if (!I->HasNUsesOrMore(1))
 					{
 						I->EraseFromParent();

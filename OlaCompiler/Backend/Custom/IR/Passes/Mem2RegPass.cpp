@@ -129,13 +129,14 @@ namespace ola
 		std::unordered_map<AllocaInst*, std::stack<Value*>> ValueStacks;
 		for (AllocaInst* AI : Allocas)
 		{
-			ValueStacks[AI].push(nullptr);
+			ValueStacks[AI].push(nullptr); 
 		}
 
 		std::unordered_set<BasicBlock*> Visited;
 		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
 			{
 				std::unordered_map<AllocaInst*, Value*> IncomingValues;
+
 				for (Instruction& I : BB->Instructions())
 				{
 					if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
@@ -147,24 +148,23 @@ namespace ola
 				}
 
 				std::vector<Instruction*> InstructionRemoveQueue;
+
 				for (Instruction& I : BB->Instructions())
 				{
 					if (LoadInst* LI = dyn_cast<LoadInst>(&I))
 					{
-						AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp());
-						if (AI)
+						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()))
 						{
 							Value* CurrentValue = ValueStacks[AI].top();
-							LI->ReplaceAllUseWith(CurrentValue);
+							LI->ReplaceAllUsesWith(CurrentValue); 
 							InstructionRemoveQueue.push_back(LI);
 						}
 					}
 					else if (StoreInst* SI = dyn_cast<StoreInst>(&I))
 					{
-						AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp());
-						if (AI)
+						if (AllocaInst* AI = dyn_cast<AllocaInst>(SI->GetAddressOp()))
 						{
-							ValueStacks[AI].push(SI->GetValueOp());
+							ValueStacks[AI].push(SI->GetValueOp()); 
 							InstructionRemoveQueue.push_back(SI);
 						}
 					}
@@ -175,17 +175,17 @@ namespace ola
 				{
 					for (PhiInst* Phi : Successor->PhiInsts())
 					{
-						AllocaInst* AI = Phi->GetAlloca();
-						if (AI)
+						if (AllocaInst* AI = Phi->GetAlloca())
 						{
-							Phi->AddIncoming(ValueStacks[AI].top(), BB);
+							Value* CurrentValue = ValueStacks[AI].top();
+							Phi->AddIncoming(CurrentValue, BB);
 						}
 					}
 				}
 
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
-					if (Visited.insert(Successor).second) 
+					if (Visited.insert(Successor).second)
 					{
 						RenameBlock(Successor);
 					}
@@ -193,12 +193,16 @@ namespace ola
 
 				for (auto& [AI, Stack] : ValueStacks)
 				{
-					if (!Stack.empty() && IncomingValues.count(AI))
+					if (IncomingValues.contains(AI))
 					{
-						Stack.pop();
+						if (!Stack.empty() && Stack.top() == IncomingValues[AI])
+						{
+							Stack.pop(); 
+						}
 					}
 				}
 			};
+
 		RenameBlock(cfg.GetEntryBlock());
 	}
 

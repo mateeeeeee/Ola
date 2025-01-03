@@ -32,10 +32,7 @@ InstMove - i64 reg 14, i64 reg 13
 InstJump - label2
 
 label4: 
-InstICmp - i64 reg 13, i64 imm 15
-x64::SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
+InstMove - i64 reg 3, i64 imm 0
 InstCall - 
 InstJump - label6
 

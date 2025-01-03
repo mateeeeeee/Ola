@@ -33,14 +33,14 @@ namespace ola
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetRHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUseWith(new_inst);
+			BI->ReplaceAllUsesWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 		else if (right_op && IsPowerOfTwo(right_op->GetValue()))
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUseWith(new_inst);
+			BI->ReplaceAllUsesWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 	}
@@ -55,7 +55,7 @@ namespace ola
 		{
 			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUseWith(new_inst);
+			BI->ReplaceAllUsesWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 	}
@@ -69,7 +69,7 @@ namespace ola
 		{
 			Int64 mask = right_op->GetValue() - 1;
 			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::And, BI->GetLHS(), ctx.GetInt64(mask));
-			BI->ReplaceAllUseWith(new_inst);
+			BI->ReplaceAllUsesWith(new_inst);
 			instructions_to_remove.push_back(BI);
 		}
 	}

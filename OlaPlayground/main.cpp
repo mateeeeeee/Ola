@@ -16,7 +16,7 @@ constexpr Uint ArraySize(T(&arr)[N])
 }
 
 
-int main()
+Int main()
 {
 	LogInit();
 	CompileRequest compile_request{};
