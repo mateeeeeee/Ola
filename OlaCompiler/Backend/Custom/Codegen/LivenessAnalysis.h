@@ -14,6 +14,12 @@ namespace ola
 		Int32  stack_offset;
 		Bool spilled;
 		Bool is_float;
+
+		void Extend(Uint64 val)
+		{
+			if (val < begin) begin = val;
+			else if (val > end) end = val;
+		}
 	};
 
 	inline Bool operator<(LiveInterval const& lhs, LiveInterval const& rhs)

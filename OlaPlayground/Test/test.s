@@ -28,16 +28,16 @@ test r13b, r13b
 jne label1
 jmp label4
 label3:
-mov r14, r15
-add r14, 1
-mov r15, r14
+mov r12, r15
+add r12, 1
+mov r15, r12
 mov r14, r13
 jmp label2
 label4:
 cmp r13, 15
-sete r13b
-and r13b, 1
-mov cl, r13b
+sete r12b
+and r12b, 1
+mov cl, r12b
 call Assert
 jmp label6
 label5:

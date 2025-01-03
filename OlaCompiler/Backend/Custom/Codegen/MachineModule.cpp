@@ -9,6 +9,7 @@
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Core/Log.h"
 
 namespace ola
 {

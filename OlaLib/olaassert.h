@@ -8,7 +8,7 @@ extern "C"
 		if (!expr)
 		{
 			puts("Assert failed!");
-			abort();
+			exit(-252);
 		}
 	}
 	void AssertMsg(bool expr, char* msg)
@@ -16,7 +16,7 @@ extern "C"
 		if (!expr)
 		{
 			printf("Assert failed: %s!", msg);
-			abort();
+			exit(-252);
 		}
 	}
 }

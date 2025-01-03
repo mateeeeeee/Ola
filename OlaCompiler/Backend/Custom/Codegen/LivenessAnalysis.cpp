@@ -51,7 +51,6 @@ namespace ola
 				}
 			}
 
-			// If the block doesn't end with a jump, push all successors onto the stack
 			if (!has_jump) 
 			{
 				for (MachineBasicBlock* succ : block->Successors())
@@ -106,11 +105,13 @@ namespace ola
 					{
 						if (!live_interval_map.contains(reg_id))
 						{
-							live_interval_map[reg_id] = LiveInterval{ .begin = instruction_idx, .end = instruction_idx + 1, .is_float = is_float_reg };
+							live_interval_map[reg_id].begin = instruction_idx;
+							live_interval_map[reg_id].end = instruction_idx + 1;
+							live_interval_map[reg_id].is_float = is_float_reg;
 						}
 						else
 						{
-							live_interval_map[reg_id].begin = std::min(live_interval_map[reg_id].begin, instruction_idx);
+							live_interval_map[reg_id].Extend(instruction_idx);
 						}
 					}
 					else if (inst_info.HasOpFlag(idx, OperandFlagUse))
@@ -123,7 +124,7 @@ namespace ola
 						}
 						else 
 						{
-							live_interval_map[reg_id].end = instruction_idx + 1;
+							live_interval_map[reg_id].Extend(instruction_idx);
 						}
 					}
 				}
@@ -133,6 +134,7 @@ namespace ola
 		std::vector<LiveInterval> live_intervals;
 		for (auto&& [vreg, interval] : live_interval_map)
 		{
+			if (interval.begin > interval.end) std::swap(interval.begin, interval.end);
 			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false, .is_float = interval.is_float });
 		}
 
