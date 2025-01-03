@@ -129,6 +129,14 @@ namespace ola
 		{
 			return block_list.Front();
 		}
+		BasicBlock const& GetLastBlock() const
+		{
+			return block_list.Back();
+		}
+		BasicBlock& GetLastBlock()
+		{
+			return block_list.Back();
+		}
 
 		auto& Blocks()
 		{

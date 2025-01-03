@@ -225,12 +225,15 @@ namespace ola
 		const_iterator cbegin() const { return const_iterator(GetRoot()); }
 		const_iterator cend() const { return const_iterator(); }
 
+		std::vector<BasicBlock*> const& Blocks() const { return order; }
+
 		void Print(std::string const& function_name) const;
 
 	private:
 		DominatorTreeNode* root;
 		ImmediateDominatorsMap immediate_dominators;
 		DominatorTreeNodeMap nodes;
+		std::vector<BasicBlock*> order;
 
 	private:
 		void ResetDepthFirstIndicesRecursive(DominatorTreeNode* node, Int& index);

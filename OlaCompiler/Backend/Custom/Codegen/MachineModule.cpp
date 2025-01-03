@@ -196,11 +196,11 @@ namespace ola
 
 		frame_info.EmitPrologue(MF, machine_ctx);
 
-		for (BasicBlock& BB : F->Blocks()) 
+		for (BasicBlock* BB : DT.Blocks()) 
 		{
-			MachineBasicBlock* MBB = machine_ctx.GetBlock(&BB);
+			MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
 			machine_ctx.SetCurrentBasicBlock(MBB);
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB->Instructions())
 			{
 				if (!isel_info.LowerInstruction(&I, machine_ctx))
 				{
@@ -208,6 +208,8 @@ namespace ola
 				}
 			}
 		}
+
+		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetLastBlock()));
 		frame_info.EmitEpilogue(MF, machine_ctx);
 	}
 

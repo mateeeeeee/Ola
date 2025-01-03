@@ -6,69 +6,37 @@ external main:
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 72
-InstStore - i64 stack -16, i64 imm 0
-InstStore - i64 stack -24, i64 imm 0
-InstJump - label1
+InstSub - i64 reg 1, i64 imm 56
+InstStore - i64 stack -16, i64 imm 10
+InstStore - i64 stack -24, i64 imm 20
+InstLoad - i64 reg 15, i64 stack -16
+InstLoad - i64 reg 14, i64 stack -24
+InstICmp - i64 reg 15, i64 reg 14
+x64::SetLT - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstTest - i8 reg 14, i8 reg 14
+InstJNE - label1
+InstJump - label2
 
 label1: 
-InstJump - label5
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstJump - label3
 
 label2: 
-InstLoad - i64 reg 15, i64 stack -16
-InstICmp - i64 reg 15, i64 imm 3
-x64::SetLT - i8 reg 15
-InstAnd - i8 reg 15, i8 imm 1
-InstTest - i8 reg 15, i8 reg 15
-InstJNE - label1
+InstMove - i64 reg 3, i64 imm 0
+InstCall - 
 InstJump - label3
 
 label3: 
-InstLoad - i64 reg 15, i64 stack -16
-InstICmp - i64 reg 15, i64 imm 3
-x64::SetE - i8 reg 15
-InstAnd - i8 reg 15, i8 imm 1
-InstMove - i8 reg 3, i8 reg 15
-InstCall - 
-InstLoad - i64 reg 15, i64 stack -24
-InstICmp - i64 reg 15, i64 imm 4
-x64::SetE - i8 reg 15
-InstAnd - i8 reg 15, i8 imm 1
-InstMove - i8 reg 3, i8 reg 15
-InstCall - 
 InstStore - i64 stack -8, i64 imm 0
-InstJump - label8
+InstJump - label5
 
 label4: 
 
 label5: 
-InstLoad - i64 reg 15, i64 stack -24
-InstStore - ptr stack -32, i64 reg 15
-InstMove - i64 reg 14, i64 reg 15
-InstAdd - i64 reg 14, i64 imm 1
-InstStore - i64 stack -24, i64 reg 14
-InstJump - label6
-
-label6: 
-InstLoad - i64 reg 14, i64 stack -24
-InstICmp - i64 reg 14, i64 imm 2
-x64::SetLT - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstTest - i8 reg 14, i8 reg 14
-InstJNE - label5
-InstJump - label7
-
-label7: 
-InstLoad - i64 reg 14, i64 stack -16
-InstStore - ptr stack -40, i64 reg 14
-InstMove - i64 reg 15, i64 reg 14
-InstAdd - i64 reg 15, i64 imm 1
-InstStore - i64 stack -16, i64 reg 15
-InstJump - label2
-
-label8: 
-InstLoad - i64 reg 15, i64 stack -8
-InstMove - i64 reg 0, i64 reg 15
+InstLoad - i64 reg 14, i64 stack -8
+InstMove - i64 reg 0, i64 reg 14
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

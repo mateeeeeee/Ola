@@ -10,47 +10,26 @@ define external @main i64() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
-store 0, ptr %1
+store 10, ptr %1
 %2 = alloca i64
-store 0, ptr %2
-br label dowhile.body
-dowhile.body:
-br label dowhile.body1
-dowhile.cond:
+store 20, ptr %2
 %3 = load i64, ptr %1
-%4 = icmp slt i64 %3, 3
-br i8 %4, label dowhile.body, label dowhile.end
-dowhile.end:
-%5 = load i64, ptr %1
-%6 = icmp eq i64 %5, 3
-call i8 %6, @Assert
-%7 = load i64, ptr %2
-%8 = icmp eq i64 %7, 4
-call i8 %8, @Assert
+%4 = load i64, ptr %2
+%5 = icmp slt i64 %3, %4
+br i8 %5, label if.then, label if.else
+if.then:
+call i8 1, @Assert
+br label if.end
+if.else:
+call i8 0, @Assert
+br label if.end
+if.end:
 store 0, ptr %0
 br label exit
 return:
 br label exit
-dowhile.body1:
-%9 = load i64, ptr %2
-%10 = alloca ptr
-store i64 %9, ptr %10
-%11 = add i64 %9, 1
-store i64 %11, ptr %2
-br label dowhile.cond1
-dowhile.cond1:
-%12 = load i64, ptr %2
-%13 = icmp slt i64 %12, 2
-br i8 %13, label dowhile.body1, label dowhile.end1
-dowhile.end1:
-%14 = load i64, ptr %1
-%15 = alloca ptr
-store i64 %14, ptr %15
-%16 = add i64 %14, 1
-store i64 %16, ptr %1
-br label dowhile.cond
 exit:
-%17 = load i64, ptr %0
-ret i64 %17
+%6 = load i64, ptr %0
+ret i64 %6
 }
 

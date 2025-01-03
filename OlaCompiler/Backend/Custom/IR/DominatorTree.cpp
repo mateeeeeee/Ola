@@ -129,6 +129,12 @@ namespace ola
 			}
 		}
 		ResetDepthFirstIndices();
+
+		order.reserve(nodes.size());
+		for (auto& DTN : *this)
+		{
+			order.push_back(DTN.GetBasicBlock());
+		}
 	}
 
 	void DominatorTree::ResetDepthFirstIndices()

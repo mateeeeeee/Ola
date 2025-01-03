@@ -2,20 +2,10 @@ import std.assert;
 
 public int main()
 {
-    int outerCounter = 0;
-    int innerCounter = 0;
+    int x = 10;
+    int y = 20;
 
-    do
-    {
-        do
-        {
-            innerCounter++;
-        } while (innerCounter < 2);
-
-        outerCounter++;
-    } while (outerCounter < 3);
-
-    Assert(outerCounter == 3);
-    Assert(innerCounter == 4);
+    if (x < y) Assert(true);
+    else Assert(false);
     return 0;
 }
