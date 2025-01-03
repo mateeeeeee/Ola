@@ -526,7 +526,7 @@ namespace ola
 			else
 			{
 				Int64 imm = cond_op.GetImmediate();
-				if (imm != 0)
+				if (imm == case_value)
 				{
 					EmitJump(InstJump, case_block, src_block);
 				}

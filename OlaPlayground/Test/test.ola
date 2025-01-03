@@ -2,10 +2,16 @@ import std.assert;
 
 public int main()
 {
-    int x = 10;
-    int y = 20;
-
-    if (x < y) Assert(true);
-    else Assert(false);
+    int choice = 2;
+	// Test a simple switch statement
+    switch (choice)
+    {
+        case 1:
+            Assert(false);  // The choice is not 1, so this case should not execute
+            break;
+        case 2:
+            Assert(true);  // The choice is 2, so this case should execute
+            break;
+    }
     return 0;
 }

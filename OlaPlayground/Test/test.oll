@@ -10,26 +10,27 @@ define external @main i64() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
-store 10, ptr %1
-%2 = alloca i64
-store 20, ptr %2
-%3 = load i64, ptr %1
-%4 = load i64, ptr %2
-%5 = icmp slt i64 %3, %4
-br i8 %5, label if.then, label if.else
-if.then:
-call i8 1, @Assert
-br label if.end
-if.else:
-call i8 0, @Assert
-br label if.end
-if.end:
-store 0, ptr %0
+br label switch.header
+switch.header:
+switch i64 2
+switch.default:
+br label exit
+switch.end:
 br label exit
 return:
 br label exit
+switch.case1:
+call i8 0, @Assert
+br label switch.end
+break:
+br label exit
+switch.case2:
+call i8 1, @Assert
+br label switch.end
+break1:
+br label exit
 exit:
-%6 = load i64, ptr %0
-ret i64 %6
+%2 = phi i64 [ 0, switch.end ]
+ret i64 %2
 }
 

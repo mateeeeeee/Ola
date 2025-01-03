@@ -12,32 +12,29 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 56
-mov qword ptr [rbp - 16], 10
-mov qword ptr [rbp - 24], 20
-mov r15, qword ptr [rbp - 16]
-mov r14, qword ptr [rbp - 24]
-cmp r15, r14
-setl r14b
-and r14b, 1
-test r14b, r14b
-jne label1
-jmp label2
+sub rsp, 48
+jmp label1
 label1:
-mov rcx, 1
-call Assert
-jmp label3
+jmp label7
+jmp label2
 label2:
+jmp label9
+label3:
+mov r15, 0
+jmp label9
+label4:
+label5:
 mov rcx, 0
 call Assert
 jmp label3
-label3:
-mov qword ptr [rbp - 8], 0
-jmp label5
-label4:
-label5:
-mov r14, qword ptr [rbp - 8]
-mov rax, r14
+label6:
+label7:
+mov rcx, 1
+call Assert
+jmp label3
+label8:
+label9:
+mov rax, r15
 mov rsp, rbp
 pop rbp
 ret

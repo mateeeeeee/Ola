@@ -185,9 +185,10 @@ namespace ola
 						AllocaInst* AI = Phi->GetAlloca();
 						if (AI && !ValueStacks[AI].empty())
 						{
-							Value* TopValue = ValueStacks[AI].top();
-							OLA_ASSERT(TopValue);
-							Phi->AddIncoming(TopValue, BB);
+							if (Value* TopValue = ValueStacks[AI].top())
+							{
+								Phi->AddIncoming(TopValue, BB);
+							}
 						}
 					}
 				}
