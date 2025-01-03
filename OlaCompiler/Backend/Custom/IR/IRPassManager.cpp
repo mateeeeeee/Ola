@@ -14,10 +14,23 @@
 namespace ola
 {
 
-	IRPassManager::IRPassManager(IRModule& M) : M(M) {}
+	IRPassManager::IRPassManager(IRModule& M, FunctionAnalysisManager& FAM) : M(M), FAM(FAM)
+	{
+	}
 
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
+		for (auto& G : M.Globals())
+		{
+			if (G->IsFunction())
+			{
+				Function& F = *cast<Function>(G);
+				FAM.RegisterPass<CFGAnalysisPass>(F);
+				FAM.RegisterPass<DominatorTreeAnalysisPass>(F);
+				FAM.RegisterPass<DominanceFrontierAnalysisPass>(F);
+			}
+		}
+
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
 		switch (level)
@@ -39,7 +52,7 @@ namespace ola
 
 		if (FPM.IsEmpty() && MPM.IsEmpty()) return;
 
-		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM));
+		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
 		IRModuleAnalysisManager MAM;
 		MPM.Run(M, MAM);
 	}

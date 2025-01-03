@@ -10,32 +10,47 @@ define external @main i64() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
+store 0, ptr %1
 %2 = alloca i64
+store 0, ptr %2
 br label dowhile.body
 dowhile.body:
-%3 = phi i64 [ 0, entry ], [ %4, dowhile.cond ]
 br label dowhile.body1
 dowhile.cond:
-br label dowhile.body
+%3 = load i64, ptr %1
+%4 = icmp slt i64 %3, 3
+br i8 %4, label dowhile.body, label dowhile.end
 dowhile.end:
-call i8 0, @Assert
-%5 = icmp eq i64 %4, 4
-call i8 %5, @Assert
+%5 = load i64, ptr %1
+%6 = icmp eq i64 %5, 3
+call i8 %6, @Assert
+%7 = load i64, ptr %2
+%8 = icmp eq i64 %7, 4
+call i8 %8, @Assert
+store 0, ptr %0
 br label exit
 return:
 br label exit
 dowhile.body1:
-%6 = phi i64 [ %3, dowhile.body ], [ %4, dowhile.cond1 ]
-%7 = alloca ptr
-%4 = add i64 %6, 1
+%9 = load i64, ptr %2
+%10 = alloca ptr
+store i64 %9, ptr %10
+%11 = add i64 %9, 1
+store i64 %11, ptr %2
 br label dowhile.cond1
 dowhile.cond1:
-%8 = icmp slt i64 %4, 2
-br i8 %8, label dowhile.body1, label dowhile.end1
+%12 = load i64, ptr %2
+%13 = icmp slt i64 %12, 2
+br i8 %13, label dowhile.body1, label dowhile.end1
 dowhile.end1:
-%9 = alloca ptr
+%14 = load i64, ptr %1
+%15 = alloca ptr
+store i64 %14, ptr %15
+%16 = add i64 %14, 1
+store i64 %16, ptr %1
 br label dowhile.cond
 exit:
-ret i64 0
+%17 = load i64, ptr %0
+ret i64 %17
 }
 

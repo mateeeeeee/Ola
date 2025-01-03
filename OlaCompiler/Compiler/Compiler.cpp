@@ -13,6 +13,7 @@
 #include "Frontend/Sema.h"
 #include "Backend/Custom/IR/IRGenContext.h"
 #include "Backend/Custom/IR/IRPassManager.h"
+#include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/x64/x64Target.h"
 #include "Utility/DebugVisitor.h"
@@ -121,7 +122,8 @@ namespace ola
 				ir_gen_ctx.Generate(ast);
 				IRModule& ir_module = ir_gen_ctx.GetModule();
 
-				IRPassManager ir_pass_manager(ir_module);
+				FunctionAnalysisManager analysis_manager;
+				IRPassManager ir_pass_manager(ir_module, analysis_manager);
 				IRPassOptions pass_opts
 				{
 					.cfg_print = opts.dump_cfg,
@@ -133,7 +135,7 @@ namespace ola
 				ir_module.Print(ir_file);
 
 				x64Target x64_target{};
-				MachineModule machine_module(ir_module, x64_target);
+				MachineModule machine_module(ir_module, x64_target, analysis_manager);
 				if(!mir_file.empty())
 				{
 					machine_module.EmitMIR(mir_file);

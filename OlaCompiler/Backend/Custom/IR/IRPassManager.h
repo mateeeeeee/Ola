@@ -13,13 +13,19 @@ namespace ola
 		Bool domfrontier_print;
 	};
 
+	class Function;
+	template<typename UnitT>
+	class AnalysisManager;
+	using FunctionAnalysisManager = AnalysisManager<Function>;
+
 	class IRPassManager
 	{
 	public:
-		explicit IRPassManager(IRModule& M);
+		IRPassManager(IRModule& M, FunctionAnalysisManager& FAM);
 		void Run(OptimizationLevel, IRPassOptions const&);
 
 	private:
 		IRModule& M;
+		FunctionAnalysisManager& FAM;
 	};
 }

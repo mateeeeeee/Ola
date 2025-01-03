@@ -9,11 +9,14 @@
 #include "LinearScanRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Backend/Custom/IR/FunctionPass.h"
+#include "Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h"
 #include "Core/Log.h"
 
 namespace ola
 {
-	MachineModule::MachineModule(IRModule& ir_module, Target const& target) : machine_ctx(*this), target(target)
+	MachineModule::MachineModule(IRModule& ir_module, Target const& target, FunctionAnalysisManager& FAM) 
+		: machine_ctx(*this), target(target), FAM(FAM)
 	{
 		LowerModule(&ir_module);
 	}
@@ -124,7 +127,6 @@ namespace ola
 
 					MachineGlobal* global = machine_ctx.GetGlobal(F);
 					MachineFunction& MF = *static_cast<MachineFunction*>(global->GetRelocable());
-
 					LegalizeInstructions(MF);
 
 					LinearScanRegisterAllocator register_allocator(*this);
@@ -138,6 +140,8 @@ namespace ola
 
 	void MachineModule::LowerFunction(Function* F)
 	{
+		DominatorTree const& DT = FAM.GetResult<DominatorTreeAnalysisPass>(*F);
+
 		MachineGlobal* global = machine_ctx.GetGlobal(F);
 		MachineFunction& MF = *dynamic_cast<MachineFunction*>(global->GetRelocable());
 
@@ -191,7 +195,8 @@ namespace ola
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));
 
 		frame_info.EmitPrologue(MF, machine_ctx);
-		for (BasicBlock& BB : F->Blocks())
+
+		for (BasicBlock& BB : F->Blocks()) 
 		{
 			MachineBasicBlock* MBB = machine_ctx.GetBlock(&BB);
 			machine_ctx.SetCurrentBasicBlock(MBB);
@@ -300,6 +305,7 @@ namespace ola
 	{
 		MachineOperand ret = machine_ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
+
 		MI.SetOp<0>(ret).SetOp<1>(machine_ctx.GetOperand(CI->GetLHS()))
 			.SetOp<2>(machine_ctx.GetOperand(CI->GetRHS()))
 			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));

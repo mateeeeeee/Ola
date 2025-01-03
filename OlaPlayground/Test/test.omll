@@ -7,49 +7,68 @@ label0:
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
 InstSub - i64 reg 1, i64 imm 72
-InstMove - i64 reg 15, i64 imm 0
+InstStore - i64 stack -16, i64 imm 0
+InstStore - i64 stack -24, i64 imm 0
 InstJump - label1
 
 label1: 
-InstMove - i64 reg 14, i64 reg 15
 InstJump - label5
 
 label2: 
-InstMove - i64 reg 15, 
-InstJump - label1
+InstLoad - i64 reg 15, i64 stack -16
+InstICmp - i64 reg 15, i64 imm 3
+x64::SetLT - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstTest - i8 reg 15, i8 reg 15
+InstJNE - label1
+InstJump - label3
 
 label3: 
-InstMove - i64 reg 3, i64 imm 0
-InstCall - 
-InstICmp - , i64 imm 4
+InstLoad - i64 reg 15, i64 stack -16
+InstICmp - i64 reg 15, i64 imm 3
 x64::SetE - i8 reg 15
 InstAnd - i8 reg 15, i8 imm 1
 InstMove - i8 reg 3, i8 reg 15
 InstCall - 
+InstLoad - i64 reg 15, i64 stack -24
+InstICmp - i64 reg 15, i64 imm 4
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstStore - i64 stack -8, i64 imm 0
 InstJump - label8
 
 label4: 
-InstJump - label8
 
 label5: 
-InstMove - i64 reg 13, i64 reg 14
-InstAdd - i64 reg 13, i64 imm 1
+InstLoad - i64 reg 15, i64 stack -24
+InstStore - ptr stack -32, i64 reg 15
+InstMove - i64 reg 14, i64 reg 15
+InstAdd - i64 reg 14, i64 imm 1
+InstStore - i64 stack -24, i64 reg 14
 InstJump - label6
 
 label6: 
-InstICmp - i64 reg 13, i64 imm 2
-x64::SetLT - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstTest - i8 reg 12, i8 reg 12
-InstMove - i64 reg 14, i64 reg 13
+InstLoad - i64 reg 14, i64 stack -24
+InstICmp - i64 reg 14, i64 imm 2
+x64::SetLT - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstTest - i8 reg 14, i8 reg 14
 InstJNE - label5
 InstJump - label7
 
 label7: 
+InstLoad - i64 reg 14, i64 stack -16
+InstStore - ptr stack -40, i64 reg 14
+InstMove - i64 reg 15, i64 reg 14
+InstAdd - i64 reg 15, i64 imm 1
+InstStore - i64 stack -16, i64 reg 15
 InstJump - label2
 
 label8: 
-InstMove - i64 reg 0, i64 imm 0
+InstLoad - i64 reg 15, i64 stack -8
+InstMove - i64 reg 0, i64 reg 15
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

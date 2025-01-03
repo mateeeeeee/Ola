@@ -23,6 +23,9 @@ namespace ola
 	class PtrAddInst;
 	class SelectInst;
 	class PhiInst;
+	template<typename UnitT>
+	class AnalysisManager;
+	using FunctionAnalysisManager = AnalysisManager<Function>;
 
 	class MachineInstruction;
 	class MIRInstructionInfo;
@@ -33,7 +36,7 @@ namespace ola
 	class MachineModule
 	{
 	public:
-		explicit MachineModule(IRModule& ir_module, Target const& target);
+		MachineModule(IRModule& ir_module, Target const& target, FunctionAnalysisManager& FAM);
 		virtual ~MachineModule() = default;
 
 		Target const& GetTarget() const { return target; }
@@ -46,6 +49,7 @@ namespace ola
 		std::vector<MachineGlobal> globals;
 		MachineContext machine_ctx;
 		Target const& target;
+		FunctionAnalysisManager& FAM;
 
 	private:
 		void LowerModule(IRModule*);
