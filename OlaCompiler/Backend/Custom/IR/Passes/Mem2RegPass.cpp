@@ -158,7 +158,7 @@ namespace ola
 						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()))
 						{
 							Value* CurrentValue = ValueStacks[AI].top();
-							assert(CurrentValue && "Load value cannot be null");
+							OLA_ASSERT(CurrentValue);
 							LI->ReplaceAllUsesWith(CurrentValue);
 							InstructionRemoveQueue.push_back(LI);
 						}
@@ -178,7 +178,6 @@ namespace ola
 					I->EraseFromParent();
 				}
 
-				// Update phi nodes in successors using current stack top
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
 					for (PhiInst* Phi : Successor->PhiInsts())
@@ -187,13 +186,12 @@ namespace ola
 						if (AI && !ValueStacks[AI].empty())
 						{
 							Value* TopValue = ValueStacks[AI].top();
-							assert(TopValue && "Invalid value for PHI node");
+							OLA_ASSERT(TopValue);
 							Phi->AddIncoming(TopValue, BB);
 						}
 					}
 				}
 
-				// Process successor blocks
 				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
 				{
 					if (Visited.insert(Successor).second)
@@ -202,7 +200,6 @@ namespace ola
 					}
 				}
 
-				// Restore stack state
 				for (auto& [AI, Stack] : ValueStacks)
 				{
 					while (Stack.size() > StackSizes[AI])

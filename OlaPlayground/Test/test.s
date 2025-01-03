@@ -12,37 +12,41 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 64
-mov r15, 1
-mov r14, 0
-jmp label2
+sub rsp, 72
+mov r15, 0
+jmp label1
 label1:
-mov r13, r14
-add r13, r15
-jmp label3
+mov r14, r15
+jmp label5
 label2:
-cmp r15, 5
-setle r13b
-and r13b, 1
-test r13b, r13b
-jne label1
-jmp label4
+mov r15, 
+jmp label1
 label3:
-mov r12, r15
-add r12, 1
-mov r15, r12
-mov r14, r13
-jmp label2
-label4:
-cmp r14, 15
-sete r13b
-and r13b, 1
-mov cl, r13b
+mov rcx, 0
 call Assert
-jmp label6
+cmp , 4
+sete r15b
+and r15b, 1
+mov cl, r15b
+call Assert
+jmp label8
+label4:
+jmp label8
 label5:
+mov r13, r14
+add r13, 1
 jmp label6
 label6:
+cmp r13, 2
+setl r12b
+and r12b, 1
+test r12b, r12b
+mov r14, r13
+jne label5
+jmp label7
+label7:
+jmp label2
+label8:
 mov rax, 0
 mov rsp, rbp
 pop rbp

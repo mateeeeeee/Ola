@@ -11,25 +11,30 @@ entry:
 %0 = alloca i64
 %1 = alloca i64
 %2 = alloca i64
-br label for.cond
-for.body:
-%3 = add i64 %4, %5
-br label for.iter
-for.cond:
-%5 = phi i64 [ 1, entry ], [ %6, for.iter ]
-%4 = phi i64 [ 0, entry ], [ %3, for.iter ]
-%7 = icmp sle i64 %5, 5
-br i8 %7, label for.body, label for.end
-for.iter:
-%8 = alloca ptr
-%6 = add i64 %5, 1
-br label for.cond
-for.end:
-%9 = icmp eq i64 %4, 15
-call i8 %9, @Assert
+br label dowhile.body
+dowhile.body:
+%3 = phi i64 [ 0, entry ], [ %4, dowhile.cond ]
+br label dowhile.body1
+dowhile.cond:
+br label dowhile.body
+dowhile.end:
+call i8 0, @Assert
+%5 = icmp eq i64 %4, 4
+call i8 %5, @Assert
 br label exit
 return:
 br label exit
+dowhile.body1:
+%6 = phi i64 [ %3, dowhile.body ], [ %4, dowhile.cond1 ]
+%7 = alloca ptr
+%4 = add i64 %6, 1
+br label dowhile.cond1
+dowhile.cond1:
+%8 = icmp slt i64 %4, 2
+br i8 %8, label dowhile.body1, label dowhile.end1
+dowhile.end1:
+%9 = alloca ptr
+br label dowhile.cond
 exit:
 ret i64 0
 }

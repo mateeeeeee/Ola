@@ -2,11 +2,20 @@ import std.assert;
 
 public int main()
 {
-    int sum = 0;
-    for (int i = 1; i <= 5; i++)
+    int outerCounter = 0;
+    int innerCounter = 0;
+
+    do
     {
-        sum += i;
-    }
-    Assert(sum == 15);
+        do
+        {
+            innerCounter++;
+        } while (innerCounter < 2);
+
+        outerCounter++;
+    } while (outerCounter < 3);
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 4);
     return 0;
 }
