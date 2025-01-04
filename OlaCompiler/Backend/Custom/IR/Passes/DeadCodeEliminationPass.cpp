@@ -6,54 +6,63 @@ namespace ola
 {
 	Bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-#if 0
-		std::set<Instruction*> AliveSet;
-		std::vector<Instruction*> WorkList;
+		std::unordered_set<Instruction*> AliveInsts;
 		for (BasicBlock& BB : F)
 		{
 			for (Instruction& I : BB.Instructions())
 			{
-				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I))
+				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I) || isa<PhiInst>(&I))
 				{
-					AliveSet.insert(&I);
-					WorkList.push_back(&I);
-				}
-			}
-		}
-		while (!WorkList.empty())
-		{
-			Instruction* curr = WorkList.back();
-			WorkList.pop_back();
-			for (Use& U : curr->Operands())
-			{
-				if (Instruction* I = dyn_cast<Instruction>(U.GetValue()))
-				{
-					if (AliveSet.insert(I).second) WorkList.push_back(I);
+					AliveInsts.insert(&I);
 				}
 			}
 		}
 
+		Bool Changed = false;
+		Bool KeepGoing = true;
+		while (KeepGoing)
+		{
+			KeepGoing = false;
+			for (BasicBlock& BB : F)
+			{
+				for (Instruction& I : BB.Instructions())
+				{
+					if (AliveInsts.contains(&I))
+					{
+						for (Use& U : I.Operands())
+						{
+							if (Instruction* OpInst = dyn_cast<Instruction>(U.GetValue()))
+							{
+								if (AliveInsts.insert(OpInst).second)
+								{
+									KeepGoing = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		std::vector<Instruction*> DeadInsts;
 		for (BasicBlock& BB : F)
 		{
 			for (Instruction& I : BB.Instructions())
 			{
-				if (!AliveSet.contains(&I))
+				if (!AliveInsts.contains(&I))
 				{
-					WorkList.push_back(&I);
-					I.ReplaceAllUseWith(nullptr);
+					DeadInsts.push_back(&I);
+					Changed = true;
 				}
 			}
 		}
 
-		for (Instruction*& I : WorkList)
+		for (auto it = DeadInsts.rbegin(); it != DeadInsts.rend(); ++it)
 		{
-			I->EraseFromParent();
+			Instruction* I = *it;
+			I->RemoveFromParent();
 		}
-
-		return !WorkList.empty();
-#else 
-		return false;
-#endif
+		return Changed;
 	}
 }
 

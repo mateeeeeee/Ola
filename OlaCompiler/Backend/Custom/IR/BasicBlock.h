@@ -27,7 +27,7 @@ namespace ola
 
 		void AddPhiInst(PhiInst* phi)
 		{
-			instructions.Insert(instructions.begin(), phi);
+			phi->InsertBefore(this, instructions.begin());
 			phi_nodes.push_back(phi);
 		}
 		auto const& PhiInsts() const { return phi_nodes; }

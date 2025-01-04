@@ -6,43 +6,35 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @global_sub_1 ptr 15
-
-
-define internal @global_sub_2 ptr 7
-
-
-define internal @global_sub_3 ptr 3
-
-
-define internal @global_sub_4 ptr 30
+define internal @TestGotoErrorHandling i64() {
+entry:
+br label if.then
+HandleError:
+br label exit
+return:
+br label exit
+if.then:
+br label HandleError
+if.else:
+br label exit
+if.end:
+br label exit
+return1:
+br label HandleError
+goto:
+br label exit
+exit:
+%0 = phi i64 [ -1, HandleError ], [ 42, if.end ]
+%1 = phi i64 [ -1, HandleError ], [ 42, if.end ]
+ret i64 %1
+}
 
 
 define external @main i64() {
 entry:
-%0 = alloca i64
-%1 = alloca i64
-call i8 1, @Assert
-%2 = alloca i64
-%3 = alloca i64
-%4 = alloca i64
-call i8 1, @Assert
-%5 = load i64, ptr @global_sub_1
-%6 = load i64, ptr @global_sub_2
-%7 = sub i64 %5, %6
-%8 = alloca i64
-%9 = icmp eq i64 %7, 8
-call i8 %9, @Assert
-%10 = load i64, ptr @global_sub_4
-%11 = sub i64 %10, 7
-%12 = alloca i64
-%13 = icmp eq i64 %11, 23
-call i8 %13, @Assert
-%14 = load i64, ptr @global_sub_3
-%15 = sub i64 15, %14
-%16 = alloca i64
-%17 = icmp eq i64 %15, 12
-call i8 %17, @Assert
+%0 = call ptr @TestGotoErrorHandling
+%1 = icmp eq i64 %0, -1
+call i8 %1, @Assert
 br label exit
 return:
 br label exit

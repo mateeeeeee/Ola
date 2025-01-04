@@ -2,53 +2,55 @@ external Assert
 
 external AssertMsg
 
-internal data storage global_sub_1
-
-internal data storage global_sub_2
-
-internal data storage global_sub_3
-
-internal data storage global_sub_4
-
-external main: 
+internal TestGotoErrorHandling: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 96
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstLoad - i64 reg 15, i64 global_sub_1
-InstLoad - i64 reg 14, i64 global_sub_2
-InstMove - i64 reg 13, i64 reg 15
-InstSub - i64 reg 13, i64 reg 14
-InstICmp - i64 reg 13, i64 imm 8
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_sub_4
-InstMove - i64 reg 14, i64 reg 13
-InstSub - i64 reg 14, i64 imm 7
-InstICmp - i64 reg 14, i64 imm 23
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoad - i64 reg 14, i64 global_sub_3
-InstMove - i64 reg 13, i64 imm 15
-InstSub - i64 reg 13, i64 reg 14
-InstICmp - i64 reg 13, i64 imm 12
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstJump - label2
+InstJump - label3
 
 label1: 
+InstMove - i64 reg 15, i64 imm -1
+InstMove - i64 reg 14, i64 imm -1
+InstJump - label8
 
 label2: 
+
+label3: 
+InstJump - label1
+
+label4: 
+
+label5: 
+InstMove - i64 reg 15, i64 imm 42
+InstMove - i64 reg 14, i64 imm 42
+InstJump - label8
+
+label6: 
+
+label7: 
+
+label8: 
+InstMove - i64 reg 0, i64 reg 14
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+
+external main: 
+label9: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm -1
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstJump - label11
+
+label10: 
+
+label11: 
 InstMove - i64 reg 0, i64 imm 0
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
