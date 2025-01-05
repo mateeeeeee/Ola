@@ -22,7 +22,6 @@ namespace ola
 		return num;
 	}
 
-
 	Bool ArithmeticReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		Bool changed = false;
@@ -85,13 +84,11 @@ namespace ola
 				}
 				else if (Sub_(CInt_(0), Any_(V))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::Neg, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(I, builder.MakeInst<UnaryInst>(Opcode::Neg, V));
 				}
 				else if (FSub_(CFloat_(0.0), Any_(V))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::FNeg, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(	I, builder.MakeInst<UnaryInst>(Opcode::FNeg, V));
 				}
 				else if (Sub_(Any_(V), Exact_(V))(ctx))
 				{
@@ -119,23 +116,19 @@ namespace ola
 				}
 				else if (Mul_(Any_(V), CInt_(2))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Add, V, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::Add, V, V));
 				}
 				else if (FMul_(Any_(V), CFloat_(2.0))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::FAdd, V, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::FAdd, V, V));
 				}
 				else if (Mul_(Any_(V), CInt_(-1))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::Neg, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(I, builder.MakeInst<UnaryInst>(Opcode::Neg, V));
 				}
 				else if (FMul_(Any_(V), CFloat_(-1.0))(ctx))
 				{
-					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::FNeg, V);
-					ReplaceInstruction(I, new_inst);
+					ReplaceInstruction(I, builder.MakeInst<UnaryInst>(Opcode::FNeg, V));
 				}
 				else if (SDiv_(Any_(V), Exact_(V))(ctx))
 				{

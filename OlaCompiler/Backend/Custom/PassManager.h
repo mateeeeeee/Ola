@@ -19,6 +19,7 @@ namespace ola
 		using BasePassT = typename UnitTraits<UnitT>::BasePassT;
 		using ParentUnitT = typename UnitTraits<UnitT>::ParentUnitT;
 		static_assert(std::is_base_of_v<Pass, BasePassT>);
+
 	public:
 		void AddPass(BasePassT* pass)
 		{
