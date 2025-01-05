@@ -6,26 +6,13 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @f i64() {
-entry:
-br label exit
-return:
-br label exit
-exit:
-ret i64 5
-}
-
-
 define external @main i64() {
 entry:
-%0 = call ptr @f
-%1 = add i64 %0, %0
-%2 = add i64 %0, %0
-%3 = smul i64 %1, %2
+call i8 1, @Assert
 br label exit
 return:
 br label exit
 exit:
-ret i64 %3
+ret i64 0
 }
 

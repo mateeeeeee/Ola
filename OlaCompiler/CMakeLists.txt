@@ -104,6 +104,7 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRType.cpp
   Backend/Custom/IR/IRVisitor.h
   Backend/Custom/IR/IRVisitor.cpp
+  Backend/Custom/IR/PatternMatch.h
 
   Backend/Custom/IR/Value.h
   Backend/Custom/IR/Value.cpp

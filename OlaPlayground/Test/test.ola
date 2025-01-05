@@ -1,15 +1,9 @@
 import std.assert;
 
-
-int f()
-{
-	return 5;
-}
-
 public int main()
 {
-	int a = f();
-	int b = a;
-	int c = (a + b) * (a + b);
-    return c;
+    int intA = 5;
+    int resultIntMulImmediate = intA * 2;
+    Assert(resultIntMulImmediate == 10);
+    return 0;
 }

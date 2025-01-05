@@ -3,6 +3,7 @@
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
+#include "Backend/Custom/IR/PatternMatch.h"
 
 namespace ola
 {
@@ -21,81 +22,136 @@ namespace ola
 		return num;
 	}
 
-	static void TryReducingMul(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
-	{
-		ConstantInt* left_op = dyn_cast<ConstantInt>(BI->GetLHS());
-		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
-		
-		IRContext& ctx = BI->GetContext();
-		IRBuilder builder(ctx);
-		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
-		if (left_op && IsPowerOfTwo(left_op->GetValue()))
-		{
-			Int64 logOfPowerOf2 = FindPowerOfTwo(left_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetRHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUsesWith(new_inst);
-			instructions_to_remove.push_back(BI);
-		}
-		else if (right_op && IsPowerOfTwo(right_op->GetValue()))
-		{
-			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Shl, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUsesWith(new_inst);
-			instructions_to_remove.push_back(BI);
-		}
-	}
-	static void TryReducingDiv(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
-	{
-		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
 
-		IRContext& ctx = BI->GetContext();
-		IRBuilder builder(ctx);
-		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
-		if (right_op && IsPowerOfTwo(right_op->GetValue()))
-		{
-			Int64 logOfPowerOf2 = FindPowerOfTwo(right_op->GetValue());
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::AShr, BI->GetLHS(), ctx.GetInt64(logOfPowerOf2));
-			BI->ReplaceAllUsesWith(new_inst);
-			instructions_to_remove.push_back(BI);
-		}
-	}
-	static void TryReducingMod(BinaryInst* BI, std::vector<Instruction*>& instructions_to_remove)
-	{
-		ConstantInt* right_op = dyn_cast<ConstantInt>(BI->GetRHS());
-		IRContext& ctx = BI->GetContext();
-		IRBuilder builder(ctx);
-		builder.SetInsertPoint(BI->GetBasicBlock(), BI);
-		if (right_op && IsPowerOfTwo(right_op->GetValue()))
-		{
-			Int64 mask = right_op->GetValue() - 1;
-			Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::And, BI->GetLHS(), ctx.GetInt64(mask));
-			BI->ReplaceAllUsesWith(new_inst);
-			instructions_to_remove.push_back(BI);
-		}
-	}
 	Bool ArithmeticReductionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		Bool changed = false;
 		std::vector<Instruction*> instructions_to_remove;
 
+		auto SwapOperands = [](Instruction& I) -> Bool
+		{
+			switch (I.GetOpcode())
+			{
+			case Opcode::Add:
+			case Opcode::SMul:
+			case Opcode::Or:
+			case Opcode::Xor:
+			case Opcode::And:
+			case Opcode::FAdd:
+			case Opcode::FMul:
+			{
+				if (I.GetOperand(0)->IsConstant() && !I.GetOperand(1)->IsConstant())
+				{
+					Use* Ops = I.GetOperandList();
+					std::swap(Ops[0], Ops[1]);
+					return true;
+				}
+			}
+			}
+			return false;
+		};
+		auto ReplaceInstruction = [&changed, &instructions_to_remove](Instruction& I, Value* V)
+		{
+			I.ReplaceAllUsesWith(V);
+			instructions_to_remove.push_back(&I);
+		};
+
 		for (BasicBlock& BB : F)
 		{
 			for (Instruction& I : BB.Instructions())
 			{
-				if (BinaryInst* BI = dyn_cast<BinaryInst>(&I))
+				changed |= SwapOperands(I);
+
+				IRBuilder builder(I.GetContext());
+				builder.SetInsertPoint(I.GetBasicBlock(), &I);
+
+				PatternMatchContext<Value> ctx(&I);
+				Value* V = nullptr;
+				if (Add_(Any_(V), CInt_(0))(ctx))
 				{
-					if (BI->GetOpcode() == Opcode::SMul)
-					{
-						TryReducingMul(BI, instructions_to_remove);
-					}
-					else if (BI->GetOpcode() == Opcode::SDiv)
-					{
-						TryReducingDiv(BI, instructions_to_remove);
-					}
-					else if (BI->GetOpcode() == Opcode::SRem)
-					{
-						TryReducingMod(BI, instructions_to_remove);
-					}
+					ReplaceInstruction(I, V);
+				}
+				else if (FAdd_(Any_(V), CFloat_(0.0))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (Sub_(Any_(V), CInt_(0))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (FSub_(Any_(V), CFloat_(0.0))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (Sub_(CInt_(0), Any_(V))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::Neg, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (FSub_(CFloat_(0.0), Any_(V))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::FNeg, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (Sub_(Any_(V), Exact_(V))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetInt64(0));
+				}
+				else if (FSub_(Any_(V), Exact_(V))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetZeroFloat());
+				}
+				else if (Mul_(Any_(V), CInt_(0))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetInt64(0));
+				}
+				else if (FMul_(Any_(V), CFloat_(0.0))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetZeroFloat());
+				}
+				else if (Mul_(Any_(V), CInt_(1))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (FMul_(Any_(V), CFloat_(1.0))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (Mul_(Any_(V), CInt_(2))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::Add, V, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (FMul_(Any_(V), CFloat_(2.0))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<BinaryInst>(Opcode::FAdd, V, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (Mul_(Any_(V), CInt_(-1))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::Neg, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (FMul_(Any_(V), CFloat_(-1.0))(ctx))
+				{
+					Value* new_inst = builder.MakeInst<UnaryInst>(Opcode::FNeg, V);
+					ReplaceInstruction(I, new_inst);
+				}
+				else if (SDiv_(Any_(V), Exact_(V))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetInt64(1));
+				}
+				else if (FDiv_(Any_(V), Exact_(V))(ctx))
+				{
+					ReplaceInstruction(I, I.GetContext().GetFloat(0));
+				}
+				else if (SDiv_(Any_(V), CInt_(1))(ctx))
+				{
+					ReplaceInstruction(I, V);
+				}
+				else if (FDiv_(Any_(V), CFloat_(0.0))(ctx))
+				{
+					ReplaceInstruction(I, V);
 				}
 			}
 		}

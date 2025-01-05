@@ -41,6 +41,7 @@ namespace ola
 		Bool IsStruct() const { return kind == IRTypeKind::Struct; }
 		Bool IsPointer() const { return kind == IRTypeKind::Pointer; }
 		Bool IsInteger() const { return kind == IRTypeKind::Integer; }
+		Bool IsBoolean() const { return kind == IRTypeKind::Integer && size == 1; }
 		Bool IsFloat() const { return kind == IRTypeKind::Float; }
 		Bool IsArray() const { return kind == IRTypeKind::Array; }
 		Bool IsFunction() const { return kind == IRTypeKind::Function; }

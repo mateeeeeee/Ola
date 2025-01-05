@@ -14,7 +14,6 @@
 
 namespace ola
 {
-
 	IRPassManager::IRPassManager(IRModule& M, FunctionAnalysisManager& FAM) : M(M), FAM(FAM)
 	{
 	}
