@@ -6,27 +6,14 @@
 
 .extern AssertMsg
 
-TestGotoErrorHandling:
+f:
 label0:
 push rbp
 mov rbp, rsp
-jmp label3
+jmp label2
 label1:
-mov r15, -1
-mov r14, -1
-jmp label8
 label2:
-label3:
-jmp label1
-label4:
-label5:
-mov r15, 42
-mov r14, 42
-jmp label8
-label6:
-label7:
-label8:
-mov rax, r14
+mov rax, 5
 mov rsp, rbp
 pop rbp
 ret
@@ -34,21 +21,22 @@ ret
 .globl main
 
 main:
-label9:
+label3:
 push rbp
 mov rbp, rsp
 sub rsp, 32
-call TestGotoErrorHandling
+call f
 mov r15, rax
-cmp r15, -1
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-jmp label11
-label10:
-label11:
-mov rax, 0
+mov r14, r15
+add r14, r15
+mov r13, r15
+add r13, r15
+mov r15, r14
+imul r15, r13
+jmp label5
+label4:
+label5:
+mov rax, r15
 mov rsp, rbp
 pop rbp
 ret

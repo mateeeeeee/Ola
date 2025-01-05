@@ -1,4 +1,4 @@
-#include <set>
+#include <unordered_set>
 #include "DeadCodeEliminationPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
@@ -31,13 +31,8 @@ namespace ola
 					{
 						for (Use& U : I.Operands())
 						{
-							if (Instruction* OpInst = dyn_cast<Instruction>(U.GetValue()))
-							{
-								if (AliveInsts.insert(OpInst).second)
-								{
-									KeepGoing = true;
-								}
-							}
+							if (Instruction* OpInst = dyn_cast<Instruction>(U.GetValue()); OpInst && AliveInsts.insert(OpInst).second) 
+								KeepGoing = true;
 						}
 					}
 				}

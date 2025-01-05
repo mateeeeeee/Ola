@@ -5,6 +5,7 @@
 #include "Passes/ConstantPropagationPass.h"
 #include "Passes/ArithmeticReductionPass.h"
 #include "Passes/DeadCodeEliminationPass.h"
+#include "Passes/CommonSubexpressionEliminationPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 #include "Passes/CFGAnalysisPass.h"
 #include "Passes/DominatorTreeAnalysisPass.h"
@@ -22,12 +23,11 @@ namespace ola
 	{
 		for (auto& G : M.Globals())
 		{
-			if (G->IsFunction())
+			if (Function* F = dyn_cast<Function>(G))
 			{
-				Function& F = *cast<Function>(G);
-				FAM.RegisterPass<CFGAnalysisPass>(F);
-				FAM.RegisterPass<DominatorTreeAnalysisPass>(F);
-				FAM.RegisterPass<DominanceFrontierAnalysisPass>(F);
+				FAM.RegisterPass<CFGAnalysisPass>(*F);
+				FAM.RegisterPass<DominatorTreeAnalysisPass>(*F);
+				FAM.RegisterPass<DominanceFrontierAnalysisPass>(*F);
 			}
 		}
 
@@ -41,9 +41,10 @@ namespace ola
 			[[fallthrough]];
 		case OptimizationLevel::O1:
 			FPM.AddPass(CreateMem2RegPass());
-			FPM.AddPass(CreateDeadCodeEliminationPass());
+			FPM.AddPass(CreateCommonSubexpressionEliminationPass());
 			FPM.AddPass(CreateArithmeticReductionPass());
 			FPM.AddPass(CreateConstantPropagationPass());
+			FPM.AddPass(CreateDeadCodeEliminationPass());
 			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());

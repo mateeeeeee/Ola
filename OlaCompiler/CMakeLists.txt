@@ -30,6 +30,7 @@ set(UTILITY_FILES
   Utility/IntrusiveList.h
   Utility/IteratorRange.h
   Utility/IteratorFacade.h
+  Utility/Hash.h
   Utility/Attribute.h
   Utility/CLIParser.h
   Utility/CLIParser.cpp
@@ -129,6 +130,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.cpp
+  Backend/Custom/IR/Passes/CommonSubexpressionEliminationPass.h
+  Backend/Custom/IR/Passes/CommonSubexpressionEliminationPass.cpp
   Backend/Custom/IR/Passes/ArithmeticReductionPass.h
   Backend/Custom/IR/Passes/ArithmeticReductionPass.cpp
   Backend/Custom/IR/Passes/GlobalAttributeInferPass.h

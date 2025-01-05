@@ -249,13 +249,15 @@ namespace ola
 		OLA_ASSERT(isa<ConstantInt>(offset));
 	}
 
-	void TrackableValue::ReplaceAllUsesWith(Value* V)
+	Bool TrackableValue::ReplaceAllUsesWith(Value* V)
 	{
+		Bool changed = !users.empty();
 		while (!users.empty())
 		{
 			Use* const& U = *users.begin();
 			U->Set(V);
 		}
+		return changed;
 	}
 
 }

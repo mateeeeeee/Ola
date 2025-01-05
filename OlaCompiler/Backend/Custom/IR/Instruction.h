@@ -202,7 +202,7 @@ namespace ola
 		{
 			users.erase(u);
 		}
-		void ReplaceAllUsesWith(Value* V);
+		OLA_MAYBE_UNUSED Bool ReplaceAllUsesWith(Value* V);
 
 		Bool IsUsed() const
 		{
