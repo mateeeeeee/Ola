@@ -1,358 +1,314 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2334pt" height="186pt" viewBox="0.00 0.00 2334.12 186.00">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 182)">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2188pt" height="191pt" viewBox="0.00 0.00 2188.44 191.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 187)">
 <title>CompilerPipeline</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-182 2330.12,-182 2330.12,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-187 2184.44,-187 2184.44,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_IR</title>
-<polygon fill="#fff5f5" stroke="#ff7675" points="623.26,-93 623.26,-170 1202.41,-170 1202.41,-93 623.26,-93"/>
-<text text-anchor="middle" x="912.83" y="-153.4" font-family="Times,serif" font-size="14.00">Custom IR Passes</text>
+<polygon fill="#fff5f5" stroke="#ff7675" points="572.22,-98 572.22,-175 1084.9,-175 1084.9,-98 572.22,-98"/>
+<text text-anchor="middle" x="828.56" y="-158.4" font-family="Times,serif" font-size="14.00">Custom IR Passes</text>
 </g>
 <g id="clust2" class="cluster">
 <title>cluster_LLVM</title>
-<polygon fill="#f5f6fa" stroke="#74b9ff" points="740.73,-8 740.73,-85 1678.78,-85 1678.78,-8 740.73,-8"/>
-<text text-anchor="middle" x="1209.76" y="-68.4" font-family="Times,serif" font-size="14.00">LLVM IR Passes</text>
+<polygon fill="#f5f6fa" stroke="#74b9ff" points="1010.84,-8 1010.84,-85 1514.03,-85 1514.03,-8 1010.84,-8"/>
+<text text-anchor="middle" x="1262.44" y="-68.4" font-family="Times,serif" font-size="14.00">LLVM IR Passes</text>
 </g>
 <!-- Source -->
 <g id="node1" class="node">
 <title>Source</title>
-<polygon fill="#e7f2fa" stroke="#2980b9" stroke-width="2" points="121.44,-73 91.08,-99.13 30.36,-99.13 0,-73 30.36,-46.87 91.08,-46.87 121.44,-73"/>
-<text text-anchor="middle" x="60.72" y="-76" font-family="Arial" font-size="10.00" fill="#2c3e50">.ola</text>
-<text text-anchor="middle" x="60.72" y="-64" font-family="Arial" font-size="10.00" fill="#2c3e50">Source Code</text>
+<polygon fill="#e7f2fa" stroke="#2980b9" stroke-width="2" points="121.44,-78 91.08,-104.13 30.36,-104.13 0,-78 30.36,-51.87 91.08,-51.87 121.44,-78"/>
+<text text-anchor="middle" x="60.72" y="-81" font-family="Arial" font-size="10.00" fill="#2c3e50">.ola</text>
+<text text-anchor="middle" x="60.72" y="-69" font-family="Arial" font-size="10.00" fill="#2c3e50">Source Code</text>
 </g>
 <!-- Tokens -->
 <g id="node2" class="node">
 <title>Tokens</title>
-<polygon fill="#f5eef8" stroke="#8e44ad" stroke-width="2" points="246.97,-91 179.96,-73 246.97,-55 313.99,-73 246.97,-91"/>
-<text text-anchor="middle" x="246.97" y="-70" font-family="Arial" font-size="10.00" fill="#2c3e50">Token Stream</text>
+<polygon fill="#f5eef8" stroke="#8e44ad" stroke-width="2" points="221.45,-96 179.96,-78 221.45,-60 262.95,-78 221.45,-96"/>
+<text text-anchor="middle" x="221.45" y="-75" font-family="Arial" font-size="10.00" fill="#2c3e50">Tokens</text>
 </g>
 <!-- Source&#45;&gt;Tokens -->
-<g id="edge11" class="edge">
+<g id="edge8" class="edge">
 <title>Source-&gt;Tokens</title>
-<path fill="none" stroke="black" d="M122.82,-73C136.29,-73 150.77,-73 164.89,-73"/>
-<polygon fill="black" stroke="black" points="164.6,-76.5 174.6,-73 164.6,-69.5 164.6,-76.5"/>
-<text text-anchor="middle" x="150.7" y="-75.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Lexer</text>
+<path fill="none" stroke="black" d="M122.64,-78C136.98,-78 152.18,-78 166.2,-78"/>
+<polygon fill="black" stroke="black" points="166.15,-81.5 176.15,-78 166.15,-74.5 166.15,-81.5"/>
+<text text-anchor="middle" x="150.7" y="-80.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Lexer</text>
 </g>
 <!-- AST -->
 <g id="node3" class="node">
 <title>AST</title>
-<polygon fill="#f5eef8" stroke="#8e44ad" stroke-width="2" points="439,-65.54 439,-80.46 423.18,-91 400.82,-91 385,-80.46 385,-65.54 400.82,-55 423.18,-55 439,-65.54"/>
-<text text-anchor="middle" x="412" y="-70" font-family="Arial" font-size="10.00" fill="#2c3e50">AST</text>
+<polygon fill="#f5eef8" stroke="#8e44ad" stroke-width="2" points="387.96,-70.54 387.96,-85.46 372.14,-96 349.77,-96 333.96,-85.46 333.96,-70.54 349.77,-60 372.14,-60 387.96,-70.54"/>
+<text text-anchor="middle" x="360.96" y="-75" font-family="Arial" font-size="10.00" fill="#2c3e50">AST</text>
 </g>
 <!-- Tokens&#45;&gt;AST -->
-<g id="edge12" class="edge">
+<g id="edge9" class="edge">
 <title>Tokens-&gt;AST</title>
-<path fill="none" stroke="black" d="M317.58,-73C336.53,-73 356.34,-73 372.83,-73"/>
-<polygon fill="black" stroke="black" points="372.67,-76.5 382.67,-73 372.67,-69.5 372.67,-76.5"/>
-<text text-anchor="middle" x="349.49" y="-86.5" font-family="Arial" font-size="9.00" fill="#2c3e50">Parser &amp;</text>
-<text text-anchor="middle" x="349.49" y="-75.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Sema</text>
+<path fill="none" stroke="black" d="M265.21,-78C283.36,-78 304.34,-78 321.94,-78"/>
+<polygon fill="black" stroke="black" points="321.72,-81.5 331.72,-78 321.72,-74.5 321.72,-81.5"/>
+<text text-anchor="middle" x="298.45" y="-91.5" font-family="Arial" font-size="9.00" fill="#2c3e50">Parser &amp;</text>
+<text text-anchor="middle" x="298.45" y="-80.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Sema</text>
 </g>
 <!-- IR1 -->
 <g id="node4" class="node">
 <title>IR1</title>
-<polygon fill="#fef5e7" stroke="#d35400" stroke-width="2" points="594.26,-135 531.03,-135 531.03,-99 594.26,-99 594.26,-135"/>
-<text text-anchor="middle" x="562.65" y="-114" font-family="Arial" font-size="10.00" fill="#2c3e50">Custom IR</text>
+<polygon fill="#fef5e7" stroke="#d35400" stroke-width="2" points="543.22,-140 479.99,-140 479.99,-104 543.22,-104 543.22,-140"/>
+<text text-anchor="middle" x="511.6" y="-119" font-family="Arial" font-size="10.00" fill="#2c3e50">Custom IR</text>
 </g>
 <!-- AST&#45;&gt;IR1 -->
-<g id="edge13" class="edge">
+<g id="edge10" class="edge">
 <title>AST-&gt;IR1</title>
-<path fill="none" stroke="black" d="M439.92,-80.97C462.07,-87.53 493.87,-96.94 519.42,-104.5"/>
-<polygon fill="black" stroke="black" points="518.26,-107.81 528.84,-107.29 520.25,-101.1 518.26,-107.81"/>
-<text text-anchor="middle" x="485.01" y="-104.21" font-family="Arial" font-size="9.00" fill="#2c3e50">IR Generation</text>
+<path fill="none" stroke="black" d="M388.88,-85.97C411.03,-92.53 442.83,-101.94 468.37,-109.5"/>
+<polygon fill="black" stroke="black" points="467.22,-112.81 477.8,-112.29 469.2,-106.1 467.22,-112.81"/>
+<text text-anchor="middle" x="433.97" y="-109.21" font-family="Arial" font-size="9.00" fill="#2c3e50">IR Generation</text>
 </g>
 <!-- LLVM1 -->
 <g id="node6" class="node">
 <title>LLVM1</title>
-<path fill="#e8f8f5" stroke="#16a085" stroke-width="2" d="M689.78,-58.73C689.78,-60.53 677.47,-62 662.33,-62 647.18,-62 634.87,-60.53 634.87,-58.73 634.87,-58.73 634.87,-29.27 634.87,-29.27 634.87,-27.47 647.18,-26 662.33,-26 677.47,-26 689.78,-27.47 689.78,-29.27 689.78,-29.27 689.78,-58.73 689.78,-58.73"/>
-<path fill="none" stroke="#16a085" stroke-width="2" d="M689.78,-58.73C689.78,-56.92 677.47,-55.45 662.33,-55.45 647.18,-55.45 634.87,-56.92 634.87,-58.73"/>
-<text text-anchor="middle" x="662.33" y="-41" font-family="Arial" font-size="10.00" fill="#2c3e50">LLVM IR</text>
+<polygon fill="#e8f8f5" stroke="#16a085" stroke-width="2" points="974.32,-58 919.42,-58 919.42,-22 974.32,-22 974.32,-58"/>
+<text text-anchor="middle" x="946.87" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">LLVM IR</text>
 </g>
 <!-- AST&#45;&gt;LLVM1 -->
-<g id="edge14" class="edge">
+<g id="edge11" class="edge">
 <title>AST-&gt;LLVM1</title>
-<path fill="none" stroke="black" d="M439.57,-69.9C483.68,-64.75 572.18,-54.41 623.03,-48.47"/>
-<polygon fill="black" stroke="black" points="623.16,-51.98 632.68,-47.34 622.35,-45.03 623.16,-51.98"/>
-<text text-anchor="middle" x="562.65" y="-72.48" font-family="Arial" font-size="9.00" fill="#2c3e50">LLVM IR</text>
-<text text-anchor="middle" x="562.65" y="-61.68" font-family="Arial" font-size="9.00" fill="#2c3e50">Generation</text>
+<path fill="none" stroke="black" d="M388.88,-72.57C431.71,-63.92 510.6,-48 510.6,-48 510.6,-48 510.6,-48 845.39,-48 845.39,-48 879.02,-45.32 907.37,-43.07"/>
+<polygon fill="black" stroke="black" points="907.48,-46.57 917.17,-42.29 906.93,-39.59 907.48,-46.57"/>
+<text text-anchor="middle" x="682.61" y="-61.5" font-family="Arial" font-size="9.00" fill="#2c3e50">LLVM IR</text>
+<text text-anchor="middle" x="682.61" y="-50.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Generation</text>
 </g>
 <!-- Mem -->
 <g id="node14" class="node">
 <title>Mem</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="693.39,-137 631.26,-137 631.26,-101 693.39,-101 693.39,-137"/>
-<text text-anchor="middle" x="662.33" y="-116" font-family="Arial" font-size="10.00" fill="#2c3e50">Mem2Reg</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="642.35,-142 580.22,-142 580.22,-106 642.35,-106 642.35,-142"/>
+<text text-anchor="middle" x="611.28" y="-121" font-family="Arial" font-size="10.00" fill="#2c3e50">Mem2Reg</text>
 </g>
 <!-- IR1&#45;&gt;Mem -->
-<g id="edge15" class="edge">
+<g id="edge12" class="edge">
 <title>IR1-&gt;Mem</title>
-<path fill="none" stroke="black" d="M595.09,-117.64C602.9,-117.8 611.39,-117.98 619.61,-118.15"/>
-<polygon fill="black" stroke="black" points="619.36,-121.64 629.43,-118.35 619.5,-114.64 619.36,-121.64"/>
+<path fill="none" stroke="black" d="M544.05,-122.64C551.86,-122.8 560.35,-122.98 568.56,-123.15"/>
+<polygon fill="black" stroke="black" points="568.31,-126.64 578.38,-123.35 568.46,-119.64 568.31,-126.64"/>
 </g>
 <!-- IR2 -->
 <g id="node5" class="node">
 <title>IR2</title>
-<polygon fill="#fef5e7" stroke="#d35400" stroke-width="2" points="1299.08,-135 1231.41,-135 1231.41,-99 1299.08,-99 1299.08,-135"/>
-<text text-anchor="middle" x="1265.25" y="-120" font-family="Arial" font-size="10.00" fill="#2c3e50">Custom IR</text>
-<text text-anchor="middle" x="1265.25" y="-108" font-family="Arial" font-size="10.00" fill="#2c3e50">(Optimized)</text>
+<polygon fill="#fef5e7" stroke="#d35400" stroke-width="2" points="1189.26,-145 1121.58,-145 1121.58,-109 1189.26,-109 1189.26,-145"/>
+<text text-anchor="middle" x="1155.42" y="-130" font-family="Arial" font-size="10.00" fill="#2c3e50">Custom IR</text>
+<text text-anchor="middle" x="1155.42" y="-118" font-family="Arial" font-size="10.00" fill="#2c3e50">(Optimized)</text>
 </g>
 <!-- MIR1 -->
 <g id="node8" class="node">
 <title>MIR1</title>
-<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1457.92,-135 1395.34,-135 1391.34,-131 1391.34,-99 1453.92,-99 1457.92,-103 1457.92,-135"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1453.92,-131 1391.34,-131"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1453.92,-131 1453.92,-99"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1453.92,-131 1457.92,-135"/>
-<text text-anchor="middle" x="1424.63" y="-114" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
+<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1331.98,-147 1269.4,-147 1265.4,-143 1265.4,-111 1327.98,-111 1331.98,-115 1331.98,-147"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1327.98,-143 1265.4,-143"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1327.98,-143 1327.98,-111"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1327.98,-143 1331.98,-147"/>
+<text text-anchor="middle" x="1298.69" y="-126" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
 </g>
 <!-- IR2&#45;&gt;MIR1 -->
-<g id="edge17" class="edge">
+<g id="edge14" class="edge">
 <title>IR2-&gt;MIR1</title>
-<path fill="none" stroke="black" d="M1300.01,-117C1323.09,-117 1353.92,-117 1379.02,-117"/>
-<polygon fill="black" stroke="black" points="1378.95,-120.5 1388.95,-117 1378.95,-113.5 1378.95,-120.5"/>
-<text text-anchor="middle" x="1335.34" y="-119.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Lowering</text>
+<path fill="none" stroke="black" d="M1190.26,-127.48C1209.18,-127.75 1232.99,-128.08 1253.38,-128.37"/>
+<polygon fill="black" stroke="black" points="1253.05,-131.87 1263.1,-128.51 1253.15,-124.87 1253.05,-131.87"/>
+<text text-anchor="middle" x="1229.14" y="-130.94" font-family="Arial" font-size="9.00" fill="#2c3e50">Lowering</text>
 </g>
 <!-- Promote -->
 <g id="node19" class="node">
 <title>Promote</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="837.54,-52 748.73,-52 748.73,-16 837.54,-16 837.54,-52"/>
-<text text-anchor="middle" x="793.14" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Promote Allocas</text>
-<text text-anchor="middle" x="793.14" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">to Registers</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="1080.97,-52 1018.84,-52 1018.84,-16 1080.97,-16 1080.97,-52"/>
+<text text-anchor="middle" x="1049.9" y="-31" font-family="Arial" font-size="10.00" fill="#2c3e50">Mem2Reg</text>
 </g>
 <!-- LLVM1&#45;&gt;Promote -->
-<g id="edge21" class="edge">
+<g id="edge18" class="edge">
 <title>LLVM1-&gt;Promote</title>
-<path fill="none" stroke="black" d="M690.64,-41.88C704.13,-40.83 720.92,-39.53 736.93,-38.29"/>
-<polygon fill="black" stroke="black" points="737.18,-41.78 746.88,-37.51 736.64,-34.8 737.18,-41.78"/>
+<path fill="none" stroke="black" d="M975.21,-38.38C985.08,-37.79 996.46,-37.11 1007.28,-36.47"/>
+<polygon fill="black" stroke="black" points="1007.41,-39.97 1017.18,-35.88 1006.99,-32.98 1007.41,-39.97"/>
 </g>
 <!-- LLVM2 -->
 <g id="node7" class="node">
 <title>LLVM2</title>
-<path fill="#e8f8f5" stroke="#16a085" stroke-width="2" d="M1830.43,-69C1830.43,-71.21 1815.26,-73 1796.59,-73 1777.92,-73 1762.75,-71.21 1762.75,-69 1762.75,-69 1762.75,-33 1762.75,-33 1762.75,-30.79 1777.92,-29 1796.59,-29 1815.26,-29 1830.43,-30.79 1830.43,-33 1830.43,-33 1830.43,-69 1830.43,-69"/>
-<path fill="none" stroke="#16a085" stroke-width="2" d="M1830.43,-69C1830.43,-66.79 1815.26,-65 1796.59,-65 1777.92,-65 1762.75,-66.79 1762.75,-69"/>
-<text text-anchor="middle" x="1796.59" y="-54" font-family="Arial" font-size="10.00" fill="#2c3e50">LLVM IR</text>
-<text text-anchor="middle" x="1796.59" y="-42" font-family="Arial" font-size="10.00" fill="#2c3e50">(Optimized)</text>
+<polygon fill="#e8f8f5" stroke="#16a085" stroke-width="2" points="1684.75,-62 1617.08,-62 1617.08,-26 1684.75,-26 1684.75,-62"/>
+<text text-anchor="middle" x="1650.92" y="-47" font-family="Arial" font-size="10.00" fill="#2c3e50">LLVM IR</text>
+<text text-anchor="middle" x="1650.92" y="-35" font-family="Arial" font-size="10.00" fill="#2c3e50">(Optimized)</text>
 </g>
 <!-- Assembly -->
 <g id="node11" class="node">
 <title>Assembly</title>
-<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="2011.85,-79 1987.62,-105.13 1939.17,-105.13 1914.94,-79 1939.17,-52.87 1987.62,-52.87 2011.85,-79"/>
-<text text-anchor="middle" x="1963.39" y="-82" font-family="Arial" font-size="10.00" fill="#2c3e50">.S</text>
-<text text-anchor="middle" x="1963.39" y="-70" font-family="Arial" font-size="10.00" fill="#2c3e50">Assembly</text>
+<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="1866.17,-80 1841.95,-106.13 1793.49,-106.13 1769.27,-80 1793.49,-53.87 1841.95,-53.87 1866.17,-80"/>
+<text text-anchor="middle" x="1817.72" y="-83" font-family="Arial" font-size="10.00" fill="#2c3e50">.S</text>
+<text text-anchor="middle" x="1817.72" y="-71" font-family="Arial" font-size="10.00" fill="#2c3e50">Assembly</text>
 </g>
 <!-- LLVM2&#45;&gt;Assembly -->
-<g id="edge23" class="edge">
+<g id="edge20" class="edge">
 <title>LLVM2-&gt;Assembly</title>
-<path fill="none" stroke="black" d="M1831.34,-56.73C1853.82,-60.55 1883.82,-65.65 1909.44,-70"/>
-<polygon fill="black" stroke="black" points="1908.56,-73.4 1919,-71.63 1909.73,-66.5 1908.56,-73.4"/>
+<path fill="none" stroke="black" d="M1685.55,-47.79C1714.37,-51.04 1751.27,-55.2 1751.27,-55.2 1751.27,-55.2 1759.52,-58.33 1770.18,-62.36"/>
+<polygon fill="black" stroke="black" points="1768.92,-65.63 1779.51,-65.9 1771.4,-59.09 1768.92,-65.63"/>
+<text text-anchor="middle" x="1727.01" y="-57.9" font-family="Arial" font-size="9.00" fill="#2c3e50">clang -S</text>
 </g>
 <!-- MIR2 -->
 <g id="node9" class="node">
 <title>MIR2</title>
-<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1687.73,-133 1565.69,-133 1561.69,-129 1561.69,-97 1683.73,-97 1687.73,-101 1687.73,-133"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1683.73,-129 1561.69,-129"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1683.73,-129 1683.73,-97"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1683.73,-129 1687.73,-133"/>
-<text text-anchor="middle" x="1624.71" y="-118" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
-<text text-anchor="middle" x="1624.71" y="-106" font-family="Arial" font-size="10.00" fill="#2c3e50">(Legal, Virtual Registers)</text>
+<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1542.06,-138 1420.01,-138 1416.01,-134 1416.01,-102 1538.06,-102 1542.06,-106 1542.06,-138"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1538.06,-134 1416.01,-134"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1538.06,-134 1538.06,-102"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1538.06,-134 1542.06,-138"/>
+<text text-anchor="middle" x="1479.03" y="-123" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
+<text text-anchor="middle" x="1479.03" y="-111" font-family="Arial" font-size="10.00" fill="#2c3e50">(Legal, Virtual Registers)</text>
 </g>
 <!-- MIR1&#45;&gt;MIR2 -->
-<g id="edge18" class="edge">
+<g id="edge15" class="edge">
 <title>MIR1-&gt;MIR2</title>
-<path fill="none" stroke="black" d="M1458.78,-116.67C1483.5,-116.42 1518.24,-116.06 1549.46,-115.75"/>
-<polygon fill="black" stroke="black" points="1549.31,-119.25 1559.27,-115.65 1549.23,-112.25 1549.31,-119.25"/>
-<text text-anchor="middle" x="1519.67" y="-129.74" font-family="Arial" font-size="9.00" fill="#2c3e50">Instruction</text>
-<text text-anchor="middle" x="1519.67" y="-118.94" font-family="Arial" font-size="9.00" fill="#2c3e50">Legalization</text>
+<path fill="none" stroke="black" d="M1332.81,-127.33C1352.82,-126.32 1379.15,-124.99 1403.9,-123.74"/>
+<polygon fill="black" stroke="black" points="1403.8,-127.25 1413.61,-123.25 1403.45,-120.26 1403.8,-127.25"/>
+<text text-anchor="middle" x="1373.99" y="-139.84" font-family="Arial" font-size="9.00" fill="#2c3e50">Instruction</text>
+<text text-anchor="middle" x="1373.99" y="-129.04" font-family="Arial" font-size="9.00" fill="#2c3e50">Legalization</text>
 </g>
 <!-- MIR3 -->
 <g id="node10" class="node">
 <title>MIR3</title>
-<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1829.88,-130 1767.3,-130 1763.3,-126 1763.3,-94 1825.88,-94 1829.88,-98 1829.88,-130"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1825.88,-126 1763.3,-126"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1825.88,-126 1825.88,-94"/>
-<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1825.88,-126 1829.88,-130"/>
-<text text-anchor="middle" x="1796.59" y="-115" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
-<text text-anchor="middle" x="1796.59" y="-103" font-family="Arial" font-size="10.00" fill="#2c3e50">(Legal)</text>
+<polygon fill="#fdebd0" stroke="#f39c12" stroke-width="2" points="1684.2,-136 1621.63,-136 1617.63,-132 1617.63,-100 1680.2,-100 1684.2,-104 1684.2,-136"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1680.2,-132 1617.63,-132"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1680.2,-132 1680.2,-100"/>
+<polyline fill="none" stroke="#f39c12" stroke-width="2" points="1680.2,-132 1684.2,-136"/>
+<text text-anchor="middle" x="1650.92" y="-121" font-family="Arial" font-size="10.00" fill="#2c3e50">Machine IR</text>
+<text text-anchor="middle" x="1650.92" y="-109" font-family="Arial" font-size="10.00" fill="#2c3e50">(Legal)</text>
 </g>
 <!-- MIR2&#45;&gt;MIR3 -->
-<g id="edge19" class="edge">
+<g id="edge16" class="edge">
 <title>MIR2-&gt;MIR3</title>
-<path fill="none" stroke="black" d="M1688.48,-113.89C1709.3,-113.52 1732.04,-113.12 1751.18,-112.78"/>
-<polygon fill="black" stroke="black" points="1751.14,-116.29 1761.07,-112.61 1751.01,-109.29 1751.14,-116.29"/>
-<text text-anchor="middle" x="1725.24" y="-127" font-family="Arial" font-size="9.00" fill="#2c3e50">Register</text>
-<text text-anchor="middle" x="1725.24" y="-116.2" font-family="Arial" font-size="9.00" fill="#2c3e50">Allocation</text>
+<path fill="none" stroke="black" d="M1542.81,-119.26C1563.63,-119.02 1586.36,-118.75 1605.5,-118.52"/>
+<polygon fill="black" stroke="black" points="1605.44,-122.02 1615.4,-118.41 1605.36,-115.02 1605.44,-122.02"/>
+<text text-anchor="middle" x="1579.57" y="-132.5" font-family="Arial" font-size="9.00" fill="#2c3e50">Register</text>
+<text text-anchor="middle" x="1579.57" y="-121.7" font-family="Arial" font-size="9.00" fill="#2c3e50">Allocation</text>
 </g>
 <!-- MIR3&#45;&gt;Assembly -->
-<g id="edge20" class="edge">
+<g id="edge17" class="edge">
 <title>MIR3-&gt;Assembly</title>
-<path fill="none" stroke="black" d="M1830.55,-105.4C1853.29,-100.85 1884.02,-94.69 1910.08,-89.47"/>
-<polygon fill="black" stroke="black" points="1910.71,-92.92 1919.83,-87.52 1909.33,-86.06 1910.71,-92.92"/>
-<text text-anchor="middle" x="1872.68" y="-104.03" font-family="Arial" font-size="9.00" fill="#2c3e50">ASM Printer</text>
+<path fill="none" stroke="black" d="M1684.87,-110.4C1707.97,-105.08 1739.29,-97.85 1765.61,-91.79"/>
+<polygon fill="black" stroke="black" points="1766.11,-95.26 1775.07,-89.6 1764.53,-88.44 1766.11,-95.26"/>
+<text text-anchor="middle" x="1727.01" y="-108.41" font-family="Arial" font-size="9.00" fill="#2c3e50">ASM Printer</text>
 </g>
 <!-- Object -->
 <g id="node12" class="node">
 <title>Object</title>
-<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="2152.69,-79 2134.35,-105.13 2097.69,-105.13 2079.36,-79 2097.69,-52.87 2134.35,-52.87 2152.69,-79"/>
-<text text-anchor="middle" x="2116.02" y="-82" font-family="Arial" font-size="10.00" fill="#2c3e50">.obj</text>
-<text text-anchor="middle" x="2116.02" y="-70" font-family="Arial" font-size="10.00" fill="#2c3e50">Object</text>
+<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="2007.01,-80 1988.68,-106.13 1952.02,-106.13 1933.69,-80 1952.02,-53.87 1988.68,-53.87 2007.01,-80"/>
+<text text-anchor="middle" x="1970.35" y="-83" font-family="Arial" font-size="10.00" fill="#2c3e50">.obj</text>
+<text text-anchor="middle" x="1970.35" y="-71" font-family="Arial" font-size="10.00" fill="#2c3e50">Object</text>
 </g>
 <!-- Assembly&#45;&gt;Object -->
-<g id="edge24" class="edge">
+<g id="edge21" class="edge">
 <title>Assembly-&gt;Object</title>
-<path fill="none" stroke="black" d="M2012.88,-79C2030.38,-79 2050.1,-79 2067.51,-79"/>
-<polygon fill="black" stroke="black" points="2067.06,-82.5 2077.06,-79 2067.06,-75.5 2067.06,-82.5"/>
-<text text-anchor="middle" x="2045.61" y="-81.7" font-family="Arial" font-size="9.00" fill="#2c3e50">clang -c</text>
+<path fill="none" stroke="black" d="M1867.21,-80C1884.71,-80 1904.42,-80 1921.84,-80"/>
+<polygon fill="black" stroke="black" points="1921.39,-83.5 1931.39,-80 1921.39,-76.5 1921.39,-83.5"/>
+<text text-anchor="middle" x="1899.93" y="-82.7" font-family="Arial" font-size="9.00" fill="#2c3e50">clang -c</text>
 </g>
 <!-- Executable -->
 <g id="node13" class="node">
 <title>Executable</title>
-<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="2326.12,-79 2299.39,-105.13 2245.92,-105.13 2219.19,-79 2245.92,-52.87 2299.39,-52.87 2326.12,-79"/>
-<text text-anchor="middle" x="2272.65" y="-82" font-family="Arial" font-size="10.00" fill="#2c3e50">.exe</text>
-<text text-anchor="middle" x="2272.65" y="-70" font-family="Arial" font-size="10.00" fill="#2c3e50">Executable</text>
+<polygon fill="#eafaf1" stroke="#27ae60" stroke-width="2" points="2180.44,-80 2153.71,-106.13 2100.25,-106.13 2073.52,-80 2100.25,-53.87 2153.71,-53.87 2180.44,-80"/>
+<text text-anchor="middle" x="2126.98" y="-83" font-family="Arial" font-size="10.00" fill="#2c3e50">.exe</text>
+<text text-anchor="middle" x="2126.98" y="-71" font-family="Arial" font-size="10.00" fill="#2c3e50">Executable</text>
 </g>
 <!-- Object&#45;&gt;Executable -->
-<g id="edge25" class="edge">
+<g id="edge22" class="edge">
 <title>Object-&gt;Executable</title>
-<path fill="none" stroke="black" d="M2153.67,-79C2169.5,-79 2188.5,-79 2206.59,-79"/>
-<polygon fill="black" stroke="black" points="2206.48,-82.5 2216.48,-79 2206.48,-75.5 2206.48,-82.5"/>
-<text text-anchor="middle" x="2185.94" y="-81.7" font-family="Arial" font-size="9.00" fill="#2c3e50">-Xlinker</text>
+<path fill="none" stroke="black" d="M2008,-80C2023.82,-80 2042.83,-80 2060.91,-80"/>
+<polygon fill="black" stroke="black" points="2060.81,-83.5 2070.81,-80 2060.81,-76.5 2060.81,-83.5"/>
+<text text-anchor="middle" x="2040.27" y="-82.7" font-family="Arial" font-size="9.00" fill="#2c3e50">-Xlinker</text>
 </g>
 <!-- CSE -->
 <g id="node15" class="node">
 <title>CSE</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="855.89,-137 730.39,-137 730.39,-101 855.89,-101 855.89,-137"/>
-<text text-anchor="middle" x="793.14" y="-122" font-family="Arial" font-size="10.00" fill="#2c3e50">Common Subexpression</text>
-<text text-anchor="middle" x="793.14" y="-110" font-family="Arial" font-size="10.00" fill="#2c3e50">Elimination</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="776.88,-142 722.88,-142 722.88,-106 776.88,-106 776.88,-142"/>
+<text text-anchor="middle" x="749.88" y="-121" font-family="Arial" font-size="10.00" fill="#2c3e50">CSE</text>
 </g>
 <!-- Mem&#45;&gt;CSE -->
 <g id="edge1" class="edge">
 <title>Mem-&gt;CSE</title>
-<path fill="none" stroke="black" d="M693.85,-119C701.4,-119 709.83,-119 718.47,-119"/>
-<polygon fill="black" stroke="black" points="718.41,-122.5 728.41,-119 718.41,-115.5 718.41,-122.5"/>
+<path fill="none" stroke="black" d="M642.6,-124C662.89,-124 689.74,-124 711.38,-124"/>
+<polygon fill="black" stroke="black" points="711.27,-127.5 721.27,-124 711.27,-120.5 711.27,-127.5"/>
 </g>
 <!-- AR -->
 <g id="node16" class="node">
 <title>AR</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="960.86,-137 899.83,-137 899.83,-101 960.86,-101 960.86,-137"/>
-<text text-anchor="middle" x="930.34" y="-122" font-family="Arial" font-size="10.00" fill="#2c3e50">Arithmetic</text>
-<text text-anchor="middle" x="930.34" y="-110" font-family="Arial" font-size="10.00" fill="#2c3e50">Reduction</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="874.91,-142 813.88,-142 813.88,-106 874.91,-106 874.91,-142"/>
+<text text-anchor="middle" x="844.39" y="-127" font-family="Arial" font-size="10.00" fill="#2c3e50">Arithmetic</text>
+<text text-anchor="middle" x="844.39" y="-115" font-family="Arial" font-size="10.00" fill="#2c3e50">Reduction</text>
 </g>
 <!-- CSE&#45;&gt;AR -->
 <g id="edge2" class="edge">
 <title>CSE-&gt;AR</title>
-<path fill="none" stroke="black" d="M856.2,-119C867.08,-119 878.15,-119 888.27,-119"/>
-<polygon fill="black" stroke="black" points="888.14,-122.5 898.14,-119 888.14,-115.5 888.14,-122.5"/>
+<path fill="none" stroke="black" d="M777.14,-124C784.93,-124 793.65,-124 802.14,-124"/>
+<polygon fill="black" stroke="black" points="801.96,-127.5 811.96,-124 801.96,-120.5 801.96,-127.5"/>
 </g>
 <!-- ConstantProp -->
 <g id="node17" class="node">
 <title>ConstantProp</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1082.77,-137 1012.84,-137 1012.84,-101 1082.77,-101 1082.77,-137"/>
-<text text-anchor="middle" x="1047.81" y="-122" font-family="Arial" font-size="10.00" fill="#2c3e50">Constant</text>
-<text text-anchor="middle" x="1047.81" y="-110" font-family="Arial" font-size="10.00" fill="#2c3e50">Propagation</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="981.84,-142 911.91,-142 911.91,-106 981.84,-106 981.84,-142"/>
+<text text-anchor="middle" x="946.87" y="-127" font-family="Arial" font-size="10.00" fill="#2c3e50">Constant</text>
+<text text-anchor="middle" x="946.87" y="-115" font-family="Arial" font-size="10.00" fill="#2c3e50">Propagation</text>
 </g>
 <!-- AR&#45;&gt;ConstantProp -->
 <g id="edge3" class="edge">
 <title>AR-&gt;ConstantProp</title>
-<path fill="none" stroke="black" d="M961.08,-119C973.4,-119 987.96,-119 1001.56,-119"/>
-<polygon fill="black" stroke="black" points="1001.16,-122.5 1011.16,-119 1001.16,-115.5 1001.16,-122.5"/>
+<path fill="none" stroke="black" d="M875.27,-124C883.14,-124 891.82,-124 900.32,-124"/>
+<polygon fill="black" stroke="black" points="900.19,-127.5 910.19,-124 900.19,-120.5 900.19,-127.5"/>
 </g>
 <!-- DCE -->
 <g id="node18" class="node">
 <title>DCE</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1194.41,-137 1127.82,-137 1127.82,-101 1194.41,-101 1194.41,-137"/>
-<text text-anchor="middle" x="1161.11" y="-122" font-family="Arial" font-size="10.00" fill="#2c3e50">Dead Code</text>
-<text text-anchor="middle" x="1161.11" y="-110" font-family="Arial" font-size="10.00" fill="#2c3e50">Elimination</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="1076.9,-142 1022.9,-142 1022.9,-106 1076.9,-106 1076.9,-142"/>
+<text text-anchor="middle" x="1049.9" y="-121" font-family="Arial" font-size="10.00" fill="#2c3e50">DCE</text>
 </g>
 <!-- ConstantProp&#45;&gt;DCE -->
 <g id="edge4" class="edge">
 <title>ConstantProp-&gt;DCE</title>
-<path fill="none" stroke="black" d="M1083.11,-119C1093.64,-119 1105.36,-119 1116.42,-119"/>
-<polygon fill="black" stroke="black" points="1116.12,-122.5 1126.12,-119 1116.12,-115.5 1116.12,-122.5"/>
+<path fill="none" stroke="black" d="M982.08,-124C991.52,-124 1001.81,-124 1011.43,-124"/>
+<polygon fill="black" stroke="black" points="1011.21,-127.5 1021.21,-124 1011.21,-120.5 1011.21,-127.5"/>
 </g>
 <!-- DCE&#45;&gt;IR2 -->
-<g id="edge16" class="edge">
+<g id="edge13" class="edge">
 <title>DCE-&gt;IR2</title>
-<path fill="none" stroke="black" d="M1194.71,-118.36C1202.49,-118.21 1210.92,-118.04 1219.15,-117.88"/>
-<polygon fill="black" stroke="black" points="1219.11,-121.38 1229.04,-117.69 1218.97,-114.39 1219.11,-121.38"/>
+<path fill="none" stroke="black" d="M1077.29,-124.76C1087.07,-125.05 1098.46,-125.38 1109.43,-125.7"/>
+<polygon fill="black" stroke="black" points="1109.02,-129.19 1119.12,-125.98 1109.23,-122.19 1109.02,-129.19"/>
 </g>
 <!-- InstSimp -->
 <g id="node20" class="node">
 <title>InstSimp</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="967.8,-52 892.89,-52 892.89,-16 967.8,-16 967.8,-52"/>
-<text text-anchor="middle" x="930.34" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Instruction</text>
-<text text-anchor="middle" x="930.34" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">Simplification</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="1192.88,-52 1117.97,-52 1117.97,-16 1192.88,-16 1192.88,-52"/>
+<text text-anchor="middle" x="1155.42" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Instruction</text>
+<text text-anchor="middle" x="1155.42" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">Simplification</text>
 </g>
 <!-- Promote&#45;&gt;InstSimp -->
 <g id="edge5" class="edge">
 <title>Promote-&gt;InstSimp</title>
-<path fill="none" stroke="black" d="M838.03,-34C851.77,-34 867,-34 881.02,-34"/>
-<polygon fill="black" stroke="black" points="880.94,-37.5 890.94,-34 880.94,-30.5 880.94,-37.5"/>
-</g>
-<!-- SimplifyCFG -->
-<g id="node21" class="node">
-<title>SimplifyCFG</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1090.82,-52 1004.8,-52 1004.8,-16 1090.82,-16 1090.82,-52"/>
-<text text-anchor="middle" x="1047.81" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Simplify Control</text>
-<text text-anchor="middle" x="1047.81" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">Flow Graph</text>
-</g>
-<!-- InstSimp&#45;&gt;SimplifyCFG -->
-<g id="edge6" class="edge">
-<title>InstSimp-&gt;SimplifyCFG</title>
-<path fill="none" stroke="black" d="M968.19,-34C976.18,-34 984.78,-34 993.26,-34"/>
-<polygon fill="black" stroke="black" points="993.17,-37.5 1003.17,-34 993.17,-30.5 993.17,-37.5"/>
-</g>
-<!-- LLVMDCE -->
-<g id="node22" class="node">
-<title>LLVMDCE</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1194.41,-52 1127.82,-52 1127.82,-16 1194.41,-16 1194.41,-52"/>
-<text text-anchor="middle" x="1161.11" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Dead Code</text>
-<text text-anchor="middle" x="1161.11" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">Elimination</text>
-</g>
-<!-- SimplifyCFG&#45;&gt;LLVMDCE -->
-<g id="edge7" class="edge">
-<title>SimplifyCFG-&gt;LLVMDCE</title>
-<path fill="none" stroke="black" d="M1091.2,-34C1099.39,-34 1107.98,-34 1116.21,-34"/>
-<polygon fill="black" stroke="black" points="1116.01,-37.5 1126.01,-34 1116.01,-30.5 1116.01,-37.5"/>
+<path fill="none" stroke="black" d="M1081.4,-34C1089.19,-34 1097.76,-34 1106.2,-34"/>
+<polygon fill="black" stroke="black" points="1106.04,-37.5 1116.04,-34 1106.04,-30.5 1106.04,-37.5"/>
 </g>
 <!-- Dots -->
-<g id="node23" class="node">
+<g id="node21" class="node">
 <title>Dots</title>
-<text text-anchor="middle" x="1265.25" y="-31" font-family="Arial" font-size="10.00" fill="#2c3e50">...</text>
+<text text-anchor="middle" x="1298.69" y="-31" font-family="Arial" font-size="10.00" fill="#2c3e50">...</text>
 </g>
-<!-- LLVMDCE&#45;&gt;Dots -->
-<g id="edge8" class="edge">
-<title>LLVMDCE-&gt;Dots</title>
-<path fill="none" stroke="black" d="M1194.71,-34C1204.97,-34 1216.39,-34 1226.95,-34"/>
-<polygon fill="black" stroke="black" points="1226.9,-37.5 1236.9,-34 1226.9,-30.5 1226.9,-37.5"/>
-</g>
-<!-- SROA -->
-<g id="node24" class="node">
-<title>SROA</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1477.65,-52 1371.61,-52 1371.61,-16 1477.65,-16 1477.65,-52"/>
-<text text-anchor="middle" x="1424.63" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Scalar Replacement</text>
-<text text-anchor="middle" x="1424.63" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">of Aggregates</text>
-</g>
-<!-- Dots&#45;&gt;SROA -->
-<g id="edge9" class="edge">
-<title>Dots-&gt;SROA</title>
-<path fill="none" stroke="black" d="M1292.23,-34C1310.62,-34 1336.1,-34 1359.73,-34"/>
-<polygon fill="black" stroke="black" points="1359.64,-37.5 1369.64,-34 1359.64,-30.5 1359.64,-37.5"/>
+<!-- InstSimp&#45;&gt;Dots -->
+<g id="edge6" class="edge">
+<title>InstSimp-&gt;Dots</title>
+<path fill="none" stroke="black" d="M1193.17,-34C1213.9,-34 1239.74,-34 1260.54,-34"/>
+<polygon fill="black" stroke="black" points="1260.31,-37.5 1270.31,-34 1260.31,-30.5 1260.31,-37.5"/>
 </g>
 <!-- ADCE -->
-<g id="node25" class="node">
+<g id="node22" class="node">
 <title>ADCE</title>
-<polygon fill="#f8f9f9" stroke="#95a5a6" points="1670.78,-52 1578.63,-52 1578.63,-16 1670.78,-16 1670.78,-52"/>
-<text text-anchor="middle" x="1624.71" y="-37" font-family="Arial" font-size="10.00" fill="#2c3e50">Aggressive Dead</text>
-<text text-anchor="middle" x="1624.71" y="-25" font-family="Arial" font-size="10.00" fill="#2c3e50">Code Elimination</text>
+<polygon fill="#f8f9f9" stroke="#95a5a6" points="1506.03,-52 1452.03,-52 1452.03,-16 1506.03,-16 1506.03,-52"/>
+<text text-anchor="middle" x="1479.03" y="-31" font-family="Arial" font-size="10.00" fill="#2c3e50">ADCE</text>
 </g>
-<!-- SROA&#45;&gt;ADCE -->
-<g id="edge10" class="edge">
-<title>SROA-&gt;ADCE</title>
-<path fill="none" stroke="black" d="M1477.93,-34C1505.33,-34 1538.93,-34 1566.96,-34"/>
-<polygon fill="black" stroke="black" points="1566.68,-37.5 1576.68,-34 1566.68,-30.5 1566.68,-37.5"/>
+<!-- Dots&#45;&gt;ADCE -->
+<g id="edge7" class="edge">
+<title>Dots-&gt;ADCE</title>
+<path fill="none" stroke="black" d="M1325.62,-34C1355.78,-34 1405.83,-34 1440.3,-34"/>
+<polygon fill="black" stroke="black" points="1440.27,-37.5 1450.27,-34 1440.27,-30.5 1440.27,-37.5"/>
 </g>
 <!-- ADCE&#45;&gt;LLVM2 -->
-<g id="edge22" class="edge">
+<g id="edge19" class="edge">
 <title>ADCE-&gt;LLVM2</title>
-<path fill="none" stroke="black" d="M1671.23,-38.56C1695.84,-41.02 1726.11,-44.05 1750.63,-46.5"/>
-<polygon fill="black" stroke="black" points="1750,-49.95 1760.3,-47.47 1750.69,-42.99 1750,-49.95"/>
+<path fill="none" stroke="black" d="M1506.21,-35.54C1532.48,-37.09 1573.48,-39.5 1604.97,-41.35"/>
+<polygon fill="black" stroke="black" points="1604.4,-44.83 1614.59,-41.92 1604.81,-37.84 1604.4,-44.83"/>
 </g>
 </g>
 </svg>
