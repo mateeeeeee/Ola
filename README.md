@@ -34,10 +34,12 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * LLVM Backend
   * Custom Backend (Work in Progress)
+  
+## Architecture
+<img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
 
 ## Structure
 The project consists of the following parts:
-
 1. **Ola Library**:
    - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. It includes essential components like:
      - `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olamemory.h`
@@ -77,8 +79,9 @@ The project consists of the following parts:
   * `--cfg`: Dump CFGs to .dot files and visualize them
   * `--callgraph`: Dump Call Graphs to .dot files and visualize them
   * `--domtree`: Dump Dominator Trees to .dot files and visualize them
-  * `--emit-ir`: Emit (i.e. don't delete) IR file
-  * `--emit-asm`: Emit (i.e. don't delete) ASM file
+  * `--emit-ir`: Emit IR file
+  * `--emit-mir`: Emit IR file
+  * `--emit-asm`: Emit ASM file
   * `--domfrontier`: Print dominance frontiers to standard output
   * `--nollvm`: Use custom backend instead of LLVM backend
   * `--test`: Used for running g-tests
@@ -89,7 +92,7 @@ The project consists of the following parts:
   * `--O2`: Optimize more
   * `--O3`: Optimize even more
   * `-i` ... : Input files
-  * `-o`     : Output file
+  * `-o`: Output file
   * `--directory`: Directory of input files
   
 ## Visualizations 

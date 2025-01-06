@@ -15,7 +15,6 @@ constexpr Uint ArraySize(T(&arr)[N])
 	return N;
 }
 
-
 Int main()
 {
 	LogInit();
