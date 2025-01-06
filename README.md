@@ -36,7 +36,7 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
   * Custom Backend (Work in Progress)
   
 ## Architecture
-<img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
+<img src="OlaDocs/olaarch.png" alt="Ola compiler architecture">
 
 ## Structure
 The project consists of the following parts:
