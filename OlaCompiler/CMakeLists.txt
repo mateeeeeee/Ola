@@ -118,6 +118,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Constant.cpp
   Backend/Custom/IR/FunctionPass.h
   Backend/Custom/IR/IRModulePass.h
+  Backend/Custom/IR/Loop.h
+  Backend/Custom/IR/Loop.cpp
   Backend/Custom/IR/DominatorTree.h
   Backend/Custom/IR/DominatorTree.cpp
   Backend/Custom/IR/DominanceFrontier.h
