@@ -242,28 +242,28 @@ namespace ola
 
 	private:
 		template<typename F>
-		Bool VisitPostOrderImpl(DominatorTreeNode* node, F&& f) 
+		Bool VisitPostOrderImpl(DominatorTreeNode* node, F f) 
 		{
 			for (DominatorTreeNode* child : *node)
 			{
-				if (!VisitPostOrderImpl(child, std::forward<F>(f))) 
+				if (!VisitPostOrderImpl(child, f))
 				{
 					return false; 
 				}
 			}
-			return std::invoke(std::forward<F>(f), node);
+			return std::invoke(f, node);
 		}
 		template<typename F>
-		Bool VisitPostOrderImpl(DominatorTreeNode const* node, F&& f) const 
+		Bool VisitPostOrderImpl(DominatorTreeNode const* node, F f) const 
 		{
 			for (DominatorTreeNode const* child : *node) 
 			{
-				if (!VisitPostOrderImpl(child, std::forward<F>(f)))
+				if (!VisitPostOrderImpl(child, f))
 				{
 					return false;
 				}
 			}
-			return std::invoke(std::forward<F>(f), node);
+			return std::invoke(f, node);
 		}
 	};
 

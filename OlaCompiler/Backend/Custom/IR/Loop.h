@@ -139,10 +139,23 @@ namespace ola
 		void AddChildLoop(Loop* NewChild);
 		Loop* RemoveChildLoop(Loop* Child);
 
-		void AddBlockEntry(BasicBlock* BB) 
+		void AddBlockToLoop(BasicBlock* BB)
 		{
-			Blocks.push_back(BB);
-			BlockSet.insert(BB);
+			if (!BlockSet.contains(BB))
+			{
+				Blocks.push_back(BB);
+				BlockSet.insert(BB);
+			}
+
+			if (BB == Blocks[0])
+			{
+				return;
+			}
+
+			if (ParentLoop) 
+			{
+				ParentLoop->AddBlockToLoop(BB);
+			}
 		}
 		void MoveToHeader(BasicBlock* BB) 
 		{

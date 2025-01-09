@@ -21,7 +21,7 @@ namespace ola
 		return current_cfg->GetPredecessors(this);
 	}
 
-	std::vector<ola::BasicBlock*> const& BasicBlock::GetSuccessors() const
+	std::vector<BasicBlock*> const& BasicBlock::GetSuccessors() const
 	{
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetSuccessors(this);
