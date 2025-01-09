@@ -13,7 +13,7 @@ namespace ola
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
 	public:
-		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1) {}
+		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1), current_cfg(nullptr) {}
 		explicit BasicBlock(IRContext& C, Function* function, Uint32 idx);
 		~BasicBlock() {}
 

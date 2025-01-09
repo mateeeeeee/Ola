@@ -8,7 +8,6 @@ namespace ola
 
 	BasicBlock::BasicBlock(IRContext& C, Function* function, Uint32 idx) : Value(ValueKind::BasicBlock, IRLabelType::Get(C)), function(function), block_idx(idx), current_cfg(nullptr)
 	{
-
 	}
 
 	Bool BasicBlock::IsEntryBlock() const
