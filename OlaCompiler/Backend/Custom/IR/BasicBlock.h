@@ -8,6 +8,7 @@ namespace ola
 	class IRContext;
 	class Function;
 	class Instruction;
+	class CFG;
 
 	class BasicBlock : public Value, public IListNode<BasicBlock>
 	{
@@ -87,10 +88,18 @@ namespace ola
 			return V->GetKind() == ValueKind::BasicBlock;
 		}
 
+		void SetCFG(CFG const* cfg)
+		{
+			current_cfg = cfg;
+		}
+		std::vector<BasicBlock*> const& GetPredecessors() const;
+		std::vector<BasicBlock*> const& GetSuccessors() const;
+
 	private:
 		Function* function;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<PhiInst*> phi_nodes;
+		CFG const* current_cfg;
 	};
 }

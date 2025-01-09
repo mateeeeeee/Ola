@@ -18,10 +18,7 @@ namespace ola
 		BasicBlock* GetEntryBlock() const { return entry_block; }
 		void AddPredecessor(BasicBlock* bb, BasicBlock* pred);
 		void AddSuccessor(BasicBlock* bb, BasicBlock* succ);
-		void AddBasicBlock(BasicBlock* bb)
-		{
-			basic_blocks.insert(bb);
-		}
+		void AddBasicBlock(BasicBlock* bb);
 
 		std::vector<BasicBlock*> const& GetPredecessors(BasicBlock const* bb) const;
 		std::vector<BasicBlock*> const& GetSuccessors(BasicBlock const* bb) const;

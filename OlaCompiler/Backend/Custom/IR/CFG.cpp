@@ -17,6 +17,12 @@ namespace ola
 		predecessors[succ].push_back(bb);
 	}
 
+	void CFG::AddBasicBlock(BasicBlock* bb)
+	{
+		basic_blocks.insert(bb);
+		bb->SetCFG(this);
+	}
+
 	std::vector<BasicBlock*> const& CFG::GetPredecessors(BasicBlock const* bb) const
 	{
 		auto it = predecessors.find(bb);
