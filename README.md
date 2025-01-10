@@ -1,13 +1,6 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide.png"/>
 Ola is a toy programming language with both LLVM backend and a work-in-progress custom backend. 
 
-## Dependencies
-* [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
-  * _Note: You can disable the LLVM backend even though you might have LLVM 17.0 installed by generating project with `ENABLE_LLVM=OFF`:_  
-    ```bash
-    cmake -DENABLE_LLVM=OFF -B build
-    ```
-
 ## Features
   * classes
 	- access modifiers: `public`, `private`
@@ -57,7 +50,7 @@ The project consists of the following parts:
          - Compilation to assembly is done using the `clang -S` command.
        - **Custom Backend**:
          - **IR Visitor**: Transforms the AST into Ola's custom IR.
-         - **IR Pass Manager**: Applies custom optimizations at the IR level.
+         - **IR Pass Manager**: Applies custom optimization passes at the IR level.
          - **MachineModule**: Responsible for lowering IR to MIR and finally to assembly.
 
 3. **Ola Driver**:
@@ -71,30 +64,8 @@ The project consists of the following parts:
      - **LLVM Tests**: Unit tests that use the LLVM backend of the compiler.
      - **Custom Backend Tests**: Unit tests that use the custom backend.
      - The tests rely on the `Assert` function from the `std.assert` import.
-     - **OlaDriver** executable is used in the tests via system calls, allowing the tests to invoke the compiled executable to verify correct behavior.
+     - **OlaDriver** executable is used in the tests via system calls.
 
-## Usage
-### Command line options
-  * `--ast`: Dump AST to output/log
-  * `--cfg`: Dump CFGs to .dot files and visualize them
-  * `--callgraph`: Dump Call Graphs to .dot files and visualize them
-  * `--domtree`: Dump Dominator Trees to .dot files and visualize them
-  * `--emit-ir`: Emit IR file
-  * `--emit-mir`: Emit IR file
-  * `--emit-asm`: Emit ASM file
-  * `--domfrontier`: Print dominance frontiers to standard output
-  * `--nollvm`: Use custom backend instead of LLVM backend
-  * `--test`: Used for running g-tests
-  * `--timeout`: Used for detecting infinite loops during tests
-  * `--Od`: No optimizations
-  * `--O0`: Same as `--Od`
-  * `--O1`: Optimize
-  * `--O2`: Optimize more
-  * `--O3`: Optimize even more
-  * `-i` ... : Input files
-  * `-o`: Output file
-  * `--directory`: Directory of input files
-  
 ## Visualizations 
 ```cpp
 private int min(int a, int b) 
@@ -149,6 +120,37 @@ public int main()
 
 ##### With and without optimizations
 <img src="OlaDocs/Images/custom_domtree.png" alt="Dominator tree in custom backend">
+
+
+## Dependencies
+* [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
+  * _Note: You can disable the LLVM backend even though you might have LLVM 17.0 installed by generating project with `ENABLE_LLVM=OFF`:_  
+    ```bash
+    cmake -DENABLE_LLVM=OFF -B build
+    ```
+
+## Usage
+### Command line options
+  * `--ast`: Dump AST to output/log
+  * `--cfg`: Dump CFGs to .dot files and visualize them
+  * `--callgraph`: Dump Call Graphs to .dot files and visualize them
+  * `--domtree`: Dump Dominator Trees to .dot files and visualize them
+  * `--emit-ir`: Emit IR file
+  * `--emit-mir`: Emit IR file
+  * `--emit-asm`: Emit ASM file
+  * `--domfrontier`: Print dominance frontiers to standard output
+  * `--nollvm`: Use custom backend instead of LLVM backend
+  * `--test`: Used for running g-tests
+  * `--timeout`: Used for detecting infinite loops during tests
+  * `--Od`: No optimizations
+  * `--O0`: Same as `--Od`
+  * `--O1`: Optimize
+  * `--O2`: Optimize more
+  * `--O3`: Optimize even more
+  * `-i` ... : Input files
+  * `-o`: Output file
+  * `--directory`: Directory of input files
+  
 
 ## Samples
 Currently to see the samples you can check the test folder: `OlaTests/Tests/`.
