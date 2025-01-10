@@ -26,7 +26,13 @@ namespace ola
 
 	Uint32 Loop::GetNumBackEdges() const
 	{
-		return 0; //#todo
+		Uint32 NumBackEdges = 0;
+		BasicBlock* Header = GetHeader();
+		for (BasicBlock* Pred : Header->GetPredecessors()) 
+		{
+			if (Contains(Pred)) NumBackEdges++;
+		}
+		return NumBackEdges;
 	}
 
 	void Loop::GetExitingBlocks(std::vector<BasicBlock*>& ExitingBlocks) const
