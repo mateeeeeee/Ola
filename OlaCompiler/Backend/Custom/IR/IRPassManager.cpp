@@ -11,6 +11,8 @@
 #include "Passes/DominatorTreeAnalysisPass.h"
 #include "Passes/DominanceFrontierAnalysisPass.h"
 #include "Passes/FunctionPassManagerModuleAdaptor.h"
+#include "Passes/LoopAnalysisPass.h"
+#include "Passes/LoopInvariantCodeMotionPass.h"
 
 namespace ola
 {
@@ -22,11 +24,12 @@ namespace ola
 	{
 		for (auto& G : M.Globals())
 		{
-			if (Function* F = dyn_cast<Function>(G))
+			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
 			{
 				FAM.RegisterPass<CFGAnalysisPass>(*F);
 				FAM.RegisterPass<DominatorTreeAnalysisPass>(*F);
 				FAM.RegisterPass<DominanceFrontierAnalysisPass>(*F);
+				FAM.RegisterPass<LoopAnalysisPass>(*F);
 			}
 		}
 
@@ -40,10 +43,11 @@ namespace ola
 			[[fallthrough]];
 		case OptimizationLevel::O1:
 			FPM.AddPass(CreateMem2RegPass());
-			FPM.AddPass(CreateCommonSubexpressionEliminationPass());
+			FPM.AddPass(CreateCSEPass());
 			FPM.AddPass(CreateArithmeticReductionPass());
 			FPM.AddPass(CreateConstantPropagationPass());
-			FPM.AddPass(CreateDeadCodeEliminationPass());
+			FPM.AddPass(CreateLICMPass());
+			FPM.AddPass(CreateDCEPass());
 			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());

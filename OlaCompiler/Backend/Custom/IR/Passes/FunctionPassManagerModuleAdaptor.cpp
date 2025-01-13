@@ -13,10 +13,9 @@ namespace ola
 		Bool changed = false;
 		for (auto& G : M.Globals())
 		{
-			if (G->IsFunction())
+			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
 			{
-				Function& F = *cast<Function>(G);
-				changed |= FPM.Run(F, FAM);
+				changed |= FPM.Run(*F, FAM);
 			}
 		}
 		return changed;

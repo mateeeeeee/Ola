@@ -20,6 +20,7 @@ namespace ola
 	};
 	using CSEPass = CommonSubexpressionEliminationPass;
 	OLA_REGISTER_PASS(CommonSubexpressionEliminationPass, "Common Subexpression Elimination Pass");
-	inline FunctionPass* CreateCommonSubexpressionEliminationPass() { return new CommonSubexpressionEliminationPass(); }
+
+	inline FunctionPass* CreateCSEPass() { return new CSEPass(); }
 }
 

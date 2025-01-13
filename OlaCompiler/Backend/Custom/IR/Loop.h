@@ -108,6 +108,10 @@ namespace ola
 		{
 			return Blocks;
 		}
+		auto const& GetBlocksVector() const
+		{
+			return Blocks;
+		}
 		auto& GetBlocksSet() 
 		{
 			return BlockSet;

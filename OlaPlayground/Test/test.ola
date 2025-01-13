@@ -1,9 +1,15 @@
 import std.assert;
 
+
 public int main()
 {
-    int intA = 5;
-    int resultIntMulImmediate = intA * 2;
-    Assert(resultIntMulImmediate == 10);
-    return 0;
+    int k = 0;
+    int a = 5;
+    int s = 0;
+    for(int k = 0; k < 5; ++k)
+    {
+        int b = a + 1;
+        s += b;
+    }
+    return s;
 }
