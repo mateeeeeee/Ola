@@ -25,8 +25,15 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
 	- attributes: `inline`, `noinline`, `nomangling` (equivalent to C++'s `extern "C"`)
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
-  * LLVM Backend
-  * Custom Backend (Work in Progress)
+  * LLVM backend
+  * Custom backend (Work in Progress)
+    - Custom IR
+    	- Optimization passes: Mem2Reg, CSE, ArithmeticReduction, ConstantPropagation, LICM, DCE
+        - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier
+    - Custom MIR
+    	- instruction legalization
+       	- register allocation
+    - x86-64 code generation
   
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
