@@ -38,7 +38,6 @@ namespace ola
 		PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
 
 		llvm::ModulePassManager MPM;
-		llvm::FunctionPassManager FPM;
 		switch (level)
 		{
 		case OptimizationLevel::O3:
@@ -48,20 +47,12 @@ namespace ola
 			MPM.addPass(PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2));
 			break;
 		case OptimizationLevel::O1:
-			FPM.addPass(llvm::PromotePass());
-			FPM.addPass(llvm::InstSimplifyPass());
-			FPM.addPass(llvm::SimplifyCFGPass());           
-			FPM.addPass(llvm::DCEPass());                   
-			FPM.addPass(llvm::ReassociatePass());           
-			FPM.addPass(llvm::SROAPass(llvm::SROAOptions::PreserveCFG));                  
-			FPM.addPass(llvm::ADCEPass());          
-			break;
-		case OptimizationLevel::O0:
-		default:
+			MPM.addPass(PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O1));
 			break;
 		}
-		if(opts.domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
 
+		llvm::FunctionPassManager FPM;
+		if(opts.domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
 		MPM.addPass(llvm::createModuleToFunctionPassAdaptor(std::move(FPM)));
 		MPM.run(module, MAM);
 		if (!VerifyLLVMModule(module))
