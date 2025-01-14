@@ -1,15 +1,13 @@
 import std.assert;
 
+int f()
+{
+    return 24;
+}
 
 public int main()
 {
-    int k = 0;
-    int a = 5;
-    int s = 0;
-    for(int k = 0; k < 5; ++k)
-    {
-        int b = a + 1;
-        s += b;
-    }
-    return s;
+    int a = f();
+    int b = a / 8;
+    return b;
 }

@@ -66,6 +66,8 @@ namespace ola
 
 				PatternMatchContext<Value> ctx(&I);
 				Value* V = nullptr;
+				Int64 i = 0;
+				Float64 f = 0.0;
 				if (Add_(Any_(V), CInt_(0))(ctx))
 				{
 					ReplaceInstruction(I, V);
@@ -145,6 +147,22 @@ namespace ola
 				else if (FDiv_(Any_(V), CFloat_(0.0))(ctx))
 				{
 					ReplaceInstruction(I, V);
+				}
+				else if (Mul_(Any_(V), Int_(i))(ctx))
+				{
+					if (IsPowerOfTwo(i))
+					{
+						Int64 const shift = FindPowerOfTwo(i);
+						ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::Shl, V, I.GetContext().GetInt64(shift)));
+					}
+				}
+				else if (SDiv_(Any_(V), Int_(i))(ctx))
+				{
+					if (IsPowerOfTwo(i))
+					{
+						Int64 const shift = FindPowerOfTwo(i);
+						ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::AShr, V, I.GetContext().GetInt64(shift)));
+					}
 				}
 			}
 		}

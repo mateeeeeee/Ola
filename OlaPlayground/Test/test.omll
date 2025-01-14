@@ -2,41 +2,33 @@ external Assert
 
 external AssertMsg
 
-external main: 
+internal f: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstMove - i64 reg 15, i64 imm 0
-InstMove - i64 reg 14, i64 imm 0
 InstJump - label2
 
 label1: 
-InstMove - i64 reg 13, i64 reg 14
-InstAdd - i64 reg 13, i64 imm 6
-InstJump - label3
 
 label2: 
-InstICmp - i64 reg 15, i64 imm 5
-x64::SetLT - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstTest - i8 reg 13, i8 reg 13
-InstJNE - label1
-InstJump - label4
+InstMove - i64 reg 0, i64 imm 24
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
 
+external main: 
 label3: 
-InstMove - i64 reg 12, i64 reg 15
-InstAdd - i64 reg 12, i64 imm 1
-InstMove - i64 reg 11, i64 imm 6
-InstMove - i64 reg 15, i64 reg 12
-InstMove - i64 reg 14, i64 reg 13
-InstJump - label2
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstMove - i64 reg 14, i64 reg 15
+InstAShr - i64 reg 14, i64 imm 3
+InstJump - label5
 
 label4: 
-InstJump - label6
 
 label5: 
-
-label6: 
 InstMove - i64 reg 0, i64 reg 14
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2

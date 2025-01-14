@@ -6,22 +6,20 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
+define internal @f i64() {
+entry:
+br label exit
+return:
+br label exit
+exit:
+ret i64 24
+}
+
+
 define external @main i64() {
 entry:
-br label for.cond
-for.body:
-%0 = add i64 %1, 6
-br label for.iter
-for.cond:
-%2 = phi i64 [ 6, for.iter ]
-%3 = phi i64 [ 0, entry ], [ %4, for.iter ]
-%1 = phi i64 [ 0, entry ], [ %0, for.iter ]
-%5 = icmp slt i64 %3, 5
-br i8 %5, label for.body, label for.end
-for.iter:
-%4 = add i64 %3, 1
-br label for.cond
-for.end:
+%0 = call ptr @f
+%1 = ashr i64 %0, 3
 br label exit
 return:
 br label exit
