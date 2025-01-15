@@ -337,6 +337,7 @@ namespace ola
 		OpRange			Operands() { return OpRange(OpBegin(), OpEnd()); }
 		ConstOpRange	Operands() const { return ConstOpRange(OpBegin(), OpEnd()); }
 
+		OLA_NODISCARD Instruction* Clone() const;
 		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::Instruction;
@@ -397,6 +398,10 @@ namespace ola
 			return Op<1>();
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new BinaryInst(GetOpcode(), GetLHS(), GetRHS());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsBinaryOp();
@@ -417,6 +422,10 @@ namespace ola
 			return Op<0>();
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new UnaryInst(GetOpcode(), GetOperand());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsUnaryOp();
@@ -470,6 +479,10 @@ namespace ola
 
 		CompareOp GetCompareOp() const { return cmp; }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new CompareInst(GetOpcode(), GetLHS(), GetRHS());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsCompareOp();
@@ -493,6 +506,10 @@ namespace ola
 		IRType* GetSrcType() const { return Op<0>()->GetType(); }
 		IRType* GetDestType() const { return GetType(); }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new CastInst(GetOpcode(), GetDestType(), GetSrc());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->IsCastOp();
@@ -509,9 +526,12 @@ namespace ola
 		explicit LoadInst(Value* address);
 		LoadInst(Value* address, IRType* type);
 
-		Value* GetAddressOp() { return GetOperand(0); }
-		Value const* GetAddressOp() const { return GetOperand(0); }
+		Value* GetAddressOp() const { return GetOperand(0); }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new LoadInst(GetAddressOp(), GetType());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Load;
@@ -527,12 +547,13 @@ namespace ola
 	public:
 		StoreInst(Value* value, Value* address);
 
-		Value* GetValueOp() { return GetOperand(0); }
-		Value const* GetValueOp() const { return GetOperand(0); }
+		Value* GetValueOp() const { return GetOperand(0); }
+		Value* GetAddressOp() const { return GetOperand(1); }
 
-		Value* GetAddressOp() { return GetOperand(1); }
-		Value const* GetAddressOp() const { return GetOperand(1); }
-
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new StoreInst(GetValueOp(), GetAddressOp());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Store;
@@ -568,6 +589,11 @@ namespace ola
 			Op<2>() = C;
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return IsConditional() ? new BranchInst(GetCondition(), GetTrueTarget(), GetFalseTarget()) 
+								   : new BranchInst(GetContext(), GetTrueTarget());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Branch;
@@ -594,6 +620,11 @@ namespace ola
 			return GetNumOperands() > 0 ? GetOperand(0) : nullptr;
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return IsVoid() ? new ReturnInst(GetContext())
+							: new ReturnInst(GetReturnValue());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Ret;
@@ -651,6 +682,10 @@ namespace ola
 			return cases.size();
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return nullptr; //#todo
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Switch;
@@ -708,6 +743,10 @@ namespace ola
 		Function* GetCalleeAsFunction() const;
 		Function* GetCaller() const;
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return nullptr; //#todo
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Call;
@@ -725,18 +764,18 @@ namespace ola
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
-
-		const Value* GetPredicate() const  { return Op<0>(); }
-		const Value* GetTrueValue() const  { return Op<1>(); }
-		const Value* GetFalseValue() const { return Op<2>(); }
-		Value* GetPredicate()  { return Op<0>(); }
-		Value* GetTrueValue()  { return Op<1>(); }
-		Value* GetFalseValue() { return Op<2>(); }
+		Value* GetPredicate()  const { return Op<0>(); }
+		Value* GetTrueValue()  const { return Op<1>(); }
+		Value* GetFalseValue() const { return Op<2>(); }
 
 		void SetCondition(Value* V) { Op<0>() = V; }
 		void SetTrueValue(Value* V) { Op<1>() = V; }
 		void SetFalseValue(Value* V) { Op<2>() = V; }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new SelectInst(GetPredicate(), GetTrueValue(), GetFalseValue());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Select;
@@ -755,6 +794,10 @@ namespace ola
 		IRPtrType* GetPtrType() const;
 		IRType* GetAllocatedType() const { return allocated_type; }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new AllocaInst(GetAllocatedType());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Alloca;
@@ -794,6 +837,10 @@ namespace ola
 		IRType* GetSourceElementType() const { return source_element_type; }
 		IRType* GetResultElementType() const { return result_element_type; }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return nullptr; //#todo
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::GetElementPtr;
@@ -817,6 +864,10 @@ namespace ola
 		Value* GetOffset() const { return Op<1>(); }
 		IRType* GetResultElementType() const { return result_element_type; }
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			return new PtrAddInst(GetBase(), GetOffset(), GetResultElementType());
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::PtrAdd;
@@ -898,6 +949,15 @@ namespace ola
 			}
 		}
 
+		OLA_NODISCARD Instruction* Clone() const
+		{
+			PhiInst* NewPhi = new PhiInst(GetType());
+			for (Uint i = 0; i < GetNumOperands(); ++i)
+			{
+				NewPhi->AddIncoming(GetOperand(i), incoming_blocks[i]);
+			}
+			return NewPhi;
+		}
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Phi;

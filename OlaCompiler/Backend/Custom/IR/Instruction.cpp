@@ -135,7 +135,28 @@ namespace ola
 		return true;
 	}
 
-	LoadInst::LoadInst(Value* address) 
+	Instruction* Instruction::Clone() const
+	{
+		Instruction* New = nullptr;
+		if (IsBinaryOp())				New = cast<BinaryInst>(this)->Clone();
+		else if (IsUnaryOp())			New = cast<UnaryInst>(this)->Clone();
+		else if (IsCompareOp())			New = cast<CompareInst>(this)->Clone();
+		else if (IsCastOp())			New = cast<CastInst>(this)->Clone();
+		else if (isa<LoadInst>(this))	New = cast<LoadInst>(this)->Clone();
+		else if (isa<StoreInst>(this))	New = cast<StoreInst>(this)->Clone();
+		else if (isa<BranchInst>(this))	New = cast<BranchInst>(this)->Clone();
+		else if (isa<ReturnInst>(this))	New = cast<ReturnInst>(this)->Clone();
+		else if (isa<SwitchInst>(this))	New = cast<SwitchInst>(this)->Clone();
+		else if (isa<CallInst>(this))	New = cast<CallInst>(this)->Clone();
+		else if (isa<SelectInst>(this))	New = cast<SelectInst>(this)->Clone();
+		else if (isa<AllocaInst>(this))	New = cast<AllocaInst>(this)->Clone();
+		else if (isa<GetElementPtrInst>(this))	New = cast<GetElementPtrInst>(this)->Clone();
+		else if (isa<PtrAddInst>(this))	New = cast<PtrAddInst>(this)->Clone();
+		else if (isa<PhiInst>(this))	New = cast<PhiInst>(this)->Clone();
+		return New;
+	}
+
+	LoadInst::LoadInst(Value* address)
 		: Instruction( Opcode::Load, cast<IRPtrType>(address->GetType())->GetPointeeType(), {address})
 	{
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
