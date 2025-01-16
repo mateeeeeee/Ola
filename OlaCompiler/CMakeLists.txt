@@ -147,6 +147,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/Mem2RegPass.cpp
   Backend/Custom/IR/Passes/ConstantPropagationPass.h
   Backend/Custom/IR/Passes/ConstantPropagationPass.cpp
+  Backend/Custom/IR/Passes/FunctionInlinerPass.h
+  Backend/Custom/IR/Passes/FunctionInlinerPass.cpp
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.h
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.cpp
 
