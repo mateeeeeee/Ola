@@ -363,10 +363,17 @@ namespace ola
 		{
 			operands.clear();
 		}
-
 		void AddOperand(Value* op)
 		{
 			operands.emplace_back(op, this);
+		}
+		void RemoveLastOperand()
+		{
+			operands.pop_back();
+		}
+		void SwapOperands(Uint32 i, Uint32 j)
+		{
+			std::swap(operands[i], operands[j]);
 		}
 
 		template <Uint32 Idx>
@@ -947,6 +954,18 @@ namespace ola
 			{
 				if (GetIncomingBlock(Op) == BB) SetIncomingValue(Op, V);
 			}
+		}
+		void RemoveIncomingValue(Uint32 i)
+		{
+			Uint32 lastIdx = GetNumOperands() - 1;
+			if (i != lastIdx) 
+			{
+				SwapOperands(i, lastIdx);
+				std::swap(incoming_blocks[i], incoming_blocks[lastIdx]);
+			}
+			RemoveLastOperand();
+			incoming_blocks.pop_back();
+			OLA_ASSERT(GetNumOperands() == incoming_blocks.size());
 		}
 
 		OLA_NODISCARD Instruction* Clone() const

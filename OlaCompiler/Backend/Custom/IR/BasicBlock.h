@@ -88,18 +88,20 @@ namespace ola
 			return V->GetKind() == ValueKind::BasicBlock;
 		}
 
-		void SetCFG(CFG const* cfg)
+		void SetCFG(CFG* cfg)
 		{
 			current_cfg = cfg;
 		}
 		std::vector<BasicBlock*> const& GetPredecessors() const;
 		std::vector<BasicBlock*> const& GetSuccessors() const;
 
+		BasicBlock* SplitBasicBlock(Instruction* SplitBefore);
+
 	private:
 		Function* function;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<PhiInst*> phi_nodes;
-		CFG const* current_cfg;
+		CFG* current_cfg;
 	};
 }

@@ -54,6 +54,12 @@ namespace ola
 			I->InsertBefore(current_block, insert_point);
 			return I;
 		}
+		Instruction* CloneInst(Instruction* I)
+		{
+			Instruction* CloneOfI = I->Clone();
+			CloneOfI->InsertBefore(current_block, insert_point);
+			return CloneOfI;
+		}
 
 		BasicBlock* AddBlock(std::string_view name = "");
 		BasicBlock* AddBlock(BasicBlock* before, std::string_view name);

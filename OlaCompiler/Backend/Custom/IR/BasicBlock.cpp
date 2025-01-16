@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 #include "GlobalValue.h"
 #include "IRType.h"
+#include "IRBuilder.h"
 #include "CFG.h"
 
 namespace ola
@@ -25,6 +26,30 @@ namespace ola
 	{
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetSuccessors(this);
+	}
+
+	BasicBlock* BasicBlock::SplitBasicBlock(Instruction* SplitBefore)
+	{
+		IRBuilder builder(GetContext());
+		builder.SetCurrentFunction(GetParent());
+
+		std::string NewBlockName(GetName()); NewBlockName += ".split";
+		BasicBlock* NewBlock = builder.AddBlock(GetNextNode(), NewBlockName);
+
+		auto& CurrentInstructions = Instructions();
+		auto& NewBlockInstructions = NewBlock->Instructions();
+
+		auto SplitIter = std::find_if(CurrentInstructions.begin(), CurrentInstructions.end(), [SplitBefore](const Instruction& I) { return &I == SplitBefore; });
+		NewBlockInstructions.Splice(NewBlockInstructions.begin(), CurrentInstructions, SplitIter, CurrentInstructions.end());
+
+		builder.SetCurrentBlock(this);
+		builder.MakeInst<BranchInst>(GetContext(), NewBlock);
+
+		if (current_cfg)
+		{
+			current_cfg->AddSuccessor(this, NewBlock);
+		}
+		return NewBlock;
 	}
 
 }

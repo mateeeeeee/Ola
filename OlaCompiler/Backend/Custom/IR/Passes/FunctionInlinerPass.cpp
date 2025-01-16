@@ -54,8 +54,9 @@ namespace ola
 		Function* Caller = CI->GetCaller();
 
 		std::unordered_map<Value*, Value*> ValueMap;
+
 		auto ArgIt = Callee->ArgBegin();
-		for (unsigned i = 0; i < CI->GetNumOperands() - 1; ++i, ++ArgIt)
+		for (Uint32 i = 0; i < CI->GetNumOperands() - 1; ++i, ++ArgIt)
 		{
 			ValueMap[*ArgIt] = CI->GetOperand(i);
 		}
@@ -72,7 +73,7 @@ namespace ola
 		for (auto& BBPair : BBMap)
 		{
 			BasicBlock* OrigBB = BBPair.first;
-			BasicBlock* NewBB = BBPair.second;
+			BasicBlock* NewBB  = BBPair.second;
 
 			for (Instruction& I : OrigBB->Instructions())
 			{
@@ -87,8 +88,9 @@ namespace ola
 					continue;
 				}
 
-				Instruction* NewInst = I.Clone();
-				NewBB->Instructions().PushBack(NewInst);
+				Builder.SetCurrentBlock(NewBB);
+				Instruction* NewInst = Builder.CloneInst(&I);
+
 				for (Uint32 i = 0; i < NewInst->GetNumOperands(); ++i)
 				{
 					Value* Op = NewInst->GetOperand(i);
@@ -101,33 +103,34 @@ namespace ola
 			}
 		}
 
-		//BasicBlock* InlinedEntry = BBMap[&Callee->GetEntryBlock()];
-		//BasicBlock* CallBlockRemainder = CallBlock->SplitBasicBlock(Call);
-		//CallBlock->GetTerminator()->EraseFromParent();
-		//
-		////BranchInst::Create(InlinedEntry, CallBlock);
-		//
-		//for (Instruction& I : CallBlockRemainder->Instructions())
-		//{
-		//	if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
-		//	{
-		//		for (Uint32 i = 0; i < Phi->GetNumIncomingValues(); ++i)
-		//		{
-		//			if (Phi->GetIncomingBlock(i) == CallBlock)
-		//			{
-		//				for (auto& BBPair : BBMap)
-		//				{
-		//					if (ReturnInst* RI = dyn_cast<ReturnInst>(BBPair.first->GetTerminator()))
-		//					{
-		//						Phi->AddIncoming(Phi->GetIncomingValue(i), BBPair.second);
-		//					}
-		//				}
-		//				//Phi->RemoveIncomingValue(i);
-		//				break;
-		//			}
-		//		}
-		//	}
-		//}
+		BasicBlock* InlinedEntry = BBMap[&Callee->GetEntryBlock()];
+		BasicBlock* CallBlockRemainder = CallBlock->SplitBasicBlock(CI);
+		CallBlock->GetTerminator()->EraseFromParent();
+
+		Builder.SetCurrentBlock(CallBlock);
+		Builder.MakeInst<BranchInst>(Ctx, InlinedEntry);
+
+		for (Instruction& I : CallBlockRemainder->Instructions())
+		{
+			if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
+			{
+				for (Uint32 i = 0; i < Phi->GetNumIncomingValues(); ++i)
+				{
+					if (Phi->GetIncomingBlock(i) == CallBlock)
+					{
+						for (auto& BBPair : BBMap)
+						{
+							if (ReturnInst* RI = dyn_cast<ReturnInst>(BBPair.first->GetTerminator()))
+							{
+								Phi->AddIncoming(Phi->GetIncomingValue(i), BBPair.second);
+							}
+						}
+						Phi->RemoveIncomingValue(i);
+						break;
+					}
+				}
+			}
+		}
 		CI->EraseFromParent();
 		return true;
 	}
