@@ -1,12 +1,12 @@
-#include <unordered_map>
+#include <map>
 #include "FunctionInlinerPass.h"
+#include "CFGAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
 
 namespace ola
 {
-
 	Bool FunctionInlinerPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		Bool Changed = false;
@@ -27,6 +27,11 @@ namespace ola
 			{
 				Changed = true;
 			}
+		}
+
+		if (Changed)
+		{
+			FAM.InvalidateCache<CFGAnalysisPass>(F);
 		}
 		return Changed;
 	}
@@ -53,7 +58,7 @@ namespace ola
 		BasicBlock* CallBlock = CI->GetBasicBlock();
 		Function* Caller = CI->GetCaller();
 
-		std::unordered_map<Value*, Value*> ValueMap;
+		std::map<Value*, Value*> ValueMap;
 
 		auto ArgIt = Callee->ArgBegin();
 		for (Uint32 i = 0; i < CI->GetNumOperands() - 1; ++i, ++ArgIt)
@@ -61,7 +66,7 @@ namespace ola
 			ValueMap[*ArgIt] = CI->GetOperand(i);
 		}
 
-		std::unordered_map<BasicBlock*, BasicBlock*> BBMap;
+		std::map<BasicBlock*, BasicBlock*> BBMap;
 		for (BasicBlock& BB : *Callee)
 		{
 			std::string name(BB.GetName());
@@ -98,6 +103,7 @@ namespace ola
 					{
 						NewInst->SetOperand(i, MappedOp);
 					}
+					else OLA_ASSERT(false);
 				}
 				ValueMap[&I] = NewInst;
 			}

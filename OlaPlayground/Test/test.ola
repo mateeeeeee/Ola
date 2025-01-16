@@ -8,6 +8,5 @@ int f()
 public int main()
 {
     int a = f();
-    int b = a / 8;
-    return b;
+    return a;
 }
