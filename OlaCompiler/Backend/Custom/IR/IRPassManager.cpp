@@ -36,13 +36,9 @@ namespace ola
 
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
-		switch (level)
+
+		if (level >= OptimizationLevel::O1)
 		{
-		case OptimizationLevel::O3:
-			[[fallthrough]];
-		case OptimizationLevel::O2:
-			[[fallthrough]];
-		case OptimizationLevel::O1:
 			FPM.AddPass(CreateFunctionInlinerPass());
 			FPM.AddPass(CreateMem2RegPass());
 			FPM.AddPass(CreateCSEPass());

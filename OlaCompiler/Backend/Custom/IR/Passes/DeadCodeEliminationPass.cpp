@@ -6,6 +6,15 @@ namespace ola
 {
 	Bool DeadCodeEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
+		BasicBlock* bb = nullptr;
+		for (auto& BB : F)
+		{
+			if (BB.GetName().starts_with("entry.split"))
+			{
+				bb = &BB;
+			}
+		}
+
 		std::unordered_set<Instruction*> AliveInsts;
 		for (BasicBlock& BB : F)
 		{
@@ -51,11 +60,10 @@ namespace ola
 				}
 			}
 		}
-
 		for (auto it = DeadInsts.rbegin(); it != DeadInsts.rend(); ++it)
 		{
 			Instruction* I = *it;
-			I->RemoveFromParent();
+			I->EraseFromParent();
 		}
 		return Changed;
 	}

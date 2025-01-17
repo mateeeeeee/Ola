@@ -4,6 +4,7 @@
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
+#include "Core/Log.h"
 
 namespace ola
 {
@@ -39,15 +40,10 @@ namespace ola
 	Bool FunctionInlinerPass::ShouldInline(CallInst* CI)
 	{
 		Function* Callee = CI->GetCalleeAsFunction(); 
-		if (!Callee || Callee->IsDeclaration())
-		{
-			return false;
-		}
-		if (CI->GetBasicBlock()->GetFunction() == Callee)
-		{
-			return false;
-		}
-		return Callee->Blocks().Size() <= 5;
+		if (!Callee || Callee->IsDeclaration()) return false;
+		if (CI->GetBasicBlock()->GetFunction() == Callee) return false;
+		if (Callee->IsNoInline())  return false;
+		return Callee->Blocks().Size() <= 3;
 	}
 
 	Bool FunctionInlinerPass::InlineFunction(CallInst* CI)
@@ -87,18 +83,27 @@ namespace ola
 		{
 			for (Instruction& NewInst : NewBB->Instructions())
 			{
+				if (BranchInst* BI = dyn_cast<BranchInst>(&NewInst))
+				{
+					BasicBlock* TrueTarget = BI->GetTrueTarget();
+					BasicBlock* FalseTarget = BI->GetFalseTarget();
+					BI->SetTrueTarget(BBMap[TrueTarget]);
+					if (FalseTarget != nullptr)
+					{
+						BI->SetFalseTarget(BBMap[FalseTarget]);
+					}
+					continue;
+				}
 				for (Uint32 i = 0; i < NewInst.GetNumOperands(); ++i)
 				{
 					Value* Op = NewInst.GetOperand(i);
-					if (BasicBlock* BB = dyn_cast<BasicBlock>(Op))
 					{
-						OLA_ASSERT(BBMap[BB]);
-						NewInst.SetOperand(i, BBMap[BB]);
-					}
-					else
-					{
-						OLA_ASSERT(ValueMap[Op]);
-						NewInst.SetOperand(i, ValueMap[Op]);
+						if (Op->IsConstant()) NewInst.SetOperand(i, Op);
+						else
+						{
+							OLA_ASSERT(ValueMap[Op]);
+							NewInst.SetOperand(i, ValueMap[Op]);
+						}
 					}
 				}
 			}
@@ -109,31 +114,20 @@ namespace ola
 
 		Builder.SetCurrentBlock(CallBlock);
 		Builder.MakeInst<BranchInst>(Ctx, BBMap[&Callee->GetEntryBlock()]);
-
 		for (BasicBlock& BB : *Callee)
 		{
 			if (ReturnInst* RI = dyn_cast<ReturnInst>(BB.GetTerminator()))
 			{
 				BasicBlock* InlinedBB = BBMap[&BB];
 				Builder.SetCurrentBlock(InlinedBB);
+				if (InlinedBB->GetTerminator() && InlinedBB->GetTerminator()->GetOpcode() == Opcode::Ret) InlinedBB->GetTerminator()->EraseFromParent();
 
-				if (InlinedBB->GetTerminator() && InlinedBB->GetTerminator()->GetOpcode() == Opcode::Ret)
+				if (!RI->IsVoid())
 				{
-					InlinedBB->GetTerminator()->EraseFromParent();
-				}
-
-				if (RI->GetNumOperands() > 0)
-				{
-					Value* RetVal = RI->GetOperand(0);
+					Value* RetVal = RI->GetReturnValue();
 					Value* MappedRetVal = ValueMap[RetVal];
-					if (MappedRetVal)
-					{
-						CI->ReplaceAllUsesWith(MappedRetVal);
-					}
-					else
-					{
-						CI->ReplaceAllUsesWith(RetVal);
-					}
+					if (MappedRetVal) CI->ReplaceAllUsesWith(MappedRetVal);
+					else CI->ReplaceAllUsesWith(RetVal);
 				}
 				Builder.MakeInst<BranchInst>(Ctx, CallBlockRemainder);
 			}

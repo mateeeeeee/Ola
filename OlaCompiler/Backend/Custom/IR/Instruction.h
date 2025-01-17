@@ -30,7 +30,7 @@ namespace ola
 		Load = MemoryOpBegin,
 		Store,
 		MemoryOpEnd = Store,
-		
+
 		IntegerOpBegin,
 		Add = IntegerOpBegin,
 		Sub,
@@ -103,23 +103,23 @@ namespace ola
 	{
 		return Opcode::TerminatorBegin <= opcode && opcode <= Opcode::TerminatorEnd;
 	}
-	inline Bool IsOpcodeMemoryOp(Opcode opcode) 
+	inline Bool IsOpcodeMemoryOp(Opcode opcode)
 	{
 		return Opcode::MemoryOpBegin <= opcode && opcode <= Opcode::MemoryOpEnd;
 	}
-	inline Bool IsOpcodeIntegerOp(Opcode opcode) 
+	inline Bool IsOpcodeIntegerOp(Opcode opcode)
 	{
 		return Opcode::IntegerOpBegin <= opcode && opcode <= Opcode::IntegerOpEnd;
 	}
-	inline Bool IsOpcodeFloatOp(Opcode opcode) 
+	inline Bool IsOpcodeFloatOp(Opcode opcode)
 	{
 		return Opcode::FloatOpBegin <= opcode && opcode <= Opcode::FloatOpEnd;
 	}
-	inline Bool IsOpcodeCastOp(Opcode opcode) 
+	inline Bool IsOpcodeCastOp(Opcode opcode)
 	{
 		return Opcode::CastOpBegin <= opcode && opcode <= Opcode::CastOpEnd;
 	}
-	inline Bool IsOpcodeCompareOp(Opcode opcode) 
+	inline Bool IsOpcodeCompareOp(Opcode opcode)
 	{
 		return Opcode::CompareOpBegin <= opcode && opcode <= Opcode::CompareOpEnd;
 	}
@@ -160,8 +160,8 @@ namespace ola
 			return false;
 		}
 	}
-	
-	class Use 
+
+	class Use
 	{
 	public:
 		Use() : value(nullptr), user(nullptr) {}
@@ -217,12 +217,12 @@ namespace ola
 		using UserRange = IteratorRange<UserIterator>;
 		using ConstUserRange = IteratorRange<ConstUserIterator>;
 
-		UserIterator	  UserBegin()		{ return users.begin(); }
-		ConstUserIterator UserBegin() const	{ return users.begin(); }
-		UserIterator      UserEnd()			{ return users.end(); }
-		ConstUserIterator UserEnd() const	{ return users.end(); }
-		UserRange		  Users()			{ return UserRange(UserBegin(), UserEnd()); }
-		ConstUserRange	  Users() const		{ return ConstUserRange(UserBegin(), UserEnd()); }
+		UserIterator	  UserBegin() { return users.begin(); }
+		ConstUserIterator UserBegin() const { return users.begin(); }
+		UserIterator      UserEnd() { return users.end(); }
+		ConstUserIterator UserEnd() const { return users.end(); }
+		UserRange		  Users() { return UserRange(UserBegin(), UserEnd()); }
+		ConstUserRange	  Users() const { return ConstUserRange(UserBegin(), UserEnd()); }
 
 		static Bool ClassOf(Value const* V)
 		{
@@ -240,12 +240,16 @@ namespace ola
 	public:
 		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), opcode(Opcode::None), basic_block(nullptr) {}
 
-		Opcode GetOpcode() const 
+		Opcode GetOpcode() const
 		{
 			return opcode;
 		}
 		Char const* GetOpcodeName() const;
 
+		void SetBasicBlock(BasicBlock* BB)
+		{
+			basic_block = BB;
+		}
 		BasicBlock* GetBasicBlock() const
 		{
 			return basic_block;
@@ -257,15 +261,15 @@ namespace ola
 		void RemoveFromParent();
 		IListIterator<Instruction> EraseFromParent();
 
-		Bool IsTerminator() const 
+		Bool IsTerminator() const
 		{
 			return IsOpcodeTerminator(opcode);
 		}
-		Bool IsMemoryOp() const 
+		Bool IsMemoryOp() const
 		{
 			return IsOpcodeMemoryOp(opcode);
 		}
-		Bool IsIntegerOp() const 
+		Bool IsIntegerOp() const
 		{
 			return IsOpcodeIntegerOp(opcode);
 		}
@@ -273,7 +277,7 @@ namespace ola
 		{
 			return IsOpcodeFloatOp(opcode);
 		}
-		Bool IsCastOp() const 
+		Bool IsCastOp() const
 		{
 			return IsOpcodeCastOp(opcode);
 		}
@@ -290,7 +294,7 @@ namespace ola
 			return IsOpcodeCompareOp(opcode);
 		}
 
-		Bool IsBranch() const 
+		Bool IsBranch() const
 		{
 			return opcode == Opcode::Branch || opcode == Opcode::Switch;
 		}
@@ -388,7 +392,7 @@ namespace ola
 		}
 	};
 
-	class BinaryInst final : public Instruction 
+	class BinaryInst final : public Instruction
 	{
 	public:
 		BinaryInst(Opcode opcode, Value* lhs, Value* rhs) : Instruction{ opcode, lhs->GetType(), { lhs, rhs } }
@@ -419,11 +423,11 @@ namespace ola
 		}
 	};
 
-	class UnaryInst final : public Instruction 
+	class UnaryInst final : public Instruction
 	{
 	public:
 		UnaryInst(Opcode opcode, Value* val) : Instruction(opcode, val->GetType(), { val }) {}
-		
+
 		Value* GetOperand() const
 		{
 			return Op<0>();
@@ -503,13 +507,13 @@ namespace ola
 		CompareOp cmp;
 	};
 
-	class CastInst final : public Instruction 
+	class CastInst final : public Instruction
 	{
 	public:
-		CastInst(Opcode opcode, IRType* cast_type, Value* src_value) 
+		CastInst(Opcode opcode, IRType* cast_type, Value* src_value)
 			: Instruction(opcode, cast_type, { src_value }) {}
-		
-		Value*  GetSrc() const { return Op<0>(); }
+
+		Value* GetSrc() const { return Op<0>(); }
 		IRType* GetSrcType() const { return Op<0>()->GetType(); }
 		IRType* GetDestType() const { return GetType(); }
 
@@ -598,8 +602,8 @@ namespace ola
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
-			return IsConditional() ? new BranchInst(GetCondition(), GetTrueTarget(), GetFalseTarget()) 
-								   : new BranchInst(GetContext(), GetTrueTarget());
+			return IsConditional() ? new BranchInst(GetCondition(), GetTrueTarget(), GetFalseTarget())
+				: new BranchInst(GetContext(), GetTrueTarget());
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
@@ -630,7 +634,7 @@ namespace ola
 		OLA_NODISCARD Instruction* Clone() const
 		{
 			return IsVoid() ? new ReturnInst(GetContext())
-							: new ReturnInst(GetReturnValue());
+				: new ReturnInst(GetReturnValue());
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
@@ -642,7 +646,7 @@ namespace ola
 		}
 	};
 
-	class SwitchInst final : public Instruction 
+	class SwitchInst final : public Instruction
 	{
 		using Case = std::pair<Int64, BasicBlock*>;
 	public:
@@ -658,11 +662,11 @@ namespace ola
 		using CaseRange = IteratorRange<CaseIterator>;
 		using ConstCaseRange = IteratorRange<ConstCaseIterator>;
 
-		CaseIterator      CaseBegin()		{ return cases.begin(); }
+		CaseIterator      CaseBegin() { return cases.begin(); }
 		ConstCaseIterator CaseBegin() const { return cases.begin(); }
-		CaseIterator      CaseEnd()			{ return cases.end(); }
-		ConstCaseIterator CaseEnd()   const	{ return cases.end(); }
-		CaseRange		  Cases()			{ return CaseRange(CaseBegin(), CaseEnd()); }
+		CaseIterator      CaseEnd() { return cases.end(); }
+		ConstCaseIterator CaseEnd()   const { return cases.end(); }
+		CaseRange		  Cases() { return CaseRange(CaseBegin(), CaseEnd()); }
 		ConstCaseRange	  Cases()	  const { return ConstCaseRange(CaseBegin(), CaseEnd()); }
 
 		BasicBlock* GetDefaultCase() const
@@ -752,7 +756,14 @@ namespace ola
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
-			return nullptr; //#todo
+			Uint32 const OpCount = GetNumOperands();
+			std::vector<Value*> Args; Args.reserve(OpCount - 1);
+			for (Uint32 i = 0; i < OpCount - 1; ++i)
+			{
+				Args.push_back(GetOperand(i));
+			}
+			Value* Callee = GetOperand(OpCount - 1);
+			return new CallInst(Callee, Args);
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
@@ -764,10 +775,10 @@ namespace ola
 		}
 	};
 
-	class SelectInst final : public Instruction 
+	class SelectInst final : public Instruction
 	{
 	public:
-		SelectInst(Value* predicate, Value* lhs, Value* rhs) : Instruction( Opcode::Select, lhs->GetType(), { predicate, lhs, rhs } )
+		SelectInst(Value* predicate, Value* lhs, Value* rhs) : Instruction(Opcode::Select, lhs->GetType(), { predicate, lhs, rhs })
 		{
 			OLA_ASSERT(lhs->GetType() == rhs->GetType());
 		}
@@ -817,7 +828,7 @@ namespace ola
 		IRType* allocated_type;
 	};
 
-	class GetElementPtrInst final : public Instruction 
+	class GetElementPtrInst final : public Instruction
 	{
 	public:
 		static IRType* GetValueType(Value* base, std::span<Value*> indices);
@@ -862,7 +873,7 @@ namespace ola
 		IRType* result_element_type;
 	};
 
-	class PtrAddInst final : public Instruction 
+	class PtrAddInst final : public Instruction
 	{
 	public:
 		explicit PtrAddInst(Value* base, Value* offset, IRType* result_element_type);
@@ -888,10 +899,10 @@ namespace ola
 		IRType* result_element_type;
 	};
 
-	class PhiInst final : public Instruction 
+	class PhiInst final : public Instruction
 	{
 	public:
-		explicit PhiInst(IRType* type) : Instruction( Opcode::Phi, type, {} ), alloca_inst(nullptr) {}
+		explicit PhiInst(IRType* type) : Instruction(Opcode::Phi, type, {}), alloca_inst(nullptr) {}
 
 		void SetAlloca(AllocaInst* AI)
 		{
@@ -899,7 +910,7 @@ namespace ola
 		}
 		AllocaInst* GetAlloca() const { return alloca_inst; }
 
-		void AddIncoming(Value* V, BasicBlock* BB) 
+		void AddIncoming(Value* V, BasicBlock* BB)
 		{
 			AddIncomingValue(V);
 			AddIncomingBlock(BB);
@@ -915,8 +926,8 @@ namespace ola
 		OpRange IncomingValues() { return Operands(); }
 		ConstOpRange IncomingValues() const { return Operands(); }
 		Uint32 GetNumIncomingValues() const { return GetNumOperands(); }
-		Value* GetIncomingValue(Uint32 i) const { return GetOperand(i);}
-		void SetIncomingValue(Uint32 i, Value* V) 
+		Value* GetIncomingValue(Uint32 i) const { return GetOperand(i); }
+		void SetIncomingValue(Uint32 i, Value* V)
 		{
 			OLA_ASSERT_MSG(V, "PHI node got a null value!");
 			OLA_ASSERT_MSG(GetType() == V->GetType(), "All operands to PHI node must be the same type as the PHI node!");
@@ -924,7 +935,7 @@ namespace ola
 		}
 
 		BasicBlock* GetIncomingBlock(Uint32 i) const { return incoming_blocks[i]; }
-		void SetIncomingBlock(Uint32 i, BasicBlock* BB) 
+		void SetIncomingBlock(Uint32 i, BasicBlock* BB)
 		{
 			incoming_blocks[i] = BB;
 		}
@@ -948,7 +959,7 @@ namespace ola
 			Int Idx = GetBasicBlockIndex(BB);
 			return Idx >= 0 ? GetIncomingValue(Idx) : nullptr;
 		}
-		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V) 
+		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V)
 		{
 			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
 			{
@@ -958,7 +969,7 @@ namespace ola
 		void RemoveIncomingValue(Uint32 i)
 		{
 			Uint32 lastIdx = GetNumOperands() - 1;
-			if (i != lastIdx) 
+			if (i != lastIdx)
 			{
 				SwapOperands(i, lastIdx);
 				std::swap(incoming_blocks[i], incoming_blocks[lastIdx]);

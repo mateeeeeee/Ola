@@ -39,8 +39,14 @@ namespace ola
 		auto& CurrentInstructions = Instructions();
 		auto& NewBlockInstructions = NewBlock->Instructions();
 
-		auto SplitIter = std::find_if(CurrentInstructions.begin(), CurrentInstructions.end(), [SplitBefore](const Instruction& I) { return &I == SplitBefore; });
+		auto SplitIter = std::find_if(CurrentInstructions.begin(), CurrentInstructions.end(), [SplitBefore](Instruction const& I) { return &I == SplitBefore; });
+		if (SplitIter == CurrentInstructions.end()) return NewBlock;
+
 		NewBlockInstructions.Splice(NewBlockInstructions.begin(), CurrentInstructions, SplitIter, CurrentInstructions.end());
+		for (Instruction& NewInstruction : NewBlockInstructions)
+		{
+			NewInstruction.SetBasicBlock(NewBlock);
+		}
 
 		builder.SetCurrentBlock(this);
 		builder.MakeInst<BranchInst>(GetContext(), NewBlock);

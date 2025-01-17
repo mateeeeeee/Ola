@@ -28,7 +28,7 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
   * LLVM backend
   * Custom backend (Work in Progress)
     - Custom IR
-    	- Optimization passes: Mem2Reg, CSE, ArithmeticReduction, ConstantPropagation, LICM, DCE
+    	- Optimization passes: Mem2Reg, CSE, ArithmeticReduction, ConstantPropagation, LICM, DCE, Function Inlining
         - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier
     - Custom MIR
     	- instruction legalization
