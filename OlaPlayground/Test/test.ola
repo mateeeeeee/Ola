@@ -1,12 +1,11 @@
-import std.assert;
-
 int f()
 {
-    return 24;
+    int b = 5;
+    return b + 19;
 }
 
 public int main()
 {
     int a = f();
-    return a;
+    return a + 6;
 }

@@ -44,11 +44,6 @@ namespace ola
 
 		builder.SetCurrentBlock(this);
 		builder.MakeInst<BranchInst>(GetContext(), NewBlock);
-
-		if (current_cfg)
-		{
-			current_cfg->AddSuccessor(this, NewBlock);
-		}
 		return NewBlock;
 	}
 

@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 #include "FunctionInlinerPass.h"
 #include "CFGAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -58,50 +58,27 @@ namespace ola
 		BasicBlock* CallBlock = CI->GetBasicBlock();
 		Function* Caller = CI->GetCaller();
 
-		std::map<Value*, Value*> ValueMap;
+		std::unordered_map<Value*, Value*> ValueMap;
 		auto ArgIt = Callee->ArgBegin();
 		for (Uint32 i = 0; i < CI->GetNumOperands() - 1; ++i, ++ArgIt)
 		{
 			ValueMap[*ArgIt] = CI->GetOperand(i);
 		}
 
-		std::map<BasicBlock*, BasicBlock*> BBMap;
+		std::unordered_map<BasicBlock*, BasicBlock*> BBMap;
 		for (BasicBlock& BB : *Callee)
 		{
 			std::string name(BB.GetName());
 			name += ".inlined";
 			BasicBlock* InlinedBB = Builder.AddBlock(Caller, CallBlock->GetNextNode(), name);
 			BBMap[&BB] = InlinedBB;
-
+			Builder.SetCurrentBlock(InlinedBB);
 			for (Instruction& I : BB.Instructions())
 			{
-				Builder.SetCurrentBlock(InlinedBB);
-				Instruction* NewInst = Builder.CloneInst(&I);
-				ValueMap[&I] = NewInst;
-			}
-		}
-
-		for (BasicBlock& BB : *Callee)
-		{
-			for (Instruction& I : BB.Instructions())
-			{
-				if (isa<ReturnInst>(&I))
+				if (!isa<ReturnInst>(&I))
 				{
-					if (I.GetNumOperands() > 0)
-					{
-						Value* RetVal = I.GetOperand(0);
-						if (RetVal->IsInstruction())
-						{
-							Value* MappedRet = ValueMap[RetVal];
-							CI->ReplaceAllUsesWith(MappedRet);
-						}
-						else
-						{
-							CI->ReplaceAllUsesWith(RetVal);
-						}
-						CI->RemoveFromParent();
-					}
-					continue;
+					Instruction* NewInst = Builder.CloneInst(&I);
+					ValueMap[&I] = NewInst;
 				}
 			}
 		}
@@ -113,52 +90,55 @@ namespace ola
 				for (Uint32 i = 0; i < NewInst.GetNumOperands(); ++i)
 				{
 					Value* Op = NewInst.GetOperand(i);
-					if (Op->IsBasicBlock())
+					if (BasicBlock* BB = dyn_cast<BasicBlock>(Op))
 					{
-						BasicBlock* MappedBB = BBMap[static_cast<BasicBlock*>(Op)];
-						OLA_ASSERT(MappedBB);
-						NewInst.SetOperand(i, MappedBB);
+						OLA_ASSERT(BBMap[BB]);
+						NewInst.SetOperand(i, BBMap[BB]);
 					}
-					else if(Op->IsInstruction())
+					else
 					{
-						Value* MappedOp = ValueMap[Op];
-						OLA_ASSERT(MappedOp);
-						NewInst.SetOperand(i, MappedOp);
+						OLA_ASSERT(ValueMap[Op]);
+						NewInst.SetOperand(i, ValueMap[Op]);
 					}
 				}
 			}
 		}
 
-		BasicBlock* InlinedEntry = BBMap[&Callee->GetEntryBlock()];
-		BasicBlock* CallBlockRemainder = CallBlock->SplitBasicBlock(CI);
+		BasicBlock* CallBlockRemainder = CallBlock->SplitBasicBlock(CI->GetNextNode());
 		CallBlock->GetTerminator()->EraseFromParent();
 
 		Builder.SetCurrentBlock(CallBlock);
-		Builder.MakeInst<BranchInst>(Ctx, InlinedEntry);
+		Builder.MakeInst<BranchInst>(Ctx, BBMap[&Callee->GetEntryBlock()]);
 
-		for (Instruction& I : CallBlockRemainder->Instructions())
+		for (BasicBlock& BB : *Callee)
 		{
-			if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
+			if (ReturnInst* RI = dyn_cast<ReturnInst>(BB.GetTerminator()))
 			{
-				for (Uint32 i = 0; i < Phi->GetNumIncomingValues(); ++i)
+				BasicBlock* InlinedBB = BBMap[&BB];
+				Builder.SetCurrentBlock(InlinedBB);
+
+				if (InlinedBB->GetTerminator() && InlinedBB->GetTerminator()->GetOpcode() == Opcode::Ret)
 				{
-					if (Phi->GetIncomingBlock(i) == CallBlock)
+					InlinedBB->GetTerminator()->EraseFromParent();
+				}
+
+				if (RI->GetNumOperands() > 0)
+				{
+					Value* RetVal = RI->GetOperand(0);
+					Value* MappedRetVal = ValueMap[RetVal];
+					if (MappedRetVal)
 					{
-						for (auto& BBPair : BBMap)
-						{
-							if (ReturnInst* RI = dyn_cast<ReturnInst>(BBPair.first->GetTerminator()))
-							{
-								Phi->AddIncoming(Phi->GetIncomingValue(i), BBPair.second);
-							}
-						}
-						Phi->RemoveIncomingValue(i);
-						break;
+						CI->ReplaceAllUsesWith(MappedRetVal);
+					}
+					else
+					{
+						CI->ReplaceAllUsesWith(RetVal);
 					}
 				}
+				Builder.MakeInst<BranchInst>(Ctx, CallBlockRemainder);
 			}
 		}
-		//CI->EraseFromParent();
+		CI->EraseFromParent();
 		return true;
 	}
-
 }

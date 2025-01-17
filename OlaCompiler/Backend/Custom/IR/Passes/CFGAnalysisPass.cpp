@@ -7,6 +7,7 @@ namespace ola
 {
 	Bool CFGAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
+		cfg.Clear();
 		for (auto& block : F.Blocks())
 		{
 			Instruction const* terminator = block.GetTerminator();

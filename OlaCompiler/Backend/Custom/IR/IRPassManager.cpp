@@ -43,14 +43,14 @@ namespace ola
 		case OptimizationLevel::O2:
 			[[fallthrough]];
 		case OptimizationLevel::O1:
-			FPM.AddPass(CreateMem2RegPass());
-			//FPM.AddPass(CreateCSEPass());
-			//FPM.AddPass(CreateArithmeticReductionPass());
-			//FPM.AddPass(CreateConstantPropagationPass());
-			//FPM.AddPass(CreateLICMPass());
-			//FPM.AddPass(CreateDCEPass());
 			FPM.AddPass(CreateFunctionInlinerPass());
-			//MPM.AddPass(CreateGlobalAttributeInferPass());
+			FPM.AddPass(CreateMem2RegPass());
+			FPM.AddPass(CreateCSEPass());
+			FPM.AddPass(CreateArithmeticReductionPass());
+			FPM.AddPass(CreateConstantPropagationPass());
+			FPM.AddPass(CreateLICMPass());
+			FPM.AddPass(CreateDCEPass());
+			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());

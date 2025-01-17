@@ -2,15 +2,10 @@
 
 .section .text
 
-.extern Assert
-
-.extern AssertMsg
-
 f:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 8
 jmp label2
 label1:
 label2:
@@ -25,16 +20,15 @@ main:
 label3:
 push rbp
 mov rbp, rsp
-sub rsp, 24
-jmp label9
-jmp label7
+sub rsp, 32
+call f
+mov r15, rax
+mov r14, r15
+add r14, 6
+jmp label5
 label4:
 label5:
-label6:
-label7:
-label8:
-label9:
-mov rax, 24
+mov rax, r14
 mov rsp, rbp
 pop rbp
 ret

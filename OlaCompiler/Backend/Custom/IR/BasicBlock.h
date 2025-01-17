@@ -88,7 +88,7 @@ namespace ola
 			return V->GetKind() == ValueKind::BasicBlock;
 		}
 
-		void SetCFG(CFG* cfg)
+		void SetCFG(CFG const* cfg)
 		{
 			current_cfg = cfg;
 		}
@@ -102,6 +102,6 @@ namespace ola
 		Uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<PhiInst*> phi_nodes;
-		CFG* current_cfg;
+		CFG const* current_cfg;
 	};
 }

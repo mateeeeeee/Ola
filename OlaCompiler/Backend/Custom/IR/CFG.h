@@ -16,12 +16,19 @@ namespace ola
 			entry_block = bb;
 		}
 		BasicBlock* GetEntryBlock() const { return entry_block; }
+
 		void AddPredecessor(BasicBlock* bb, BasicBlock* pred);
 		void AddSuccessor(BasicBlock* bb, BasicBlock* succ);
 		void AddBasicBlock(BasicBlock* bb);
-
 		std::vector<BasicBlock*> const& GetPredecessors(BasicBlock const* bb) const;
 		std::vector<BasicBlock*> const& GetSuccessors(BasicBlock const* bb) const;
+
+		void Clear()
+		{
+			basic_blocks.clear();
+			predecessors.clear();
+			successors.clear();
+		}
 
 		using iterator = std::unordered_set<BasicBlock*>::iterator;
 		using const_iterator = std::unordered_set<BasicBlock*>::const_iterator;
