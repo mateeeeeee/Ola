@@ -1,0 +1,39 @@
+Module ID : test.ola
+
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @f i64() {
+entry:
+%0 = alloca i64
+br label exit
+return:
+br label exit
+exit:
+ret i64 24
+}
+
+
+define external @main i64() {
+entry:
+%0 = alloca i64
+%1 = alloca i64
+br label exit
+br label entry.inlined
+entry.split:
+exit.inlined:
+ret i64 24
+return.inlined:
+br label exit1
+entry.inlined:
+%2 = alloca i64
+br label exit1
+return:
+br label exit
+exit:
+ret i64 24
+}
+

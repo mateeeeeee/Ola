@@ -59,7 +59,6 @@ namespace ola
 		Function* Caller = CI->GetCaller();
 
 		std::map<Value*, Value*> ValueMap;
-
 		auto ArgIt = Callee->ArgBegin();
 		for (Uint32 i = 0; i < CI->GetNumOperands() - 1; ++i, ++ArgIt)
 		{
@@ -73,39 +72,60 @@ namespace ola
 			name += ".inlined";
 			BasicBlock* InlinedBB = Builder.AddBlock(Caller, CallBlock->GetNextNode(), name);
 			BBMap[&BB] = InlinedBB;
+
+			for (Instruction& I : BB.Instructions())
+			{
+				Builder.SetCurrentBlock(InlinedBB);
+				Instruction* NewInst = Builder.CloneInst(&I);
+				ValueMap[&I] = NewInst;
+			}
 		}
 
-		for (auto& BBPair : BBMap)
+		for (BasicBlock& BB : *Callee)
 		{
-			BasicBlock* OrigBB = BBPair.first;
-			BasicBlock* NewBB  = BBPair.second;
-
-			for (Instruction& I : OrigBB->Instructions())
+			for (Instruction& I : BB.Instructions())
 			{
 				if (isa<ReturnInst>(&I))
 				{
 					if (I.GetNumOperands() > 0)
 					{
 						Value* RetVal = I.GetOperand(0);
-						Value* MappedVal = ValueMap[RetVal];
-						CI->ReplaceAllUsesWith(MappedVal);
+						if (RetVal->IsInstruction())
+						{
+							Value* MappedRet = ValueMap[RetVal];
+							CI->ReplaceAllUsesWith(MappedRet);
+						}
+						else
+						{
+							CI->ReplaceAllUsesWith(RetVal);
+						}
+						CI->RemoveFromParent();
 					}
 					continue;
 				}
+			}
+		}
 
-				Builder.SetCurrentBlock(NewBB);
-				Instruction* NewInst = Builder.CloneInst(&I);
-
-				for (Uint32 i = 0; i < NewInst->GetNumOperands(); ++i)
+		for (auto& [OrigBB, NewBB] : BBMap)
+		{
+			for (Instruction& NewInst : NewBB->Instructions())
+			{
+				for (Uint32 i = 0; i < NewInst.GetNumOperands(); ++i)
 				{
-					Value* Op = NewInst->GetOperand(i);
-					if (Value* MappedOp = ValueMap[Op])
+					Value* Op = NewInst.GetOperand(i);
+					if (Op->IsBasicBlock())
 					{
-						NewInst->SetOperand(i, MappedOp);
+						BasicBlock* MappedBB = BBMap[static_cast<BasicBlock*>(Op)];
+						OLA_ASSERT(MappedBB);
+						NewInst.SetOperand(i, MappedBB);
 					}
-					else OLA_ASSERT(false);
+					else if(Op->IsInstruction())
+					{
+						Value* MappedOp = ValueMap[Op];
+						OLA_ASSERT(MappedOp);
+						NewInst.SetOperand(i, MappedOp);
+					}
 				}
-				ValueMap[&I] = NewInst;
 			}
 		}
 
@@ -137,7 +157,7 @@ namespace ola
 				}
 			}
 		}
-		CI->EraseFromParent();
+		//CI->EraseFromParent();
 		return true;
 	}
 

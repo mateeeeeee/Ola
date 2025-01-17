@@ -6,6 +6,7 @@ internal f:
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 8
 InstJump - label2
 
 label1: 
@@ -19,17 +20,22 @@ external main:
 label3: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
-InstCall - 
-InstMove - i64 reg 15, i64 reg 0
-InstMove - i64 reg 14, i64 reg 15
-InstAShr - i64 reg 14, i64 imm 3
-InstJump - label5
+InstSub - i64 reg 1, i64 imm 24
+InstJump - label9
+InstJump - label7
 
 label4: 
 
 label5: 
-InstMove - i64 reg 0, i64 reg 14
+
+label6: 
+
+label7: 
+
+label8: 
+
+label9: 
+InstMove - i64 reg 0, i64 imm 24
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

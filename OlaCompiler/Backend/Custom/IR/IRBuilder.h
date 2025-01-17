@@ -57,6 +57,7 @@ namespace ola
 		Instruction* CloneInst(Instruction* I)
 		{
 			Instruction* CloneOfI = I->Clone();
+			OLA_ASSERT(CloneOfI);
 			CloneOfI->InsertBefore(current_block, insert_point);
 			return CloneOfI;
 		}

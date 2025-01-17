@@ -10,6 +10,7 @@ f:
 label0:
 push rbp
 mov rbp, rsp
+sub rsp, 8
 jmp label2
 label1:
 label2:
@@ -24,15 +25,16 @@ main:
 label3:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-call f
-mov r15, rax
-mov r14, r15
-sar r14, 3
-jmp label5
+sub rsp, 24
+jmp label9
+jmp label7
 label4:
 label5:
-mov rax, r14
+label6:
+label7:
+label8:
+label9:
+mov rax, 24
 mov rsp, rbp
 pop rbp
 ret
