@@ -1,43 +1,13 @@
 Module ID : test.ola
 
-declare @Assert void(i8)
-
-
-declare @AssertMsg void(i8,ptr)
-
-
-define internal @global_int_1 ptr 5
-
-
-define internal @global_int_2 ptr 10
-
-
-define internal @global_int_3 ptr 7
-
-
-define internal @global_int_4 ptr 20
-
-
-define internal @TestIntAddition void() {
+define internal @f__I i64(i64 %a) {
 entry:
-call i8 1, @Assert
-call i8 1, @Assert
-%0 = load i64, ptr @global_int_1
-%1 = load i64, ptr @global_int_2
-%2 = add i64 %0, %1
-%3 = icmp eq i64 %2, 15
-call i8 %3, @Assert
-%4 = load i64, ptr @global_int_1
-%5 = add i64 %4, 10
-%6 = icmp eq i64 %5, 15
-call i8 %6, @Assert
-%7 = load i64, ptr @global_int_3
-%8 = add i64 %7, 5
-%9 = icmp eq i64 %8, 12
-call i8 %9, @Assert
+%0 = add i64 %a, 5
+br label exit
+return:
 br label exit
 exit:
-ret 
+ret i64 %0
 }
 
 
@@ -48,26 +18,13 @@ entry.split:
 br label exit
 exit.inlined:
 br label entry.split
+return.inlined:
+br label exit.inlined
 entry.inlined:
-call i8 1, @Assert
-call i8 1, @Assert
-%0 = load i64, ptr @global_int_1
-%1 = load i64, ptr @global_int_2
-%2 = add i64 %0, %1
-%3 = icmp eq i64 %2, 15
-call i8 %3, @Assert
-%4 = load i64, ptr @global_int_1
-%5 = add i64 %4, 10
-%6 = icmp eq i64 %5, 15
-call i8 %6, @Assert
-%7 = load i64, ptr @global_int_3
-%8 = add i64 %7, 5
-%9 = icmp eq i64 %8, 12
-call i8 %9, @Assert
 br label exit.inlined
 return:
 br label exit
 exit:
-ret i64 0
+ret i64 13
 }
 

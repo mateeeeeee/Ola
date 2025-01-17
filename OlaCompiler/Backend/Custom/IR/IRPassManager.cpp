@@ -36,7 +36,6 @@ namespace ola
 
 		IRModulePassManager MPM;
 		FunctionPassManager FPM;
-
 		if (level >= OptimizationLevel::O1)
 		{
 			FPM.AddPass(CreateFunctionInlinerPass());

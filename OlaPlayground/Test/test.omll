@@ -1,104 +1,40 @@
-external Assert
-
-external AssertMsg
-
-internal data storage global_int_1
-
-internal data storage global_int_2
-
-internal data storage global_int_3
-
-internal data storage global_int_4
-
-internal TestIntAddition: 
+internal f__I: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstLoad - i64 reg 15, i64 global_int_1
-InstLoad - i64 reg 14, i64 global_int_2
-InstMove - i64 reg 13, i64 reg 15
-InstAdd - i64 reg 13, i64 reg 14
-InstICmp - i64 reg 13, i64 imm 15
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_int_1
-InstMove - i64 reg 14, i64 reg 13
-InstAdd - i64 reg 14, i64 imm 10
-InstICmp - i64 reg 14, i64 imm 15
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoad - i64 reg 14, i64 global_int_3
-InstMove - i64 reg 13, i64 reg 14
-InstAdd - i64 reg 13, i64 imm 5
-InstICmp - i64 reg 13, i64 imm 12
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstJump - label1
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 15
+InstAdd - i64 reg 14, i64 imm 5
+InstJump - label2
 
 label1: 
+
+label2: 
+InstMove - i64 reg 0, i64 reg 14
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 
 external main: 
-label2: 
+label3: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
-InstJump - label5
-
-label3: 
 InstJump - label7
 
 label4: 
-InstJump - label3
+InstJump - label9
 
 label5: 
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstMove - i64 reg 3, i64 imm 1
-InstCall - 
-InstLoad - i64 reg 15, i64 global_int_1
-InstLoad - i64 reg 14, i64 global_int_2
-InstMove - i64 reg 13, i64 reg 15
-InstAdd - i64 reg 13, i64 reg 14
-InstICmp - i64 reg 13, i64 imm 15
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_int_1
-InstMove - i64 reg 14, i64 reg 13
-InstAdd - i64 reg 14, i64 imm 10
-InstICmp - i64 reg 14, i64 imm 15
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoad - i64 reg 14, i64 global_int_3
-InstMove - i64 reg 13, i64 reg 14
-InstAdd - i64 reg 13, i64 imm 5
-InstICmp - i64 reg 13, i64 imm 12
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
 InstJump - label4
 
 label6: 
 
 label7: 
-InstMove - i64 reg 0, i64 imm 0
+InstJump - label5
+
+label8: 
+
+label9: 
+InstMove - i64 reg 0, i64 imm 13
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

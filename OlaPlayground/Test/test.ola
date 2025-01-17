@@ -1,38 +1,11 @@
-import std.assert;
 
-// Globals for addition tests
-int global_int_1 = 5;
-int global_int_2 = 10;
-int global_int_3 = 7;
-int global_int_4 = 20;
-
-
-void TestIntAddition()
+int f(int a)
 {
-    // Adding literals
-    int literal_result = 5 + 10;
-    Assert(literal_result == 15);
-
-    // Adding locals
-    int local_a = 5;
-    int local_b = 10;
-    int local_result = local_a + local_b;
-    Assert(local_result == 15);
-
-    // Adding globals
-    int global_result_1 = global_int_1 + global_int_2;
-    Assert(global_result_1 == 15);
-
-    // Mixing globals and locals
-    int mix_result_1 = global_int_1 + local_b;
-    Assert(mix_result_1 == 15);
-
-    int mix_result_2 = local_a + global_int_3;
-    Assert(mix_result_2 == 12);
+    return a + 5;
 }
 
 public int main()
 {
-    TestIntAddition();
-    return 0;
+    int a = f(3) + 5;
+    return a;
 }
