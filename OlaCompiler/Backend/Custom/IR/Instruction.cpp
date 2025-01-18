@@ -3,6 +3,7 @@
 #include "BasicBlock.h"
 #include "GlobalValue.h"
 #include "Constant.h"
+#include <sanitizer/asan_interface.h>
 
 namespace ola
 {
@@ -85,7 +86,23 @@ namespace ola
 		}
 	}
 
-	Use::~Use() {}
+	Use::~Use() 
+	{
+		//// Only try to remove if we still have a value
+		//// But first check if it's still valid to avoid UAF
+		//void* ptr = static_cast<void*>(value);
+		//if (__asan_address_is_poisoned(ptr)) 
+		//{
+		//	// Memory is already freed, just null out
+		//	value = nullptr;
+		//	return;
+		//}
+		//this causes ASAN errors
+		//if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
+		//{
+		//	trackable_value->RemoveUse(this);
+		//}
+	}
 
 	void Use::Set(Value* V)
 	{
@@ -98,6 +115,25 @@ namespace ola
 		{
 			trackable_value->AddUse(this);
 		}
+	}
+
+	TrackableValue::~TrackableValue()
+	{
+	}
+
+	Bool TrackableValue::ReplaceAllUsesWith(Value* V)
+	{
+		Bool changed = !users.empty();
+		std::vector<Use*> UsersVec(users.begin(), users.end());
+		for (Use* U : UsersVec)
+		{
+			U->Set(V);
+		}
+		return changed;
+	}
+
+	Instruction::~Instruction()
+	{
 	}
 
 	Char const* Instruction::GetOpcodeName() const
@@ -120,9 +156,9 @@ namespace ola
 		return BB->Instructions().Insert(IT, this);
 	}
 
-	void Instruction::RemoveFromParent()
+	Instruction* Instruction::RemoveFromParent()
 	{
-		basic_block->Instructions().Remove(this);
+		return basic_block->Instructions().Remove(this);
 	}
 
 	IListIterator<Instruction> Instruction::EraseFromParent()
@@ -269,16 +305,4 @@ namespace ola
 		OLA_ASSERT(base->GetType()->IsPointer());
 		OLA_ASSERT(isa<ConstantInt>(offset));
 	}
-
-	Bool TrackableValue::ReplaceAllUsesWith(Value* V)
-	{
-		Bool changed = !users.empty();
-		while (!users.empty())
-		{
-			Use* const& U = *users.begin();
-			U->Set(V);
-		}
-		return changed;
-	}
-
 }

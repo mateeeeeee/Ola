@@ -11,6 +11,10 @@ namespace ola
 	{
 	}
 
+	BasicBlock::~BasicBlock()
+	{
+	}
+
 	Bool BasicBlock::IsEntryBlock() const
 	{
 		return function && &function->GetEntryBlock() == this;

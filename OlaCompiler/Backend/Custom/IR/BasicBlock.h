@@ -15,7 +15,7 @@ namespace ola
 	public:
 		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1), current_cfg(nullptr) {}
 		explicit BasicBlock(IRContext& C, Function* function, Uint32 idx);
-		~BasicBlock() {}
+		~BasicBlock();
 
 		auto& Instructions()
 		{

@@ -194,6 +194,9 @@ namespace ola
 	{
 		using UserSet = std::unordered_set<Use*>;
 	public:
+
+		~TrackableValue();
+
 		void AddUse(Use* u)
 		{
 			users.insert(u);
@@ -229,7 +232,7 @@ namespace ola
 			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant;
 		}
 	private:
-		std::unordered_set<Use*> users;
+		UserSet users;
 
 	protected:
 		TrackableValue(ValueKind kind, IRType* type) : Value(kind, type) {}
@@ -239,6 +242,7 @@ namespace ola
 	{
 	public:
 		Instruction() : TrackableValue(ValueKind::Instruction, nullptr), opcode(Opcode::None), basic_block(nullptr) {}
+		~Instruction();
 
 		Opcode GetOpcode() const
 		{
@@ -258,8 +262,8 @@ namespace ola
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 
-		void RemoveFromParent();
-		IListIterator<Instruction> EraseFromParent();
+		OLA_MAYBE_UNUSED Instruction* RemoveFromParent();
+		OLA_MAYBE_UNUSED IListIterator<Instruction> EraseFromParent();
 
 		Bool IsTerminator() const
 		{
@@ -328,6 +332,10 @@ namespace ola
 		{
 			return GetOperandList()[i];
 		}
+		void ClearOperands()
+		{
+			operands.clear();
+		}
 
 		using OpIterator = Use*;
 		using ConstOpIterator = Use const*;
@@ -363,10 +371,6 @@ namespace ola
 			}
 		}
 
-		void ClearOperands()
-		{
-			operands.clear();
-		}
 		void AddOperand(Value* op)
 		{
 			operands.emplace_back(op, this);

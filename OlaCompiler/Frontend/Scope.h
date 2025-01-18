@@ -22,39 +22,41 @@ namespace ola
 		
 		Bool Insert(SymType* symbol)
 		{
-			if (sym_map.contains(symbol->GetName())) return false;
-			if (overload_sym_map.contains(symbol->GetName())) return false;
-			sym_map[symbol->GetName()] = symbol;
+			std::string name_key(symbol->GetName());
+			if (sym_map.contains(name_key)) return false;
+			if (overload_sym_map.contains(name_key)) return false;
+			sym_map[name_key] = symbol;
 			return true;
 		}
 		Bool Insert_Overload(SymType* symbol)
 		{
-			if (sym_map.contains(symbol->GetName())) return false;
-			overload_sym_map[symbol->GetName()].push_back(symbol);
+			std::string name_key(symbol->GetName());
+			if (sym_map.contains(name_key)) return false;
+			overload_sym_map[name_key].push_back(symbol);
 			return true;
 		}
 		SymType* LookUp(std::string_view sym_name)
 		{
-			std::string name(sym_name);
-			if (sym_map.contains(name))
+			std::string name_key(sym_name);
+			if (sym_map.contains(name_key))
 			{
-				return sym_map[name];
+				return sym_map[name_key];
 			}
-			else if (overload_sym_map.contains(name) && !overload_sym_map[name].empty())
+			else if (overload_sym_map.contains(name_key) && !overload_sym_map[name_key].empty())
 			{
-				return overload_sym_map[name][0];
+				return overload_sym_map[name_key][0];
 			}
 			else return nullptr;
 		}
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
-			std::string name(sym_name);
-			return overload_sym_map[name];
+			std::string name_key(sym_name);
+			return overload_sym_map[name_key];
 		}
 
 	private:
-		std::unordered_map<std::string_view, SymType*> sym_map;
-		std::unordered_map<std::string_view, std::vector<SymType*>> overload_sym_map;
+		std::unordered_map<std::string, SymType*> sym_map;
+		std::unordered_map<std::string, std::vector<SymType*>> overload_sym_map;
 	};
 
 	template<typename T> requires Symbol<T>

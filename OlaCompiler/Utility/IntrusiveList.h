@@ -29,7 +29,7 @@ namespace ola
 	struct IListSentinelTraits
 	{
 		static NodeTy* CreateSentinel() { return new NodeTy(); }
-		static void DestroySentinel(NodeTy* N) { delete N; }
+		static void DestroySentinel(NodeTy* N) { delete N; N = nullptr; }
 		static NodeTy* ProvideInitialHead() { return nullptr; }
 		static NodeTy* EnsureHead(NodeTy*& Head)
 		{
@@ -85,7 +85,7 @@ namespace ola
 	struct IListNodeTraits
 	{
 		static NodeTy* CreateNode(const NodeTy& V) { return new NodeTy(V); }
-		static void DeleteNode(NodeTy* V) { delete V; }
+		static void DeleteNode(NodeTy* V) { delete V; V = nullptr; }
 
 		void AddNodeToList(NodeTy*) {}
 		void RemoveNodeFromList(NodeTy*) {}
