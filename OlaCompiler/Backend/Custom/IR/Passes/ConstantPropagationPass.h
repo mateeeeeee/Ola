@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 #include "Backend/Custom/IR/FunctionPass.h"
-#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 
 namespace ola
 {

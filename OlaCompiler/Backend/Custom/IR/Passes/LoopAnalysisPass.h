@@ -2,7 +2,7 @@
 #include <memory>
 #include <utility>
 #include <span>
-#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 #include "Backend/Custom/IR/Loop.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 

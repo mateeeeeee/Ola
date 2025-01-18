@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/IR/CFG.h"
 

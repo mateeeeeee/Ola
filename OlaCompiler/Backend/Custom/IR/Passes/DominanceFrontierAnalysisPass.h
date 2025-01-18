@@ -1,5 +1,5 @@
 #pragma once
-#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 #include "Backend/Custom/IR/DominanceFrontier.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 

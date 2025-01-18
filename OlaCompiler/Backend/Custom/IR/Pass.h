@@ -11,9 +11,7 @@ namespace ola
 	enum class PassKind
 	{
 		Function,
-		MachineFunction,
-		Module,
-		MachineModule
+		Module
 	};
 
 	class Pass

@@ -124,7 +124,12 @@ set(BACKEND_FILES
   Backend/Custom/IR/DominatorTree.cpp
   Backend/Custom/IR/DominanceFrontier.h
   Backend/Custom/IR/DominanceFrontier.cpp
-  
+  Backend/Custom/IR/Pass.h
+  Backend/Custom/IR/Pass.cpp
+  Backend/Custom/IR/PassManager.h
+  Backend/Custom/IR/PassRegistry.h
+  Backend/Custom/IR/AnalysisManager.h
+
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.cpp
   Backend/Custom/IR/Passes/LoopAnalysisPass.h
@@ -172,8 +177,6 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/Target.cpp
   Backend/Custom/Codegen/MachineContext.h
   Backend/Custom/Codegen/MachineContext.cpp
-  Backend/Custom/Codegen/MachineModulePass.h
-  Backend/Custom/Codegen/MachineFunctionPass.h
   Backend/Custom/Codegen/LivenessAnalysis.h
   Backend/Custom/Codegen/LivenessAnalysis.cpp
   Backend/Custom/Codegen/RegisterAllocator.h
@@ -191,13 +194,6 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/x64/x64TargetInstInfo.cpp
   Backend/Custom/Codegen/x64/x64AsmPrinter.h
   Backend/Custom/Codegen/x64/x64AsmPrinter.cpp
-
-
-  Backend/Custom/Pass.h
-  Backend/Custom/Pass.cpp
-  Backend/Custom/PassManager.h
-  Backend/Custom/PassRegistry.h
-  Backend/Custom/AnalysisManager.h
 )
 
 if(LLVM_FOUND)

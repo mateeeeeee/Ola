@@ -1,6 +1,6 @@
 #pragma once
-#include "Backend/Custom/PassManager.h"
-#include "Backend/Custom/AnalysisManager.h"
+#include "PassManager.h"
+#include "AnalysisManager.h"
 
 namespace ola
 {

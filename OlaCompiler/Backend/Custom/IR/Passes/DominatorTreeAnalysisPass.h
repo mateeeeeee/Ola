@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <utility>
-#include "Backend/Custom/PassRegistry.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 #include "Backend/Custom/IR/DominatorTree.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 
