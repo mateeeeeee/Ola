@@ -336,6 +336,7 @@ namespace ola
 		{
 			operands.clear();
 		}
+		void SwapOperands(Uint32 i, Uint32 j);
 
 		using OpIterator = Use*;
 		using ConstOpIterator = Use const*;
@@ -361,15 +362,7 @@ namespace ola
 		BasicBlock* basic_block;
 
 	protected:
-		Instruction(Opcode opcode, IRType* type, std::vector<Value*> const& ops = {}) : TrackableValue(ValueKind::Instruction, type),
-			opcode(opcode), basic_block(nullptr)
-		{
-			operands.reserve(8);
-			for (Value* op : ops)
-			{
-				operands.emplace_back(op, this);
-			}
-		}
+		Instruction(Opcode opcode, IRType* type, std::vector<Value*> const& ops = {});
 
 		void AddOperand(Value* op)
 		{
@@ -378,10 +371,6 @@ namespace ola
 		void RemoveLastOperand()
 		{
 			operands.pop_back();
-		}
-		void SwapOperands(Uint32 i, Uint32 j)
-		{
-			std::swap(operands[i], operands[j]);
 		}
 
 		template <Uint32 Idx>

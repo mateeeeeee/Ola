@@ -41,8 +41,7 @@ namespace ola
 			{
 				if (I.GetOperand(0)->IsConstant() && !I.GetOperand(1)->IsConstant())
 				{
-					Use* Ops = I.GetOperandList();
-					std::swap(Ops[0], Ops[1]);
+					I.SwapOperands(0, 1);
 					return true;
 				}
 			}

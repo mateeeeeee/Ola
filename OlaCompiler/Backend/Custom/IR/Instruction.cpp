@@ -109,22 +109,30 @@ namespace ola
 
 	TrackableValue::~TrackableValue()
 	{
-		for (Use* use : users) 
-		{
-			use->SetValue(nullptr); 
-		}
-		users.clear();
+		ReplaceAllUsesWith(nullptr);
 	}
 
 	Bool TrackableValue::ReplaceAllUsesWith(Value* V)
 	{
 		Bool changed = !users.empty();
-		std::vector<Use*> UsersVec(users.begin(), users.end());
-		for (Use* U : UsersVec)
+		std::vector<Use*> UsersVector(users.begin(), users.end());
+		for (Use* U : UsersVector)
 		{
 			U->Set(V);
 		}
+		users.clear();
 		return changed;
+	}
+
+
+	Instruction::Instruction(Opcode opcode, IRType* type, std::vector<Value*> const& ops /*= {}*/) : TrackableValue(ValueKind::Instruction, type),
+		opcode(opcode), basic_block(nullptr)
+	{
+		operands.reserve(8);
+		for (Value* op : ops)
+		{
+			operands.emplace_back(op, this);
+		}
 	}
 
 	Instruction::~Instruction()
@@ -164,6 +172,14 @@ namespace ola
 	Bool Instruction::CanBeOperand() const
 	{
 		return true;
+	}
+
+	void Instruction::SwapOperands(Uint32 i, Uint32 j)
+	{
+		Value* Tmp = operands[i].GetValue();
+		OLA_ASSERT(operands[i].GetUser() == operands[j].GetUser());
+		operands[i].Set(operands[j].GetValue());
+		operands[j].Set(Tmp);
 	}
 
 	Instruction* Instruction::Clone() const
