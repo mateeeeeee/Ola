@@ -29,6 +29,7 @@ namespace ola
 			return function_map[name];
 		}
 		void AddGlobal(GlobalValue* GV);
+		void RemoveGlobal(GlobalValue* GV);
 		std::vector<GlobalValue*> const& Globals() const { return globals; }
 
 		void Print(std::string_view filename) const;

@@ -1,35 +1,24 @@
-internal f__I: 
+external main: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstMove - i64 reg 15, i64 reg 3
-InstMove - i64 reg 14, i64 reg 15
-InstAdd - i64 reg 14, i64 imm 5
-InstJump - label2
+InstJump - label4
 
 label1: 
+InstJump - label6
 
 label2: 
-InstMove - i64 reg 0, i64 reg 14
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
+InstJump - label1
 
-external main: 
 label3: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
-InstMove - i64 reg 3, i64 imm 3
-InstCall - 
-InstMove - i64 reg 15, i64 reg 0
-InstMove - i64 reg 14, i64 reg 15
-InstAdd - i64 reg 14, i64 imm 5
-InstJump - label5
 
 label4: 
+InstJump - label2
 
 label5: 
-InstMove - i64 reg 0, i64 reg 14
+
+label6: 
+InstMove - i64 reg 0, i64 imm 13
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

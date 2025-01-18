@@ -26,6 +26,11 @@ namespace ola
 		}
 	}
 
+	void IRModule::RemoveGlobal(GlobalValue* GV)
+	{
+		globals.erase(std::remove(std::begin(globals), std::end(globals), GV), std::end(globals));
+	}
+
 	void IRModule::Print(std::string_view filename) const
 	{
 		std::ofstream ir_stream(filename.data());

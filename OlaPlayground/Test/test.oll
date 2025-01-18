@@ -1,24 +1,19 @@
 Module ID : test.ola
 
-define internal @f__I i64(i64 %a) {
-entry:
-%0 = add i64 %a, 5
-br label exit
-return:
-br label exit
-exit:
-ret i64 %0
-}
-
-
 define external @main i64() {
 entry:
-%0 = call i64 3, @f__I
-%1 = add i64 %0, 5
+br label entry.inlined
+entry.split:
 br label exit
+exit.inlined:
+br label entry.split
+return.inlined:
+br label exit.inlined
+entry.inlined:
+br label exit.inlined
 return:
 br label exit
 exit:
-ret i64 %1
+ret i64 13
 }
 
