@@ -88,20 +88,10 @@ namespace ola
 
 	Use::~Use() 
 	{
-		//// Only try to remove if we still have a value
-		//// But first check if it's still valid to avoid UAF
-		//void* ptr = static_cast<void*>(value);
-		//if (__asan_address_is_poisoned(ptr)) 
-		//{
-		//	// Memory is already freed, just null out
-		//	value = nullptr;
-		//	return;
-		//}
-		//this causes ASAN errors
-		//if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
-		//{
-		//	trackable_value->RemoveUse(this);
-		//}
+		if (TrackableValue* trackable_value = dyn_cast<TrackableValue>(value))
+		{
+			trackable_value->RemoveUse(this);
+		}
 	}
 
 	void Use::Set(Value* V)
@@ -119,6 +109,11 @@ namespace ola
 
 	TrackableValue::~TrackableValue()
 	{
+		for (Use* use : users) 
+		{
+			use->SetValue(nullptr); 
+		}
+		users.clear();
 	}
 
 	Bool TrackableValue::ReplaceAllUsesWith(Value* V)

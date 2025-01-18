@@ -37,7 +37,7 @@ namespace ola
 		FunctionPassManager FPM;
 		if (level >= OptimizationLevel::O1)
 		{
-			FPM.AddPass(CreateFunctionInlinerPass());
+			//FPM.AddPass(CreateFunctionInlinerPass());
 			FPM.AddPass(CreateMem2RegPass());
 			FPM.AddPass(CreateCSEPass());
 			FPM.AddPass(CreateArithmeticReductionPass());

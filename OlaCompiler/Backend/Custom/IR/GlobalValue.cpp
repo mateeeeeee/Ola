@@ -15,10 +15,7 @@ namespace ola
 
 	Function::~Function()
 	{
-		for (Uint32 i = 0; i < arguments.size(); ++i)
-		{
-			delete arguments[i];
-		}
+		arguments.clear();
 	}
 
 	Uint64 Function::GetInstructionCount() const
