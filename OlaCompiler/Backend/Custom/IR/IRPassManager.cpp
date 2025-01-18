@@ -5,6 +5,7 @@
 #include "Passes/ConstantPropagationPass.h"
 #include "Passes/ArithmeticReductionPass.h"
 #include "Passes/DeadCodeEliminationPass.h"
+#include "Passes/GlobalDeadCodeEliminationPass.h"
 #include "Passes/CommonSubexpressionEliminationPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 #include "Passes/CFGAnalysisPass.h"
@@ -33,8 +34,6 @@ namespace ola
 				FAM.RegisterPass<LoopAnalysisPass>(*F);
 			}
 		}
-
-		IRModulePassManager MPM;
 		FunctionPassManager FPM;
 		if (level >= OptimizationLevel::O1)
 		{
@@ -45,17 +44,24 @@ namespace ola
 			FPM.AddPass(CreateConstantPropagationPass());
 			FPM.AddPass(CreateLICMPass());
 			FPM.AddPass(CreateDCEPass());
-			MPM.AddPass(CreateGlobalAttributeInferPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());
 		if (opts.domfrontier_print)  FPM.AddPass(CreateDominanceFrontierPrinterPass());
 
-		if (FPM.IsEmpty() && MPM.IsEmpty()) return;
+		IRModulePassManager MPM;
+		if (level >= OptimizationLevel::O1)
+		{
+			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+			MPM.AddPass(CreateGlobalAttributeInferPass());
+			MPM.AddPass(CreateGlobalDCEPass());
+		}
 
-		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
-		IRModuleAnalysisManager MAM;
-		MPM.Run(M, MAM);
+		if (!MPM.IsEmpty() || !FPM.IsEmpty())
+		{
+			IRModuleAnalysisManager MAM;
+			MPM.Run(M, MAM);
+		}
 	}
 
 }

@@ -23,17 +23,16 @@ main:
 label3:
 push rbp
 mov rbp, rsp
-jmp label7
-label4:
-jmp label9
-label5:
-jmp label4
-label6:
-label7:
+sub rsp, 32
+mov rcx, 3
+call f__I
+mov r15, rax
+mov r14, r15
+add r14, 5
 jmp label5
-label8:
-label9:
-mov rax, 13
+label4:
+label5:
+mov rax, r14
 mov rsp, rbp
 pop rbp
 ret

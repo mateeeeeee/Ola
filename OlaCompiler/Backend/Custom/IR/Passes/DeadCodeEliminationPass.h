@@ -3,8 +3,6 @@
 
 namespace ola
 {
-	class Instruction;
-
 	class DeadCodeEliminationPass : public FunctionPass
 	{
 		inline static Char id = 0;

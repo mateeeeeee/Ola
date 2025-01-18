@@ -18,23 +18,18 @@ external main:
 label3: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstJump - label7
-
-label4: 
-InstJump - label9
-
-label5: 
-InstJump - label4
-
-label6: 
-
-label7: 
+InstSub - i64 reg 1, i64 imm 32
+InstMove - i64 reg 3, i64 imm 3
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstMove - i64 reg 14, i64 reg 15
+InstAdd - i64 reg 14, i64 imm 5
 InstJump - label5
 
-label8: 
+label4: 
 
-label9: 
-InstMove - i64 reg 0, i64 imm 13
+label5: 
+InstMove - i64 reg 0, i64 reg 14
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 
