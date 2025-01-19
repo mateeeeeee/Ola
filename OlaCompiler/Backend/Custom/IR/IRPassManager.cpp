@@ -9,6 +9,7 @@
 #include "Passes/CommonSubexpressionEliminationPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 #include "Passes/CFGAnalysisPass.h"
+#include "Passes/SimplifyCFGPass.h"
 #include "Passes/DominatorTreeAnalysisPass.h"
 #include "Passes/DominanceFrontierAnalysisPass.h"
 #include "Passes/FunctionPassManagerModuleAdaptor.h"
@@ -44,6 +45,7 @@ namespace ola
 			FPM.AddPass(CreateConstantPropagationPass());
 			FPM.AddPass(CreateLICMPass());
 			FPM.AddPass(CreateDCEPass());
+			FPM.AddPass(CreateSimplifyCFGPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());

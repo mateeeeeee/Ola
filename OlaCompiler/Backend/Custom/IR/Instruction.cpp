@@ -120,7 +120,6 @@ namespace ola
 		{
 			U->Set(V);
 		}
-		users.clear();
 		return changed;
 	}
 
@@ -148,7 +147,6 @@ namespace ola
 	{
 		return InsertBefore(BB, I->GetIterator());
 	}
-
 	IListIterator<Instruction> Instruction::InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT)
 	{
 		if (basic_block) 
@@ -163,7 +161,6 @@ namespace ola
 	{
 		return basic_block->Instructions().Remove(this);
 	}
-
 	IListIterator<Instruction> Instruction::EraseFromParent()
 	{
 		return basic_block->Instructions().Erase(this);
@@ -173,7 +170,6 @@ namespace ola
 	{
 		return true;
 	}
-
 	void Instruction::SwapOperands(Uint32 i, Uint32 j)
 	{
 		Value* Tmp = operands[i].GetValue();
@@ -208,7 +204,6 @@ namespace ola
 	{
 		OLA_ASSERT(isa<IRPtrType>(address->GetType()));
 	}
-
 	LoadInst::LoadInst(Value* address, IRType* type)
 		: Instruction(Opcode::Load, type, { address })
 	{
@@ -220,20 +215,34 @@ namespace ola
 	}
 
 	BranchInst::BranchInst(IRContext& C, BasicBlock* target) 
-		: Instruction(Opcode::Branch, IRVoidType::Get(C), { target }), true_target(target), false_target(nullptr)
+		: Instruction(Opcode::Branch, IRVoidType::Get(C), { target }), is_conditional(false)
+	{
+	}
+	BranchInst::BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target) 
+		: Instruction(Opcode::Branch, IRVoidType::Get(condition->GetContext()), { true_target, false_target, condition }), is_conditional(true)
 	{
 	}
 
-	BranchInst::BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target) 
-		: Instruction(Opcode::Branch, IRVoidType::Get(condition->GetContext()), { true_target, false_target, condition }),
-		true_target(true_target), false_target(false_target)
+	BasicBlock* BranchInst::GetTrueTarget() const
 	{
+		return cast<BasicBlock>(GetOperand(0));
+	}
+	BasicBlock* BranchInst::GetFalseTarget() const
+	{
+		return IsConditional() ? cast<BasicBlock>(GetOperand(1)) : nullptr;
+	}
+	void BranchInst::SetTrueTarget(BasicBlock* bb)
+	{
+		SetOperand(0, bb);
+	}
+	void BranchInst::SetFalseTarget(BasicBlock* bb)
+	{
+		SetOperand(1, bb);
 	}
 
 	ReturnInst::ReturnInst(IRContext& C) : Instruction(Opcode::Ret, IRVoidType::Get(C), {})
 	{
 	}
-
 	ReturnInst::ReturnInst(Value* ret_value) : Instruction(Opcode::Ret, IRVoidType::Get(ret_value->GetContext()), { ret_value })
 	{
 	}
@@ -254,7 +263,6 @@ namespace ola
 		if (Function* F = dyn_cast<Function>(GetCallee())) return F;
 		else return nullptr;
 	}
-
 	Function* CallInst::GetCaller() const
 	{
 		return GetBasicBlock()->GetFunction();
@@ -263,7 +271,6 @@ namespace ola
 	AllocaInst::AllocaInst(IRType* type) : Instruction(Opcode::Alloca, IRPtrType::Get(type), {}), allocated_type(type)
 	{
 	}
-
 	IRPtrType* AllocaInst::GetPtrType() const
 	{
 		return cast<IRPtrType>(GetType());
@@ -291,7 +298,6 @@ namespace ola
 		}
 		return current_type;
 	}
-
 	GetElementPtrInst::GetElementPtrInst(Value* base, std::span<Value*> indices)
 		: Instruction{ Opcode::GetElementPtr, base->GetType(), {} },
 		result_element_type(GetValueType(base, indices))

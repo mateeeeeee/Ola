@@ -2,27 +2,23 @@ external Assert
 
 external AssertMsg
 
-internal data storage global_int_3
-
 external main: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
-InstLoad - i64 reg 15, i64 global_int_3
-InstMove - i64 reg 14, i64 reg 15
-InstAdd - i64 reg 14, i64 imm 5
-InstICmp - i64 reg 14, i64 imm 12
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstJump - label2
+InstJump - label3
 
 label1: 
+InstJump - label4
 
 label2: 
-InstMove - i64 reg 0, i64 imm 0
+InstJump - label1
+
+label3: 
+InstJump - label2
+
+label4: 
+InstMove - i64 reg 0, i64 imm 8
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

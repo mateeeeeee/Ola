@@ -7,7 +7,7 @@
 namespace ola
 {
 
-	BasicBlock::BasicBlock(IRContext& C, Function* function, Uint32 idx) : Value(ValueKind::BasicBlock, IRLabelType::Get(C)), function(function), block_idx(idx), current_cfg(nullptr)
+	BasicBlock::BasicBlock(IRContext& C, Function* function, Uint32 idx) : TrackableValue(ValueKind::BasicBlock, IRLabelType::Get(C)), function(function), block_idx(idx), current_cfg(nullptr)
 	{
 	}
 
@@ -15,9 +15,40 @@ namespace ola
 	{
 	}
 
+	BasicBlock* BasicBlock::RemoveFromParent()
+	{
+		return function->Blocks().Remove(this);
+	}
+
+	IListIterator<BasicBlock> BasicBlock::EraseFromParent()
+	{
+		return function->Blocks().Erase(this);
+	}
+
 	Bool BasicBlock::IsEntryBlock() const
 	{
 		return function && &function->GetEntryBlock() == this;
+	}
+
+	void BasicBlock::AddPredecessor(BasicBlock* pred)
+	{
+		OLA_ASSERT(current_cfg);
+		return current_cfg->AddPredecessor(this, pred);
+	}
+	void BasicBlock::AddSuccessor(BasicBlock* succ)
+	{
+		OLA_ASSERT(current_cfg);
+		return current_cfg->AddSuccessor(this, succ);
+	}
+	void BasicBlock::RemovePredecessor(BasicBlock* pred)
+	{
+		OLA_ASSERT(current_cfg);
+		return current_cfg->RemovePredecessor(this, pred);
+	}
+	void BasicBlock::RemoveSuccessor(BasicBlock* succ)
+	{
+		OLA_ASSERT(current_cfg);
+		return current_cfg->RemovePredecessor(this, succ);
 	}
 
 	std::vector<BasicBlock*> const& BasicBlock::GetPredecessors() const
@@ -25,11 +56,18 @@ namespace ola
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetPredecessors(this);
 	}
-
 	std::vector<BasicBlock*> const& BasicBlock::GetSuccessors() const
 	{
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetSuccessors(this);
+	}
+	BasicBlock* BasicBlock::GetUniquePredecessor() const
+	{
+		return current_cfg->GetUniquePredecessor(this);
+	}
+	BasicBlock* BasicBlock::GetUniqueSuccessor() const
+	{
+		return current_cfg->GetUniqueSuccessor(this);
 	}
 
 	BasicBlock* BasicBlock::SplitBasicBlock(Instruction* SplitBefore)

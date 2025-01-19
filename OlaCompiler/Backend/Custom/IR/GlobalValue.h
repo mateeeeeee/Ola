@@ -146,6 +146,11 @@ namespace ola
 		{
 			return block_list;
 		}
+		Bool HasPhiInsts() const
+		{
+			for (auto const& BB : block_list) if (BB.PhiInsts().size() > 0) return true;
+			return false;
+		}
 
 		void Insert(BasicBlock* BB);
 		void InsertBefore(BasicBlock* BB, BasicBlock* before);

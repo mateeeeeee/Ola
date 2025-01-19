@@ -16,9 +16,9 @@ namespace ola
 				return; 
 			}
 
-			for (BasicBlock const& BB : F->Blocks()) 
+			for (BasicBlock const& BB : *F) 
 			{
-				for (Instruction const& I : BB.Instructions()) 
+				for (Instruction const& I : BB) 
 				{
 					if (CallInst const* Call = dyn_cast<CallInst>(&I))
 					{

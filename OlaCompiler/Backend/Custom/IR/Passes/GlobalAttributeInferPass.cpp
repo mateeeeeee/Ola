@@ -28,9 +28,9 @@ namespace ola
 		{
 			if (Function* F = dyn_cast<Function>(G))
 			{
-				for (BasicBlock& BB : F->Blocks())
+				for (BasicBlock& BB : *F)
 				{
-					for (Instruction& I : BB.Instructions())
+					for (Instruction& I : BB)
 					{
 						if (StoreInst* SI = dyn_cast<StoreInst>(&I))
 						{

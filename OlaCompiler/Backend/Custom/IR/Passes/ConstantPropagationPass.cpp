@@ -149,9 +149,9 @@ namespace ola
 	{
 		std::unordered_set<Instruction*> WorkList;
 		std::vector<Instruction*> WorkListVector;
-		for (BasicBlock& BB : F.Blocks())
+		for (BasicBlock& BB : F)
 		{
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				WorkList.insert(&I);
 				WorkListVector.push_back(&I);

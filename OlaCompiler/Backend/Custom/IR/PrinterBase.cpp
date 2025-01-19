@@ -144,7 +144,7 @@ namespace ola
 	void PrinterBase::PrintBasicBlock(BasicBlock const& BB)
 	{
 		EmitLn("{}:", GetUniqueName(&BB));
-		for (Instruction const& I : BB.Instructions())
+		for (Instruction const& I : BB)
 		{
 			PrintInstruction(I);
 		}

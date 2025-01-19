@@ -9,7 +9,7 @@ namespace ola
 		std::unordered_set<Instruction*> AliveInsts;
 		for (BasicBlock& BB : F)
 		{
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I) || isa<PhiInst>(&I))
 				{
@@ -25,7 +25,7 @@ namespace ola
 			KeepGoing = false;
 			for (BasicBlock& BB : F)
 			{
-				for (Instruction& I : BB.Instructions())
+				for (Instruction& I : BB)
 				{
 					if (AliveInsts.contains(&I))
 					{
@@ -42,7 +42,7 @@ namespace ola
 		std::vector<Instruction*> DeadInsts;
 		for (BasicBlock& BB : F)
 		{
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				if (!AliveInsts.contains(&I))
 				{

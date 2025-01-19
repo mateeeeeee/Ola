@@ -11,7 +11,7 @@ namespace ola
 		OLA_ASSERT(BB != nullptr);
 		current_block = BB;
 		current_function = BB->GetFunction();
-		insert_point = current_block->Instructions().end();
+		insert_point = current_block->end();
 	}
 
 
@@ -59,7 +59,7 @@ namespace ola
 
 	BasicBlock* IRBuilder::AddBlock(Function* F, BasicBlock* before, std::string_view name)
 	{
-		OLA_ASSERT(before->GetFunction() == F);
+		OLA_ASSERT(!before || before->GetFunction() == F);
 		auto& blocks = F->Blocks();
 		BasicBlock* block = new BasicBlock(ctx, F, blocks.Size());
 		if (name.empty())
@@ -71,14 +71,15 @@ namespace ola
 		{
 			block->SetName(name);
 		}
-		blocks.Insert(before->GetIterator(), block);
+		if (before) blocks.Insert(before->GetIterator(), block);
+		else		blocks.PushBack(block);
 		return block;
 	}
 
 
 	BasicBlock* IRBuilder::AddBlock(BasicBlock* before, std::string_view name)
 	{
-		return AddBlock(before->GetFunction(), before, name);
+		return AddBlock(before ? before->GetFunction() : current_function, before, name);
 	}
 
 }

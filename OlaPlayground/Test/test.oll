@@ -6,19 +6,16 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @global_int_3 ptr 7
-
-
 define external @main i64() {
 entry:
-%0 = load i64, ptr @global_int_3
-%1 = add i64 %0, 5
-%2 = icmp eq i64 %1, 12
-call i8 %2, @Assert
+br label entry.inlined
+entry.split:
 br label exit
-return:
-br label exit
+exit.inlined:
+br label entry.split
+entry.inlined:
+br label exit.inlined
 exit:
-ret i64 0
+ret i64 8
 }
 

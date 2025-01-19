@@ -68,7 +68,7 @@ namespace ola
 		std::vector<AllocaInst*> Allocas;
 		for (BasicBlock& BB : F) 
 		{
-			for (Instruction& I : BB.Instructions()) 
+			for (Instruction& I : BB) 
 			{
 				if (AllocaInst* AI = dyn_cast<AllocaInst>(&I))
 				{
@@ -91,7 +91,7 @@ namespace ola
 			std::set<BasicBlock*> DefBlocks; 
 			for (BasicBlock* BB : cfg)
 			{
-				for (Instruction& I : BB->Instructions())
+				for (Instruction& I : *BB)
 				{
 					if (StoreInst* SI = dyn_cast<StoreInst>(&I))
 					{
@@ -150,7 +150,7 @@ namespace ola
 					StackSizes[AI] = Stack.size();
 				}
 
-				for (Instruction& I : BB->Instructions())
+				for (Instruction& I : *BB)
 				{
 					if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
 					{
@@ -160,7 +160,7 @@ namespace ola
 				}
 
 				std::vector<Instruction*> InstructionRemoveQueue;
-				for (Instruction& I : BB->Instructions())
+				for (Instruction& I : *BB)
 				{
 					if (LoadInst* LI = dyn_cast<LoadInst>(&I))
 					{

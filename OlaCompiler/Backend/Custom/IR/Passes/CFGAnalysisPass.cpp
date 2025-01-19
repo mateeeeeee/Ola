@@ -11,11 +11,10 @@ namespace ola
 		for (auto& block : F.Blocks())
 		{
 			Instruction const* terminator = block.GetTerminator();
-			if (terminator->IsBranch())
+			if (terminator && terminator->IsBranch())
 			{
-				if (terminator->GetOpcode() == Opcode::Switch)
+				if (SwitchInst const* switch_inst = dyn_cast<SwitchInst>(terminator))
 				{
-					SwitchInst const* switch_inst = cast<SwitchInst>(terminator);
 					std::unordered_set<BasicBlock*> switch_targets;
 					switch_targets.insert(switch_inst->GetDefaultCase());
 					for (auto&& [_, target] : switch_inst->Cases())
@@ -28,9 +27,8 @@ namespace ola
 						cfg.AddSuccessor(&block, target);
 					}
 				}
-				else
+				else if (BranchInst const* branch_inst = dyn_cast<BranchInst>(terminator))
 				{
-					BranchInst const* branch_inst = cast<BranchInst>(terminator);
 					BasicBlock* true_target = branch_inst->GetTrueTarget();
 					BasicBlock* false_target = branch_inst->GetFalseTarget();
 					cfg.AddSuccessor(&block, true_target);
@@ -39,6 +37,7 @@ namespace ola
 						cfg.AddSuccessor(&block, false_target);
 					}
 				}
+				else OLA_ASSERT(false);
 			}
 			cfg.AddBasicBlock(&block);
 		}

@@ -200,7 +200,7 @@ namespace ola
 		{
 			MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
 			machine_ctx.SetCurrentBasicBlock(MBB);
-			for (Instruction& I : BB->Instructions())
+			for (Instruction& I : *BB)
 			{
 				if (!isel_info.LowerInstruction(&I, machine_ctx))
 				{

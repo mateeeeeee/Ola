@@ -1,13 +1,13 @@
 import std.assert;
 
 
-int global_int_3 = 7;
+int add(int a, int b)
+{
+	return a + b;
+}
 
 public int main()
 {
-    // Adding locals
-    int local_a = 5;
-    int mix_result_2 = local_a + global_int_3;
-    Assert(mix_result_2 == 12);
-    return 0;
+	int g = add(1,2);
+	return g + 5;
 }

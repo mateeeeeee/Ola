@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include "FunctionInlinerPass.h"
 #include "CFGAnalysisPass.h"
+#include "DominatorTreeAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
@@ -14,7 +15,7 @@ namespace ola
 		std::vector<CallInst*> CallsToInline;
 		for (BasicBlock& BB : F)
 		{
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				if (CallInst* CI = dyn_cast<CallInst>(&I))
 				{
@@ -33,6 +34,7 @@ namespace ola
 		if (Changed)
 		{
 			FAM.InvalidateCache<CFGAnalysisPass>(F);
+			FAM.InvalidateCache<DominatorTreeAnalysisPass>(F);
 		}
 		return Changed;
 	}
@@ -43,7 +45,8 @@ namespace ola
 		if (!Callee || Callee->IsDeclaration()) return false;
 		if (CI->GetBasicBlock()->GetFunction() == Callee) return false;
 		if (Callee->IsNoInline())  return false;
-		return Callee->Blocks().Size() <= 3;
+		//if (Callee->HasPhiInsts())  return false;
+		return (Callee->Blocks().Size() <= 3) || Callee->IsForceInline();
 	}
 
 	Bool FunctionInlinerPass::InlineFunction(CallInst* CI)
@@ -69,7 +72,7 @@ namespace ola
 			BasicBlock* InlinedBB = Builder.AddBlock(Caller, CallBlock->GetNextNode(), name);
 			BBMap[&BB] = InlinedBB;
 			Builder.SetCurrentBlock(InlinedBB);
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				if (!isa<ReturnInst>(&I))
 				{
@@ -81,7 +84,7 @@ namespace ola
 
 		for (auto& [OrigBB, NewBB] : BBMap)
 		{
-			for (Instruction& NewInst : NewBB->Instructions())
+			for (Instruction& NewInst : *NewBB)
 			{
 				if (BranchInst* BI = dyn_cast<BranchInst>(&NewInst))
 				{

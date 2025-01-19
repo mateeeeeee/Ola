@@ -155,6 +155,8 @@ namespace ola
 		void ClearTree()
 		{
 			nodes.clear();
+			order.clear();
+			immediate_dominators.clear();
 			root = nullptr;
 		}
 

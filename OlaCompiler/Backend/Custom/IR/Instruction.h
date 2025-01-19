@@ -229,7 +229,7 @@ namespace ola
 
 		static Bool ClassOf(Value const* V)
 		{
-			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant;
+			return V->GetKind() == ValueKind::Instruction || V->GetKind() == ValueKind::Constant || V->GetKind() == ValueKind::BasicBlock;
 		}
 	private:
 		UserSet users;
@@ -575,13 +575,13 @@ namespace ola
 		BranchInst(Value* condition, BasicBlock* true_target, BasicBlock* false_target);
 
 		Bool IsUnconditional() const { return !IsConditional(); }
-		Bool IsConditional()   const { return false_target != nullptr; }
+		Bool IsConditional()   const { return is_conditional; }
 
-		BasicBlock* GetTrueTarget() const { return true_target; }
-		BasicBlock* GetFalseTarget() const { return false_target; }
+		BasicBlock* GetTrueTarget() const;
+		BasicBlock* GetFalseTarget() const;
 
-		void SetTrueTarget(BasicBlock* bb) { true_target = bb; }
-		void SetFalseTarget(BasicBlock* bb) { false_target = bb; }
+		void SetTrueTarget(BasicBlock* bb);
+		void SetFalseTarget(BasicBlock* bb);
 
 		Value* GetCondition() const
 		{
@@ -591,12 +591,13 @@ namespace ola
 		{
 			OLA_ASSERT(IsConditional());
 			Op<2>() = C;
+			is_conditional = (C != nullptr);
 		}
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
 			return IsConditional() ? new BranchInst(GetCondition(), GetTrueTarget(), GetFalseTarget())
-				: new BranchInst(GetContext(), GetTrueTarget());
+								   : new BranchInst(GetContext(), GetTrueTarget());
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
@@ -608,8 +609,7 @@ namespace ola
 		}
 
 	private:
-		BasicBlock* true_target;
-		BasicBlock* false_target;
+		Bool is_conditional;
 	};
 
 	class ReturnInst final : public Instruction

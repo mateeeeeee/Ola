@@ -56,7 +56,7 @@ namespace ola
 
 		for (BasicBlock& BB : F)
 		{
-			for (Instruction& I : BB.Instructions())
+			for (Instruction& I : BB)
 			{
 				changed |= SwapOperands(I);
 

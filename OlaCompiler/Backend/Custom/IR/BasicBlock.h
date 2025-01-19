@@ -10,12 +10,25 @@ namespace ola
 	class Instruction;
 	class CFG;
 
-	class BasicBlock : public Value, public IListNode<BasicBlock>
+	class BasicBlock : public TrackableValue, public IListNode<BasicBlock>
 	{
 	public:
-		BasicBlock() : Value(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1), current_cfg(nullptr) {}
+		BasicBlock() : TrackableValue(ValueKind::BasicBlock, nullptr), function(nullptr), block_idx(-1), current_cfg(nullptr) {}
 		explicit BasicBlock(IRContext& C, Function* function, Uint32 idx);
 		~BasicBlock();
+
+		auto begin() { return instructions.begin(); }
+		auto begin() const { return instructions.begin(); }
+		auto end() { return instructions.end(); }
+		auto end() const { return instructions.end(); }
+		auto rbegin() { return instructions.rbegin(); }
+		auto rbegin() const { return instructions.rbegin(); }
+		auto rend() { return instructions.rend(); }
+		auto rend() const { return instructions.rend(); }
+		Instruction& front() { return *begin(); }
+		Instruction const& front() const { return *begin(); }
+		Instruction& back() { return *rbegin(); }
+		Instruction const& back() const { return *rbegin(); }
 
 		auto& Instructions()
 		{
@@ -58,6 +71,8 @@ namespace ola
 		{
 			function = func;
 		}
+		OLA_MAYBE_UNUSED BasicBlock* RemoveFromParent();
+		OLA_MAYBE_UNUSED IListIterator<BasicBlock> EraseFromParent();
 
 		Uint32 GetIndex() const
 		{
@@ -83,25 +98,31 @@ namespace ola
 			}
 		}
 
+		BasicBlock* SplitBasicBlock(Instruction* SplitBefore);
+
+		void SetCFG(CFG* cfg)
+		{
+			current_cfg = cfg;
+		}
+		void AddPredecessor(BasicBlock* pred);
+		void AddSuccessor(BasicBlock* succ);
+		void RemovePredecessor(BasicBlock* pred);
+		void RemoveSuccessor(BasicBlock* succ);
+		std::vector<BasicBlock*> const& GetPredecessors() const;
+		std::vector<BasicBlock*> const& GetSuccessors() const;
+		BasicBlock* GetUniquePredecessor() const;
+		BasicBlock* GetUniqueSuccessor() const;
+
 		static Bool ClassOf(Value const* V)
 		{
 			return V->GetKind() == ValueKind::BasicBlock;
 		}
-
-		void SetCFG(CFG const* cfg)
-		{
-			current_cfg = cfg;
-		}
-		std::vector<BasicBlock*> const& GetPredecessors() const;
-		std::vector<BasicBlock*> const& GetSuccessors() const;
-
-		BasicBlock* SplitBasicBlock(Instruction* SplitBefore);
 
 	private:
 		Function* function;
 		Uint32 block_idx;
 		IList<Instruction> instructions;
 		std::vector<PhiInst*> phi_nodes;
-		CFG const* current_cfg;
+		CFG* current_cfg;
 	};
 }

@@ -15,7 +15,7 @@ namespace ola
 		using Result = CFG;
 	public:
 		CFGAnalysisPass() : FunctionPass(id) {}
-		virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
+		OLA_MAYBE_UNUSED virtual Bool RunOn(Function& F, FunctionAnalysisManager& FAM) override;
 
 		CFG const& GetResult() const { return cfg; }
 		static void const* ID() { return &id; }

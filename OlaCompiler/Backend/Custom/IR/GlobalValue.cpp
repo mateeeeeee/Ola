@@ -49,7 +49,7 @@ namespace ola
 	{
 		for (BasicBlock const& bb : block_list)
 		{
-			for (Instruction const& I : bb.Instructions())
+			for (Instruction const& I : bb)
 			{
 				if (I.GetOpcode() == Opcode::Call) return true;
 			}

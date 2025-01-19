@@ -32,7 +32,7 @@ namespace ola
 					}
 
 					std::vector<Instruction*> invariant_instructions;
-					for (Instruction& Inst : BB->Instructions())
+					for (Instruction& Inst : *BB)
 					{
 						if (isa<PhiInst>(&Inst) || Inst.IsTerminator()) continue;
 
