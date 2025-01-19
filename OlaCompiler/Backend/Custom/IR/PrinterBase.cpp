@@ -183,7 +183,7 @@ namespace ola
 		else if (isa<PhiInst>(&I))
 		{
 			PhiInst const* Phi = cast<PhiInst>(&I);
-			Uint OpCount = Phi->GetNumOperands();
+			Uint OpCount = Phi->GetNumOperands() / 2;
 			PrintType(Phi->GetType());
 			EmitSpace();
 			for (Uint i = 0; i < OpCount; ++i)

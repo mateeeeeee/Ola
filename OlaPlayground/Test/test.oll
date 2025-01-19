@@ -6,10 +6,22 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @main i64() {
+define internal @TestIfElse i64() {
 entry:
 br label exit
 exit:
-ret i64 8
+%0 = phi i64 [ 0, exit ], [ 10, exit ]
+ret i64 %0
+}
+
+
+define external @main i64() {
+entry:
+%0 = call ptr @TestIfElse
+%1 = icmp eq i64 %0, 10
+call i8 %1, @Assert
+br label exit
+exit:
+ret i64 0
 }
 

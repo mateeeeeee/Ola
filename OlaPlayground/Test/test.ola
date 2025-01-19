@@ -1,13 +1,15 @@
 import std.assert;
 
-
-int add(int a, int b)
+int TestIfElse()
 {
-	return a + b;
+	int a = 6;
+	if(a > 5) return 10;
+	else return 0;
 }
 
 public int main()
 {
-	int g = add(1,2);
-	return g + 5;
+	int r = TestIfElse();
+	Assert(r == 10);
+	return 0;
 }

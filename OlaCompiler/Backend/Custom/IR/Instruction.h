@@ -912,38 +912,29 @@ namespace ola
 		using ConstBlockIterator = std::vector<BasicBlock*>::const_iterator;
 		using ConstBlockRange = IteratorRange<ConstBlockIterator>;
 
-		ConstBlockIterator BlockBegin() const { return incoming_blocks.begin(); }
-		ConstBlockIterator BlockEnd() const { return incoming_blocks.end(); }
-		IteratorRange<ConstBlockIterator> Blocks() const { return MakeRange(BlockBegin(), BlockEnd()); }
-
-		OpRange IncomingValues() { return Operands(); }
-		ConstOpRange IncomingValues() const { return Operands(); }
-		Uint32 GetNumIncomingValues() const { return GetNumOperands(); }
-		Value* GetIncomingValue(Uint32 i) const { return GetOperand(i); }
+		Uint32 GetNumIncomingValues() const { return GetNumOperands() / 2; }
+		Value* GetIncomingValue(Uint32 i) const { return GetOperand(GetValueOpIndex(i)); }
 		void SetIncomingValue(Uint32 i, Value* V)
 		{
 			OLA_ASSERT_MSG(V, "PHI node got a null value!");
 			OLA_ASSERT_MSG(GetType() == V->GetType(), "All operands to PHI node must be the same type as the PHI node!");
-			SetOperand(i, V);
+			SetOperand(GetValueOpIndex(i), V);
 		}
 
-		BasicBlock* GetIncomingBlock(Uint32 i) const { return incoming_blocks[i]; }
-		void SetIncomingBlock(Uint32 i, BasicBlock* BB)
-		{
-			incoming_blocks[i] = BB;
-		}
+		BasicBlock* GetIncomingBlock(Uint32 i) const;
+		void SetIncomingBlock(Uint32 i, BasicBlock* BB);
 		void ReplaceIncomingBlockWith(BasicBlock const* Old, BasicBlock* New)
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
 			{
 				if (GetIncomingBlock(Op) == Old) SetIncomingBlock(Op, New);
 			}
 		}
 		Int GetBasicBlockIndex(BasicBlock const* BB) const
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
 			{
-				if (incoming_blocks[Op] == BB) return Op;
+				if (GetIncomingBlock(Op) == BB) return Op;
 			}
 			return -1;
 		}
@@ -954,33 +945,24 @@ namespace ola
 		}
 		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V)
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands(); Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
 			{
 				if (GetIncomingBlock(Op) == BB) SetIncomingValue(Op, V);
 			}
 		}
 		void RemoveIncomingValue(Uint32 i)
 		{
-			Uint32 lastIdx = GetNumOperands() - 1;
+			Uint32 lastIdx = GetNumOperands()/2 - 1;
 			if (i != lastIdx)
 			{
-				SwapOperands(i, lastIdx);
-				std::swap(incoming_blocks[i], incoming_blocks[lastIdx]);
+				SwapOperands(GetValueOpIndex(i), GetValueOpIndex(lastIdx));
+				SwapOperands(GetBlockOpIndex(i), GetBlockOpIndex(lastIdx));
 			}
 			RemoveLastOperand();
-			incoming_blocks.pop_back();
-			OLA_ASSERT(GetNumOperands() == incoming_blocks.size());
+			RemoveLastOperand();
 		}
 
-		OLA_NODISCARD Instruction* Clone() const
-		{
-			PhiInst* NewPhi = new PhiInst(GetType());
-			for (Uint i = 0; i < GetNumOperands(); ++i)
-			{
-				NewPhi->AddIncoming(GetOperand(i), incoming_blocks[i]);
-			}
-			return NewPhi;
-		}
+		OLA_NODISCARD Instruction* Clone() const;
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Phi;
@@ -991,7 +973,6 @@ namespace ola
 		}
 
 	private:
-		std::vector<BasicBlock*> incoming_blocks;
 		AllocaInst* alloca_inst;
 
 	private:
@@ -1000,10 +981,15 @@ namespace ola
 			OLA_ASSERT(V->GetType() == GetType());
 			AddOperand(V);
 		}
-		void AddIncomingBlock(BasicBlock* BB)
+		void AddIncomingBlock(BasicBlock* BB);
+
+		static Uint32 GetValueOpIndex(Uint32 i)
 		{
-			incoming_blocks.push_back(BB);
-			OLA_ASSERT(GetNumOperands() == incoming_blocks.size());
+			return 2 * i;
+		}
+		static Uint32 GetBlockOpIndex(Uint32 i)
+		{
+			return 2 * i + 1;
 		}
 	};
 }

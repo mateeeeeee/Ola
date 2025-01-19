@@ -2,6 +2,7 @@
 #include "FunctionInlinerPass.h"
 #include "CFGAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
+#include "DominanceFrontierAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
 #include "Backend/Custom/IR/IRContext.h"
@@ -35,6 +36,7 @@ namespace ola
 		{
 			FAM.InvalidateCache<CFGAnalysisPass>(F);
 			FAM.InvalidateCache<DominatorTreeAnalysisPass>(F);
+			FAM.InvalidateCache<DominanceFrontierAnalysisPass>(F);
 		}
 		return Changed;
 	}
@@ -45,6 +47,7 @@ namespace ola
 		if (!Callee || Callee->IsDeclaration()) return false;
 		if (CI->GetBasicBlock()->GetFunction() == Callee) return false;
 		if (Callee->IsNoInline())  return false;
+		if (Callee->HasPhiInsts())  return false; 
 		return (Callee->Blocks().Size() <= 3) || Callee->IsForceInline();
 	}
 
@@ -99,13 +102,17 @@ namespace ola
 				for (Uint32 i = 0; i < NewInst.GetNumOperands(); ++i)
 				{
 					Value* Op = NewInst.GetOperand(i);
+					if (Op->IsConstant()) NewInst.SetOperand(i, Op);
+					else if (Op->IsBasicBlock())
 					{
-						if (Op->IsConstant()) NewInst.SetOperand(i, Op);
-						else
-						{
-							OLA_ASSERT(ValueMap[Op]);
-							NewInst.SetOperand(i, ValueMap[Op]);
-						}
+						BasicBlock* BB = cast<BasicBlock>(Op);
+						OLA_ASSERT(BBMap[BB]);
+						NewInst.SetOperand(i, BBMap[BB]);
+					}
+					else
+					{
+						OLA_ASSERT(ValueMap[Op]);
+						NewInst.SetOperand(i, ValueMap[Op]);
 					}
 				}
 			}

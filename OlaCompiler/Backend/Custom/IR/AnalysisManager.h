@@ -70,7 +70,11 @@ namespace ola
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
 			analysis_info.analysis_results.erase(PassT::ID());
 		}
-
+		void InvalidateCache(UnitT& U, PassID id) const
+		{
+			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
+			analysis_info.analysis_results.erase(id);
+		}
 		void InvalidateCache(UnitT& U) const
 		{
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];

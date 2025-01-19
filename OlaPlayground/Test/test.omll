@@ -2,14 +2,33 @@ external Assert
 
 external AssertMsg
 
-external main: 
+internal TestIfElse: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
 InstJump - label1
 
 label1: 
-InstMove - i64 reg 0, i64 imm 8
+InstMove - i64 reg 0, i64 reg 15
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+
+external main: 
+label2: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 10
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstJump - label3
+
+label3: 
+InstMove - i64 reg 0, i64 imm 0
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 

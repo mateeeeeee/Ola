@@ -3,6 +3,7 @@
 #include "SimplifyCFGPass.h"
 #include "CFGAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
+#include "DominanceFrontierAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
@@ -13,8 +14,9 @@ namespace ola
 		Bool LocalChanged;
 		do 
 		{
+			ResetCFG(F, FAM);
 			LocalChanged = false;
-			LocalChanged |= MergeBlocks(F);
+			//LocalChanged |= MergeBlocks(F);
 			ResetCFG(F, FAM);
 			LocalChanged |= RemoveUnreachableBlocks(F);
 			Changed |= LocalChanged;
@@ -24,6 +26,7 @@ namespace ola
 		{
 			FAM.InvalidateCache<CFGAnalysisPass>(F);
 			FAM.InvalidateCache<DominatorTreeAnalysisPass>(F);
+			FAM.InvalidateCache<DominanceFrontierAnalysisPass>(F);
 		}
 		return Changed;
 	}

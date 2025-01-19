@@ -322,4 +322,31 @@ namespace ola
 		OLA_ASSERT(base->GetType()->IsPointer());
 		OLA_ASSERT(isa<ConstantInt>(offset));
 	}
+
+	BasicBlock* PhiInst::GetIncomingBlock(Uint32 i) const
+	{
+		return cast<BasicBlock>(GetOperand(GetBlockOpIndex(i)));
+	}
+
+	void PhiInst::SetIncomingBlock(Uint32 i, BasicBlock* BB)
+	{
+		SetOperand(GetBlockOpIndex(i), BB);
+	}
+
+	Instruction* PhiInst::Clone() const
+	{
+		PhiInst* NewPhi = new PhiInst(GetType());
+		for (Uint i = 0; i < GetNumOperands() / 2; ++i)
+		{
+			NewPhi->AddIncoming(GetOperand(GetValueOpIndex(i)), cast<BasicBlock>(GetOperand(GetBlockOpIndex(i))));
+		}
+		return NewPhi;
+	}
+
+	void PhiInst::AddIncomingBlock(BasicBlock* BB)
+	{
+		AddOperand(BB);
+		OLA_ASSERT(GetNumOperands() % 2 == 0);
+	}
+
 }
