@@ -140,6 +140,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/DominanceFrontierAnalysisPass.cpp
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
+  Backend/Custom/IR/Passes/SimplifyCFGPass.h
+  Backend/Custom/IR/Passes/SimplifyCFGPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.cpp
   Backend/Custom/IR/Passes/GlobalDeadCodeEliminationPass.h

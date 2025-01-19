@@ -19,7 +19,7 @@ namespace ola
 	private:
 		static Bool IsLoopInvariant(Instruction* I, Loop const* L);
 	};
-	OLA_REGISTER_PASS(LoopInvariantCodeMotionPass, "Loop Invariant Code Motion Pass Pass");
+	OLA_REGISTER_PASS(LoopInvariantCodeMotionPass, "Loop Invariant Code Motion Pass");
 	using LICMPass = LoopInvariantCodeMotionPass;
 
 	inline FunctionPass* CreateLICMPass() { return new LICMPass(); }

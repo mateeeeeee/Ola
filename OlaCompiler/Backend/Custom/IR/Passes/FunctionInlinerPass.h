@@ -19,7 +19,7 @@ namespace ola
 		static Bool ShouldInline(CallInst* CI);
 		static Bool InlineFunction(CallInst* Call);
 	};
-	OLA_REGISTER_PASS(FunctionInlinerPass, "Loop Invariant Code Motion Pass Pass");
+	OLA_REGISTER_PASS(FunctionInlinerPass, "Function Inliner Pass");
 
 	inline FunctionPass* CreateFunctionInlinerPass() { return new FunctionInlinerPass(); }
 }
