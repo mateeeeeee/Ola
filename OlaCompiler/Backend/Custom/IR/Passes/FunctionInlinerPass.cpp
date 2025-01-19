@@ -45,7 +45,6 @@ namespace ola
 		if (!Callee || Callee->IsDeclaration()) return false;
 		if (CI->GetBasicBlock()->GetFunction() == Callee) return false;
 		if (Callee->IsNoInline())  return false;
-		//if (Callee->HasPhiInsts())  return false;
 		return (Callee->Blocks().Size() <= 3) || Callee->IsForceInline();
 	}
 

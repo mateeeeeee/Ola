@@ -13,9 +13,9 @@ namespace ola
 		Bool LocalChanged;
 		do 
 		{
-			cfg = const_cast<CFG*>(&FAM.GetResult<CFGAnalysisPass>(F));
 			LocalChanged = false;
-			//LocalChanged |= MergeBlocks(F);
+			LocalChanged |= MergeBlocks(F);
+			ResetCFG(F, FAM);
 			LocalChanged |= RemoveUnreachableBlocks(F);
 			Changed |= LocalChanged;
 		} while (LocalChanged);
@@ -28,6 +28,12 @@ namespace ola
 		return Changed;
 	}
 
+	void SimplifyCFGPass::ResetCFG(Function& F, FunctionAnalysisManager& FAM)
+	{
+		FAM.InvalidateCache<CFGAnalysisPass>(F);
+		cfg = &FAM.GetResult<CFGAnalysisPass>(F);
+	}
+
 	Bool SimplifyCFGPass::MergeBlocks(Function& F)
 	{
 		Bool Changed = false;
@@ -36,10 +42,9 @@ namespace ola
 			if (BB.Instructions().Size() == 1)
 			{
 				Instruction* I = BB.GetTerminator();
-				if (BranchInst* BI = dyn_cast<BranchInst>(I); BI && BI->IsUnconditional())
+				if (BranchInst* BI = dyn_cast<BranchInst>(I); BI && BI->IsUnconditional() && BI->GetTrueTarget())
 				{
 					BasicBlock* Succ = BI->GetTrueTarget();
-					OLA_ASSERT(Succ);
 					BB.ReplaceAllUsesWith(Succ);
 				}
 			}

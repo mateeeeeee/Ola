@@ -22,8 +22,8 @@ namespace ola
 		void RemovePredecessor(BasicBlock* bb, BasicBlock* pred);
 		void RemoveSuccessor(BasicBlock* bb, BasicBlock* succ);
 		void AddBasicBlock(BasicBlock* bb);
-		std::vector<BasicBlock*> const& GetPredecessors(BasicBlock const* bb) const;
-		std::vector<BasicBlock*> const& GetSuccessors(BasicBlock const* bb) const;
+		std::unordered_set<BasicBlock*> const& GetPredecessors(BasicBlock const* bb) const;
+		std::unordered_set<BasicBlock*> const& GetSuccessors(BasicBlock const* bb) const;
 		BasicBlock* GetUniquePredecessor(BasicBlock const* bb) const;
 		BasicBlock* GetUniqueSuccessor(BasicBlock const* bb) const;
 
@@ -47,7 +47,7 @@ namespace ola
 	private:
 		BasicBlock* entry_block = nullptr;
 		std::unordered_set<BasicBlock*> basic_blocks;
-		std::unordered_map<BasicBlock const*, std::vector<BasicBlock*>> predecessors;
-		std::unordered_map<BasicBlock const*, std::vector<BasicBlock*>> successors;
+		std::unordered_map<BasicBlock const*, std::unordered_set<BasicBlock*>> predecessors;
+		std::unordered_map<BasicBlock const*, std::unordered_set<BasicBlock*>> successors;
 	};
 }

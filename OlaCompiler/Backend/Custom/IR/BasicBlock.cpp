@@ -51,12 +51,12 @@ namespace ola
 		return current_cfg->RemovePredecessor(this, succ);
 	}
 
-	std::vector<BasicBlock*> const& BasicBlock::GetPredecessors() const
+	std::unordered_set<BasicBlock*> const& BasicBlock::GetPredecessors() const
 	{
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetPredecessors(this);
 	}
-	std::vector<BasicBlock*> const& BasicBlock::GetSuccessors() const
+	std::unordered_set<BasicBlock*> const& BasicBlock::GetSuccessors() const
 	{
 		OLA_ASSERT(current_cfg);
 		return current_cfg->GetSuccessors(this);

@@ -29,7 +29,7 @@ namespace ola
 			changed = false;
 			for (auto b = postorder.rbegin() + 1; b != postorder.rend(); ++b) 
 			{
-				std::vector<BasicBlock*> const& predecessors = cfg.GetPredecessors(*b);
+				std::unordered_set<BasicBlock*> const& predecessors = cfg.GetPredecessors(*b);
 
 				// Find the first processed/reachable predecessor that is reachable in the forward traversal.
 				auto res = std::find_if(std::begin(predecessors), std::end(predecessors),

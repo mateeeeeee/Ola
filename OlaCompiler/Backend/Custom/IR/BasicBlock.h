@@ -108,8 +108,8 @@ namespace ola
 		void AddSuccessor(BasicBlock* succ);
 		void RemovePredecessor(BasicBlock* pred);
 		void RemoveSuccessor(BasicBlock* succ);
-		std::vector<BasicBlock*> const& GetPredecessors() const;
-		std::vector<BasicBlock*> const& GetSuccessors() const;
+		std::unordered_set<BasicBlock*> const& GetPredecessors() const;
+		std::unordered_set<BasicBlock*> const& GetSuccessors() const;
 		BasicBlock* GetUniquePredecessor() const;
 		BasicBlock* GetUniqueSuccessor() const;
 

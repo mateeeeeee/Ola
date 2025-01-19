@@ -14,9 +14,10 @@ namespace ola
 		static void const* ID() { return &id; }
 
 	private:
-		CFG* cfg;
+		CFG const* cfg;
 
 	private:
+		void ResetCFG(Function& F, FunctionAnalysisManager& FAM);
 		Bool MergeBlocks(Function& F);
 		Bool RemoveUnreachableBlocks(Function& F);
 	};

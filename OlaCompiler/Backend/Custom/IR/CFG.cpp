@@ -3,67 +3,34 @@
 
 namespace ola
 {
-	static const std::vector<BasicBlock*> empty{};
+	static const std::unordered_set<BasicBlock*> empty{};
 
 	void CFG::AddPredecessor(BasicBlock* bb, BasicBlock* pred)
 	{
-		predecessors[bb].push_back(pred);
-		successors[pred].push_back(bb);
+		predecessors[bb].insert(pred);
+		successors[pred].insert(bb);
 	}
 
 	void CFG::AddSuccessor(BasicBlock* bb, BasicBlock* succ)
 	{
-		successors[bb].push_back(succ);
-		predecessors[succ].push_back(bb);
+		successors[bb].insert(succ);
+		predecessors[succ].insert(bb);
 	}
 
 	void CFG::RemovePredecessor(BasicBlock* bb, BasicBlock* pred)
 	{
 		auto& preds = predecessors[bb];
-		for (Uint32 i = 0; i < preds.size(); ++i) 
-		{
-			if (preds[i] == pred) 
-			{
-				std::swap(preds[i], preds.back());
-				preds.pop_back();
-				break;
-			}
-		}
+		preds.erase(pred);
 		auto& succs = successors[pred];
-		for (Uint32 i = 0; i < succs.size(); ++i) 
-		{
-			if (succs[i] == bb) 
-			{
-				std::swap(succs[i], succs.back());
-				succs.pop_back();
-				break;
-			}
-		}
+		succs.erase(bb);
 	}
 
 	void CFG::RemoveSuccessor(BasicBlock* bb, BasicBlock* succ)
 	{
 		auto& succs = successors[bb];
-		for (Uint32 i = 0; i < succs.size(); ++i)
-		{
-			if (succs[i] == succ)
-			{
-				std::swap(succs[i], succs.back());
-				succs.pop_back();
-				break;
-			}
-		}
-
+		succs.erase(succ);
 		auto& preds = predecessors[succ];
-		for (Uint32 i = 0; i < preds.size(); ++i)
-		{
-			if (preds[i] == bb) 
-			{
-				std::swap(preds[i], preds.back());
-				preds.pop_back();
-				break;
-			}
-		}
+		preds.erase(bb);
 	}
 
 	void CFG::AddBasicBlock(BasicBlock* bb)
@@ -72,13 +39,13 @@ namespace ola
 		bb->SetCFG(this);
 	}
 
-	std::vector<BasicBlock*> const& CFG::GetPredecessors(BasicBlock const* bb) const
+	std::unordered_set<BasicBlock*> const& CFG::GetPredecessors(BasicBlock const* bb) const
 	{
 		auto it = predecessors.find(bb);
 		return (it != predecessors.end()) ? it->second : empty;
 	}
 
-	std::vector<BasicBlock*> const& CFG::GetSuccessors(BasicBlock const* bb) const
+	std::unordered_set<BasicBlock*> const& CFG::GetSuccessors(BasicBlock const* bb) const
 	{
 		auto it = successors.find(bb);
 		return (it != successors.end()) ? it->second : empty;
@@ -86,14 +53,14 @@ namespace ola
 
 	BasicBlock* CFG::GetUniquePredecessor(BasicBlock const* bb) const
 	{
-		std::vector<BasicBlock*> const& predecessors = GetPredecessors(bb);
-		return predecessors.size() == 1 ? predecessors[0] : nullptr;
+		std::unordered_set<BasicBlock*> const& predecessors = GetPredecessors(bb);
+		return predecessors.size() == 1 ? *predecessors.begin() : nullptr;
 	}
 
 	BasicBlock* CFG::GetUniqueSuccessor(BasicBlock const* bb) const
 	{
-		std::vector<BasicBlock*> const& successors = GetSuccessors(bb);
-		return successors.size() == 1 ? successors[0] : nullptr;
+		std::unordered_set<BasicBlock*> const& successors = GetSuccessors(bb);
+		return successors.size() == 1 ? *successors.begin() : nullptr;
 	}
 
 }
