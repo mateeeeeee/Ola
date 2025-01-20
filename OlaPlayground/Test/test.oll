@@ -8,11 +8,8 @@ declare @AssertMsg void(i8,ptr)
 
 define external @main i64() {
 entry:
-br label entry.split
-entry.split:
-call i8 1, @Assert
 br label exit
 exit:
-ret i64 0
+ret i64 20
 }
 

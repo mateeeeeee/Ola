@@ -102,13 +102,16 @@ namespace ola
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
 
-		MachineInstruction push_rbp(InstPush);
-		push_rbp.SetOp<0>(rbp);
-		ctx.EmitInst(push_rbp);
+		if (MF.GetStackAllocationSize() > 0)
+		{
+			MachineInstruction push_rbp(InstPush);
+			push_rbp.SetOp<0>(rbp);
+			ctx.EmitInst(push_rbp);
 
-		MachineInstruction set_rbp(InstMove);
-		set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
-		ctx.EmitInst(set_rbp);
+			MachineInstruction set_rbp(InstMove);
+			set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
+			ctx.EmitInst(set_rbp);
+		}
 
 		Int32 stack_allocation = MF.GetStackAllocationSize();
 		if (stack_allocation > 0)
@@ -175,16 +178,19 @@ namespace ola
 	{
 		using enum MachineType;
 
-		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
-		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
+		if (MF.GetStackAllocationSize() > 0)
+		{
+			MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
+			MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
 
-		MachineInstruction reset_rbp(InstMove);
-		reset_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
-		ctx.EmitInst(reset_rbp);
+			MachineInstruction reset_rbp(InstMove);
+			reset_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
+			ctx.EmitInst(reset_rbp);
 
-		MachineInstruction pop_rbp(InstPop);
-		pop_rbp.SetOp<0>(rbp);
-		ctx.EmitInst(pop_rbp);
+			MachineInstruction pop_rbp(InstPop);
+			pop_rbp.SetOp<0>(rbp);
+			ctx.EmitInst(pop_rbp);
+		}
 	}
 
 	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const

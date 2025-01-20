@@ -1,15 +1,12 @@
 import std.assert;
 
-int TestIfElse()
+int f(int a)
 {
-	int a = 6;
-	if(a > 5) return 10;
-	else return 0;
+	return a + 10;
 }
 
 public int main()
 {
-	int r = TestIfElse();
-	Assert(r == 10);
-	return 0;
+	int g = f(5);
+	return g + 5;
 }
