@@ -185,7 +185,7 @@ namespace ola
 
 	void Loop::AddChildLoop(Loop* NewChild)
 	{
-		if (NewChild->ParentLoop == this) return; //#todo shouldnt happen?
+		if (NewChild->ParentLoop == this) return; OLA_TODO("This should not happen?");
 		OLA_ASSERT_MSG(!NewChild->ParentLoop, "NewChild already has a parent!");
 		NewChild->ParentLoop = static_cast<Loop*>(this);
 		SubLoops.push_back(NewChild);

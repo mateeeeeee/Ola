@@ -32,7 +32,8 @@ namespace ola
 		CLIParseResult cli_result = cli_parser.Parse(argc, argv);
 
 		std::string input_file = cli_result["-i"].AsStringOr("");
-		if(!input_file.empty()) input_files.push_back(input_file); //#todo add support for multiple input files
+		OLA_TODO("Add support for multiple input files");
+		if(!input_file.empty()) input_files.push_back(input_file); 
 		output_file = cli_result["-o"].AsStringOr("");
 		input_directory = cli_result["--directory"].AsStringOr("");
 		if (cli_result["--test"])

@@ -18,6 +18,7 @@
 #define OLA_DEPRECATED_MSG(msg)	    [[deprecated(#msg)]]
 #define OLA_DEBUGZONE_BEGIN         __pragma(optimize("", off))
 #define OLA_DEBUGZONE_END           __pragma(optimize("", on))
+#define OLA_TODO(...)
 
 #if defined(_MSC_VER)
 #define OLA_UNREACHABLE()			__assume(false)

@@ -117,7 +117,6 @@ namespace ola
 
 	std::vector<Token> ImportProcessor::GetImportTokens(std::string_view import_path)
 	{
-		//#todo: cache intermediate results of this process
 		SourceBuffer import_src_buffer(import_path);
 		Lexer lex(diagnostics);
 		lex.Lex(import_src_buffer);

@@ -688,7 +688,8 @@ namespace ola
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
-			return nullptr; //#todo
+			OLA_TODO();
+			return nullptr; 
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
@@ -828,6 +829,7 @@ namespace ola
 
 		GetElementPtrInst(Value* base, std::span<Value*> indices);
 
+		Value* GetIndex(Uint32 i) const { return GetOperand(i + 1); }
 		Uint32 GetNumIndices() const { return GetNumOperands() - 1; }
 		Bool HasIndices() const { return GetNumIndices() > 0; }
 
@@ -850,7 +852,13 @@ namespace ola
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
-			return nullptr; //#todo
+			Value* base = GetBaseOperand();
+			std::vector<Value*> indices; indices.reserve(GetNumIndices());
+			for (Uint32 i = 0; i < GetNumIndices(); ++i)
+			{
+				indices.push_back(GetIndex(i));
+			}
+			return new GetElementPtrInst(base, indices);
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
