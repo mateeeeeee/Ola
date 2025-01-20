@@ -20,6 +20,7 @@ namespace ola
 		void ResetCFG(Function& F, FunctionAnalysisManager& FAM);
 		Bool MergeBlocks(Function& F);
 		Bool RemoveUnreachableBlocks(Function& F);
+		Bool SimplifyPHIs(Function& F);
 	};
 	OLA_REGISTER_PASS(SimplifyCFGPass, "Simplify CFG Pass");
 

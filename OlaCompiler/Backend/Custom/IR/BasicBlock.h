@@ -45,6 +45,7 @@ namespace ola
 			phi_nodes.push_back(phi);
 		}
 		auto const& PhiInsts() const { return phi_nodes; }
+		Bool HasPhiInsts() const { return !phi_nodes.empty(); }
 		
 		Instruction const* GetTerminator() const 
 		{

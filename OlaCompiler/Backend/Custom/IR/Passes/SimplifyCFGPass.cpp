@@ -14,20 +14,19 @@ namespace ola
 		Bool LocalChanged;
 		do 
 		{
-			ResetCFG(F, FAM);
 			LocalChanged = false;
-			//LocalChanged |= MergeBlocks(F);
+			LocalChanged |= MergeBlocks(F);
 			ResetCFG(F, FAM);
 			LocalChanged |= RemoveUnreachableBlocks(F);
 			Changed |= LocalChanged;
 		} while (LocalChanged);
-
 		if (Changed)
 		{
 			FAM.InvalidateCache<CFGAnalysisPass>(F);
 			FAM.InvalidateCache<DominatorTreeAnalysisPass>(F);
 			FAM.InvalidateCache<DominanceFrontierAnalysisPass>(F);
 		}
+		Changed |= SimplifyPHIs(F);
 		return Changed;
 	}
 
@@ -48,7 +47,10 @@ namespace ola
 				if (BranchInst* BI = dyn_cast<BranchInst>(I); BI && BI->IsUnconditional() && BI->GetTrueTarget())
 				{
 					BasicBlock* Succ = BI->GetTrueTarget();
-					BB.ReplaceAllUsesWith(Succ);
+					if (!Succ->HasPhiInsts())
+					{
+						BB.ReplaceAllUsesWith(Succ);
+					}
 				}
 			}
 		}
@@ -84,4 +86,34 @@ namespace ola
 		}
 		return Changed;
 	}
+
+	Bool SimplifyCFGPass::SimplifyPHIs(Function& F)
+	{
+		Bool Changed = false;
+		for (auto& BB : F)
+		{
+			for (auto& I : BB)
+			{
+				if (PhiInst* Phi = dyn_cast<PhiInst>(&I))
+				{
+					for (Int i = Phi->GetNumIncomingValues() - 1; i >= 0; --i) 
+					{
+						if (Phi->GetIncomingBlock(i) == nullptr) 
+						{
+							Phi->RemoveIncomingValue(i);
+							Changed = true;
+						}
+					}
+
+					if (Phi->GetNumIncomingValues() == 1)
+					{
+						Phi->ReplaceAllUsesWith(Phi->GetIncomingValue(0));
+						Changed = true;
+					}
+				}
+			}
+		}
+		return Changed;
+	}
+
 }

@@ -925,14 +925,14 @@ namespace ola
 		void SetIncomingBlock(Uint32 i, BasicBlock* BB);
 		void ReplaceIncomingBlockWith(BasicBlock const* Old, BasicBlock* New)
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumIncomingValues(); Op != NumOps; ++Op)
 			{
 				if (GetIncomingBlock(Op) == Old) SetIncomingBlock(Op, New);
 			}
 		}
 		Int GetBasicBlockIndex(BasicBlock const* BB) const
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumIncomingValues(); Op != NumOps; ++Op)
 			{
 				if (GetIncomingBlock(Op) == BB) return Op;
 			}
@@ -945,14 +945,14 @@ namespace ola
 		}
 		void SetIncomingValueForBlock(BasicBlock const* BB, Value* V)
 		{
-			for (Uint32 Op = 0, NumOps = GetNumOperands() / 2; Op != NumOps; ++Op)
+			for (Uint32 Op = 0, NumOps = GetNumIncomingValues(); Op != NumOps; ++Op)
 			{
 				if (GetIncomingBlock(Op) == BB) SetIncomingValue(Op, V);
 			}
 		}
 		void RemoveIncomingValue(Uint32 i)
 		{
-			Uint32 lastIdx = GetNumOperands()/2 - 1;
+			Uint32 lastIdx = GetNumIncomingValues() - 1;
 			if (i != lastIdx)
 			{
 				SwapOperands(GetValueOpIndex(i), GetValueOpIndex(lastIdx));

@@ -46,6 +46,7 @@ namespace ola
 			FPM.AddPass(CreateLICMPass());
 			FPM.AddPass(CreateDCEPass());
 			FPM.AddPass(CreateSimplifyCFGPass());
+			FPM.AddPass(CreateDCEPass());
 		}
 		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
 		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());

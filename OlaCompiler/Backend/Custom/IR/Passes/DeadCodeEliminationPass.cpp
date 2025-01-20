@@ -11,7 +11,7 @@ namespace ola
 		{
 			for (Instruction& I : BB)
 			{
-				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I) || isa<PhiInst>(&I))
+				if (I.IsTerminator() || isa<StoreInst>(&I) || isa<CallInst>(&I))
 				{
 					AliveInsts.insert(&I);
 				}
