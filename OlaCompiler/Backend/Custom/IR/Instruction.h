@@ -639,43 +639,46 @@ namespace ola
 		}
 	};
 
+	class SwitchCase
+	{
+	public:
+		SwitchCase(Int64 value, BasicBlock* block)
+			: case_value(value)
+			, case_block(block)
+		{}
+		Int64 GetCaseValue() const { return case_value; }
+		BasicBlock* GetCaseBlock() const { return case_block; }
+
+	private:
+		Int64 case_value;
+		BasicBlock* case_block;
+	};
+
 	class SwitchInst final : public Instruction
 	{
-		using Case = std::pair<Int64, BasicBlock*>;
 	public:
 		SwitchInst(Value* val, BasicBlock* default_block);
 
-		void AddCase(Int64 key, BasicBlock* label)
-		{
-			cases.emplace_back(key, label);
-		}
+		void AddCase(Int64 key, BasicBlock* label);
 
-		using CaseIterator = std::vector<Case>::iterator;
-		using ConstCaseIterator = std::vector<Case>::const_iterator;
+		using CaseIterator = std::vector<SwitchCase>::iterator;
+		using ConstCaseIterator = std::vector<SwitchCase>::const_iterator;
 		using CaseRange = IteratorRange<CaseIterator>;
 		using ConstCaseRange = IteratorRange<ConstCaseIterator>;
 
-		CaseIterator      CaseBegin() { return cases.begin(); }
-		ConstCaseIterator CaseBegin() const { return cases.begin(); }
-		CaseIterator      CaseEnd() { return cases.end(); }
-		ConstCaseIterator CaseEnd()   const { return cases.end(); }
-		CaseRange		  Cases() { return CaseRange(CaseBegin(), CaseEnd()); }
+		CaseIterator      CaseBegin()		{ return case_values.begin(); }
+		ConstCaseIterator CaseBegin() const { return case_values.begin(); }
+		CaseIterator      CaseEnd()			{ return case_values.end(); }
+		ConstCaseIterator CaseEnd()   const { return case_values.end(); }
+		CaseRange		  Cases()			{ return CaseRange(CaseBegin(), CaseEnd()); }
 		ConstCaseRange	  Cases()	  const { return ConstCaseRange(CaseBegin(), CaseEnd()); }
 
-		BasicBlock* GetDefaultCase() const
-		{
-			return default_block;
-		}
-
-		BasicBlock* GetCaseBlock(Uint32 case_idx) const
-		{
-			if (case_idx >= cases.size()) return nullptr;
-			return cases[case_idx].second;
-		}
+		BasicBlock* GetDefaultCase() const;
+		BasicBlock* GetCaseBlock(Uint32 case_idx) const;
 		Int64 GetCaseValue(Uint32 case_idx) const
 		{
-			if (case_idx >= cases.size()) return INT64_MAX;
-			return cases[case_idx].first;
+			if (case_idx >= case_values.size()) return INT64_MAX;
+			return case_values[case_idx].GetCaseValue(); 
 		}
 
 		Value* GetCondition() const { return GetOperand(0); }
@@ -683,7 +686,7 @@ namespace ola
 
 		Uint32 GetNumCases() const
 		{
-			return cases.size();
+			return case_values.size();
 		}
 
 		OLA_NODISCARD Instruction* Clone() const
@@ -701,8 +704,7 @@ namespace ola
 		}
 
 	private:
-		BasicBlock* default_block;
-		std::vector<Case> cases;
+		std::vector<SwitchCase> case_values;
 	};
 
 	class CallInst final : public Instruction

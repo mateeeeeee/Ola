@@ -17,9 +17,9 @@ namespace ola
 				{
 					std::unordered_set<BasicBlock*> switch_targets;
 					switch_targets.insert(switch_inst->GetDefaultCase());
-					for (auto&& [_, target] : switch_inst->Cases())
+					for (auto&& switch_case : switch_inst->Cases())
 					{
-						switch_targets.insert(target);
+						switch_targets.insert(switch_case.GetCaseBlock());
 					}
 
 					for (BasicBlock* target : switch_targets)

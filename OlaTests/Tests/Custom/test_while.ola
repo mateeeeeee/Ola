@@ -71,22 +71,22 @@ void TestWhileLoopWithBreak()
 
 void TestWhileLoopWithContinue()
 {
-    //int sum = 0;
-    //int i = 0;
-    //
-    //while (i < 5)
-    //{
-    //    i++;
-    //
-    //    if (i % 2 == 0)
-    //    {
-    //        continue;
-    //    }
-    //
-    //    sum += i;
-    //}
-    //
-    //Assert(sum == 9);
+    int sum = 0;
+    int i = 0;
+    
+    while (i < 5)
+    {
+        i++;
+    
+        if (i % 2 == 0)
+        {
+            continue;
+        }
+    
+        sum += i;
+    }
+    
+    Assert(sum == 9);
 }
 
 public int main()

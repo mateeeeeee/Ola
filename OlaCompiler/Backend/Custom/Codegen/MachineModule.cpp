@@ -511,8 +511,8 @@ namespace ola
 
 		for (auto& case_pair : SI->Cases())
 		{
-			Int64 case_value = case_pair.first;
-			BasicBlock* case_block = case_pair.second;
+			Int64 case_value = case_pair.GetCaseValue();
+			BasicBlock* case_block = case_pair.GetCaseBlock();
 
 			if (!cond_op.IsImmediate())
 			{

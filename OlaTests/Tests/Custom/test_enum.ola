@@ -40,23 +40,23 @@ public int TestEnumValuesAfterModification()
 
 public int TestEnumSwitch()
 {
-    //Color switchColor = Green;
-    //int result = 0;
-    //
-    //switch (switchColor)
-    //{
-    //    case Red:
-    //        result = 1;
-    //        break;
-    //    case Green:
-    //        result = 2;
-    //        break;
-    //    case Blue:
-    //        result = 3;
-    //        break;
-    //}
-    //
-    //Assert(result == 2);
+    Color switchColor = Green;
+    int result = 0;
+    
+    switch (switchColor)
+    {
+        case Red:
+            result = 1;
+            break;
+        case Green:
+            result = 2;
+            break;
+        case Blue:
+            result = 3;
+            break;
+    }
+    
+    Assert(result == 2);
     return 0;
 }
 

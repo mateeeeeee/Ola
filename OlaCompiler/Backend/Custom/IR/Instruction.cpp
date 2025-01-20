@@ -247,9 +247,24 @@ namespace ola
 	{
 	}
 
-	SwitchInst::SwitchInst(Value* val, BasicBlock* default_block) : Instruction{ Opcode::Switch, IRVoidType::Get(val->GetContext()), { val } }, default_block{ default_block }
+	SwitchInst::SwitchInst(Value* val, BasicBlock* default_block) 
+		: Instruction{ Opcode::Switch, IRVoidType::Get(val->GetContext()), { val, default_block } }
 	{
-
+	}
+	void SwitchInst::AddCase(Int64 key, BasicBlock* label)
+	{
+		AddOperand(label);
+		case_values.emplace_back(key, cast<BasicBlock>(GetOperand(GetNumOperands() - 1)));
+		OLA_ASSERT(case_values.size() == GetNumOperands() - 2);
+	}
+	BasicBlock* SwitchInst::GetDefaultCase() const
+	{
+		return GetOperand(1) ? cast<BasicBlock>(GetOperand(1)) : nullptr;
+	}
+	BasicBlock* SwitchInst::GetCaseBlock(Uint32 case_idx) const
+	{
+		if (case_idx >= case_values.size()) return nullptr;
+		return case_values[case_idx].GetCaseBlock();
 	}
 
 	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<Function>(callee)->GetReturnType(), {})
