@@ -10,6 +10,7 @@ namespace ola
 		InstUnknown,
 		// control-flow
 		InstCall,
+		InstRet,
 		InstJump,
 		InstJE,
 		InstJNE,

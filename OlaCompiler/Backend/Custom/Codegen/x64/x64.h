@@ -107,6 +107,7 @@ namespace ola::x64
 		case InstJE:      return "je";
 		case InstJNE:     return "jne";
 		case InstCall:    return "call";
+		case InstRet:    return "ret";
 		case InstStore:
 		case InstLoad:    
 		case InstMove:    return "mov";

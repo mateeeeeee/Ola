@@ -4,8 +4,42 @@ external AssertMsg
 
 external main: 
 label0: 
-InstJump - label1
+InstPop - i64 reg 2
+InstLoad - i64 reg 2, i64 reg 1
+InstUMul - i64 reg 1, i64 imm 64
+x64::MoveFP - f64 reg 32, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -16, f64 reg 32
+x64::MoveFP - f64 reg 32, f64 imm 4613937818241073152
+x64::StoreFP - f64 stack -24, f64 reg 32
+x64::LoadFP - f64 reg 32, f64 stack -16
+x64::LoadFP - f64 reg 31, f64 stack -24
+InstTest - f64 reg 32, f64 reg 31
+x64::SetA - i8 reg 15
+InstOr - i8 reg 15, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -16
+x64::LoadFP - f64 reg 32, f64 stack -24
+x64::MoveFP - f64 reg 30, f64 reg 32
+InstZExt - i8 reg 15, i8 reg 15
+InstJNE - label3
+x64::MoveFP - f64 reg 30, f64 reg 31
+
+label3: 
+x64::StoreFP - f64 stack -32, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -32
+InstTest - f64 reg 30, f64 imm 4613937818241073152
+x64::SetE - i8 reg 15
+InstOr - i8 reg 15, i8 imm 1
+InstLoad - i8 reg 3, i8 reg 15
+InstCall - 
+InstLoadGlobalAddress - i64 stack -8, i64 imm 0
+InstJE - label2
 
 label1: 
-InstMove - i64 reg 0, i64 imm 20
+
+label2: 
+InstStore - i64 reg 15, i64 stack -8
+InstLoad - i64 reg 0, i64 reg 15
+InstLoad - i64 reg 1, i64 reg 2
+InstAdd - i64 reg 2
+InstJump - 
 

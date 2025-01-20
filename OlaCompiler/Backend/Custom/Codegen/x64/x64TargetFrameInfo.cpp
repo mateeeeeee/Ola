@@ -191,6 +191,7 @@ namespace ola
 			pop_rbp.SetOp<0>(rbp);
 			ctx.EmitInst(pop_rbp);
 		}
+		ctx.EmitInst(MachineInstruction(InstRet));
 	}
 
 	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const

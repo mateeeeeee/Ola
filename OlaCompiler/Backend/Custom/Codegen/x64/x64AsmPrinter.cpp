@@ -121,6 +121,7 @@ namespace ola
 							EmitText("{} {}", opcode_string, relocable->GetSymbol());
 						}
 						break;
+						case InstRet:
 						case x64::InstCqo:
 						{
 							EmitText("{}", opcode_string);
@@ -238,7 +239,6 @@ namespace ola
 						}
 					}
 				}
-				EmitText("ret\n");
 			}
 			else if (relocable->IsDataStorage())
 			{

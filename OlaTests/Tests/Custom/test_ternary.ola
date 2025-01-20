@@ -11,11 +11,11 @@ void TestTernaryOperatorIntegers()
 
 void TestTernaryOperatorFloats()
 {
-    //float c = 2.5;
-    //float d = 3.0;
-    //
-    //float result = (c > d) ? c : d;
-    //Assert(result == 3.0);
+    float c = 2.5;
+    float d = 3.0;
+    
+    float result = (c > d) ? c : d;
+    Assert(result == 3.0);
 }
 
 void TestTernaryOperatorBools()

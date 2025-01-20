@@ -7,6 +7,8 @@
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
+#include "Backend/Custom/Codegen/MachineBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 
 namespace ola
@@ -89,6 +91,44 @@ namespace ola
 						ctx.EmitInst(move_remainder);
 					}
 					ctx.MapOperand(BI, dst);
+					return true;
+				}
+			}
+			else if (SelectInst* SI = dyn_cast<SelectInst>(I))
+			{
+				if (SI->GetType()->IsFloat())
+				{
+					Value* predicate = SI->GetPredicate();
+					Value* true_value = SI->GetTrueValue();
+					Value* false_value = SI->GetFalseValue();
+					MachineOperand result_reg = ctx.VirtualReg(SI->GetType());
+					MachineOperand true_op = ctx.GetOperand(true_value);
+					MachineOperand false_op = ctx.GetOperand(false_value);
+					MachineOperand predicate_op = ctx.GetOperand(predicate);
+
+					ctx.EmitInst(MachineInstruction(InstMove)
+						.SetOp<0>(result_reg)
+						.SetOp<1>(false_op));
+
+					MachineInstruction testMI(InstTest);
+					testMI.SetOp<0>(predicate_op);
+					testMI.SetOp<1>(predicate_op);
+					ctx.EmitInst(testMI);
+
+					MachineBasicBlock* MBB = ctx.GetCurrentBasicBlock();
+					MachineFunction* MF = MBB->GetFunction();
+					auto Where = std::find_if(MF->Blocks().begin(), MF->Blocks().end(),
+											  [MBB](const auto& block) { return block.get() == MBB; });
+					++Where;
+					auto& inserted = *MF->Blocks().insert(Where, std::make_unique<MachineBasicBlock>(MF, ctx.GetLabel()));
+					MachineBasicBlock* SkipBlock = inserted.get();
+
+					ctx.EmitInst(MachineInstruction(InstJE).SetOp<0>(MachineOperand::Relocable(SkipBlock)));
+					ctx.EmitInst(MachineInstruction(InstMove)
+						.SetOp<0>(result_reg)
+						.SetOp<1>(true_op));
+					ctx.MapOperand(SI, result_reg);
+					ctx.SetCurrentBasicBlock(SkipBlock);
 					return true;
 				}
 			}

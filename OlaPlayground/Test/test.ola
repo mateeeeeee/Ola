@@ -1,12 +1,12 @@
 import std.assert;
 
-int f(int a)
-{
-	return a + 10;
-}
 
 public int main()
 {
-	int g = f(5);
-	return g + 5;
+	float c = 2.5;
+	float d = 3.0;
+	
+	float result = (c > d) ? c : d;
+	Assert(result == 3.0);
+	return 0;
 }

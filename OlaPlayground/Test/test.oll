@@ -8,8 +8,28 @@ declare @AssertMsg void(i8,ptr)
 
 define external @main i64() {
 entry:
+%0 = alloca i64
+%1 = alloca f64
+store 2.5, ptr %1
+%2 = alloca f64
+store 3, ptr %2
+%3 = load f64, ptr %1
+%4 = load f64, ptr %2
+%5 = fcmp ogt f64 %3, %4
+%6 = load f64, ptr %1
+%7 = load f64, ptr %2
+%8 = select i8 %5, f64 %6, f64 %7
+%9 = alloca f64
+store f64 %8, ptr %9
+%10 = load f64, ptr %9
+%11 = fcmp oeq f64 %10, 3
+call i8 %11, @Assert
+store 0, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 20
+%12 = load i64, ptr %0
+ret i64 %12
 }
 
