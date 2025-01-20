@@ -253,6 +253,7 @@ namespace ola
 			}
 			break;
 			case InstNeg:
+			case InstNot:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op = MI.GetOperand(1);

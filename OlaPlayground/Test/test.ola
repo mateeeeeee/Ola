@@ -3,10 +3,8 @@ import std.assert;
 
 public int main()
 {
-	float c = 2.5;
-	float d = 3.0;
-	
-	float result = (c > d) ? c : d;
-	Assert(result == 3.0);
-	return 0;
+	int s = 5;
+    int resultNotS = ~s; 
+    Assert(resultNotS == -6); 
+    return 0;
 }

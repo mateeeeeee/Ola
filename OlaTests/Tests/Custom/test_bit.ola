@@ -30,25 +30,25 @@ public int main()
     e ^= f;
     Assert(e == 6);
 
-    //int s = 5;
-    //int resultNotS = ~s; 
-    //Assert(resultNotS == -6); 
-    //
-    //int t = -1;
-    //int resultNotT = ~t; 
-    //Assert(resultNotT == 0);
-    //
-    //int u = 0;
-    //int resultNotU = ~u;  
-    //Assert(resultNotU == -1); 
-    //
-    //int v = 255;  
-    //int resultNotV = ~v;  
-    //Assert(resultNotV == -256);   
-    //
-    //int z = 65535;  
-    //int resultNotZ = ~z;  
-    //Assert(resultNotZ == -65536); 
+    int s = 5;
+    int resultNotS = ~s; 
+    Assert(resultNotS == -6); 
+    
+    int t = -1;
+    int resultNotT = ~t; 
+    Assert(resultNotT == 0);
+    
+    int u = 0;
+    int resultNotU = ~u;  
+    Assert(resultNotU == -1); 
+    
+    int v = 255;  
+    int resultNotV = ~v;  
+    Assert(resultNotV == -256);   
+    
+    int z = 65535;  
+    int resultNotZ = ~z;  
+    Assert(resultNotZ == -65536); 
 
     return 0;
 }

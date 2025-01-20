@@ -86,6 +86,7 @@ namespace ola
 		}
 		break;
 		case InstNeg:
+		case InstNot:
 		case InstFNeg:
 		case x64::InstSetE:
 		case x64::InstSetNE:
