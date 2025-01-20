@@ -60,13 +60,14 @@ namespace ola
 
 	private:
 
-		UniqueVarDeclPtr       ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueFieldDeclPtr ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueParamVarDeclPtr  ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
+		UniqueVarDeclPtr		ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueFieldDeclPtr		ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueParamVarDeclPtr	ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
-												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-												DeclVisibility visibility, FuncAttributes attributes);
+												UniqueParamVarDeclPtrList&& param_decls, DeclVisibility visibility, FuncAttributes attributes);
+		void				  ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr& func_decl, UniqueCompoundStmtPtr&& body_stmt);
+
 		UniqueMethodDeclPtr ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
 												DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs);

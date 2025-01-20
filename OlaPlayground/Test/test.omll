@@ -2,30 +2,52 @@ external Assert
 
 external AssertMsg
 
-external main: 
+internal fact__I: 
 label0: 
 InstPop - i64 reg 2
 InstLoad - i64 reg 2, i64 reg 1
-InstUMul - i64 reg 1, i64 imm 56
-InstLoadGlobalAddress - i64 stack -16, i64 imm 5
-InstStore - i64 reg 15, i64 stack -16
-InstLoad - i64 reg 14, i64 reg 15
-InstFAdd - i64 reg 14
-InstLoadGlobalAddress - i64 stack -24, i64 reg 14
-InstStore - i64 reg 14, i64 stack -24
-InstFCmp - i64 reg 14, i64 imm -6
+InstUMul - i64 reg 1, i64 imm 32
+InstLoad - i64 reg 15, i64 reg 3
+InstFCmp - i64 reg 15, i64 imm 1
 x64::SetE - i8 reg 14
 InstOr - i8 reg 14, i8 imm 1
-InstLoad - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoadGlobalAddress - i64 stack -8, i64 imm 0
+InstZExt - i8 reg 14, i8 reg 14
+InstMove - label1
 InstJE - label2
 
 label1: 
+InstLoad - i64 reg 14, i64 imm 5
+InstJE - label3
 
 label2: 
-InstStore - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 14, i64 reg 15
+InstUMul - i64 reg 14, i64 imm 1
+InstLoad - i64 reg 3, i64 reg 14
+InstCall - 
+InstLoad - i64 reg 14, i64 reg 0
+InstLoad - i64 reg 13, i64 reg 15
+InstUDiv - i64 reg 13, i64 reg 14
+InstLoad - i64 reg 14, i64 reg 13
+InstJE - label3
+
+label3: 
 InstLoad - i64 reg 0, i64 reg 14
+InstLoad - i64 reg 1, i64 reg 2
+InstAdd - i64 reg 2
+InstJump - 
+
+external main: 
+label4: 
+InstPop - i64 reg 2
+InstLoad - i64 reg 2, i64 reg 1
+InstUMul - i64 reg 1, i64 imm 32
+InstLoad - i64 reg 3, i64 imm 5
+InstCall - 
+InstLoad - i64 reg 15, i64 reg 0
+InstJE - label5
+
+label5: 
+InstLoad - i64 reg 0, i64 reg 15
 InstLoad - i64 reg 1, i64 reg 2
 InstAdd - i64 reg 2
 InstJump - 

@@ -114,7 +114,7 @@ namespace ola
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			Expect(TokenKind::semicolon);
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), nullptr, DeclVisibility::Extern, attrs);
+		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), DeclVisibility::Extern, attrs);
 	}
 
 	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
@@ -125,6 +125,7 @@ namespace ola
 		UniqueParamVarDeclPtrList param_decls;
 		UniqueCompoundStmtPtr function_body;
 		FuncAttributes attrs = FuncAttribute_None;
+		UniqueFunctionDeclPtr func_decl = nullptr;
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(attrs);
@@ -148,11 +149,13 @@ namespace ola
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 
+			func_decl = sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), visibility, attrs);
 			sema->sema_ctx.current_func = &function_type;
 			function_body = ParseCompoundStatement();
 			sema->sema_ctx.current_func = nullptr;
 		}
-		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, attrs);
+		sema->ActOnFunctionDefinition(loc, func_decl, std::move(function_body));
+		return func_decl;
 	}
 
 	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)

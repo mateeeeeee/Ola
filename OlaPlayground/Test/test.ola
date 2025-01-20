@@ -1,10 +1,14 @@
 import std.assert;
 
 
+int fact(int n)
+{
+    if(n == 1) return 1;
+    return n * fact(n - 1);
+}
+
 public int main()
 {
-	int s = 5;
-    int resultNotS = ~s; 
-    Assert(resultNotS == -6); 
-    return 0;
+	int s = fact(5);
+    return s;
 }

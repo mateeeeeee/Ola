@@ -69,8 +69,7 @@ namespace ola
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
-		UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-		DeclVisibility visibility, FuncAttributes attributes)
+		UniqueParamVarDeclPtrList&& param_decls, DeclVisibility visibility, FuncAttributes attributes)
 	{
 		FuncType const* func_type = dyn_cast<FuncType>(type);
 		OLA_ASSERT(func_type);
@@ -93,30 +92,33 @@ namespace ola
 		function_decl->SetType(type);
 		function_decl->SetVisibility(visibility);
 		function_decl->SetParamDecls(std::move(param_decls));
-		if (body_stmt)
-		{
-			function_decl->SetBodyStmt(std::move(body_stmt));
-			for (std::string const& goto_label : sema_ctx.gotos)
-			{
-				if (!sema_ctx.labels.contains(goto_label))
-				{
-					diagnostics.Report(loc, undeclared_label, goto_label);
-					return nullptr;
-				}
-			}
-			sema_ctx.gotos.clear();
-			sema_ctx.labels.clear();
-
-			if (!sema_ctx.return_stmt_encountered && !isa<VoidType>(func_type->GetReturnType()))
-			{
-				diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
-			}
-			sema_ctx.return_stmt_encountered = false;
-		}
-
+		
 		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
 		OLA_ASSERT(result);
 		return function_decl;
+	}
+
+	void Sema::ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& body_stmt)
+	{
+		OLA_ASSERT(body_stmt);
+		function_decl->SetBodyStmt(std::move(body_stmt));
+		for (std::string const& goto_label : sema_ctx.gotos)
+		{
+			if (!sema_ctx.labels.contains(goto_label))
+			{
+				diagnostics.Report(loc, undeclared_label, goto_label);
+				return;
+			}
+		}
+		sema_ctx.gotos.clear();
+		sema_ctx.labels.clear();
+		if (!sema_ctx.return_stmt_encountered && !isa<VoidType>(function_decl->GetFuncType()->GetReturnType()))
+		{
+			diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
+		}
+		sema_ctx.return_stmt_encountered = false;
+		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
+		OLA_ASSERT(result);
 	}
 
 	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
@@ -201,6 +203,11 @@ namespace ola
 				return nullptr;
 			}
 			sema_ctx.return_stmt_encountered = false;
+		}
+		else
+		{
+			diagnostics.Report(loc, method_needs_definition);
+			return nullptr;
 		}
 
 		Bool result = sema_ctx.decl_sym_table.Insert_Overload(member_function_decl.get());
