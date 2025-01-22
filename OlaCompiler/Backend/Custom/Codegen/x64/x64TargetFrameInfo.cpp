@@ -24,7 +24,7 @@ namespace ola
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			if (idx >= 4) 
 			{
-				Int32 offset = MF->GetLocalStackAllocationSize() + (idx - 4) * 8; //this is wrong, 6th goes 
+				Int32 offset = 8 + MF->GetLocalStackAllocationSize() + (CI->ArgSize() - 1 - idx) * 8; //this is wrong, 6th goes 
 				MachineInstruction copy_arg_to_stack(InstMove);
 				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
@@ -120,7 +120,7 @@ namespace ola
 			else
 			{
 				MachineInstruction copy_arg_to_reg(InstMove);
-				Int32 offset = 8 + 32 + (arg_idx - 4) * 8;
+				Int32 offset = 8 + 40 + (arg_idx - 4) * 8;
 				copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 				ctx.EmitInst(copy_arg_to_reg);
 			}

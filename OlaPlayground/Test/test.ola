@@ -1,12 +1,14 @@
+import std.assert;
+import std.string;
 
-
-int f(int a, int b, int c, int d, int e)
+void PassStringVariable(const char[] variable)
 {
-	return a + b + c + d + e;
+	Assert(variable[0] == 'l');
 }
 
 public int main()
 {
-	int r = f(1,2,3,4,5);
-    return r;
+	const char[] localString = "local";
+	PassStringVariable(localString);
+	return 0;
 }

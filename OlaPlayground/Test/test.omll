@@ -1,66 +1,91 @@
-internal f__I__I__I__I__I: 
+external Assert
+
+external AssertMsg
+
+external IsAlnum
+
+external IsAlpha
+
+external IsLower
+
+external IsUpper
+
+external IsDigit
+
+external IsSpace
+
+external ToLower
+
+external ToUpper
+
+external StringToFloat
+
+external StringToInt
+
+external StringCopy
+
+internal PassStringVariable__C0: 
 label0: 
 InstPop - i64 reg 2
 InstLoad - i64 reg 2, i64 reg 1
-InstUMul - i64 reg 1, i64 imm 48
-InstLoad - i64 reg 15, i64 reg 3
-InstLoad - i64 reg 14, i64 reg 4
-InstLoad - i64 reg 13, i64 reg 8
-InstLoad - i64 reg 12, i64 reg 9
-InstStore - i64 reg 11, i64 stack 40
-InstLoadGlobalAddress - i64 stack -8, i64 reg 15
-InstLoadGlobalAddress - i64 stack -16, i64 reg 14
-InstLoadGlobalAddress - i64 stack -24, i64 reg 13
-InstLoadGlobalAddress - i64 stack -32, i64 reg 12
-InstLoadGlobalAddress - i64 stack -40, i64 reg 11
-InstStore - i64 reg 11, i64 stack -8
-InstStore - i64 reg 12, i64 stack -16
-InstLoad - i64 reg 13, i64 reg 11
-InstSub - i64 reg 13, i64 reg 12
-InstStore - i64 reg 12, i64 stack -24
-InstLoad - i64 reg 11, i64 reg 13
-InstSub - i64 reg 11, i64 reg 12
-InstStore - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 13, i64 reg 11
-InstSub - i64 reg 13, i64 reg 12
-InstStore - i64 reg 12, i64 stack -40
-InstLoad - i64 reg 11, i64 reg 13
-InstSub - i64 reg 11, i64 reg 12
-InstLoadGlobalAddress - i64 stack -48, i64 reg 11
-InstJE - label2
+InstUMul - i64 reg 1, i64 imm 40
+InstLoad - ptr reg 15, ptr reg 3
+InstLoadGlobalAddress - ptr stack -8, ptr reg 15
+InstStore - ptr reg 15, ptr stack -8
+InstLoad - ptr reg 14, ptr reg 15
+InstStore - i8 reg 15, i8 reg 14
+InstFCmp - i8 reg 15, i64 imm 108
+x64::SetE - i8 reg 15
+InstOr - i8 reg 15, i8 imm 1
+InstLoad - i8 reg 3, i8 reg 15
+InstCall - 
+InstJE - label1
 
 label1: 
-
-label2: 
-InstStore - i64 reg 11, i64 stack -48
-InstLoad - i64 reg 0, i64 reg 11
 InstLoad - i64 reg 1, i64 reg 2
 InstAdd - i64 reg 2
 InstJump - 
 
 external main: 
-label3: 
+label2: 
 InstPop - i64 reg 2
 InstLoad - i64 reg 2, i64 reg 1
-InstUMul - i64 reg 1, i64 imm 56
-InstLoadGlobalAddress - i64 stack -16, i64 imm 5
-InstLoad - i64 reg 9, i64 imm 4
-InstLoad - i64 reg 8, i64 imm 3
-InstLoad - i64 reg 4, i64 imm 2
-InstLoad - i64 reg 3, i64 imm 1
+InstUMul - i64 reg 1, i64 imm 48
+InstCMoveEQ - ptr reg 15, ptr stack -16
+InstLoadGlobalAddress - ptr reg 15, i64 imm 108
+InstCMoveEQ - ptr reg 15, ptr stack -16
+InstLoad - ptr reg 14, ptr reg 15
+InstSub - ptr reg 14, i64 imm 1
+InstLoadGlobalAddress - i8 reg 14, i64 imm 111
+InstCMoveEQ - ptr reg 14, ptr stack -16
+InstLoad - ptr reg 15, ptr reg 14
+InstSub - ptr reg 15, i64 imm 2
+InstLoadGlobalAddress - i8 reg 15, i64 imm 99
+InstCMoveEQ - ptr reg 15, ptr stack -16
+InstLoad - ptr reg 14, ptr reg 15
+InstSub - ptr reg 14, i64 imm 3
+InstLoadGlobalAddress - i8 reg 14, i64 imm 97
+InstCMoveEQ - ptr reg 14, ptr stack -16
+InstLoad - ptr reg 15, ptr reg 14
+InstSub - ptr reg 15, i64 imm 4
+InstLoadGlobalAddress - i8 reg 15, i64 imm 108
+InstCMoveEQ - ptr reg 15, ptr stack -16
+InstLoad - ptr reg 14, ptr reg 15
+InstSub - ptr reg 14, i64 imm 5
+InstLoadGlobalAddress - i8 reg 14, i64 imm 0
+InstStore - ptr reg 3, ptr stack -16
 InstCall - 
-InstLoad - i64 reg 15, i64 reg 0
-InstLoadGlobalAddress - i64 stack -16, i64 reg 15
-InstStore - i64 reg 15, i64 stack -16
-InstLoadGlobalAddress - i64 stack -8, i64 reg 15
-InstJE - label5
+InstLoadGlobalAddress - i64 stack -8, i64 imm 0
+InstJE - label4
+
+label3: 
 
 label4: 
-
-label5: 
-InstStore - i64 reg 15, i64 stack -8
-InstLoad - i64 reg 0, i64 reg 15
+InstStore - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 0, i64 reg 14
 InstLoad - i64 reg 1, i64 reg 2
 InstAdd - i64 reg 2
 InstJump - 
+
+internal data storage __StringLiteral0
 

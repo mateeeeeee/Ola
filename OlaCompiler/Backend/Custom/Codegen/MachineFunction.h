@@ -32,6 +32,7 @@ namespace ola
 		MachineOperand& AllocateLocalStack(Uint32 size)
 		{
 			local_stack_offset += size;
+			local_stack_offset = OLA_ALIGN_UP(local_stack_offset, 8);
 			MachineOperand stack_object = MachineOperand::StackObject(-local_stack_offset, MachineType::Ptr);
 			local_stack_objects.push_back(stack_object);
 			return local_stack_objects.back();

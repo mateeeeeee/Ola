@@ -19,6 +19,8 @@
 #define OLA_DEBUGZONE_BEGIN         __pragma(optimize("", off))
 #define OLA_DEBUGZONE_END           __pragma(optimize("", on))
 #define OLA_TODO(...)
+#define OLA_ALIGN(x, align)         ((x) & ~((align) - 1))
+#define OLA_ALIGN_UP(x, align)      (((x) + (align) - 1) & ~((align) - 1))
 
 #if defined(_MSC_VER)
 #define OLA_UNREACHABLE()			__assume(false)
