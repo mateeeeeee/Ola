@@ -114,7 +114,9 @@ namespace ola
 
 		virtual void EmitCall(CallInst* CI, MachineContext& ctx) const = 0;
 		virtual void EmitPrologue(MachineFunction& MF, MachineContext& ctx) const = 0;
+		virtual void EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const = 0;
 		virtual void EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const = 0;
+		virtual void EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const = 0;
 		virtual void EmitReturn(ReturnInst* RI, MachineContext& ctx) const = 0;
 	};
 

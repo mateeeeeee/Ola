@@ -129,6 +129,11 @@ namespace ola
 		}
 	}
 
+	void x64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	{
+
+	}
+
 	void x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
@@ -147,6 +152,11 @@ namespace ola
 			ctx.EmitInst(pop_rbp);
 		}
 		ctx.EmitInst(MachineInstruction(InstRet));
+	}
+
+	void x64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	{
+
 	}
 
 	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const

@@ -116,6 +116,7 @@ namespace ola
 			machine_ctx.MapGlobal(GV, &globals.back());
 		}
 
+		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		for (GlobalValue* GV : ir_globals)
 		{
 			if (GV->IsFunction())
@@ -131,6 +132,12 @@ namespace ola
 
 					LinearScanRegisterAllocator register_allocator(*this);
 					register_allocator.AssignRegisters(MF);
+					machine_ctx.SetUsedRegistersInfo(&register_allocator.GetUsedRegistersInfo());
+
+					machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));
+					frame_info.EmitProloguePostRA(MF, machine_ctx);
+					machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetLastBlock()));
+					frame_info.EmitEpiloguePostRA(MF, machine_ctx);
 
 					PostLegalizeInstructions(MF);
 				}
