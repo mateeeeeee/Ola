@@ -10,7 +10,23 @@
 
 namespace ola
 {
-
+	//Stack layout for x64 Microsoft ABI
+	//Higher memory addresses
+	//+ ------------------------------------ +
+	//| Caller - saved registers(if spilled) | < -Saved by caller before call
+	//+ ------------------------------------ +
+	//| Arguments beyond 4th(if any)		 | <- Pushed by caller before call
+	//+ ------------------------------------ +
+	//| Shadow Space(32B)					 | <- Allocated by caller before CALL
+	//+ ------------------------------------ +
+	//| Return Address						 | <- Pushed by CALL instruction
+	//+ ------------------------------------ +
+	//| Old RBP(if used)					 | <- Pushed by callee (if using frame pointer)
+	//| Callee - saved registers			 | <- Saved by callee(if needed)  
+	//| Local variables + register spills	 | <- Allocated by callee
+	//+ ------------------------------------ +
+	//Lower memory addresses(stack grows downward)
+	
 	void x64TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
 		Function* callee = CI->GetCalleeAsFunction();
