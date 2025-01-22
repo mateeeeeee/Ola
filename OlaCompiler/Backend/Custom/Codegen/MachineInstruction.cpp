@@ -2,11 +2,12 @@
 
 namespace ola
 {
-	Char const* MachineOpcodeNames[] = 
+	Char const* MachineOpcodeNames[] =
 	{
 		"InstUnknown",
 		// control-flow
 		"InstCall",
+		"InstRet",
 		"InstJump",
 		"InstJE",
 		"InstJNE",
@@ -64,6 +65,7 @@ namespace ola
 		"InstF2S",
 		"InstS2F",
 	};
+	static_assert(sizeof(MachineOpcodeNames)/sizeof(MachineOpcodeNames[0]) == InstOpcodeCount);
 
 	Char const* MachineInstruction::GetOpcodeName() const
 	{

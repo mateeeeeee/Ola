@@ -2,90 +2,483 @@ external Assert
 
 external AssertMsg
 
-external IsAlnum
-
-external IsAlpha
-
-external IsLower
-
-external IsUpper
-
-external IsDigit
-
-external IsSpace
-
-external ToLower
-
-external ToUpper
-
-external StringToFloat
-
-external StringToInt
-
-external StringCopy
-
-internal PassStringVariable__C0: 
+internal Add__I__I: 
 label0: 
-InstPop - i64 reg 2
-InstLoad - i64 reg 2, i64 reg 1
-InstUMul - i64 reg 1, i64 imm 40
-InstLoad - ptr reg 15, ptr reg 3
-InstLoadGlobalAddress - ptr stack -8, ptr reg 15
-InstStore - ptr reg 15, ptr stack -8
-InstLoad - ptr reg 14, ptr reg 15
-InstStore - i8 reg 15, i8 reg 14
-InstFCmp - i8 reg 15, i64 imm 108
-x64::SetE - i8 reg 15
-InstOr - i8 reg 15, i8 imm 1
-InstLoad - i8 reg 3, i8 reg 15
-InstCall - 
-InstJE - label1
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 24
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 4
+InstStore - i64 stack -8, i64 reg 15
+InstStore - i64 stack -16, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 15, i64 stack -16
+InstMove - i64 reg 13, i64 reg 14
+InstAdd - i64 reg 13, i64 reg 15
+InstStore - i64 stack -24, i64 reg 13
+InstJump - label2
 
 label1: 
-InstLoad - i64 reg 1, i64 reg 2
-InstAdd - i64 reg 2
-InstJump - 
 
-external main: 
 label2: 
+InstLoad - i64 reg 13, i64 stack -24
+InstMove - i64 reg 0, i64 reg 13
+InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
-InstLoad - i64 reg 2, i64 reg 1
-InstUMul - i64 reg 1, i64 imm 48
-InstCMoveEQ - ptr reg 15, ptr stack -16
-InstLoadGlobalAddress - ptr reg 15, i64 imm 108
-InstCMoveEQ - ptr reg 15, ptr stack -16
-InstLoad - ptr reg 14, ptr reg 15
-InstSub - ptr reg 14, i64 imm 1
-InstLoadGlobalAddress - i8 reg 14, i64 imm 111
-InstCMoveEQ - ptr reg 14, ptr stack -16
-InstLoad - ptr reg 15, ptr reg 14
-InstSub - ptr reg 15, i64 imm 2
-InstLoadGlobalAddress - i8 reg 15, i64 imm 99
-InstCMoveEQ - ptr reg 15, ptr stack -16
-InstLoad - ptr reg 14, ptr reg 15
-InstSub - ptr reg 14, i64 imm 3
-InstLoadGlobalAddress - i8 reg 14, i64 imm 97
-InstCMoveEQ - ptr reg 14, ptr stack -16
-InstLoad - ptr reg 15, ptr reg 14
-InstSub - ptr reg 15, i64 imm 4
-InstLoadGlobalAddress - i8 reg 15, i64 imm 108
-InstCMoveEQ - ptr reg 15, ptr stack -16
-InstLoad - ptr reg 14, ptr reg 15
-InstSub - ptr reg 14, i64 imm 5
-InstLoadGlobalAddress - i8 reg 14, i64 imm 0
-InstStore - ptr reg 3, ptr stack -16
-InstCall - 
-InstLoadGlobalAddress - i64 stack -8, i64 imm 0
-InstJE - label4
+InstRet - 
 
+internal AddThreeNumbers__I__I__I: 
 label3: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 4
+InstMove - i64 reg 13, i64 reg 8
+InstStore - i64 stack -8, i64 reg 15
+InstStore - i64 stack -16, i64 reg 14
+InstStore - i64 stack -24, i64 reg 13
+InstLoad - i64 reg 13, i64 stack -8
+InstLoad - i64 reg 14, i64 stack -16
+InstMove - i64 reg 15, i64 reg 13
+InstAdd - i64 reg 15, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -24
+InstMove - i64 reg 13, i64 reg 15
+InstAdd - i64 reg 13, i64 reg 14
+InstStore - i64 stack -32, i64 reg 13
+InstJump - label5
 
 label4: 
-InstStore - i64 reg 14, i64 stack -8
-InstLoad - i64 reg 0, i64 reg 14
-InstLoad - i64 reg 1, i64 reg 2
-InstAdd - i64 reg 2
-InstJump - 
 
-internal data storage __StringLiteral0
+label5: 
+InstLoad - i64 reg 13, i64 stack -32
+InstMove - i64 reg 0, i64 reg 13
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AddFourNumbers__I__I__I__I: 
+label6: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 40
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 4
+InstMove - i64 reg 13, i64 reg 8
+InstMove - i64 reg 12, i64 reg 9
+InstStore - i64 stack -8, i64 reg 15
+InstStore - i64 stack -16, i64 reg 14
+InstStore - i64 stack -24, i64 reg 13
+InstStore - i64 stack -32, i64 reg 12
+InstLoad - i64 reg 12, i64 stack -8
+InstLoad - i64 reg 13, i64 stack -16
+InstMove - i64 reg 14, i64 reg 12
+InstAdd - i64 reg 14, i64 reg 13
+InstLoad - i64 reg 13, i64 stack -24
+InstMove - i64 reg 12, i64 reg 14
+InstAdd - i64 reg 12, i64 reg 13
+InstLoad - i64 reg 13, i64 stack -32
+InstMove - i64 reg 14, i64 reg 12
+InstAdd - i64 reg 14, i64 reg 13
+InstStore - i64 stack -40, i64 reg 14
+InstJump - label8
+
+label7: 
+
+label8: 
+InstLoad - i64 reg 14, i64 stack -40
+InstMove - i64 reg 0, i64 reg 14
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AddSixNumbers__I__I__I__I__I__I: 
+label9: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 56
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 4
+InstMove - i64 reg 13, i64 reg 8
+InstMove - i64 reg 12, i64 reg 9
+InstLoad - i64 reg 11, i64 stack 48
+InstLoad - i64 reg 10, i64 stack 56
+InstStore - i64 stack -8, i64 reg 15
+InstStore - i64 stack -16, i64 reg 14
+InstStore - i64 stack -24, i64 reg 13
+InstStore - i64 stack -32, i64 reg 12
+InstStore - i64 stack -40, i64 reg 11
+InstStore - i64 stack -48, i64 reg 10
+InstLoad - i64 reg 10, i64 stack -8
+InstLoad - i64 reg 11, i64 stack -16
+InstMove - i64 reg 12, i64 reg 10
+InstAdd - i64 reg 12, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -24
+InstMove - i64 reg 10, i64 reg 12
+InstAdd - i64 reg 10, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -32
+InstMove - i64 reg 12, i64 reg 10
+InstAdd - i64 reg 12, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -40
+InstMove - i64 reg 10, i64 reg 12
+InstAdd - i64 reg 10, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -48
+InstMove - i64 reg 12, i64 reg 10
+InstAdd - i64 reg 12, i64 reg 11
+InstStore - i64 stack -56, i64 reg 12
+InstJump - label11
+
+label10: 
+
+label11: 
+InstLoad - i64 reg 12, i64 stack -56
+InstMove - i64 reg 0, i64 reg 12
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AlternatingSum__I__I__I__I__I__I: 
+label12: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 56
+InstMove - i64 reg 15, i64 reg 3
+InstMove - i64 reg 14, i64 reg 4
+InstMove - i64 reg 13, i64 reg 8
+InstMove - i64 reg 12, i64 reg 9
+InstLoad - i64 reg 11, i64 stack 48
+InstLoad - i64 reg 10, i64 stack 56
+InstStore - i64 stack -8, i64 reg 15
+InstStore - i64 stack -16, i64 reg 14
+InstStore - i64 stack -24, i64 reg 13
+InstStore - i64 stack -32, i64 reg 12
+InstStore - i64 stack -40, i64 reg 11
+InstStore - i64 stack -48, i64 reg 10
+InstLoad - i64 reg 10, i64 stack -8
+InstLoad - i64 reg 11, i64 stack -16
+InstMove - i64 reg 12, i64 reg 10
+InstSub - i64 reg 12, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -24
+InstMove - i64 reg 10, i64 reg 12
+InstAdd - i64 reg 10, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -32
+InstMove - i64 reg 12, i64 reg 10
+InstSub - i64 reg 12, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -40
+InstMove - i64 reg 10, i64 reg 12
+InstAdd - i64 reg 10, i64 reg 11
+InstLoad - i64 reg 11, i64 stack -48
+InstMove - i64 reg 12, i64 reg 10
+InstSub - i64 reg 12, i64 reg 11
+InstStore - i64 stack -56, i64 reg 12
+InstJump - label14
+
+label13: 
+
+label14: 
+InstLoad - i64 reg 12, i64 stack -56
+InstMove - i64 reg 0, i64 reg 12
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AddFloats__F__F: 
+label15: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 24
+x64::MoveFP - f64 reg 32, f64 reg 17
+x64::MoveFP - f64 reg 31, f64 reg 18
+x64::StoreFP - f64 stack -8, f64 reg 32
+x64::StoreFP - f64 stack -16, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -8
+x64::LoadFP - f64 reg 32, f64 stack -16
+x64::MoveFP - f64 reg 30, f64 reg 31
+InstFAdd - f64 reg 30, f64 reg 32
+x64::StoreFP - f64 stack -24, f64 reg 30
+InstJump - label17
+
+label16: 
+
+label17: 
+x64::LoadFP - f64 reg 30, f64 stack -24
+x64::MoveFP - f64 reg 17, f64 reg 30
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AddIntAndFloat__I__F__F: 
+label18: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstMove - i64 reg 15, i64 reg 3
+x64::MoveFP - f64 reg 32, f64 reg 18
+x64::MoveFP - f64 reg 31, f64 reg 19
+InstStore - i64 stack -8, i64 reg 15
+x64::StoreFP - f64 stack -16, f64 reg 32
+x64::StoreFP - f64 stack -24, f64 reg 31
+InstLoad - i64 reg 15, i64 stack -8
+InstS2F - f64 reg 31, i64 reg 15
+x64::LoadFP - f64 reg 32, f64 stack -16
+x64::MoveFP - f64 reg 30, f64 reg 31
+InstFAdd - f64 reg 30, f64 reg 32
+x64::LoadFP - f64 reg 32, f64 stack -24
+x64::MoveFP - f64 reg 31, f64 reg 30
+InstFAdd - f64 reg 31, f64 reg 32
+x64::StoreFP - f64 stack -32, f64 reg 31
+InstJump - label20
+
+label19: 
+
+label20: 
+x64::LoadFP - f64 reg 31, f64 stack -32
+x64::MoveFP - f64 reg 17, f64 reg 31
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal ConditionSum__F__F__F__F__B: 
+label21: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 41
+x64::MoveFP - f64 reg 32, f64 reg 17
+x64::MoveFP - f64 reg 31, f64 reg 18
+x64::MoveFP - f64 reg 30, f64 reg 19
+x64::MoveFP - f64 reg 29, f64 reg 20
+InstLoad - i8 reg 15, i8 stack 48
+x64::StoreFP - f64 stack -8, f64 reg 32
+x64::StoreFP - f64 stack -16, f64 reg 31
+x64::StoreFP - f64 stack -24, f64 reg 30
+x64::StoreFP - f64 stack -32, f64 reg 29
+InstStore - i8 stack -33, i8 reg 15
+InstLoad - i8 reg 15, i8 stack -33
+x64::LoadFP - f64 reg 29, f64 stack -8
+x64::LoadFP - f64 reg 30, f64 stack -16
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFAdd - f64 reg 31, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -24
+x64::LoadFP - f64 reg 29, f64 stack -32
+x64::MoveFP - f64 reg 32, f64 reg 30
+InstFAdd - f64 reg 32, f64 reg 29
+x64::MoveFP - f64 reg 29, f64 reg 32
+InstTest - i8 reg 15, i8 reg 15
+InstJE - label24
+x64::MoveFP - f64 reg 29, f64 reg 31
+
+label24: 
+x64::StoreFP - f64 stack -41, f64 reg 29
+InstJump - label23
+
+label22: 
+
+label23: 
+x64::LoadFP - f64 reg 29, f64 stack -41
+x64::MoveFP - f64 reg 17, f64 reg 29
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal AddBooleans__B__B__B__B: 
+label25: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 12
+InstMove - i8 reg 15, i8 reg 3
+InstMove - i8 reg 14, i8 reg 4
+InstMove - i8 reg 13, i8 reg 8
+InstMove - i8 reg 12, i8 reg 9
+InstStore - i8 stack -1, i8 reg 15
+InstStore - i8 stack -2, i8 reg 14
+InstStore - i8 stack -3, i8 reg 13
+InstStore - i8 stack -4, i8 reg 12
+InstLoad - i8 reg 12, i8 stack -1
+InstLoad - i8 reg 13, i8 stack -2
+InstMove - i8 reg 14, i8 reg 12
+InstAdd - i8 reg 14, i8 reg 13
+InstLoad - i8 reg 13, i8 stack -3
+InstMove - i8 reg 12, i8 reg 14
+InstAdd - i8 reg 12, i8 reg 13
+InstLoad - i8 reg 13, i8 stack -4
+InstMove - i8 reg 14, i8 reg 12
+InstAdd - i8 reg 14, i8 reg 13
+InstZExt - i64 reg 13, i8 reg 14
+InstStore - i64 stack -12, i64 reg 13
+InstJump - label27
+
+label26: 
+
+label27: 
+InstLoad - i64 reg 13, i64 stack -12
+InstMove - i64 reg 0, i64 reg 13
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal TestIntCalls: 
+label28: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 48
+InstMove - i64 reg 4, i64 imm 2
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 3
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstMove - i64 reg 8, i64 imm 3
+InstMove - i64 reg 4, i64 imm 2
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 6
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstMove - i64 reg 9, i64 imm 4
+InstMove - i64 reg 8, i64 imm 3
+InstMove - i64 reg 4, i64 imm 2
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 10
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstStore - i64 stack -8, i64 imm 6
+InstStore - i64 stack -16, i64 imm 5
+InstMove - i64 reg 9, i64 imm 4
+InstMove - i64 reg 8, i64 imm 3
+InstMove - i64 reg 4, i64 imm 2
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 21
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstStore - i64 stack -8, i64 imm 6
+InstStore - i64 stack -16, i64 imm 5
+InstMove - i64 reg 9, i64 imm 4
+InstMove - i64 reg 8, i64 imm 3
+InstMove - i64 reg 4, i64 imm 2
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm -3
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstJump - label29
+
+label29: 
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal TestFloatCalls: 
+label30: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 40
+x64::MoveFP - f64 reg 18, f64 imm 4611686018427387904
+x64::MoveFP - f64 reg 17, f64 imm 4607182418800017408
+InstCall - 
+x64::MoveFP - f64 reg 32, f64 reg 17
+InstFCmp - f64 reg 32, f64 imm 4613937818241073152
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+x64::MoveFP - f64 reg 19, f64 imm 4613937818241073152
+x64::MoveFP - f64 reg 18, f64 imm 4611686018427387904
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+x64::MoveFP - f64 reg 32, f64 reg 17
+InstFCmp - f64 reg 32, f64 imm 4618441417868443648
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstStore - i64 stack -8, i64 imm 1
+x64::MoveFP - f64 reg 20, f64 imm 4616189618054758400
+x64::MoveFP - f64 reg 19, f64 imm 4613937818241073152
+x64::MoveFP - f64 reg 18, f64 imm 4611686018427387904
+x64::MoveFP - f64 reg 17, f64 imm 4607182418800017408
+InstCall - 
+x64::MoveFP - f64 reg 32, f64 reg 17
+InstFCmp - f64 reg 32, f64 imm 4613937818241073152
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstStore - i64 stack -8, i64 imm 0
+x64::MoveFP - f64 reg 20, f64 imm 4616189618054758400
+x64::MoveFP - f64 reg 19, f64 imm 4613937818241073152
+x64::MoveFP - f64 reg 18, f64 imm 4611686018427387904
+x64::MoveFP - f64 reg 17, f64 imm 4607182418800017408
+InstCall - 
+x64::MoveFP - f64 reg 32, f64 reg 17
+InstFCmp - f64 reg 32, f64 imm 4619567317775286272
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstJump - label31
+
+label31: 
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal TestBoolCalls: 
+label32: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 32
+InstMove - i64 reg 9, i64 imm 0
+InstMove - i64 reg 8, i64 imm 1
+InstMove - i64 reg 4, i64 imm 0
+InstMove - i64 reg 3, i64 imm 1
+InstCall - 
+InstMove - i64 reg 15, i64 reg 0
+InstICmp - i64 reg 15, i64 imm 2
+x64::SetE - i8 reg 15
+InstAnd - i8 reg 15, i8 imm 1
+InstMove - i8 reg 3, i8 reg 15
+InstCall - 
+InstJump - label33
+
+label33: 
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+external main: 
+label34: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 40
+InstCall - 
+InstCall - 
+InstCall - 
+InstStore - i64 stack -8, i64 imm 0
+InstJump - label36
+
+label35: 
+
+label36: 
+InstLoad - i64 reg 15, i64 stack -8
+InstMove - i64 reg 0, i64 reg 15
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
 

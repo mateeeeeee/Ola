@@ -22,10 +22,11 @@ namespace ola
 		{
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
+			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
 			if (idx >= 4) 
 			{
 				Int32 offset = 8 + MF->GetLocalStackAllocationSize() + (CI->ArgSize() - 1 - idx) * 8; //this is wrong, 6th goes 
-				MachineInstruction copy_arg_to_stack(InstMove);
+				MachineInstruction copy_arg_to_stack(opcode);
 				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
 			}
@@ -34,14 +35,14 @@ namespace ola
 				if (arg_operand.GetType() != MachineType::Float64)
 				{
 					static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
-					MachineInstruction mov(InstMove);
+					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
 				}
 				else
 				{
 					static constexpr x64::Register arg_regs[] = { x64::XMM0, x64::XMM1, x64::XMM2, x64::XMM3 };
-					MachineInstruction mov(InstMove);
+					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
 				}

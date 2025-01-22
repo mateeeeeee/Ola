@@ -67,8 +67,8 @@ namespace ola
 		InstZExt,
 		InstF2S,
 		InstS2F,
-		
-		ISASpecificBegin,
+		InstOpcodeCount,
+		ISASpecificBegin = InstOpcodeCount,
 	};
 
 	enum MachineInstFlag : Uint32
