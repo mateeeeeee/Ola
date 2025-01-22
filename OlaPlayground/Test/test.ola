@@ -1,77 +1,14 @@
 import std.assert;
 
 
-int Add(int a, int b)
+int fact(int n)
 {
-    return a + b;
-}
-
-int AddThreeNumbers(int a, int b, int c)
-{
-    return a + b + c;
-}
-
-int AddFourNumbers(int a, int b, int c, int d)
-{
-    return a + b + c + d;
-}
-
-int AddSixNumbers(int a, int b, int c, int d, int e, int f)
-{
-    return a + b + c + d + e + f;
-}
-
-int AlternatingSum(int a, int b, int c, int d, int e, int f)
-{
-    return a - b + c - d + e - f;
-}
-
-float AddFloats(float a, float b)
-{
-    return a + b;
-}
-
-float AddIntAndFloat(int a, float b, float c)
-{
-    return a + b + c;
-}
-
-float ConditionSum(float a, float b, float c, float d, bool e)
-{
-    return e ? a + b : c + d;
-}
-
-int AddBooleans(bool a, bool b, bool c, bool d)
-{
-    return a + b + c + d;  // Implicit conversion (true = 1, false = 0)
-}
-
-
-void TestIntCalls()
-{
-    Assert(Add(1, 2) == 3);
-    Assert(AddThreeNumbers(1,2,3) == 6);
-    Assert(AddFourNumbers(1,2,3,4) == 10);
-    Assert(AddSixNumbers(1,2,3,4,5,6) == 21);
-    Assert(AlternatingSum(1,2,3,4,5,6) == -3);
-}
-void TestFloatCalls()
-{
-    Assert(AddFloats(1.0, 2.0) == 3.0);
-    Assert(AddIntAndFloat(1, 2.0, 3.0) == 6.0);
-    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, true) == 3.0);
-    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, false) == 7.0);
-}
-
-void TestBoolCalls()
-{
-    Assert(AddBooleans(true, false, true, false) == 2);
+    if(n < 2) return 1;
+    return n * fact(n-1);
 }
 
 public int main()
 {
-    TestIntCalls();
-    TestFloatCalls();
-    TestBoolCalls();
-    return 0;
+    int n = fact(5);
+    return n;
 }

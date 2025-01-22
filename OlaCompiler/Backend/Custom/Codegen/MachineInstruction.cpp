@@ -65,7 +65,7 @@ namespace ola
 		"InstF2S",
 		"InstS2F",
 	};
-	static_assert(sizeof(MachineOpcodeNames)/sizeof(MachineOpcodeNames[0]) == InstOpcodeCount);
+	static_assert(std::size(MachineOpcodeNames) == InstOpcodeCount);
 
 	Char const* MachineInstruction::GetOpcodeName() const
 	{
