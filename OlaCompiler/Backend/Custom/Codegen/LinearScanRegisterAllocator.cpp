@@ -46,12 +46,18 @@ namespace ola
 					Uint32 reg = fp_registers.back();
 					fp_registers.pop_back();
 					LI.reg = reg;
+					if (target_reg_info.IsCalleeSaved(reg)) used_registers_info.fpr_callee_saved_registers.insert(reg);
+					else if (target_reg_info.IsCallerSaved(reg)) used_registers_info.fpr_caller_saved_registers.insert(reg);
+					else OLA_ASSERT(false);
 				}
 				else
 				{
 					Uint32 reg = registers.back();
 					registers.pop_back();
 					LI.reg = reg;
+					if (target_reg_info.IsCalleeSaved(reg)) used_registers_info.gpr_callee_saved_registers.insert(reg);
+					else if (target_reg_info.IsCallerSaved(reg)) used_registers_info.gpr_caller_saved_registers.insert(reg);
+					else OLA_ASSERT(false);
 				}
 				vreg2reg_map[LI.vreg] = LI.reg;
 

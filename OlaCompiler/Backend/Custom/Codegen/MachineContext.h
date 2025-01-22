@@ -14,6 +14,8 @@ namespace ola
 	class BasicBlock;
 	class Value;
 	class IRType;
+	struct UsedRegistersInfo;
+
 	enum MachineOpcode : Uint32;
 	enum class Opcode : Uint32;
 
@@ -78,9 +80,21 @@ namespace ola
 			return "label" + std::to_string(label_id++);
 		}
 
+		void SetUsedRegistersInfo(UsedRegistersInfo const* reg_info)
+		{
+			OLA_ASSERT(reg_info);
+			used_reg_info = reg_info;
+		}
+		UsedRegistersInfo const* GetUsedRegistersInfo() const
+		{
+			OLA_ASSERT(used_reg_info);
+			return used_reg_info;
+		}
+
 	private:
 		MachineModule& module;
 		MachineBasicBlock* current_block = nullptr;
+		UsedRegistersInfo const* used_reg_info = nullptr;
 
 		mutable std::unordered_map<GlobalValue const*, MachineGlobal*> global_map;
 		mutable std::unordered_map<BasicBlock const*, MachineBasicBlock*> block_map;

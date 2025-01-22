@@ -72,7 +72,7 @@ namespace ola
 	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
-		Int32 local_variables_stack = MF.GetStackAllocationSize();
+
 		if (MF.HasCallInstructions()) MF.AllocateArgumentStack(32);
 		if (MF.GetMaxCallArgCount() > 4) MF.AllocateArgumentStack(8 * (MF.GetMaxCallArgCount() - 4));
 

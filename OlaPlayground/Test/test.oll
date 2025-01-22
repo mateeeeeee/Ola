@@ -6,28 +6,133 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @fact__I i64(i64 %n) {
-entry:
-%0 = icmp slt i64 %n, 2
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%1 = sub i64 %n, 1
-%2 = call i64 %1, @fact__I
-%3 = smul i64 %n, %2
-br label exit
-exit:
-%4 = phi i64 [ 1, if.then ], [ %3, if.end ]
-ret i64 %4
-}
+define internal @global_int_1 ptr 5
+
+
+define internal @global_int_2 ptr 10
+
+
+define internal @global_int_3 ptr 7
+
+
+define internal @global_sub_1 ptr 15
+
+
+define internal @global_sub_2 ptr 7
+
+
+define internal @global_sub_3 ptr 3
+
+
+define internal @global_sub_4 ptr 30
+
+
+define internal @global_float_1 ptr 3.5
+
+
+define internal @global_float_2 ptr 2.5
+
+
+define internal @global_float_3 ptr 1.2
+
+
+define internal @global_float_4 ptr 5
 
 
 define external @main i64() {
 entry:
-%0 = call i64 5, @fact__I
+br label entry.inlined
+entry.inlined1:
+%0 = and i8 1, 1
+%1 = icmp ne i8 %0, 0
+call i8 %1, @Assert
+call i8 %1, @Assert
+%2 = load f64, ptr @global_float_4
+%3 = load f64, ptr @global_float_2
+%4 = fsub f64 %2, %3
+%5 = fcmp ogt f64 %4, 2.4999
+%6 = fcmp olt f64 %4, 2.5001
+%7 = and i8 %5, %6
+%8 = icmp ne i8 %7, 0
+call i8 %8, @Assert
+%9 = load f64, ptr @global_float_4
+%10 = fsub f64 %9, 2.5
+%11 = fcmp ogt f64 %10, 2.4999
+%12 = fcmp olt f64 %10, 2.5001
+%13 = and i8 %11, %12
+%14 = icmp ne i8 %13, 0
+call i8 %14, @Assert
+%15 = load f64, ptr @global_float_3
+%16 = fsub f64 5, %15
+%17 = fcmp ogt f64 %16, 3.7999
+%18 = fcmp olt f64 %16, 3.8001
+%19 = and i8 %17, %18
+%20 = icmp ne i8 %19, 0
+call i8 %20, @Assert
 br label exit
+entry.inlined2:
+%21 = and i8 1, 1
+%22 = icmp ne i8 %21, 0
+call i8 %22, @Assert
+call i8 %22, @Assert
+%23 = load f64, ptr @global_float_1
+%24 = load f64, ptr @global_float_2
+%25 = fadd f64 %23, %24
+%26 = fcmp ogt f64 %25, 5.9999
+%27 = fcmp olt f64 %25, 6.0001
+%28 = and i8 %26, %27
+%29 = icmp ne i8 %28, 0
+call i8 %29, @Assert
+%30 = load f64, ptr @global_float_1
+%31 = fadd f64 %30, 2.5
+%32 = fcmp ogt f64 %31, 5.9999
+%33 = fcmp olt f64 %31, 6.0001
+%34 = and i8 %32, %33
+%35 = icmp ne i8 %34, 0
+call i8 %35, @Assert
+%36 = load f64, ptr @global_float_3
+%37 = fadd f64 %36, 3.5
+%38 = fcmp ogt f64 %37, 4.6999
+%39 = fcmp olt f64 %37, 4.7001
+%40 = and i8 %38, %39
+%41 = icmp ne i8 %40, 0
+call i8 %41, @Assert
+br label entry.inlined1
+entry.inlined3:
+call i8 1, @Assert
+call i8 1, @Assert
+%42 = load i64, ptr @global_sub_1
+%43 = load i64, ptr @global_sub_2
+%44 = sub i64 %42, %43
+%45 = icmp eq i64 %44, 8
+call i8 %45, @Assert
+%46 = load i64, ptr @global_sub_4
+%47 = sub i64 %46, 7
+%48 = icmp eq i64 %47, 23
+call i8 %48, @Assert
+%49 = load i64, ptr @global_sub_3
+%50 = sub i64 15, %49
+%51 = icmp eq i64 %50, 12
+call i8 %51, @Assert
+br label entry.inlined2
+entry.inlined:
+call i8 1, @Assert
+call i8 1, @Assert
+%52 = load i64, ptr @global_int_1
+%53 = load i64, ptr @global_int_2
+%54 = add i64 %52, %53
+%55 = icmp eq i64 %54, 15
+call i8 %55, @Assert
+%56 = load i64, ptr @global_int_1
+%57 = add i64 %56, 10
+%58 = icmp eq i64 %57, 15
+call i8 %58, @Assert
+%59 = load i64, ptr @global_int_3
+%60 = add i64 %59, 5
+%61 = icmp eq i64 %60, 12
+call i8 %61, @Assert
+br label entry.inlined3
 exit:
-ret i64 %0
+ret i64 0
 }
 

@@ -551,7 +551,7 @@ namespace ola
 			gp_registers.reserve(x64::GPREnd - x64::GPRBegin + 1);
 			for (Uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
 			{
-				gp_registers.push_back(r);
+				if(r >= x64::RCX) gp_registers.push_back(r); //skip rbp, rsp
 			}
 
 			fp_registers.reserve(x64::FPREnd - x64::FPRBegin + 1);
@@ -592,7 +592,6 @@ namespace ola
 		{
 			return x64::IsCallerSaved(r);
 		}
-
 
 		virtual Bool IsCalleeSaved(Uint32 r) const override
 		{
