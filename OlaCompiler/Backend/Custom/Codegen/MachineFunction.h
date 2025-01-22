@@ -22,27 +22,41 @@ namespace ola
 		{
 			return args;
 		}
-		MachineOperand& AllocateStack(MachineType type)
+		MachineOperand& AllocateLocalStack(MachineType type)
 		{
-			stack_offset += GetOperandSize(type);
-			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, type);
-			stack_objects.push_back(stack_object);
-			return stack_objects.back();
+			local_stack_offset += GetOperandSize(type);
+			MachineOperand stack_object = MachineOperand::StackObject(-local_stack_offset, type);
+			local_stack_objects.push_back(stack_object);
+			return local_stack_objects.back();
 		}
-		MachineOperand& AllocateStack(Uint32 size)
+		MachineOperand& AllocateLocalStack(Uint32 size)
 		{
-			stack_offset += size;
-			MachineOperand stack_object = MachineOperand::StackObject(-stack_offset, MachineType::Ptr);
-			stack_objects.push_back(stack_object);
-			return stack_objects.back();
+			local_stack_offset += size;
+			MachineOperand stack_object = MachineOperand::StackObject(-local_stack_offset, MachineType::Ptr);
+			local_stack_objects.push_back(stack_object);
+			return local_stack_objects.back();
+		}
+		void AllocateArgumentStack(Uint32 size)
+		{
+			argument_stack_offset += size;
 		}
 		Int32 GetStackAllocationSize() const
 		{
-			return stack_offset;
+			return GetLocalStackAllocationSize() + argument_stack_offset;
 		}
-		void SetHasCallInstructions(Bool v)
+		Int32 GetLocalStackAllocationSize() const
 		{
-			has_call_instructions = v;
+			return local_stack_offset;
+		}
+
+		void AddCallInstructionArgCount(Uint32 arg_count)
+		{
+			has_call_instructions = true;
+			max_call_arg_count = std::max(max_call_arg_count, arg_count);
+		}
+		Uint32 GetMaxCallArgCount() const
+		{
+			return max_call_arg_count;
 		}
 		Bool HasCallInstructions() const
 		{
@@ -58,8 +72,10 @@ namespace ola
 		Bool is_declaration;
 		std::list<std::unique_ptr<MachineBasicBlock>> blocks;
 		std::vector<MachineOperand> args;
-		Int32 stack_offset = 0;
-		std::vector<MachineOperand> stack_objects;
+		Int32 local_stack_offset = 0;
+		Int32 argument_stack_offset = 0;
+		std::vector<MachineOperand> local_stack_objects;
 		Bool has_call_instructions = false;
+		Uint32 max_call_arg_count = 0;
 	};
 }

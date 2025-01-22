@@ -5,6 +5,7 @@
 #include "Backend/Custom/Codegen/MachineContext.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineGlobal.h"
+#include "Backend/Custom/Codegen/MachineBasicBlock.h"
 #include "Backend/Custom/Codegen/MachineFunction.h"
 
 namespace ola
@@ -16,63 +17,37 @@ namespace ola
 		OLA_ASSERT(callee);
 		MachineGlobal const* global = ctx.GetGlobal(callee);
 
-		static constexpr Uint32 PASS_BY_REG_OFFSET = 1 << 16;
-		std::vector<Int32> offsets;  
-		Uint32 const arg_count = CI->ArgSize();
-		offsets.reserve(arg_count);
-		Uint32 gprs = 0;
-		Uint32 current_stack_offset = 0;
-		for (auto& arg : CI->Args())
+		MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
+		for (Int32 idx = CI->ArgSize() - 1; idx >= 0; --idx)
 		{
-			if (!arg.GetValue()->GetType()->IsFloat())
-			{
-				if (gprs < 4)
-				{
-					offsets.push_back(PASS_BY_REG_OFFSET + gprs++);
-					continue;
-				}
-			}
-			else
-			{
-				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
-			}
-
-			Uint32 size = arg.GetValue()->GetType()->GetSize();
-			Uint32 alignment = size;
-
-			current_stack_offset = (current_stack_offset + alignment - 1) / alignment * alignment;
-			offsets.push_back(current_stack_offset);
-			current_stack_offset += size;
-		}
-
-		MachineGlobal* caller_global = ctx.GetGlobal(CI->GetCaller());
-		MachineFunction& machine_callee = *static_cast<MachineFunction*>(global->GetRelocable());
-		std::vector<MachineOperand> const& machine_arguments = machine_callee.Args();
-		for (Int32 idx = arg_count - 1; idx >= 0; --idx)
-		{
-			Int32 offset = offsets[idx];
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
-			Uint32 size = arg->GetType()->GetSize();
-			Uint32 alignment = size;
-															
-			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
-			if (offset < PASS_BY_REG_OFFSET)
+			if (idx >= 4) 
 			{
-				MachineOperand& argument_stack = machine_callee.AllocateStack(arg_operand.GetType());
-				MachineInstruction copy_arg_to_stack(opcode);
-				copy_arg_to_stack.SetOp<0>(argument_stack).SetOp<1>(arg_operand);
+				Int32 offset = MF->GetLocalStackAllocationSize() + (idx - 4) * 8; //this is wrong, 6th goes 
+				MachineInstruction copy_arg_to_stack(InstMove);
+				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
 			}
-			else
+			else 
 			{
-				Uint32 gpr = offset - PASS_BY_REG_OFFSET;
-				static constexpr x64::Register arg_regs[] = {x64::RCX, x64::RDX, x64::R8, x64::R9 };
-				MachineInstruction copy_arg_to_reg(opcode);
-				copy_arg_to_reg.SetOp<0>(MachineOperand::ISAReg(arg_regs[gpr], arg_operand.GetType())).SetOp<1>(arg_operand);
-				ctx.EmitInst(copy_arg_to_reg);
+				if (arg_operand.GetType() != MachineType::Float64)
+				{
+					static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
+					MachineInstruction mov(InstMove);
+					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
+					ctx.EmitInst(mov);
+				}
+				else
+				{
+					static constexpr x64::Register arg_regs[] = { x64::XMM0, x64::XMM1, x64::XMM2, x64::XMM3 };
+					MachineInstruction mov(InstMove);
+					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
+					ctx.EmitInst(mov);
+				}
 			}
 		}
+
 		MachineInstruction call_inst(InstCall);
 		call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
 		ctx.EmitInst(call_inst);
@@ -93,11 +68,12 @@ namespace ola
 		ctx.MapOperand(CI, return_reg);
 	}
 
-
 	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
-		if (MF.HasCallInstructions()) MF.AllocateStack(32); //temp hack for win64 until stack layout resolve is made
+		Int32 local_variables_stack = MF.GetStackAllocationSize();
+		if (MF.HasCallInstructions()) MF.AllocateArgumentStack(32);
+		if (MF.GetMaxCallArgCount() > 4) MF.AllocateArgumentStack(8 * (MF.GetMaxCallArgCount() - 4));
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
@@ -120,57 +96,35 @@ namespace ola
 			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(stack_allocation, Int64));
 			ctx.EmitInst(allocate_stack);
 		}
-		static constexpr Uint32 PASS_BY_REG_OFFSET = 1 << 16;
 
-		std::vector<MachineOperand> const& args = MF.Args();
-		std::vector<Uint32> offsets; 
-		offsets.reserve(args.size());
-		Uint32 gprs = 0;
-		Uint32 current_offset = 0;
-		for (MachineOperand const& arg : args)
+		Uint32 arg_idx = 0;
+		for (MachineOperand const& arg : MF.Args())
 		{
-			if (arg.GetType() != MachineType::Float64) 
+			if (arg_idx < 4)
 			{
-				if (gprs < 4) 
+				if (arg.GetType() != Float64)
 				{
-					offsets.push_back(PASS_BY_REG_OFFSET + gprs++);
-					continue;
+					static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
+					MachineInstruction copy_arg_to_reg(InstMove);
+					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					ctx.EmitInst(copy_arg_to_reg);
+				}
+				else
+				{
+					static constexpr x64::Register arg_regs[] = { x64::XMM0, x64::XMM1, x64::XMM2, x64::XMM3 };
+					MachineInstruction copy_arg_to_reg(InstMove);
+					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					ctx.EmitInst(copy_arg_to_reg);
 				}
 			}
 			else
 			{
-				OLA_ASSERT_MSG(false, "floating point arguments not implemented yet");
-			}
-			Uint32 size = GetOperandSize(arg.GetType());
-			Uint32 alignment = size;
-			current_offset = (current_offset + alignment - 1) / alignment * alignment;
-			offsets.push_back(current_offset);
-			current_offset += size;
-		}
-
-		for (uint32_t idx = 0; idx < args.size(); ++idx) 
-		{
-			Uint32 offset = offsets[idx];
-			MachineOperand const& arg = args[idx];
-			if (offset >= PASS_BY_REG_OFFSET)
-			{
-				Uint32 gpr = offset - PASS_BY_REG_OFFSET;
-				static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
 				MachineInstruction copy_arg_to_reg(InstMove);
-				copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[gpr], arg.GetType())).SetOp<0>(arg);
+				Int32 offset = 8 + 32 + (arg_idx - 4) * 8;
+				copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 				ctx.EmitInst(copy_arg_to_reg);
 			}
-		}
-		for (Uint32 idx = 0; idx < args.size(); ++idx) 
-		{
-			Uint32 offset = offsets[idx];
-			MachineOperand const& arg = args[idx];
-			Uint32 size = GetOperandSize(arg.GetType());
-			Uint32 alignment = size;
-
-			if (offset < PASS_BY_REG_OFFSET)
-			{
-			}
+			++arg_idx;
 		}
 	}
 

@@ -148,37 +148,36 @@ namespace ola
 		TargetFrameInfo const& frame_info = target.GetFrameInfo();
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 
-		for (BasicBlock& BB : F->Blocks())
+		for (BasicBlock& BB : *F)
 		{
 			MF.Blocks().push_back(std::make_unique<MachineBasicBlock>(&MF, machine_ctx.GetLabel()));
 			auto& MBB = MF.Blocks().back();
 			machine_ctx.MapBlock(&BB, MBB.get());
 			BB.ForAllInstructions([this, &MF](Instruction& I)
 				{
-					if (I.GetOpcode() == Opcode::Alloca)
+					if (AllocaInst* AI = dyn_cast<AllocaInst>(&I))
 					{
-						AllocaInst* AI = cast<AllocaInst>(&I);
 						IRType const* type = AI->GetAllocatedType();
 						if (type->IsArray())
 						{
 							IRArrayType const* array_type = cast<IRArrayType>(type);
-							MachineOperand const& MO = MF.AllocateStack(array_type->GetSize());
+							MachineOperand const& MO = MF.AllocateLocalStack(array_type->GetSize());
 							machine_ctx.MapOperand(AI, MO);
 						}
 						else
 						{
-							MachineOperand const& MO = MF.AllocateStack(GetOperandType(type));
+							MachineOperand const& MO = MF.AllocateLocalStack(GetOperandType(type));
 							machine_ctx.MapOperand(AI, MO);
 						}
 					}
-					if (I.GetOpcode() == Opcode::Phi)
+					if (isa<PhiInst>(&I))
 					{
 						MachineOperand const& MO = machine_ctx.VirtualReg(I.GetType());
 						machine_ctx.MapOperand(&I, MO);
 					}
-					else if (I.GetOpcode() == Opcode::Call)
+					else if (CallInst* CI = dyn_cast<CallInst>(&I))
 					{
-						MF.SetHasCallInstructions(true);
+						MF.AddCallInstructionArgCount(CI->ArgSize());
 					}
 				});
 		}
@@ -192,10 +191,9 @@ namespace ola
 			machine_ctx.MapOperand(arg, vreg);
 			args.push_back(vreg);
 		}
+
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));
-
 		frame_info.EmitPrologue(MF, machine_ctx);
-
 		for (BasicBlock* BB : DT.Blocks()) 
 		{
 			MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
@@ -208,7 +206,6 @@ namespace ola
 				}
 			}
 		}
-
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetLastBlock()));
 		frame_info.EmitEpilogue(MF, machine_ctx);
 	}

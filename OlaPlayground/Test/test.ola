@@ -1,14 +1,12 @@
-import std.assert;
 
 
-int fact(int n)
+int f(int a, int b, int c, int d, int e)
 {
-    if(n == 1) return 1;
-    return n * fact(n - 1);
+	return a + b + c + d + e;
 }
 
 public int main()
 {
-	int s = fact(5);
-    return s;
+	int r = f(1,2,3,4,5);
+    return r;
 }
