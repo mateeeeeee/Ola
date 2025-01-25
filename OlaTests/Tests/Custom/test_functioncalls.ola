@@ -66,6 +66,7 @@ void TestFloatCalls()
     Assert(AddIntAndFloat(1, 2.0, 3.0) == 6.0);
     Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, true) == 3.0);
     Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, false) == 7.0);
+    Assert(AddTenNumbers(1,2,3,4,5,6,7,8,9,10) == 55);
 }
 
 void TestBoolCalls()
@@ -78,7 +79,5 @@ public int main()
     TestIntCalls();
     TestFloatCalls();
     TestBoolCalls();
-    int r = AddTenNumbers(1,2,3,4,5,6,7,8,9,10);
-    Assert(r == 55);
     return 0;
 }

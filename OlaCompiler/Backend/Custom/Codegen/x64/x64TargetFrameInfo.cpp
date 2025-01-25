@@ -17,7 +17,9 @@ namespace ola
 	//+ ------------------------------------ +
 	//| Caller - saved registers(if spilled) | < -Saved by caller before call
 	//+ ------------------------------------ +
-	//| Arguments beyond 4th(if any)		 | <- Pushed by caller before call
+	//| 7th argument etc					 | <- Pushed by caller before call
+	//| 6th argument						 | <- Pushed by caller before call
+	//| 5th argument						 | <- Pushed by caller before call
 	//+ ------------------------------------ +
 	//| Shadow Space(32B)					 | <- Allocated by caller before CALL
 	//+ ------------------------------------ +
@@ -43,7 +45,7 @@ namespace ola
 			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
 			if (idx >= 4) 
 			{
-				Int32 offset = 8 + MF->GetLocalStackAllocationSize() + (CI->ArgSize() - 1 - idx) * 8; //this is wrong, 6th goes 
+				Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8; 
 				MachineInstruction copy_arg_to_stack(opcode);
 				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
@@ -92,7 +94,10 @@ namespace ola
 		using enum MachineType;
 
 		if (MF.HasCallInstructions()) MF.AllocateArgumentStack(32);
-		if (MF.GetMaxCallArgCount() > 4) MF.AllocateArgumentStack(8 * (MF.GetMaxCallArgCount() - 4));
+		if (MF.GetMaxCallArgCount() > 4)
+		{
+			MF.AllocateArgumentStack((MF.GetMaxCallArgCount() - 4) * 8);
+		}
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);

@@ -1,8 +1,19 @@
 external main: 
 label0: 
-InstJump - label1
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 16
+InstStore - i64 stack -8, i64 reg 14
+InstStore - i64 stack -16, i64 imm 0
+InstJump - label2
 
 label1: 
-InstMove - i64 reg 0, i64 imm 0
+
+label2: 
+InstLoad - i64 reg 14, i64 stack -16
+InstMove - i64 reg 0, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -8
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
 InstRet - 
 
