@@ -145,13 +145,10 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
+		return;
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
 		Uint32 const stack_adjustment = (gp_regs.size() + fp_regs.size()) * 8;
-		if (stack_adjustment == 0)
-		{
-			return;
-		}
 
 		std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
 		std::list<MachineInstruction>::iterator insert_point = insert_list.begin();
@@ -166,7 +163,7 @@ namespace ola
 			MachineInstruction& MI = *insert_point;
 			OLA_ASSERT(MI.GetOp<1>().IsImmediate());
 			Int64 stack_alloc = MI.GetOp<1>().GetImmediate();
-			MI.SetOp<1>(MachineOperand::Immediate(stack_alloc + stack_adjustment, MachineType::Int64));
+			MI.SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
 			++insert_point;
 		}
 		else
@@ -184,7 +181,7 @@ namespace ola
 			insert_point = ctx.EmitInst(insert_point, set_rbp); ++insert_point;
 
 			MachineInstruction allocate_stack(InstSub);
-			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(stack_adjustment, MachineType::Int64));
+			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
 			insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
 		}
 
@@ -253,6 +250,8 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
+		return;
+
 		if (!MF.GetCalleeSavedArgs().empty())
 		{
 			std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();

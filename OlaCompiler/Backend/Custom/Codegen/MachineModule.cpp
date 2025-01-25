@@ -564,7 +564,7 @@ namespace ola
 
 		machine_ctx.EmitInst(MachineInstruction(InstCMoveNE)
 			.SetOp<0>(result_reg)    
-			.SetOp<1>(true_op).SetIgnoreDef());
+			.SetOp<1>(true_op));
 		machine_ctx.MapOperand(SI, result_reg);
 	}
 
@@ -634,7 +634,7 @@ namespace ola
 			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 			{
 				MachineInstruction& MI = *MIiterator;
-				InstLegalizeContext ctx{ MI, instructions, MIiterator };
+				InstLegalizeContext ctx{ target.GetRegisterInfo(), MI, instructions, MIiterator };
 				isel_info.LegalizeInstruction(ctx, machine_ctx);
 			}
 		}
@@ -643,14 +643,13 @@ namespace ola
 	void MachineModule::PostLegalizeInstructions(MachineFunction& MF)
 	{
 		TargetISelInfo const& isel_info = target.GetISelInfo();
-
 		for (auto& MBB : MF.Blocks())
 		{
 			auto& instructions = MBB->Instructions();
 			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 			{
 				MachineInstruction& MI = *MIiterator;
-				InstLegalizeContext ctx{ MI, instructions, MIiterator };
+				InstLegalizeContext ctx{ target.GetRegisterInfo(), MI, instructions, MIiterator };
 				isel_info.PostLegalizeInstruction(ctx);
 			}
 		}

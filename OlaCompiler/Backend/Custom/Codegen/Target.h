@@ -83,6 +83,8 @@ namespace ola
 
 		virtual Uint32 GetStackPointerRegister() const = 0;
 		virtual Uint32 GetFramePointerRegister() const = 0;
+		virtual Uint32 GetGPScratchRegister() const = 0;
+		virtual Uint32 GetFPScratchRegister() const = 0;
 		virtual Uint32 GetReturnRegister() const = 0;
 		virtual std::vector<Uint32> const& GetGPRegisters() const = 0;
 		virtual std::vector<Uint32> GetGPCallerSavedRegisters() const = 0;
@@ -97,6 +99,7 @@ namespace ola
 	class MachineContext;
 	struct InstLegalizeContext
 	{
+		TargetRegisterInfo const& target_reg_info;
 		MachineInstruction& instruction;
 		std::list<MachineInstruction>& instructions;
 		std::list<MachineInstruction>::iterator instruction_iterator;

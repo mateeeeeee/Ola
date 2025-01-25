@@ -43,7 +43,7 @@ namespace ola
 		}
 		Int32 GetStackAllocationSize() const
 		{
-			return GetLocalStackAllocationSize() + argument_stack_offset;
+			return local_stack_offset + argument_stack_offset;
 		}
 		Int32 GetLocalStackAllocationSize() const
 		{

@@ -150,7 +150,6 @@ namespace ola
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
-					MI.SetIgnoreDef();
 
 					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(dst);
@@ -167,7 +166,6 @@ namespace ola
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
-					MI.SetIgnoreDef();
 					MI.SetOpcode(x64::InstMoveFP);
 
 					MachineInstruction MI2(InstStore);
@@ -180,7 +178,6 @@ namespace ola
 					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
 					MI.SetOp<0>(tmp);
 					MI.SetOp<1>(src); 
-					MI.SetIgnoreDef();
 					MI.SetOpcode(InstLoadGlobalAddress);
 
 					MachineInstruction MI2(InstStore);
@@ -195,7 +192,6 @@ namespace ola
 					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
 					MI.SetOp<0>(tmp);
 					MI.SetOp<1>(src);
-					MI.SetIgnoreDef();
 					MI.SetOpcode(InstLoad);
 
 					MachineInstruction MI2(InstStore);
@@ -219,7 +215,6 @@ namespace ola
 				if (!op2.IsUndefined())
 				{
 					MI.SetOp<1>(op2);
-					MI.SetIgnoreDef();
 					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(op1);
@@ -235,7 +230,6 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 
 				MI.SetOp<1>(op2);
-				MI.SetIgnoreDef();
 				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
@@ -256,7 +250,6 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand op = MI.GetOperand(1);
-				MI.SetIgnoreDef();
 
 				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
@@ -271,7 +264,6 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 				
 				MI.SetOp<1>(op2);
-				MI.SetIgnoreDef();
 				MachineInstruction MI2(InstMove);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
@@ -336,7 +328,6 @@ namespace ola
 					MachineInstruction MI3(InstAnd);
 					MI3.SetOp<0>(dst);
 					MI3.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
-					MI3.SetIgnoreDef();
 					instructions.insert(instruction_iter++, MI3);
 				}
 			}
@@ -352,7 +343,6 @@ namespace ola
 					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(tmp);
 					MI2.SetOp<1>(src);
-					MI2.SetIgnoreDef();
 					MI.SetOp<1>(tmp);
 					instructions.insert(instruction_iter, MI2);
 				}
@@ -368,7 +358,6 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 
 				MI.SetOp<1>(op2);
-				MI.SetIgnoreDef();
 				MachineInstruction MI2(x64::InstMoveFP);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
@@ -407,7 +396,6 @@ namespace ola
 				MI.SetOpcode(x64::InstXorFP);
 				MI.SetOp<0>(dst);
 				MI.SetOp<1>(neg_mask);
-				MI.SetIgnoreDef();
 			}
 			break;
 			case InstFCmp:
@@ -466,7 +454,6 @@ namespace ola
 				MachineInstruction MI3(InstAnd);
 				MI3.SetOp<0>(dst);
 				MI3.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
-				MI3.SetIgnoreDef();
 				instructions.insert(instruction_iter++, MI3);
 			}
 			break;
@@ -503,6 +490,17 @@ namespace ola
 			MachineInstruction& MI = legalize_ctx.instruction;
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
+			auto GetScratchReg = [&legalize_ctx](MachineType type)
+			{
+				if (type == MachineType::Float64)
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetFPScratchRegister(), type);
+				}
+				else
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetGPScratchRegister(), type);
+				}
+			};
 
 			switch (MI.GetOpcode())
 			{
@@ -520,6 +518,21 @@ namespace ola
 				}
 			}
 			break;
+			}
+
+			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (dst.IsMemoryOperand() && src.IsMemoryOperand()) //this can happen if register spilling occurs
+				{
+					auto scratch = GetScratchReg(dst.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(scratch).SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(scratch);
+					MI.SetOpcode(InstStore);
+				}
 			}
 
 			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
@@ -564,12 +577,18 @@ namespace ola
 		{
 			return x64::RSP;
 		}
-
+		virtual Uint32 GetGPScratchRegister() const override
+		{
+			return x64::R15;
+		}
+		virtual Uint32 GetFPScratchRegister() const override
+		{
+			return x64::XMM15;
+		}
 		virtual Uint32 GetFramePointerRegister() const override
 		{
 			return x64::RBP;
 		}
-
 		virtual Uint32 GetReturnRegister() const override
 		{
 			return x64::RAX;
@@ -594,7 +613,11 @@ namespace ola
 			std::vector<Uint32> gp_callee_saved_regs;
 			for (Uint32 reg : gp_regs)
 			{
-				if (IsCalleeSaved(reg) && reg != x64::RBP && reg != x64::RSP) gp_callee_saved_regs.push_back(reg);
+				if (IsCalleeSaved(reg) && reg != GetStackPointerRegister() 
+					&& reg != GetFramePointerRegister() && reg != GetGPScratchRegister())
+				{
+					gp_callee_saved_regs.push_back(reg);
+				}
 			}
 			return gp_callee_saved_regs;
 		}
@@ -615,12 +638,12 @@ namespace ola
 		}
 		virtual std::vector<Uint32> GetFPCalleeSavedRegisters() const override
 		{
-			std::vector<Uint32> gp_callee_saved_regs;
+			std::vector<Uint32> fp_callee_saved_regs;
 			for (Uint32 reg : fp_regs)
 			{
-				if (IsCalleeSaved(reg)) gp_callee_saved_regs.push_back(reg);
+				if (IsCalleeSaved(reg) && reg != GetFPScratchRegister()) fp_callee_saved_regs.push_back(reg);
 			}
-			return gp_callee_saved_regs;
+			return fp_callee_saved_regs;
 		}
 
 		virtual Bool IsCallerSaved(Uint32 r) const override

@@ -74,7 +74,7 @@ namespace ola
 	enum MachineInstFlag : Uint32
 	{
 		MachineInstFlag_None = 0x0,
-		MachineInstFlag_IgnoreDef = 0x1,
+		MachineInstFlag_Dead = 0x1
 	};
 
 	class MachineInstruction
@@ -134,18 +134,17 @@ namespace ola
 			flags |= flag;
 			return *this;
 		}
-		MachineInstruction& SetIgnoreDef()
+		MachineInstruction& SetDead()
 		{
-			return SetFlag(MachineInstFlag_IgnoreDef);
+			return SetFlag(MachineInstFlag_Dead);
 		}
-
 		Bool HasFlag(MachineInstFlag flag) const
 		{
 			return (flags & flag) != 0;
 		}
-		Bool HasIgnoreDef() const
+		Bool IsDead() const
 		{
-			return HasFlag(MachineInstFlag_IgnoreDef);
+			return HasFlag(MachineInstFlag_Dead);
 		}
 
 	private:

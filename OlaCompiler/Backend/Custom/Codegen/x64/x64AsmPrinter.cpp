@@ -86,6 +86,7 @@ namespace ola
 					EmitText("{}:", MBB->GetSymbol());
 					for (MachineInstruction& MI : MBB->Instructions())
 					{
+						if (MI.IsDead()) continue;
 						Uint32 opcode = MI.GetOpcode();
 						Char const* opcode_string = x64::GetOpcodeString(opcode);
 						switch (opcode)

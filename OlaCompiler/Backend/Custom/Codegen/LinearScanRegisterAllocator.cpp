@@ -31,13 +31,11 @@ namespace ola
 		gp_regs = target_reg_info.GetGPCalleeSavedRegisters();
 		fp_regs = target_reg_info.GetFPCalleeSavedRegisters();
 		frame_register = target_reg_info.GetFramePointerRegister();
-
 		for (LiveInterval& LI : live_intervals)
 		{
 			ExpireOldIntervals(LI);
 			if ((LI.is_float && fp_regs.empty()) || (!LI.is_float && gp_regs.empty()))
 			{
-				//OLA_ASSERT_MSG(false, "Register spilling not yet implemented!");
 				SpillAtInterval(LI);
 			}
 			else
@@ -121,7 +119,7 @@ namespace ola
 	void LinearScanRegisterAllocator::Finalize(MachineFunction& MF, std::vector<LiveInterval>& intervals)
 	{
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
-
+		std::unordered_map<Uint32, MachineOperand*> vreg_stack_map;
 		for (auto& MBB : MF.Blocks())
 		{
 			for (MachineInstruction& MI : MBB->Instructions())
@@ -131,18 +129,26 @@ namespace ola
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
 					if (!IsOperandVReg(MO)) continue;
-					Uint32 vreg_id = MO.GetReg().reg;
 
-					//spilling
-					if (!vreg2reg_map.contains(vreg_id))
-					{
-						MachineOperand& SpilledMO = MF.AllocateLocalStack(MachineType::Int64);
-						MI.SetOperand(idx, SpilledMO);
-					}
-					else
+					Uint32 vreg_id = MO.GetReg().reg;
+					if (vreg2reg_map.contains(vreg_id))
 					{
 						Uint32 reg_id = vreg2reg_map[vreg_id];
 						MI.SetOperand(idx, MachineOperand::ISAReg(reg_id, MO.GetType()));
+					}
+					else
+					{
+						MachineOperand* existing_stack_loc = vreg_stack_map[vreg_id];
+						if (existing_stack_loc != nullptr)
+						{
+							MI.SetOperand(idx, *existing_stack_loc);
+						}
+						else
+						{
+							MachineOperand& new_stack_loc = MF.AllocateLocalStack(MachineType::Int64);
+							vreg_stack_map[vreg_id] = &new_stack_loc;
+							MI.SetOperand(idx, new_stack_loc);
+						}
 					}
 				}
 			}
