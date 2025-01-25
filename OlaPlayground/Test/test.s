@@ -6,117 +6,108 @@
 
 .extern AssertMsg
 
-TestIfElse:
+sum__I__I__I__I__I__I__I__I__I__I:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 24
-mov qword ptr [rbp - 8], r15
-mov qword ptr [rbp - 24], 6
-mov r15, qword ptr [rbp - 24]
-cmp r15, 5
-setg r15b
-and r15b, 1
-test r15b, r15b
-jne label1
-jmp label3
-label1:
-mov qword ptr [rbp - 16], 10
-jmp label6
-label2:
-label3:
-mov qword ptr [rbp - 16], 0
-jmp label6
-label4:
-label5:
-label6:
-mov r15, qword ptr [rbp - 16]
-mov rax, r15
-mov r15, qword ptr [rbp - 8]
-mov rsp, rbp
-pop rbp
-ret
-TestWhile:
-label7:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r15
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 32], 0
-jmp label8
-label8:
-mov r15, qword ptr [rbp - 32]
-cmp r15, 10
-setl r15b
-and r15b, 1
-test r15b, r15b
-jne label9
-jmp label10
-label9:
-mov r15, qword ptr [rbp - 32]
-cmp r15, 5
-sete r15b
-and r15b, 1
-test r15b, r15b
-jne label12
-jmp label15
-label10:
-mov qword ptr [rbp - 24], 0
-jmp label16
-label11:
-label12:
-mov r14, qword ptr [rbp - 32]
-mov r15, r14
-imul r15, 2
-mov qword ptr [rbp - 24], r15
-jmp label16
-label13:
-label14:
-label15:
-mov r15, qword ptr [rbp - 32]
-mov r14, r15
-add r14, 1
+sub rsp, 144
+mov qword ptr [rbp - 8], rdi
+mov qword ptr [rbp - 16], r15
+mov qword ptr [rbp - 24], rsi
 mov qword ptr [rbp - 32], r14
-jmp label8
-label16:
-mov r15, qword ptr [rbp - 24]
-mov rax, r15
-mov r15, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
+mov qword ptr [rbp - 40], rbx
+mov qword ptr [rbp - 48], r13
+mov qword ptr [rbp - 56], r12
+mov r15, rcx
+mov r14, rdx
+mov r13, r8
+mov r12, r9
+mov rdi, qword ptr [rbp + 48]
+mov rsi, qword ptr [rbp + 56]
+mov rbx, qword ptr [rbp + 64]
+mov qword ptr [rbp - 152], qword ptr [rbp + 72]
+mov qword ptr [rbp - 160], qword ptr [rbp + 80]
+mov qword ptr [rbp - 168], qword ptr [rbp + 88]
+mov qword ptr [rbp - 64], r15
+mov qword ptr [rbp - 72], r14
+mov qword ptr [rbp - 80], r13
+mov qword ptr [rbp - 88], r12
+mov qword ptr [rbp - 96], rdi
+mov qword ptr [rbp - 104], rsi
+mov qword ptr [rbp - 112], rbx
+mov qword ptr [rbp - 120], qword ptr [rbp - 120]
+mov qword ptr [rbp - 128], qword ptr [rbp - 128]
+mov qword ptr [rbp - 136], qword ptr [rbp - 136]
+mov rbx, qword ptr [rbp - 64]
+mov rsi, qword ptr [rbp - 72]
+mov rdi, rbx
+add rdi, rsi
+mov rsi, qword ptr [rbp - 80]
+mov rbx, rdi
+add rbx, rsi
+mov rsi, qword ptr [rbp - 88]
+mov rdi, rbx
+add rdi, rsi
+mov rsi, qword ptr [rbp - 96]
+mov rbx, rdi
+add rbx, rsi
+mov rsi, qword ptr [rbp - 104]
+mov rdi, rbx
+add rdi, rsi
+mov rsi, qword ptr [rbp - 112]
+mov rbx, rdi
+add rbx, rsi
+mov rsi, qword ptr [rbp - 120]
+mov rdi, rbx
+add rdi, rsi
+mov rsi, qword ptr [rbp - 128]
+mov rbx, rdi
+add rbx, rsi
+mov rsi, qword ptr [rbp - 136]
+mov rdi, rbx
+add rdi, rsi
+mov qword ptr [rbp - 144], rdi
+jmp label2
+label1:
+label2:
+mov rdi, qword ptr [rbp - 144]
+mov rax, rdi
+mov rdi, qword ptr [rbp - 8]
+mov r15, qword ptr [rbp - 16]
+mov rsi, qword ptr [rbp - 24]
+mov r14, qword ptr [rbp - 32]
+mov rbx, qword ptr [rbp - 40]
+mov r13, qword ptr [rbp - 48]
+mov r12, qword ptr [rbp - 56]
 mov rsp, rbp
 pop rbp
 ret
 .globl main
 
 main:
-label17:
+label3:
 push rbp
 mov rbp, rsp
-sub rsp, 56
+sub rsp, 104
 mov qword ptr [rbp - 8], r15
-call TestIfElse
+mov qword ptr [rbp - 32], 10
+mov qword ptr [rbp - 40], 9
+mov qword ptr [rbp - 48], 8
+mov qword ptr [rbp - 56], 7
+mov qword ptr [rbp - 64], 6
+mov qword ptr [rbp - 72], 5
+mov r9, 4
+mov r8, 3
+mov rdx, 2
+mov rcx, 1
+call sum__I__I__I__I__I__I__I__I__I__I
 mov r15, rax
 mov qword ptr [rbp - 24], r15
 mov r15, qword ptr [rbp - 24]
-cmp r15, 10
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-call TestWhile
-mov r15, rax
-mov qword ptr [rbp - 24], r15
-mov r15, qword ptr [rbp - 24]
-cmp r15, 10
-sete r15b
-and r15b, 1
-mov cl, r15b
-call Assert
-mov qword ptr [rbp - 16], 0
-jmp label19
-label18:
-label19:
+mov qword ptr [rbp - 16], r15
+jmp label5
+label4:
+label5:
 mov r15, qword ptr [rbp - 16]
 mov rax, r15
 mov r15, qword ptr [rbp - 8]

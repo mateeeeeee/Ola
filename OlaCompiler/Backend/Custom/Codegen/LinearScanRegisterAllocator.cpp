@@ -37,7 +37,7 @@ namespace ola
 			ExpireOldIntervals(LI);
 			if ((LI.is_float && fp_regs.empty()) || (!LI.is_float && gp_regs.empty()))
 			{
-				OLA_ASSERT_MSG(false, "Register spilling not yet implemented!");
+				//OLA_ASSERT_MSG(false, "Register spilling not yet implemented!");
 				SpillAtInterval(LI);
 			}
 			else
@@ -136,16 +136,13 @@ namespace ola
 					//spilling
 					if (!vreg2reg_map.contains(vreg_id))
 					{
-						MachineOperand& MO = MF.AllocateLocalStack(MachineType::Int64);
-						Int32 stack_offset = MO.GetStackOffset();
-						Uint32 frame_reg = frame_register;
-
-						//todo
+						MachineOperand& SpilledMO = MF.AllocateLocalStack(MachineType::Int64);
+						MI.SetOperand(idx, SpilledMO);
 					}
 					else
 					{
 						Uint32 reg_id = vreg2reg_map[vreg_id];
-						MO = MachineOperand::ISAReg(reg_id, MO.GetType());
+						MI.SetOperand(idx, MachineOperand::ISAReg(reg_id, MO.GetType()));
 					}
 				}
 			}

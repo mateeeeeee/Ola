@@ -1,28 +1,17 @@
 import std.assert;
 
-int TestIfElse()
+int sum(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j)
 {
-	int a = 6;
-	if(a > 5) return 10;
-	else return 0;
+	return a + b + c + d + e + f + g + h + i + j;
 }
 
-int TestWhile()
-{
-	int a = 0;
-	while(a < 10)
-	{
-		if (a == 5) return a * 2;
-		++a;
-	}
-	return 0;
-}
-
+//int sum(int a, int b, int c, int d, int e)
+//{
+//	return a + b + c + d + e;
+//}
 public int main()
 {
-	int r = TestIfElse();
-	Assert(r == 10);
-	r = TestWhile();
-	Assert(r == 10);
-	return 0;
+	int r = sum(1,2,3,4,5,6,7,8,9,10);
+	//int r = sum(1,2,3,4,5);
+	return r;
 }
