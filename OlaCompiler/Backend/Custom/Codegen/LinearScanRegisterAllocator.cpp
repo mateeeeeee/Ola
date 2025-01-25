@@ -27,37 +27,34 @@ namespace ola
 		std::vector<LiveInterval>& live_intervals = liveness.live_intervals;
 
 		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
-		registers = target_reg_info.GetIntegerRegisters();
-		fp_registers = target_reg_info.GetFPRegisters();
+		//use callee saved regs because we can save them and restore them in prologue and epilogue of a function
+		gp_regs = target_reg_info.GetGPCalleeSavedRegisters();
+		fp_regs = target_reg_info.GetFPCalleeSavedRegisters();
 		frame_register = target_reg_info.GetFramePointerRegister();
 
 		for (LiveInterval& LI : live_intervals)
 		{
 			ExpireOldIntervals(LI);
-			if (registers.empty())
+			if ((LI.is_float && fp_regs.empty()) || (!LI.is_float && gp_regs.empty()))
 			{
-				OLA_ASSERT_MSG(false, "Register spilling!");
+				OLA_ASSERT_MSG(false, "Register spilling not yet implemented!");
 				SpillAtInterval(LI);
 			}
 			else
 			{
 				if (LI.is_float)
 				{
-					Uint32 reg = fp_registers.back();
-					fp_registers.pop_back();
+					Uint32 reg = fp_regs.back();
+					fp_regs.pop_back();
 					LI.reg = reg;
-					if (target_reg_info.IsCalleeSaved(reg)) used_registers_info.fpr_callee_saved_registers.insert(reg);
-					else if (target_reg_info.IsCallerSaved(reg)) used_registers_info.fpr_caller_saved_registers.insert(reg);
-					else OLA_ASSERT(false);
+					used_registers_info.fpr_used_registers.insert(reg);
 				}
 				else
 				{
-					Uint32 reg = registers.back();
-					registers.pop_back();
+					Uint32 reg = gp_regs.back();
+					gp_regs.pop_back();
 					LI.reg = reg;
-					if (target_reg_info.IsCalleeSaved(reg)) used_registers_info.gpr_callee_saved_registers.insert(reg);
-					else if (target_reg_info.IsCallerSaved(reg)) used_registers_info.gpr_caller_saved_registers.insert(reg);
-					else OLA_ASSERT(false);
+					used_registers_info.gpr_used_registers.insert(reg);
 				}
 				vreg2reg_map[LI.vreg] = LI.reg;
 
@@ -83,11 +80,11 @@ namespace ola
 			if (interval->end >= LI.begin) break;
 			if (interval->is_float)
 			{
-				fp_registers.push_back(interval->reg);
+				fp_regs.push_back(interval->reg);
 			}
 			else
 			{
-				registers.push_back(interval->reg);
+				gp_regs.push_back(interval->reg);
 			}
 		}
 		active = std::vector<LiveInterval*>(active.begin() + i, active.end());

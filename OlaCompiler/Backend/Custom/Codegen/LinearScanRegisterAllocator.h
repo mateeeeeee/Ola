@@ -15,8 +15,8 @@ namespace ola
 
 	private:
 		std::vector<LiveInterval*> active;
-		std::vector<Uint32> registers;
-		std::vector<Uint32> fp_registers;
+		std::vector<Uint32> gp_regs;
+		std::vector<Uint32> fp_regs;
 		Uint32 frame_register;
 		std::unordered_map<Uint32, Uint32> vreg2reg_map;
 

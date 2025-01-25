@@ -13,7 +13,7 @@ namespace ola::x64
 		XMM0 = FPRBegin, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
 		XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15,
 		FPREnd,
-		FLAGS, 
+		FLAGS,
 		FFLAGS,
 	};
 
@@ -27,7 +27,7 @@ namespace ola::x64
 	}
 	inline constexpr Bool IsCallerSaved(Uint32 r)
 	{
-		switch (r) 
+		switch (r)
 		{
 		case RAX:
 		case RCX:
@@ -42,6 +42,24 @@ namespace ola::x64
 		case XMM3:
 		case XMM4:
 		case XMM5:
+			return true;
+		default:
+			return false;
+		}
+	}
+	inline constexpr Bool IsCalleeSaved(Uint32 r)
+	{
+		switch (r)
+		{
+		case RBX:
+		case RBP:
+		case RSP:
+		case RDI:
+		case RSI:
+		case R12:
+		case R13:
+		case R14:
+		case R15:
 		case XMM6:
 		case XMM7:
 		case XMM8:
@@ -52,23 +70,6 @@ namespace ola::x64
 		case XMM13:
 		case XMM14:
 		case XMM15:
-			return true;
-		default:
-			return false;
-		}
-	}
-	inline constexpr Bool IsCalleeSaved(Uint32 r) 
-	{
-		switch (r)
-		{
-		case RBX:
-		case RBP:
-		case RDI:
-		case RSI:
-		case R12:
-		case R13:
-		case R14:
-		case R15:
 			return true;
 		default:
 			return false;
@@ -109,7 +110,7 @@ namespace ola::x64
 		case InstCall:    return "call";
 		case InstRet:    return "ret";
 		case InstStore:
-		case InstLoad:    
+		case InstLoad:
 		case InstMove:    return "mov";
 		case InstCMoveEQ: return "cmove";
 		case InstCMoveNE: return "cmovne";
@@ -140,8 +141,8 @@ namespace ola::x64
 		case InstSMul:    return "imul";
 		case InstSDiv:    return "idiv";
 		case InstCqo:     return "cqo";
-		case InstStoreFP:   
-		case InstLoadFP:   
+		case InstStoreFP:
+		case InstLoadFP:
 		case InstMoveFP:  return "movsd";
 		case InstF2S:     return "cvttsd2si";
 		case InstS2F:     return "cvtsi2sd";
@@ -158,10 +159,10 @@ namespace ola::x64
 	inline Char const* GetRegisterString(Uint32 r, MachineType type)
 	{
 		using enum MachineType;
-		switch (type) 
+		switch (type)
 		{
 		case Int8:
-			switch (r) 
+			switch (r)
 			{
 			case RAX: return "al";
 			case RCX: return "cl";
@@ -181,7 +182,7 @@ namespace ola::x64
 			}
 		case Int64:
 		case Ptr:
-			switch (r) 
+			switch (r)
 			{
 			case RAX: return "rax";
 			case RCX: return "rcx";

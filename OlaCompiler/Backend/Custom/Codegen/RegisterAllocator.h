@@ -5,10 +5,8 @@ namespace ola
 {
 	struct UsedRegistersInfo
 	{
-		std::unordered_set<Uint32> gpr_callee_saved_registers;
-		std::unordered_set<Uint32> fpr_callee_saved_registers;
-		std::unordered_set<Uint32> gpr_caller_saved_registers;
-		std::unordered_set<Uint32> fpr_caller_saved_registers;
+		std::unordered_set<Uint32> gpr_used_registers;
+		std::unordered_set<Uint32> fpr_used_registers;
 	};
 
 	class MachineFunction;

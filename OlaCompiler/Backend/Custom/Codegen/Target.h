@@ -84,8 +84,12 @@ namespace ola
 		virtual Uint32 GetStackPointerRegister() const = 0;
 		virtual Uint32 GetFramePointerRegister() const = 0;
 		virtual Uint32 GetReturnRegister() const = 0;
-		virtual std::vector<Uint32> const& GetIntegerRegisters() const = 0;
+		virtual std::vector<Uint32> const& GetGPRegisters() const = 0;
+		virtual std::vector<Uint32> GetGPCallerSavedRegisters() const = 0;
+		virtual std::vector<Uint32> GetGPCalleeSavedRegisters() const = 0;
 		virtual std::vector<Uint32> const& GetFPRegisters() const = 0;
+		virtual std::vector<Uint32> GetFPCallerSavedRegisters() const = 0;
+		virtual std::vector<Uint32> GetFPCalleeSavedRegisters() const = 0;
 		virtual Bool IsCallerSaved(Uint32) const = 0;
 		virtual Bool IsCalleeSaved(Uint32) const = 0;
 	};

@@ -13,7 +13,6 @@
 
 namespace ola
 {
-
 	class x64TargetDataLayout : public TargetDataLayout
 	{
 	public:
@@ -548,16 +547,16 @@ namespace ola
 	public:
 		x64TargetRegisterInfo()
 		{
-			gp_registers.reserve(x64::GPREnd - x64::GPRBegin + 1);
+			gp_regs.reserve(x64::GPREnd - x64::GPRBegin + 1);
 			for (Uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
 			{
-				if(r >= x64::RCX) gp_registers.push_back(r); //skip rbp, rsp
+				gp_regs.push_back(r); //skip rbp, rsp
 			}
 
-			fp_registers.reserve(x64::FPREnd - x64::FPRBegin + 1);
+			fp_regs.reserve(x64::FPREnd - x64::FPRBegin + 1);
 			for (Uint32 r = x64::FPRBegin; r < x64::FPREnd; ++r)
 			{
-				fp_registers.push_back(r);
+				fp_regs.push_back(r);
 			}
 		}
 
@@ -571,22 +570,58 @@ namespace ola
 			return x64::RBP;
 		}
 
-
 		virtual Uint32 GetReturnRegister() const override
 		{
 			return x64::RAX;
 		}
 
-		virtual std::vector<Uint32> const& GetIntegerRegisters() const override
+		virtual std::vector<Uint32> const& GetGPRegisters() const override
 		{
-			return gp_registers;
+			return gp_regs;
+		}
+
+		virtual std::vector<Uint32> GetGPCallerSavedRegisters() const override
+		{
+			std::vector<Uint32> gp_caller_saved_regs;
+			for (Uint32 reg : gp_regs)
+			{
+				if (IsCallerSaved(reg)) gp_caller_saved_regs.push_back(reg);
+			}
+			return gp_caller_saved_regs;
+		}
+		virtual std::vector<Uint32> GetGPCalleeSavedRegisters() const override
+		{
+			std::vector<Uint32> gp_callee_saved_regs;
+			for (Uint32 reg : gp_regs)
+			{
+				if (IsCalleeSaved(reg) && reg != x64::RBP && reg != x64::RSP) gp_callee_saved_regs.push_back(reg);
+			}
+			return gp_callee_saved_regs;
 		}
 
 		virtual std::vector<Uint32> const& GetFPRegisters() const override
 		{
-			return fp_registers;
+			return fp_regs;
 		}
 
+		virtual std::vector<Uint32> GetFPCallerSavedRegisters() const override
+		{
+			std::vector<Uint32> fp_caller_saved_regs;
+			for (Uint32 reg : fp_regs)
+			{
+				if (IsCallerSaved(reg)) fp_caller_saved_regs.push_back(reg);
+			}
+			return fp_caller_saved_regs;
+		}
+		virtual std::vector<Uint32> GetFPCalleeSavedRegisters() const override
+		{
+			std::vector<Uint32> gp_callee_saved_regs;
+			for (Uint32 reg : fp_regs)
+			{
+				if (IsCalleeSaved(reg)) gp_callee_saved_regs.push_back(reg);
+			}
+			return gp_callee_saved_regs;
+		}
 
 		virtual Bool IsCallerSaved(Uint32 r) const override
 		{
@@ -599,8 +634,8 @@ namespace ola
 		}
 
 	private:
-		std::vector<Uint32> gp_registers;
-		std::vector<Uint32> fp_registers;
+		std::vector<Uint32> gp_regs;
+		std::vector<Uint32> fp_regs;
 	};
 
 	TargetDataLayout const& x64Target::GetDataLayout() const
