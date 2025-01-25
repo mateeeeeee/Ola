@@ -145,7 +145,6 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
-		return;
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
 		Uint32 const stack_adjustment = (gp_regs.size() + fp_regs.size()) * 8;
@@ -169,21 +168,26 @@ namespace ola
 		else
 		{
 			OLA_ASSERT(MF.GetStackAllocationSize() == 0);
-			MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, MachineType::Int64);
-			MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, MachineType::Int64);
+			Uint32 new_stack_allocation = MF.GetStackAllocationSize() + stack_adjustment;
+			if (new_stack_allocation > 0)
+			{
+				MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, MachineType::Int64);
+				MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, MachineType::Int64);
 
-			MachineInstruction push_rbp(InstPush);
-			push_rbp.SetOp<0>(rbp);
-			insert_point = ctx.EmitInst(insert_list.begin(), push_rbp); ++insert_point;
+				MachineInstruction push_rbp(InstPush);
+				push_rbp.SetOp<0>(rbp);
+				insert_point = ctx.EmitInst(insert_list.begin(), push_rbp); ++insert_point;
 
-			MachineInstruction set_rbp(InstMove);
-			set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
-			insert_point = ctx.EmitInst(insert_point, set_rbp); ++insert_point;
+				MachineInstruction set_rbp(InstMove);
+				set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
+				insert_point = ctx.EmitInst(insert_point, set_rbp); ++insert_point;
 
-			MachineInstruction allocate_stack(InstSub);
-			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
-			insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
+				MachineInstruction allocate_stack(InstSub);
+				allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
+				insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
+			}
 		}
+		if (stack_adjustment == 0) return;
 
 		TargetInstInfo const& target_inst_info = ctx.GetModule().GetTarget().GetInstInfo();
 		for (auto const& MBB : MF.Blocks())
@@ -200,7 +204,6 @@ namespace ola
 						if (operand_offset < 0)
 						{
 							MI.SetOperand(i, MachineOperand::StackObject(operand_offset - stack_adjustment, MO.GetType()));
-							break;
 						}
 					}
 				}
@@ -250,8 +253,6 @@ namespace ola
 
 	void x64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
-		return;
-
 		if (!MF.GetCalleeSavedArgs().empty())
 		{
 			std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
