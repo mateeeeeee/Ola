@@ -49,6 +49,14 @@ namespace ola
 		{
 			return local_stack_offset;
 		}
+		void AddCalleeSavedArg(Uint32 reg, Int32 offset, MachineType type)
+		{
+			callee_saved_args.emplace_back(reg, offset, type);
+		}
+		auto const& GetCalleeSavedArgs() const
+		{
+			return callee_saved_args;
+		}
 
 		void AddCallInstructionArgCount(Uint32 arg_count)
 		{
@@ -76,6 +84,8 @@ namespace ola
 		Int32 local_stack_offset = 0;
 		Int32 argument_stack_offset = 0;
 		std::vector<MachineOperand> local_stack_objects;
+		std::vector<std::tuple<Uint32, Int32, MachineType>> callee_saved_args;
+
 		Bool has_call_instructions = false;
 		Uint32 max_call_arg_count = 0;
 	};

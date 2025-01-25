@@ -151,12 +151,24 @@ namespace ola
 		return MachineInstList.emplace_back(MI);
 	}
 
+	MachineInstruction& MachineContext::EmitInstAtStart(MachineInstruction const& MI)
+	{
+		auto& MachineInstList = current_block->Instructions();
+		return MachineInstList.emplace_front(MI);
+	}
+
 	MachineInstruction& MachineContext::EmitInstBeforeTerminator(MachineInstruction const& MI)
 	{
 		auto& MachineInstList = current_block->Instructions();
 		auto it = MachineInstList.end();
 		it = std::prev(it, 1);
 		return *MachineInstList.insert(it, MI);
+	}
+
+	std::list<MachineInstruction>::iterator MachineContext::EmitInst(std::list<MachineInstruction>::iterator where, MachineInstruction const& MI)
+	{
+		auto& MachineInstList = current_block->Instructions();
+		return MachineInstList.insert(where, MI);
 	}
 
 }

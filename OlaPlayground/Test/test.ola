@@ -1,11 +1,28 @@
-int fact(int n)
+import std.assert;
+
+int TestIfElse()
 {
-    if(n < 2) return 1;
-    return n * fact(n-1);
+	int a = 6;
+	if(a > 5) return 10;
+	else return 0;
+}
+
+int TestWhile()
+{
+	int a = 0;
+	while(a < 10)
+	{
+		if (a == 5) return a * 2;
+		++a;
+	}
+	return 0;
 }
 
 public int main()
 {
-    int n = fact(5);
-    return n;
+	int r = TestIfElse();
+	Assert(r == 10);
+	r = TestWhile();
+	Assert(r == 10);
+	return 0;
 }

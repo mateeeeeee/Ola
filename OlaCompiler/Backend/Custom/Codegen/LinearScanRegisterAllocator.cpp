@@ -47,14 +47,14 @@ namespace ola
 					Uint32 reg = fp_regs.back();
 					fp_regs.pop_back();
 					LI.reg = reg;
-					used_registers_info.fpr_used_registers.insert(reg);
+					used_registers_info.fp_used_registers.insert(reg);
 				}
 				else
 				{
 					Uint32 reg = gp_regs.back();
 					gp_regs.pop_back();
 					LI.reg = reg;
-					used_registers_info.gpr_used_registers.insert(reg);
+					used_registers_info.gp_used_registers.insert(reg);
 				}
 				vreg2reg_map[LI.vreg] = LI.reg;
 
