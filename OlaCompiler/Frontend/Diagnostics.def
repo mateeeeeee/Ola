@@ -101,4 +101,5 @@ DIAG(base_ctor_call_without_base_class, error, "Cannot call base constructor whe
 DIAG(ctor_call_without_class, error, "Cannot call constructor when there is no class")
 DIAG(method_needs_definition, error, "Method needs definition")
 DIAG(function_decl_needs_to_be_extern, error, "function declaration needs to be declared as extern!")
+DIAG(function_def_cannot_be_extern, error, "function definition cannot be declared as extern! Use either public or private!")
 #undef DIAG

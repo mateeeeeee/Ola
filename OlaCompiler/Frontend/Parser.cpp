@@ -49,7 +49,7 @@ namespace ola
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition());
+			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
 			else global_decl_list = ParseExternVariableDeclaration();
 		}
 		else
@@ -88,7 +88,7 @@ namespace ola
 		return global_decl_list;
 	}
 
-	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -116,7 +116,7 @@ namespace ola
 				param_decls.push_back(std::move(param_decl));
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
-			Expect(TokenKind::semicolon);
+			Expect(TokenKind::semicolon, function_def_cannot_be_extern);
 		}
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), DeclVisibility::Extern, attrs);
 	}
@@ -153,7 +153,7 @@ namespace ola
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			func_decl = sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), visibility, attrs);
-			if (current_token->IsNot(TokenKind::left_brace))
+			if (Consume(TokenKind::semicolon))
 			{
 				Diag(function_decl_needs_to_be_extern);
 				return nullptr;
@@ -1533,6 +1533,16 @@ namespace ola
 		if (!Consume(k, ts...))
 		{
 			Diag(unexpected_token);
+			return false;
+		}
+		return true;
+	}
+
+	Bool Parser::Expect(TokenKind k, DiagCode code)
+	{
+		if (!Consume(k))
+		{
+			Diag(code);
 			return false;
 		}
 		return true;

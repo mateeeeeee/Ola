@@ -1,13 +1,194 @@
 Module ID : test.ola
 
-declare @add__I__I i64(i64,i64)
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @TestForLoopInt void() {
+entry:
+%0 = alloca ptr
+br label for.cond
+for.body:
+%1 = add i64 %2, %3
+br label for.iter
+for.cond:
+%3 = phi i64 [ 1, entry ], [ %4, for.iter ]
+%2 = phi i64 [ 0, entry ], [ %1, for.iter ]
+%5 = icmp sle i64 %3, 5
+br i8 %5, label for.body, label for.end
+for.iter:
+store i64 %3, ptr %0
+%4 = add i64 %3, 1
+br label for.cond
+for.end:
+%6 = icmp eq i64 %2, 15
+call i8 %6, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestForLoopBoolCondition void() {
+entry:
+%0 = alloca ptr
+br label for.cond
+for.body:
+store i64 %1, ptr %0
+%2 = add i64 %1, 1
+br label for.iter
+for.cond:
+%1 = phi i64 [ 0, entry ], [ %2, for.iter ]
+%3 = icmp slt i64 %1, 3
+br i8 %3, label for.body, label for.end
+for.iter:
+br label for.cond
+for.end:
+%4 = icmp eq i64 %1, 3
+call i8 %4, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestForLoopMultipleExpressions void() {
+entry:
+%0 = alloca ptr
+%1 = alloca ptr
+br label for.cond
+for.body:
+%2 = add i64 %3, %4
+%5 = add i64 %6, %2
+br label for.iter
+for.cond:
+%4 = phi i64 [ 5, entry ], [ %7, for.iter ]
+%3 = phi i64 [ 1, entry ], [ %8, for.iter ]
+%6 = phi i64 [ 0, entry ], [ %5, for.iter ]
+%9 = icmp sle i64 %3, 3
+br i8 %9, label for.body, label for.end
+for.iter:
+store i64 %3, ptr %0
+%8 = add i64 %3, 1
+store i64 %4, ptr %1
+%7 = sub i64 %4, 1
+br label for.cond
+for.end:
+%10 = icmp eq i64 %6, 18
+call i8 %10, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestNestedForLoops void() {
+entry:
+%0 = alloca ptr
+%1 = alloca ptr
+br label for.cond
+for.body:
+br label for.cond1
+for.cond:
+%2 = phi i64 [ 0, entry ], [ %3, for.iter ]
+%4 = phi i64 [ 0, entry ], [ %5, for.iter ]
+%6 = icmp slt i64 %4, 3
+br i8 %6, label for.body, label for.end
+for.iter:
+store i64 %4, ptr %0
+%5 = add i64 %4, 1
+br label for.cond
+for.end:
+%7 = icmp eq i64 %4, 3
+call i8 %7, @Assert
+%8 = icmp eq i64 %2, 2
+call i8 %8, @Assert
+br label exit
+for.cond1:
+%3 = phi i64 [ %2, for.body ], [ %9, for.iter1 ]
+%10 = icmp slt i64 %3, 2
+br i8 %10, label for.iter1, label for.iter
+for.iter1:
+store i64 %3, ptr %1
+%9 = add i64 %3, 1
+br label for.cond1
+exit:
+ret 
+}
+
+
+define internal @TestForLoopWithBreak void() {
+entry:
+%0 = alloca ptr
+br label for.cond
+for.body:
+%1 = add i64 %2, %3
+%4 = icmp eq i64 %3, 3
+br i8 %4, label if.then, label for.iter
+for.cond:
+%3 = phi i64 [ 1, entry ], [ %5, for.iter ]
+%2 = phi i64 [ 0, entry ], [ %1, for.iter ]
+%6 = icmp sle i64 %3, 5
+br i8 %6, label for.body, label for.end
+for.iter:
+store i64 %3, ptr %0
+%5 = add i64 %3, 1
+br label for.cond
+for.end:
+%7 = phi i64 [ %2, for.cond ], [ %1, if.then ]
+%8 = icmp eq i64 %7, 6
+call i8 %8, @Assert
+br label exit
+if.then:
+br label for.end
+exit:
+ret 
+}
+
+
+define internal @TestForLoopWithContinue void() {
+entry:
+%0 = alloca ptr
+br label for.cond
+for.body:
+%1 = icmp eq i64 %2, 3
+br i8 %1, label if.then, label if.end
+for.cond:
+%2 = phi i64 [ 1, entry ], [ %3, for.iter ]
+%4 = phi i64 [ 0, entry ], [ %5, for.iter ]
+%6 = icmp sle i64 %2, 5
+br i8 %6, label for.body, label for.end
+for.iter:
+%5 = phi i64 [ %4, if.then ], [ %7, if.end ]
+store i64 %2, ptr %0
+%3 = add i64 %2, 1
+br label for.cond
+for.end:
+%8 = icmp eq i64 %4, 12
+call i8 %8, @Assert
+br label exit
+if.then:
+br label for.iter
+if.end:
+%7 = add i64 %4, %2
+br label for.iter
+exit:
+ret 
+}
 
 
 define external @main i64() {
 entry:
-%0 = call i64 1, 2, @add__I__I
+call ptr @TestForLoopInt
+call ptr @TestForLoopBoolCondition
+call ptr @TestForLoopMultipleExpressions
+call ptr @TestNestedForLoops
+call ptr @TestForLoopWithBreak
+call ptr @TestForLoopWithContinue
 br label exit
 exit:
-ret i64 %0
+ret i64 0
 }
 

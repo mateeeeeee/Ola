@@ -33,10 +33,6 @@ namespace ola
 					}
 				}
 			}
-			else
-			{
-				OLA_ASSERT_MSG(false, "Unknown argument");
-			}
 		}
 
 		for (CLIArg const& arg : args)

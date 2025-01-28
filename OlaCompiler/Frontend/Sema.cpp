@@ -112,6 +112,11 @@ namespace ola
 		}
 		sema_ctx.gotos.clear();
 		sema_ctx.labels.clear();
+		if (function_decl->IsExtern())
+		{
+			diagnostics.Report(loc, function_def_cannot_be_extern);
+			return nullptr;
+		}
 		if (!sema_ctx.return_stmt_encountered && !isa<VoidType>(function_decl->GetFuncType()->GetReturnType()))
 		{
 			diagnostics.Report(loc, no_return_statement_found_in_non_void_function);

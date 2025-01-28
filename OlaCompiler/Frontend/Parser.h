@@ -43,6 +43,7 @@ namespace ola
 		template<typename... Ts>
 		Bool Consume(TokenKind k, Ts... ts);
 		Bool Expect(TokenKind k);
+		Bool Expect(TokenKind k, DiagCode code);
 		template<typename... Ts>
 		Bool Expect(TokenKind k, Ts... ts);
 		void Diag(DiagCode);
@@ -53,7 +54,7 @@ namespace ola
 		void AddBuiltinDecls(UniqueTranslationUnitPtr& TU);
 
 		OLA_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
-		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition();
+		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
 		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(Bool first_pass);
 		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(Bool first_pass);
