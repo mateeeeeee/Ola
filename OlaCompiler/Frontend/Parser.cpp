@@ -49,7 +49,7 @@ namespace ola
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
+			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition());
 			else global_decl_list = ParseExternVariableDeclaration();
 		}
 		else
@@ -72,7 +72,10 @@ namespace ola
 			}
 			else
 			{
-				if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDefinition(visibility));
+				if (IsFunctionDeclaration())
+				{
+					global_decl_list.push_back(ParseFunctionDefinition(visibility));
+				}
 				else
 				{
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(visibility);
@@ -85,7 +88,7 @@ namespace ola
 		return global_decl_list;
 	}
 
-	UniqueFunctionDeclPtr Parser::ParseFunctionDeclaration()
+	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition()
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -96,6 +99,7 @@ namespace ola
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(attrs);
 			QualType return_type{};
+			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
 
@@ -148,14 +152,17 @@ namespace ola
 				param_decls.push_back(std::move(param_decl));
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
-
 			func_decl = sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), visibility, attrs);
+			if (current_token->IsNot(TokenKind::left_brace))
+			{
+				Diag(function_decl_needs_to_be_extern);
+				return nullptr;
+			}
 			sema->sema_ctx.current_func = &function_type;
 			function_body = ParseCompoundStatement();
 			sema->sema_ctx.current_func = nullptr;
 		}
-		sema->ActOnFunctionDefinition(loc, func_decl, std::move(function_body));
-		return func_decl;
+		return sema->ActOnFunctionDefinition(loc, std::move(func_decl), std::move(function_body));
 	}
 
 	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)
@@ -1483,8 +1490,7 @@ namespace ola
 		ParseTypeSpecifier(tmp);
 		Expect(TokenKind::identifier);
 
-		Bool is_function = false;
-		if (Consume(TokenKind::left_round)) is_function = true;
+		Bool is_function = Consume(TokenKind::left_round);
 		current_token = token;
 		return is_function;
 	}

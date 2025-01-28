@@ -1,0 +1,10 @@
+Module ID : test2.ola
+
+define external @add__I__I i64(i64 %a,i64 %b) {
+entry:
+%0 = add i64 %a, %b
+br label exit
+exit:
+ret i64 %0
+}
+

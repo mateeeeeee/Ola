@@ -1,14 +1,13 @@
 Module ID : test.ola
 
+declare @add__I__I i64(i64,i64)
+
+
 define external @main i64() {
 entry:
-%0 = alloca i64
-store 0, ptr %0
-br label exit
-return:
+%0 = call i64 1, 2, @add__I__I
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+ret i64 %0
 }
 

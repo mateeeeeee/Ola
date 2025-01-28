@@ -66,7 +66,7 @@ namespace ola
 
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueParamVarDeclPtrList&& param_decls, DeclVisibility visibility, FuncAttributes attributes);
-		void				  ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr& func_decl, UniqueCompoundStmtPtr&& body_stmt);
+		UniqueFunctionDeclPtr				  ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr&& func_decl, UniqueCompoundStmtPtr&& body_stmt);
 
 		UniqueMethodDeclPtr ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,

@@ -1,0 +1,23 @@
+external add__I__I: 
+label0: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 24
+InstStore - i64 stack -8, i64 reg 14
+InstStore - i64 stack -16, i64 reg 13
+InstStore - i64 stack -24, i64 reg 12
+InstMove - i64 reg 14, i64 reg 3
+InstMove - i64 reg 13, i64 reg 4
+InstMove - i64 reg 12, i64 reg 14
+InstAdd - i64 reg 12, i64 reg 13
+InstJump - label1
+
+label1: 
+InstMove - i64 reg 0, i64 reg 12
+InstLoad - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 13, i64 stack -16
+InstLoad - i64 reg 12, i64 stack -24
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+

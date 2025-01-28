@@ -98,7 +98,7 @@ namespace ola
 		return function_decl;
 	}
 
-	void Sema::ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr& function_decl, UniqueCompoundStmtPtr&& body_stmt)
+	UniqueFunctionDeclPtr Sema::ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr&& function_decl, UniqueCompoundStmtPtr&& body_stmt)
 	{
 		OLA_ASSERT(body_stmt);
 		function_decl->SetBodyStmt(std::move(body_stmt));
@@ -107,7 +107,7 @@ namespace ola
 			if (!sema_ctx.labels.contains(goto_label))
 			{
 				diagnostics.Report(loc, undeclared_label, goto_label);
-				return;
+				return nullptr;
 			}
 		}
 		sema_ctx.gotos.clear();
@@ -119,6 +119,7 @@ namespace ola
 		sema_ctx.return_stmt_encountered = false;
 		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
 		OLA_ASSERT(result);
+		return function_decl;
 	}
 
 	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,

@@ -17,8 +17,9 @@ namespace ola
 		Bool AsBool(Bool default_value = false) const
 		{
 			OLA_ASSERT(has_value);
-			if (value == "true" || value == "1") return true;
-			if (value == "false" || value == "0") return false;
+			if (values.empty()) return default_value;
+			if (values[0] == "true" || values[0] == "1") return true;
+			if (values[0] == "false" || values[0] == "0") return false;
 			OLA_ASSERT_MSG(false, "Invalid bool argument!");
 			OLA_UNREACHABLE();
 		}
@@ -31,7 +32,7 @@ namespace ola
 		Int AsInt() const
 		{
 			OLA_ASSERT(has_value);
-			return (Int)strtol(value.c_str(), nullptr, 10);
+			return (Int)strtol(values[0].c_str(), nullptr, 10);
 		}
 		Int AsIntOr(Int def) const
 		{
@@ -42,7 +43,7 @@ namespace ola
 		Float AsFloat() const
 		{
 			OLA_ASSERT(has_value);
-			return (Float)std::strtod(value.c_str(), nullptr);
+			return (Float)std::strtod(values[0].c_str(), nullptr);
 		}
 		Float AsFloatOr(Float def) const
 		{
@@ -53,12 +54,18 @@ namespace ola
 		std::string AsString() const
 		{
 			OLA_ASSERT(has_value);
-			return value;
+			return values.empty() ? "" : values[0];
 		}
 		std::string AsStringOr(std::string const& def) const
 		{
 			if (IsPresent()) return AsString();
 			else return def;
+		}
+
+		std::vector<std::string> AsStrings() const
+		{
+			OLA_ASSERT(has_value);
+			return values;
 		}
 
 		Bool IsPresent() const
@@ -73,13 +80,13 @@ namespace ola
 	private:
 		std::vector<std::string> prefixes;
 		Bool has_value;
-		std::string value;
+		std::vector<std::string> values;
 		Bool is_present = false;
 
-		void SetValue(std::string const& _value)
+		void AddValue(std::string const& value)
 		{
 			OLA_ASSERT(has_value);
-			value = _value;
+			values.push_back(value);
 		}
 		void SetIsPresent()
 		{

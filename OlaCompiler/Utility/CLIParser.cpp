@@ -12,30 +12,42 @@ namespace ola
 
 	CLIParseResult CLIParser::Parse(Int argc, Char** argv)
 	{
-		std::vector<std::string> cmdline(argv, argv + argc);
-		for (Uint64 i = 0; i < cmdline.size(); ++i)
+		std::unordered_map<std::string, CLIArg> cli_arg_map;
+		for (Int i = 0; i < argc; ++i)
 		{
-			Bool found = false;
-			for (CLIArg& arg : args)
+			std::string arg = argv[i];
+			if (prefix_arg_index_map.find(arg) != prefix_arg_index_map.end())
 			{
-				for (auto const& prefix : arg.prefixes)
+				Uint32 arg_index = prefix_arg_index_map[arg];
+				CLIArg& cli_arg = args[arg_index];
+				cli_arg.SetIsPresent();
+				if (cli_arg.has_value)
 				{
-					Bool prefix_found = cmdline[i] == prefix;
-					if (prefix_found)
+					while (i + 1 < argc && !prefix_arg_index_map.contains(argv[i + 1]))
 					{
-						found = true;
-						arg.SetIsPresent();
-						if (arg.has_value) arg.SetValue(cmdline[++i]);
-						break;
+						cli_arg.AddValue(argv[++i]);
+					}
+					if (cli_arg.values.empty())
+					{
+						OLA_ASSERT_MSG(false, "Missing value for cmdline argument");
 					}
 				}
-				if (found) break;
+			}
+			else
+			{
+				OLA_ASSERT_MSG(false, "Unknown argument");
 			}
 		}
 
-		CLIParseResult result(args, prefix_arg_index_map);
-		args.clear();
-		prefix_arg_index_map.clear();
-		return result;
+		for (CLIArg const& arg : args)
+		{
+			for (std::string const& prefix : arg.prefixes)
+			{
+				cli_arg_map[prefix] = arg;
+			}
+		}
+
+		return CLIParseResult(args, prefix_arg_index_map);
 	}
+
 }
