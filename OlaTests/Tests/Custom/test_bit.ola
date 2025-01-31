@@ -1,54 +1,220 @@
 import std.assert;
 
+// Global variables for bit operations
+int global_a = 5;    // 0101 in binary
+int global_b = 3;    // 0011 in binary
+int global_c = 7;    // 0111 in binary
+int global_d = 1;    // 0001 in binary
+
+int global_composite_and_a = 5;    // 0101 in binary
+int global_composite_and_b = 3;    // 0011 in binary
+int global_composite_and_c = 7;    // 0111 in binary
+int global_composite_or_a = 5;     // 0101 in binary
+int global_composite_or_b = 3;     // 0011 in binary
+int global_composite_or_c = 7;     // 0111 in binary
+int global_composite_xor_a = 5;    // 0101 in binary
+int global_composite_xor_b = 3;    // 0011 in binary
+int global_composite_xor_c = 7;    // 0111 in binary
+
+void TestBitAnd()
+{
+    // Testing with literals
+    int literal_result = 5 & 3;
+    Assert(literal_result == 1);
+
+    // Testing with locals
+    int local_a = 5;
+    int local_b = 3;
+    int local_result = local_a & local_b;
+    Assert(local_result == 1);
+
+    // Testing with globals
+    int global_result = global_a & global_b;
+    Assert(global_result == 1);
+
+    // Mixing locals and globals
+    int mix_result_1 = local_a & global_b;
+    Assert(mix_result_1 == 1);
+
+    // Mixing literals and locals
+    int mix_result_2 = 5 & local_b;
+    Assert(mix_result_2 == 1);
+
+    // Mixing literals and globals
+    int mix_result_3 = global_a & 3;
+    Assert(mix_result_3 == 1);
+    
+     // Composite local-literal
+    int local_x = 5;
+    local_x &= 3;
+    Assert(local_x == 1);
+    
+    // Composite local-local
+    int local_y = 5;
+    int local_z = 3;
+    local_y &= local_z;
+    Assert(local_y == 1);
+    
+    // Composite global-global
+    global_composite_and_a &= global_composite_and_b;
+    Assert(global_composite_and_a == 1);
+    
+    //// Composite global-literal
+    global_composite_and_b &= 5;
+    Assert(global_composite_and_b == 1);
+    
+     // Composite global-local
+    int local_w = 2;
+    global_composite_and_c &= local_w;
+    Assert(global_composite_and_c == 2);
+}
+
+void TestBitOr()
+{
+    // Testing with literals
+    int literal_result = 5 | 3;
+    Assert(literal_result == 7);
+
+    // Testing with locals
+    int local_c = 5;
+    int local_d = 3;
+    int local_result = local_c | local_d;
+    Assert(local_result == 7);
+
+    // Testing with globals
+    int global_result = global_a | global_b;
+    Assert(global_result == 7);
+
+    // Mixing locals and globals
+    int mix_result_1 = local_c | global_b;
+    Assert(mix_result_1 == 7);
+
+    // Mixing literals and locals
+    int mix_result_2 = 5 | local_d;
+    Assert(mix_result_2 == 7);
+
+    // Mixing literals and globals
+    int mix_result_3 = global_a | 3;
+    Assert(mix_result_3 == 7);
+
+    // Composite local-literal
+    int local_x = 5;
+    local_x |= 3;
+    Assert(local_x == 7);
+    
+    // Composite local-local
+    int local_y = 5;
+    int local_z = 3;
+    local_y |= local_z;
+    Assert(local_y == 7);
+    
+    // Composite global-global
+    global_composite_or_a |= global_composite_or_b;
+    Assert(global_composite_or_a == 7);
+    
+    // Composite global-literal
+    global_composite_or_b |= 5;
+    Assert(global_composite_or_b == 7);
+    
+    // Composite global-local
+    int local_w = 2;
+    global_composite_or_c |= local_w;
+    Assert(global_composite_or_c == 7);
+}
+
+void TestBitXor()
+{
+    // Testing with literals
+    int literal_result = 5 ^ 3;
+    Assert(literal_result == 6);
+
+    // Testing with locals
+    int local_e = 5;
+    int local_f = 3;
+    int local_result = local_e ^ local_f;
+    Assert(local_result == 6);
+
+    // Testing with globals
+    int global_result = global_a ^ global_b;
+    Assert(global_result == 6);
+
+    // Mixing locals and globals
+    int mix_result_1 = local_e ^ global_b;
+    Assert(mix_result_1 == 6);
+
+    // Mixing literals and locals
+    int mix_result_2 = 5 ^ local_f;
+    Assert(mix_result_2 == 6);
+
+    // Mixing literals and globals
+    int mix_result_3 = global_a ^ 3;
+    Assert(mix_result_3 == 6);
+
+    // Composite local-literal
+    int local_x = 5;
+    local_x ^= 3;
+    Assert(local_x == 6);
+    
+    // Composite local-local
+    int local_y = 5;
+    int local_z = 3;
+    local_y ^= local_z;
+    Assert(local_y == 6);
+    
+    // Composite global-global
+    global_composite_xor_a ^= global_composite_xor_b;
+    Assert(global_composite_xor_a == 6);
+    
+    // Composite global-literal
+    global_composite_xor_b ^= 5;
+    Assert(global_composite_xor_b == 6);
+    
+    // Composite global-local
+    int local_w = 2;
+    global_composite_xor_c ^= local_w;
+    Assert(global_composite_xor_c == 5);
+}
+
+void TestBitNot()
+{
+    // Testing with literals
+    int literal_result_1 = ~5;
+    Assert(literal_result_1 == -6);
+
+    int literal_result_2 = ~(-1);
+    Assert(literal_result_2 == 0);
+
+    int literal_result_3 = ~0;
+    Assert(literal_result_3 == -1);
+
+    int literal_result_4 = ~255;
+    Assert(literal_result_4 == -256);
+
+    int literal_result_5 = ~65535;
+    Assert(literal_result_5 == -65536);
+
+    // Testing with locals
+    int local_s = 5;
+    int local_result_s = ~local_s;
+    Assert(local_result_s == -6);
+
+    int local_t = -1;
+    int local_result_t = ~local_t;
+    Assert(local_result_t == 0);
+
+    // Testing with globals
+    int global_result_a = ~global_a;
+    Assert(global_result_a == -6);
+
+    int global_result_c = ~global_c;
+    Assert(global_result_c == -8);
+}
 
 public int main()
 {
-    int a = 5;    // 0101 in binary
-    int b = 3;    // 0011 in binary
-
-    int resultAnd = a & b;  // 0001 in binary
-    Assert(resultAnd == 1);
-
-    a &= b;
-    Assert(a == 1);
-
-    int c = 5;    // 0101 in binary
-    int d = 3;    // 0011 in binary
-
-    int resultOr = c | d;   // 0111 in binary
-    Assert(resultOr == 7);
-
-    c |= d;
-    Assert(c == 7);
-
-    int e = 5;    // 0101 in binary
-    int f = 3;    // 0011 in binary
-
-    int resultXor = e ^ f;  // 0110 in binary
-    Assert(resultXor == 6);
-
-    e ^= f;
-    Assert(e == 6);
-
-    int s = 5;
-    int resultNotS = ~s; 
-    Assert(resultNotS == -6); 
-    
-    int t = -1;
-    int resultNotT = ~t; 
-    Assert(resultNotT == 0);
-    
-    int u = 0;
-    int resultNotU = ~u;  
-    Assert(resultNotU == -1); 
-    
-    int v = 255;  
-    int resultNotV = ~v;  
-    Assert(resultNotV == -256);   
-    
-    int z = 65535;  
-    int resultNotZ = ~z;  
-    Assert(resultNotZ == -65536); 
-
+    TestBitAnd();
+    TestBitOr();
+    TestBitXor();
+    TestBitNot();
     return 0;
 }

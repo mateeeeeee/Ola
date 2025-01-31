@@ -1,187 +1,57 @@
 .intel_syntax noprefix
 
-.section .rodata
-
-_FP0:
-.quad 4547007122018943789
-
-
-_FP1:
-.quad 4620974636363844210
-
-
-_FP2:
-.quad 4620974748953834894
-
-
-_FP3:
-.quad 4620130155138716900
-
-
-_FP4:
-.quad 4620130380318698268
-
-
-_FP5:
-.quad 4612811918334230528
-
-
-_FP6:
-.quad 4623226436177529458
-
-
-_FP7:
-.quad 4623226548767520142
-
-
-_INT0:
-.quad 10
-
-
-_FP8:
-.quad 4622494601238081752
-
-
-_FP9:
-.quad 4622494713828072437
-
-
-_FP10:
-.quad 4615063718147915776
-
-
-_FP11:
-.quad 4622100536270686834
-
-
-_FP12:
-.quad 4622100648860677518
-
-
-_FP13:
-.quad 4609434218613702656
-
-
-_FP14:
-.quad 4619004255231874276
-
-
-_FP15:
-.quad 4619004480411855644
-
-
-_FP16:
-.quad 4611686243607369273
-
-
-_FP17:
-.quad -9223372036854775808
-
-
-_FP18:
-.quad 4611685568067425167
-
-
-_FP19:
-.quad 4617315517961601024
-
-
-_FP20:
-.quad 4617315630551591708
-
-
-_FP21:
-.quad 4617315405371610340
-
-
-_FP22:
-.quad 4602679719892572386
-
-
-_FP23:
-.quad 4602677017732795964
-
-
-_FP24:
-.quad 4620130267728707584
-
-
-_FP25:
-.quad 4612811693154249159
-
-
-_FP26:
-.quad 4612812143514211897
-
-
-_INT1:
-.quad 2
-
-
-_FP27:
-.quad 4609433768253739919
-
-
-_FP28:
-.quad 4609434668973665393
-
-
-_FP29:
-.quad 4613937593061091783
-
-
-_FP30:
-.quad 4613938043421054521
-
-
 .section .data
 
-global_int_1:
+global_a:
 .quad 5
 
 
-global_int_2:
-.quad 10
-
-
-global_int_3:
-.quad 7
-
-
-global_int_4:
-.quad 20
-
-
-global_sub_1:
-.quad 15
-
-
-global_sub_2:
-.quad 7
-
-
-global_sub_3:
+global_b:
 .quad 3
 
 
-global_sub_4:
-.quad 30
+global_c:
+.quad 7
 
 
-global_float_1:
-.quad 4615063718147915776
+global_d:
+.quad 1
 
 
-global_float_2:
-.quad 4612811918334230528
+global_composite_and_a:
+.quad 5
 
 
-global_float_3:
-.quad 4608083138725491507
+global_composite_and_b:
+.quad 3
 
 
-global_float_4:
-.quad 4617315517961601024
+global_composite_and_c:
+.quad 7
+
+
+global_composite_or_a:
+.quad 5
+
+
+global_composite_or_b:
+.quad 3
+
+
+global_composite_or_c:
+.quad 7
+
+
+global_composite_xor_a:
+.quad 5
+
+
+global_composite_xor_b:
+.quad 3
+
+
+global_composite_xor_c:
+.quad 7
 
 
 .section .text
@@ -190,7 +60,7 @@ global_float_4:
 
 .extern AssertMsg
 
-TestMixedTypeAddition:
+TestBitAnd:
 label0:
 push rbp
 mov rbp, rsp
@@ -198,136 +68,124 @@ sub rsp, 152
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
 mov qword ptr [rbp - 24], r12
-movsd qword ptr [rbp - 32], xmm14
-movsd qword ptr [rbp - 40], xmm13
-movsd qword ptr [rbp - 48], xmm12
-movsd xmm14, qword ptr [rip + _FP0]
-movsd qword ptr [rbp - 56], xmm14
-mov r14, qword ptr global_int_1[rip]
-cvtsi2sd xmm14, r14
-movsd xmm13, qword ptr global_float_1[rip]
-movsd xmm12, xmm14
-addsd xmm12, xmm13
-movsd qword ptr [rbp - 64], xmm12
-movsd xmm12, qword ptr [rbp - 64]
-comisd xmm12, qword ptr [rip + _FP1]
-seta r14b
-and r14b, 1
-movsd xmm12, qword ptr [rbp - 64]
-comisd xmm12, qword ptr [rip + _FP2]
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov qword ptr [rbp - 72], 5
-mov r12, qword ptr [rbp - 72]
-cvtsi2sd xmm12, r12
-movsd xmm13, qword ptr global_float_2[rip]
-movsd xmm14, xmm12
-addsd xmm14, xmm13
-movsd qword ptr [rbp - 80], xmm14
-movsd xmm14, qword ptr [rbp - 80]
-comisd xmm14, qword ptr [rip + _FP3]
-seta r12b
-and r12b, 1
-movsd xmm14, qword ptr [rbp - 80]
-comisd xmm14, qword ptr [rip + _FP4]
-setb r13b
-and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov r14, 5
+and r14, 3
+mov qword ptr [rbp - 32], r14
+mov r14, qword ptr [rbp - 32]
+cmp r14, 1
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
-movsd xmm14, qword ptr [rip + _FP5]
-movsd qword ptr [rbp - 88], xmm14
-mov r14, qword ptr global_int_2[rip]
-cvtsi2sd xmm14, r14
-movsd xmm13, qword ptr [rbp - 88]
-movsd xmm12, xmm14
-addsd xmm12, xmm13
-movsd qword ptr [rbp - 96], xmm12
-movsd xmm12, qword ptr [rbp - 96]
-comisd xmm12, qword ptr [rip + _FP6]
-seta r14b
-and r14b, 1
-movsd xmm12, qword ptr [rbp - 96]
-comisd xmm12, qword ptr [rip + _FP7]
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
+mov qword ptr [rbp - 40], 5
+mov qword ptr [rbp - 48], 3
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr [rbp - 48]
+mov r12, r14
+and r12, r13
+mov qword ptr [rbp - 56], r12
+mov r12, qword ptr [rbp - 56]
+cmp r12, 1
+sete r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-cvtsi2sd xmm12, qword ptr [rip + _INT0]
-movsd xmm13, qword ptr global_float_3[rip]
-movsd xmm14, xmm12
-addsd xmm14, xmm13
-movsd qword ptr [rbp - 104], xmm14
-movsd xmm14, qword ptr [rbp - 104]
-comisd xmm14, qword ptr [rip + _FP8]
-seta r12b
-and r12b, 1
-movsd xmm14, qword ptr [rbp - 104]
-comisd xmm14, qword ptr [rip + _FP9]
-setb r13b
-and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov r12, qword ptr global_a[rip]
+mov r13, qword ptr global_b[rip]
+mov r14, r12
+and r14, r13
+mov qword ptr [rbp - 64], r14
+mov r14, qword ptr [rbp - 64]
+cmp r14, 1
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
-mov r14, qword ptr global_int_3[rip]
-cvtsi2sd xmm14, r14
-movsd xmm13, xmm14
-movsd xmm14, qword ptr [rip + _FP10]
-addsd xmm13, xmm14
-movsd qword ptr [rbp - 112], xmm13
-movsd xmm13, qword ptr [rbp - 112]
-comisd xmm13, qword ptr [rip + _FP11]
-seta r14b
-and r14b, 1
-movsd xmm13, qword ptr [rbp - 112]
-comisd xmm13, qword ptr [rip + _FP12]
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr global_b[rip]
+mov r12, r14
+and r12, r13
+mov qword ptr [rbp - 72], r12
+mov r12, qword ptr [rbp - 72]
+cmp r12, 1
+sete r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-mov r12, qword ptr [rbp - 72]
-cvtsi2sd xmm13, r12
-movsd xmm14, xmm13
-movsd xmm13, qword ptr [rip + _FP13]
-addsd xmm14, xmm13
-movsd qword ptr [rbp - 120], xmm14
-movsd xmm14, qword ptr [rbp - 120]
-comisd xmm14, qword ptr [rip + _FP14]
-seta r12b
-and r12b, 1
-movsd xmm14, qword ptr [rbp - 120]
-comisd xmm14, qword ptr [rip + _FP15]
-setb r13b
+mov r12, qword ptr [rbp - 48]
+mov r13, 5
+and r13, r12
+mov qword ptr [rbp - 80], r13
+mov r13, qword ptr [rbp - 80]
+cmp r13, 1
+sete r13b
 and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_a[rip]
+mov r12, r13
+and r12, 3
+mov qword ptr [rbp - 88], r12
+mov r12, qword ptr [rbp - 88]
+cmp r12, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 96], 5
+mov r12, qword ptr [rbp - 96]
+mov r13, r12
+and r13, 3
+mov qword ptr [rbp - 96], r13
+mov r13, qword ptr [rbp - 96]
+cmp r13, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov qword ptr [rbp - 104], 5
+mov qword ptr [rbp - 112], 3
+mov r13, qword ptr [rbp - 104]
+mov r12, qword ptr [rbp - 112]
+mov r14, r13
+and r14, r12
+mov qword ptr [rbp - 104], r14
+mov r14, qword ptr [rbp - 104]
+cmp r14, 1
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr global_composite_and_a[rip]
+mov r12, qword ptr global_composite_and_b[rip]
+mov r13, r14
+and r13, r12
+mov qword ptr global_composite_and_a[rip], r13
+mov r13, qword ptr global_composite_and_a[rip]
+cmp r13, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_composite_and_b[rip]
+mov r12, r13
+and r12, 5
+mov qword ptr global_composite_and_b[rip], r12
+mov r12, qword ptr global_composite_and_b[rip]
+cmp r12, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 120], 2
+mov r12, qword ptr global_composite_and_c[rip]
+mov r13, qword ptr [rbp - 120]
+mov r14, r12
+and r14, r13
+mov qword ptr global_composite_and_c[rip], r14
+mov r14, qword ptr global_composite_and_c[rip]
+cmp r14, 2
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
@@ -336,13 +194,10 @@ label1:
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
 mov r12, qword ptr [rbp - 24]
-movsd xmm14, qword ptr [rbp - 32]
-movsd xmm13, qword ptr [rbp - 40]
-movsd xmm12, qword ptr [rbp - 48]
 mov rsp, rbp
 pop rbp
 ret
-TestMixedTypeSubtraction:
+TestBitOr:
 label2:
 push rbp
 mov rbp, rsp
@@ -350,152 +205,124 @@ sub rsp, 152
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
 mov qword ptr [rbp - 24], r12
-movsd qword ptr [rbp - 32], xmm14
-movsd qword ptr [rbp - 40], xmm13
-movsd qword ptr [rbp - 48], xmm12
-movsd xmm14, qword ptr [rip + _FP0]
-movsd qword ptr [rbp - 56], xmm14
-mov r14, qword ptr global_int_3[rip]
-cvtsi2sd xmm14, r14
-movsd xmm13, qword ptr global_float_4[rip]
-movsd xmm12, xmm13
-subsd xmm12, xmm14
-movsd qword ptr [rbp - 64], xmm12
-movsd xmm12, qword ptr [rip + _FP16]
-movsd xmm14, qword ptr [rip + _FP17]
-xorpd xmm12, xmm14
-movsd xmm14, qword ptr [rbp - 64]
-comisd xmm14, xmm12
-seta r14b
-and r14b, 1
-movsd xmm14, qword ptr [rip + _FP18]
-movsd xmm12, qword ptr [rip + _FP17]
-xorpd xmm14, xmm12
-movsd xmm12, qword ptr [rbp - 64]
-comisd xmm12, xmm14
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-movsd xmm12, qword ptr [rip + _FP19]
-movsd qword ptr [rbp - 72], xmm12
-mov r12, qword ptr global_int_2[rip]
-cvtsi2sd xmm12, r12
-movsd xmm14, qword ptr [rbp - 72]
-movsd xmm13, xmm14
-subsd xmm13, xmm12
-movsd qword ptr [rbp - 80], xmm13
-movsd xmm13, qword ptr [rip + _FP20]
-movsd xmm12, qword ptr [rip + _FP17]
-xorpd xmm13, xmm12
-movsd xmm12, qword ptr [rbp - 80]
-comisd xmm12, xmm13
-seta r12b
-and r12b, 1
-movsd xmm12, qword ptr [rip + _FP21]
-movsd xmm13, qword ptr [rip + _FP17]
-xorpd xmm12, xmm13
-movsd xmm13, qword ptr [rbp - 80]
-comisd xmm13, xmm12
-setb r13b
-and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov r14, 5
+or r14, 3
+mov qword ptr [rbp - 32], r14
+mov r14, qword ptr [rbp - 32]
+cmp r14, 7
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
-mov qword ptr [rbp - 88], 3
-mov r14, qword ptr [rbp - 88]
-cvtsi2sd xmm13, r14
-movsd xmm12, qword ptr global_float_2[rip]
-movsd xmm14, xmm12
-subsd xmm14, xmm13
-movsd qword ptr [rbp - 96], xmm14
-movsd xmm14, qword ptr [rip + _FP22]
-movsd xmm13, qword ptr [rip + _FP17]
-xorpd xmm14, xmm13
-movsd xmm13, qword ptr [rbp - 96]
-comisd xmm13, xmm14
-seta r14b
-and r14b, 1
-movsd xmm13, qword ptr [rip + _FP23]
-movsd xmm14, qword ptr [rip + _FP17]
-xorpd xmm13, xmm14
-movsd xmm14, qword ptr [rbp - 96]
-comisd xmm14, xmm13
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
+mov qword ptr [rbp - 40], 5
+mov qword ptr [rbp - 48], 3
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr [rbp - 48]
+mov r12, r14
+or r12, r13
+mov qword ptr [rbp - 56], r12
+mov r12, qword ptr [rbp - 56]
+cmp r12, 7
+sete r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-mov r12, qword ptr global_int_1[rip]
-cvtsi2sd xmm14, r12
-movsd xmm13, qword ptr [rip + _FP24]
-subsd xmm13, xmm14
-movsd qword ptr [rbp - 104], xmm13
-movsd xmm13, qword ptr [rbp - 104]
-comisd xmm13, qword ptr [rip + _FP25]
-seta r12b
-and r12b, 1
-movsd xmm13, qword ptr [rbp - 104]
-comisd xmm13, qword ptr [rip + _FP26]
-setb r13b
-and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov r12, qword ptr global_a[rip]
+mov r13, qword ptr global_b[rip]
+mov r14, r12
+or r14, r13
+mov qword ptr [rbp - 64], r14
+mov r14, qword ptr [rbp - 64]
+cmp r14, 7
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
-cvtsi2sd xmm13, qword ptr [rip + _INT1]
-movsd xmm14, qword ptr global_float_1[rip]
-movsd xmm12, xmm14
-subsd xmm12, xmm13
-movsd qword ptr [rbp - 112], xmm12
-movsd xmm12, qword ptr [rbp - 112]
-comisd xmm12, qword ptr [rip + _FP27]
-seta r14b
-and r14b, 1
-movsd xmm12, qword ptr [rbp - 112]
-comisd xmm12, qword ptr [rip + _FP28]
-setb r13b
-and r13b, 1
-mov r12b, r14b
-and r12b, r13b
-cmp r12b, 0
-setne r12b
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr global_b[rip]
+mov r12, r14
+or r12, r13
+mov qword ptr [rbp - 72], r12
+mov r12, qword ptr [rbp - 72]
+cmp r12, 7
+sete r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-cvtsi2sd xmm12, qword ptr [rip + _INT1]
-movsd xmm13, qword ptr [rbp - 72]
-movsd xmm14, xmm13
-subsd xmm14, xmm12
-movsd qword ptr [rbp - 120], xmm14
-movsd xmm14, qword ptr [rbp - 120]
-comisd xmm14, qword ptr [rip + _FP29]
-seta r12b
-and r12b, 1
-movsd xmm14, qword ptr [rbp - 120]
-comisd xmm14, qword ptr [rip + _FP30]
-setb r13b
+mov r12, qword ptr [rbp - 48]
+mov r13, 5
+or r13, r12
+mov qword ptr [rbp - 80], r13
+mov r13, qword ptr [rbp - 80]
+cmp r13, 7
+sete r13b
 and r13b, 1
-mov r14b, r12b
-and r14b, r13b
-cmp r14b, 0
-setne r14b
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_a[rip]
+mov r12, r13
+or r12, 3
+mov qword ptr [rbp - 88], r12
+mov r12, qword ptr [rbp - 88]
+cmp r12, 7
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 96], 5
+mov r12, qword ptr [rbp - 96]
+mov r13, r12
+or r13, 3
+mov qword ptr [rbp - 96], r13
+mov r13, qword ptr [rbp - 96]
+cmp r13, 7
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov qword ptr [rbp - 104], 5
+mov qword ptr [rbp - 112], 3
+mov r13, qword ptr [rbp - 104]
+mov r12, qword ptr [rbp - 112]
+mov r14, r13
+or r14, r12
+mov qword ptr [rbp - 104], r14
+mov r14, qword ptr [rbp - 104]
+cmp r14, 7
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr global_composite_or_a[rip]
+mov r12, qword ptr global_composite_or_b[rip]
+mov r13, r14
+or r13, r12
+mov qword ptr global_composite_or_a[rip], r13
+mov r13, qword ptr global_composite_or_a[rip]
+cmp r13, 7
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_composite_or_b[rip]
+mov r12, r13
+or r12, 5
+mov qword ptr global_composite_or_b[rip], r12
+mov r12, qword ptr global_composite_or_b[rip]
+cmp r12, 7
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 120], 2
+mov r12, qword ptr global_composite_or_c[rip]
+mov r13, qword ptr [rbp - 120]
+mov r14, r12
+or r14, r13
+mov qword ptr global_composite_or_c[rip], r14
+mov r14, qword ptr global_composite_or_c[rip]
+cmp r14, 7
+sete r14b
 and r14b, 1
 mov cl, r14b
 call Assert
@@ -504,26 +331,253 @@ label3:
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
 mov r12, qword ptr [rbp - 24]
-movsd xmm14, qword ptr [rbp - 32]
-movsd xmm13, qword ptr [rbp - 40]
-movsd xmm12, qword ptr [rbp - 48]
+mov rsp, rbp
+pop rbp
+ret
+TestBitXor:
+label4:
+push rbp
+mov rbp, rsp
+sub rsp, 152
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov r14, 5
+xor r14, 3
+mov qword ptr [rbp - 32], r14
+mov r14, qword ptr [rbp - 32]
+cmp r14, 6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 40], 5
+mov qword ptr [rbp - 48], 3
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr [rbp - 48]
+mov r12, r14
+xor r12, r13
+mov qword ptr [rbp - 56], r12
+mov r12, qword ptr [rbp - 56]
+cmp r12, 6
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov r12, qword ptr global_a[rip]
+mov r13, qword ptr global_b[rip]
+mov r14, r12
+xor r14, r13
+mov qword ptr [rbp - 64], r14
+mov r14, qword ptr [rbp - 64]
+cmp r14, 6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr global_b[rip]
+mov r12, r14
+xor r12, r13
+mov qword ptr [rbp - 72], r12
+mov r12, qword ptr [rbp - 72]
+cmp r12, 6
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov r12, qword ptr [rbp - 48]
+mov r13, 5
+xor r13, r12
+mov qword ptr [rbp - 80], r13
+mov r13, qword ptr [rbp - 80]
+cmp r13, 6
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_a[rip]
+mov r12, r13
+xor r12, 3
+mov qword ptr [rbp - 88], r12
+mov r12, qword ptr [rbp - 88]
+cmp r12, 6
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 96], 5
+mov r12, qword ptr [rbp - 96]
+mov r13, r12
+xor r13, 3
+mov qword ptr [rbp - 96], r13
+mov r13, qword ptr [rbp - 96]
+cmp r13, 6
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov qword ptr [rbp - 104], 5
+mov qword ptr [rbp - 112], 3
+mov r13, qword ptr [rbp - 104]
+mov r12, qword ptr [rbp - 112]
+mov r14, r13
+xor r14, r12
+mov qword ptr [rbp - 104], r14
+mov r14, qword ptr [rbp - 104]
+cmp r14, 6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr global_composite_xor_a[rip]
+mov r12, qword ptr global_composite_xor_b[rip]
+mov r13, r14
+xor r13, r12
+mov qword ptr global_composite_xor_a[rip], r13
+mov r13, qword ptr global_composite_xor_a[rip]
+cmp r13, 6
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_composite_xor_b[rip]
+mov r12, r13
+xor r12, 5
+mov qword ptr global_composite_xor_b[rip], r12
+mov r12, qword ptr global_composite_xor_b[rip]
+cmp r12, 6
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov qword ptr [rbp - 120], 2
+mov r12, qword ptr global_composite_xor_c[rip]
+mov r13, qword ptr [rbp - 120]
+mov r14, r12
+xor r14, r13
+mov qword ptr global_composite_xor_c[rip], r14
+mov r14, qword ptr global_composite_xor_c[rip]
+cmp r14, 5
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label5
+label5:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestBitNot:
+label6:
+push rbp
+mov rbp, rsp
+sub rsp, 136
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], -6
+mov r14, qword ptr [rbp - 24]
+cmp r14, -6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 32], 0
+mov r14, qword ptr [rbp - 32]
+cmp r14, 0
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 40], -1
+mov r14, qword ptr [rbp - 40]
+cmp r14, -1
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 48], -256
+mov r14, qword ptr [rbp - 48]
+cmp r14, -256
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 56], -65536
+mov r14, qword ptr [rbp - 56]
+cmp r14, -65536
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov qword ptr [rbp - 64], 5
+mov r14, qword ptr [rbp - 64]
+mov r13, r14
+not r13
+mov qword ptr [rbp - 72], r13
+mov r13, qword ptr [rbp - 72]
+cmp r13, -6
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov qword ptr [rbp - 80], -1
+mov r13, qword ptr [rbp - 80]
+mov r14, r13
+not r14
+mov qword ptr [rbp - 88], r14
+mov r14, qword ptr [rbp - 88]
+cmp r14, 0
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr global_a[rip]
+mov r13, r14
+not r13
+mov qword ptr [rbp - 96], r13
+mov r13, qword ptr [rbp - 96]
+cmp r13, -6
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov r13, qword ptr global_c[rip]
+mov r14, r13
+not r14
+mov qword ptr [rbp - 104], r14
+mov r14, qword ptr [rbp - 104]
+cmp r14, -8
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label7
+label7:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
 mov rsp, rbp
 pop rbp
 ret
 .globl main
 
 main:
-label4:
+label8:
 push rbp
 mov rbp, rsp
 sub rsp, 48
 mov qword ptr [rbp - 8], r14
-call TestMixedTypeAddition
-call TestMixedTypeSubtraction
+call TestBitAnd
+call TestBitOr
+call TestBitXor
+call TestBitNot
 mov qword ptr [rbp - 16], 0
-jmp label6
-label5:
-label6:
+jmp label10
+label9:
+label10:
 mov r14, qword ptr [rbp - 16]
 mov rax, r14
 mov r14, qword ptr [rbp - 8]
