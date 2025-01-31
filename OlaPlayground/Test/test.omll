@@ -2,160 +2,171 @@ external Assert
 
 external AssertMsg
 
-internal data storage global_a
+internal data storage global_int_1
 
-internal data storage global_b
+internal data storage global_int_2
 
-internal data storage global_c
+internal data storage global_int_3
 
-internal data storage global_d
+internal data storage global_int_4
 
-internal data storage global_composite_and_a
+internal data storage global_sub_1
 
-internal data storage global_composite_and_b
+internal data storage global_sub_2
 
-internal data storage global_composite_and_c
+internal data storage global_sub_3
 
-internal data storage global_composite_or_a
+internal data storage global_sub_4
 
-internal data storage global_composite_or_b
+internal data storage global_float_1
 
-internal data storage global_composite_or_c
+internal data storage global_float_2
 
-internal data storage global_composite_xor_a
+internal data storage global_float_3
 
-internal data storage global_composite_xor_b
+internal data storage global_float_4
 
-internal data storage global_composite_xor_c
+internal data storage global_composite_add_a
 
-internal TestBitAnd: 
+internal data storage global_composite_add_b
+
+internal data storage global_composite_sub_a
+
+internal data storage global_composite_sub_b
+
+internal data storage global_composite_fadd_a
+
+internal data storage global_composite_fadd_b
+
+internal data storage global_composite_fsub_a
+
+internal data storage global_composite_fsub_b
+
+internal data storage global_composite_mix_add_int
+
+internal data storage global_composite_mix_add_float
+
+internal data storage global_composite_mix_sub_int
+
+internal data storage global_composite_mix_sub_float
+
+internal TestIntAddition: 
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 152
+InstSub - i64 reg 1, i64 imm 144
 InstStore - i64 stack -8, i64 reg 14
 InstStore - i64 stack -16, i64 reg 13
 InstStore - i64 stack -24, i64 reg 12
-InstMove - i64 reg 14, i64 imm 5
-InstAnd - i64 reg 14, i64 imm 3
-InstStore - i64 stack -32, i64 reg 14
+InstStore - i64 stack -32, i64 imm 15
 InstLoad - i64 reg 14, i64 stack -32
-InstICmp - i64 reg 14, i64 imm 1
+InstICmp - i64 reg 14, i64 imm 15
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
 InstStore - i64 stack -40, i64 imm 5
-InstStore - i64 stack -48, i64 imm 3
+InstStore - i64 stack -48, i64 imm 10
 InstLoad - i64 reg 14, i64 stack -40
 InstLoad - i64 reg 13, i64 stack -48
 InstMove - i64 reg 12, i64 reg 14
-InstAnd - i64 reg 12, i64 reg 13
+InstAdd - i64 reg 12, i64 reg 13
 InstStore - i64 stack -56, i64 reg 12
 InstLoad - i64 reg 12, i64 stack -56
-InstICmp - i64 reg 12, i64 imm 1
+InstICmp - i64 reg 12, i64 imm 15
 x64::SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 global_a
-InstLoad - i64 reg 13, i64 global_b
+InstLoad - i64 reg 12, i64 global_int_1
+InstLoad - i64 reg 13, i64 global_int_2
 InstMove - i64 reg 14, i64 reg 12
-InstAnd - i64 reg 14, i64 reg 13
+InstAdd - i64 reg 14, i64 reg 13
 InstStore - i64 stack -64, i64 reg 14
 InstLoad - i64 reg 14, i64 stack -64
-InstICmp - i64 reg 14, i64 imm 1
+InstICmp - i64 reg 14, i64 imm 15
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstLoad - i64 reg 14, i64 stack -40
-InstLoad - i64 reg 13, i64 global_b
+InstLoad - i64 reg 14, i64 global_int_1
+InstLoad - i64 reg 13, i64 stack -48
 InstMove - i64 reg 12, i64 reg 14
-InstAnd - i64 reg 12, i64 reg 13
+InstAdd - i64 reg 12, i64 reg 13
 InstStore - i64 stack -72, i64 reg 12
 InstLoad - i64 reg 12, i64 stack -72
-InstICmp - i64 reg 12, i64 imm 1
+InstICmp - i64 reg 12, i64 imm 15
 x64::SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 stack -48
-InstMove - i64 reg 13, i64 imm 5
-InstAnd - i64 reg 13, i64 reg 12
-InstStore - i64 stack -80, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -80
-InstICmp - i64 reg 13, i64 imm 1
+InstLoad - i64 reg 12, i64 stack -40
+InstLoad - i64 reg 13, i64 global_int_3
+InstMove - i64 reg 14, i64 reg 12
+InstAdd - i64 reg 14, i64 reg 13
+InstStore - i64 stack -80, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -80
+InstICmp - i64 reg 14, i64 imm 12
+x64::SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -88, i64 imm 5
+InstLoad - i64 reg 14, i64 stack -88
+InstMove - i64 reg 13, i64 reg 14
+InstAdd - i64 reg 13, i64 imm 10
+InstStore - i64 stack -88, i64 reg 13
+InstLoad - i64 reg 13, i64 stack -88
+InstICmp - i64 reg 13, i64 imm 15
 x64::SetE - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
 InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_a
-InstMove - i64 reg 12, i64 reg 13
-InstAnd - i64 reg 12, i64 imm 3
-InstStore - i64 stack -88, i64 reg 12
-InstLoad - i64 reg 12, i64 stack -88
-InstICmp - i64 reg 12, i64 imm 1
-x64::SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
 InstCall - 
 InstStore - i64 stack -96, i64 imm 5
-InstLoad - i64 reg 12, i64 stack -96
-InstMove - i64 reg 13, i64 reg 12
-InstAnd - i64 reg 13, i64 imm 3
-InstStore - i64 stack -96, i64 reg 13
+InstStore - i64 stack -104, i64 imm 10
 InstLoad - i64 reg 13, i64 stack -96
-InstICmp - i64 reg 13, i64 imm 1
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstStore - i64 stack -104, i64 imm 5
-InstStore - i64 stack -112, i64 imm 3
-InstLoad - i64 reg 13, i64 stack -104
-InstLoad - i64 reg 12, i64 stack -112
-InstMove - i64 reg 14, i64 reg 13
-InstAnd - i64 reg 14, i64 reg 12
-InstStore - i64 stack -104, i64 reg 14
 InstLoad - i64 reg 14, i64 stack -104
-InstICmp - i64 reg 14, i64 imm 1
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoad - i64 reg 14, i64 global_composite_and_a
-InstLoad - i64 reg 12, i64 global_composite_and_b
-InstMove - i64 reg 13, i64 reg 14
-InstAnd - i64 reg 13, i64 reg 12
-InstStore - global_composite_and_a, i64 reg 13
-InstLoad - i64 reg 13, i64 global_composite_and_a
-InstICmp - i64 reg 13, i64 imm 1
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_composite_and_b
 InstMove - i64 reg 12, i64 reg 13
-InstAnd - i64 reg 12, i64 imm 5
-InstStore - global_composite_and_b, i64 reg 12
-InstLoad - i64 reg 12, i64 global_composite_and_b
-InstICmp - i64 reg 12, i64 imm 1
+InstAdd - i64 reg 12, i64 reg 14
+InstStore - i64 stack -96, i64 reg 12
+InstLoad - i64 reg 12, i64 stack -96
+InstICmp - i64 reg 12, i64 imm 15
 x64::SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstStore - i64 stack -120, i64 imm 2
-InstLoad - i64 reg 12, i64 global_composite_and_c
-InstLoad - i64 reg 13, i64 stack -120
-InstMove - i64 reg 14, i64 reg 12
-InstAnd - i64 reg 14, i64 reg 13
-InstStore - global_composite_and_c, i64 reg 14
-InstLoad - i64 reg 14, i64 global_composite_and_c
-InstICmp - i64 reg 14, i64 imm 2
+InstLoad - i64 reg 12, i64 global_composite_add_a
+InstLoad - i64 reg 14, i64 global_composite_add_b
+InstMove - i64 reg 13, i64 reg 12
+InstAdd - i64 reg 13, i64 reg 14
+InstStore - global_composite_add_a, i64 reg 13
+InstLoad - i64 reg 13, i64 global_composite_add_a
+InstICmp - i64 reg 13, i64 imm 15
+x64::SetE - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 3, i8 reg 13
+InstCall - 
+InstLoad - i64 reg 13, i64 global_composite_add_b
+InstMove - i64 reg 14, i64 reg 13
+InstAdd - i64 reg 14, i64 imm 5
+InstStore - global_composite_add_b, i64 reg 14
+InstLoad - i64 reg 14, i64 global_composite_add_b
+InstICmp - i64 reg 14, i64 imm 15
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -112, i64 imm 5
+InstLoad - i64 reg 14, i64 global_composite_add_a
+InstLoad - i64 reg 13, i64 stack -112
+InstMove - i64 reg 12, i64 reg 14
+InstAdd - i64 reg 12, i64 reg 13
+InstStore - global_composite_add_a, i64 reg 12
+InstLoad - i64 reg 12, i64 global_composite_add_a
+InstICmp - i64 reg 12, i64 imm 20
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
 InstCall - 
 InstJump - label1
 
@@ -167,134 +178,123 @@ InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
 
-internal TestBitOr: 
+internal TestIntSubtraction: 
 label2: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 152
+InstSub - i64 reg 1, i64 imm 144
 InstStore - i64 stack -8, i64 reg 14
 InstStore - i64 stack -16, i64 reg 13
 InstStore - i64 stack -24, i64 reg 12
-InstMove - i64 reg 14, i64 imm 5
-InstOr - i64 reg 14, i64 imm 3
-InstStore - i64 stack -32, i64 reg 14
+InstStore - i64 stack -32, i64 imm 8
 InstLoad - i64 reg 14, i64 stack -32
-InstICmp - i64 reg 14, i64 imm 7
+InstICmp - i64 reg 14, i64 imm 8
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstStore - i64 stack -40, i64 imm 5
-InstStore - i64 stack -48, i64 imm 3
+InstStore - i64 stack -40, i64 imm 15
+InstStore - i64 stack -48, i64 imm 7
 InstLoad - i64 reg 14, i64 stack -40
 InstLoad - i64 reg 13, i64 stack -48
 InstMove - i64 reg 12, i64 reg 14
-InstOr - i64 reg 12, i64 reg 13
+InstSub - i64 reg 12, i64 reg 13
 InstStore - i64 stack -56, i64 reg 12
 InstLoad - i64 reg 12, i64 stack -56
-InstICmp - i64 reg 12, i64 imm 7
+InstICmp - i64 reg 12, i64 imm 8
 x64::SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 global_a
-InstLoad - i64 reg 13, i64 global_b
+InstLoad - i64 reg 12, i64 global_sub_1
+InstLoad - i64 reg 13, i64 global_sub_2
 InstMove - i64 reg 14, i64 reg 12
-InstOr - i64 reg 14, i64 reg 13
+InstSub - i64 reg 14, i64 reg 13
 InstStore - i64 stack -64, i64 reg 14
 InstLoad - i64 reg 14, i64 stack -64
-InstICmp - i64 reg 14, i64 imm 7
+InstICmp - i64 reg 14, i64 imm 8
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstLoad - i64 reg 14, i64 stack -40
-InstLoad - i64 reg 13, i64 global_b
+InstLoad - i64 reg 14, i64 global_sub_4
+InstLoad - i64 reg 13, i64 stack -48
 InstMove - i64 reg 12, i64 reg 14
-InstOr - i64 reg 12, i64 reg 13
+InstSub - i64 reg 12, i64 reg 13
 InstStore - i64 stack -72, i64 reg 12
 InstLoad - i64 reg 12, i64 stack -72
-InstICmp - i64 reg 12, i64 imm 7
+InstICmp - i64 reg 12, i64 imm 23
 x64::SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 stack -48
-InstMove - i64 reg 13, i64 imm 5
-InstOr - i64 reg 13, i64 reg 12
-InstStore - i64 stack -80, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -80
-InstICmp - i64 reg 13, i64 imm 7
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_a
-InstMove - i64 reg 12, i64 reg 13
-InstOr - i64 reg 12, i64 imm 3
-InstStore - i64 stack -88, i64 reg 12
-InstLoad - i64 reg 12, i64 stack -88
-InstICmp - i64 reg 12, i64 imm 7
-x64::SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstStore - i64 stack -96, i64 imm 5
-InstLoad - i64 reg 12, i64 stack -96
-InstMove - i64 reg 13, i64 reg 12
-InstOr - i64 reg 13, i64 imm 3
-InstStore - i64 stack -96, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -96
-InstICmp - i64 reg 13, i64 imm 7
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstStore - i64 stack -104, i64 imm 5
-InstStore - i64 stack -112, i64 imm 3
-InstLoad - i64 reg 13, i64 stack -104
-InstLoad - i64 reg 12, i64 stack -112
-InstMove - i64 reg 14, i64 reg 13
-InstOr - i64 reg 14, i64 reg 12
-InstStore - i64 stack -104, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -104
-InstICmp - i64 reg 14, i64 imm 7
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoad - i64 reg 14, i64 global_composite_or_a
-InstLoad - i64 reg 12, i64 global_composite_or_b
-InstMove - i64 reg 13, i64 reg 14
-InstOr - i64 reg 13, i64 reg 12
-InstStore - global_composite_or_a, i64 reg 13
-InstLoad - i64 reg 13, i64 global_composite_or_a
-InstICmp - i64 reg 13, i64 imm 7
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_composite_or_b
-InstMove - i64 reg 12, i64 reg 13
-InstOr - i64 reg 12, i64 imm 5
-InstStore - global_composite_or_b, i64 reg 12
-InstLoad - i64 reg 12, i64 global_composite_or_b
-InstICmp - i64 reg 12, i64 imm 7
-x64::SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstStore - i64 stack -120, i64 imm 2
-InstLoad - i64 reg 12, i64 global_composite_or_c
-InstLoad - i64 reg 13, i64 stack -120
+InstLoad - i64 reg 12, i64 stack -40
+InstLoad - i64 reg 13, i64 global_sub_3
 InstMove - i64 reg 14, i64 reg 12
-InstOr - i64 reg 14, i64 reg 13
-InstStore - global_composite_or_c, i64 reg 14
-InstLoad - i64 reg 14, i64 global_composite_or_c
-InstICmp - i64 reg 14, i64 imm 7
+InstSub - i64 reg 14, i64 reg 13
+InstStore - i64 stack -80, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -80
+InstICmp - i64 reg 14, i64 imm 12
 x64::SetE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -88, i64 imm 15
+InstLoad - i64 reg 14, i64 stack -88
+InstMove - i64 reg 13, i64 reg 14
+InstSub - i64 reg 13, i64 imm 7
+InstStore - i64 stack -88, i64 reg 13
+InstLoad - i64 reg 13, i64 stack -88
+InstICmp - i64 reg 13, i64 imm 8
+x64::SetE - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 3, i8 reg 13
+InstCall - 
+InstStore - i64 stack -96, i64 imm 15
+InstStore - i64 stack -104, i64 imm 7
+InstLoad - i64 reg 13, i64 stack -96
+InstLoad - i64 reg 14, i64 stack -104
+InstMove - i64 reg 12, i64 reg 13
+InstSub - i64 reg 12, i64 reg 14
+InstStore - i64 stack -96, i64 reg 12
+InstLoad - i64 reg 12, i64 stack -96
+InstICmp - i64 reg 12, i64 imm 8
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstLoad - i64 reg 12, i64 global_composite_sub_a
+InstLoad - i64 reg 14, i64 global_composite_sub_b
+InstMove - i64 reg 13, i64 reg 12
+InstSub - i64 reg 13, i64 reg 14
+InstStore - global_composite_sub_a, i64 reg 13
+InstLoad - i64 reg 13, i64 global_composite_sub_a
+InstICmp - i64 reg 13, i64 imm 8
+x64::SetE - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 3, i8 reg 13
+InstCall - 
+InstLoad - i64 reg 13, i64 global_composite_sub_b
+InstMove - i64 reg 14, i64 reg 13
+InstSub - i64 reg 14, i64 imm 7
+InstStore - global_composite_sub_b, i64 reg 14
+InstLoad - i64 reg 14, i64 global_composite_sub_b
+InstICmp - i64 reg 14, i64 imm 0
+x64::SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -112, i64 imm 7
+InstLoad - i64 reg 14, i64 global_composite_sub_a
+InstLoad - i64 reg 13, i64 stack -112
+InstMove - i64 reg 12, i64 reg 14
+InstSub - i64 reg 12, i64 reg 13
+InstStore - global_composite_sub_a, i64 reg 12
+InstLoad - i64 reg 12, i64 global_composite_sub_a
+InstICmp - i64 reg 12, i64 imm 1
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
 InstCall - 
 InstJump - label3
 
@@ -306,132 +306,225 @@ InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
 
-internal TestBitXor: 
+internal TestFloatAddition: 
 label4: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 152
+InstSub - i64 reg 1, i64 imm 176
 InstStore - i64 stack -8, i64 reg 14
 InstStore - i64 stack -16, i64 reg 13
 InstStore - i64 stack -24, i64 reg 12
-InstMove - i64 reg 14, i64 imm 5
-InstXor - i64 reg 14, i64 imm 3
-InstStore - i64 stack -32, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -32
-InstICmp - i64 reg 14, i64 imm 6
-x64::SetE - i8 reg 14
+x64::StoreFP - f64 stack -32, f64 reg 31
+x64::StoreFP - f64 stack -40, f64 reg 30
+x64::StoreFP - f64 stack -48, f64 reg 29
+x64::MoveFP - f64 reg 31, f64 imm 4547007122018943789
+x64::StoreFP - f64 stack -56, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4618441417868443648
+x64::StoreFP - f64 stack -64, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -64
+InstFCmp - f64 reg 31, f64 imm 4618441305278452964
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -64
+InstFCmp - f64 reg 31, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4615063718147915776
+x64::StoreFP - f64 stack -72, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -80, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -72
+x64::LoadFP - f64 reg 30, f64 stack -80
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFAdd - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -88, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -88
+InstFCmp - f64 reg 29, f64 imm 4618441305278452964
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -88
+InstFCmp - f64 reg 29, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstStore - i64 stack -40, i64 imm 5
-InstStore - i64 stack -48, i64 imm 3
-InstLoad - i64 reg 14, i64 stack -40
-InstLoad - i64 reg 13, i64 stack -48
-InstMove - i64 reg 12, i64 reg 14
-InstXor - i64 reg 12, i64 reg 13
-InstStore - i64 stack -56, i64 reg 12
-InstLoad - i64 reg 12, i64 stack -56
-InstICmp - i64 reg 12, i64 imm 6
-x64::SetE - i8 reg 12
+x64::LoadFP - f64 reg 29, f64 global_float_1
+x64::LoadFP - f64 reg 30, f64 global_float_2
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -96, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -96
+InstFCmp - f64 reg 31, f64 imm 4618441305278452964
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -96
+InstFCmp - f64 reg 31, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 global_a
-InstLoad - i64 reg 13, i64 global_b
-InstMove - i64 reg 14, i64 reg 12
-InstXor - i64 reg 14, i64 reg 13
-InstStore - i64 stack -64, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -64
-InstICmp - i64 reg 14, i64 imm 6
-x64::SetE - i8 reg 14
+x64::LoadFP - f64 reg 31, f64 global_float_1
+x64::LoadFP - f64 reg 30, f64 stack -80
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFAdd - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -104, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -104
+InstFCmp - f64 reg 29, f64 imm 4618441305278452964
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -104
+InstFCmp - f64 reg 29, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstLoad - i64 reg 14, i64 stack -40
-InstLoad - i64 reg 13, i64 global_b
-InstMove - i64 reg 12, i64 reg 14
-InstXor - i64 reg 12, i64 reg 13
-InstStore - i64 stack -72, i64 reg 12
-InstLoad - i64 reg 12, i64 stack -72
-InstICmp - i64 reg 12, i64 imm 6
-x64::SetE - i8 reg 12
+x64::LoadFP - f64 reg 29, f64 stack -72
+x64::LoadFP - f64 reg 30, f64 global_float_3
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -112, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -112
+InstFCmp - f64 reg 31, f64 imm 4616977635399557553
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -112
+InstFCmp - f64 reg 31, f64 imm 4616977860579538921
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 12, i64 stack -48
-InstMove - i64 reg 13, i64 imm 5
-InstXor - i64 reg 13, i64 reg 12
-InstStore - i64 stack -80, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -80
-InstICmp - i64 reg 13, i64 imm 6
-x64::SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_a
-InstMove - i64 reg 12, i64 reg 13
-InstXor - i64 reg 12, i64 imm 3
-InstStore - i64 stack -88, i64 reg 12
-InstLoad - i64 reg 12, i64 stack -88
-InstICmp - i64 reg 12, i64 imm 6
-x64::SetE - i8 reg 12
+x64::MoveFP - f64 reg 31, f64 imm 4615063718147915776
+x64::StoreFP - f64 stack -120, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -120
+x64::MoveFP - f64 reg 30, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+InstFAdd - f64 reg 30, f64 reg 31
+x64::StoreFP - f64 stack -120, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -120
+InstFCmp - f64 reg 30, f64 imm 4618441305278452964
+x64::SetA - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstStore - i64 stack -96, i64 imm 5
-InstLoad - i64 reg 12, i64 stack -96
-InstMove - i64 reg 13, i64 reg 12
-InstXor - i64 reg 13, i64 imm 3
-InstStore - i64 stack -96, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -96
-InstICmp - i64 reg 13, i64 imm 6
-x64::SetE - i8 reg 13
+x64::LoadFP - f64 reg 30, f64 stack -120
+InstFCmp - f64 reg 30, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstStore - i64 stack -104, i64 imm 5
-InstStore - i64 stack -112, i64 imm 3
-InstLoad - i64 reg 13, i64 stack -104
-InstLoad - i64 reg 12, i64 stack -112
-InstMove - i64 reg 14, i64 reg 13
-InstXor - i64 reg 14, i64 reg 12
-InstStore - i64 stack -104, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -104
-InstICmp - i64 reg 14, i64 imm 6
-x64::SetE - i8 reg 14
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstLoad - i64 reg 14, i64 global_composite_xor_a
-InstLoad - i64 reg 12, i64 global_composite_xor_b
-InstMove - i64 reg 13, i64 reg 14
-InstXor - i64 reg 13, i64 reg 12
-InstStore - global_composite_xor_a, i64 reg 13
-InstLoad - i64 reg 13, i64 global_composite_xor_a
-InstICmp - i64 reg 13, i64 imm 6
-x64::SetE - i8 reg 13
+x64::MoveFP - f64 reg 30, f64 imm 4615063718147915776
+x64::StoreFP - f64 stack -128, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -136, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -128
+x64::LoadFP - f64 reg 31, f64 stack -136
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFAdd - f64 reg 29, f64 reg 31
+x64::StoreFP - f64 stack -128, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4618441305278452964
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstLoad - i64 reg 13, i64 global_composite_xor_b
-InstMove - i64 reg 12, i64 reg 13
-InstXor - i64 reg 12, i64 imm 5
-InstStore - global_composite_xor_b, i64 reg 12
-InstLoad - i64 reg 12, i64 global_composite_xor_b
-InstICmp - i64 reg 12, i64 imm 6
-x64::SetE - i8 reg 12
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstStore - i64 stack -120, i64 imm 2
-InstLoad - i64 reg 12, i64 global_composite_xor_c
-InstLoad - i64 reg 13, i64 stack -120
-InstMove - i64 reg 14, i64 reg 12
-InstXor - i64 reg 14, i64 reg 13
-InstStore - global_composite_xor_c, i64 reg 14
-InstLoad - i64 reg 14, i64 global_composite_xor_c
-InstICmp - i64 reg 14, i64 imm 5
-x64::SetE - i8 reg 14
+x64::LoadFP - f64 reg 29, f64 global_composite_fadd_a
+x64::LoadFP - f64 reg 31, f64 global_composite_fadd_b
+x64::MoveFP - f64 reg 30, f64 reg 29
+InstFAdd - f64 reg 30, f64 reg 31
+x64::StoreFP - global_composite_fadd_a, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_fadd_a
+InstFCmp - f64 reg 30, f64 imm 4618441305278452964
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_fadd_a
+InstFCmp - f64 reg 30, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::LoadFP - f64 reg 30, f64 global_composite_fadd_b
+x64::MoveFP - f64 reg 31, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4615063718147915776
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - global_composite_fadd_b, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 global_composite_fadd_b
+InstFCmp - f64 reg 31, f64 imm 4618441305278452964
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 global_composite_fadd_b
+InstFCmp - f64 reg 31, f64 imm 4618441530458434332
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -144, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 global_composite_fadd_a
+x64::LoadFP - f64 reg 30, f64 stack -144
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFAdd - f64 reg 29, f64 reg 30
+x64::StoreFP - global_composite_fadd_a, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 global_composite_fadd_a
+InstFCmp - f64 reg 29, f64 imm 4620974636363844210
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 global_composite_fadd_a
+InstFCmp - f64 reg 29, f64 imm 4620974748953834894
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
@@ -441,91 +534,238 @@ label5:
 InstLoad - i64 reg 14, i64 stack -8
 InstLoad - i64 reg 13, i64 stack -16
 InstLoad - i64 reg 12, i64 stack -24
+x64::LoadFP - f64 reg 31, f64 stack -32
+x64::LoadFP - f64 reg 30, f64 stack -40
+x64::LoadFP - f64 reg 29, f64 stack -48
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
 
-internal TestBitNot: 
+internal TestFloatSubtraction: 
 label6: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 136
+InstSub - i64 reg 1, i64 imm 176
 InstStore - i64 stack -8, i64 reg 14
 InstStore - i64 stack -16, i64 reg 13
-InstStore - i64 stack -24, i64 imm -6
-InstLoad - i64 reg 14, i64 stack -24
-InstICmp - i64 reg 14, i64 imm -6
-x64::SetE - i8 reg 14
+InstStore - i64 stack -24, i64 reg 12
+x64::StoreFP - f64 stack -32, f64 reg 31
+x64::StoreFP - f64 stack -40, f64 reg 30
+x64::StoreFP - f64 stack -48, f64 reg 29
+x64::MoveFP - f64 reg 31, f64 imm 4547007122018943789
+x64::StoreFP - f64 stack -56, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -64, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -64
+InstFCmp - f64 reg 31, f64 imm 4612811693154249159
+x64::SetA - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -32, i64 imm 0
-InstLoad - i64 reg 14, i64 stack -32
-InstICmp - i64 reg 14, i64 imm 0
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -40, i64 imm -1
-InstLoad - i64 reg 14, i64 stack -40
-InstICmp - i64 reg 14, i64 imm -1
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -48, i64 imm -256
-InstLoad - i64 reg 14, i64 stack -48
-InstICmp - i64 reg 14, i64 imm -256
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -56, i64 imm -65536
-InstLoad - i64 reg 14, i64 stack -56
-InstICmp - i64 reg 14, i64 imm -65536
-x64::SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -64, i64 imm 5
-InstLoad - i64 reg 14, i64 stack -64
-InstMove - i64 reg 13, i64 reg 14
-InstNot - i64 reg 13
-InstStore - i64 stack -72, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -72
-InstICmp - i64 reg 13, i64 imm -6
-x64::SetE - i8 reg 13
+x64::LoadFP - f64 reg 31, f64 stack -64
+InstFCmp - f64 reg 31, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstStore - i64 stack -80, i64 imm -1
-InstLoad - i64 reg 13, i64 stack -80
-InstMove - i64 reg 14, i64 reg 13
-InstNot - i64 reg 14
-InstStore - i64 stack -88, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -88
-InstICmp - i64 reg 14, i64 imm 0
-x64::SetE - i8 reg 14
+x64::MoveFP - f64 reg 31, f64 imm 4617315517961601024
+x64::StoreFP - f64 stack -72, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -80, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -72
+x64::LoadFP - f64 reg 30, f64 stack -80
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFSub - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -88, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -88
+InstFCmp - f64 reg 29, f64 imm 4612811693154249159
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -88
+InstFCmp - f64 reg 29, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
-InstLoad - i64 reg 14, i64 global_a
-InstMove - i64 reg 13, i64 reg 14
-InstNot - i64 reg 13
-InstStore - i64 stack -96, i64 reg 13
-InstLoad - i64 reg 13, i64 stack -96
-InstICmp - i64 reg 13, i64 imm -6
-x64::SetE - i8 reg 13
+x64::LoadFP - f64 reg 29, f64 global_float_4
+x64::LoadFP - f64 reg 30, f64 global_float_2
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFSub - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -96, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -96
+InstFCmp - f64 reg 31, f64 imm 4612811693154249159
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -96
+InstFCmp - f64 reg 31, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-InstLoad - i64 reg 13, i64 global_c
-InstMove - i64 reg 14, i64 reg 13
-InstNot - i64 reg 14
-InstStore - i64 stack -104, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -104
-InstICmp - i64 reg 14, i64 imm -8
-x64::SetE - i8 reg 14
+x64::LoadFP - f64 reg 31, f64 global_float_4
+x64::LoadFP - f64 reg 30, f64 stack -80
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFSub - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -104, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -104
+InstFCmp - f64 reg 29, f64 imm 4612811693154249159
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -104
+InstFCmp - f64 reg 29, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::LoadFP - f64 reg 29, f64 stack -72
+x64::LoadFP - f64 reg 30, f64 global_float_3
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFSub - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -112, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -112
+InstFCmp - f64 reg 31, f64 imm 4615739032912039982
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -112
+InstFCmp - f64 reg 31, f64 imm 4615739483272002719
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4617315517961601024
+x64::StoreFP - f64 stack -120, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -120
+x64::MoveFP - f64 reg 30, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+InstFSub - f64 reg 30, f64 reg 31
+x64::StoreFP - f64 stack -120, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -120
+InstFCmp - f64 reg 30, f64 imm 4612811693154249159
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 stack -120
+InstFCmp - f64 reg 30, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 30, f64 imm 4617315517961601024
+x64::StoreFP - f64 stack -128, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -136, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -128
+x64::LoadFP - f64 reg 31, f64 stack -136
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFSub - f64 reg 29, f64 reg 31
+x64::StoreFP - f64 stack -128, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4612811693154249159
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::LoadFP - f64 reg 29, f64 global_composite_fsub_a
+x64::LoadFP - f64 reg 31, f64 global_composite_fsub_b
+x64::MoveFP - f64 reg 30, f64 reg 29
+InstFSub - f64 reg 30, f64 reg 31
+x64::StoreFP - global_composite_fsub_a, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_a
+InstFCmp - f64 reg 30, f64 imm 4612811693154249159
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_a
+InstFCmp - f64 reg 30, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_b
+x64::MoveFP - f64 reg 31, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+InstFSub - f64 reg 31, f64 reg 30
+x64::StoreFP - global_composite_fsub_b, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4547007122018943789
+x64::MoveFP - f64 reg 30, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 31, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_b
+InstFCmp - f64 reg 30, f64 reg 31
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_b
+InstFCmp - f64 reg 30, f64 imm 4547007122018943789
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -144, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_fsub_a
+x64::LoadFP - f64 reg 31, f64 stack -144
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFSub - f64 reg 29, f64 reg 31
+x64::StoreFP - global_composite_fsub_a, f64 reg 29
+x64::MoveFP - f64 reg 29, f64 imm 4547007122018943789
+x64::MoveFP - f64 reg 31, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 29, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 global_composite_fsub_a
+InstFCmp - f64 reg 31, f64 reg 29
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 global_composite_fsub_a
+InstFCmp - f64 reg 31, f64 imm 4547007122018943789
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
@@ -534,12 +774,555 @@ InstJump - label7
 label7: 
 InstLoad - i64 reg 14, i64 stack -8
 InstLoad - i64 reg 13, i64 stack -16
+InstLoad - i64 reg 12, i64 stack -24
+x64::LoadFP - f64 reg 31, f64 stack -32
+x64::LoadFP - f64 reg 30, f64 stack -40
+x64::LoadFP - f64 reg 29, f64 stack -48
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal TestMixedTypeAddition: 
+label8: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 184
+InstStore - i64 stack -8, i64 reg 14
+InstStore - i64 stack -16, i64 reg 13
+InstStore - i64 stack -24, i64 reg 12
+x64::StoreFP - f64 stack -32, f64 reg 31
+x64::StoreFP - f64 stack -40, f64 reg 30
+x64::StoreFP - f64 stack -48, f64 reg 29
+x64::MoveFP - f64 reg 31, f64 imm 4547007122018943789
+x64::StoreFP - f64 stack -56, f64 reg 31
+InstLoad - i64 reg 14, i64 global_int_1
+InstS2F - f64 reg 31, i64 reg 14
+x64::LoadFP - f64 reg 30, f64 global_float_1
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFAdd - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -64, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -64
+InstFCmp - f64 reg 29, f64 imm 4620974636363844210
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -64
+InstFCmp - f64 reg 29, f64 imm 4620974748953834894
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstStore - i64 stack -72, i64 imm 5
+InstLoad - i64 reg 12, i64 stack -72
+InstS2F - f64 reg 29, i64 reg 12
+x64::LoadFP - f64 reg 30, f64 global_float_2
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -80, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -80
+InstFCmp - f64 reg 31, f64 imm 4620130155138716900
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -80
+InstFCmp - f64 reg 31, f64 imm 4620130380318698268
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -88, f64 reg 31
+InstLoad - i64 reg 14, i64 global_int_2
+InstS2F - f64 reg 31, i64 reg 14
+x64::LoadFP - f64 reg 30, f64 stack -88
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFAdd - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -96, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -96
+InstFCmp - f64 reg 29, f64 imm 4623226436177529458
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -96
+InstFCmp - f64 reg 29, f64 imm 4623226548767520142
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstS2F - f64 reg 29, i64 imm 10
+x64::LoadFP - f64 reg 30, f64 global_float_3
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -104, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -104
+InstFCmp - f64 reg 31, f64 imm 4622494601238081752
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -104
+InstFCmp - f64 reg 31, f64 imm 4622494713828072437
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstLoad - i64 reg 14, i64 global_int_3
+InstS2F - f64 reg 31, i64 reg 14
+x64::MoveFP - f64 reg 30, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4615063718147915776
+InstFAdd - f64 reg 30, f64 reg 31
+x64::StoreFP - f64 stack -112, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -112
+InstFCmp - f64 reg 30, f64 imm 4622100536270686834
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 stack -112
+InstFCmp - f64 reg 30, f64 imm 4622100648860677518
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstLoad - i64 reg 12, i64 stack -72
+InstS2F - f64 reg 30, i64 reg 12
+x64::MoveFP - f64 reg 31, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4609434218613702656
+InstFAdd - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -120, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -120
+InstFCmp - f64 reg 31, f64 imm 4619004255231874276
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -120
+InstFCmp - f64 reg 31, f64 imm 4619004480411855644
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4615063718147915776
+x64::StoreFP - f64 stack -128, f64 reg 31
+InstS2F - f64 reg 31, i64 imm 5
+x64::LoadFP - f64 reg 30, f64 stack -128
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFAdd - f64 reg 29, f64 reg 31
+x64::StoreFP - f64 stack -128, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4620974636363844210
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -128
+InstFCmp - f64 reg 29, f64 imm 4620974748953834894
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstStore - i64 stack -136, i64 imm 5
+InstLoad - i64 reg 12, i64 stack -136
+InstS2F - f64 reg 29, i64 reg 12
+x64::MoveFP - f64 reg 31, f64 reg 29
+x64::MoveFP - f64 reg 29, f64 imm 4612811918334230528
+InstFAdd - f64 reg 31, f64 reg 29
+InstF2S - i64 reg 12, f64 reg 31
+InstStore - i64 stack -136, i64 reg 12
+InstLoad - i64 reg 12, i64 stack -136
+InstICmp - i64 reg 12, i64 imm 7
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstStore - i64 stack -144, i64 imm 5
+InstLoad - i64 reg 12, i64 stack -144
+InstS2F - f64 reg 31, i64 reg 12
+x64::LoadFP - f64 reg 29, f64 global_composite_mix_add_float
+x64::MoveFP - f64 reg 30, f64 reg 29
+InstFAdd - f64 reg 30, f64 reg 31
+x64::StoreFP - global_composite_mix_add_float, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_add_float
+InstFCmp - f64 reg 30, f64 imm 4620974636363844210
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_add_float
+InstFCmp - f64 reg 30, f64 imm 4620974748953834894
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -152, f64 reg 30
+InstLoad - i64 reg 14, i64 global_composite_mix_add_int
+InstS2F - f64 reg 30, i64 reg 14
+x64::LoadFP - f64 reg 31, f64 stack -152
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFAdd - f64 reg 29, f64 reg 31
+InstF2S - i64 reg 14, f64 reg 29
+InstStore - global_composite_mix_add_int, i64 reg 14
+InstLoad - i64 reg 14, i64 global_composite_mix_add_int
+InstICmp - i64 reg 14, i64 imm 7
+x64::SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstS2F - f64 reg 29, i64 imm 5
+x64::LoadFP - f64 reg 31, f64 global_composite_mix_add_float
+x64::MoveFP - f64 reg 30, f64 reg 31
+InstFAdd - f64 reg 30, f64 reg 29
+x64::StoreFP - global_composite_mix_add_float, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_add_float
+InstFCmp - f64 reg 30, f64 imm 4623789386130950770
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_add_float
+InstFCmp - f64 reg 30, f64 imm 4623789498720941454
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstLoad - i64 reg 12, i64 global_composite_mix_add_int
+InstS2F - f64 reg 30, i64 reg 12
+x64::MoveFP - f64 reg 29, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+InstFAdd - f64 reg 29, f64 reg 30
+InstF2S - i64 reg 12, f64 reg 29
+InstStore - global_composite_mix_add_int, i64 reg 12
+InstLoad - i64 reg 12, i64 global_composite_mix_add_int
+InstICmp - i64 reg 12, i64 imm 9
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstJump - label9
+
+label9: 
+InstLoad - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 13, i64 stack -16
+InstLoad - i64 reg 12, i64 stack -24
+x64::LoadFP - f64 reg 31, f64 stack -32
+x64::LoadFP - f64 reg 30, f64 stack -40
+x64::LoadFP - f64 reg 29, f64 stack -48
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
+
+internal TestMixedTypeSubtraction: 
+label10: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 184
+InstStore - i64 stack -8, i64 reg 14
+InstStore - i64 stack -16, i64 reg 13
+InstStore - i64 stack -24, i64 reg 12
+x64::StoreFP - f64 stack -32, f64 reg 31
+x64::StoreFP - f64 stack -40, f64 reg 30
+x64::StoreFP - f64 stack -48, f64 reg 29
+x64::MoveFP - f64 reg 31, f64 imm 4547007122018943789
+x64::StoreFP - f64 stack -56, f64 reg 31
+InstLoad - i64 reg 14, i64 global_int_3
+InstS2F - f64 reg 31, i64 reg 14
+x64::LoadFP - f64 reg 30, f64 global_float_4
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFSub - f64 reg 29, f64 reg 31
+x64::StoreFP - f64 stack -64, f64 reg 29
+x64::MoveFP - f64 reg 29, f64 imm 4611686243607369273
+x64::MoveFP - f64 reg 31, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 29, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -64
+InstFCmp - f64 reg 31, f64 reg 29
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::MoveFP - f64 reg 31, f64 imm 4611685568067425167
+x64::MoveFP - f64 reg 29, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 31, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -64
+InstFCmp - f64 reg 29, f64 reg 31
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+x64::MoveFP - f64 reg 29, f64 imm 4617315517961601024
+x64::StoreFP - f64 stack -72, f64 reg 29
+InstLoad - i64 reg 12, i64 global_int_2
+InstS2F - f64 reg 29, i64 reg 12
+x64::LoadFP - f64 reg 31, f64 stack -72
+x64::MoveFP - f64 reg 30, f64 reg 31
+InstFSub - f64 reg 30, f64 reg 29
+x64::StoreFP - f64 stack -80, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4617315630551591708
+x64::MoveFP - f64 reg 29, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 30, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -80
+InstFCmp - f64 reg 29, f64 reg 30
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::MoveFP - f64 reg 29, f64 imm 4617315405371610340
+x64::MoveFP - f64 reg 30, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 29, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -80
+InstFCmp - f64 reg 30, f64 reg 29
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -88, i64 imm 3
+InstLoad - i64 reg 14, i64 stack -88
+InstS2F - f64 reg 30, i64 reg 14
+x64::LoadFP - f64 reg 29, f64 global_float_2
+x64::MoveFP - f64 reg 31, f64 reg 29
+InstFSub - f64 reg 31, f64 reg 30
+x64::StoreFP - f64 stack -96, f64 reg 31
+x64::MoveFP - f64 reg 31, f64 imm 4602679719892572386
+x64::MoveFP - f64 reg 30, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 31, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -96
+InstFCmp - f64 reg 30, f64 reg 31
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::MoveFP - f64 reg 30, f64 imm 4602677017732795964
+x64::MoveFP - f64 reg 31, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 30, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -96
+InstFCmp - f64 reg 31, f64 reg 30
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstLoad - i64 reg 12, i64 global_int_1
+InstS2F - f64 reg 31, i64 reg 12
+x64::MoveFP - f64 reg 30, f64 imm 4620130267728707584
+InstFSub - f64 reg 30, f64 reg 31
+x64::StoreFP - f64 stack -104, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -104
+InstFCmp - f64 reg 30, f64 imm 4612811693154249159
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 stack -104
+InstFCmp - f64 reg 30, f64 imm 4612812143514211897
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstS2F - f64 reg 30, i64 imm 2
+x64::LoadFP - f64 reg 31, f64 global_float_1
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFSub - f64 reg 29, f64 reg 30
+x64::StoreFP - f64 stack -112, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 stack -112
+InstFCmp - f64 reg 29, f64 imm 4609433768253739919
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 stack -112
+InstFCmp - f64 reg 29, f64 imm 4609434668973665393
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstS2F - f64 reg 29, i64 imm 2
+x64::LoadFP - f64 reg 30, f64 stack -72
+x64::MoveFP - f64 reg 31, f64 reg 30
+InstFSub - f64 reg 31, f64 reg 29
+x64::StoreFP - f64 stack -120, f64 reg 31
+x64::LoadFP - f64 reg 31, f64 stack -120
+InstFCmp - f64 reg 31, f64 imm 4613937593061091783
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 31, f64 stack -120
+InstFCmp - f64 reg 31, f64 imm 4613938043421054521
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 31, f64 imm 4617315517961601024
+x64::StoreFP - f64 stack -128, f64 reg 31
+InstS2F - f64 reg 31, i64 imm 3
+x64::LoadFP - f64 reg 29, f64 stack -128
+x64::MoveFP - f64 reg 30, f64 reg 29
+InstFSub - f64 reg 30, f64 reg 31
+x64::StoreFP - f64 stack -128, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 stack -128
+InstFCmp - f64 reg 30, f64 imm 4611685568067425167
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 stack -128
+InstFCmp - f64 reg 30, f64 imm 4611686243607369273
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstStore - i64 stack -136, i64 imm 15
+InstLoad - i64 reg 12, i64 stack -136
+InstS2F - f64 reg 30, i64 reg 12
+x64::MoveFP - f64 reg 31, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+InstFSub - f64 reg 31, f64 reg 30
+InstF2S - i64 reg 12, f64 reg 31
+InstStore - i64 stack -136, i64 reg 12
+InstLoad - i64 reg 12, i64 stack -136
+InstICmp - i64 reg 12, i64 imm 12
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstStore - i64 stack -144, i64 imm 3
+InstLoad - i64 reg 12, i64 stack -144
+InstS2F - f64 reg 31, i64 reg 12
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_sub_float
+x64::MoveFP - f64 reg 29, f64 reg 30
+InstFSub - f64 reg 29, f64 reg 31
+x64::StoreFP - global_composite_mix_sub_float, f64 reg 29
+x64::LoadFP - f64 reg 29, f64 global_composite_mix_sub_float
+InstFCmp - f64 reg 29, f64 imm 4611685568067425167
+x64::SetA - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+x64::LoadFP - f64 reg 29, f64 global_composite_mix_sub_float
+InstFCmp - f64 reg 29, f64 imm 4611686243607369273
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 14, i8 reg 12
+InstAnd - i8 reg 14, i8 reg 13
+InstICmp - i8 reg 14, i64 imm 0
+x64::SetNE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+x64::MoveFP - f64 reg 29, f64 imm 4612811918334230528
+x64::StoreFP - f64 stack -152, f64 reg 29
+InstLoad - i64 reg 14, i64 global_composite_mix_sub_int
+InstS2F - f64 reg 29, i64 reg 14
+x64::LoadFP - f64 reg 31, f64 stack -152
+x64::MoveFP - f64 reg 30, f64 reg 29
+InstFSub - f64 reg 30, f64 reg 31
+InstF2S - i64 reg 14, f64 reg 30
+InstStore - global_composite_mix_sub_int, i64 reg 14
+InstLoad - i64 reg 14, i64 global_composite_mix_sub_int
+InstICmp - i64 reg 14, i64 imm 12
+x64::SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstS2F - f64 reg 30, i64 imm 2
+x64::LoadFP - f64 reg 31, f64 global_composite_mix_sub_float
+x64::MoveFP - f64 reg 29, f64 reg 31
+InstFSub - f64 reg 29, f64 reg 30
+x64::StoreFP - global_composite_mix_sub_float, f64 reg 29
+x64::MoveFP - f64 reg 29, f64 imm 4547007122018943789
+x64::MoveFP - f64 reg 30, f64 imm -9223372036854775808
+x64::XorFP - f64 reg 29, f64 reg 30
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_sub_float
+InstFCmp - f64 reg 30, f64 reg 29
+x64::SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+x64::LoadFP - f64 reg 30, f64 global_composite_mix_sub_float
+InstFCmp - f64 reg 30, f64 imm 4547007122018943789
+x64::SetB - i8 reg 13
+InstAnd - i8 reg 13, i8 imm 1
+InstMove - i8 reg 12, i8 reg 14
+InstAnd - i8 reg 12, i8 reg 13
+InstICmp - i8 reg 12, i64 imm 0
+x64::SetNE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstLoad - i64 reg 12, i64 global_composite_mix_sub_int
+InstS2F - f64 reg 30, i64 reg 12
+x64::MoveFP - f64 reg 29, f64 reg 30
+x64::MoveFP - f64 reg 30, f64 imm 4612811918334230528
+InstFSub - f64 reg 29, f64 reg 30
+InstF2S - i64 reg 12, f64 reg 29
+InstStore - global_composite_mix_sub_int, i64 reg 12
+InstLoad - i64 reg 12, i64 global_composite_mix_sub_int
+InstICmp - i64 reg 12, i64 imm 9
+x64::SetE - i8 reg 12
+InstAnd - i8 reg 12, i8 imm 1
+InstMove - i8 reg 3, i8 reg 12
+InstCall - 
+InstJump - label11
+
+label11: 
+InstLoad - i64 reg 14, i64 stack -8
+InstLoad - i64 reg 13, i64 stack -16
+InstLoad - i64 reg 12, i64 stack -24
+x64::LoadFP - f64 reg 31, f64 stack -32
+x64::LoadFP - f64 reg 30, f64 stack -40
+x64::LoadFP - f64 reg 29, f64 stack -48
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
 
 external main: 
-label8: 
+label12: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
 InstSub - i64 reg 1, i64 imm 48
@@ -548,12 +1331,14 @@ InstCall -
 InstCall - 
 InstCall - 
 InstCall - 
+InstCall - 
+InstCall - 
 InstStore - i64 stack -16, i64 imm 0
-InstJump - label10
+InstJump - label14
 
-label9: 
+label13: 
 
-label10: 
+label14: 
 InstLoad - i64 reg 14, i64 stack -16
 InstMove - i64 reg 0, i64 reg 14
 InstLoad - i64 reg 14, i64 stack -8
