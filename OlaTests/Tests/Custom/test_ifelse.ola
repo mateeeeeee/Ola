@@ -80,6 +80,67 @@ void TestIfElseLogicalOperators()
         Assert(false);
     }
 }
+void TestShortCircuitEvaluation()
+{
+    int a = 1, b = 0;
+
+    // Testing short-circuiting with '&&'
+    if (a < 0 && (b / a) == 0) // Should not divide by zero due to short-circuit
+    {
+        Assert(false); // This block should never be reached due to short-circuiting
+    }
+    else
+    {
+        Assert(true); // This should be executed because 'a < 0' is false
+    }
+
+    // Testing short-circuiting with '||'
+    if (a > 0 || (b / a) == 0) // Should not divide by zero due to short-circuit
+    {
+        Assert(true); // Here, 'a > 0' is true, so the second condition isn't evaluated
+    }
+    else
+    {
+        Assert(false); // This should not be executed
+    }
+}
+void TestIfElseFloatComparisons()
+{
+    float a = 0.1 + 0.2; 
+    float b = 0.3;
+
+    if (a - b < 0.0001 && a - b > -0.0001)
+    {
+        Assert(true); // Floating-point comparison with tolerance
+    }
+    else
+    {
+        Assert(false);
+    }
+}
+
+void TestIfElseWithBooleanLiterals()
+{
+    bool flag = true;
+    if (flag) 
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+
+    flag = false;
+    if (!flag)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+}
 
 public int main()
 {
@@ -88,6 +149,7 @@ public int main()
     TestNestedIfElse();
     TestComplexNestedIfElse();
     TestIfElseLogicalOperators();
-
+    TestIfElseWithBooleanLiterals();
+    TestShortCircuitEvaluation();
     return 0;
 }

@@ -1,134 +1,155 @@
 import std.assert;
 
-void TestForLoopInt()
+void TestIfElseBasic()
 {
-    int sum = 0;
-    for (int i = 1; i <= 5; i++)
-    {
-        sum += i;
-    }
-    Assert(sum == 15);
+    int x = 10;
+    int y = 20;
+
+    if (x < y) Assert(true);
+    else Assert(false);
 }
 
-void TestForLoopManualIncrement()
+void TestIfElseMultipleConditions()
 {
-    int sum = 0;
-    int i = 1;
-    for (; i <= 5;)
+    int a = 5;
+    int b = 5;
+
+    if (a > b)
     {
-        sum += i;
-        i += 2; // Manual increment by 2
+        Assert(false);
     }
-    Assert(sum == 9);
+    else if (a < b)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
 }
 
-void TestForLoopMultipleExpressions()
+void TestNestedIfElse()
 {
-    int sum = 0;
-    for (int i = 1, j = 5; i <= 3; i++, j--)
+    int num = 42;
+
+    if (num > 21)
     {
-        sum += i + j;
+        if (num > 0)  Assert(true);
+        else Assert(false);
     }
-    Assert(sum == 18);
+    else Assert(false);
+
 }
 
-void TestNestedForLoops()
+void TestComplexNestedIfElse()
 {
-    int outerCounter = 0;
-    int innerCounter = 0;
-    int iterations = 0;
-    for (; outerCounter < 3; outerCounter++)
+    int i = 1, j = 5, k = 5;
+
+    if (i > 0)
     {
-        for (; innerCounter < 2; innerCounter++)
+        if (j < 10)
         {
-            ++iterations;
+            if (k == 5) Assert(true); // Condition met: i > 0, j < 10, k == 5
+            else  Assert(false); 
+        }
+        else
+        {
+            Assert(false);
         }
     }
-
-    Assert(outerCounter == 3);
-    Assert(innerCounter == 2);
-}
-void TestNestedForLoopsReset()
-{
-    int outerCounter = 0;
-    int totalIterations = 0;
-
-    for (; outerCounter < 3; outerCounter++)
+    else
     {
-        for (int j = 0; j < 2; j++)
+        if (j == 0)  Assert(false); 
+        else
         {
-            totalIterations++;
+            if (k > 0) Assert(false); 
+            else  Assert(false); 
         }
     }
-    Assert(outerCounter == 3);
-    //Assert(totalIterations == 6); todo: fails with optimizations
 }
 
-void TestForLoopWithBreak()
+void TestIfElseLogicalOperators()
 {
-    int sum = 0;
-
-    for (int i = 1; i <= 5; i++)
+    int value = 15;
+    if (value > 10) // && value < 20)
     {
-        sum += i;
-        if (i == 3) break;
+        Assert(true);
     }
-
-    Assert(sum == 6);
-}
-
-void TestForLoopWithContinue()
-{
-    int sum = 0;
-
-    for (int i = 1; i <= 5; i++)
+    else
     {
-        if (i == 3) continue;
-        sum += i;
+        Assert(false);
+    }
+}
+void TestShortCircuitEvaluation()
+{
+    int a = 1, b = 0;
+
+    // Testing short-circuiting with '&&'
+    if (a < 0 && (b / a) == 0) // Should not divide by zero due to short-circuit
+    {
+        Assert(false); // This block should never be reached due to short-circuiting
+    }
+    else
+    {
+        Assert(true); // This should be executed because 'a < 0' is false
     }
 
-    Assert(sum == 12);
-}
-void TestForLoopEmptyBody()
-{
-    int count = 0;
-    int i = 0; 
-    for (;i < 5; i++) 
+    // Testing short-circuiting with '||'
+    if (a > 0 || (b / a) == 0) // Should not divide by zero due to short-circuit
     {
-        // Empty body, just to increment i
+        Assert(true); // Here, 'a > 0' is true, so the second condition isn't evaluated
     }
-    Assert(count == 0); 
-    Assert(i == 5);     
-}
-void TestForLoopNeverExecutes()
-{
-    int sum = 0;
-    for (int i = 10; i < 5; i++) {
-        sum += i; 
-    }
-    Assert(sum == 0);
-}
-void TestForLoopFloatCondition()
-{
-    float sum = 0.0;
-    for (float i = 0.1; i < 0.95; i += 0.1)
+    else
     {
-        sum += i;
+        Assert(false); // This should not be executed
     }
-    Assert(sum > 4.49 && sum < 4.51);
+}
+void TestIfElseFloatComparisons()
+{
+    float a = 0.1 + 0.2; 
+    float b = 0.3;
+
+    if (a - b < 0.0001 && a - b > -0.0001)
+    {
+        Assert(true); // Floating-point comparison with tolerance
+    }
+    else
+    {
+        Assert(false);
+    }
+}
+
+void TestIfElseWithBooleanLiterals()
+{
+    bool flag = true;
+    if (flag) 
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+
+    flag = false;
+    if (!flag)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
 }
 
 public int main()
 {
-    TestForLoopInt();
-    TestForLoopManualIncrement();
-    TestForLoopMultipleExpressions();
-    TestNestedForLoops();
-    TestNestedForLoopsReset();
-    TestForLoopWithBreak();
-    TestForLoopWithContinue();
-    TestForLoopEmptyBody();
-    TestForLoopNeverExecutes();
-    TestForLoopFloatCondition();
+    TestIfElseBasic();
+    TestIfElseMultipleConditions();
+    TestNestedIfElse();
+    TestComplexNestedIfElse();
+    TestIfElseLogicalOperators();
+    TestIfElseWithBooleanLiterals();
+    TestShortCircuitEvaluation();
     return 0;
 }
