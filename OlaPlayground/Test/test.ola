@@ -1,75 +1,229 @@
 import std.assert;
 
-int TestIfElse()
+// Global variables
+int GlobalIntX = 20;
+int GlobalIntY = 4;
+float GlobalFloatX = 7.5;
+float GlobalFloatY = 2.5;
+
+void TestMultiplication()
 {
-	int a = 6;
-	if(a > 5) return 10;
-	else return 0;
+    // 1. Local variables
+    int intA = 5;
+    int intB = 3;
+    float floatC = 2.5;
+    float floatD = 1.2;
+
+    int resultIntMul = intA * intB;
+    Assert(resultIntMul == 15);
+
+    float resultFloatMul = floatC * floatD;
+    Assert(resultFloatMul == 3.0);
+
+    // 2. Local and global variables
+    int resultIntMulLocalGlobal = intA * GlobalIntY;
+    Assert(resultIntMulLocalGlobal == 20);
+
+    float resultFloatMulLocalGlobal = floatC * GlobalFloatY;
+    Assert(resultFloatMulLocalGlobal == 6.25);
+
+    // 3. Local variables and immediate values
+    int resultIntMulImmediate = intA * 2;
+    Assert(resultIntMulImmediate == 10);
+
+    float resultFloatMulImmediate = floatC * 2.0;
+    Assert(resultFloatMulImmediate == 5.0);
+
+    // 4. Global variables
+    int resultIntMulGlobal = GlobalIntX * GlobalIntY;
+    Assert(resultIntMulGlobal == 80);
+
+    float resultFloatMulGlobal = GlobalFloatX * GlobalFloatY;
+    Assert(resultFloatMulGlobal == 18.75);
+
+    // 5. Global variables and immediate values
+    int resultIntMulGlobalImmediate = GlobalIntX * 2;
+    Assert(resultIntMulGlobalImmediate == 40);
+
+    float resultFloatMulGlobalImmediate = GlobalFloatX * 2.0;
+    Assert(resultFloatMulGlobalImmediate == 15.0);
+
+    // 6. Immediate values
+    Assert(2 * 3 == 6);
+    Assert(2.0 * 3.0 == 6.0);
+
+    // Compound multiplication
+    intA *= 2;
+    Assert(intA == 10);
+
+    floatC *= 1.5;
+    Assert(floatC == 3.75);
+
+    // Composite multiplication with local-local
+    int local_int = 2;
+    local_int *= 3;
+    Assert(local_int == 6);
+
+    // Composite multiplication with global-global
+    GlobalIntX *= GlobalIntY;
+    Assert(GlobalIntX == 80); // Note: GlobalIntX is now changed
+
+    // Composite multiplication with global-local
+    int local_int_2 = 2;
+    GlobalIntY *= local_int_2;
+    Assert(GlobalIntY == 8); // Note: GlobalIntY is now changed
+
+    // Reset global variables for subsequent tests if needed
+    GlobalIntX = 20;
+    GlobalIntY = 4;
 }
 
-int TestWhile()
+void TestDivision()
 {
-	int a = 0;
-	while(a < 10)
-	{
-		if (a == 5) return a * 2;
-		++a;
-	}
-	return 0;
-}
-int TestMultipleReturns()
-{
-    int x = 5;
-    if (x < 0) return -1;
-    else if (x == 0) return 0;
-    else if (x > 0) return 1;
-    return -999; // Should never reach this point, but included for completeness
-}
-int TestEarlyReturnInLoop()
-{
-    for (int i = 0; i < 10; i++)
-    {
-        if (i == 5) return i;
-    }
-    return -1; // Should never reach here if the return in the loop works correctly
-}
-int TestNestedReturn()
-{
-    for (int i = 0; i < 3; i++)
-    {
-        if (i == 1)
-        {
-            for (int j = 0; j < 2; j++)
-            {
-                if (j == 1) return i * j; // Should return 1 * 1 = 1
-            }
-        }
-    }
-    return -1; // Should not reach here if nested return works correctly
-}
-void TestVoidWithEarlyReturn()
-{
-    int sum = 0;
-    for (int i = 1; i <= 10; i++)
-    {
-        sum += i;
-        if (sum > 30) return;
-    }
-    Assert(false); // This should not be reached
+    // 1. Local variables
+    int intA = 15;
+    int intB = 3;
+    float floatC = 5.0;
+    float floatD = 2.0;
+
+    // Division
+    int resultIntDiv = intA / intB;
+    Assert(resultIntDiv == 5);
+
+    float resultFloatDiv = floatC / floatD;
+    Assert(resultFloatDiv == 2.5);
+
+    // 2. Local and global variables
+    int resultIntDivLocalGlobal = intA / GlobalIntY;
+    Assert(resultIntDivLocalGlobal == 3);
+
+    float resultFloatDivLocalGlobal = floatC / GlobalFloatY;
+    Assert(resultFloatDivLocalGlobal == 2.0);
+
+    // 3. Local variables and immediate values
+    int resultIntDivImmediate = intA / 3;
+    Assert(resultIntDivImmediate == 5);
+
+    float resultFloatDivImmediate = floatC / 2.0;
+    Assert(resultFloatDivImmediate == 2.5);
+
+    // 4. Global variables
+    int resultIntDivGlobal = GlobalIntX / GlobalIntY;
+    Assert(resultIntDivGlobal == 5);
+
+    float resultFloatDivGlobal = GlobalFloatX / GlobalFloatY;
+    Assert(resultFloatDivGlobal == 3.0);
+
+    // 5. Global variables and immediate values
+    int resultIntDivGlobalImmediate = GlobalIntX / 5;
+    Assert(resultIntDivGlobalImmediate == 4);
+
+    float resultFloatDivGlobalImmediate = GlobalFloatX / 2.5;
+    Assert(resultFloatDivGlobalImmediate == 3.0);
+
+    // 6. Immediate values
+    Assert(10 / 2 == 5);
+    Assert(10.0 / 2.0 == 5.0);
+
+    // Compound division
+    intA /= 2;
+    Assert(intA == 7);
+
+    floatC /= 2.0;
+    Assert(floatC == 2.5);
+
+     // Composite division with local-local
+    float local_float = 10.0;
+    local_float /= 2.0;
+    Assert(local_float == 5.0);
+
+    // Composite division with global-global
+    GlobalFloatX /= GlobalFloatY;
+    Assert(GlobalFloatX == 3.0); // Note: GlobalFloatX is now changed
+
+    // Composite division with global-local
+    float local_float_2 = 2.0;
+    GlobalFloatY /= local_float_2;
+    Assert(GlobalFloatY == 1.25); // Note: GlobalFloatY is now changed
+
+    // Reset global variables for subsequent tests if needed
+    GlobalFloatX = 7.5;
+    GlobalFloatY = 2.5;
 }
 
-void TestVoidWithEarlyReturnCheck()
+void TestModulo()
 {
-    TestVoidWithEarlyReturn(); // Should not assert if it returns early
+    // 1. Local variables
+    int intA = 17;
+    int intB = 4;
+
+    // Modulo
+    int resultModulo = intA % intB;
+    Assert(resultModulo == 1);
+
+    // 2. Local and global variables
+    int resultModuloLocalGlobal = intA % GlobalIntY;
+    Assert(resultModuloLocalGlobal == 1);
+
+    // 3. Local variables and immediate values
+    int resultModuloImmediate = intA % 3;
+    Assert(resultModuloImmediate == 2);
+
+    // 4. Global variables
+    int resultModuloGlobal = GlobalIntX % GlobalIntY;
+    Assert(resultModuloGlobal == 0);
+
+    // 5. Global variables and immediate values
+    int resultModuloGlobalImmediate = GlobalIntX % 3;
+    Assert(resultModuloGlobalImmediate == 2);
+
+    // 6. Immediate values
+    Assert(10 % 3 == 1);
+
+    // Compound modulo
+    intA %= 3;
+    Assert(intA == 2);
+}
+void TestMixedTypeMultiplicationAndDivision()
+{
+    const float tolerance = 0.0001; // For floating-point comparisons
+
+    // Multiplication: int * float
+    int local_int = 2;
+    float result_int_float = local_int * GlobalFloatX;
+    Assert(result_int_float > 14.9999 && result_int_float < 15.0001);
+
+    // Multiplication: float * int
+    float local_float = 2.5;
+    float result_float_int = local_float * GlobalIntY;
+    Assert(result_float_int > 9.9999 && result_float_int < 10.0001);
+
+    // Division: int / float
+    int local_int_2 = 5;
+    float result_int_div_float = local_int_2 / GlobalFloatY;
+    Assert(result_int_div_float > 1.9999 && result_int_div_float < 2.0001);
+
+    // Division: float / int
+    float local_float_2 = 10.0;
+    float result_float_div_int = local_float_2 / GlobalIntY;
+    Assert(result_float_div_int > 2.4999 && result_float_div_int < 2.5001);
+
+    // Composite multiplication: int *= float
+    int local_int_3 = 2;
+    local_int_3 *= GlobalFloatX;
+    Assert(local_int_3 == 15); // Assuming truncation or rounding down for int *= float
+
+    // Composite division: float /= int
+    float local_float_3 = 15.0;
+    local_float_3 /= local_int;
+    Assert(local_float_3 > 7.4999 && local_float_3 < 7.5001);
 }
 
 public int main()
 {
-	Assert(TestIfElse() == 10);
-	Assert(TestWhile() == 10);
-	Assert(TestMultipleReturns() == 1);
-	Assert(TestEarlyReturnInLoop() == 5);
-    Assert(TestNestedReturn() == 1);
-    TestVoidWithEarlyReturn();
-	return 0;
+    TestMultiplication();
+    TestDivision();
+    TestModulo();
+    TestMixedTypeMultiplicationAndDivision();
+    return 0;
 }

@@ -58,6 +58,24 @@ void TestMultiplication()
 
     floatC *= 1.5;
     Assert(floatC == 3.75);
+
+    // Composite multiplication with local-local
+    int local_int = 2;
+    local_int *= 3;
+    Assert(local_int == 6);
+
+    // Composite multiplication with global-global
+    GlobalIntX *= GlobalIntY;
+    Assert(GlobalIntX == 80); // Note: GlobalIntX is now changed
+
+    // Composite multiplication with global-local
+    int local_int_2 = 2;
+    GlobalIntY *= local_int_2;
+    Assert(GlobalIntY == 8); // Note: GlobalIntY is now changed
+
+    // Reset global variables for subsequent tests if needed
+    GlobalIntX = 20;
+    GlobalIntY = 4;
 }
 
 void TestDivision()
@@ -113,6 +131,24 @@ void TestDivision()
 
     floatC /= 2.0;
     Assert(floatC == 2.5);
+
+     // Composite division with local-local
+    float local_float = 10.0;
+    local_float /= 2.0;
+    Assert(local_float == 5.0);
+
+    // Composite division with global-global
+    GlobalFloatX /= GlobalFloatY;
+    Assert(GlobalFloatX == 3.0); // Note: GlobalFloatX is now changed
+
+    // Composite division with global-local
+    float local_float_2 = 2.0;
+    GlobalFloatY /= local_float_2;
+    Assert(GlobalFloatY == 1.25); // Note: GlobalFloatY is now changed
+
+    // Reset global variables for subsequent tests if needed
+    GlobalFloatX = 7.5;
+    GlobalFloatY = 2.5;
 }
 
 void TestModulo()
@@ -148,12 +184,46 @@ void TestModulo()
     intA %= 3;
     Assert(intA == 2);
 }
+void TestMixedTypeMultiplicationAndDivision()
+{
+    const float tolerance = 0.0001; // For floating-point comparisons
+
+    // Multiplication: int * float
+    int local_int = 2;
+    float result_int_float = local_int * GlobalFloatX;
+    Assert(result_int_float > 14.9999 && result_int_float < 15.0001);
+
+    // Multiplication: float * int
+    float local_float = 2.5;
+    float result_float_int = local_float * GlobalIntY;
+    Assert(result_float_int > 9.9999 && result_float_int < 10.0001);
+
+    // Division: int / float
+    int local_int_2 = 5;
+    float result_int_div_float = local_int_2 / GlobalFloatY;
+    Assert(result_int_div_float > 1.9999 && result_int_div_float < 2.0001);
+
+    // Division: float / int
+    float local_float_2 = 10.0;
+    float result_float_div_int = local_float_2 / GlobalIntY;
+    Assert(result_float_div_int > 2.4999 && result_float_div_int < 2.5001);
+
+    // Composite multiplication: int *= float
+    int local_int_3 = 2;
+    local_int_3 *= GlobalFloatX;
+    Assert(local_int_3 == 15); // Assuming truncation or rounding down for int *= float
+
+    // Composite division: float /= int
+    float local_float_3 = 15.0;
+    local_float_3 /= local_int;
+    Assert(local_float_3 > 7.4999 && local_float_3 < 7.5001);
+}
 
 public int main()
 {
     TestMultiplication();
     TestDivision();
     TestModulo();
-
+    TestMixedTypeMultiplicationAndDivision();
     return 0;
 }
