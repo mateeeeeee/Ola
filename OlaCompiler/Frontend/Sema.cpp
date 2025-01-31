@@ -210,9 +210,9 @@ namespace ola
 			}
 			sema_ctx.return_stmt_encountered = false;
 		}
-		else
+		else if(!member_function_decl->IsPure())
 		{
-			diagnostics.Report(loc, method_needs_definition);
+			diagnostics.Report(loc, non_pure_method_needs_definition);
 			return nullptr;
 		}
 

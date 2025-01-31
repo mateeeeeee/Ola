@@ -1,8 +1,26 @@
 
+import std.assert;
 
-int add(int a, int b);
+// Globals for addition tests
+int global_int_1 = 5;
+int global_int_2 = 10;
+int global_int_3 = 7;
+int global_int_4 = 20;
+
+// Globals for subtraction tests
+int global_sub_1 = 15;
+int global_sub_2 = 7;
+int global_sub_3 = 3;
+int global_sub_4 = 30;
+
+// Globals for float tests
+float global_float_1 = 3.5;
+float global_float_2 = 2.5;
+float global_float_3 = 1.2;
+float global_float_4 = 5.0;
+
 
 public int main()
 {
-    return add(1,2);
+    return 0;
 }

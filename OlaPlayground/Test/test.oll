@@ -6,174 +6,221 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestForLoopInt void() {
+define internal @global_int_1 ptr 5
+
+
+define internal @global_int_2 ptr 10
+
+
+define internal @global_int_3 ptr 7
+
+
+define internal @global_int_4 ptr 20
+
+
+define internal @global_sub_1 ptr 15
+
+
+define internal @global_sub_2 ptr 7
+
+
+define internal @global_sub_3 ptr 3
+
+
+define internal @global_sub_4 ptr 30
+
+
+define internal @global_float_1 ptr 3.5
+
+
+define internal @global_float_2 ptr 2.5
+
+
+define internal @global_float_3 ptr 1.2
+
+
+define internal @global_float_4 ptr 5
+
+
+define internal @TestMixedTypeAddition void() {
 entry:
-%0 = alloca ptr
-br label for.cond
-for.body:
-%1 = add i64 %2, %3
-br label for.iter
-for.cond:
-%3 = phi i64 [ 1, entry ], [ %4, for.iter ]
-%2 = phi i64 [ 0, entry ], [ %1, for.iter ]
-%5 = icmp sle i64 %3, 5
-br i8 %5, label for.body, label for.end
-for.iter:
-store i64 %3, ptr %0
-%4 = add i64 %3, 1
-br label for.cond
-for.end:
-%6 = icmp eq i64 %2, 15
-call i8 %6, @Assert
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = load i64, ptr @global_int_1
+%2 = s2f i64 %1
+%3 = load f64, ptr @global_float_1
+%4 = fadd f64 %2, %3
+%5 = alloca f64
+store f64 %4, ptr %5
+%6 = load f64, ptr %5
+%7 = fcmp ogt f64 %6, 8.4999
+%8 = load f64, ptr %5
+%9 = fcmp olt f64 %8, 8.5001
+%10 = and i8 %7, %9
+%11 = icmp ne i8 %10, 0
+call i8 %11, @Assert
+%12 = alloca i64
+store 5, ptr %12
+%13 = load i64, ptr %12
+%14 = s2f i64 %13
+%15 = load f64, ptr @global_float_2
+%16 = fadd f64 %14, %15
+%17 = alloca f64
+store f64 %16, ptr %17
+%18 = load f64, ptr %17
+%19 = fcmp ogt f64 %18, 7.4999
+%20 = load f64, ptr %17
+%21 = fcmp olt f64 %20, 7.5001
+%22 = and i8 %19, %21
+%23 = icmp ne i8 %22, 0
+call i8 %23, @Assert
+%24 = alloca f64
+store 2.5, ptr %24
+%25 = load i64, ptr @global_int_2
+%26 = s2f i64 %25
+%27 = load f64, ptr %24
+%28 = fadd f64 %26, %27
+%29 = alloca f64
+store f64 %28, ptr %29
+%30 = load f64, ptr %29
+%31 = fcmp ogt f64 %30, 12.4999
+%32 = load f64, ptr %29
+%33 = fcmp olt f64 %32, 12.5001
+%34 = and i8 %31, %33
+%35 = icmp ne i8 %34, 0
+call i8 %35, @Assert
+%36 = s2f i64 10
+%37 = load f64, ptr @global_float_3
+%38 = fadd f64 %36, %37
+%39 = alloca f64
+store f64 %38, ptr %39
+%40 = load f64, ptr %39
+%41 = fcmp ogt f64 %40, 11.1999
+%42 = load f64, ptr %39
+%43 = fcmp olt f64 %42, 11.2001
+%44 = and i8 %41, %43
+%45 = icmp ne i8 %44, 0
+call i8 %45, @Assert
+%46 = load i64, ptr @global_int_3
+%47 = s2f i64 %46
+%48 = fadd f64 %47, 3.5
+%49 = alloca f64
+store f64 %48, ptr %49
+%50 = load f64, ptr %49
+%51 = fcmp ogt f64 %50, 10.4999
+%52 = load f64, ptr %49
+%53 = fcmp olt f64 %52, 10.5001
+%54 = and i8 %51, %53
+%55 = icmp ne i8 %54, 0
+call i8 %55, @Assert
+%56 = load i64, ptr %12
+%57 = s2f i64 %56
+%58 = fadd f64 %57, 1.5
+%59 = alloca f64
+store f64 %58, ptr %59
+%60 = load f64, ptr %59
+%61 = fcmp ogt f64 %60, 6.4999
+%62 = load f64, ptr %59
+%63 = fcmp olt f64 %62, 6.5001
+%64 = and i8 %61, %63
+%65 = icmp ne i8 %64, 0
+call i8 %65, @Assert
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestForLoopBoolCondition void() {
+define internal @TestMixedTypeSubtraction void() {
 entry:
-%0 = alloca ptr
-br label for.cond
-for.body:
-store i64 %1, ptr %0
-%2 = add i64 %1, 1
-br label for.iter
-for.cond:
-%1 = phi i64 [ 0, entry ], [ %2, for.iter ]
-%3 = icmp slt i64 %1, 3
-br i8 %3, label for.body, label for.end
-for.iter:
-br label for.cond
-for.end:
-%4 = icmp eq i64 %1, 3
-call i8 %4, @Assert
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = load i64, ptr @global_int_3
+%2 = s2f i64 %1
+%3 = load f64, ptr @global_float_4
+%4 = fsub f64 %3, %2
+%5 = alloca f64
+store f64 %4, ptr %5
+%6 = fneg f64 2.0001
+%7 = load f64, ptr %5
+%8 = fcmp ogt f64 %7, %6
+%9 = fneg f64 1.9999
+%10 = load f64, ptr %5
+%11 = fcmp olt f64 %10, %9
+%12 = and i8 %8, %11
+%13 = icmp ne i8 %12, 0
+call i8 %13, @Assert
+%14 = alloca f64
+store 5, ptr %14
+%15 = load i64, ptr @global_int_2
+%16 = s2f i64 %15
+%17 = load f64, ptr %14
+%18 = fsub f64 %17, %16
+%19 = alloca f64
+store f64 %18, ptr %19
+%20 = fneg f64 5.0001
+%21 = load f64, ptr %19
+%22 = fcmp ogt f64 %21, %20
+%23 = fneg f64 4.9999
+%24 = load f64, ptr %19
+%25 = fcmp olt f64 %24, %23
+%26 = and i8 %22, %25
+%27 = icmp ne i8 %26, 0
+call i8 %27, @Assert
+%28 = alloca i64
+store 3, ptr %28
+%29 = load i64, ptr %28
+%30 = s2f i64 %29
+%31 = load f64, ptr @global_float_2
+%32 = fsub f64 %31, %30
+%33 = alloca f64
+store f64 %32, ptr %33
+%34 = fneg f64 0.5001
+%35 = load f64, ptr %33
+%36 = fcmp ogt f64 %35, %34
+%37 = fneg f64 0.4999
+%38 = load f64, ptr %33
+%39 = fcmp olt f64 %38, %37
+%40 = and i8 %36, %39
+%41 = icmp ne i8 %40, 0
+call i8 %41, @Assert
+%42 = load i64, ptr @global_int_1
+%43 = s2f i64 %42
+%44 = fsub f64 7.5, %43
+%45 = alloca f64
+store f64 %44, ptr %45
+%46 = load f64, ptr %45
+%47 = fcmp ogt f64 %46, 2.4999
+%48 = load f64, ptr %45
+%49 = fcmp olt f64 %48, 2.5001
+%50 = and i8 %47, %49
+%51 = icmp ne i8 %50, 0
+call i8 %51, @Assert
+%52 = s2f i64 2
+%53 = load f64, ptr @global_float_1
+%54 = fsub f64 %53, %52
+%55 = alloca f64
+store f64 %54, ptr %55
+%56 = load f64, ptr %55
+%57 = fcmp ogt f64 %56, 1.4999
+%58 = load f64, ptr %55
+%59 = fcmp olt f64 %58, 1.5001
+%60 = and i8 %57, %59
+%61 = icmp ne i8 %60, 0
+call i8 %61, @Assert
+%62 = s2f i64 2
+%63 = load f64, ptr %14
+%64 = fsub f64 %63, %62
+%65 = alloca f64
+store f64 %64, ptr %65
+%66 = load f64, ptr %65
+%67 = fcmp ogt f64 %66, 2.9999
+%68 = load f64, ptr %65
+%69 = fcmp olt f64 %68, 3.0001
+%70 = and i8 %67, %69
+%71 = icmp ne i8 %70, 0
+call i8 %71, @Assert
 br label exit
-exit:
-ret 
-}
-
-
-define internal @TestForLoopMultipleExpressions void() {
-entry:
-%0 = alloca ptr
-%1 = alloca ptr
-br label for.cond
-for.body:
-%2 = add i64 %3, %4
-%5 = add i64 %6, %2
-br label for.iter
-for.cond:
-%4 = phi i64 [ 5, entry ], [ %7, for.iter ]
-%3 = phi i64 [ 1, entry ], [ %8, for.iter ]
-%6 = phi i64 [ 0, entry ], [ %5, for.iter ]
-%9 = icmp sle i64 %3, 3
-br i8 %9, label for.body, label for.end
-for.iter:
-store i64 %3, ptr %0
-%8 = add i64 %3, 1
-store i64 %4, ptr %1
-%7 = sub i64 %4, 1
-br label for.cond
-for.end:
-%10 = icmp eq i64 %6, 18
-call i8 %10, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestNestedForLoops void() {
-entry:
-%0 = alloca ptr
-%1 = alloca ptr
-br label for.cond
-for.body:
-br label for.cond1
-for.cond:
-%2 = phi i64 [ 0, entry ], [ %3, for.iter ]
-%4 = phi i64 [ 0, entry ], [ %5, for.iter ]
-%6 = icmp slt i64 %4, 3
-br i8 %6, label for.body, label for.end
-for.iter:
-store i64 %4, ptr %0
-%5 = add i64 %4, 1
-br label for.cond
-for.end:
-%7 = icmp eq i64 %4, 3
-call i8 %7, @Assert
-%8 = icmp eq i64 %2, 2
-call i8 %8, @Assert
-br label exit
-for.cond1:
-%3 = phi i64 [ %2, for.body ], [ %9, for.iter1 ]
-%10 = icmp slt i64 %3, 2
-br i8 %10, label for.iter1, label for.iter
-for.iter1:
-store i64 %3, ptr %1
-%9 = add i64 %3, 1
-br label for.cond1
-exit:
-ret 
-}
-
-
-define internal @TestForLoopWithBreak void() {
-entry:
-%0 = alloca ptr
-br label for.cond
-for.body:
-%1 = add i64 %2, %3
-%4 = icmp eq i64 %3, 3
-br i8 %4, label if.then, label for.iter
-for.cond:
-%3 = phi i64 [ 1, entry ], [ %5, for.iter ]
-%2 = phi i64 [ 0, entry ], [ %1, for.iter ]
-%6 = icmp sle i64 %3, 5
-br i8 %6, label for.body, label for.end
-for.iter:
-store i64 %3, ptr %0
-%5 = add i64 %3, 1
-br label for.cond
-for.end:
-%7 = phi i64 [ %2, for.cond ], [ %1, if.then ]
-%8 = icmp eq i64 %7, 6
-call i8 %8, @Assert
-br label exit
-if.then:
-br label for.end
-exit:
-ret 
-}
-
-
-define internal @TestForLoopWithContinue void() {
-entry:
-%0 = alloca ptr
-br label for.cond
-for.body:
-%1 = icmp eq i64 %2, 3
-br i8 %1, label if.then, label if.end
-for.cond:
-%2 = phi i64 [ 1, entry ], [ %3, for.iter ]
-%4 = phi i64 [ 0, entry ], [ %5, for.iter ]
-%6 = icmp sle i64 %2, 5
-br i8 %6, label for.body, label for.end
-for.iter:
-%5 = phi i64 [ %4, if.then ], [ %7, if.end ]
-store i64 %2, ptr %0
-%3 = add i64 %2, 1
-br label for.cond
-for.end:
-%8 = icmp eq i64 %4, 12
-call i8 %8, @Assert
-br label exit
-if.then:
-br label for.iter
-if.end:
-%7 = add i64 %4, %2
-br label for.iter
 exit:
 ret 
 }
@@ -181,14 +228,15 @@ ret
 
 define external @main i64() {
 entry:
-call ptr @TestForLoopInt
-call ptr @TestForLoopBoolCondition
-call ptr @TestForLoopMultipleExpressions
-call ptr @TestNestedForLoops
-call ptr @TestForLoopWithBreak
-call ptr @TestForLoopWithContinue
+%0 = alloca i64
+call ptr @TestMixedTypeAddition
+call ptr @TestMixedTypeSubtraction
+store 0, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 0
+%1 = load i64, ptr %0
+ret i64 %1
 }
 

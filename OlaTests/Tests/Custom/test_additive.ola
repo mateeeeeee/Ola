@@ -118,12 +118,78 @@ void TestFloatSubtraction()
     Assert(mix_result_2 > 3.7999 && mix_result_2 < 3.8001);
 }
 
+
+void TestMixedTypeAddition()
+{
+    const float tolerance = 0.0001;
+    
+    // Global int + global float
+    float result1 = global_int_1 + global_float_1;
+    Assert(result1 > 8.4999 && result1 < 8.5001);
+
+    // Local int + global float
+    int local_int = 5;
+    float result2 = local_int + global_float_2;
+    Assert(result2 > 7.4999 && result2 < 7.5001);
+
+    // Global int + local float
+    float local_float = 2.5;
+    float result3 = global_int_2 + local_float;
+    Assert(result3 > 12.4999 && result3 < 12.5001);
+
+    // Literal int + global float
+    float result4 = 10 + global_float_3;
+    Assert(result4 > 11.1999 && result4 < 11.2001);
+
+    // Global int + literal float
+    float result5 = global_int_3 + 3.5;
+    Assert(result5 > 10.4999 && result5 < 10.5001);
+
+    // Local int + literal float
+    float result6 = local_int + 1.5;
+    Assert(result6 > 6.4999 && result6 < 6.5001);
+}
+
+void TestMixedTypeSubtraction()
+{
+    const float tolerance = 0.0001;
+    
+    // Global float - global int
+    float result1 = global_float_4 - global_int_3;
+    Assert(result1 > -2.0001 && result1 < -1.9999);
+
+    // Local float - global int
+    float local_float = 5.0;
+    float result2 = local_float - global_int_2;
+    Assert(result2 > -5.0001 && result2 < -4.9999);
+    
+    // Global float - local int
+    int local_int = 3;
+    float result3 = global_float_2 - local_int;
+    Assert(result3 > -0.5001 && result3 < -0.4999);
+    
+    // Literal float - global int
+    float result4 = 7.5 - global_int_1;
+    Assert(result4 > 2.4999 && result4 < 2.5001);
+    
+    // Global float - literal int
+    float result5 = global_float_1 - 2;
+    Assert(result5 > 1.4999 && result5 < 1.5001);
+    
+    // Local float - literal int
+    float result6 = local_float - 2;
+    Assert(result6 > 2.9999 && result6 < 3.0001);
+}
+
+
 public int main()
 {
     TestIntAddition();
     TestIntSubtraction();
     TestFloatAddition();
     TestFloatSubtraction();
-
+    TestMixedTypeAddition();
+    TestMixedTypeSubtraction();
+    
     return 0;
 }
