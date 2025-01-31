@@ -1,565 +1,635 @@
 .intel_syntax noprefix
 
+.section .rodata
+
+_FP0:
+.quad 0
+
+
+_FP1:
+.quad 4591870180066957722
+
+
+_FP2:
+.quad 4606732058837280358
+
+
+_FP3:
+.quad 4616741309009111286
+
+
+_FP4:
+.quad 4616763827007248138
+
+
 .section .text
 
 .extern Assert
 
 .extern AssertMsg
 
-TestDoWhileLoopInt:
+TestForLoopInt:
 label0:
 push rbp
 mov rbp, rsp
 sub rsp, 80
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, 1
-mov r13, 0
-jmp label1
-label1:
-mov r12, r13
-add r12, r14
-mov qword ptr [rbp - 48], r14
-mov rdi, r14
-add rdi, 1
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 1
 jmp label2
-label2:
-cmp rdi, 5
-setle sil
-and sil, 1
-test sil, sil
-mov r14, rdi
-mov r13, r12
-jne label1
+label1:
+mov r14, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+mov r12, r14
+add r12, r13
+mov qword ptr [rbp - 32], r12
 jmp label3
-label3:
-cmp r12, 15
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
+label2:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 5
+setle r14b
+and r14b, 1
+test r14b, r14b
+jne label1
 jmp label4
+label3:
+mov r12, qword ptr [rbp - 40]
+mov qword ptr [rbp - 48], r12
+mov r13, r12
+add r13, 1
+mov qword ptr [rbp - 40], r13
+jmp label2
 label4:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
+mov r14, qword ptr [rbp - 32]
+cmp r14, 15
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label5
+label5:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
 mov rsp, rbp
 pop rbp
 ret
-TestDoWhileLoopBool:
-label5:
+TestForLoopManualIncrement:
+label6:
 push rbp
 mov rbp, rsp
 sub rsp, 72
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
 mov qword ptr [rbp - 24], r12
-mov qword ptr [rbp - 32], rdi
-mov r14, 0
-mov r13b, 1
-jmp label6
-label6:
-mov qword ptr [rbp - 40], r14
-mov r12, r14
-add r12, 1
-cmp r12, 3
-sete dil
-and dil, 1
-test dil, dil
-jne label9
-mov dil, r13b
-jmp label10
-label7:
-test dil, dil
-mov r14, r12
-mov r13b, dil
-jne label6
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 1
 jmp label8
+label7:
+mov r14, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+mov r12, r14
+add r12, r13
+mov qword ptr [rbp - 32], r12
+mov r12, qword ptr [rbp - 40]
+mov r13, r12
+add r13, 2
+mov qword ptr [rbp - 40], r13
+jmp label9
 label8:
-cmp r12, 3
-sete r12b
-and r12b, 1
-mov cl, r12b
+mov r14, qword ptr [rbp - 40]
+cmp r14, 5
+setle r14b
+and r14b, 1
+test r14b, r14b
+jne label7
+jmp label10
+label9:
+jmp label8
+label10:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 9
+sete r14b
+and r14b, 1
+mov cl, r14b
 call Assert
 jmp label11
-label9:
-mov dil, 0
-jmp label10
-label10:
-jmp label7
 label11:
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
 mov r12, qword ptr [rbp - 24]
-mov rdi, qword ptr [rbp - 32]
 mov rsp, rbp
 pop rbp
 ret
-TestNestedDoWhileLoops:
+TestForLoopMultipleExpressions:
 label12:
 push rbp
 mov rbp, rsp
-sub rsp, 88
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, 0
-mov r13, 0
-jmp label13
-label13:
-mov r12, r14
-jmp label16
-label14:
-cmp r12, 3
-setl sil
-and sil, 1
-test sil, sil
-mov r14, rdi
-mov r13, r12
-jne label13
-jmp label15
-label15:
-cmp r12, 3
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-cmp rdi, 4
-sete dil
-and dil, 1
-mov cl, dil
-call Assert
-jmp label19
-label16:
-mov qword ptr [rbp - 56], r12
-mov rdi, r12
-add rdi, 1
-jmp label17
-label17:
-cmp rdi, 2
-setl sil
-and sil, 1
-test sil, sil
-mov r12, rdi
-jne label16
-jmp label18
-label18:
-mov qword ptr [rbp - 48], r13
-mov r12, r13
-add r12, 1
+sub rsp, 96
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 1
+mov qword ptr [rbp - 48], 5
 jmp label14
-label19:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopWithBreak:
-label20:
-push rbp
-mov rbp, rsp
-sub rsp, 80
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, 0
-mov r13, 1
-jmp label21
-label21:
+label13:
+mov r14, qword ptr [rbp - 40]
+mov r13, qword ptr [rbp - 48]
 mov r12, r14
 add r12, r13
-mov qword ptr [rbp - 48], r13
-mov rdi, r13
-add rdi, 1
-cmp rdi, 5
-setg sil
-and sil, 1
-test sil, sil
-jne label23
-jmp label22
-label22:
-mov r14, r12
-mov r13, rdi
-jmp label21
-label23:
-cmp r12, 15
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-jmp label24
-label24:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopWithContinue:
-label25:
-push rbp
-mov rbp, rsp
-sub rsp, 80
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, 0
-mov r13, 0
-jmp label26
-label26:
-mov qword ptr [rbp - 48], r14
-mov r12, r14
-add r12, 1
-mov rax, r12
-cqo
-mov rdi, 2
-idiv rdi
-mov rdi, rdx
-cmp rdi, 0
-sete dil
-and dil, 1
-test dil, dil
-jne label29
-jmp label30
-label27:
-cmp r12, 5
-setl dil
-and dil, 1
-test dil, dil
-mov r14, r12
-mov r13, rsi
-jne label26
-jmp label28
-label28:
-cmp rsi, 9
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-jmp label31
-label29:
-mov rsi, r13
-jmp label27
-label30:
-mov rdi, r13
-add rdi, r12
-mov rsi, rdi
-jmp label27
-label31:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
-mov rsp, rbp
-pop rbp
-ret
-TestEmptyDoWhileLoop:
-label32:
-push rbp
-mov rbp, rsp
-sub rsp, 56
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, 0
-jmp label33
-label33:
-jmp label34
-label34:
-mov r13, r14
-add r13, 1
-cmp r13, 2
-setl r12b
-and r12b, 1
-test r12b, r12b
-mov r14, r13
-jne label33
-jmp label35
-label35:
-cmp r13, 2
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label36
-label36:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopBoundary:
-label37:
-push rbp
-mov rbp, rsp
-sub rsp, 56
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, 0
-jmp label38
-label38:
-mov qword ptr [rbp - 24], r14
-mov r13, r14
-add r13, 1
-jmp label39
-label39:
-cmp r13, 1
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label40
-label40:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopWithMultipleVariables:
-label41:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov qword ptr [rbp - 32], rdi
-mov r14, 1
-mov r13, 1
-jmp label42
-label42:
-mov r12, r13
-add r12, r14
-jmp label43
-label43:
-cmp r12, 10
-setl dil
-and dil, 1
-test dil, dil
-mov rdi, r14
-mov r14, r12
-mov r13, rdi
-jne label42
-jmp label44
-label44:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rdi, qword ptr [rbp - 32]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopComplexCondition:
-label45:
-push rbp
-mov rbp, rsp
-sub rsp, 104
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], rbx
-mov qword ptr [rbp - 32], r13
-mov qword ptr [rbp - 40], r12
-mov qword ptr [rbp - 48], rdi
-mov r14, 3
-mov r13, 0
-jmp label46
-label46:
-mov qword ptr [rbp - 56], r13
-mov r12, r13
-add r12, 1
-mov qword ptr [rbp - 64], r14
-mov qword ptr [rbp - 72], r14
-sub qword ptr [rbp - 72], 1
-jmp label47
-label47:
-cmp r12, 3
-setl sil
-and sil, 1
-cmp qword ptr [rbp - 72], 0
-setg bl
-and bl, 1
-mov dil, sil
-and dil, bl
-cmp dil, 0
-setne dil
-and dil, 1
-test dil, dil
-mov r14, qword ptr [rbp - 72]
-mov r13, r12
-jne label46
-jmp label48
-label48:
-cmp r12, 3
-sete r12b
-and r12b, 1
-cmp qword ptr [rbp - 72], 0
-sete dil
-and dil, 1
-mov r13b, r12b
-and r13b, dil
-cmp r13b, 0
-setne r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-jmp label49
-label49:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov rbx, qword ptr [rbp - 24]
 mov r13, qword ptr [rbp - 32]
-mov r12, qword ptr [rbp - 40]
-mov rdi, qword ptr [rbp - 48]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopChangingCondition:
-label50:
-push rbp
-mov rbp, rsp
-sub rsp, 80
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, 0
-mov r13, 0
-jmp label51
-label51:
-mov qword ptr [rbp - 48], r13
-mov r12, r13
-add r12, 1
-cmp r12, 3
-sete dil
-and dil, 1
-test dil, dil
-jne label54
-mov rdi, r12
-jmp label55
-label52:
-cmp rdi, 5
-setl sil
-and sil, 1
-test sil, sil
-mov r14, r12
-mov r13, rdi
-jne label51
-jmp label53
-label53:
-cmp r12, 13
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-jmp label56
-label54:
-mov rdi, 10
-jmp label55
-label55:
-mov r12, r14
-add r12, rdi
-jmp label52
-label56:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
-mov rsp, rbp
-pop rbp
-ret
-TestDoWhileLoopMultipleExits:
-label57:
-push rbp
-mov rbp, rsp
-sub rsp, 64
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, 0
-jmp label58
-label58:
-mov qword ptr [rbp - 32], r14
-mov r13, r14
-add r13, 1
-cmp r13, 5
-sete r12b
-and r12b, 1
-test r12b, r12b
-jne label61
-jmp label62
-label59:
 mov r14, r13
-jmp label58
-label60:
-cmp r13, 5
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
+add r14, r12
+mov qword ptr [rbp - 32], r14
+jmp label15
+label14:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 3
+setle r14b
+and r14b, 1
+test r14b, r14b
+jne label13
+jmp label16
+label15:
+mov r14, qword ptr [rbp - 40]
+mov qword ptr [rbp - 56], r14
+mov r12, r14
+add r12, 1
+mov qword ptr [rbp - 40], r12
+mov r12, qword ptr [rbp - 48]
+mov qword ptr [rbp - 64], r12
+mov r14, r12
+sub r14, 1
+mov qword ptr [rbp - 48], r14
+mov r14, qword ptr [rbp - 56]
+mov r14, qword ptr [rbp - 64]
+jmp label14
+label16:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 18
+sete r14b
+and r14b, 1
 mov cl, r14b
 call Assert
-jmp label64
-label61:
-mov r14b, 1
-jmp label60
-label62:
-cmp r13, 10
-setg r12b
-and r12b, 1
-test r12b, r12b
-jne label63
-jmp label59
-label63:
-mov r14b, 0
-jmp label60
-label64:
+jmp label17
+label17:
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
 mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestNestedForLoops:
+label18:
+push rbp
+mov rbp, rsp
+sub rsp, 88
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], 0
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 0
+jmp label20
+label19:
+jmp label24
+label20:
+mov r14, qword ptr [rbp - 24]
+cmp r14, 3
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label19
+jmp label22
+label21:
+mov r14, qword ptr [rbp - 24]
+mov qword ptr [rbp - 48], r14
+mov r13, r14
+add r13, 1
+mov qword ptr [rbp - 24], r13
+jmp label20
+label22:
+mov r14, qword ptr [rbp - 24]
+cmp r14, 3
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr [rbp - 32]
+cmp r14, 2
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label27
+label23:
+mov r13, qword ptr [rbp - 40]
+mov r14, r13
+add r14, 1
+mov qword ptr [rbp - 40], r14
+jmp label25
+label24:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 2
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label23
+jmp label26
+label25:
+mov r14, qword ptr [rbp - 32]
+mov qword ptr [rbp - 56], r14
+mov r13, r14
+add r13, 1
+mov qword ptr [rbp - 32], r13
+jmp label24
+label26:
+jmp label21
+label27:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+TestNestedForLoopsReset:
+label28:
+push rbp
+mov rbp, rsp
+sub rsp, 96
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], 0
+mov qword ptr [rbp - 32], 0
+jmp label30
+label29:
+mov qword ptr [rbp - 40], 0
+jmp label34
+label30:
+mov r14, qword ptr [rbp - 24]
+cmp r14, 3
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label29
+jmp label32
+label31:
+mov r14, qword ptr [rbp - 24]
+mov qword ptr [rbp - 48], r14
+mov r13, r14
+add r13, 1
+mov qword ptr [rbp - 24], r13
+jmp label30
+label32:
+mov r14, qword ptr [rbp - 24]
+cmp r14, 3
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr [rbp - 32]
+cmp r14, 6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label37
+label33:
+mov r13, qword ptr [rbp - 32]
+mov qword ptr [rbp - 56], r13
+mov r14, r13
+add r14, 1
+mov qword ptr [rbp - 32], r14
+jmp label35
+label34:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 2
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label33
+jmp label36
+label35:
+mov r14, qword ptr [rbp - 40]
+mov qword ptr [rbp - 64], r14
+mov r13, r14
+add r13, 1
+mov qword ptr [rbp - 40], r13
+jmp label34
+label36:
+jmp label31
+label37:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+TestForLoopWithBreak:
+label38:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 1
+jmp label40
+label39:
+mov r14, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+mov r12, r14
+add r12, r13
+mov qword ptr [rbp - 32], r12
+mov r12, qword ptr [rbp - 40]
+cmp r12, 3
+sete r12b
+and r12b, 1
+test r12b, r12b
+jne label43
+jmp label45
+label40:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 5
+setle r14b
+and r14b, 1
+test r14b, r14b
+jne label39
+jmp label42
+label41:
+mov r12, qword ptr [rbp - 40]
+mov qword ptr [rbp - 48], r12
+mov r13, r12
+add r13, 1
+mov qword ptr [rbp - 40], r13
+jmp label40
+label42:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 6
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label47
+label43:
+jmp label42
+label44:
+label45:
+jmp label41
+label46:
+label47:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestForLoopWithContinue:
+label48:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 1
+jmp label50
+label49:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 3
+sete r14b
+and r14b, 1
+test r14b, r14b
+jne label53
+jmp label55
+label50:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 5
+setle r14b
+and r14b, 1
+test r14b, r14b
+jne label49
+jmp label52
+label51:
+mov r12, qword ptr [rbp - 40]
+mov qword ptr [rbp - 48], r12
+mov r13, r12
+add r13, 1
+mov qword ptr [rbp - 40], r13
+jmp label50
+label52:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 12
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label57
+label53:
+jmp label51
+label54:
+label55:
+mov r14, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+mov r12, r14
+add r12, r13
+mov qword ptr [rbp - 32], r12
+jmp label51
+label56:
+label57:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestForLoopEmptyBody:
+label58:
+push rbp
+mov rbp, rsp
+sub rsp, 72
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], 0
+mov qword ptr [rbp - 32], 0
+jmp label60
+label59:
+jmp label61
+label60:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 5
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label59
+jmp label62
+label61:
+mov r14, qword ptr [rbp - 32]
+mov qword ptr [rbp - 40], r14
+mov r13, r14
+add r13, 1
+mov qword ptr [rbp - 32], r13
+jmp label60
+label62:
+mov r14, qword ptr [rbp - 24]
+cmp r14, 0
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+mov r14, qword ptr [rbp - 32]
+cmp r14, 5
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label63
+label63:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+TestForLoopNeverExecutes:
+label64:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 0
+mov qword ptr [rbp - 40], 10
+jmp label66
+label65:
+mov r14, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+mov r12, r14
+add r12, r13
+mov qword ptr [rbp - 32], r12
+jmp label67
+label66:
+mov r14, qword ptr [rbp - 40]
+cmp r14, 5
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label65
+jmp label68
+label67:
+mov r12, qword ptr [rbp - 40]
+mov qword ptr [rbp - 48], r12
+mov r13, r12
+add r13, 1
+mov qword ptr [rbp - 40], r13
+jmp label66
+label68:
+mov r14, qword ptr [rbp - 32]
+cmp r14, 0
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label69
+label69:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestForLoopFloatCondition:
+label70:
+push rbp
+mov rbp, rsp
+sub rsp, 96
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+movsd qword ptr [rbp - 32], xmm14
+movsd qword ptr [rbp - 40], xmm13
+movsd qword ptr [rbp - 48], xmm12
+movsd xmm14, qword ptr [rip + _FP0]
+movsd qword ptr [rbp - 56], xmm14
+movsd xmm14, qword ptr [rip + _FP1]
+movsd qword ptr [rbp - 64], xmm14
+jmp label72
+label71:
+movsd xmm14, qword ptr [rbp - 56]
+movsd xmm13, qword ptr [rbp - 64]
+movsd xmm12, xmm14
+addsd xmm12, xmm13
+movsd qword ptr [rbp - 56], xmm12
+jmp label73
+label72:
+movsd xmm14, qword ptr [rbp - 64]
+comisd xmm14, qword ptr [rip + _FP2]
+setb r14b
+and r14b, 1
+test r14b, r14b
+jne label71
+jmp label74
+label73:
+movsd xmm12, qword ptr [rbp - 64]
+movsd xmm13, xmm12
+movsd xmm12, qword ptr [rip + _FP1]
+addsd xmm13, xmm12
+movsd qword ptr [rbp - 64], xmm13
+jmp label72
+label74:
+movsd xmm14, qword ptr [rbp - 56]
+comisd xmm14, qword ptr [rip + _FP3]
+seta r14b
+and r14b, 1
+movsd xmm14, qword ptr [rbp - 56]
+comisd xmm14, qword ptr [rip + _FP4]
+setb r13b
+and r13b, 1
+mov r12b, r14b
+and r12b, r13b
+cmp r12b, 0
+setne r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+jmp label75
+label75:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+movsd xmm14, qword ptr [rbp - 32]
+movsd xmm13, qword ptr [rbp - 40]
+movsd xmm12, qword ptr [rbp - 48]
 mov rsp, rbp
 pop rbp
 ret
 .globl main
 
 main:
-label65:
+label76:
 push rbp
 mov rbp, rsp
-sub rsp, 32
-call TestDoWhileLoopInt
-call TestDoWhileLoopBool
-call TestNestedDoWhileLoops
-call TestDoWhileLoopWithBreak
-call TestDoWhileLoopWithContinue
-call TestEmptyDoWhileLoop
-call TestDoWhileLoopBoundary
-call TestDoWhileLoopWithMultipleVariables
-call TestDoWhileLoopComplexCondition
-call TestDoWhileLoopChangingCondition
-call TestDoWhileLoopMultipleExits
-jmp label66
-label66:
-mov rax, 0
+sub rsp, 48
+mov qword ptr [rbp - 8], r14
+call TestForLoopInt
+call TestForLoopManualIncrement
+call TestForLoopMultipleExpressions
+call TestNestedForLoops
+call TestNestedForLoopsReset
+call TestForLoopWithBreak
+call TestForLoopWithContinue
+call TestForLoopEmptyBody
+call TestForLoopNeverExecutes
+call TestForLoopFloatCondition
+mov qword ptr [rbp - 16], 0
+jmp label78
+label77:
+label78:
+mov r14, qword ptr [rbp - 16]
+mov rax, r14
+mov r14, qword ptr [rbp - 8]
 mov rsp, rbp
 pop rbp
 ret

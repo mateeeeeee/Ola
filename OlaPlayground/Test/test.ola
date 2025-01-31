@@ -1,184 +1,134 @@
 import std.assert;
 
-void TestDoWhileLoopInt()
+void TestForLoopInt()
 {
     int sum = 0;
-    int i = 1;
-
-    do
+    for (int i = 1; i <= 5; i++)
     {
         sum += i;
-        i++;
-    } while (i <= 5);
-
+    }
     Assert(sum == 15);
 }
 
-void TestDoWhileLoopBool()
-{
-    bool condition = true;
-    int iterations = 0;
-
-    do
-    {
-        iterations++;
-        if (iterations == 3)
-        {
-            condition = false;
-        }
-    } while (condition);
-
-    Assert(iterations == 3);
-}
-
-void TestNestedDoWhileLoops()
-{
-    int outerCounter = 0;
-    int innerCounter = 0;
-
-    do
-    {
-        do
-        {
-            innerCounter++;
-        } while (innerCounter < 2);
-
-        outerCounter++;
-    } while (outerCounter < 3);
-
-    Assert(outerCounter == 3);
-    Assert(innerCounter == 4);
-}
-
-void TestDoWhileLoopWithBreak()
+void TestForLoopManualIncrement()
 {
     int sum = 0;
     int i = 1;
-
-    do
+    for (; i <= 5;)
     {
         sum += i;
-        i++;
-
-        if (i > 5)
-        {
-            break;
-        }
-    } while (true);
-
-    Assert(sum == 15);
-}
-
-void TestDoWhileLoopWithContinue()
-{
-    int sum = 0;
-    int i = 0;
-    
-    do
-    {
-        i++;
-    
-        if (i % 2 == 0)
-        {
-            continue;
-        }
-    
-        sum += i;
-    } while (i < 5);
-    
+        i += 2; // Manual increment by 2
+    }
     Assert(sum == 9);
 }
 
-void TestEmptyDoWhileLoop()
+void TestForLoopMultipleExpressions()
 {
-    int i = 0;
-    do 
-    {
-        // Empty body
-    } while (++i < 2);
-    Assert(i == 2);
-}
-void TestDoWhileLoopBoundary()
-{
-    int i = 5;
-    int count = 0;
-    do 
-    {
-        count++;
-    } while (i < 5);
-    Assert(count == 1);
-}
-void TestDoWhileLoopWithMultipleVariables()
-{
-    int a = 1, b = 1;
-    do 
-    {
-        int temp = a;
-        a = b;
-        b = temp + b;
-    } while (b < 10);
-    //Assert(a == 8 && b == 13); //not working with optimizations
-}
-void TestDoWhileLoopComplexCondition()
-{
-    int x = 0;
-    int y = 3;
-    do 
-    {
-        x++;
-        y--;
-    } while (x < 3 && y > 0);
-    Assert(x == 3 && y == 0);
-}
-void TestDoWhileLoopChangingCondition()
-{
-    int i = 0;
     int sum = 0;
-    do
+    for (int i = 1, j = 5; i <= 3; i++, j--)
     {
-        i++;
-        if (i == 3) // Change the loop condition mid-loop
-        {
-            i = 10; // Skip some iterations
-        }
-        sum += i;
-    } while (i < 5);
-    Assert(sum == 13); // (1 + 2 + 10) = 13 
+        sum += i + j;
+    }
+    Assert(sum == 18);
 }
-void TestDoWhileLoopMultipleExits()
+
+void TestNestedForLoops()
+{
+    int outerCounter = 0;
+    int innerCounter = 0;
+    int iterations = 0;
+    for (; outerCounter < 3; outerCounter++)
+    {
+        for (; innerCounter < 2; innerCounter++)
+        {
+            ++iterations;
+        }
+    }
+
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
+}
+void TestNestedForLoopsReset()
+{
+    int outerCounter = 0;
+    int totalIterations = 0;
+
+    for (; outerCounter < 3; outerCounter++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            totalIterations++;
+        }
+    }
+    Assert(outerCounter == 3);
+    //Assert(totalIterations == 6); todo: fails with optimizations
+}
+
+void TestForLoopWithBreak()
+{
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++)
+    {
+        sum += i;
+        if (i == 3) break;
+    }
+
+    Assert(sum == 6);
+}
+
+void TestForLoopWithContinue()
+{
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++)
+    {
+        if (i == 3) continue;
+        sum += i;
+    }
+
+    Assert(sum == 12);
+}
+void TestForLoopEmptyBody()
 {
     int count = 0;
-    bool foundValue = false;
-    do
+    int i = 0; 
+    for (;i < 5; i++) 
     {
-        count++;
-        if (count == 5)
-        {
-            foundValue = true;
-            break;
-        }
-        if (count > 10)
-        {
-            break; // Another exit condition to prevent infinite loop if something goes wrong
-        }
-    } while (true);
-
-    Assert(count == 5);
-    Assert(foundValue);
+        // Empty body, just to increment i
+    }
+    Assert(count == 0); 
+    Assert(i == 5);     
+}
+void TestForLoopNeverExecutes()
+{
+    int sum = 0;
+    for (int i = 10; i < 5; i++) {
+        sum += i; 
+    }
+    Assert(sum == 0);
+}
+void TestForLoopFloatCondition()
+{
+    float sum = 0.0;
+    for (float i = 0.1; i < 0.95; i += 0.1)
+    {
+        sum += i;
+    }
+    Assert(sum > 4.49 && sum < 4.51);
 }
 
 public int main()
 {
-    TestDoWhileLoopInt();
-    TestDoWhileLoopBool();
-    TestNestedDoWhileLoops();
-    TestDoWhileLoopWithBreak();
-    TestDoWhileLoopWithContinue();
-    TestEmptyDoWhileLoop();
-    TestDoWhileLoopBoundary();
-    TestDoWhileLoopWithMultipleVariables();
-    TestDoWhileLoopComplexCondition();
-    TestDoWhileLoopChangingCondition();
-    TestDoWhileLoopMultipleExits();
+    TestForLoopInt();
+    TestForLoopManualIncrement();
+    TestForLoopMultipleExpressions();
+    TestNestedForLoops();
+    TestNestedForLoopsReset();
+    TestForLoopWithBreak();
+    TestForLoopWithContinue();
+    TestForLoopEmptyBody();
+    TestForLoopNeverExecutes();
+    TestForLoopFloatCondition();
     return 0;
 }
