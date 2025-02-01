@@ -88,6 +88,62 @@ void TestWhileLoopWithContinue()
     
     Assert(sum == 9);
 }
+void TestWhileLoopMultipleExits()
+{
+    int count = 0;
+    bool foundValue = false;
+
+    while (count < 5 && !foundValue)
+    {
+        count++;
+        if (count == 3)
+        {
+            foundValue = true;
+        }
+    }
+
+    Assert(count == 3);
+    Assert(foundValue);
+}
+void TestWhileLoopExternalDeclaration()
+{
+    int i = 0;
+    int sum = 0;
+    while (i < 5)
+    {
+        sum += i;
+        i++;
+    }
+    Assert(sum == 10);
+}
+void TestWhileLoopWithCalculation()
+{
+    int x = 10;
+    int count = 0;
+
+    while (x > 0)
+    {
+        x -= 2;
+        count++;
+    }
+
+    Assert(count == 5);
+}
+void TestWhileLoopFloatCondition()
+{
+    float sum = 0.0;
+    float i = 0.1;
+
+    while (i < 0.99)
+    {
+        sum += i;
+        i += 0.1; // Note: Floating-point precision might cause issues here
+    }
+    
+    // Due to floating-point imprecision, we might not get exactly 4.5,
+    // so we'll check within a range.
+    Assert(sum > 4.49 && sum < 4.51);
+}
 
 public int main()
 {
@@ -96,6 +152,9 @@ public int main()
     TestNestedWhileLoops();
     TestWhileLoopWithBreak();
     TestWhileLoopWithContinue();
-
+    TestWhileLoopMultipleExits();
+    TestWhileLoopExternalDeclaration();
+    TestWhileLoopWithCalculation();
+    TestWhileLoopFloatCondition();
     return 0;
 }

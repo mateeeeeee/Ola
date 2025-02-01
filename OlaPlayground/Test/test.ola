@@ -1,195 +1,160 @@
 import std.assert;
 
-// Global variables
-int GlobalIntX = 2;
-char GlobalCharX = 'b';
-
-void TestSwitchBasic()
+void TestWhileLoopInt()
 {
-    int value = 1;
-    int result = 0;
+    int sum = 0;
+    int i = 1;
 
-    switch (value)
+    while (i <= 5)
     {
-        case 1:
-            result = 10;
-            break;
-        case 2:
-            result = 20;
-            break;
-        default:
-            result = 0;
+        sum += i;
+        i++;
     }
 
-    Assert(result == 10);
+    Assert(sum == 15);
 }
 
-void TestSwitchMultipleCases()
+void TestWhileLoopBool()
 {
-    int value = 3;
-    int result = 0;
+    bool condition = true;
+    int iterations = 0;
 
-    switch (value)
+    while (condition)
     {
-        case 1:
-        case 2:
-            result = 10;
-            break;
-        case 3:
-        case 4:
-            result = 20;
-            break;
-        default:
-            result = 0;
+        iterations++;
+        if (iterations == 3)
+        {
+            condition = false;
+        }
     }
 
-    Assert(result == 20);
+    Assert(iterations == 3);
 }
 
-void TestSwitchFallthrough()
+void TestNestedWhileLoops()
 {
-    int value = 2;
-    int result = 0;
+    int outerCounter = 0;
+    int innerCounter = 0;
 
-    switch (value)
+    while (outerCounter < 3)
     {
-        case 1:
-            result = 10;
-        case 2: // Fall through to the next case
-            result += 20;
-        case 3:
-            result += 30;
-            break;
-        default:
-            result = 0;
+        while (innerCounter < 2)
+        {
+            innerCounter++;
+        }
+
+        outerCounter++;
     }
 
-    Assert(result == 50);
+    Assert(outerCounter == 3);
+    Assert(innerCounter == 2);
 }
 
-void TestSwitchWithBreak()
+void TestWhileLoopWithBreak()
 {
-    int value = 2;
-    int result = 0;
+    int sum = 0;
+    int i = 1;
 
-    switch (value)
+    while (true)
     {
-        case 1:
-            result = 10;
+        sum += i;
+        i++;
+
+        if (i > 5)
+        {
             break;
-        case 2:
-            result = 20;
-            break;
-        case 3:
-            result = 30;
-            break;
-        default:
-            result = 0;
+        }
     }
 
-    Assert(result == 20);
+    Assert(sum == 15);
 }
 
-void TestSwitchChar()
+void TestWhileLoopWithContinue()
 {
-    //char c = 'b';
-    //int result = 0;
-    //
-    //switch (c)
-    //{
-    //    case 'a':
-    //        result = 1;
-    //        break;
-    //    case 'b':
-    //        result = 2;
-    //        break;
-    //    case 'c':
-    //        result = 3;
-    //        break;
-    //    default:
-    //        result = 0;
-    //}
-    //
-    //Assert(result == 2);
-}
-
-void TestSwitchGlobalVariable()
-{
-    int result = 0;
-
-    switch (GlobalIntX)
+    int sum = 0;
+    int i = 0;
+    
+    while (i < 5)
     {
-        case 1:
-            result = 1;
-            break;
-        case 2:
-            result = 2;
-            break;
-        case 3:
-            result = 3;
-            break;
-        default:
-            result = 0;
+        i++;
+    
+        if (i % 2 == 0)
+        {
+            continue;
+        }
+    
+        sum += i;
+    }
+    
+    Assert(sum == 9);
+}
+void TestWhileLoopMultipleExits()
+{
+    int count = 0;
+    bool foundValue = false;
+
+    while (count < 5 && !foundValue)
+    {
+        count++;
+        if (count == 3)
+        {
+            foundValue = true;
+        }
     }
 
-    Assert(result == 2);
+    Assert(count == 3);
+    Assert(foundValue);
 }
-
-void TestSwitchGlobalChar()
+void TestWhileLoopExternalDeclaration()
 {
-    //int result = 0;
-    //
-    //switch (GlobalCharX)
-    //{
-    //    case 'a':
-    //        result = 1;
-    //        break;
-    //    case 'b':
-    //        result = 2;
-    //        break;
-    //    case 'c':
-    //        result = 3;
-    //        break;
-    //    default:
-    //        result = 0;
-    //}
-    //
-    //Assert(result == 2);
-}
-
-void TestSwitchNoMatch()
-{
-    int value = 5;
-    int result = 0;
-
-    switch (value)
+    int i = 0;
+    int sum = 0;
+    while (i < 5)
     {
-        case 1:
-            result = 1;
-            break;
-        case 2:
-            result = 2;
-            break;
-        case 3:
-            result = 3;
-            break;
-        default:
-            result = -1;
+        sum += i;
+        i++;
+    }
+    Assert(sum == 10);
+}
+void TestWhileLoopWithCalculation()
+{
+    int x = 10;
+    int count = 0;
+
+    while (x > 0)
+    {
+        x -= 2;
+        count++;
     }
 
-    Assert(result == -1);
+    Assert(count == 5);
+}
+void TestWhileLoopFloatCondition()
+{
+    float sum = 0.0;
+    float i = 0.1;
+
+    while (i < 0.99)
+    {
+        sum += i;
+        i += 0.1; // Note: Floating-point precision might cause issues here
+    }
+    
+    // Due to floating-point imprecision, we might not get exactly 4.5,
+    // so we'll check within a range.
+    Assert(sum > 4.49 && sum < 4.51);
 }
 
 public int main()
 {
-    TestSwitchBasic();
-    TestSwitchMultipleCases();
-    TestSwitchFallthrough();
-    TestSwitchWithBreak();
-    TestSwitchChar();
-    TestSwitchGlobalVariable();
-    TestSwitchGlobalChar();
-    TestSwitchNoMatch();
-
+    TestWhileLoopInt();
+    TestWhileLoopBool();
+    TestNestedWhileLoops();
+    TestWhileLoopWithBreak();
+    TestWhileLoopWithContinue();
+    TestWhileLoopMultipleExits();
+    TestWhileLoopExternalDeclaration();
+    TestWhileLoopWithCalculation();
+    TestWhileLoopFloatCondition();
     return 0;
 }
