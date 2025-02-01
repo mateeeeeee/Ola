@@ -6,78 +6,93 @@ int GlobalIntY = 3;
 
 void TestShiftOperatorsIntegers()
 {
-    // 1. Local variables
-    int intA = 5;
-    int intB = 2;
+    // Local variables
+    int localIntA = 5;
+    int localIntB = 2;
 
-    // Left shift
-    int leftShiftResult = intA << intB;
-    Assert(leftShiftResult == 20);
-
-    // Right shift
-    int rightShiftResult = intA >> intB;
-    Assert(rightShiftResult == 1);
-
-    // 2. Local and global variables
-    int leftShiftLocalGlobal = intA << GlobalIntY;
-    Assert(leftShiftLocalGlobal == 40);
-
-    int rightShiftLocalGlobal = intA >> GlobalIntY;
-    Assert(rightShiftLocalGlobal == 0);
-
-    // 3. Local variables and immediate values
-    int leftShiftImmediate = intA << 1;
-    Assert(leftShiftImmediate == 10);
-
-    int rightShiftImmediate = intA >> 1;
-    Assert(rightShiftImmediate == 2);
-
-    // 4. Global variables
-    int leftShiftGlobal = GlobalIntX << GlobalIntY;
-    Assert(leftShiftGlobal == 64);
-
-    int rightShiftGlobal = GlobalIntX >> GlobalIntY;
-    Assert(rightShiftGlobal == 1);
-
-    // 5. Global variables and immediate values
-    int leftShiftGlobalImmediate = GlobalIntX << 2;
-    Assert(leftShiftGlobalImmediate == 32);
-
-    int rightShiftGlobalImmediate = GlobalIntX >> 2;
-    Assert(rightShiftGlobalImmediate == 2);
-
-    // 6. Immediate values
+    // Literal - Literal
     Assert((4 << 1) == 8);
     Assert((4 >> 1) == 2);
+
+    // Global - Literal
+    Assert(GlobalIntX << 1 == 16);
+    Assert(GlobalIntX >> 1 == 4);
+
+    // Literal - Global
+    Assert(4 << GlobalIntY == 32);
+    Assert(4 >> GlobalIntY == 0);
+
+    // Local - Literal
+    Assert(localIntA << 1 == 10);
+    Assert(localIntA >> 1 == 2);
+
+    // Literal - Local
+    Assert(4 << localIntB == 16);
+    Assert(4 >> localIntB == 1);
+
+    // Global - Local
+    Assert(GlobalIntX << localIntB == 32);
+    Assert(GlobalIntX >> localIntB == 2);
+
+    // Local - Global
+    Assert(localIntA << GlobalIntY == 40);
+    Assert(localIntA >> GlobalIntY == 0);
+
+    // Local - Local
+    Assert(localIntA << localIntB == 20);
+    Assert(localIntA >> localIntB == 1);
+
+    // Global - Global
+    Assert(GlobalIntX << GlobalIntY == 64);
+    Assert(GlobalIntX >> GlobalIntY == 1);
 }
 
 void TestCompoundShiftOperatorsIntegers()
 {
-    // 1. Local variables
-    int intA = 5;
-    int intB = 2;
+    // Local variables
+    int localIntA = 5;
+    int localIntB = 2;
 
-    // Compound left shift
-    intA <<= intB;
-    Assert(intA == 20);
+    // Local - Literal compound operations
+    localIntA <<= 2;
+    Assert(localIntA == 20);
+    localIntA >>= 2;
+    Assert(localIntA == 5);
 
-    // Compound right shift
-    intA >>= intB;
-    Assert(intA == 5);
+    // Literal - Local compound operations (not directly possible, so we use an intermediate)
+    int temp = 4;
+    temp <<= localIntB;
+    Assert(temp == 16);
+    temp = 16; // Reset for the next test
+    temp >>= localIntB;
+    Assert(temp == 4);
 
-    // 2. Global variables with compound operators
+    // Local - Global compound operations
+    localIntA <<= GlobalIntY;
+    Assert(localIntA == 40);
+    localIntA >>= GlobalIntY;
+    Assert(localIntA == 5);
+
+    // Global - Literal compound operations
+    GlobalIntX <<= 1;
+    Assert(GlobalIntX == 16);
+    GlobalIntX >>= 1;
+    Assert(GlobalIntX == 8);
+
+    // Global - Local compound operations
+    GlobalIntX <<= localIntB;
+    Assert(GlobalIntX == 32);
+    GlobalIntX >>= localIntB;
+    Assert(GlobalIntX == 8);
+
+    // Global - Global compound operations
     GlobalIntX <<= GlobalIntY;
     Assert(GlobalIntX == 64);
-
     GlobalIntX >>= GlobalIntY;
     Assert(GlobalIntX == 8);
 
-    // 3. Global variables with immediate values
-    GlobalIntY <<= 1;
-    Assert(GlobalIntY == 6);
-
-    GlobalIntY >>= 1;
-    Assert(GlobalIntY == 3);
+    // Resetting GlobalIntX for subsequent tests if necessary
+    GlobalIntX = 8;
 }
 
 public int main()

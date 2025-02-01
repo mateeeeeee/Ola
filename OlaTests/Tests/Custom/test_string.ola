@@ -6,10 +6,16 @@ const char[] globalString = "global";
 void PassStringLiteral(const char[] literal)
 {
 	Assert(literal[0] == 'L');
+	Assert(literal[1] == 'i');
+	Assert(literal[2] == 't');
 }
 void PassStringVariable(const char[] variable)
 {
 	Assert(variable[0] == 'l');
+	Assert(variable[1] == 'o');
+	Assert(variable[2] == 'c');
+	Assert(variable[3] == 'a');
+	Assert(variable[4] == 'l');
 }
 
 public int main()
