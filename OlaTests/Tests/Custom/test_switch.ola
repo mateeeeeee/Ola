@@ -1,59 +1,195 @@
 import std.assert;
 
-public int main()
-{
-    int choice = 2;
-	// Test a simple switch statement
-    switch (choice)
-    {
-        case 1:
-            Assert(false);  // The choice is not 1, so this case should not execute
-            break;
-        case 2:
-            Assert(true);  // The choice is 2, so this case should execute
-            break;
-        case 3:
-            Assert(false);  // The choice is not 3, so this case should not execute
-            break;
-        default:
-            Assert(false);  // This case should not execute
-            break;
-    }
+// Global variables
+int GlobalIntX = 2;
+char GlobalCharX = 'b';
 
-    // Test switch statement with fall-through
+void TestSwitchBasic()
+{
     int value = 1;
+    int result = 0;
+
     switch (value)
     {
         case 1:
-            Assert(true);  // The value is 1, but this case falls through to the next one
-        case 2:
-            Assert(true);  // The value is 2, so this case should execute
+            result = 10;
             break;
-        case 3:
-            Assert(false);  // The value is not 3, so this case should not execute
+        case 2:
+            result = 20;
             break;
         default:
-            Assert(false);  // This case should not execute
-            break;
+            result = 0;
     }
 
-    // Test switch statement with no matching case
-    int number = 5;
-    switch (number)
+    Assert(result == 10);
+}
+
+void TestSwitchMultipleCases()
+{
+    int value = 3;
+    int result = 0;
+
+    switch (value)
     {
         case 1:
-            Assert(false);  // The number does not match any case, so no case should execute
-            break;
         case 2:
-            Assert(false);
+            result = 10;
             break;
         case 3:
-            Assert(false);
+        case 4:
+            result = 20;
             break;
         default:
-            Assert(true);  // The default case should execute
-            break;
+            result = 0;
     }
+
+    Assert(result == 20);
+}
+
+void TestSwitchFallthrough()
+{
+    int value = 2;
+    int result = 0;
+
+    switch (value)
+    {
+        case 1:
+            result = 10;
+        case 2: // Fall through to the next case
+            result += 20;
+        case 3:
+            result += 30;
+            break;
+        default:
+            result = 0;
+    }
+
+    Assert(result == 50);
+}
+
+void TestSwitchWithBreak()
+{
+    int value = 2;
+    int result = 0;
+
+    switch (value)
+    {
+        case 1:
+            result = 10;
+            break;
+        case 2:
+            result = 20;
+            break;
+        case 3:
+            result = 30;
+            break;
+        default:
+            result = 0;
+    }
+
+    Assert(result == 20);
+}
+
+void TestSwitchChar()
+{
+    //char c = 'b';
+    //int result = 0;
+    //
+    //switch (c)
+    //{
+    //    case 'a':
+    //        result = 1;
+    //        break;
+    //    case 'b':
+    //        result = 2;
+    //        break;
+    //    case 'c':
+    //        result = 3;
+    //        break;
+    //    default:
+    //        result = 0;
+    //}
+    //
+    //Assert(result == 2);
+}
+
+void TestSwitchGlobalVariable()
+{
+    int result = 0;
+
+    switch (GlobalIntX)
+    {
+        case 1:
+            result = 1;
+            break;
+        case 2:
+            result = 2;
+            break;
+        case 3:
+            result = 3;
+            break;
+        default:
+            result = 0;
+    }
+
+    Assert(result == 2);
+}
+
+void TestSwitchGlobalChar()
+{
+    //int result = 0;
+    //
+    //switch (GlobalCharX)
+    //{
+    //    case 'a':
+    //        result = 1;
+    //        break;
+    //    case 'b':
+    //        result = 2;
+    //        break;
+    //    case 'c':
+    //        result = 3;
+    //        break;
+    //    default:
+    //        result = 0;
+    //}
+    //
+    //Assert(result == 2);
+}
+
+void TestSwitchNoMatch()
+{
+    int value = 5;
+    int result = 0;
+
+    switch (value)
+    {
+        case 1:
+            result = 1;
+            break;
+        case 2:
+            result = 2;
+            break;
+        case 3:
+            result = 3;
+            break;
+        default:
+            result = -1;
+    }
+
+    Assert(result == -1);
+}
+
+public int main()
+{
+    TestSwitchBasic();
+    TestSwitchMultipleCases();
+    TestSwitchFallthrough();
+    TestSwitchWithBreak();
+    TestSwitchChar();
+    TestSwitchGlobalVariable();
+    TestSwitchGlobalChar();
+    TestSwitchNoMatch();
 
     return 0;
 }

@@ -1,13 +1,9 @@
 .intel_syntax noprefix
 
-.section .data
+.section .rodata
 
 GlobalIntX:
-.quad 8
-
-
-GlobalIntY:
-.quad 3
+.quad 2
 
 
 .section .text
@@ -16,350 +12,237 @@ GlobalIntY:
 
 .extern AssertMsg
 
-TestShiftOperatorsIntegers:
+TestSwitchBasic:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 72
+sub rsp, 40
 mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov qword ptr [rbp - 32], 5
-mov qword ptr [rbp - 40], 2
-mov rcx, 1
-call Assert
-mov rcx, 1
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r13, r14
-shl r13, 1
-cmp r13, 16
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr GlobalIntX[rip]
-mov r14, r13
-sar r14, 1
-cmp r14, 4
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntY[rip]
-mov r13, 4
-mov rcx, r14
-shl r13, cl
-cmp r13, 32
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr GlobalIntY[rip]
-mov r14, 4
-mov rcx, r13
-sar r14, cl
-cmp r14, 0
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr [rbp - 32]
-mov r13, r14
-shl r13, 1
-cmp r13, 10
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr [rbp - 32]
-mov r14, r13
-sar r14, 1
-cmp r14, 2
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr [rbp - 40]
-mov r13, 4
-mov rcx, r14
-shl r13, cl
-cmp r13, 16
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr [rbp - 40]
-mov r14, 4
-mov rcx, r13
-sar r14, cl
-cmp r14, 1
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r13, qword ptr [rbp - 40]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-cmp r12, 32
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr GlobalIntX[rip]
-mov r13, qword ptr [rbp - 40]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-cmp r14, 2
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr [rbp - 32]
-mov r13, qword ptr GlobalIntY[rip]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-cmp r12, 40
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr [rbp - 32]
-mov r13, qword ptr GlobalIntY[rip]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-cmp r14, 0
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr [rbp - 32]
-mov r13, qword ptr [rbp - 40]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-cmp r12, 20
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr [rbp - 32]
-mov r13, qword ptr [rbp - 40]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-cmp r14, 1
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r13, qword ptr GlobalIntY[rip]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-cmp r12, 64
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr GlobalIntX[rip]
-mov r13, qword ptr GlobalIntY[rip]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-cmp r14, 1
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
 jmp label1
 label1:
+jmp label4
+jmp label2
+label2:
+jmp label6
+label3:
+cmp r14, 10
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label6
+label4:
+mov r14, 10
+jmp label3
+label5:
+mov r14, 20
+jmp label3
+label6:
 mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
 mov rsp, rbp
 pop rbp
 ret
-TestCompoundShiftOperatorsIntegers:
-label2:
+TestSwitchMultipleCases:
+label7:
 push rbp
 mov rbp, rsp
-sub rsp, 80
+sub rsp, 40
+mov qword ptr [rbp - 8], r14
+jmp label8
+label8:
+jmp label13
+jmp label9
+label9:
+jmp label15
+label10:
+cmp r14, 20
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label15
+label11:
+jmp label12
+label12:
+mov r14, 10
+jmp label10
+label13:
+jmp label14
+label14:
+mov r14, 20
+jmp label10
+label15:
+mov r14, qword ptr [rbp - 8]
+mov rsp, rbp
+pop rbp
+ret
+TestSwitchFallthrough:
+label16:
+push rbp
+mov rbp, rsp
+sub rsp, 48
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov qword ptr [rbp - 32], 5
-mov qword ptr [rbp - 40], 2
-mov r14, qword ptr [rbp - 32]
-mov r13, r14
-shl r13, 2
-mov qword ptr [rbp - 32], r13
-mov r13, qword ptr [rbp - 32]
-cmp r13, 20
+jmp label17
+label17:
+mov r14, 0
+jmp label21
+jmp label18
+label18:
+jmp label23
+label19:
+cmp r13, 50
 sete r13b
 and r13b, 1
 mov cl, r13b
 call Assert
-mov r13, qword ptr [rbp - 32]
-mov r14, r13
-sar r14, 2
-mov qword ptr [rbp - 32], r14
-mov r14, qword ptr [rbp - 32]
-cmp r14, 5
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov qword ptr [rbp - 48], 4
-mov r14, qword ptr [rbp - 48]
-mov r13, qword ptr [rbp - 40]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-mov qword ptr [rbp - 48], r12
-mov r12, qword ptr [rbp - 48]
-cmp r12, 16
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov qword ptr [rbp - 48], 16
-mov r12, qword ptr [rbp - 48]
-mov r13, qword ptr [rbp - 40]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-mov qword ptr [rbp - 48], r14
-mov r14, qword ptr [rbp - 48]
-cmp r14, 4
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr [rbp - 32]
-mov r13, qword ptr GlobalIntY[rip]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-mov qword ptr [rbp - 32], r12
-mov r12, qword ptr [rbp - 32]
-cmp r12, 40
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr [rbp - 32]
-mov r13, qword ptr GlobalIntY[rip]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-mov qword ptr [rbp - 32], r14
-mov r14, qword ptr [rbp - 32]
-cmp r14, 5
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
+jmp label23
+label20:
+mov r14, 10
+jmp label21
+label21:
 mov r13, r14
-shl r13, 1
-mov qword ptr GlobalIntX[rip], r13
-mov r13, qword ptr GlobalIntX[rip]
-cmp r13, 16
-sete r13b
-and r13b, 1
-mov cl, r13b
-call Assert
-mov r13, qword ptr GlobalIntX[rip]
+add r13, 20
 mov r14, r13
-sar r14, 1
-mov qword ptr GlobalIntX[rip], r14
-mov r14, qword ptr GlobalIntX[rip]
-cmp r14, 8
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r13, qword ptr [rbp - 40]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-mov qword ptr GlobalIntX[rip], r12
-mov r12, qword ptr GlobalIntX[rip]
-cmp r12, 32
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr GlobalIntX[rip]
-mov r13, qword ptr [rbp - 40]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-mov qword ptr GlobalIntX[rip], r14
-mov r14, qword ptr GlobalIntX[rip]
-cmp r14, 8
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov r14, qword ptr GlobalIntX[rip]
-mov r13, qword ptr GlobalIntY[rip]
-mov r12, r14
-mov rcx, r13
-shl r12, cl
-mov qword ptr GlobalIntX[rip], r12
-mov r12, qword ptr GlobalIntX[rip]
-cmp r12, 64
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-mov r12, qword ptr GlobalIntX[rip]
-mov r13, qword ptr GlobalIntY[rip]
-mov r14, r12
-mov rcx, r13
-sar r14, cl
-mov qword ptr GlobalIntX[rip], r14
-mov r14, qword ptr GlobalIntX[rip]
-cmp r14, 8
-sete r14b
-and r14b, 1
-mov cl, r14b
-call Assert
-mov qword ptr GlobalIntX[rip], 8
-jmp label3
-label3:
+jmp label22
+label22:
+mov r13, r14
+add r13, 30
+jmp label19
+label23:
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestSwitchWithBreak:
+label24:
+push rbp
+mov rbp, rsp
+sub rsp, 40
+mov qword ptr [rbp - 8], r14
+jmp label25
+label25:
+jmp label29
+jmp label26
+label26:
+jmp label31
+label27:
+cmp r14, 20
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label31
+label28:
+mov r14, 10
+jmp label27
+label29:
+mov r14, 20
+jmp label27
+label30:
+mov r14, 30
+jmp label27
+label31:
+mov r14, qword ptr [rbp - 8]
+mov rsp, rbp
+pop rbp
+ret
+TestSwitchGlobalVariable:
+label32:
+push rbp
+mov rbp, rsp
+sub rsp, 48
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+jmp label33
+label33:
+mov r14, qword ptr GlobalIntX[rip]
+cmp r14, 1
+je label36
+cmp r14, 2
+je label37
+cmp r14, 3
+je label38
+jmp label34
+label34:
+jmp label39
+label35:
+cmp r14, 2
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+jmp label39
+label36:
+mov r14, 1
+jmp label35
+label37:
+mov r14, 2
+jmp label35
+label38:
+mov r14, 3
+jmp label35
+label39:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+TestSwitchNoMatch:
+label40:
+push rbp
+mov rbp, rsp
+sub rsp, 48
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+jmp label41
+label41:
+jmp label42
+label42:
+jmp label47
+label43:
+cmp r14, -1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+jmp label47
+label44:
+mov r14, 1
+jmp label43
+label45:
+mov r14, 2
+jmp label43
+label46:
+mov r14, 3
+jmp label43
+label47:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
 mov rsp, rbp
 pop rbp
 ret
 .globl main
 
 main:
-label4:
+label48:
 push rbp
 mov rbp, rsp
-sub rsp, 48
-mov qword ptr [rbp - 8], r14
-call TestShiftOperatorsIntegers
-call TestCompoundShiftOperatorsIntegers
-mov qword ptr [rbp - 16], 0
-jmp label6
-label5:
-label6:
-mov r14, qword ptr [rbp - 16]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
+sub rsp, 32
+call TestSwitchBasic
+call TestSwitchMultipleCases
+call TestSwitchFallthrough
+call TestSwitchWithBreak
+jmp label49
+label49:
+call TestSwitchGlobalVariable
+jmp label50
+label50:
+call TestSwitchNoMatch
+jmp label51
+label51:
+mov rax, 0
 mov rsp, rbp
 pop rbp
 ret

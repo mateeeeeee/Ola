@@ -1,104 +1,195 @@
 import std.assert;
 
 // Global variables
-int GlobalIntX = 8;
-int GlobalIntY = 3;
+int GlobalIntX = 2;
+char GlobalCharX = 'b';
 
-void TestShiftOperatorsIntegers()
+void TestSwitchBasic()
 {
-    // Local variables
-    int localIntA = 5;
-    int localIntB = 2;
+    int value = 1;
+    int result = 0;
 
-    // Literal - Literal
-    Assert((4 << 1) == 8);
-    Assert((4 >> 1) == 2);
+    switch (value)
+    {
+        case 1:
+            result = 10;
+            break;
+        case 2:
+            result = 20;
+            break;
+        default:
+            result = 0;
+    }
 
-    // Global - Literal
-    Assert(GlobalIntX << 1 == 16);
-    Assert(GlobalIntX >> 1 == 4);
-
-    // Literal - Global
-    Assert(4 << GlobalIntY == 32);
-    Assert(4 >> GlobalIntY == 0);
-
-    // Local - Literal
-    Assert(localIntA << 1 == 10);
-    Assert(localIntA >> 1 == 2);
-
-    // Literal - Local
-    Assert(4 << localIntB == 16);
-    Assert(4 >> localIntB == 1);
-
-    // Global - Local
-    Assert(GlobalIntX << localIntB == 32);
-    Assert(GlobalIntX >> localIntB == 2);
-
-    // Local - Global
-    Assert(localIntA << GlobalIntY == 40);
-    Assert(localIntA >> GlobalIntY == 0);
-
-    // Local - Local
-    Assert(localIntA << localIntB == 20);
-    Assert(localIntA >> localIntB == 1);
-
-    // Global - Global
-    Assert(GlobalIntX << GlobalIntY == 64);
-    Assert(GlobalIntX >> GlobalIntY == 1);
+    Assert(result == 10);
 }
 
-void TestCompoundShiftOperatorsIntegers()
+void TestSwitchMultipleCases()
 {
-    // Local variables
-    int localIntA = 5;
-    int localIntB = 2;
+    int value = 3;
+    int result = 0;
 
-    // Local - Literal compound operations
-    localIntA <<= 2;
-    Assert(localIntA == 20);
-    localIntA >>= 2;
-    Assert(localIntA == 5);
+    switch (value)
+    {
+        case 1:
+        case 2:
+            result = 10;
+            break;
+        case 3:
+        case 4:
+            result = 20;
+            break;
+        default:
+            result = 0;
+    }
 
-    // Literal - Local compound operations (not directly possible, so we use an intermediate)
-    int temp = 4;
-    temp <<= localIntB;
-    Assert(temp == 16);
-    temp = 16; // Reset for the next test
-    temp >>= localIntB;
-    Assert(temp == 4);
+    Assert(result == 20);
+}
 
-    // Local - Global compound operations
-    localIntA <<= GlobalIntY;
-    Assert(localIntA == 40);
-    localIntA >>= GlobalIntY;
-    Assert(localIntA == 5);
+void TestSwitchFallthrough()
+{
+    int value = 2;
+    int result = 0;
 
-    // Global - Literal compound operations
-    GlobalIntX <<= 1;
-    Assert(GlobalIntX == 16);
-    GlobalIntX >>= 1;
-    Assert(GlobalIntX == 8);
+    switch (value)
+    {
+        case 1:
+            result = 10;
+        case 2: // Fall through to the next case
+            result += 20;
+        case 3:
+            result += 30;
+            break;
+        default:
+            result = 0;
+    }
 
-    // Global - Local compound operations
-    GlobalIntX <<= localIntB;
-    Assert(GlobalIntX == 32);
-    GlobalIntX >>= localIntB;
-    Assert(GlobalIntX == 8);
+    Assert(result == 50);
+}
 
-    // Global - Global compound operations
-    GlobalIntX <<= GlobalIntY;
-    Assert(GlobalIntX == 64);
-    GlobalIntX >>= GlobalIntY;
-    Assert(GlobalIntX == 8);
+void TestSwitchWithBreak()
+{
+    int value = 2;
+    int result = 0;
 
-    // Resetting GlobalIntX for subsequent tests if necessary
-    GlobalIntX = 8;
+    switch (value)
+    {
+        case 1:
+            result = 10;
+            break;
+        case 2:
+            result = 20;
+            break;
+        case 3:
+            result = 30;
+            break;
+        default:
+            result = 0;
+    }
+
+    Assert(result == 20);
+}
+
+void TestSwitchChar()
+{
+    //char c = 'b';
+    //int result = 0;
+    //
+    //switch (c)
+    //{
+    //    case 'a':
+    //        result = 1;
+    //        break;
+    //    case 'b':
+    //        result = 2;
+    //        break;
+    //    case 'c':
+    //        result = 3;
+    //        break;
+    //    default:
+    //        result = 0;
+    //}
+    //
+    //Assert(result == 2);
+}
+
+void TestSwitchGlobalVariable()
+{
+    int result = 0;
+
+    switch (GlobalIntX)
+    {
+        case 1:
+            result = 1;
+            break;
+        case 2:
+            result = 2;
+            break;
+        case 3:
+            result = 3;
+            break;
+        default:
+            result = 0;
+    }
+
+    Assert(result == 2);
+}
+
+void TestSwitchGlobalChar()
+{
+    //int result = 0;
+    //
+    //switch (GlobalCharX)
+    //{
+    //    case 'a':
+    //        result = 1;
+    //        break;
+    //    case 'b':
+    //        result = 2;
+    //        break;
+    //    case 'c':
+    //        result = 3;
+    //        break;
+    //    default:
+    //        result = 0;
+    //}
+    //
+    //Assert(result == 2);
+}
+
+void TestSwitchNoMatch()
+{
+    int value = 5;
+    int result = 0;
+
+    switch (value)
+    {
+        case 1:
+            result = 1;
+            break;
+        case 2:
+            result = 2;
+            break;
+        case 3:
+            result = 3;
+            break;
+        default:
+            result = -1;
+    }
+
+    Assert(result == -1);
 }
 
 public int main()
 {
-    TestShiftOperatorsIntegers();
-    TestCompoundShiftOperatorsIntegers();
+    TestSwitchBasic();
+    TestSwitchMultipleCases();
+    TestSwitchFallthrough();
+    TestSwitchWithBreak();
+    TestSwitchChar();
+    TestSwitchGlobalVariable();
+    TestSwitchGlobalChar();
+    TestSwitchNoMatch();
 
     return 0;
 }

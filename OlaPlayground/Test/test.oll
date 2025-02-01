@@ -6,189 +6,146 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @GlobalIntX ptr 8
+define internal @GlobalIntX ptr 2
 
 
-define internal @GlobalIntY ptr 3
-
-
-define internal @TestShiftOperatorsIntegers void() {
+define internal @TestSwitchBasic void() {
 entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 2, ptr %1
-call i8 1, @Assert
-call i8 1, @Assert
-%2 = load i64, ptr @GlobalIntX
-%3 = shl i64 %2, 1
-%4 = icmp eq i64 %3, 16
-call i8 %4, @Assert
-%5 = load i64, ptr @GlobalIntX
-%6 = ashr i64 %5, 1
-%7 = icmp eq i64 %6, 4
-call i8 %7, @Assert
-%8 = load i64, ptr @GlobalIntY
-%9 = shl i64 4, %8
-%10 = icmp eq i64 %9, 32
-call i8 %10, @Assert
-%11 = load i64, ptr @GlobalIntY
-%12 = ashr i64 4, %11
-%13 = icmp eq i64 %12, 0
-call i8 %13, @Assert
-%14 = load i64, ptr %0
-%15 = shl i64 %14, 1
-%16 = icmp eq i64 %15, 10
-call i8 %16, @Assert
-%17 = load i64, ptr %0
-%18 = ashr i64 %17, 1
-%19 = icmp eq i64 %18, 2
-call i8 %19, @Assert
-%20 = load i64, ptr %1
-%21 = shl i64 4, %20
-%22 = icmp eq i64 %21, 16
-call i8 %22, @Assert
-%23 = load i64, ptr %1
-%24 = ashr i64 4, %23
-%25 = icmp eq i64 %24, 1
-call i8 %25, @Assert
-%26 = load i64, ptr @GlobalIntX
-%27 = load i64, ptr %1
-%28 = shl i64 %26, %27
-%29 = icmp eq i64 %28, 32
-call i8 %29, @Assert
-%30 = load i64, ptr @GlobalIntX
-%31 = load i64, ptr %1
-%32 = ashr i64 %30, %31
-%33 = icmp eq i64 %32, 2
-call i8 %33, @Assert
-%34 = load i64, ptr %0
-%35 = load i64, ptr @GlobalIntY
-%36 = shl i64 %34, %35
-%37 = icmp eq i64 %36, 40
-call i8 %37, @Assert
-%38 = load i64, ptr %0
-%39 = load i64, ptr @GlobalIntY
-%40 = ashr i64 %38, %39
-%41 = icmp eq i64 %40, 0
-call i8 %41, @Assert
-%42 = load i64, ptr %0
-%43 = load i64, ptr %1
-%44 = shl i64 %42, %43
-%45 = icmp eq i64 %44, 20
-call i8 %45, @Assert
-%46 = load i64, ptr %0
-%47 = load i64, ptr %1
-%48 = ashr i64 %46, %47
-%49 = icmp eq i64 %48, 1
-call i8 %49, @Assert
-%50 = load i64, ptr @GlobalIntX
-%51 = load i64, ptr @GlobalIntY
-%52 = shl i64 %50, %51
-%53 = icmp eq i64 %52, 64
-call i8 %53, @Assert
-%54 = load i64, ptr @GlobalIntX
-%55 = load i64, ptr @GlobalIntY
-%56 = ashr i64 %54, %55
-%57 = icmp eq i64 %56, 1
-call i8 %57, @Assert
+br label switch.header
+switch.header:
+switch i64 1, switch.default, switch.case1, switch.case2
+switch.default:
 br label exit
+switch.end:
+%0 = phi i64 [ 10, switch.case1 ], [ 20, switch.case2 ]
+%1 = icmp eq i64 %0, 10
+call i8 %1, @Assert
+br label exit
+switch.case1:
+br label switch.end
+switch.case2:
+br label switch.end
 exit:
 ret 
 }
 
 
-define internal @TestCompoundShiftOperatorsIntegers void() {
+define internal @TestSwitchMultipleCases void() {
 entry:
-%0 = alloca i64
-store 5, ptr %0
-%1 = alloca i64
-store 2, ptr %1
-%2 = load i64, ptr %0
-%3 = shl i64 %2, 2
-store i64 %3, ptr %0
-%4 = load i64, ptr %0
-%5 = icmp eq i64 %4, 20
-call i8 %5, @Assert
-%6 = load i64, ptr %0
-%7 = ashr i64 %6, 2
-store i64 %7, ptr %0
-%8 = load i64, ptr %0
-%9 = icmp eq i64 %8, 5
-call i8 %9, @Assert
-%10 = alloca i64
-store 4, ptr %10
-%11 = load i64, ptr %10
-%12 = load i64, ptr %1
-%13 = shl i64 %11, %12
-store i64 %13, ptr %10
-%14 = load i64, ptr %10
-%15 = icmp eq i64 %14, 16
-call i8 %15, @Assert
-store 16, ptr %10
-%16 = load i64, ptr %10
-%17 = load i64, ptr %1
-%18 = ashr i64 %16, %17
-store i64 %18, ptr %10
-%19 = load i64, ptr %10
-%20 = icmp eq i64 %19, 4
-call i8 %20, @Assert
-%21 = load i64, ptr %0
-%22 = load i64, ptr @GlobalIntY
-%23 = shl i64 %21, %22
-store i64 %23, ptr %0
-%24 = load i64, ptr %0
-%25 = icmp eq i64 %24, 40
-call i8 %25, @Assert
-%26 = load i64, ptr %0
-%27 = load i64, ptr @GlobalIntY
-%28 = ashr i64 %26, %27
-store i64 %28, ptr %0
-%29 = load i64, ptr %0
-%30 = icmp eq i64 %29, 5
-call i8 %30, @Assert
-%31 = load i64, ptr @GlobalIntX
-%32 = shl i64 %31, 1
-store i64 %32, ptr @GlobalIntX
-%33 = load i64, ptr @GlobalIntX
-%34 = icmp eq i64 %33, 16
-call i8 %34, @Assert
-%35 = load i64, ptr @GlobalIntX
-%36 = ashr i64 %35, 1
-store i64 %36, ptr @GlobalIntX
-%37 = load i64, ptr @GlobalIntX
-%38 = icmp eq i64 %37, 8
-call i8 %38, @Assert
-%39 = load i64, ptr @GlobalIntX
-%40 = load i64, ptr %1
-%41 = shl i64 %39, %40
-store i64 %41, ptr @GlobalIntX
-%42 = load i64, ptr @GlobalIntX
-%43 = icmp eq i64 %42, 32
-call i8 %43, @Assert
-%44 = load i64, ptr @GlobalIntX
-%45 = load i64, ptr %1
-%46 = ashr i64 %44, %45
-store i64 %46, ptr @GlobalIntX
-%47 = load i64, ptr @GlobalIntX
-%48 = icmp eq i64 %47, 8
-call i8 %48, @Assert
-%49 = load i64, ptr @GlobalIntX
-%50 = load i64, ptr @GlobalIntY
-%51 = shl i64 %49, %50
-store i64 %51, ptr @GlobalIntX
-%52 = load i64, ptr @GlobalIntX
-%53 = icmp eq i64 %52, 64
-call i8 %53, @Assert
-%54 = load i64, ptr @GlobalIntX
-%55 = load i64, ptr @GlobalIntY
-%56 = ashr i64 %54, %55
-store i64 %56, ptr @GlobalIntX
-%57 = load i64, ptr @GlobalIntX
-%58 = icmp eq i64 %57, 8
-call i8 %58, @Assert
-store 8, ptr @GlobalIntX
+br label switch.header
+switch.header:
+switch i64 3, switch.default, switch.case2, switch.case2, switch.case4, switch.case4
+switch.default:
 br label exit
+switch.end:
+%0 = phi i64 [ 10, switch.case2 ], [ 20, switch.case4 ]
+%1 = icmp eq i64 %0, 20
+call i8 %1, @Assert
+br label exit
+switch.case1:
+br label switch.case2
+switch.case2:
+br label switch.end
+switch.case3:
+br label switch.case4
+switch.case4:
+br label switch.end
+exit:
+ret 
+}
+
+
+define internal @TestSwitchFallthrough void() {
+entry:
+br label switch.header
+switch.header:
+switch i64 2, switch.default, switch.case1, switch.case2, switch.case3
+switch.default:
+br label exit
+switch.end:
+%0 = icmp eq i64 %1, 50
+call i8 %0, @Assert
+br label exit
+switch.case1:
+br label switch.case2
+switch.case2:
+%2 = phi i64 [ 0, switch.header ], [ 10, switch.case1 ]
+%3 = add i64 %2, 20
+br label switch.case3
+switch.case3:
+%4 = phi i64 [ 0, switch.header ], [ %3, switch.case2 ]
+%1 = add i64 %4, 30
+br label switch.end
+exit:
+ret 
+}
+
+
+define internal @TestSwitchWithBreak void() {
+entry:
+br label switch.header
+switch.header:
+switch i64 2, switch.default, switch.case1, switch.case2, switch.case3
+switch.default:
+br label exit
+switch.end:
+%0 = phi i64 [ 30, switch.case3 ], [ 10, switch.case1 ], [ 20, switch.case2 ]
+%1 = icmp eq i64 %0, 20
+call i8 %1, @Assert
+br label exit
+switch.case1:
+br label switch.end
+switch.case2:
+br label switch.end
+switch.case3:
+br label switch.end
+exit:
+ret 
+}
+
+
+define internal @TestSwitchGlobalVariable void() {
+entry:
+br label switch.header
+switch.header:
+%0 = load i64, ptr @GlobalIntX
+switch i64 %0, switch.default, switch.case1, switch.case2, switch.case3
+switch.default:
+br label exit
+switch.end:
+%1 = phi i64 [ 1, switch.case1 ], [ 2, switch.case2 ], [ 3, switch.case3 ]
+%2 = icmp eq i64 %1, 2
+call i8 %2, @Assert
+br label exit
+switch.case1:
+br label switch.end
+switch.case2:
+br label switch.end
+switch.case3:
+br label switch.end
+exit:
+ret 
+}
+
+
+define internal @TestSwitchNoMatch void() {
+entry:
+br label switch.header
+switch.header:
+switch i64 5, switch.default, switch.case1, switch.case2, switch.case3
+switch.default:
+br label exit
+switch.end:
+%0 = phi i64 [ 1, switch.case1 ], [ 2, switch.case2 ], [ 3, switch.case3 ]
+%1 = icmp eq i64 %0, -1
+call i8 %1, @Assert
+br label exit
+switch.case1:
+br label switch.end
+switch.case2:
+br label switch.end
+switch.case3:
+br label switch.end
 exit:
 ret 
 }
@@ -196,15 +153,18 @@ ret
 
 define external @main i64() {
 entry:
-%0 = alloca i64
-call ptr @TestShiftOperatorsIntegers
-call ptr @TestCompoundShiftOperatorsIntegers
-store 0, ptr %0
-br label exit
-return:
+call ptr @TestSwitchBasic
+call ptr @TestSwitchMultipleCases
+call ptr @TestSwitchFallthrough
+call ptr @TestSwitchWithBreak
+br label entry.split
+entry.split:
+call ptr @TestSwitchGlobalVariable
+br label entry.split.split
+entry.split.split:
+call ptr @TestSwitchNoMatch
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+ret i64 0
 }
 
