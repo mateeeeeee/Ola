@@ -4,13 +4,12 @@
 
 int main(int argc, char** argv)
 {
-	ola::LogInit();
+	OLA_LOG_INIT();
 	ola::CompileRequest compile_request{};
 	if (compile_request.Parse(argc, argv))
 	{
 		ola::Int compile_result = ola::Compile(compile_request);
 		return compile_result;
 	}
-	ola::LogDestroy();
 	return 0;
 }

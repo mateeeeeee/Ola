@@ -17,7 +17,7 @@ constexpr Uint ArraySize(T(&arr)[N])
 
 Int main()
 {
-	LogInit();
+	OLA_LOG_INIT();
 	CompileRequest compile_request{};
 #if NOLLVM
 	Char const* argv[] = { "-i", "test", "--O0","--nollvm", "--emit-asm","--emit-ir","--emit-mir", "--directory", OLA_PLAYGROUND_PATH"Test"};
@@ -29,6 +29,5 @@ Int main()
 		Int compile_result = Compile(compile_request);
 		return compile_result;
 	}
-	LogDestroy();
 	return 0;
 }

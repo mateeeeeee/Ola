@@ -27,7 +27,13 @@ namespace ola
 		printf("%s\n", full_log_entry.c_str());
 		WriteToLogFile(full_log_entry);
 	}
+	struct LogInitScope
+	{
+		LogInitScope() { LogInit(); }
+		~LogInitScope() { LogDestroy(); }
+	};
 }
+#define OLA_LOG_INIT() ola::LogInitScope __log_init_scope{};
 
 #if defined(DEBUG)
 #define OLA_DEBUG(fmt, ...)		ola::Log(ola::LogLevel::Debug, fmt, __VA_ARGS__)
