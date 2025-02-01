@@ -1307,6 +1307,18 @@ namespace ola
 					return;
 				}
 			}
+			else if (Consume(TokenKind::KW_noopt))
+			{
+				if (!HasAttribute(attrs, FuncAttribute_NoOpt))
+				{
+					attrs |= FuncAttribute_NoOpt;
+				}
+				else
+				{
+					Diag(function_attribute_repetition);
+					return;
+				}
+			}
 		}
 	}
 
@@ -1480,6 +1492,11 @@ namespace ola
 			return true;
 		}
 		if (Consume(TokenKind::KW_nomangle))
+		{
+			current_token = token;
+			return true;
+		}
+		if (Consume(TokenKind::KW_noopt))
 		{
 			current_token = token;
 			return true;

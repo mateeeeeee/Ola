@@ -7,19 +7,17 @@
 
 namespace ola
 {
-
 	Bool FunctionPassManagerModuleAdaptor::RunOn(IRModule& M, IRModuleAnalysisManager& MAM)
 	{
 		Bool changed = false;
 		for (auto& G : M.Globals())
 		{
-			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
+			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration() && !F->IsNoOptimizations())
 			{
 				changed |= FPM.Run(*F, FAM);
 			}
 		}
 		return changed;
 	}
-
 }
 

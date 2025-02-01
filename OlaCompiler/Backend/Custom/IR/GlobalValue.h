@@ -103,7 +103,8 @@ namespace ola
 	{
 		Attribute_None = 0x00,
 		Attribute_NoInline = 0x01,
-		Attribute_ForceInline = 0x02
+		Attribute_ForceInline = 0x02,
+		Attribute_NoOptimizations = 0x04
 	};
 
 	class BasicBlock;
@@ -161,6 +162,8 @@ namespace ola
 		void SetForceInline() { attr.AddAttr(Attribute_ForceInline); }
 		Bool IsNoInline() const { return attr.HasAttr(Attribute_NoInline); }
 		void SetNoInline() { attr.AddAttr(Attribute_NoInline); }
+		Bool IsNoOptimizations() const { return attr.HasAttr(Attribute_NoOptimizations); }
+		void SetNoOptimizations() { attr.AddAttr(Attribute_NoOptimizations); }
 
 		Uint64	Size() const;
 		Bool    Empty() const { return block_list.Empty(); }

@@ -20,7 +20,7 @@ Int main()
 	OLA_LOG_INIT();
 	CompileRequest compile_request{};
 #if NOLLVM
-	Char const* argv[] = { "-i", "test", "--O0","--nollvm", "--emit-asm","--emit-ir","--emit-mir", "--directory", OLA_PLAYGROUND_PATH"Test"};
+	Char const* argv[] = { "-i", "test", "--O1","--nollvm", "--emit-asm","--emit-ir","--emit-mir", "--directory", OLA_PLAYGROUND_PATH"Test"};
 #else
 	Char const* argv[] = { "-i", "test", "--O1","--timeout",  "--emit-asm","--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test" };
 #endif

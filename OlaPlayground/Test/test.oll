@@ -1,50 +1,59 @@
 Module ID : test.ola
 
-declare @Assert void(i8)
-
-
-declare @AssertMsg void(i8,ptr)
+define internal @TestNestedForLoopsReset void() {
+entry:
+%0 = alloca i64
+store 0, ptr %0
+%1 = alloca i64
+store 0, ptr %1
+br label for.cond
+for.body:
+%2 = alloca i64
+store 0, ptr %2
+br label for.cond1
+for.cond:
+%3 = load i64, ptr %0
+%4 = icmp slt i64 %3, 3
+br i8 %4, label for.body, label for.end
+for.iter:
+%5 = load i64, ptr %0
+%6 = alloca ptr
+store i64 %5, ptr %6
+%7 = add i64 %5, 1
+store i64 %7, ptr %0
+br label for.cond
+for.end:
+br label exit
+for.body1:
+%8 = load i64, ptr %1
+%9 = alloca ptr
+store i64 %8, ptr %9
+%10 = add i64 %8, 1
+store i64 %10, ptr %1
+br label for.iter1
+for.cond1:
+%11 = load i64, ptr %2
+%12 = icmp slt i64 %11, 2
+br i8 %12, label for.body1, label for.end1
+for.iter1:
+%13 = load i64, ptr %2
+%14 = alloca ptr
+store i64 %13, ptr %14
+%15 = add i64 %13, 1
+store i64 %15, ptr %2
+br label for.cond1
+for.end1:
+br label for.iter
+exit:
+ret 
+}
 
 
 define external @main i64() {
 entry:
-%0 = alloca i64
-%1 = alloca i8
-store 98, ptr %1
-%2 = alloca i64
-store 0, ptr %2
-br label switch.header
-switch.header:
-%3 = load i64, ptr %1
-switch i64 %3, switch.default, switch.case97, switch.case98, switch.case99
-switch.default:
-store 0, ptr %2
-br label exit
-switch.end:
-%4 = load i64, ptr %2
-%5 = icmp eq i64 %4, 2
-call i8 %5, @Assert
-store 0, ptr %0
-br label exit
-return:
-br label exit
-switch.case97:
-store 1, ptr %2
-br label switch.end
-break:
-br label exit
-switch.case98:
-store 2, ptr %2
-br label switch.end
-break1:
-br label exit
-switch.case99:
-store 3, ptr %2
-br label switch.end
-break2:
+call ptr @TestNestedForLoopsReset
 br label exit
 exit:
-%6 = load i64, ptr %0
-ret i64 %6
+ret i64 0
 }
 

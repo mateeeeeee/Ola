@@ -1317,6 +1317,7 @@ namespace ola
 	{
 		if (func_decl.IsInline()) func->addFnAttr(llvm::Attribute::AlwaysInline);
 		else if (func_decl.IsNoInline()) func->addFnAttr(llvm::Attribute::NoInline);
+		if (func_decl.IsNoOpt()) func->addFnAttr(llvm::Attribute::OptimizeNone);
 
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", func);
 		builder.SetInsertPoint(entry_block);

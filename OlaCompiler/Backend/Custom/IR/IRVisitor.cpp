@@ -86,7 +86,6 @@ namespace ola
 
 	void IRVisitor::Visit(ParamVarDecl const&, Uint32)
 	{
-
 	}
 
 	void IRVisitor::Visit(FieldDecl const& field_decl, Uint32)
@@ -1173,6 +1172,7 @@ namespace ola
 	{
 		if (func_decl.IsInline()) func->SetForceInline();
 		else if (func_decl.IsNoInline()) func->SetNoInline();
+		if (func_decl.IsNoOpt()) func->SetNoOptimizations();
 
 		BasicBlock* entry_block = builder->AddBlock(func, "entry");
 		builder->SetCurrentBlock(entry_block);
