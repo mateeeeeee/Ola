@@ -6,430 +6,1034 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @GlobalIntX ptr 20
+define internal @GlobalIntX ptr 15
 
 
-define internal @GlobalIntY ptr 4
+define internal @GlobalIntY ptr 20
 
 
 define internal @GlobalFloatX ptr 7.5
 
 
-define internal @GlobalFloatY ptr 2.5
+define internal @GlobalFloatY ptr 12.5
 
 
-define internal @TestMultiplication void() {
+define internal @TestLessThanOperators void() {
 entry:
 %0 = alloca i64
 store 5, ptr %0
 %1 = alloca i64
-store 3, ptr %1
-%2 = alloca f64
-store 2.5, ptr %2
-%3 = alloca f64
-store 1.2, ptr %3
-%4 = load i64, ptr %0
-%5 = load i64, ptr %1
-%6 = smul i64 %4, %5
-%7 = alloca i64
-store i64 %6, ptr %7
-%8 = load i64, ptr %7
-%9 = icmp eq i64 %8, 15
-call i8 %9, @Assert
-%10 = load f64, ptr %2
-%11 = load f64, ptr %3
-%12 = fmul f64 %10, %11
-%13 = alloca f64
-store f64 %12, ptr %13
-%14 = load f64, ptr %13
-%15 = fcmp oeq f64 %14, 3
-call i8 %15, @Assert
-%16 = load i64, ptr %0
-%17 = load i64, ptr @GlobalIntY
-%18 = smul i64 %16, %17
-%19 = alloca i64
-store i64 %18, ptr %19
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 20
-call i8 %21, @Assert
-%22 = load f64, ptr %2
-%23 = load f64, ptr @GlobalFloatY
-%24 = fmul f64 %22, %23
-%25 = alloca f64
-store f64 %24, ptr %25
-%26 = load f64, ptr %25
-%27 = fcmp oeq f64 %26, 6.25
-call i8 %27, @Assert
-%28 = load i64, ptr %0
-%29 = smul i64 %28, 2
-%30 = alloca i64
-store i64 %29, ptr %30
-%31 = load i64, ptr %30
-%32 = icmp eq i64 %31, 10
-call i8 %32, @Assert
-%33 = load f64, ptr %2
-%34 = fmul f64 %33, 2
-%35 = alloca f64
-store f64 %34, ptr %35
-%36 = load f64, ptr %35
-%37 = fcmp oeq f64 %36, 5
-call i8 %37, @Assert
-%38 = load i64, ptr @GlobalIntX
-%39 = load i64, ptr @GlobalIntY
-%40 = smul i64 %38, %39
-%41 = alloca i64
-store i64 %40, ptr %41
-%42 = load i64, ptr %41
-%43 = icmp eq i64 %42, 80
-call i8 %43, @Assert
-%44 = load f64, ptr @GlobalFloatX
-%45 = load f64, ptr @GlobalFloatY
-%46 = fmul f64 %44, %45
-%47 = alloca f64
-store f64 %46, ptr %47
-%48 = load f64, ptr %47
-%49 = fcmp oeq f64 %48, 18.75
-call i8 %49, @Assert
-%50 = load i64, ptr @GlobalIntX
-%51 = smul i64 %50, 2
-%52 = alloca i64
-store i64 %51, ptr %52
-%53 = load i64, ptr %52
-%54 = icmp eq i64 %53, 40
-call i8 %54, @Assert
-%55 = load f64, ptr @GlobalFloatX
-%56 = fmul f64 %55, 2
-%57 = alloca f64
-store f64 %56, ptr %57
-%58 = load f64, ptr %57
-%59 = fcmp oeq f64 %58, 15
-call i8 %59, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-%60 = load i64, ptr %0
-%61 = smul i64 %60, 2
-store i64 %61, ptr %0
-%62 = load i64, ptr %0
-%63 = icmp eq i64 %62, 10
-call i8 %63, @Assert
-%64 = load f64, ptr %2
-%65 = fmul f64 %64, 1.5
-store f64 %65, ptr %2
-%66 = load f64, ptr %2
-%67 = fcmp oeq f64 %66, 3.75
-call i8 %67, @Assert
-%68 = alloca i64
-store 2, ptr %68
-%69 = load i64, ptr %68
-%70 = smul i64 %69, 3
-store i64 %70, ptr %68
-%71 = load i64, ptr %68
-%72 = icmp eq i64 %71, 6
-call i8 %72, @Assert
-%73 = load i64, ptr @GlobalIntX
-%74 = load i64, ptr @GlobalIntY
-%75 = smul i64 %73, %74
-store i64 %75, ptr @GlobalIntX
-%76 = load i64, ptr @GlobalIntX
-%77 = icmp eq i64 %76, 80
-call i8 %77, @Assert
-%78 = alloca i64
-store 2, ptr %78
-%79 = load i64, ptr @GlobalIntY
-%80 = load i64, ptr %78
-%81 = smul i64 %79, %80
-store i64 %81, ptr @GlobalIntY
-%82 = load i64, ptr @GlobalIntY
-%83 = icmp eq i64 %82, 8
-call i8 %83, @Assert
-store 20, ptr @GlobalIntX
-store 4, ptr @GlobalIntY
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestDivision void() {
-entry:
-%0 = alloca i64
-store 15, ptr %0
-%1 = alloca i64
-store 3, ptr %1
-%2 = alloca f64
-store 5, ptr %2
-%3 = alloca f64
-store 2, ptr %3
-%4 = load i64, ptr %0
-%5 = load i64, ptr %1
-%6 = sdiv i64 %4, %5
-%7 = alloca i64
-store i64 %6, ptr %7
-%8 = load i64, ptr %7
-%9 = icmp eq i64 %8, 5
-call i8 %9, @Assert
-%10 = load f64, ptr %2
-%11 = load f64, ptr %3
-%12 = fdiv f64 %10, %11
-%13 = alloca f64
-store f64 %12, ptr %13
-%14 = load f64, ptr %13
-%15 = fcmp oeq f64 %14, 2.5
-call i8 %15, @Assert
-%16 = load i64, ptr %0
-%17 = load i64, ptr @GlobalIntY
-%18 = sdiv i64 %16, %17
-%19 = alloca i64
-store i64 %18, ptr %19
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 3
-call i8 %21, @Assert
-%22 = load f64, ptr %2
-%23 = load f64, ptr @GlobalFloatY
-%24 = fdiv f64 %22, %23
-%25 = alloca f64
-store f64 %24, ptr %25
-%26 = load f64, ptr %25
-%27 = fcmp oeq f64 %26, 2
-call i8 %27, @Assert
-%28 = load i64, ptr %0
-%29 = sdiv i64 %28, 3
-%30 = alloca i64
-store i64 %29, ptr %30
-%31 = load i64, ptr %30
-%32 = icmp eq i64 %31, 5
-call i8 %32, @Assert
-%33 = load f64, ptr %2
-%34 = fdiv f64 %33, 2
-%35 = alloca f64
-store f64 %34, ptr %35
-%36 = load f64, ptr %35
-%37 = fcmp oeq f64 %36, 2.5
-call i8 %37, @Assert
-%38 = load i64, ptr @GlobalIntX
-%39 = load i64, ptr @GlobalIntY
-%40 = sdiv i64 %38, %39
-%41 = alloca i64
-store i64 %40, ptr %41
-%42 = load i64, ptr %41
-%43 = icmp eq i64 %42, 5
-call i8 %43, @Assert
-%44 = load f64, ptr @GlobalFloatX
-%45 = load f64, ptr @GlobalFloatY
-%46 = fdiv f64 %44, %45
-%47 = alloca f64
-store f64 %46, ptr %47
-%48 = load f64, ptr %47
-%49 = fcmp oeq f64 %48, 3
-call i8 %49, @Assert
-%50 = load i64, ptr @GlobalIntX
-%51 = sdiv i64 %50, 5
-%52 = alloca i64
-store i64 %51, ptr %52
-%53 = load i64, ptr %52
-%54 = icmp eq i64 %53, 4
-call i8 %54, @Assert
-%55 = load f64, ptr @GlobalFloatX
-%56 = fdiv f64 %55, 2.5
-%57 = alloca f64
-store f64 %56, ptr %57
-%58 = load f64, ptr %57
-%59 = fcmp oeq f64 %58, 3
-call i8 %59, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-%60 = load i64, ptr %0
-%61 = sdiv i64 %60, 2
-store i64 %61, ptr %0
-%62 = load i64, ptr %0
-%63 = icmp eq i64 %62, 7
-call i8 %63, @Assert
-%64 = load f64, ptr %2
-%65 = fdiv f64 %64, 2
-store f64 %65, ptr %2
-%66 = load f64, ptr %2
-%67 = fcmp oeq f64 %66, 2.5
-call i8 %67, @Assert
-%68 = alloca f64
-store 10, ptr %68
-%69 = load f64, ptr %68
-%70 = fdiv f64 %69, 2
-store f64 %70, ptr %68
-%71 = load f64, ptr %68
-%72 = fcmp oeq f64 %71, 5
-call i8 %72, @Assert
-%73 = load f64, ptr @GlobalFloatX
-%74 = load f64, ptr @GlobalFloatY
-%75 = fdiv f64 %73, %74
-store f64 %75, ptr @GlobalFloatX
-%76 = load f64, ptr @GlobalFloatX
-%77 = fcmp oeq f64 %76, 3
-call i8 %77, @Assert
-%78 = alloca f64
-store 2, ptr %78
-%79 = load f64, ptr @GlobalFloatY
-%80 = load f64, ptr %78
-%81 = fdiv f64 %79, %80
-store f64 %81, ptr @GlobalFloatY
-%82 = load f64, ptr @GlobalFloatY
-%83 = fcmp oeq f64 %82, 1.25
-call i8 %83, @Assert
-store 7.5, ptr @GlobalFloatX
-store 2.5, ptr @GlobalFloatY
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestModulo void() {
-entry:
-%0 = alloca i64
-store 17, ptr %0
-%1 = alloca i64
-store 4, ptr %1
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = srem i64 %2, %3
-%5 = alloca i64
-store i64 %4, ptr %5
-%6 = load i64, ptr %5
-%7 = icmp eq i64 %6, 1
-call i8 %7, @Assert
-%8 = load i64, ptr %0
-%9 = load i64, ptr @GlobalIntY
-%10 = srem i64 %8, %9
-%11 = alloca i64
-store i64 %10, ptr %11
-%12 = load i64, ptr %11
-%13 = icmp eq i64 %12, 1
-call i8 %13, @Assert
-%14 = load i64, ptr %0
-%15 = srem i64 %14, 3
-%16 = alloca i64
-store i64 %15, ptr %16
-%17 = load i64, ptr %16
-%18 = icmp eq i64 %17, 2
-call i8 %18, @Assert
-%19 = load i64, ptr @GlobalIntX
-%20 = load i64, ptr @GlobalIntY
-%21 = srem i64 %19, %20
-%22 = alloca i64
-store i64 %21, ptr %22
-%23 = load i64, ptr %22
-%24 = icmp eq i64 %23, 0
-call i8 %24, @Assert
-%25 = load i64, ptr @GlobalIntX
-%26 = srem i64 %25, 3
-%27 = alloca i64
-store i64 %26, ptr %27
-%28 = load i64, ptr %27
-%29 = icmp eq i64 %28, 2
-call i8 %29, @Assert
-%30 = srem i64 10, 3
-%31 = icmp eq i64 %30, 1
-call i8 %31, @Assert
-%32 = load i64, ptr %0
-%33 = srem i64 %32, 3
-store i64 %33, ptr %0
-%34 = load i64, ptr %0
-%35 = icmp eq i64 %34, 2
-call i8 %35, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestMixedTypeMultiplicationAndDivision void() {
-entry:
-%0 = alloca f64
-store 1e-04, ptr %0
-%1 = alloca i64
-store 2, ptr %1
-%2 = load i64, ptr %1
-%3 = s2f i64 %2
-%4 = load f64, ptr @GlobalFloatX
-%5 = fmul f64 %3, %4
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
 %6 = alloca f64
-store f64 %5, ptr %6
-%7 = load f64, ptr %6
-%8 = fcmp ogt f64 %7, 14.9999
-%9 = load f64, ptr %6
-%10 = fcmp olt f64 %9, 15.0001
-%11 = and i8 %8, %10
-%12 = icmp ne i8 %11, 0
-call i8 %12, @Assert
-%13 = alloca f64
-store 2.5, ptr %13
-%14 = load i64, ptr @GlobalIntY
-%15 = s2f i64 %14
-%16 = load f64, ptr %13
-%17 = fmul f64 %16, %15
-%18 = alloca f64
-store f64 %17, ptr %18
-%19 = load f64, ptr %18
-%20 = fcmp ogt f64 %19, 9.9999
-%21 = load f64, ptr %18
-%22 = fcmp olt f64 %21, 10.0001
-%23 = and i8 %20, %22
-%24 = icmp ne i8 %23, 0
-call i8 %24, @Assert
-%25 = alloca i64
-store 5, ptr %25
-%26 = load i64, ptr %25
-%27 = s2f i64 %26
-%28 = load f64, ptr @GlobalFloatY
-%29 = fdiv f64 %27, %28
-%30 = alloca f64
-store f64 %29, ptr %30
-%31 = load f64, ptr %30
-%32 = fcmp ogt f64 %31, 1.9999
-%33 = load f64, ptr %30
-%34 = fcmp olt f64 %33, 2.0001
-%35 = and i8 %32, %34
-%36 = icmp ne i8 %35, 0
-call i8 %36, @Assert
-%37 = alloca f64
-store 10, ptr %37
-%38 = load i64, ptr @GlobalIntY
-%39 = s2f i64 %38
-%40 = load f64, ptr %37
-%41 = fdiv f64 %40, %39
-%42 = alloca f64
-store f64 %41, ptr %42
-%43 = load f64, ptr %42
-%44 = fcmp ogt f64 %43, 2.4999
-%45 = load f64, ptr %42
-%46 = fcmp olt f64 %45, 2.5001
-%47 = and i8 %44, %46
-%48 = icmp ne i8 %47, 0
-call i8 %48, @Assert
-%49 = alloca i64
-store 2, ptr %49
-%50 = load i64, ptr %49
-%51 = s2f i64 %50
-%52 = load f64, ptr @GlobalFloatX
-%53 = fmul f64 %51, %52
-%54 = f2s f64 %53
-store i64 %54, ptr %49
-%55 = load i64, ptr %49
-%56 = icmp eq i64 %55, 15
-call i8 %56, @Assert
-%57 = alloca f64
-store 15, ptr %57
-%58 = load i64, ptr %1
-%59 = s2f i64 %58
-%60 = load f64, ptr %57
-%61 = fdiv f64 %60, %59
-store f64 %61, ptr %57
-%62 = load f64, ptr %57
-%63 = fcmp ogt f64 %62, 7.4999
-%64 = load f64, ptr %57
-%65 = fcmp olt f64 %64, 7.5001
-%66 = and i8 %63, %65
-%67 = icmp ne i8 %66, 0
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %0
+%9 = load i64, ptr %1
+%10 = icmp slt i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %2
+%12 = load i64, ptr %3
+%13 = icmp slt i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %4
+%15 = load f64, ptr %5
+%16 = fcmp olt f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %6
+%18 = load f64, ptr %7
+%19 = fcmp olt f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %0
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp slt i64 %20, %21
+call i8 %22, @Assert
+%23 = load i64, ptr %1
+%24 = load i64, ptr @GlobalIntY
+%25 = icmp slt i64 %23, %24
+call i8 %25, @Assert
+%26 = load f64, ptr %4
+%27 = load f64, ptr @GlobalFloatX
+%28 = fcmp olt f64 %26, %27
+call i8 %28, @Assert
+%29 = load f64, ptr %5
+%30 = load f64, ptr @GlobalFloatY
+%31 = fcmp olt f64 %29, %30
+call i8 %31, @Assert
+%32 = load i64, ptr @GlobalIntX
+%33 = load i64, ptr %2
+%34 = icmp slt i64 %32, %33
+call i8 %34, @Assert
+%35 = load i64, ptr @GlobalIntY
+%36 = load i64, ptr %3
+%37 = icmp slt i64 %35, %36
+call i8 %37, @Assert
+%38 = load f64, ptr @GlobalFloatX
+%39 = load f64, ptr %6
+%40 = fcmp olt f64 %38, %39
+call i8 %40, @Assert
+%41 = load f64, ptr @GlobalFloatY
+%42 = load f64, ptr %7
+%43 = fcmp olt f64 %41, %42
+call i8 %43, @Assert
+%44 = load i64, ptr %1
+%45 = icmp slt i64 %44, 20
+call i8 %45, @Assert
+%46 = load f64, ptr %5
+%47 = fcmp olt f64 %46, 7.5
+call i8 %47, @Assert
+%48 = load i64, ptr %2
+%49 = icmp slt i64 15, %48
+call i8 %49, @Assert
+%50 = load f64, ptr %7
+%51 = fcmp olt f64 10, %50
+call i8 %51, @Assert
+%52 = load i64, ptr @GlobalIntX
+%53 = load i64, ptr @GlobalIntY
+%54 = icmp slt i64 %52, %53
+call i8 %54, @Assert
+%55 = load f64, ptr @GlobalFloatX
+%56 = load f64, ptr @GlobalFloatY
+%57 = fcmp olt f64 %55, %56
+call i8 %57, @Assert
+%58 = load i64, ptr @GlobalIntX
+%59 = icmp slt i64 %58, 30
+call i8 %59, @Assert
+%60 = load f64, ptr @GlobalFloatX
+%61 = fcmp olt f64 %60, 15
+call i8 %61, @Assert
+%62 = load i64, ptr @GlobalIntX
+%63 = icmp slt i64 5, %62
+call i8 %63, @Assert
+%64 = load f64, ptr @GlobalFloatY
+%65 = fcmp olt f64 7.5, %64
+call i8 %65, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%66 = load i64, ptr %0
+%67 = s2f i64 %66
+%68 = load f64, ptr @GlobalFloatY
+%69 = fcmp olt f64 %67, %68
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntX
+%71 = s2f i64 %70
+%72 = load f64, ptr %7
+%73 = fcmp olt f64 %71, %72
+call i8 %73, @Assert
+%74 = load i64, ptr @GlobalIntY
+%75 = s2f i64 %74
+%76 = load f64, ptr %4
+%77 = fcmp olt f64 %76, %75
+call i8 %77, @Assert
+%78 = load i64, ptr %3
+%79 = s2f i64 %78
+%80 = load f64, ptr @GlobalFloatX
+%81 = fcmp olt f64 %80, %79
+call i8 %81, @Assert
+%82 = load i64, ptr %0
+%83 = s2f i64 %82
+%84 = fcmp olt f64 %83, 7.5
+call i8 %84, @Assert
+%85 = s2f i64 5
+%86 = load f64, ptr %7
+%87 = fcmp olt f64 %85, %86
+call i8 %87, @Assert
+%88 = s2f i64 10
+%89 = load f64, ptr %5
+%90 = fcmp olt f64 %89, %88
+call i8 %90, @Assert
+%91 = load i64, ptr %2
+%92 = s2f i64 %91
+%93 = fcmp olt f64 2.5, %92
+call i8 %93, @Assert
+%94 = load i64, ptr @GlobalIntX
+%95 = s2f i64 %94
+%96 = fcmp olt f64 %95, 20
+call i8 %96, @Assert
+%97 = s2f i64 12
+%98 = load f64, ptr @GlobalFloatY
+%99 = fcmp olt f64 %97, %98
+call i8 %99, @Assert
+%100 = s2f i64 10
+%101 = load f64, ptr @GlobalFloatX
+%102 = fcmp olt f64 %101, %100
+call i8 %102, @Assert
+%103 = load i64, ptr @GlobalIntX
+%104 = s2f i64 %103
+%105 = fcmp olt f64 7.5, %104
+call i8 %105, @Assert
+%106 = s2f i64 4
+%107 = fcmp olt f64 3.5, %106
+call i8 %107, @Assert
+%108 = s2f i64 5
+%109 = fcmp olt f64 %108, 5.5
+call i8 %109, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestLessThanOrEqualOperators void() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+%1 = alloca i64
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
+%6 = alloca f64
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %0
+%9 = load i64, ptr %1
+%10 = icmp sle i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %2
+%12 = load i64, ptr %3
+%13 = icmp sle i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %4
+%15 = load f64, ptr %5
+%16 = fcmp ole f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %6
+%18 = load f64, ptr %7
+%19 = fcmp ole f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %0
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp sle i64 %20, %21
+call i8 %22, @Assert
+%23 = load i64, ptr %1
+%24 = load i64, ptr @GlobalIntY
+%25 = icmp sle i64 %23, %24
+call i8 %25, @Assert
+%26 = load f64, ptr %4
+%27 = load f64, ptr @GlobalFloatX
+%28 = fcmp ole f64 %26, %27
+call i8 %28, @Assert
+%29 = load f64, ptr %5
+%30 = load f64, ptr @GlobalFloatY
+%31 = fcmp ole f64 %29, %30
+call i8 %31, @Assert
+%32 = load i64, ptr @GlobalIntX
+%33 = load i64, ptr %2
+%34 = icmp sle i64 %32, %33
+call i8 %34, @Assert
+%35 = load i64, ptr @GlobalIntY
+%36 = load i64, ptr %3
+%37 = icmp sle i64 %35, %36
+call i8 %37, @Assert
+%38 = load f64, ptr @GlobalFloatX
+%39 = load f64, ptr %6
+%40 = fcmp ole f64 %38, %39
+call i8 %40, @Assert
+%41 = load f64, ptr @GlobalFloatY
+%42 = load f64, ptr %7
+%43 = fcmp ole f64 %41, %42
+call i8 %43, @Assert
+%44 = load i64, ptr %1
+%45 = icmp sle i64 %44, 20
+call i8 %45, @Assert
+%46 = load i64, ptr %2
+%47 = icmp sle i64 %46, 25
+call i8 %47, @Assert
+%48 = load f64, ptr %5
+%49 = fcmp ole f64 %48, 7.5
+call i8 %49, @Assert
+%50 = load f64, ptr %7
+%51 = fcmp ole f64 %50, 20
+call i8 %51, @Assert
+%52 = load i64, ptr %2
+%53 = icmp sle i64 15, %52
+call i8 %53, @Assert
+%54 = load i64, ptr %3
+%55 = icmp sle i64 29, %54
+call i8 %55, @Assert
+%56 = load f64, ptr %7
+%57 = fcmp ole f64 10, %56
+call i8 %57, @Assert
+%58 = load f64, ptr %7
+%59 = fcmp ole f64 19, %58
+call i8 %59, @Assert
+%60 = load i64, ptr @GlobalIntX
+%61 = load i64, ptr @GlobalIntY
+%62 = icmp sle i64 %60, %61
+call i8 %62, @Assert
+%63 = load f64, ptr @GlobalFloatX
+%64 = load f64, ptr @GlobalFloatY
+%65 = fcmp ole f64 %63, %64
+call i8 %65, @Assert
+%66 = load i64, ptr @GlobalIntX
+%67 = icmp sle i64 %66, 30
 call i8 %67, @Assert
+%68 = load f64, ptr @GlobalFloatX
+%69 = fcmp ole f64 %68, 15
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntX
+%71 = icmp sle i64 5, %70
+call i8 %71, @Assert
+%72 = load f64, ptr @GlobalFloatY
+%73 = fcmp ole f64 7.5, %72
+call i8 %73, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%74 = load i64, ptr %0
+%75 = s2f i64 %74
+%76 = load f64, ptr @GlobalFloatY
+%77 = fcmp ole f64 %75, %76
+call i8 %77, @Assert
+%78 = load i64, ptr @GlobalIntX
+%79 = s2f i64 %78
+%80 = load f64, ptr %7
+%81 = fcmp ole f64 %79, %80
+call i8 %81, @Assert
+%82 = load i64, ptr @GlobalIntY
+%83 = s2f i64 %82
+%84 = load f64, ptr %4
+%85 = fcmp ole f64 %84, %83
+call i8 %85, @Assert
+%86 = load i64, ptr %3
+%87 = s2f i64 %86
+%88 = load f64, ptr @GlobalFloatX
+%89 = fcmp ole f64 %88, %87
+call i8 %89, @Assert
+%90 = load i64, ptr %0
+%91 = s2f i64 %90
+%92 = fcmp ole f64 %91, 7.5
+call i8 %92, @Assert
+%93 = s2f i64 5
+%94 = load f64, ptr %7
+%95 = fcmp ole f64 %93, %94
+call i8 %95, @Assert
+%96 = s2f i64 10
+%97 = load f64, ptr %5
+%98 = fcmp ole f64 %97, %96
+call i8 %98, @Assert
+%99 = load i64, ptr %2
+%100 = s2f i64 %99
+%101 = fcmp ole f64 2.5, %100
+call i8 %101, @Assert
+%102 = load i64, ptr @GlobalIntX
+%103 = s2f i64 %102
+%104 = fcmp ole f64 %103, 20
+call i8 %104, @Assert
+%105 = s2f i64 12
+%106 = load f64, ptr @GlobalFloatY
+%107 = fcmp ole f64 %105, %106
+call i8 %107, @Assert
+%108 = s2f i64 10
+%109 = load f64, ptr @GlobalFloatX
+%110 = fcmp ole f64 %109, %108
+call i8 %110, @Assert
+%111 = load i64, ptr @GlobalIntX
+%112 = s2f i64 %111
+%113 = fcmp ole f64 7.5, %112
+call i8 %113, @Assert
+%114 = s2f i64 4
+%115 = fcmp ole f64 3.5, %114
+call i8 %115, @Assert
+%116 = s2f i64 5
+%117 = fcmp ole f64 %116, 5.5
+call i8 %117, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestGreaterThanOperators void() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+%1 = alloca i64
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
+%6 = alloca f64
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %1
+%9 = load i64, ptr %0
+%10 = icmp sgt i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %3
+%12 = load i64, ptr %2
+%13 = icmp sgt i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %5
+%15 = load f64, ptr %4
+%16 = fcmp ogt f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %7
+%18 = load f64, ptr %6
+%19 = fcmp ogt f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %2
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp sgt i64 %20, %21
+call i8 %22, @Assert
+%23 = load i64, ptr %3
+%24 = load i64, ptr @GlobalIntY
+%25 = icmp sgt i64 %23, %24
+call i8 %25, @Assert
+%26 = load f64, ptr %6
+%27 = load f64, ptr @GlobalFloatX
+%28 = fcmp ogt f64 %26, %27
+call i8 %28, @Assert
+%29 = load f64, ptr %7
+%30 = load f64, ptr @GlobalFloatY
+%31 = fcmp ogt f64 %29, %30
+call i8 %31, @Assert
+%32 = load i64, ptr @GlobalIntX
+%33 = load i64, ptr %0
+%34 = icmp sgt i64 %32, %33
+call i8 %34, @Assert
+%35 = load i64, ptr @GlobalIntY
+%36 = load i64, ptr %1
+%37 = icmp sgt i64 %35, %36
+call i8 %37, @Assert
+%38 = load f64, ptr @GlobalFloatX
+%39 = load f64, ptr %4
+%40 = fcmp ogt f64 %38, %39
+call i8 %40, @Assert
+%41 = load f64, ptr @GlobalFloatY
+%42 = load f64, ptr %5
+%43 = fcmp ogt f64 %41, %42
+call i8 %43, @Assert
+%44 = load i64, ptr %3
+%45 = icmp sgt i64 %44, 20
+call i8 %45, @Assert
+%46 = load f64, ptr %7
+%47 = fcmp ogt f64 %46, 7.5
+call i8 %47, @Assert
+%48 = load i64, ptr %2
+%49 = icmp sgt i64 30, %48
+call i8 %49, @Assert
+%50 = load f64, ptr %5
+%51 = fcmp ogt f64 25, %50
+call i8 %51, @Assert
+%52 = load i64, ptr @GlobalIntY
+%53 = load i64, ptr @GlobalIntX
+%54 = icmp sgt i64 %52, %53
+call i8 %54, @Assert
+%55 = load f64, ptr @GlobalFloatY
+%56 = load f64, ptr @GlobalFloatX
+%57 = fcmp ogt f64 %55, %56
+call i8 %57, @Assert
+%58 = load i64, ptr @GlobalIntY
+%59 = icmp sgt i64 %58, 10
+call i8 %59, @Assert
+%60 = load f64, ptr @GlobalFloatY
+%61 = fcmp ogt f64 %60, 5
+call i8 %61, @Assert
+%62 = load i64, ptr @GlobalIntX
+%63 = icmp sgt i64 20, %62
+call i8 %63, @Assert
+%64 = load f64, ptr @GlobalFloatX
+%65 = fcmp ogt f64 15, %64
+call i8 %65, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%66 = load i64, ptr %3
+%67 = s2f i64 %66
+%68 = load f64, ptr @GlobalFloatX
+%69 = fcmp ogt f64 %67, %68
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntY
+%71 = s2f i64 %70
+%72 = load f64, ptr %4
+%73 = fcmp ogt f64 %71, %72
+call i8 %73, @Assert
+%74 = load i64, ptr @GlobalIntX
+%75 = s2f i64 %74
+%76 = load f64, ptr %7
+%77 = fcmp ogt f64 %76, %75
+call i8 %77, @Assert
+%78 = load i64, ptr %0
+%79 = s2f i64 %78
+%80 = load f64, ptr @GlobalFloatY
+%81 = fcmp ogt f64 %80, %79
+call i8 %81, @Assert
+%82 = load i64, ptr %3
+%83 = s2f i64 %82
+%84 = fcmp ogt f64 %83, 7.5
+call i8 %84, @Assert
+%85 = s2f i64 30
+%86 = load f64, ptr %4
+%87 = fcmp ogt f64 %85, %86
+call i8 %87, @Assert
+%88 = s2f i64 10
+%89 = load f64, ptr %7
+%90 = fcmp ogt f64 %89, %88
+call i8 %90, @Assert
+%91 = load i64, ptr %2
+%92 = s2f i64 %91
+%93 = fcmp ogt f64 27.5, %92
+call i8 %93, @Assert
+%94 = load i64, ptr @GlobalIntY
+%95 = s2f i64 %94
+%96 = fcmp ogt f64 %95, 7.5
+call i8 %96, @Assert
+%97 = s2f i64 15
+%98 = load f64, ptr @GlobalFloatX
+%99 = fcmp ogt f64 %97, %98
+call i8 %99, @Assert
+%100 = s2f i64 5
+%101 = load f64, ptr @GlobalFloatY
+%102 = fcmp ogt f64 %101, %100
+call i8 %102, @Assert
+%103 = load i64, ptr @GlobalIntX
+%104 = s2f i64 %103
+%105 = fcmp ogt f64 15, %104
+call i8 %105, @Assert
+%106 = s2f i64 4
+%107 = fcmp ogt f64 4.5, %106
+call i8 %107, @Assert
+%108 = s2f i64 6
+%109 = fcmp ogt f64 %108, 5.5
+call i8 %109, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestGreaterThanOrEqualOperators void() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+%1 = alloca i64
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
+%6 = alloca f64
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %1
+%9 = load i64, ptr %0
+%10 = icmp sge i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %3
+%12 = load i64, ptr %2
+%13 = icmp sge i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %5
+%15 = load f64, ptr %4
+%16 = fcmp oge f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %7
+%18 = load f64, ptr %6
+%19 = fcmp oge f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %2
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp sge i64 %20, %21
+call i8 %22, @Assert
+%23 = load i64, ptr %3
+%24 = load i64, ptr @GlobalIntY
+%25 = icmp sge i64 %23, %24
+call i8 %25, @Assert
+%26 = load f64, ptr %6
+%27 = load f64, ptr @GlobalFloatX
+%28 = fcmp oge f64 %26, %27
+call i8 %28, @Assert
+%29 = load f64, ptr %7
+%30 = load f64, ptr @GlobalFloatY
+%31 = fcmp oge f64 %29, %30
+call i8 %31, @Assert
+%32 = load i64, ptr @GlobalIntX
+%33 = load i64, ptr %0
+%34 = icmp sge i64 %32, %33
+call i8 %34, @Assert
+%35 = load i64, ptr @GlobalIntY
+%36 = load i64, ptr %1
+%37 = icmp sge i64 %35, %36
+call i8 %37, @Assert
+%38 = load f64, ptr @GlobalFloatX
+%39 = load f64, ptr %4
+%40 = fcmp oge f64 %38, %39
+call i8 %40, @Assert
+%41 = load f64, ptr @GlobalFloatY
+%42 = load f64, ptr %5
+%43 = fcmp oge f64 %41, %42
+call i8 %43, @Assert
+%44 = load i64, ptr %3
+%45 = icmp sge i64 %44, 20
+call i8 %45, @Assert
+%46 = load f64, ptr %7
+%47 = fcmp oge f64 %46, 7.5
+call i8 %47, @Assert
+%48 = load i64, ptr %2
+%49 = icmp sge i64 30, %48
+call i8 %49, @Assert
+%50 = load f64, ptr %5
+%51 = fcmp oge f64 25, %50
+call i8 %51, @Assert
+%52 = load i64, ptr @GlobalIntY
+%53 = load i64, ptr @GlobalIntX
+%54 = icmp sge i64 %52, %53
+call i8 %54, @Assert
+%55 = load f64, ptr @GlobalFloatY
+%56 = load f64, ptr @GlobalFloatX
+%57 = fcmp oge f64 %55, %56
+call i8 %57, @Assert
+%58 = load i64, ptr @GlobalIntY
+%59 = icmp sge i64 %58, 10
+call i8 %59, @Assert
+%60 = load f64, ptr @GlobalFloatY
+%61 = fcmp oge f64 %60, 5
+call i8 %61, @Assert
+%62 = load i64, ptr @GlobalIntX
+%63 = icmp sge i64 20, %62
+call i8 %63, @Assert
+%64 = load f64, ptr @GlobalFloatX
+%65 = fcmp oge f64 15, %64
+call i8 %65, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+return:
+%66 = load i64, ptr %3
+%67 = s2f i64 %66
+%68 = load f64, ptr @GlobalFloatX
+%69 = fcmp oge f64 %67, %68
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntY
+%71 = s2f i64 %70
+%72 = load f64, ptr %4
+%73 = fcmp oge f64 %71, %72
+call i8 %73, @Assert
+%74 = load i64, ptr @GlobalIntX
+%75 = s2f i64 %74
+%76 = load f64, ptr %7
+%77 = fcmp oge f64 %76, %75
+call i8 %77, @Assert
+%78 = load i64, ptr %0
+%79 = s2f i64 %78
+%80 = load f64, ptr @GlobalFloatY
+%81 = fcmp oge f64 %80, %79
+call i8 %81, @Assert
+%82 = load i64, ptr %3
+%83 = s2f i64 %82
+%84 = fcmp oge f64 %83, 7.5
+call i8 %84, @Assert
+%85 = s2f i64 30
+%86 = load f64, ptr %4
+%87 = fcmp oge f64 %85, %86
+call i8 %87, @Assert
+%88 = s2f i64 10
+%89 = load f64, ptr %7
+%90 = fcmp oge f64 %89, %88
+call i8 %90, @Assert
+%91 = load i64, ptr %2
+%92 = s2f i64 %91
+%93 = fcmp oge f64 17.5, %92
+call i8 %93, @Assert
+%94 = load i64, ptr @GlobalIntY
+%95 = s2f i64 %94
+%96 = fcmp oge f64 %95, 7.5
+call i8 %96, @Assert
+%97 = s2f i64 15
+%98 = load f64, ptr @GlobalFloatX
+%99 = fcmp oge f64 %97, %98
+call i8 %99, @Assert
+%100 = s2f i64 5
+%101 = load f64, ptr @GlobalFloatY
+%102 = fcmp oge f64 %101, %100
+call i8 %102, @Assert
+%103 = load i64, ptr @GlobalIntX
+%104 = s2f i64 %103
+%105 = fcmp oge f64 15, %104
+call i8 %105, @Assert
+%106 = s2f i64 4
+%107 = fcmp oge f64 4.5, %106
+call i8 %107, @Assert
+%108 = s2f i64 6
+%109 = fcmp oge f64 %108, 5.5
+call i8 %109, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestEqualOperators void() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+%1 = alloca i64
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
+%6 = alloca f64
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %0
+%9 = load i64, ptr %0
+%10 = icmp eq i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %2
+%12 = load i64, ptr %2
+%13 = icmp eq i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %4
+%15 = load f64, ptr %4
+%16 = fcmp oeq f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %7
+%18 = load f64, ptr %7
+%19 = fcmp oeq f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %0
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp eq i64 %20, %21
+%23 = icmp eq i8 %22, 0
+call i8 %23, @Assert
+%24 = load i64, ptr %1
+%25 = load i64, ptr @GlobalIntY
+%26 = icmp eq i64 %24, %25
+%27 = icmp eq i8 %26, 0
+call i8 %27, @Assert
+%28 = load f64, ptr %4
+%29 = load f64, ptr @GlobalFloatX
+%30 = fcmp oeq f64 %28, %29
+%31 = icmp eq i8 %30, 0
+call i8 %31, @Assert
+%32 = load f64, ptr %5
+%33 = load f64, ptr @GlobalFloatY
+%34 = fcmp oeq f64 %32, %33
+%35 = icmp eq i8 %34, 0
+call i8 %35, @Assert
+%36 = load i64, ptr @GlobalIntX
+%37 = load i64, ptr %0
+%38 = icmp eq i64 %36, %37
+%39 = icmp eq i8 %38, 0
+call i8 %39, @Assert
+%40 = load i64, ptr @GlobalIntY
+%41 = load i64, ptr %1
+%42 = icmp eq i64 %40, %41
+%43 = icmp eq i8 %42, 0
+call i8 %43, @Assert
+%44 = load f64, ptr @GlobalFloatX
+%45 = load f64, ptr %4
+%46 = fcmp oeq f64 %44, %45
+%47 = icmp eq i8 %46, 0
+call i8 %47, @Assert
+%48 = load f64, ptr @GlobalFloatY
+%49 = load f64, ptr %5
+%50 = fcmp oeq f64 %48, %49
+%51 = icmp eq i8 %50, 0
+call i8 %51, @Assert
+%52 = load i64, ptr %0
+%53 = icmp eq i64 %52, 5
+call i8 %53, @Assert
+%54 = load f64, ptr %4
+%55 = fcmp oeq f64 %54, 2.5
+call i8 %55, @Assert
+%56 = load i64, ptr %2
+%57 = icmp eq i64 25, %56
+call i8 %57, @Assert
+%58 = load f64, ptr %7
+%59 = fcmp oeq f64 20, %58
+call i8 %59, @Assert
+%60 = load i64, ptr @GlobalIntX
+%61 = load i64, ptr @GlobalIntX
+%62 = icmp eq i64 %60, %61
+call i8 %62, @Assert
+%63 = load f64, ptr @GlobalFloatX
+%64 = load f64, ptr @GlobalFloatX
+%65 = fcmp oeq f64 %63, %64
+call i8 %65, @Assert
+%66 = load i64, ptr @GlobalIntX
+%67 = icmp eq i64 %66, 15
+call i8 %67, @Assert
+%68 = load f64, ptr @GlobalFloatX
+%69 = fcmp oeq f64 %68, 7.5
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntX
+%71 = icmp eq i64 15, %70
+call i8 %71, @Assert
+%72 = load f64, ptr @GlobalFloatX
+%73 = fcmp oeq f64 7.5, %72
+call i8 %73, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%74 = load i64, ptr %0
+%75 = s2f i64 %74
+%76 = load f64, ptr @GlobalFloatX
+%77 = fcmp oeq f64 %75, %76
+%78 = icmp eq i8 %77, 0
+call i8 %78, @Assert
+%79 = load i64, ptr @GlobalIntX
+%80 = s2f i64 %79
+%81 = load f64, ptr %5
+%82 = fcmp oeq f64 %80, %81
+%83 = icmp eq i8 %82, 0
+call i8 %83, @Assert
+%84 = load i64, ptr @GlobalIntY
+%85 = s2f i64 %84
+%86 = load f64, ptr %4
+%87 = fcmp oeq f64 %86, %85
+%88 = icmp eq i8 %87, 0
+call i8 %88, @Assert
+%89 = load i64, ptr %1
+%90 = s2f i64 %89
+%91 = load f64, ptr @GlobalFloatY
+%92 = fcmp oeq f64 %91, %90
+%93 = icmp eq i8 %92, 0
+call i8 %93, @Assert
+%94 = load i64, ptr %0
+%95 = s2f i64 %94
+%96 = fcmp oeq f64 %95, 5
+%97 = icmp eq i8 %96, 1
+call i8 %97, @Assert
+%98 = s2f i64 5
+%99 = load f64, ptr %5
+%100 = fcmp oeq f64 %98, %99
+%101 = icmp eq i8 %100, 1
+call i8 %101, @Assert
+%102 = s2f i64 3
+%103 = load f64, ptr %4
+%104 = fcmp oeq f64 %103, %102
+%105 = icmp eq i8 %104, 0
+call i8 %105, @Assert
+%106 = load i64, ptr %2
+%107 = s2f i64 %106
+%108 = fcmp oeq f64 2.5, %107
+%109 = icmp eq i8 %108, 0
+call i8 %109, @Assert
+%110 = load i64, ptr @GlobalIntX
+%111 = s2f i64 %110
+%112 = fcmp oeq f64 %111, 15
+%113 = icmp eq i8 %112, 1
+call i8 %113, @Assert
+%114 = s2f i64 12
+%115 = load f64, ptr @GlobalFloatY
+%116 = fcmp oeq f64 %114, %115
+%117 = icmp eq i8 %116, 0
+call i8 %117, @Assert
+%118 = s2f i64 8
+%119 = load f64, ptr @GlobalFloatX
+%120 = fcmp oeq f64 %119, %118
+%121 = icmp eq i8 %120, 0
+call i8 %121, @Assert
+%122 = load i64, ptr @GlobalIntX
+%123 = s2f i64 %122
+%124 = fcmp oeq f64 7.5, %123
+%125 = icmp eq i8 %124, 0
+call i8 %125, @Assert
+%126 = s2f i64 4
+%127 = fcmp oeq f64 3.5, %126
+%128 = icmp eq i8 %127, 0
+call i8 %128, @Assert
+%129 = s2f i64 5
+%130 = fcmp oeq f64 %129, 5
+%131 = icmp eq i8 %130, 1
+call i8 %131, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestNotEqualOperators void() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+%1 = alloca i64
+store 10, ptr %1
+%2 = alloca i64
+store 25, ptr %2
+%3 = alloca i64
+store 30, ptr %3
+%4 = alloca f64
+store 2.5, ptr %4
+%5 = alloca f64
+store 5, ptr %5
+%6 = alloca f64
+store 17.5, ptr %6
+%7 = alloca f64
+store 20, ptr %7
+%8 = load i64, ptr %0
+%9 = load i64, ptr %1
+%10 = icmp ne i64 %8, %9
+call i8 %10, @Assert
+%11 = load i64, ptr %2
+%12 = load i64, ptr %3
+%13 = icmp ne i64 %11, %12
+call i8 %13, @Assert
+%14 = load f64, ptr %4
+%15 = load f64, ptr %5
+%16 = fcmp one f64 %14, %15
+call i8 %16, @Assert
+%17 = load f64, ptr %6
+%18 = load f64, ptr %7
+%19 = fcmp one f64 %17, %18
+call i8 %19, @Assert
+%20 = load i64, ptr %0
+%21 = load i64, ptr @GlobalIntX
+%22 = icmp ne i64 %20, %21
+call i8 %22, @Assert
+%23 = load i64, ptr %1
+%24 = load i64, ptr @GlobalIntY
+%25 = icmp ne i64 %23, %24
+call i8 %25, @Assert
+%26 = load f64, ptr %4
+%27 = load f64, ptr @GlobalFloatX
+%28 = fcmp one f64 %26, %27
+call i8 %28, @Assert
+%29 = load f64, ptr %5
+%30 = load f64, ptr @GlobalFloatY
+%31 = fcmp one f64 %29, %30
+call i8 %31, @Assert
+%32 = load i64, ptr @GlobalIntX
+%33 = load i64, ptr %0
+%34 = icmp ne i64 %32, %33
+call i8 %34, @Assert
+%35 = load i64, ptr @GlobalIntY
+%36 = load i64, ptr %1
+%37 = icmp ne i64 %35, %36
+call i8 %37, @Assert
+%38 = load f64, ptr @GlobalFloatX
+%39 = load f64, ptr %4
+%40 = fcmp one f64 %38, %39
+call i8 %40, @Assert
+%41 = load f64, ptr @GlobalFloatY
+%42 = load f64, ptr %5
+%43 = fcmp one f64 %41, %42
+call i8 %43, @Assert
+%44 = load i64, ptr %0
+%45 = icmp ne i64 %44, 10
+call i8 %45, @Assert
+%46 = load f64, ptr %4
+%47 = fcmp one f64 %46, 5
+call i8 %47, @Assert
+%48 = load i64, ptr %2
+%49 = icmp ne i64 30, %48
+call i8 %49, @Assert
+%50 = load f64, ptr %7
+%51 = fcmp one f64 25, %50
+call i8 %51, @Assert
+%52 = load i64, ptr @GlobalIntX
+%53 = load i64, ptr @GlobalIntY
+%54 = icmp ne i64 %52, %53
+call i8 %54, @Assert
+%55 = load f64, ptr @GlobalFloatX
+%56 = load f64, ptr @GlobalFloatY
+%57 = fcmp one f64 %55, %56
+call i8 %57, @Assert
+%58 = load i64, ptr @GlobalIntX
+%59 = icmp ne i64 %58, 20
+call i8 %59, @Assert
+%60 = load f64, ptr @GlobalFloatX
+%61 = fcmp one f64 %60, 10
+call i8 %61, @Assert
+%62 = load i64, ptr @GlobalIntX
+%63 = icmp ne i64 10, %62
+call i8 %63, @Assert
+%64 = load f64, ptr @GlobalFloatY
+%65 = fcmp one f64 5, %64
+call i8 %65, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%66 = load i64, ptr %0
+%67 = s2f i64 %66
+%68 = load f64, ptr @GlobalFloatY
+%69 = fcmp one f64 %67, %68
+call i8 %69, @Assert
+%70 = load i64, ptr @GlobalIntX
+%71 = s2f i64 %70
+%72 = load f64, ptr %7
+%73 = fcmp one f64 %71, %72
+call i8 %73, @Assert
+%74 = load i64, ptr @GlobalIntY
+%75 = s2f i64 %74
+%76 = load f64, ptr %4
+%77 = fcmp one f64 %76, %75
+call i8 %77, @Assert
+%78 = load i64, ptr %3
+%79 = s2f i64 %78
+%80 = load f64, ptr @GlobalFloatX
+%81 = fcmp one f64 %80, %79
+call i8 %81, @Assert
+%82 = load i64, ptr %0
+%83 = s2f i64 %82
+%84 = fcmp one f64 %83, 7.5
+call i8 %84, @Assert
+%85 = s2f i64 5
+%86 = load f64, ptr %7
+%87 = fcmp one f64 %85, %86
+call i8 %87, @Assert
+%88 = s2f i64 10
+%89 = load f64, ptr %5
+%90 = fcmp one f64 %89, %88
+call i8 %90, @Assert
+%91 = load i64, ptr %2
+%92 = s2f i64 %91
+%93 = fcmp one f64 2.5, %92
+call i8 %93, @Assert
+%94 = load i64, ptr @GlobalIntX
+%95 = s2f i64 %94
+%96 = fcmp one f64 %95, 20
+call i8 %96, @Assert
+%97 = s2f i64 12
+%98 = load f64, ptr @GlobalFloatY
+%99 = fcmp one f64 %97, %98
+call i8 %99, @Assert
+%100 = s2f i64 10
+%101 = load f64, ptr @GlobalFloatX
+%102 = fcmp one f64 %101, %100
+call i8 %102, @Assert
+%103 = load i64, ptr @GlobalIntX
+%104 = s2f i64 %103
+%105 = fcmp one f64 7.5, %104
+call i8 %105, @Assert
+%106 = s2f i64 4
+%107 = fcmp one f64 3.5, %106
+call i8 %107, @Assert
+%108 = s2f i64 5
+%109 = fcmp one f64 %108, 5.5
+call i8 %109, @Assert
 br label exit
 exit:
 ret 
@@ -439,10 +1043,12 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestMultiplication
-call ptr @TestDivision
-call ptr @TestModulo
-call ptr @TestMixedTypeMultiplicationAndDivision
+call ptr @TestLessThanOperators
+call ptr @TestLessThanOrEqualOperators
+call ptr @TestGreaterThanOperators
+call ptr @TestGreaterThanOrEqualOperators
+call ptr @TestEqualOperators
+call ptr @TestNotEqualOperators
 store 0, ptr %0
 br label exit
 return:

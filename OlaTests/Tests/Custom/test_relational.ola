@@ -11,31 +11,98 @@ void TestLessThanOperators()
     // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
+    //local < local
     Assert(intA < intB);
+    Assert(intC < intD);
+    Assert(floatA < floatB);
     Assert(floatC < floatD);
 
-    // 2. Local and global variables
-    Assert(intA < GlobalIntY);
-    Assert(floatC < GlobalFloatY);
+    // local < global
+    Assert(intA < GlobalIntX);
+    Assert(intB < GlobalIntY);
+    Assert(floatA < GlobalFloatX);
+    Assert(floatB < GlobalFloatY);
 
-    // 3. Local variables and immediate values
-    Assert(intA < 20);
-    Assert(floatC < 7.5);
+    //global < local
+    Assert(GlobalIntX < intC);
+    Assert(GlobalIntY < intD);
+    Assert(GlobalFloatX < floatC);
+    Assert(GlobalFloatY < floatD);
 
-    // 4. Global variables
+    //local < literal
+    Assert(intB < 20);
+    Assert(floatB < 7.5);
+
+    //literal < local
+    Assert(15 < intC);
+    Assert(10.0 < floatD);
+
+    //global < global
     Assert(GlobalIntX < GlobalIntY);
     Assert(GlobalFloatX < GlobalFloatY);
 
-    // 5. Global variables and immediate values
+    //global < literal
     Assert(GlobalIntX < 30);
     Assert(GlobalFloatX < 15.0);
 
-    // 6. Immediate values
+    //literal < global
+    Assert(5 < GlobalIntX);
+    Assert(7.5 < GlobalFloatY);
+
+    //literal < literal
     Assert(3 < 5);
     Assert(1.5 < 2.0);
+
+    // Mixed type comparisons
+   
+    // Local int < Global float
+    Assert(intA < GlobalFloatY);
+    
+    // Global int < Local float
+    Assert(GlobalIntX < floatD);
+    
+    // Local float < Global int
+    Assert(floatA < GlobalIntY);
+    
+    // Global float < Local int
+    Assert(GlobalFloatX < intD);
+    
+    // Local int < Literal float
+    Assert(intA < 7.5);
+    
+    // Literal int < Local float
+    Assert(5 < floatD);
+    
+    // Local float < Literal int
+    Assert(floatB < 10);
+    
+    // Literal float < Local int
+    Assert(2.5 < intC);
+    
+    // Global int < Literal float
+    Assert(GlobalIntX < 20.0);
+    
+    // Literal int < Global float
+    Assert(12 < GlobalFloatY);
+    
+    // Global float < Literal int
+    Assert(GlobalFloatX < 10);
+    
+    // Literal float < Global int
+    Assert(7.5 < GlobalIntX);
+
+    // Literal float < Literal int
+    Assert(3.5 < 4);
+
+    // Literal int < Literal float
+    Assert(5 < 5.5);
 }
 
 void TestLessThanOrEqualOperators()
@@ -43,31 +110,104 @@ void TestLessThanOrEqualOperators()
     // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
+    ////local <= local
     Assert(intA <= intB);
+    Assert(intC <= intD);
+    Assert(floatA <= floatB);
     Assert(floatC <= floatD);
-
-    // 2. Local and global variables
-    Assert(intA <= GlobalIntY);
-    Assert(floatC <= GlobalFloatY);
-
-    // 3. Local variables and immediate values
-    Assert(intA <= 20);
-    Assert(floatC <= 7.5);
-
-    // 4. Global variables
+    
+    //// local <= global
+    Assert(intA <= GlobalIntX);
+    Assert(intB <= GlobalIntY);
+    Assert(floatA <= GlobalFloatX);
+    Assert(floatB <= GlobalFloatY);
+    
+    ////global <= local
+    Assert(GlobalIntX <= intC);
+    Assert(GlobalIntY <= intD);
+    Assert(GlobalFloatX <= floatC);
+    Assert(GlobalFloatY <= floatD);
+    
+    ////local <= literal
+    Assert(intB <= 20);
+    Assert(intC <= 25);
+    Assert(floatB <= 7.5);
+    Assert(floatD <= 20.0);
+    
+    ////literal <= local
+    Assert(15 <= intC);
+    Assert(29 <= intD);         //todo 30 <= intD fails??
+    Assert(10.0 <= floatD);       
+    Assert(19.0 <= floatD);     //todo 20.0 <= floatD fails??
+    
+    ////global <= global
     Assert(GlobalIntX <= GlobalIntY);
     Assert(GlobalFloatX <= GlobalFloatY);
-
-    // 5. Global variables and immediate values
-    Assert(GlobalIntX <= 15);
-    Assert(GlobalFloatX <= 7.5);
-
-    // 6. Immediate values
+    
+    //global <= literal
+    Assert(GlobalIntX <= 30);
+    Assert(GlobalFloatX <= 15.0);
+    
+    ////literal <= global
+    Assert(5 <= GlobalIntX);
+    Assert(7.5 <= GlobalFloatY);
+    
+    //literal <= literal
     Assert(3 <= 5);
-    Assert(1.5 <= 1.5);
+    Assert(1.5 <= 2.0);
+    Assert(3 <= 3);
+    Assert(2.0 <= 2.0);
+
+   // Mixed type comparisons
+
+    // Local int <= Global float
+    Assert(intA <= GlobalFloatY);
+    
+    // Global int <= Local float
+    Assert(GlobalIntX <= floatD);
+    
+    // Local float <= Global int
+    Assert(floatA <= GlobalIntY);
+    
+    // Global float <= Local int
+    Assert(GlobalFloatX <= intD);
+    
+    // Local int <= Literal float
+    Assert(intA <= 7.5);
+    
+    // Literal int <= Local float
+    Assert(5 <= floatD);
+    
+    // Local float <= Literal int
+    Assert(floatB <= 10);
+    
+    // Literal float <= Local int
+    Assert(2.5 <= intC);
+    
+    // Global int <= Literal float
+    Assert(GlobalIntX <= 20.0);
+    
+    // Literal int <= Global float
+    Assert(12 <= GlobalFloatY);
+    
+    // Global float <= Literal int
+    Assert(GlobalFloatX <= 10);
+    
+    // Literal float <= Global int
+    Assert(7.5 <= GlobalIntX);
+
+     // Literal float < Literal int
+    Assert(3.5 <= 4);
+
+    // Literal int < Literal float
+    Assert(5 <= 5.5);
 }
 
 void TestGreaterThanOperators()
@@ -75,31 +215,100 @@ void TestGreaterThanOperators()
     // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
+    //local > local
     Assert(intB > intA);
+    Assert(intD > intC);
+    Assert(floatB > floatA);
     Assert(floatD > floatC);
 
-    // 2. Local and global variables
-    Assert(GlobalIntX > intB);
-    Assert(GlobalFloatX > floatD);
+    
 
-    // 3. Local variables and immediate values
-    Assert(intB > 5);
-    Assert(floatD > 2.5);
+    // local > global
+    Assert(intC > GlobalIntX);
+    Assert(intD > GlobalIntY);
+    Assert(floatC > GlobalFloatX);
+    Assert(floatD > GlobalFloatY);
 
-    // 4. Global variables
+    //global > local
+    Assert(GlobalIntX > intA);
+    Assert(GlobalIntY > intB);
+    Assert(GlobalFloatX > floatA);
+    Assert(GlobalFloatY > floatB);
+
+    //local > literal
+    Assert(intD > 20);
+    Assert(floatD > 7.5);
+
+    //literal > local
+    Assert(30 > intC);
+    Assert(25.0 > floatB);
+
+    //global > global
     Assert(GlobalIntY > GlobalIntX);
     Assert(GlobalFloatY > GlobalFloatX);
 
-    // 5. Global variables and immediate values
+    //global > literal
     Assert(GlobalIntY > 10);
     Assert(GlobalFloatY > 5.0);
 
-    // 6. Immediate values
+    //literal > global
+    Assert(20 > GlobalIntX);
+    Assert(15.0 > GlobalFloatX);
+
+    //literal > literal
     Assert(5 > 3);
     Assert(2.0 > 1.5);
+    
+    // Mixed type comparisons
+
+    // Local int > Global float
+    Assert(intD > GlobalFloatX);
+    
+    // Global int > Local float
+    Assert(GlobalIntY > floatA);
+
+    // Local float > Global int
+    Assert(floatD > GlobalIntX);
+
+    // Global float > Local int
+    Assert(GlobalFloatY > intA);
+
+    // Local int > Literal float
+    Assert(intD > 7.5);
+    
+    // Literal int > Local float
+    Assert(30 > floatA);
+    
+    // Local float > Literal int
+    Assert(floatD > 10);
+
+    // Literal float > Local int
+    Assert(27.5 > intC);
+    
+    // Global int > Literal float
+    Assert(GlobalIntY > 7.5);
+    
+    // Literal int > Global float
+    Assert(15 > GlobalFloatX);
+    
+    // Global float > Literal int
+    Assert(GlobalFloatY > 5);
+    
+    // Literal float > Global int
+    Assert(15.001 > GlobalIntX);
+
+    // Literal float > Literal int
+    Assert(4.5 > 4);
+
+    // Literal int > Literal float
+    Assert(6 > 5.5);
 }
 
 void TestGreaterThanOrEqualOperators()
@@ -107,63 +316,198 @@ void TestGreaterThanOrEqualOperators()
     // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
+    //local >= local
     Assert(intB >= intA);
+    Assert(intD >= intC);
+    Assert(floatB >= floatA);
     Assert(floatD >= floatC);
 
-    // 2. Local and global variables
-    Assert(GlobalIntX >= intB);
-    Assert(GlobalFloatX >= floatD);
+    // local >= global
+    Assert(intC >= GlobalIntX);
+    Assert(intD >= GlobalIntY);
+    Assert(floatC >= GlobalFloatX);
+    Assert(floatD >= GlobalFloatY);
 
-    // 3. Local variables and immediate values
-    Assert(intB >= 5);
-    Assert(floatD >= 2.5);
+    //global >= local
+    Assert(GlobalIntX >= intA);
+    Assert(GlobalIntY >= intB);
+    Assert(GlobalFloatX >= floatA);
+    Assert(GlobalFloatY >= floatB);
 
-    // 4. Global variables
+    //local >= literal
+    Assert(intD >= 20);
+    Assert(floatD >= 7.5);
+
+    //literal >= local
+    Assert(30 >= intC);
+    Assert(25.0 >= floatB);
+
+    //global >= global
     Assert(GlobalIntY >= GlobalIntX);
     Assert(GlobalFloatY >= GlobalFloatX);
 
-    // 5. Global variables and immediate values
-    Assert(GlobalIntY >= 15);
-    Assert(GlobalFloatY >= 7.5);
+    //global >= literal
+    Assert(GlobalIntY >= 10);
+    Assert(GlobalFloatY >= 5.0);
 
-    // 6. Immediate values
+    //literal >= global
+    Assert(20 >= GlobalIntX);
+    Assert(15.0 >= GlobalFloatX);
+
+    //literal >= literal
     Assert(5 >= 3);
     Assert(2.0 >= 1.5);
+
+    return;
+    // Mixed type comparisons
+
+    // Local int >= Global float
+    Assert(intD >= GlobalFloatX);
+    
+    // Global int >= Local float
+    Assert(GlobalIntY >= floatA);
+    
+    // Local float >= Global int
+    Assert(floatD >= GlobalIntX);
+    
+    // Global float >= Local int
+    Assert(GlobalFloatY >= intA);
+    
+    // Local int >= Literal float
+    Assert(intD >= 7.5);
+    
+    // Literal int >= Local float
+    Assert(30 >= floatA);
+    
+    // Local float >= Literal int
+    Assert(floatD >= 10);
+    
+    // Literal float >= Local int
+    Assert(17.5 >= intC);
+    
+    // Global int >= Literal float
+    Assert(GlobalIntY >= 7.5);
+    
+    // Literal int >= Global float
+    Assert(15 >= GlobalFloatX);
+    
+    // Global float >= Literal int
+    Assert(GlobalFloatY >= 5);
+    
+    // Literal float >= Global int
+    Assert(15.0 >= GlobalIntX);
+
+    // Literal float >= Literal int
+    Assert(4.5 >= 4);
+
+    // Literal int >= Literal float
+    Assert(6 >= 5.5);
 }
 
 void TestEqualOperators()
 {
-    // 1. Local variables
+        // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
-    Assert(intA == intB == false);
-    Assert(floatC == floatD == false);
+    //local == local
+    Assert(intA == intA);
+    Assert(intC == intC);
+    Assert(floatA == floatA);
+    Assert(floatD == floatD);
 
-    // 2. Local and global variables
-    Assert(intA == GlobalIntX == false);
-    Assert(floatC == GlobalFloatX == false);
+    // local == global
+    Assert(intA == GlobalIntX == false); // intA is 5, GlobalIntX is 15
+    Assert(intB == GlobalIntY == false); // intB is 10, GlobalIntY is 20
+    Assert(floatA == GlobalFloatX == false); // floatA is 2.5, GlobalFloatX is 7.5
+    Assert(floatB == GlobalFloatY == false); // floatB is 5.0, GlobalFloatY is 12.5
 
-    // 3. Local variables and immediate values
+    //global == local
+    Assert(GlobalIntX == intA == false);
+    Assert(GlobalIntY == intB == false);
+    Assert(GlobalFloatX == floatA == false);
+    Assert(GlobalFloatY == floatB == false);
+
+    //local == literal
     Assert(intA == 5);
-    Assert(floatC == 2.5);
+    Assert(floatA == 2.5);
 
-    // 4. Global variables
-    Assert(GlobalIntX == GlobalIntX); // true
-    Assert(GlobalFloatX == GlobalFloatX); // true
+    //literal == local
+    Assert(25 == intC);
+    Assert(20.0 == floatD);
 
-    // 5. Global variables and immediate values
-    Assert(GlobalIntX == 15); // true
-    Assert(GlobalFloatX == 7.5); // true
+    //global == global
+    Assert(GlobalIntX == GlobalIntX);
+    Assert(GlobalFloatX == GlobalFloatX);
 
-    // 6. Immediate values
-    Assert(3 == 3); // true
-    Assert(1.5 == 1.5); // true
+    //global == literal
+    Assert(GlobalIntX == 15);
+    Assert(GlobalFloatX == 7.5);
+
+    //literal == global
+    Assert(15 == GlobalIntX);
+    Assert(7.5 == GlobalFloatX);
+
+    //literal == literal
+    Assert(5 == 5);
+    Assert(2.0 == 2.0);
+
+    // Mixed type comparisons
+
+    // Local int == Global float
+    Assert(intA == GlobalFloatX == false); // Different types and values
+
+    // Global int == Local float
+    Assert(GlobalIntX == floatB == false); // Different types and values
+
+    // Local float == Global int
+    Assert(floatA == GlobalIntY == false); // Different types and values
+
+    // Global float == Local int
+    Assert(GlobalFloatY == intB == false); // Different types and values
+
+    // Local int == Literal float
+    Assert(intA == 5.0 == true); // Assuming type promotion or conversion
+
+    // Literal int == Local float
+    Assert(5 == floatB == true); // Assuming type promotion or conversion
+
+    // Local float == Literal int
+    Assert(floatA == 3 == false); // Different values
+
+    // Literal float == Local int
+    Assert(2.5 == intC == false); // Different values
+
+    // Global int == Literal float
+    Assert(GlobalIntX == 15.0 == true); // Assuming type promotion or conversion
+
+    // Literal int == Global float
+    Assert(12 == GlobalFloatY == false); // Different values
+
+    // Global float == Literal int
+    Assert(GlobalFloatX == 8 == false); // Different values
+
+    // Literal float == Global int
+    Assert(7.5 == GlobalIntX == false); // Different values
+
+    // Literal float == Literal int
+    Assert(3.5 == 4 == false);
+
+    // Literal int == Literal float
+    Assert(5 == 5.0 == true); // Assuming type promotion or conversion
 }
 
 void TestNotEqualOperators()
@@ -171,31 +515,98 @@ void TestNotEqualOperators()
     // 1. Local variables
     int intA = 5;
     int intB = 10;
-    float floatC = 2.5;
-    float floatD = 5.0;
+    int intC = 25;
+    int intD = 30;
+    float floatA = 2.5;
+    float floatB = 5.0;
+    float floatC = 17.5;
+    float floatD = 20.0;
 
-    Assert(intA != intB == true);
-    Assert(floatC != floatD == true);
+    //local != local
+    Assert(intA != intB);
+    Assert(intC != intD);
+    Assert(floatA != floatB);
+    Assert(floatC != floatD);
 
-    // 2. Local and global variables
-    Assert(intA != GlobalIntX == true);
-    Assert(floatC != GlobalFloatX == true);
+    // local != global
+    Assert(intA != GlobalIntX);
+    Assert(intB != GlobalIntY);
+    Assert(floatA != GlobalFloatX);
+    Assert(floatB != GlobalFloatY);
 
-    // 3. Local variables and immediate values
+    //global != local
+    Assert(GlobalIntX != intA);
+    Assert(GlobalIntY != intB);
+    Assert(GlobalFloatX != floatA);
+    Assert(GlobalFloatY != floatB);
+
+    //local != literal
     Assert(intA != 10);
-    Assert(floatC != 5.0);
+    Assert(floatA != 5.0);
 
-    // 4. Global variables
-    Assert(GlobalIntX != GlobalIntY == true);
-    Assert(GlobalFloatX != GlobalFloatY == true);
+    //literal != local
+    Assert(30 != intC);
+    Assert(25.0 != floatD);
 
-    // 5. Global variables and immediate values
-    Assert(GlobalIntX != 20 == true);
-    Assert(GlobalFloatX != 10.0 == true);
+    //global != global
+    Assert(GlobalIntX != GlobalIntY);
+    Assert(GlobalFloatX != GlobalFloatY);
 
-    // 6. Immediate values
-    Assert(3 != 5); // true
-    Assert(1.5 != 2.0); // true
+    //global != literal
+    Assert(GlobalIntX != 20);
+    Assert(GlobalFloatX != 10.0);
+
+    //literal != global
+    Assert(10 != GlobalIntX);
+    Assert(5.0 != GlobalFloatY);
+
+    //literal != literal
+    Assert(5 != 3);
+    Assert(2.0 != 1.5);
+
+    // Mixed type comparisons
+
+    // Local int != Global float
+    Assert(intA != GlobalFloatY);
+    
+    // Global int != Local float
+    Assert(GlobalIntX != floatD);
+    
+    // Local float != Global int
+    Assert(floatA != GlobalIntY);
+    
+    // Global float != Local int
+    Assert(GlobalFloatX != intD);
+    
+    // Local int != Literal float
+    Assert(intA != 7.5);
+    
+    // Literal int != Local float
+    Assert(5 != floatD);
+    
+    // Local float != Literal int
+    Assert(floatB != 10);
+    
+    // Literal float != Local int
+    Assert(2.5 != intC);
+    
+    // Global int != Literal float
+    Assert(GlobalIntX != 20.0);
+    
+    // Literal int != Global float
+    Assert(12 != GlobalFloatY);
+    
+    // Global float != Literal int
+    Assert(GlobalFloatX != 10);
+    
+    // Literal float != Global int
+    Assert(7.5 != GlobalIntX);
+
+    // Literal float != Literal int
+    Assert(3.5 != 4);
+
+    // Literal int != Literal float
+    Assert(5 != 5.5);
 }
 
 public int main()

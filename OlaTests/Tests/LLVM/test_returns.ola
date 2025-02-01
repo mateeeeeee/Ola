@@ -58,11 +58,6 @@ void TestVoidWithEarlyReturn()
     Assert(false); // This should not be reached
 }
 
-void TestVoidWithEarlyReturnCheck()
-{
-    TestVoidWithEarlyReturn(); // Should not assert if it returns early
-}
-
 public int main()
 {
 	Assert(TestIfElse() == 10);
