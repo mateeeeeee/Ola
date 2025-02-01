@@ -92,25 +92,25 @@ void TestSwitchWithBreak()
 
 void TestSwitchChar()
 {
-    //char c = 'b';
-    //int result = 0;
-    //
-    //switch (c)
-    //{
-    //    case 'a':
-    //        result = 1;
-    //        break;
-    //    case 'b':
-    //        result = 2;
-    //        break;
-    //    case 'c':
-    //        result = 3;
-    //        break;
-    //    default:
-    //        result = 0;
-    //}
-    //
-    //Assert(result == 2);
+    char c = 'b';
+    int result = 0;
+    
+    switch (c)
+    {
+        case 'a':
+            result = 1;
+            break;
+        case 'b':
+            result = 2;
+            break;
+        case 'c':
+            result = 3;
+            break;
+        default:
+            result = 0;
+    }
+    
+    Assert(result == 2);
 }
 
 void TestSwitchGlobalVariable()
@@ -137,24 +137,24 @@ void TestSwitchGlobalVariable()
 
 void TestSwitchGlobalChar()
 {
-    //int result = 0;
-    //
-    //switch (GlobalCharX)
-    //{
-    //    case 'a':
-    //        result = 1;
-    //        break;
-    //    case 'b':
-    //        result = 2;
-    //        break;
-    //    case 'c':
-    //        result = 3;
-    //        break;
-    //    default:
-    //        result = 0;
-    //}
-    //
-    //Assert(result == 2);
+    int result = 0;
+    
+    switch (GlobalCharX)
+    {
+        case 'a':
+            result = 1;
+            break;
+        case 'b':
+            result = 2;
+            break;
+        case 'c':
+            result = 3;
+            break;
+        default:
+            result = 0;
+    }
+    
+    Assert(result == 2);
 }
 
 void TestSwitchNoMatch()
@@ -190,6 +190,5 @@ public int main()
     TestSwitchGlobalVariable();
     TestSwitchGlobalChar();
     TestSwitchNoMatch();
-
     return 0;
 }

@@ -258,6 +258,7 @@ namespace ola
 		Char GetChar() const { return c; }
 
 		virtual Bool IsConstexpr() const { return true; }
+		virtual Int64 EvaluateConstexpr() const { return static_cast<Int64>(c); }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
