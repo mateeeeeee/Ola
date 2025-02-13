@@ -51,12 +51,13 @@ namespace ola
 				}
 			} while (LocalChanged);
 		}
+
 		return Changed;
 	}
 
 	Bool LoopInvariantCodeMotionPass::IsLoopInvariant(Instruction* I, Loop const* L)
 	{
-		if (isa<StoreInst>(I) || isa<LoadInst>(I) || isa<CallInst>(I))
+		if (isa<StoreInst>(I) || isa<LoadInst>(I) || isa<PhiInst>(I) || I->IsTerminator())
 		{
 			return false;
 		}
