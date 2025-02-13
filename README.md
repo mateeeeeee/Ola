@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide.png"/>
-Ola is a toy programming language with both LLVM backend and a work-in-progress custom backend. 
+Ola is a toy programming language with both LLVM backend and a custom backend. 
 
 ## Features
   * classes
@@ -26,7 +26,7 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * LLVM backend
-  * Custom backend (Work in Progress)
+  * Custom backend
     - Custom IR
     	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, Arithmetic Reduction, Constant Propagation, LICM, DCE, Global DCE
         - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier
@@ -34,6 +34,7 @@ Ola is a toy programming language with both LLVM backend and a work-in-progress 
     	- instruction legalization
        	- register allocation
     - x86-64 code generation
+    - Class support (wip)
   
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
@@ -49,7 +50,7 @@ The project consists of the following parts:
      - **Lexer**: Tokenizes the source code.
      - **Import Processor**: Processes `import` statements from the tokenized input.
      - **Parser**: A recursive descent parser that constructs an Abstract Syntax Tree (AST) from processed tokens.
-     - **Sema**: Performs semantic analysis on the AST to ensure code correctness.
+     - **Sema**: Performs semantic analysis on the AST. Runs together with Parser, not as a separate step.
      - **Backend**: After frontend processing, the compilation process diverges into two backend paths:
        - **LLVM**:
          - **LLVMIR Visitor**: Transforms the AST into LLVM IR.
@@ -105,60 +106,3 @@ The project consists of the following parts:
 
 ## Samples
 Currently to see the samples you can check the test folder: `OlaTests/Tests/`.
-
-## Visualizations 
-```cpp
-private int min(int a, int b) 
-{
-    int c;
-    if (a < b) 
-    {
-        c = a;
-    } 
-    else
-    {
-        c = b;
-    }
-    return c;
-}
-
-public int main()
-{
-    return min(3,4);
-}
-```
-
-### CFG
-
-#### LLVM backend
-
-##### Without optimizations
-<img src="OlaDocs/Images/llvm_cfg_O0.png" alt="CFG without optimizations in LLVM backend">
-
-##### With optimizations 
-<img src="OlaDocs/Images/llvm_cfg_O1.png" alt="CFG with optimizations in LLVM backend">
-
-#### Custom backend
-
-##### Without optimizations
-<img src="OlaDocs/Images/custom_cfg_O0.png" alt="CFG without optimizations in custom backend">
-
-##### With optimizations 
-<img src="OlaDocs/Images/custom_cfg_O1.png" alt="CFG with optimizations in custom backend">
-
-### Dominator Tree
-
-#### LLVM backend
-
-##### Without optimizations
-<img src="OlaDocs/Images/llvm_domtree_O0.png" alt="Dominator tree without optimizations in LLVM backend">
-
-##### With optimizations 
-<img src="OlaDocs/Images/llvm_domtree_O1.png" alt="Dominator tree with optimizations in LLVM backend">
-
-#### Custom backend
-
-##### With and without optimizations
-<img src="OlaDocs/Images/custom_domtree.png" alt="Dominator tree in custom backend">
-
-
