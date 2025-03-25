@@ -1,8 +1,14 @@
 import std.assert;
 
-class Abstract 
+//alternative way instead of interface
+//class Abstract 
+//{
+//	public int GetX() const pure virtual;
+//};
+
+interface Abstract 
 {
-	public int GetX() const pure virtual;
+	public int GetX() const;
 };
 
 class Base : Abstract

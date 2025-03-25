@@ -5,7 +5,7 @@
 #include "Compiler/Compiler.h"
 #include "autogen/OlaConfig.h"
 
-#define NOLLVM 1
+#define NOLLVM 0
 
 using namespace ola;
 

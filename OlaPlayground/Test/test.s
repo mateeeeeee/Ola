@@ -1,78 +1,113 @@
-.intel_syntax noprefix
+	.text
+	.def	@feat.00;
+	.scl	3;
+	.type	0;
+	.endef
+	.globl	@feat.00
+.set @feat.00, 0
+	.intel_syntax noprefix
+	.file	"test.ola"
+	.def	"Base::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Base::GetX"                    # -- Begin function Base::GetX
+	.p2align	4, 0x90
+"Base::GetX":                           # @"Base::GetX"
+# %bb.0:                                # %entry
+	mov	rax, qword ptr [rcx + 8]
+	ret
+                                        # -- End function
+	.def	"Base::GetSumX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Base::GetSumX"                 # -- Begin function Base::GetSumX
+	.p2align	4, 0x90
+"Base::GetSumX":                        # @"Base::GetSumX"
+# %bb.0:                                # %entry
+	mov	rax, qword ptr [rcx]
+	mov	rax, qword ptr [rax]
+	rex64 jmp	rax                     # TAILCALL
+                                        # -- End function
+	.def	"Derived::GetX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Derived::GetX"                 # -- Begin function Derived::GetX
+	.p2align	4, 0x90
+"Derived::GetX":                        # @"Derived::GetX"
+# %bb.0:                                # %entry
+	mov	rax, qword ptr [rcx + 16]
+	ret
+                                        # -- End function
+	.def	"Derived::GetSumX";
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	"Derived::GetSumX"              # -- Begin function Derived::GetSumX
+	.p2align	4, 0x90
+"Derived::GetSumX":                     # @"Derived::GetSumX"
+.seh_proc "Derived::GetSumX"
+# %bb.0:                                # %entry
+	sub	rsp, 40
+	.seh_stackalloc 40
+	.seh_endprologue
+	mov	qword ptr [rsp + 32], rcx       # 8-byte Spill
+	mov	rax, qword ptr [rcx]
+	call	qword ptr [rax]
+	mov	rcx, qword ptr [rsp + 32]       # 8-byte Reload
+	mov	rcx, qword ptr [rcx + 8]
+	add	rax, rcx
+	add	rsp, 40
+	ret
+	.seh_endproc
+                                        # -- End function
+	.def	main;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	main                            # -- Begin function main
+	.p2align	4, 0x90
+main:                                   # @main
+.seh_proc main
+# %bb.0:                                # %entry
+	sub	rsp, 56
+	.seh_stackalloc 56
+	.seh_endprologue
+	mov	ecx, 1
+	call	Assert
+	lea	rax, [rip + VTable_Derived]
+	mov	qword ptr [rsp + 32], rax
+	mov	qword ptr [rsp + 40], 1
+	mov	qword ptr [rsp + 48], 10
+	mov	ecx, 1
+	call	Assert
+	mov	rax, qword ptr [rsp + 32]
+	lea	rcx, [rsp + 32]
+	call	qword ptr [rax]
+	cmp	rax, 10
+	sete	cl
+	call	Assert
+	mov	rax, qword ptr [rsp + 32]
+	lea	rcx, [rsp + 32]
+	call	qword ptr [rax + 8]
+	cmp	rax, 11
+	sete	cl
+	call	Assert
+	xor	eax, eax
+                                        # kill: def $rax killed $eax
+	add	rsp, 56
+	ret
+	.seh_endproc
+                                        # -- End function
+	.section	.rdata,"dr"
+	.p2align	3, 0x0                          # @VTable_Derived
+VTable_Derived:
+	.quad	"Derived::GetX"
+	.quad	"Derived::GetSumX"
 
-.section .text
-
-TestNestedForLoopsReset:
-label0:
-push rbp
-mov rbp, rsp
-sub rsp, 64
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], 0
-mov qword ptr [rbp - 32], 0
-jmp label2
-label1:
-mov qword ptr [rbp - 40], 0
-jmp label6
-label2:
-mov r14, qword ptr [rbp - 24]
-cmp r14, 3
-setl r14b
-and r14b, 1
-test r14b, r14b
-jne label1
-jmp label4
-label3:
-mov r14, qword ptr [rbp - 24]
-mov qword ptr [rbp - 48], r14
-mov r13, r14
-add r13, 1
-mov qword ptr [rbp - 24], r13
-jmp label2
-label4:
-jmp label9
-label5:
-mov r13, qword ptr [rbp - 32]
-mov qword ptr [rbp - 56], r13
-mov r14, r13
-add r14, 1
-mov qword ptr [rbp - 32], r14
-jmp label7
-label6:
-mov r14, qword ptr [rbp - 40]
-cmp r14, 2
-setl r14b
-and r14b, 1
-test r14b, r14b
-jne label5
-jmp label8
-label7:
-mov r14, qword ptr [rbp - 40]
-mov qword ptr [rbp - 64], r14
-mov r13, r14
-add r13, 1
-mov qword ptr [rbp - 40], r13
-jmp label6
-label8:
-jmp label3
-label9:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-.globl main
-
-main:
-label10:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-call TestNestedForLoopsReset
-jmp label11
-label11:
-mov rax, 0
-mov rsp, rbp
-pop rbp
-ret
+	.addrsig
+	.addrsig_sym "Derived::GetX"
+	.addrsig_sym "Derived::GetSumX"
+	.addrsig_sym VTable_Derived

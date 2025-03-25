@@ -56,6 +56,7 @@ namespace ola
 		OLA_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
+		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDeclaration();
 		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(Bool first_pass);
 		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(Bool first_pass);
 		OLA_NODISCARD UniqueParamVarDeclPtr ParseParamVariableDeclaration();
@@ -65,6 +66,7 @@ namespace ola
 		OLA_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		OLA_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();
 		OLA_NODISCARD UniqueClassDeclPtr ParseClassDeclaration();
+		OLA_NODISCARD UniqueClassDeclPtr ParseInterfaceDeclaration();
 
 		OLA_NODISCARD UniqueStmtPtr ParseStatement();
 		OLA_NODISCARD UniqueCompoundStmtPtr ParseCompoundStatement();

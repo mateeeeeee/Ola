@@ -1,25 +1,60 @@
 import std.assert;
 
+
+interface Abstract 
+{
+	public int GetX() const;
+};
+
+class Base : Abstract
+{
+	public int GetX() const virtual
+	{
+		return x;
+	}
+	public int GetSumX() const virtual
+	{
+		return GetX();
+	}
+	int x = 1;
+};
+
+class Derived : Base
+{
+	public int GetX() const virtual
+	{
+		return x;
+	}
+	public int GetSumX() const virtual
+	{
+		return GetX() + super.GetX();
+	}
+
+	int x = 10;
+};
+
+void TestBase(ref Abstract a)
+{
+	Assert(a.GetX() == 1);
+}
+
+void TestDerived(ref Abstract a)
+{
+	Assert(a.GetX() == 10);
+}
+
+void TestDerived2(ref Base b)
+{
+	Assert(b.GetX() == 10);
+	Assert(b.GetSumX() == 11);
+}
+
 public int main()
 {
-    char c = 'b';
-    int result = 0;
-    
-    switch (c)
-    {
-        case 'a':
-            result = 1;
-            break;
-        case 'b':
-            result = 2;
-            break;
-        case 'c':
-            result = 3;
-            break;
-        default:
-            result = 0;
-    }
-    
-    Assert(result == 2);
-    return 0;
+	Base b;
+	TestBase(b);
+	Derived d;
+	TestDerived(d);
+	TestDerived2(d);
+	return 0;
 }

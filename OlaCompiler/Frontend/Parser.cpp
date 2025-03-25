@@ -62,6 +62,10 @@ namespace ola
 			{
 				global_decl_list.push_back(ParseClassDeclaration());
 			}
+			else if (Consume(TokenKind::KW_interface))
+			{
+				global_decl_list.push_back(ParseInterfaceDeclaration());
+			}
 			else if (Consume(TokenKind::KW_enum))
 			{
 				global_decl_list.push_back(ParseEnumDeclaration());
@@ -163,6 +167,47 @@ namespace ola
 			sema->sema_ctx.current_func = nullptr;
 		}
 		return sema->ActOnFunctionDefinition(loc, std::move(func_decl), std::move(function_body));
+	}
+
+	UniqueMethodDeclPtr Parser::ParseMethodDeclaration()
+	{
+		DeclVisibility visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
+		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+
+		SourceLocation const& loc = current_token->GetLocation();
+		std::string_view name = "";
+		QualType function_type{};
+		UniqueParamVarDeclPtrList param_decls;
+		FuncAttributes func_attrs = FuncAttribute_None;
+		MethodAttributes method_attrs = MethodAttribute_None;
+		{
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
+			ParseFunctionAttributes(func_attrs);
+			QualType return_type{};
+			ParseTypeQualifier(return_type);
+			ParseTypeSpecifier(return_type);
+			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+
+			SourceLocation const& loc = current_token->GetLocation();
+			name = current_token->GetData(); ++current_token;
+			Expect(TokenKind::left_round);
+			std::vector<QualType> param_types{};
+			while (!Consume(TokenKind::right_round))
+			{
+				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+
+				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				param_types.emplace_back(param_decl->GetType());
+				param_decls.push_back(std::move(param_decl));
+			}
+			function_type.SetType(FuncType::Get(context, return_type, param_types));
+			ParseMethodAttributes(method_attrs);
+			method_attrs |= MethodAttribute_Pure;	//method declarations can appear only in interfaces, and they are always pure and virtual
+			method_attrs |= MethodAttribute_Virtual; 
+			Expect(TokenKind::semicolon);
+		}
+		return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), nullptr, visibility, func_attrs, method_attrs);
 	}
 
 	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)
@@ -529,6 +574,37 @@ namespace ola
 			sema->sema_ctx.current_base_class = nullptr;
 		}
 		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions), final);
+	}
+
+	UniqueClassDeclPtr Parser::ParseInterfaceDeclaration()
+	{
+		std::string class_name = "";
+		SourceLocation loc = current_token->GetLocation();
+		if (current_token->Is(TokenKind::identifier))
+		{
+			class_name = current_token->GetData();
+			++current_token;
+		}
+		else Expect(TokenKind::identifier);
+		UniqueFieldDeclPtrList member_variables;
+		UniqueMethodDeclPtrList member_functions;
+		{
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
+
+			sema->sema_ctx.current_base_class = nullptr;
+			sema->sema_ctx.current_class_name = class_name;
+			Expect(TokenKind::left_brace);
+			while (!Consume(TokenKind::right_brace))
+			{
+				UniqueMethodDeclPtr member_function = ParseMethodDeclaration();
+				member_functions.push_back(std::move(member_function));
+			}
+			Expect(TokenKind::semicolon);
+			sema->sema_ctx.current_class_name = "";
+			sema->sema_ctx.current_base_class = nullptr;
+		}
+		return sema->ActOnClassDecl(class_name, nullptr, loc, std::move(member_variables), std::move(member_functions), false);
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()

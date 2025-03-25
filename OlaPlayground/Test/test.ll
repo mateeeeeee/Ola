@@ -1,201 +1,73 @@
 ; ModuleID = 'test.ola'
 source_filename = "test.ola"
 
-@GlobalIntA = internal global i64 12
-@GlobalIntB = internal global i64 7
-@GlobalFloatC = internal global double 4.500000e+00
-@GlobalFloatD = internal global double 9.000000e+00
-@GlobalCondition = internal global i1 false
+%Base = type { ptr, i64 }
+%Derived = type { ptr, i64, i64 }
 
-declare void @Assert(i1)
+@VTable_Derived = internal constant [2 x ptr] [ptr @"Derived::GetX", ptr @"Derived::GetSumX"]
 
-declare void @AssertMsg(i1, ptr)
+declare void @Assert(i1) local_unnamed_addr
 
-define internal void @TestTernaryOperatorIntegers() {
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read)
+define i64 @"Base::GetX"(ptr nocapture readonly %this) local_unnamed_addr #0 {
 entry:
-  %0 = alloca i64, align 8
-  store i64 5, ptr %0, align 4
-  %1 = alloca i64, align 8
-  store i64 10, ptr %1, align 4
-  %2 = load i64, ptr %0, align 4
-  %3 = load i64, ptr %1, align 4
-  %4 = icmp sgt i64 %2, %3
-  %5 = load i64, ptr %0, align 4
-  %6 = load i64, ptr %1, align 4
-  %7 = select i1 %4, i64 %5, i64 %6
-  %8 = alloca i64, align 8
-  store i64 %7, ptr %8, align 4
-  %9 = load i64, ptr %8, align 4
-  %10 = icmp eq i64 %9, 10
-  call void @Assert(i1 %10)
-  %11 = load i64, ptr %0, align 4
-  %12 = load i64, ptr @GlobalIntB, align 4
-  %13 = icmp sgt i64 %11, %12
-  %14 = load i64, ptr %0, align 4
-  %15 = load i64, ptr @GlobalIntB, align 4
-  %16 = select i1 %13, i64 %14, i64 %15
-  %17 = alloca i64, align 8
-  store i64 %16, ptr %17, align 4
-  %18 = load i64, ptr %17, align 4
-  %19 = icmp eq i64 %18, 7
-  call void @Assert(i1 %19)
-  %20 = load i64, ptr @GlobalIntA, align 4
-  %21 = load i64, ptr @GlobalIntB, align 4
-  %22 = icmp sgt i64 %20, %21
-  %23 = load i64, ptr @GlobalIntA, align 4
-  %24 = load i64, ptr @GlobalIntB, align 4
-  %25 = select i1 %22, i64 %23, i64 %24
-  %26 = alloca i64, align 8
-  store i64 %25, ptr %26, align 4
-  %27 = load i64, ptr %26, align 4
-  %28 = icmp eq i64 %27, 12
-  call void @Assert(i1 %28)
-  %29 = load i64, ptr @GlobalIntA, align 4
-  %30 = icmp sgt i64 %29, 15
-  %31 = load i64, ptr @GlobalIntA, align 4
-  %32 = select i1 %30, i64 %31, i64 15
-  %33 = alloca i64, align 8
-  store i64 %32, ptr %33, align 4
-  %34 = load i64, ptr %33, align 4
-  %35 = icmp eq i64 %34, 15
-  call void @Assert(i1 %35)
-  %36 = alloca i64, align 8
-  store i64 3, ptr %36, align 4
-  %37 = load i64, ptr %36, align 4
-  %38 = icmp eq i64 %37, 3
-  call void @Assert(i1 %38)
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
+  %0 = getelementptr inbounds %Base, ptr %this, i64 0, i32 1
+  %1 = load ptr, ptr %0, align 8
+  %2 = ptrtoint ptr %1 to i64
+  ret i64 %2
 }
 
-define internal void @TestTernaryOperatorFloats() {
+define i64 @"Base::GetSumX"(ptr %this) local_unnamed_addr {
 entry:
-  %0 = alloca double, align 8
-  store double 2.500000e+00, ptr %0, align 8
-  %1 = alloca double, align 8
-  store double 3.000000e+00, ptr %1, align 8
-  %2 = load double, ptr %0, align 8
-  %3 = load double, ptr %1, align 8
-  %4 = fcmp ogt double %2, %3
-  %5 = load double, ptr %0, align 8
-  %6 = load double, ptr %1, align 8
-  %7 = select i1 %4, double %5, double %6
-  %8 = alloca double, align 8
-  store double %7, ptr %8, align 8
-  %9 = load double, ptr %8, align 8
-  %10 = fcmp oeq double %9, 3.000000e+00
-  call void @Assert(i1 %10)
-  %11 = load double, ptr %0, align 8
-  %12 = load double, ptr @GlobalFloatD, align 8
-  %13 = fcmp ogt double %11, %12
-  %14 = load double, ptr %0, align 8
-  %15 = load double, ptr @GlobalFloatD, align 8
-  %16 = select i1 %13, double %14, double %15
-  %17 = alloca double, align 8
-  store double %16, ptr %17, align 8
-  %18 = load double, ptr %17, align 8
-  %19 = fcmp oeq double %18, 9.000000e+00
-  call void @Assert(i1 %19)
-  %20 = load double, ptr @GlobalFloatC, align 8
-  %21 = load double, ptr @GlobalFloatD, align 8
-  %22 = fcmp ogt double %20, %21
-  %23 = load double, ptr @GlobalFloatC, align 8
-  %24 = load double, ptr @GlobalFloatD, align 8
-  %25 = select i1 %22, double %23, double %24
-  %26 = alloca double, align 8
-  store double %25, ptr %26, align 8
-  %27 = load double, ptr %26, align 8
-  %28 = fcmp oeq double %27, 9.000000e+00
-  call void @Assert(i1 %28)
-  %29 = load double, ptr @GlobalFloatC, align 8
-  %30 = fcmp ogt double %29, 5.000000e+00
-  %31 = load double, ptr @GlobalFloatC, align 8
-  %32 = select i1 %30, double %31, double 5.000000e+00
-  %33 = alloca double, align 8
-  store double %32, ptr %33, align 8
-  %34 = load double, ptr %33, align 8
-  %35 = fcmp oeq double %34, 5.000000e+00
-  call void @Assert(i1 %35)
-  %36 = alloca double, align 8
-  store double 7.000000e+00, ptr %36, align 8
-  %37 = load double, ptr %36, align 8
-  %38 = fcmp oeq double %37, 7.000000e+00
-  call void @Assert(i1 %38)
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
+  %0 = load ptr, ptr %this, align 8
+  %1 = load ptr, ptr %0, align 8
+  %2 = tail call i64 %1(ptr nonnull %this)
+  ret i64 %2
 }
 
-define internal void @TestTernaryOperatorBools() {
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read)
+define i64 @"Derived::GetX"(ptr nocapture readonly %this) #0 {
 entry:
-  %0 = alloca i1, align 1
-  store i1 true, ptr %0, align 1
-  %1 = alloca i64, align 8
-  store i64 5, ptr %1, align 4
-  %2 = alloca i64, align 8
-  store i64 10, ptr %2, align 4
-  %3 = load i1, ptr %0, align 1
-  %4 = load i64, ptr %1, align 4
-  %5 = load i64, ptr %2, align 4
-  %6 = select i1 %3, i64 %4, i64 %5
-  %7 = alloca i64, align 8
-  store i64 %6, ptr %7, align 4
-  %8 = load i64, ptr %7, align 4
-  %9 = icmp eq i64 %8, 5
-  call void @Assert(i1 %9)
-  %10 = load i1, ptr @GlobalCondition, align 1
-  %11 = load i64, ptr %1, align 4
-  %12 = load i64, ptr %2, align 4
-  %13 = select i1 %10, i64 %11, i64 %12
-  %14 = alloca i64, align 8
-  store i64 %13, ptr %14, align 4
-  %15 = load i64, ptr %14, align 4
-  %16 = icmp eq i64 %15, 10
-  call void @Assert(i1 %16)
-  %17 = load i1, ptr @GlobalCondition, align 1
-  %18 = load i64, ptr @GlobalIntA, align 4
-  %19 = load i64, ptr @GlobalIntB, align 4
-  %20 = select i1 %17, i64 %18, i64 %19
-  %21 = alloca i64, align 8
-  store i64 %20, ptr %21, align 4
-  %22 = load i64, ptr %21, align 4
-  %23 = icmp eq i64 %22, 7
-  call void @Assert(i1 %23)
-  %24 = load i1, ptr @GlobalCondition, align 1
-  %25 = select i1 %24, i64 20, i64 30
-  %26 = alloca i64, align 8
-  store i64 %25, ptr %26, align 4
-  %27 = load i64, ptr %26, align 4
-  %28 = icmp eq i64 %27, 30
-  call void @Assert(i1 %28)
-  %29 = alloca i64, align 8
-  store i64 1, ptr %29, align 4
-  %30 = load i64, ptr %29, align 4
-  %31 = icmp eq i64 %30, 1
-  call void @Assert(i1 %31)
-  br label %exit
-
-exit:                                             ; preds = %entry
-  ret void
+  %0 = getelementptr inbounds %Derived, ptr %this, i64 0, i32 2
+  %1 = load ptr, ptr %0, align 8
+  %2 = ptrtoint ptr %1 to i64
+  ret i64 %2
 }
 
-define i64 @main() {
+define i64 @"Derived::GetSumX"(ptr %this) {
 entry:
-  %0 = alloca i64, align 8
-  call void @TestTernaryOperatorIntegers()
-  call void @TestTernaryOperatorFloats()
-  call void @TestTernaryOperatorBools()
-  store i64 0, ptr %0, align 4
-  br label %exit
-
-return:                                           ; No predecessors!
-  %nop = alloca i1, align 1
-  br label %exit
-
-exit:                                             ; preds = %return, %entry
-  %1 = load i64, ptr %0, align 4
-  ret i64 %1
+  %0 = load ptr, ptr %this, align 8
+  %1 = load ptr, ptr %0, align 8
+  %2 = tail call i64 %1(ptr nonnull %this)
+  %3 = getelementptr inbounds %Base, ptr %this, i64 0, i32 1
+  %4 = load ptr, ptr %3, align 8
+  %5 = ptrtoint ptr %4 to i64
+  %6 = add i64 %2, %5
+  ret i64 %6
 }
+
+define i64 @main() local_unnamed_addr {
+entry:
+  tail call void @Assert(i1 true)
+  %0 = alloca %Derived, align 8
+  store ptr @VTable_Derived, ptr %0, align 8
+  %1 = getelementptr inbounds %Derived, ptr %0, i64 0, i32 1
+  store i64 1, ptr %1, align 8
+  %2 = getelementptr inbounds %Derived, ptr %0, i64 0, i32 2
+  store i64 10, ptr %2, align 8
+  tail call void @Assert(i1 true)
+  %3 = load ptr, ptr %0, align 8
+  %4 = load ptr, ptr %3, align 8
+  %5 = call i64 %4(ptr nonnull %0)
+  %6 = icmp eq i64 %5, 10
+  call void @Assert(i1 %6)
+  %7 = load ptr, ptr %0, align 8
+  %8 = getelementptr inbounds ptr, ptr %7, i64 1
+  %9 = load ptr, ptr %8, align 8
+  %10 = call i64 %9(ptr nonnull %0)
+  %11 = icmp eq i64 %10, 11
+  call void @Assert(i1 %11)
+  ret i64 0
+}
+
+attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: read) }
