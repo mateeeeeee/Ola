@@ -44,7 +44,7 @@ namespace ola
 			visibility = _visibility;
 		}
 		Bool IsPublic()  const { return  visibility == DeclVisibility::Public; }
-		Bool IsPrivate() const { return visibility == DeclVisibility::Private; }
+		Bool IsPrivate() const { return  visibility == DeclVisibility::Private; }
 		Bool IsExtern()  const { return  visibility == DeclVisibility::Extern; }
 
 		virtual Bool IsTag() const { return false; }

@@ -33,6 +33,14 @@
 #define OLA_DEBUGBREAK()	        
 #endif
 
+
+template<typename T, int N>
+constexpr int _ArraySize(T(&arr)[N])
+{
+	return N;
+}
+#define OLA_ARRAYSIZE(arr) (_ArraySize(arr))
+
 #define OLA_NONCOPYABLE(Class)                   \
         Class(Class const&)            = delete; \
         Class& operator=(Class const&) = delete;

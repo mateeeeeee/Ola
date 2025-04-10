@@ -9,11 +9,6 @@
 
 using namespace ola;
 
-template<typename T, Uint N>
-constexpr Uint ArraySize(T(&arr)[N])
-{
-	return N;
-}
 
 Int main()
 {
@@ -24,7 +19,7 @@ Int main()
 #else
 	Char const* argv[] = { "-i", "test", "--O1","--timeout",  "--emit-asm","--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test" };
 #endif
-	if (compile_request.Parse(ArraySize(argv), const_cast<Char**>(argv)))
+	if (compile_request.Parse(OLA_ARRAYSIZE(argv), const_cast<Char**>(argv)))
 	{
 		Int compile_result = Compile(compile_request);
 		return compile_result;
