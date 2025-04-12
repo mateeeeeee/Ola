@@ -1345,53 +1345,54 @@ namespace ola
 
 	void Parser::ParseFunctionAttributes(Uint8& attrs)
 	{
+		auto FunctionAttributeParseHelper = [this](Uint8& attrs, FuncAttribute attr) 
+		{
+			if (!HasAttribute(attrs, attr))
+			{
+				attrs |= attr;
+			}
+			else
+			{
+				Diag(function_attribute_repetition);
+				return false;
+			}
+			return true;
+		};
+
 		while (current_token->IsFunctionAttribute())
 		{
 			if (Consume(TokenKind::KW_inline))
 			{
-				if (!HasAttribute(attrs, FuncAttribute_Inline))
+				if (!FunctionAttributeParseHelper(attrs, FuncAttribute_Inline))
 				{
-					attrs |= FuncAttribute_Inline;
-				}
-				else
-				{
-					Diag(function_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_noinline))
 			{
-				if (!HasAttribute(attrs, FuncAttribute_NoInline))
+				if (!FunctionAttributeParseHelper(attrs, FuncAttribute_NoInline))
 				{
-					attrs |= FuncAttribute_NoInline;
-				}
-				else
-				{
-					Diag(function_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_nomangle))
 			{
-				if (!HasAttribute(attrs, FuncAttribute_NoMangle))
+				if (!FunctionAttributeParseHelper(attrs, FuncAttribute_NoMangle))
 				{
-					attrs |= FuncAttribute_NoMangle;
-				}
-				else
-				{
-					Diag(function_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_noopt))
 			{
-				if (!HasAttribute(attrs, FuncAttribute_NoOpt))
+				if (!FunctionAttributeParseHelper(attrs, FuncAttribute_NoOpt))
 				{
-					attrs |= FuncAttribute_NoOpt;
+					return;
 				}
-				else
+			}
+			else if (Consume(TokenKind::KW_deprecated))
+			{
+				if (!FunctionAttributeParseHelper(attrs, FuncAttribute_Deprecated))
 				{
-					Diag(function_attribute_repetition);
 					return;
 				}
 			}
@@ -1400,53 +1401,47 @@ namespace ola
 
 	void Parser::ParseMethodAttributes(Uint8& attrs)
 	{
+		auto MethodAttributeParseHelper = [this](Uint8& attrs, MethodAttribute attr)
+		{
+			if (!HasAttribute(attrs, attr))
+			{
+				attrs |= attr;
+			}
+			else
+			{
+				Diag(method_attribute_repetition);
+				return false;
+			}
+			return true;
+		};
+
 		while (current_token->IsMethodAttribute())
 		{
 			if (Consume(TokenKind::KW_const))
 			{
-				if (!HasAttribute(attrs, MethodAttribute_Const))
+				if (!MethodAttributeParseHelper(attrs, MethodAttribute_Const))
 				{
-					attrs |= MethodAttribute_Const;
-				}
-				else
-				{
-					Diag(method_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_virtual))
 			{
-				if (!HasAttribute(attrs, MethodAttribute_Virtual))
+				if (!MethodAttributeParseHelper(attrs, MethodAttribute_Virtual))
 				{
-					attrs |= MethodAttribute_Virtual;
-				}
-				else
-				{
-					Diag(method_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_pure))
 			{
-				if (!HasAttribute(attrs, MethodAttribute_Pure))
+				if (!MethodAttributeParseHelper(attrs, MethodAttribute_Pure))
 				{
-					attrs |= MethodAttribute_Pure;
-				}
-				else
-				{
-					Diag(method_attribute_repetition);
 					return;
 				}
 			}
 			else if (Consume(TokenKind::KW_final))
 			{
-				if (!HasAttribute(attrs, MethodAttribute_Final))
+				if (!MethodAttributeParseHelper(attrs, MethodAttribute_Final))
 				{
-					attrs |= MethodAttribute_Final;
-				}
-				else
-				{
-					Diag(method_attribute_repetition);
 					return;
 				}
 			}
@@ -1577,6 +1572,11 @@ namespace ola
 			current_token = token;
 			return true;
 		}
+		if (Consume(TokenKind::KW_deprecated))
+		{
+			current_token = token;
+			return true;
+		}
 
 		QualType tmp{};
 		ParseTypeQualifier(tmp);
@@ -1652,5 +1652,4 @@ namespace ola
 	{
 		diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
 	}
-
 }

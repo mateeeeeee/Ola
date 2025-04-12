@@ -102,4 +102,5 @@ DIAG(ctor_call_without_class, error, "Cannot call constructor when there is no c
 DIAG(non_pure_method_needs_definition, error, "Non-pure method needs definition")
 DIAG(function_decl_needs_to_be_extern, error, "function declaration needs to be declared as extern!")
 DIAG(function_def_cannot_be_extern, error, "function definition cannot be declared as extern! Use either public or private!")
+DIAG(calling_deprecated_function, warning, "Function {} is deprecated")
 #undef DIAG

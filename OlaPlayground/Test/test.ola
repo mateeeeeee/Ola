@@ -1,60 +1,10 @@
-import std.assert;
 
-
-interface Abstract 
+deprecated int f(int a, int b)
 {
-	public int GetX() const;
-};
-
-class Base : Abstract
-{
-	public int GetX() const virtual
-	{
-		return x;
-	}
-	public int GetSumX() const virtual
-	{
-		return GetX();
-	}
-	int x = 1;
-};
-
-class Derived : Base
-{
-	public int GetX() const virtual
-	{
-		return x;
-	}
-	public int GetSumX() const virtual
-	{
-		return GetX() + super.GetX();
-	}
-
-	int x = 10;
-};
-
-void TestBase(ref Abstract a)
-{
-	Assert(a.GetX() == 1);
+	return a + b;
 }
-
-void TestDerived(ref Abstract a)
-{
-	Assert(a.GetX() == 10);
-}
-
-void TestDerived2(ref Base b)
-{
-	Assert(b.GetX() == 10);
-	Assert(b.GetSumX() == 11);
-}
-
 public int main()
 {
-	Base b;
-	TestBase(b);
-	Derived d;
-	TestDerived(d);
-	TestDerived2(d);
-	return 0;
+	int r = f(1,2);
+	return r;
 }

@@ -71,7 +71,7 @@ namespace ola
 		}
 		Bool IsFunctionAttribute() const
 		{
-			return IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline, TokenKind::KW_nomangle, TokenKind::KW_noopt);
+			return IsOneOf(TokenKind::KW_inline, TokenKind::KW_noinline, TokenKind::KW_nomangle, TokenKind::KW_noopt, TokenKind::KW_deprecated);
 		}
 		Bool IsMethodAttribute() const
 		{

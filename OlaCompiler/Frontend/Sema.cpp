@@ -895,6 +895,11 @@ namespace ola
 				}
 			}
 
+			if (match_decl->IsDeprecated())
+			{
+				diagnostics.Report(loc, calling_deprecated_function, match_decl->GetName());
+			}
+
 			if (isa<MethodDecl>(match_decl))
 			{
 				UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
@@ -950,6 +955,10 @@ namespace ola
 
 			ConstructorDecl const* match_decl = match_decls[0];
 			FuncType const* match_func_type = match_decl->GetFuncType();
+			if (match_decl->IsDeprecated())
+			{
+				diagnostics.Report(loc, calling_deprecated_function, match_decl->GetName());
+			}
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)
@@ -1002,6 +1011,10 @@ namespace ola
 
 			ConstructorDecl const* match_decl = match_decls[0];
 			FuncType const* match_func_type = match_decl->GetFuncType();
+			if (match_decl->IsDeprecated())
+			{
+				diagnostics.Report(loc, calling_deprecated_function, match_decl->GetName());
+			}
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)

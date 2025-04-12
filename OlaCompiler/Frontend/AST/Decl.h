@@ -163,7 +163,8 @@ namespace ola
 		FuncAttribute_NoInline = 0x01,
 		FuncAttribute_Inline = 0x02,
 		FuncAttribute_NoMangle = 0x04,
-		FuncAttribute_NoOpt = 0x08
+		FuncAttribute_NoOpt = 0x08,
+		FuncAttribute_Deprecated = 0x10
 	};
 	using FuncAttributes = Uint8;
 
@@ -185,10 +186,11 @@ namespace ola
 		{
 			return HasAttribute(func_attributes, attr);
 		}
-		Bool IsInline()   const { return HasFuncAttribute(FuncAttribute_Inline); }
-		Bool IsNoInline() const { return HasFuncAttribute(FuncAttribute_NoInline); }
-		Bool IsNoMangle() const { return HasFuncAttribute(FuncAttribute_NoMangle); }
-		Bool IsNoOpt()    const { return HasFuncAttribute(FuncAttribute_NoOpt); }
+		Bool IsInline()		const { return HasFuncAttribute(FuncAttribute_Inline); }
+		Bool IsNoInline()	const { return HasFuncAttribute(FuncAttribute_NoInline); }
+		Bool IsNoMangle()	const { return HasFuncAttribute(FuncAttribute_NoMangle); }
+		Bool IsNoOpt()		const { return HasFuncAttribute(FuncAttribute_NoOpt); }
+		Bool IsDeprecated() const { return HasFuncAttribute(FuncAttribute_Deprecated); }
 
 		UniqueParamVarDeclPtrList const& GetParamDecls() const { return param_decls; }
 		CompoundStmt const* GetBodyStmt() const { return body_stmt.get(); }

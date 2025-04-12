@@ -22,7 +22,7 @@ Ola is a toy programming language with both LLVM backend and a custom backend.
   * enums
   * functions 
     - overloading
-	- attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`
+	- attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * LLVM backend
