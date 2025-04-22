@@ -7,6 +7,8 @@
 #define OLA_STRINGIFY(a) _OLA_STRINGIFY_IMPL(a)
 #define OLA_CONCAT(x, y) _OLA_CONCAT_IMPL( x, y )
 
+#define OLA_TODO(...)
+#define OLA_HACK(stmt, msg)         stmt
 #define OLA_ASSERT(expr)			assert(expr)
 #define OLA_ASSERT_MSG(expr, msg)   assert(expr && msg)
 #define OLA_UNREACHABLE()			__assume(false)

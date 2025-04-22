@@ -3,6 +3,11 @@ deprecated int f(int a, int b)
 {
 	return a + b;
 }
+int f2(int a, int b)
+{
+	return a + b;
+}
+
 public int main()
 {
 	int r = f(1,2);
