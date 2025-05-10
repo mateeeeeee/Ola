@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide_new2.png"/>
-Ola is a toy programming language with both LLVM backend and a custom backend. 
+Ola is a toy language with both LLVM backend and a custom backend. 
 
 ## Features
   * classes
@@ -8,8 +8,6 @@ Ola is a toy programming language with both LLVM backend and a custom backend.
 	- single inheritance: `:`
 	- polymorphism using vtables: `virtual`, `pure`, `final`
 	- `interface`, `this` and `super` keywords
-  * reference type: `ref`
-  * automatic type deduction: `auto`
   * operators:
     - additive: `+`, `-`, `+=`, `-=`, `++`, `--`
     - multiplicative: `*`, `/`, `%`, `*=`, `/=`, `%=`
@@ -19,10 +17,12 @@ Ola is a toy programming language with both LLVM backend and a custom backend.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
+  * reference type: `ref`
+  * automatic type deduction: `auto`
   * enums
   * functions 
     - overloading
-	- attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
+    - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * LLVM backend
@@ -31,8 +31,8 @@ Ola is a toy programming language with both LLVM backend and a custom backend.
     	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, Arithmetic Reduction, Constant Propagation, LICM, DCE, Global DCE
         - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier
     - Custom MIR
-    	- instruction legalization
-       	- register allocation
+      - instruction legalization
+      - register allocation
     - x86-64 code generation
     - Class support (wip)
   
