@@ -15,9 +15,9 @@ namespace ola
 		ImportProcessor(FrontendContext* context, Diagnostics& diagnostics);
 		void ProcessImports(std::vector<Token>&& tokens);
 		void RemoveImports(std::vector<Token>&& tokens);
-		std::vector<Token>&& GetProcessedTokens()  
+		std::vector<Token> GetProcessedTokens() const
 		{
-			return std::move(tokens);
+			return tokens;
 		}
 
 	private:

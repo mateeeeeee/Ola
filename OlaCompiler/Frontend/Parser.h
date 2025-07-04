@@ -84,7 +84,7 @@ namespace ola
 		OLA_NODISCARD UniqueGotoStmtPtr ParseGotoStatement();
 		OLA_NODISCARD UniqueLabelStmtPtr ParseLabelStatement();
 
-		template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
+		template<ExprParseFn, TokenKind, BinaryExprKind>
 		OLA_NODISCARD UniqueExprPtr ParseBinaryExpression();
 		OLA_NODISCARD UniqueExprPtr ParseExpression();
 		OLA_NODISCARD UniqueExprPtr ParseParenthesizedExpression();

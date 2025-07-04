@@ -17,11 +17,7 @@ namespace ola
 		CompilerFlag_EmitMIR = 0x100,
 		CompilerFlag_TimeoutDetection = 0x200
 	};
-	template<>
-	struct EnumBitmaskOperators<CompilerFlags>
-	{
-		static constexpr Bool enable = true;
-	};
+	ENABLE_ENUM_BIT_OPERATORS(CompilerFlags);
 
 	enum class OptimizationLevel : Uint8
 	{

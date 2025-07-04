@@ -35,7 +35,6 @@ namespace ola
 		ClassType* GetClassType(ClassDecl const* class_decl);
 
 	private:
-
 		VoidType* void_type;
 		BoolType* bool_type;
 		CharType* char_type;

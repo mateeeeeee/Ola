@@ -4,18 +4,8 @@
 
 namespace ola
 {
-	template <>
-	struct EnumBitmaskOperators<InstFlag>
-	{
-		static constexpr Bool enable = true;
-	};
-
-	template <>
-	struct EnumBitmaskOperators<OperandFlag>
-	{
-		static constexpr Bool enable = true;
-	};
-
+	ENABLE_ENUM_BIT_OPERATORS(InstFlag);
+	ENABLE_ENUM_BIT_OPERATORS(OperandFlag);
 
 	InstInfo TargetInstInfo::GetInstInfo(MachineInstruction const& inst) const
 	{

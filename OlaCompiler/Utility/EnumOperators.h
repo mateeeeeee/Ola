@@ -70,4 +70,8 @@ namespace ola
 		return (((T)value) & (T)flags) != 0;
 	}
 
+#define ENABLE_ENUM_BIT_OPERATORS(EnumType) \
+	template<> struct EnumBitmaskOperators<EnumType> \
+	{ static constexpr bool enable = true; }
+
 }

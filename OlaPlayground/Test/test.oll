@@ -1,59 +1,37 @@
 Module ID : test.ola
 
-define internal @TestNestedForLoopsReset void() {
+define internal @g i64() {
 entry:
 %0 = alloca i64
-store 0, ptr %0
 %1 = alloca i64
-store 0, ptr %1
-br label for.cond
-for.body:
+store 110, ptr %1
 %2 = alloca i64
-store 0, ptr %2
-br label for.cond1
-for.cond:
-%3 = load i64, ptr %0
-%4 = icmp slt i64 %3, 3
-br i8 %4, label for.body, label for.end
-for.iter:
-%5 = load i64, ptr %0
-%6 = alloca ptr
-store i64 %5, ptr %6
-%7 = add i64 %5, 1
-store i64 %7, ptr %0
-br label for.cond
-for.end:
+store 107, ptr %2
+%3 = load i64, ptr %1
+%4 = load i64, ptr %2
+%5 = sub i64 %3, %4
+store i64 %5, ptr %0
 br label exit
-for.body1:
-%8 = load i64, ptr %1
-%9 = alloca ptr
-store i64 %8, ptr %9
-%10 = add i64 %8, 1
-store i64 %10, ptr %1
-br label for.iter1
-for.cond1:
-%11 = load i64, ptr %2
-%12 = icmp slt i64 %11, 2
-br i8 %12, label for.body1, label for.end1
-for.iter1:
-%13 = load i64, ptr %2
-%14 = alloca ptr
-store i64 %13, ptr %14
-%15 = add i64 %13, 1
-store i64 %15, ptr %2
-br label for.cond1
-for.end1:
-br label for.iter
+return:
+br label exit
 exit:
-ret 
+%6 = load i64, ptr %0
+ret i64 %6
 }
 
 
 define external @main i64() {
 entry:
-call ptr @TestNestedForLoopsReset
+br label entry.inlined
+entry.split:
+%0 = smul i64 %1, 6148914691236517206
+%2 = ashr i64 %0, 64
 br label exit
+entry.inlined:
+%3 = call ptr @g
+%1 = add i64 30, %3
+br label entry.split
 exit:
-ret i64 0
+ret i64 %2
 }
 

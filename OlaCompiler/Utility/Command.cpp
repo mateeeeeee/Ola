@@ -22,13 +22,16 @@ namespace ola
 
 			PROCESSENTRY32 pe32;
 			pe32.dwSize = sizeof(PROCESSENTRY32);
-
-			if (Process32First(hSnapShot, &pe32)) {
-				do {
-					if (pe32.th32ParentProcessID == pid) {
+			if (Process32First(hSnapShot, &pe32)) 
+			{
+				do 
+				{
+					if (pe32.th32ParentProcessID == pid) 
+					{
 						HANDLE hChildProc = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
-						if (hChildProc) {
-							KillProcessAndChildren(pe32.th32ProcessID); // Recursively kill child processes
+						if (hChildProc) 
+						{
+							KillProcessAndChildren(pe32.th32ProcessID); 
 							TerminateProcess(hChildProc, 1);
 							CloseHandle(hChildProc);
 						}
@@ -37,9 +40,9 @@ namespace ola
 			}
 			CloseHandle(hSnapShot);
 
-			// Now kill the main process
 			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, FALSE, pid);
-			if (hProcess) {
+			if (hProcess) 
+			{
 				TerminateProcess(hProcess, 1);
 				CloseHandle(hProcess);
 			}

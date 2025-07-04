@@ -80,6 +80,25 @@ namespace ola
 		return BoolMatch(V);
 	}
 
+	class Int64Match
+	{
+	public:
+		explicit Int64Match(Value*& value) : V(value) {}
+
+		OLA_NODISCARD Bool operator()(PatternMatchContext<Value> const& ctx) const
+		{
+			V = ctx.value;
+			return V->GetType()->IsInteger() && V->GetType()->GetSize() == 8;
+		}
+
+	private:
+		Value*& V;
+	};
+	inline auto Int64_(Value*& V)
+	{
+		return Int64Match(V);
+	}
+
 	template <typename ValueT, typename Derived>
 	class GenericMatch 
 	{

@@ -14,11 +14,8 @@ namespace ola
 		TokenFlag_BeginningOfLine = 0x2,
 		TokenFlag_PartOfImportDirective = 0x4
 	};
-	template<>
-	struct EnumBitmaskOperators<TokenFlag>
-	{
-		static constexpr Bool enable = true;
-	};
+	ENABLE_ENUM_BIT_OPERATORS(TokenFlag);
+
 	using TokenFlags = Uint32;
 
 	class Token

@@ -1,15 +1,24 @@
 
-deprecated int f(int a, int b)
+
+noopt int g()
 {
-	return a + b;
+	int b = 110;
+	int c = 107;
+	return b - c;
 }
-int f2(int a, int b)
+
+noopt int f()
 {
-	return a + b;
+	int a = 5;
+	int b = 6;
+	int c = a * b;
+	int d = g();
+	int e = c + d;
+	return e;
 }
 
 public int main()
 {
-	int r = f(1,2);
-	return r;
+	int k = f();
+	return k/3;
 }

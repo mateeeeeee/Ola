@@ -855,16 +855,16 @@ namespace ola
 		return sema->ActOnLabelStmt(loc, label_name);
 	}
 
-	template<ExprParseFn ParseFn, TokenKind token_kind, BinaryExprKind op_kind>
+	template<ExprParseFn ParseFn, TokenKind TK, BinaryExprKind OpK>
 	UniqueExprPtr Parser::ParseBinaryExpression()
 	{
 		UniqueExprPtr lhs = (this->*ParseFn)();
-		while (Consume(token_kind))
+		while (Consume(TK))
 		{
 			SourceLocation loc = current_token->GetLocation();
 			UniqueExprPtr rhs = (this->*ParseFn)();
 
-			UniqueBinaryExprPtr parent = sema->ActOnBinaryExpr(op_kind, loc, std::move(lhs), std::move(rhs)); 
+			UniqueBinaryExprPtr parent = sema->ActOnBinaryExpr(OpK, loc, std::move(lhs), std::move(rhs));
 			lhs = std::move(parent);
 		}
 		return lhs;
