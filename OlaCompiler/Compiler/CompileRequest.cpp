@@ -38,9 +38,18 @@ namespace ola
 		{
 			if (!input_files.empty())
 			{
-				if (output_file.empty()) output_file = input_files[0];
-				if (cli_result["--nollvm"])	input_directory = OLA_TESTS_PATH"Tests/Custom";
-				else						input_directory = OLA_TESTS_PATH"Tests/LLVM";
+				if (output_file.empty())
+				{
+					output_file = input_files[0];
+				}
+				if (cli_result["--nollvm"])
+				{
+					input_directory = OLA_TESTS_PATH"Tests/Custom";
+				}
+				else
+				{
+					input_directory = OLA_TESTS_PATH"Tests/LLVM";
+				}
 			}
 			else
 			{
@@ -54,7 +63,10 @@ namespace ola
 			OLA_WARN("No input files provided!");
 			return false;
 		}
-		if (output_file.empty()) output_file = input_files[0];
+		if (output_file.empty())
+		{
+			output_file = input_files[0];
+		}
 
 		if (cli_result["--ast"])				compiler_flags |= CompilerFlag_DumpAST;
 		if (cli_result["--nollvm"])				compiler_flags |= CompilerFlag_NoLLVM;

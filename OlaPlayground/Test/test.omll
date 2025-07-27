@@ -37,10 +37,11 @@ InstStore - i64 stack -16, i64 reg 13
 InstJump - label5
 
 label4: 
-InstMove - i64 reg 14, i64 reg 13
-InstSMul - i64 reg 14, i64 imm 6148914691236517206
-InstMove - i64 reg 13, i64 reg 14
-InstAShr - i64 reg 13, i64 imm 64
+InstMove - i64 reg 0, i64 reg 13
+x64::Cqo - 
+InstMove - i64 reg 13, i64 imm 3
+InstSDiv - i64 reg 13
+InstMove - i64 reg 13, i64 reg 0
 InstJump - label6
 
 label5: 

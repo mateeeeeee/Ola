@@ -46,7 +46,7 @@ namespace ola
 	public:
 		explicit ExactMatch(Value*& value) : V(value) {}
 
-		bool operator()(PatternMatchContext<Value> const& ctx) const
+		Bool operator()(PatternMatchContext<Value> const& ctx) const
 		{
 			return ctx.value == V;
 		}

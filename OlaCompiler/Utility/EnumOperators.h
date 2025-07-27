@@ -72,6 +72,6 @@ namespace ola
 
 #define ENABLE_ENUM_BIT_OPERATORS(EnumType) \
 	template<> struct EnumBitmaskOperators<EnumType> \
-	{ static constexpr bool enable = true; }
+	{ static constexpr Bool enable = true; }
 
 }

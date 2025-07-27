@@ -32,7 +32,7 @@ namespace ola
 			if (visited.contains(block))  continue; 
 			visited.insert(block);
 
-			bool has_jump = false;
+			Bool has_jump = false;
 			for (MachineInstruction& MI : block->Instructions()) 
 			{
 				inst_number_map[&MI] = current;

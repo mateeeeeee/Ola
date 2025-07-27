@@ -22,7 +22,7 @@ namespace ola
 			SetName(symbol);
 		}
 		OLA_NONCOPYABLE(GlobalValue)
-			~GlobalValue() = default;
+		~GlobalValue() = default;
 
 		Linkage GetLinkage() const { return linkage; }
 		void SetLinkage(Linkage _linkage)

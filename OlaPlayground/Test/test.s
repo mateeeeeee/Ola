@@ -39,10 +39,11 @@ mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
 jmp label5
 label4:
-mov r14, r13
-imul r14, 6148914691236517206
-mov r13, r14
-sar r13, 64
+mov rax, r13
+cqo
+mov r13, 3
+idiv r13
+mov r13, rax
 jmp label6
 label5:
 call g

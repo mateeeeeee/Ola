@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide_new2.png"/>
-Ola is a toy language with both LLVM backend and a custom backend. 
+Ola is a toy compiler with both LLVM backend and a custom backend. 
 
 ## Features
   * classes

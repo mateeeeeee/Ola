@@ -16,6 +16,11 @@ namespace ola
 		for (Int i = 0; i < argc; ++i)
 		{
 			std::string arg = argv[i];
+			if (arg.empty())
+			{
+				continue;
+			}
+
 			if (prefix_arg_index_map.find(arg) != prefix_arg_index_map.end())
 			{
 				Uint32 arg_index = prefix_arg_index_map[arg];
