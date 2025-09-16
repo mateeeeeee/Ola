@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "Value.h"
-#include "Compiler/RTTI.h"
+#include "Utility/RTTI.h"
 #include "Utility/IntrusiveList.h"
 #include "Utility/IteratorRange.h"
 

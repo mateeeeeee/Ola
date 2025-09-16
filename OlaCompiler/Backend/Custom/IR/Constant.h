@@ -3,7 +3,7 @@
 #include <span>
 #include "Instruction.h"
 #include "IRType.h"
-#include "Compiler/RTTI.h"
+#include "Utility/RTTI.h"
 
 namespace ola
 {

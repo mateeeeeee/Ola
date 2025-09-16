@@ -37,6 +37,7 @@ set(UTILITY_FILES
   Utility/TreeIterator.h
   Utility/Command.h
   Utility/Command.cpp
+    Utility/RTTI.h
 )
 
 
@@ -219,7 +220,6 @@ set(COMPILER_FILES
   Compiler/CompilerMacros.h
   Compiler/CompileRequest.cpp
   Compiler/CompilerOptions.h
-  Compiler/RTTI.h
 )
 
 add_library(OlaCompiler STATIC

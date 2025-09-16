@@ -4,7 +4,7 @@
 #include "Expr.h"
 #include "Type.h"
 #include "Frontend/SourceLocation.h"
-#include "Compiler/RTTI.h"
+#include "Utility/RTTI.h"
 
 namespace ola
 {
