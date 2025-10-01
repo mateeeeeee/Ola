@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Macros.h"
+#include "Core/Defines.h"
 #include "autogen/OlaConfig.h"
 
 #if !LLVM_BACKEND

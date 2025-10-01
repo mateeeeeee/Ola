@@ -18,7 +18,7 @@ configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/a
 
 set(CORE_FILES
   Core/Types.h
-  Core/Macros.h
+  Core/Defines.h
   Core/Log.h
   Core/Log.cpp
 )
@@ -355,9 +355,9 @@ if(MSVC)
 		/wd4324
 	)
 	target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
-    add_definitions(/FI"Core/Types.h" /FI"Core/Macros.h")
+    add_definitions(/FI"Core/Types.h" /FI"Core/Defines.h")
 else()                                                   
-    add_definitions(-include Core/Types.h -include Core/Macros.h)
+    add_definitions(-include Core/Types.h -include Core/Defines.h)
 endif()
 
 add_executable(OlaDriver main.cpp autogen/OlaConfig.h)

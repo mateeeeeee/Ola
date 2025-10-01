@@ -1,5 +1,5 @@
 #include "Core/Types.h"
-#include "Core/Macros.h"
+#include "Core/Defines.h"
 #include "Core/Log.h"
 #include "Compiler/CompileRequest.h"
 #include "Compiler/Compiler.h"
