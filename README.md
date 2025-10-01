@@ -34,8 +34,8 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
       - instruction legalization
       - register allocation
     - x86-64 code generation
-    - Class support (wip)
-  
+    - Class support still not complete
+	
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
 
@@ -104,5 +104,5 @@ The project consists of the following parts:
   * `--directory`: Directory of input files
   
 
-## Samples
-Currently to see the samples you can check the test folder: `OlaTests/Tests/`.
+## Examples
+You can find example programs for Ola in the `OlaTests/Tests/` folder.
