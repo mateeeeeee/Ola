@@ -107,6 +107,7 @@ namespace ola
 			vreg2reg_map[LI.vreg] = LI.reg;
 			spill->spilled = true;
 			vreg2reg_map.erase(spill->vreg);
+			active.pop_back();
 			active.push_back(&LI);
 			sort(active.begin(), active.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
 		}
