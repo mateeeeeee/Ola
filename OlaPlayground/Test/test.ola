@@ -1,24 +1,20 @@
+import std.assert;
 
-
-noopt int g()
-{
-	int b = 110;
-	int c = 107;
-	return b - c;
-}
-
-noopt int f()
-{
-	int a = 5;
-	int b = 6;
-	int c = a * b;
-	int d = g();
-	int e = c + d;
-	return e;
-}
+int f() {return 3;}
 
 public int main()
 {
-	int k = f();
-	return k/3;
+	int a = 1 + 2; // Compute sum
+    int b = f();
+    int diff = a - b;  
+    if (diff == 0)
+    {
+        int diff2 = a - b; // Redundant computation of a - b
+        Assert(diff2 == 0); // Use diff2
+    }
+    else
+    {
+        Assert(false);
+    }
+    return 0;
 }

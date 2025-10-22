@@ -187,10 +187,24 @@ namespace ola
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode const*>
 		Bool VisitPostOrder(F&& f) const 
 		{
-			if (!root) return true; // No nodes to traverse
-
+			if (!root) return true; 
 			return VisitPostOrderImpl(root, std::forward<F>(f));
 		}
+
+		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
+		Bool VisitReversePostOrder(F&& f) 
+		{
+			if (!root) return true;
+			return VisitReversePostOrderImpl(root, std::forward<F>(f));
+		}
+
+		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode const*>
+		Bool VisitReversePostOrder(F&& f) const
+		{
+			if (!root) return true;
+			return VisitReversePostOrderImpl(root, std::forward<F>(f));
+		}
+
 		template<typename F> requires std::is_invocable_r_v<Bool, F, DominatorTreeNode*>
 		Bool VisitChildrenIf(F&& f, iterator node)
 		{
@@ -266,6 +280,50 @@ namespace ola
 				}
 			}
 			return std::invoke(f, node);
+		}
+
+		template<typename F>
+		Bool VisitReversePostOrderImpl(DominatorTreeNode* node, F&& f) const
+		{
+			if (!node)
+			{
+				return true;
+			}
+
+			if (!std::invoke(f, node))
+			{
+				return false;
+			}
+			for (DominatorTreeNode* child : *node)
+			{
+				if (!VisitReversePostOrderImpl(child, std::forward<F>(f)))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		template<typename F> 
+		Bool VisitReversePostOrderImpl(DominatorTreeNode const* node, F&& f) const
+		{
+			if (!node)
+			{
+				return true;
+			}
+
+			if (!std::invoke(f, node))
+			{
+				return false;
+			}
+			for (DominatorTreeNode const* child : *node) 
+			{
+				if (!VisitReversePostOrderImpl(child, std::forward<F>(f))) 
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 	};
 

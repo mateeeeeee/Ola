@@ -161,6 +161,37 @@ namespace ola
 		}
 	}
 
+	inline Bool IsOpcodeCommutative(Opcode opcode)
+	{
+		switch (opcode)
+		{
+		case Opcode::Add:
+		case Opcode::SMul:
+		case Opcode::And:
+		case Opcode::Or:
+		case Opcode::Xor:
+		case Opcode::FAdd:
+		case Opcode::FMul:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	inline Bool HasOpcodeSideEffects(Opcode opcode)
+	{
+		switch (opcode)
+		{
+		case Opcode::Alloca:  
+		case Opcode::Load:    
+		case Opcode::Store:   
+		case Opcode::Call:    
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	class Use
 	{
 	public:
@@ -296,6 +327,14 @@ namespace ola
 		Bool IsCompareOp() const
 		{
 			return IsOpcodeCompareOp(opcode);
+		}
+		Bool IsCommutative() const
+		{
+			return IsOpcodeCommutative(opcode);
+		}
+		Bool HasSideEffects() const
+		{
+			return HasOpcodeSideEffects(opcode);
 		}
 
 		Bool IsBranch() const

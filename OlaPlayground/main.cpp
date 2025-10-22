@@ -8,7 +8,7 @@
 using namespace ola;
 
 #define BACKEND		"--nollvm"
-#define OPT_LEVEL	"--O2"
+#define OPT_LEVEL	"--O0"
 
 Int main()
 {
