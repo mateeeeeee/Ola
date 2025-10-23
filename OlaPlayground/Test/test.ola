@@ -1,16 +1,17 @@
 import std.assert;
 
-int f() {return 3;}
+int f() {return 2;}
 
 public int main()
 {
 	int a = 1 + 2; // Compute sum
     int b = f();
     int diff = a - b;  
-    if (diff == 0)
+    if (diff != 0)
     {
-        int diff2 = a - b; // Redundant computation of a - b
-        Assert(diff2 == 0); // Use diff2
+        int diff2 = a - b + 1; // Redundant computation of a - b
+        int ret = diff2 + 5;
+        return ret;
     }
     else
     {

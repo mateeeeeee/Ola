@@ -1,9 +1,6 @@
 #pragma once
 #include <cassert>
 
-#pragma once
-#include <cassert>
-
 #define _OLA_STRINGIFY_IMPL(a) #a
 #define _OLA_CONCAT_IMPL(x, y) x##y
 

@@ -9,7 +9,7 @@ declare @AssertMsg void(i8,ptr)
 define internal @f i64() {
 entry:
 %0 = alloca i64
-store 3, ptr %0
+store 2, ptr %0
 br label exit
 return:
 br label exit
@@ -33,28 +33,34 @@ store i64 %2, ptr %3
 %7 = alloca i64
 store i64 %6, ptr %7
 %8 = load i64, ptr %7
-%9 = icmp eq i64 %8, 0
+%9 = icmp ne i64 %8, 0
 br i8 %9, label if.then, label if.else
 if.then:
 %10 = load i64, ptr %1
 %11 = load i64, ptr %3
 %12 = sub i64 %10, %11
-%13 = alloca i64
-store i64 %12, ptr %13
-%14 = load i64, ptr %13
-%15 = icmp eq i64 %14, 0
-call i8 %15, @Assert
-br label if.end
+%13 = add i64 %12, 1
+%14 = alloca i64
+store i64 %13, ptr %14
+%15 = load i64, ptr %14
+%16 = add i64 %15, 5
+%17 = alloca i64
+store i64 %16, ptr %17
+%18 = load i64, ptr %17
+store i64 %18, ptr %0
+br label exit
+return:
+br label exit
 if.else:
 call i8 0, @Assert
 br label if.end
 if.end:
 store 0, ptr %0
 br label exit
-return:
+return1:
 br label exit
 exit:
-%16 = load i64, ptr %0
-ret i64 %16
+%19 = load i64, ptr %0
+ret i64 %19
 }
 

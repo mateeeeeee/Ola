@@ -183,7 +183,6 @@ namespace ola
 		switch (opcode)
 		{
 		case Opcode::Alloca:  
-		case Opcode::Load:    
 		case Opcode::Store:   
 		case Opcode::Call:    
 			return true;

@@ -22,10 +22,16 @@ namespace ola
 	{
 	public:
 		IRPassManager(IRModule& M, FunctionAnalysisManager& FAM);
-		void Run(OptimizationLevel, IRPassOptions const&);
+		void Run(OptimizationLevel level, IRPassOptions const& opts);
 
 	private:
 		IRModule& M;
 		FunctionAnalysisManager& FAM;
+
+	private:
+		void RunEarlyOptimizationPipeline();
+		void RunMainOptimizationLoop(Uint32 max_iterations);
+		void RunLateOptimizationPipeline();
+		void RunDebugPasses(IRPassOptions const& opts);
 	};
 }

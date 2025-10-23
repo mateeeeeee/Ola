@@ -7,6 +7,7 @@
 #include "Passes/DeadCodeEliminationPass.h"
 #include "Passes/GlobalDeadCodeEliminationPass.h"
 #include "Passes/CommonSubexpressionEliminationPass.h"
+#include "Passes/GlobalValueNumberingPass.h"
 #include "Passes/GlobalAttributeInferPass.h"
 #include "Passes/CFGAnalysisPass.h"
 #include "Passes/SimplifyCFGPass.h"
@@ -20,12 +21,11 @@
 namespace ola
 {
 	IRPassManager::IRPassManager(IRModule& M, FunctionAnalysisManager& FAM) : M(M), FAM(FAM)
-	{
-	}
+	{}
 
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
-		for (auto& G : M.Globals())
+		for (GlobalValue* G : M.Globals())
 		{
 			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
 			{
@@ -35,37 +35,109 @@ namespace ola
 				FAM.RegisterPass<LoopAnalysisPass>(*F);
 			}
 		}
-		FunctionPassManager FPM;
-		if (level >= OptimizationLevel::O1)
-		{
-			FPM.AddPass(CreateFunctionInlinerPass());
-			FPM.AddPass(CreateMem2RegPass());
-			FPM.AddPass(CreateCSEPass());
-			FPM.AddPass(CreateArithmeticReductionPass());
-			FPM.AddPass(CreateConstantPropagationPass());
-			FPM.AddPass(CreateLICMPass());
-			FPM.AddPass(CreateDCEPass());
-			FPM.AddPass(CreateSimplifyCFGPass());
-			FPM.AddPass(CreateDCEPass());
-		}
-		if (opts.cfg_print)			 FPM.AddPass(CreateCFGPrinterPass());
-		if (opts.domtree_print)		 FPM.AddPass(CreateDominatorTreePrinterPass());
-		if (opts.domfrontier_print)  FPM.AddPass(CreateDominanceFrontierPrinterPass());
 
-		IRModulePassManager MPM;
 		if (level >= OptimizationLevel::O1)
 		{
-			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+			RunEarlyOptimizationPipeline();
+			if (level >= OptimizationLevel::O2)
+			{
+				RunMainOptimizationLoop(5);
+			}
+			else
+			{
+				RunMainOptimizationLoop(2);
+			}
+			RunLateOptimizationPipeline();
+		}
+
+		if (opts.cfg_print || opts.domtree_print || opts.domfrontier_print)
+		{
+			RunDebugPasses(opts);
+		}
+
+		if (level >= OptimizationLevel::O1)
+		{
+			IRModulePassManager MPM;
 			MPM.AddPass(CreateGlobalAttributeInferPass());
 			MPM.AddPass(CreateGlobalDCEPass());
-		}
 
-		if (!MPM.IsEmpty() || !FPM.IsEmpty())
-		{
 			IRModuleAnalysisManager MAM;
 			MPM.Run(M, MAM);
 		}
 	}
 
-}
+	void IRPassManager::RunEarlyOptimizationPipeline()
+	{
+		FunctionPassManager FPM;
 
+		FPM.AddPass(CreateFunctionInlinerPass());
+		FPM.AddPass(CreateMem2RegPass());
+		FPM.AddPass(CreateDCEPass());
+		FPM.AddPass(CreateSimplifyCFGPass());
+
+		IRModulePassManager MPM;
+		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+		IRModuleAnalysisManager MAM;
+		MPM.Run(M, MAM);
+	}
+
+	void IRPassManager::RunMainOptimizationLoop(Uint32 max_iterations)
+	{
+		for (Uint32 iteration = 0; iteration < max_iterations; ++iteration)
+		{
+			FunctionPassManager FPM;
+			FPM.AddPass(CreateConstantPropagationPass());
+			FPM.AddPass(CreateArithmeticReductionPass());
+
+			FPM.AddPass(CreateCSEPass());
+			FPM.AddPass(CreateDCEPass());
+			FPM.AddPass(CreateLICMPass());
+			FPM.AddPass(CreateSimplifyCFGPass());
+			//FPM.AddPass(CreateGVNPass());
+			FPM.AddPass(CreateDCEPass());
+
+			IRModulePassManager MPM;
+			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+
+			IRModuleAnalysisManager MAM;
+			Bool changed = MPM.Run(M, MAM);
+
+			if (!changed)
+			{
+				break;
+			}
+		}
+	}
+
+	void IRPassManager::RunLateOptimizationPipeline()
+	{
+		FunctionPassManager FPM;
+
+		FPM.AddPass(CreateDCEPass());
+		FPM.AddPass(CreateSimplifyCFGPass());
+		FPM.AddPass(CreateDCEPass());
+
+		IRModulePassManager MPM;
+		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+
+		IRModuleAnalysisManager MAM;
+		MPM.Run(M, MAM);
+	}
+
+	void IRPassManager::RunDebugPasses(IRPassOptions const& opts)
+	{
+		FunctionPassManager FPM;
+		if (opts.cfg_print) FPM.AddPass(CreateCFGPrinterPass());
+		if (opts.domtree_print) FPM.AddPass(CreateDominatorTreePrinterPass());
+		if (opts.domfrontier_print) FPM.AddPass(CreateDominanceFrontierPrinterPass());
+
+		if (!FPM.IsEmpty())
+		{
+			IRModulePassManager MPM;
+			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+
+			IRModuleAnalysisManager MAM;
+			MPM.Run(M, MAM);
+		}
+	}
+}
