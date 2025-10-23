@@ -29,22 +29,31 @@ namespace ola
 			fs::path import_path = "";
 			do 
 			{
-				if (current_token->IsNot(TokenKind::identifier)) diagnostics.Report(current_token->GetLocation(), unexpected_token);
+				if (current_token->IsNot(TokenKind::identifier))
+				{
+					diagnostics.Report(current_token->GetLocation(), unexpected_token);
+				}
 				std::string import_name(current_token->GetData());
 				import_path /= import_name;
 				++current_token;
 			} while (Consume(TokenKind::period));
+
 			Expect(TokenKind::semicolon);
 			TokenPtr end_token = current_token;
-			for (; start_token != end_token; ++start_token) start_token->SetFlag(TokenFlag_PartOfImportDirective);
+			for (; start_token != end_token; ++start_token)
+			{
+				start_token->SetFlag(TokenFlag_PartOfImportDirective);
+			}
 
 			import_path += ola_extension;
 			if (!fs::exists(import_path))
 			{
 				import_path = fs::path(ola_lib_path) / import_path;
-				if (!fs::exists(import_path)) diagnostics.Report(current_token->GetLocation(), invalid_import_path);
+				if (!fs::exists(import_path))
+				{
+					diagnostics.Report(current_token->GetLocation(), invalid_import_path);
+				}
 			}
-			
 			std::vector<Token> import_tokens = GetImportTokens(import_path.string());
 
 			TokenPtr first_inserted = tokens.insert(current_token, import_tokens.begin(), import_tokens.end());

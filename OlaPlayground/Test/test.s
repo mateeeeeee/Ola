@@ -1,83 +1,115 @@
 .intel_syntax noprefix
 
+.section .rodata
+
+__StringLiteral0:
+.string "abc.txt"
+
+
+__StringLiteral1:
+.string "w"
+
+
+.section .bss
+
+SEEK_SET_VALUE:
+.zero 8
+SEEK_CUR_VALUE:
+.zero 8
+SEEK_END_VALUE:
+.zero 8
+MODE_READ:
+.zero 8
+MODE_WRITE:
+.zero 8
+MODE_APPEND:
+.zero 8
+MODE_READ_WRITE:
+.zero 8
+MODE_WRITE_READ:
+.zero 8
+MODE_APPEND_READ:
+.zero 8
+MODE_READ_BINARY:
+.zero 8
+MODE_WRITE_BINARY:
+.zero 8
+MODE_APPEND_BINARY:
+.zero 8
 .section .text
 
-.extern Assert
+.extern FileOpen
 
-.extern AssertMsg
+.extern FileClose
 
-f:
+.extern FileIsOpen
+
+.extern FileReadInt
+
+.extern FileReadFloat
+
+.extern FileReadChar
+
+.extern FileReadLine
+
+.extern FileRead
+
+.extern FileWriteInt
+
+.extern FileWriteFloat
+
+.extern FileWriteChar
+
+.extern FileWriteString
+
+.extern FileWriteLine
+
+.extern FileWrite
+
+.extern FileTell
+
+.extern FileSeek
+
+.extern FileRewind
+
+.extern FileEOF
+
+.extern FileError
+
+.extern FileClearError
+
+.extern FileFlush
+
+.extern FileExists
+
+.extern FileDelete
+
+.extern FileRename
+
+.extern FileSize
+
+.globl main
+
+main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 16
+sub rsp, 56
 mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], 2
+lea r14, [rip + __StringLiteral1]
+mov rdx, r14
+lea r14, [rip + __StringLiteral0]
+mov rcx, r14
+call FileOpen
+mov r14, rax
+mov qword ptr [rbp - 24], r14
+mov qword ptr [rbp - 16], 0
 jmp label2
 label1:
 label2:
 mov r14, qword ptr [rbp - 16]
 mov rax, r14
 mov r14, qword ptr [rbp - 8]
-mov rsp, rbp
-pop rbp
-ret
-.globl main
-
-main:
-label3:
-push rbp
-mov rbp, rsp
-sub rsp, 104
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov qword ptr [rbp - 40], 3
-call f
-mov r14, rax
-mov qword ptr [rbp - 48], r14
-mov r14, qword ptr [rbp - 40]
-mov r13, qword ptr [rbp - 48]
-mov r12, r14
-sub r12, r13
-mov qword ptr [rbp - 56], r12
-mov r12, qword ptr [rbp - 56]
-cmp r12, 0
-setne r12b
-and r12b, 1
-test r12b, r12b
-jne label4
-jmp label6
-label4:
-mov r12, qword ptr [rbp - 40]
-mov r13, qword ptr [rbp - 48]
-mov r14, r12
-sub r14, r13
-mov r13, r14
-add r13, 1
-mov qword ptr [rbp - 64], r13
-mov r13, qword ptr [rbp - 64]
-mov r14, r13
-add r14, 5
-mov qword ptr [rbp - 72], r14
-mov r14, qword ptr [rbp - 72]
-mov qword ptr [rbp - 32], r14
-jmp label9
-label5:
-label6:
-mov rcx, 0
-call Assert
-jmp label7
-label7:
-mov qword ptr [rbp - 32], 0
-jmp label9
-label8:
-label9:
-mov r12, qword ptr [rbp - 32]
-mov rax, r12
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
 mov rsp, rbp
 pop rbp
 ret

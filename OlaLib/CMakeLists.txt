@@ -8,6 +8,7 @@ set(HEADERS
   olaio.h
   olamath.h
   olastring.h
+  olafile.h
 )
 
 add_library(OlaLib ${SOURCE} ${HEADERS})

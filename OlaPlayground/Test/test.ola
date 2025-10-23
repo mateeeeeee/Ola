@@ -1,21 +1,11 @@
-import std.assert;
-
-int f() {return 2;}
+import std.file;
 
 public int main()
 {
-	int a = 1 + 2; // Compute sum
-    int b = f();
-    int diff = a - b;  
-    if (diff != 0)
-    {
-        int diff2 = a - b + 1; // Redundant computation of a - b
-        int ret = diff2 + 5;
-        return ret;
-    }
-    else
-    {
-        Assert(false);
-    }
-    return 0;
+	FileHandle file = FileOpen("abc.txt", "w");
+	//bool res = FileIsOpen(file);
+	//FileWriteLine(file, "Hello, World!");
+    //FileWriteInt(file, 42);
+	//FileClose(file);
+	return 0;
 }

@@ -1,0 +1,53 @@
+alias FileHandle = int;
+
+// File open/close operations
+extern nomangle FileHandle FileOpen(char[] filename, char[] mode);
+extern nomangle bool FileClose(FileHandle file);
+extern nomangle bool FileIsOpen(FileHandle file);
+
+// Reading operations
+extern nomangle int FileReadInt(FileHandle file);
+extern nomangle float FileReadFloat(FileHandle file);
+extern nomangle char FileReadChar(FileHandle file);
+extern nomangle bool FileReadLine(FileHandle file, char[] buffer, int buffer_size);
+extern nomangle int FileRead(FileHandle file, char[] buffer, int count);
+
+// Writing operations
+extern nomangle bool FileWriteInt(FileHandle file, int value);
+extern nomangle bool FileWriteFloat(FileHandle file, float value);
+extern nomangle bool FileWriteChar(FileHandle file, char ch);
+extern nomangle bool FileWriteString(FileHandle file, char[] str);
+extern nomangle bool FileWriteLine(FileHandle file, char[] str);
+extern nomangle int FileWrite(FileHandle file, char[] buffer, int count);
+
+// File position operations
+extern nomangle int FileTell(FileHandle file);
+extern nomangle bool FileSeek(FileHandle file, int offset, int origin);
+extern nomangle void FileRewind(FileHandle file);
+
+// File status operations
+extern nomangle bool FileEOF(FileHandle file);
+extern nomangle bool FileError(FileHandle file);
+extern nomangle void FileClearError(FileHandle file);
+extern nomangle bool FileFlush(FileHandle file);
+
+// File system operations
+extern nomangle bool FileExists(char[] filename);
+extern nomangle bool FileDelete(char[] filename);
+extern nomangle bool FileRename(char[] old_name, char[] new_name);
+extern nomangle int FileSize(char[] filename);
+
+// Seek origin constants (access via external constants)
+extern const int SEEK_SET_VALUE;
+extern const int SEEK_CUR_VALUE;
+extern const int SEEK_END_VALUE;
+
+extern const char[] MODE_READ;
+extern const char[] MODE_WRITE;
+extern const char[] MODE_APPEND;
+extern const char[] MODE_READ_WRITE;
+extern const char[] MODE_WRITE_READ;
+extern const char[] MODE_APPEND_READ;
+extern const char[] MODE_READ_BINARY;
+extern const char[] MODE_WRITE_BINARY;
+extern const char[] MODE_APPEND_BINARY;
