@@ -12,7 +12,7 @@ set(TEST_FILES
 )
 
 add_executable(OlaPlayground ${SOURCE} ${TEST_FILES})
-set_target_properties(OlaPlayground PROPERTIES OUTPUT_NAME Playground)
+set_target_properties(OlaPlayground PROPERTIES OUTPUT_NAME OlaPlayground)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE} ${TEST_FILES})
