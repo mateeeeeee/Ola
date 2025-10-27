@@ -1,26 +1,17 @@
 # OlaCompiler/CMakeLists.txt
 cmake_minimum_required(VERSION 3.20)
 
-# LLVM backend detection with fallback to multiple versions
+# LLVM backend detection
 if(ENABLE_LLVM)
     message(STATUS "LLVM backend is enabled, searching for LLVM...")
     find_package(LLVM 17 QUIET CONFIG)
-    if(NOT LLVM_FOUND)
-        find_package(LLVM 16 QUIET CONFIG)
-    endif()
-    if(NOT LLVM_FOUND)
-        find_package(LLVM 15 QUIET CONFIG)
-    endif()
-    if(NOT LLVM_FOUND)
-        find_package(LLVM 14 QUIET CONFIG)
-    endif()
 
     if(LLVM_FOUND)
         message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
         message(STATUS "LLVM include dirs: ${LLVM_INCLUDE_DIRS}")
         message(STATUS "LLVM library dirs: ${LLVM_LIBRARY_DIRS}")
     else()
-        message(WARNING "LLVM backend was enabled, but LLVM was not found! Disabling LLVM backend...")
+        message(WARNING "LLVM backend was enabled, but LLVM 17 was not found! Disabling LLVM backend...")
     endif()
 else()
     message(STATUS "LLVM backend is disabled.")

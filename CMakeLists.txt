@@ -43,8 +43,7 @@ endif()
 # MSVC-specific settings
 if(MSVC)
 	add_compile_options(/MP)  # Multi-processor compilation
-	# Use modern CMake approach for runtime library
-	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	add_definitions(/MT)
 endif()
 
 # Define DEBUG/RELEASE macros
