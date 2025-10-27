@@ -75,11 +75,45 @@ The project consists of the following parts:
      - **OlaDriver** executable is used in the tests via system calls.
 
 ## Dependencies
-* [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)  
-  * _Note: You can disable the LLVM backend even though you might have LLVM 17.0 installed by generating project with `ENABLE_LLVM=OFF`:_  
+* [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)
+  * _Note: You can disable the LLVM backend by generating project with `ENABLE_LLVM=OFF`:_
     ```bash
     cmake -DENABLE_LLVM=OFF -B build
     ```
+* CMake 3.20 or higher
+* C++20 compatible compiler (MSVC 2019+, GCC 10+, Clang 12+)
+
+## Building
+
+### Windows (MSVC)
+```bash
+cmake -B build [-G "Visual Studio 17 2022"]
+cmake --build build --config Release
+```
+
+### Linux
+```bash
+cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+### macOS
+```bash
+# Xcode
+cmake -B build -G Xcode
+cmake --build build --config Release
+
+# Unix Makefiles
+cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+### Build Options
+```bash
+cmake -B build -DENABLE_LLVM=OFF          # Disable LLVM backend
+cmake -B build -DBUILD_TESTS=OFF          # Disable tests
+cmake -B build -DBUILD_PLAYGROUND=OFF     # Disable playground
+```
 
 ## Usage
 ### Command line options

@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <span>
 #include <unordered_map>
 #include "MachineOperand.h"

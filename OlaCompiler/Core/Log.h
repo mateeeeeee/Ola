@@ -36,12 +36,12 @@ namespace ola
 #define OLA_LOG_INIT() ola::LogInitScope __log_init_scope{};
 
 #if defined(DEBUG)
-#define OLA_DEBUG(fmt, ...)		ola::Log(ola::LogLevel::Debug, fmt, __VA_ARGS__)
-#define OLA_INFO(fmt, ...)		ola::Log(ola::LogLevel::Info, fmt, __VA_ARGS__)
-#define OLA_WARN(fmt, ...)		ola::Log(ola::LogLevel::Warning, fmt, __VA_ARGS__)
-#else 
-#define OLA_DEBUG(fmt, ...)		
-#define OLA_INFO(fmt, ...)		
+#define OLA_DEBUG(fmt, ...)		ola::Log(ola::LogLevel::Debug, fmt, ##__VA_ARGS__)
+#define OLA_INFO(fmt, ...)		ola::Log(ola::LogLevel::Info, fmt, ##__VA_ARGS__)
+#define OLA_WARN(fmt, ...)		ola::Log(ola::LogLevel::Warning, fmt, ##__VA_ARGS__)
+#else
+#define OLA_DEBUG(fmt, ...)		((void)0)
+#define OLA_INFO(fmt, ...)		((void)0)
 #define OLA_WARN(fmt, ...)	
 #endif
 #define OLA_ERROR(fmt, ...)		ola::Log(ola::LogLevel::Error, fmt, __VA_ARGS__)

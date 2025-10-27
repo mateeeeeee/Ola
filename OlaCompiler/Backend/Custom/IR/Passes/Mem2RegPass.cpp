@@ -1,4 +1,4 @@
-﻿#include <set>
+#include <set>
 #include <functional>
 #include "Mem2RegPass.h"
 #include "CFGAnalysisPass.h"

@@ -55,7 +55,7 @@ namespace ola
 	public:
 		Sema(FrontendContext* context, Diagnostics& diagnostics);
 		OLA_NONCOPYABLE(Sema)
-		OLA_DEFAULT_MOVABLE(Sema)
+		OLA_NONMOVABLE(Sema)
 		~Sema();
 
 	private:

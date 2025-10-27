@@ -34,8 +34,8 @@ namespace ola
 		}
 		IRContext& GetContext() const { return ctx; }
 
-		void* operator new(Uint64) = delete;
-		void* operator new(Uint64 sz, IRContext*) { return ::operator new(sz); }
+		void* operator new(std::size_t) = delete;
+		void* operator new(std::size_t sz, IRContext*) { return ::operator new(sz); }
 
 		Bool IsVoid() const { return kind == IRTypeKind::Void; }
 		Bool IsStruct() const { return kind == IRTypeKind::Struct; }

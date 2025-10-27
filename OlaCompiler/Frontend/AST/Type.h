@@ -76,13 +76,14 @@ namespace ola
 	class Type
 	{
 	public:
+        virtual ~Type() = default;
 		constexpr Type() {}
 		constexpr Uint32 GetSize() const { return size; }
 		constexpr Uint32 GetAlign() const { return align; }
 		TypeKind GetKind() const { return kind; }
 
-		void* operator new(Uint64) = delete;
-		void* operator new(Uint64 sz, FrontendContext*) { return ::operator new(sz); }
+		void* operator new(std::size_t) = delete;
+		void* operator new(std::size_t sz, FrontendContext*) { return ::operator new(sz); }
 
 		virtual Bool IsAssignableFrom(Type const*) const { return true; }
 

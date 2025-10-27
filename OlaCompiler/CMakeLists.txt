@@ -1,12 +1,26 @@
-option(ENABLE_LLVM "Enable LLVM backend" ON)
+# OlaCompiler/CMakeLists.txt
+cmake_minimum_required(VERSION 3.20)
 
+# LLVM backend detection with fallback to multiple versions
 if(ENABLE_LLVM)
-    message(STATUS "LLVM backend is enabled.")
+    message(STATUS "LLVM backend is enabled, searching for LLVM...")
     find_package(LLVM 17 QUIET CONFIG)
+    if(NOT LLVM_FOUND)
+        find_package(LLVM 16 QUIET CONFIG)
+    endif()
+    if(NOT LLVM_FOUND)
+        find_package(LLVM 15 QUIET CONFIG)
+    endif()
+    if(NOT LLVM_FOUND)
+        find_package(LLVM 14 QUIET CONFIG)
+    endif()
+
     if(LLVM_FOUND)
-        message(STATUS "LLVM 17.0 found.")
+        message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+        message(STATUS "LLVM include dirs: ${LLVM_INCLUDE_DIRS}")
+        message(STATUS "LLVM library dirs: ${LLVM_LIBRARY_DIRS}")
     else()
-        message(STATUS "LLVM backend was enabled, but LLVM 17.0 was not found! Disabling LLVM backend...")
+        message(WARNING "LLVM backend was enabled, but LLVM was not found! Disabling LLVM backend...")
     endif()
 else()
     message(STATUS "LLVM backend is disabled.")
@@ -14,7 +28,36 @@ endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
 
-
+# Set up compiler-specific flags
+if(MSVC)
+    # MSVC warning suppressions
+    set(DISABLED_WARNINGS
+        /wd4141 /wd4146 /wd4244 /wd4267 /wd4291 /wd4351 /wd4456 /wd4457 /wd4458 /wd4459
+        /wd4503 /wd4624 /wd4722 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702
+        /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4804 /wd4805 /wd4204
+        /wd4577 /wd4091 /wd4592 /wd4319 /wd4709 /wd5105 /wd4324
+    )
+    set(FORCE_INCLUDE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Core/Types.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Core/Defines.h"
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # GCC and Clang warnings
+    set(COMPILER_WARNINGS
+        -Wall
+        -Wextra
+        -Wno-unused-parameter
+        -Wno-unused-variable
+        -Wno-unused-function
+        -Wno-switch
+        -Wno-missing-field-initializers
+        -Wno-implicit-fallthrough
+    )
+    set(FORCE_INCLUDE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Core/Types.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Core/Defines.h"
+    )
+endif()
 
 set(CORE_FILES
   Core/Types.h
@@ -37,9 +80,8 @@ set(UTILITY_FILES
   Utility/TreeIterator.h
   Utility/Command.h
   Utility/Command.cpp
-    Utility/RTTI.h
+  Utility/RTTI.h
 )
-
 
 set(FRONTEND_FILES
   Frontend/Diagnostics.cpp
@@ -79,7 +121,6 @@ set(FRONTEND_FILES
   Frontend/AST/Expr.cpp
 )
 
-
 set(BACKEND_FILES
   Backend/Custom/IR/IRBuilder.h
   Backend/Custom/IR/IRBuilder.cpp
@@ -106,7 +147,6 @@ set(BACKEND_FILES
   Backend/Custom/IR/IRVisitor.h
   Backend/Custom/IR/IRVisitor.cpp
   Backend/Custom/IR/PatternMatch.h
-
   Backend/Custom/IR/Value.h
   Backend/Custom/IR/Value.cpp
   Backend/Custom/IR/Instruction.h
@@ -130,7 +170,6 @@ set(BACKEND_FILES
   Backend/Custom/IR/PassManager.h
   Backend/Custom/IR/PassRegistry.h
   Backend/Custom/IR/AnalysisManager.h
-
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h
   Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.cpp
   Backend/Custom/IR/Passes/LoopAnalysisPass.h
@@ -163,7 +202,6 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/FunctionInlinerPass.cpp
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.h
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.cpp
-
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
   Backend/Custom/Codegen/MachineInstruction.h
@@ -189,7 +227,6 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/LinearScanRegisterAllocator.cpp
   Backend/Custom/Codegen/AsmPrinter.h
   Backend/Custom/Codegen/AsmPrinter.cpp
-
   Backend/Custom/Codegen/x64/x64.h
   Backend/Custom/Codegen/x64/x64Target.h
   Backend/Custom/Codegen/x64/x64Target.cpp
@@ -202,17 +239,17 @@ set(BACKEND_FILES
 )
 
 if(LLVM_FOUND)
-    list(APPEND BACKEND_FILES 
-	  Backend/LLVM/LLVMIRGenContext.h
-	  Backend/LLVM/LLVMIRGenContext.cpp
-	  Backend/LLVM/LLVMIRVisitor.h
-	  Backend/LLVM/LLVMIRVisitor.cpp
-	  Backend/LLVM/LLVMIRPassManager.h
-	  Backend/LLVM/LLVMIRPassManager.cpp
-	  Backend/LLVM/LLVMUtils.h
-	  Backend/LLVM/LLVMUtils.cpp
-	  Backend/LLVM/Passes/TestPass.h
-)
+    list(APPEND BACKEND_FILES
+      Backend/LLVM/LLVMIRGenContext.h
+      Backend/LLVM/LLVMIRGenContext.cpp
+      Backend/LLVM/LLVMIRVisitor.h
+      Backend/LLVM/LLVMIRVisitor.cpp
+      Backend/LLVM/LLVMIRPassManager.h
+      Backend/LLVM/LLVMIRPassManager.cpp
+      Backend/LLVM/LLVMUtils.h
+      Backend/LLVM/LLVMUtils.cpp
+      Backend/LLVM/Passes/TestPass.h
+    )
 endif()
 
 set(COMPILER_FILES
@@ -224,6 +261,7 @@ set(COMPILER_FILES
   Compiler/CompilerOptions.h
 )
 
+# Create the OlaCompiler library
 add_library(OlaCompiler STATIC
   ${CORE_FILES}
   ${UTILITY_FILES}
@@ -231,150 +269,97 @@ add_library(OlaCompiler STATIC
   ${BACKEND_FILES}
   ${COMPILER_FILES}
 )
-target_include_directories(OlaCompiler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(LLVM_FOUND)
-	target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
-	set(LLVM_LIBRARIES
-		LLVMAnalysis
-		LLVMCore
-		LLVMExecutionEngine
-		LLVMInstCombine
-		LLVMObject
-		LLVMSupport
-		LLVMOrcJIT
-		LLVMRuntimeDyld
-		LLVMScalarOpts
-		LLVMX86CodeGen
-		LLVMX86AsmParser
-		LLVMX86Desc
-		LLVMX86Disassembler
-		LLVMX86Info
-		LLVMAArch64AsmParser
-		LLVMAArch64CodeGen
-		LLVMAArch64Desc
-		LLVMAArch64Disassembler
-		LLVMAArch64Info
-		LLVMAArch64Utils
-		LLVMARMAsmParser
-		LLVMARMCodeGen
-		LLVMARMDesc
-		LLVMARMDisassembler
-		LLVMARMInfo
-		LLVMARMUtils
-		LLVMWebAssemblyAsmParser
-		LLVMWebAssemblyCodeGen
-		LLVMWebAssemblyDesc
-		LLVMWebAssemblyDisassembler
-		LLVMWebAssemblyInfo
-		LLVMWebAssemblyUtils
-		LLVMPasses
-		LLVMCoroutines
-		LLVMipo
-		LLVMFrontendOpenMP
-		LLVMLinker
-		LLVMIRPrinter
-		LLVMVectorize
-		LLVMJITLink
-		LLVMOrcTargetProcess
-		LLVMOrcShared
-		LLVMWindowsDriver
-		LLVMOption
-		LLVMAsmPrinter
-		LLVMCFGuard
-		LLVMGlobalISel
-		LLVMInstrumentation
-		LLVMSelectionDAG
-		LLVMCodeGen
-		LLVMAggressiveInstCombine
-		LLVMTarget
-		LLVMBitWriter
-		LLVMObjCARCOpts
-		LLVMTransformUtils
-		LLVMProfileData
-		LLVMSymbolize
-		LLVMDebugInfoPDB
-		LLVMDebugInfoMSF
-		LLVMDebugInfoBTF
-		LLVMDebugInfoDWARF
-		LLVMIRReader
-		LLVMBitReader
-		LLVMAsmParser
-		LLVMTextAPI
-		LLVMRemarks
-		LLVMBitstreamReader
-		LLVMCodeGenTypes
-		LLVMMCParser
-		LLVMMCDisassembler
-		LLVMMC
-		LLVMBinaryFormat
-		LLVMTargetParser
-		LLVMDebugInfoCodeView
-		LLVMDemangle
-	)
-	target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
-	target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
-endif()
+# Set include directories for OlaCompiler
+target_include_directories(OlaCompiler
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}  # Make headers available to linking targets
+)
 
+# Apply compiler-specific options to OlaCompiler
 if(MSVC)
-	set(DISABLED_WARNINGS
-		/wd4141
-		/wd4146
-		/wd4244
-		/wd4267
-		/wd4291
-		/wd4351
-		/wd4456
-		/wd4457
-		/wd4458
-		/wd4459
-		/wd4503
-		/wd4624
-		/wd4722
-		/wd4100
-		/wd4127
-		/wd4512
-		/wd4505
-		/wd4610
-		/wd4510
-		/wd4702
-		/wd4245
-		/wd4706
-		/wd4310
-		/wd4701
-		/wd4703
-		/wd4389
-		/wd4611
-		/wd4804
-		/wd4805
-		/wd4204
-		/wd4577
-		/wd4091
-		/wd4592
-		/wd4319
-		/wd4709
-		/wd5105
-		/wd4324
-	)
-	target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
-    add_definitions(/FI"Core/Types.h" /FI"Core/Defines.h")
-else()                                                   
-    add_definitions(-include Core/Types.h -include Core/Defines.h)
+    target_compile_options(OlaCompiler PRIVATE ${DISABLED_WARNINGS})
+    foreach(HEADER_FILE ${FORCE_INCLUDE_FILES})
+        target_compile_options(OlaCompiler PRIVATE /FI"${HEADER_FILE}")
+    endforeach()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(OlaCompiler PRIVATE ${COMPILER_WARNINGS})
+    # Work around Xcode generator bug with multiple -include flags
+    target_compile_options(OlaCompiler PRIVATE
+        "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/Core/Types.h"
+        "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/Core/Defines.h"
+    )
+    # Add optimization flags
+    target_compile_options(OlaCompiler PRIVATE
+        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Debug>:-O0 -g>
+    )
 endif()
 
-add_executable(OlaDriver main.cpp autogen/OlaConfig.h)
-target_link_libraries(OlaDriver PRIVATE OlaCompiler)
-set_target_properties(OlaDriver PROPERTIES OUTPUT_NAME Ola)
-
-
+# LLVM configuration for OlaCompiler
 if(LLVM_FOUND)
+    target_include_directories(OlaCompiler PRIVATE ${LLVM_INCLUDE_DIRS})
+    set(LLVM_LIBRARIES
+        LLVMAnalysis LLVMCore LLVMExecutionEngine LLVMInstCombine LLVMObject LLVMSupport
+        LLVMOrcJIT LLVMRuntimeDyld LLVMScalarOpts LLVMX86CodeGen LLVMX86AsmParser LLVMX86Desc
+        LLVMX86Disassembler LLVMX86Info LLVMAArch64AsmParser LLVMAArch64CodeGen LLVMAArch64Desc
+        LLVMAArch64Disassembler LLVMAArch64Info LLVMAArch64Utils LLVMARMAsmParser LLVMARMCodeGen
+        LLVMARMDesc LLVMARMDisassembler LLVMARMInfo LLVMARMUtils LLVMWebAssemblyAsmParser
+        LLVMWebAssemblyCodeGen LLVMWebAssemblyDesc LLVMWebAssemblyDisassembler LLVMWebAssemblyInfo
+        LLVMWebAssemblyUtils LLVMPasses LLVMCoroutines LLVMipo LLVMFrontendOpenMP LLVMLinker
+        LLVMIRPrinter LLVMVectorize LLVMJITLink LLVMOrcTargetProcess LLVMOrcShared LLVMWindowsDriver
+        LLVMOption LLVMAsmPrinter LLVMCFGuard LLVMGlobalISel LLVMInstrumentation LLVMSelectionDAG
+        LLVMCodeGen LLVMAggressiveInstCombine LLVMTarget LLVMBitWriter LLVMObjCARCOpts LLVMTransformUtils
+        LLVMProfileData LLVMSymbolize LLVMDebugInfoPDB LLVMDebugInfoMSF LLVMDebugInfoBTF
+        LLVMDebugInfoDWARF LLVMIRReader LLVMBitReader LLVMAsmParser LLVMTextAPI LLVMRemarks
+        LLVMBitstreamReader LLVMCodeGenTypes LLVMMCParser LLVMMCDisassembler LLVMMC LLVMBinaryFormat
+        LLVMTargetParser LLVMDebugInfoCodeView LLVMDemangle
+    )
+    target_link_directories(OlaCompiler PRIVATE ${LLVM_LIBRARY_DIRS})
+    target_link_libraries(OlaCompiler PRIVATE ${LLVM_LIBRARIES})
     target_compile_definitions(OlaCompiler PRIVATE HAS_LLVM=1)
-    target_compile_definitions(OlaDriver PRIVATE HAS_LLVM=1)
 else()
     target_compile_definitions(OlaCompiler PRIVATE HAS_LLVM=0)
+endif()
+
+# Create the OlaDriver executable
+add_executable(OlaDriver main.cpp autogen/OlaConfig.h)
+target_link_libraries(OlaDriver PRIVATE OlaCompiler)
+target_include_directories(OlaDriver PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(OlaDriver PROPERTIES OUTPUT_NAME Ola)
+
+# Apply force include to OlaDriver as well
+if(MSVC)
+    foreach(HEADER_FILE ${FORCE_INCLUDE_FILES})
+        target_compile_options(OlaDriver PRIVATE /FI"${HEADER_FILE}")
+    endforeach()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Work around Xcode generator bug with multiple -include flags
+    target_compile_options(OlaDriver PRIVATE
+        "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/Core/Types.h"
+        "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/Core/Defines.h"
+    )
+endif()
+
+# Apply LLVM definitions to OlaDriver
+if(LLVM_FOUND)
+    target_compile_definitions(OlaDriver PRIVATE HAS_LLVM=1)
+else()
     target_compile_definitions(OlaDriver PRIVATE HAS_LLVM=0)
 endif()
 
+# IDE organization
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES main.cpp autogen/OlaConfig.h ${CORE_FILES} ${UTILITY_FILES} ${FRONTEND_FILES} ${BACKEND_FILES} ${COMPILER_FILES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
+    main.cpp
+    autogen/OlaConfig.h
+    ${CORE_FILES}
+    ${UTILITY_FILES}
+    ${FRONTEND_FILES}
+    ${BACKEND_FILES}
+    ${COMPILER_FILES}
+)
+
+# Install target
 install(TARGETS OlaDriver DESTINATION bin)
+

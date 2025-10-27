@@ -303,7 +303,7 @@ namespace ola
 	public:
 		ConstructorDecl(std::string_view name, SourceLocation const& loc) : MethodDecl(DeclKind::Constructor, name, loc) {}
 
-		virtual Bool IsConstructor() const { return true; }
+		virtual Bool IsConstructor() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 
