@@ -1,12 +1,23 @@
 
-bool f() {return true;}
+noopt bool g() {return true;}
+noopt int f() {return 5;}
 
-public noopt int main()
+public int main()
 {
-	bool cond = f();
-	if(cond)
-	{
-		return 5;
-	}
-	return 10;
+	int a = f();
+    int b = f() * 2;
+    int x = a + b; 
+    int result = 0;
+    if (g() > 0)
+    {
+        int y = a + b; 
+        result = y;    
+    }
+    else
+    {
+        int z = a + b; 
+        result = z;    
+    }
+    
+    return result + x; 
 }

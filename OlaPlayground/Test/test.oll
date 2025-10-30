@@ -1,0 +1,61 @@
+Module ID : test.ola
+
+define internal @g i8() {
+entry:
+%0 = alloca i8
+store 1, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%1 = load i8, ptr %0
+ret i8 %1
+}
+
+
+define internal @f i64() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%1 = load i64, ptr %0
+ret i64 %1
+}
+
+
+define external @main i64() {
+entry:
+%0 = alloca i64
+%1 = call ptr @f
+%2 = alloca i64
+%3 = call ptr @f
+%4 = smul i64 %3, 2
+%5 = alloca i64
+%6 = add i64 %1, %4
+%7 = alloca i64
+%8 = alloca i64
+%9 = call ptr @g
+%10 = zext i8 %9
+%11 = icmp sgt i64 %10, 0
+br i8 %11, label if.then, label if.else
+if.then:
+%12 = alloca i64
+br label if.end
+if.else:
+%13 = alloca i64
+br label if.end
+if.end:
+%14 = phi i64 [ %6, if.then ]
+%15 = phi i64 [ %6, if.else ]
+%16 = phi i64 [ %6, if.then ], [ %6, if.else ]
+%17 = add i64 %16, %6
+br label exit
+return:
+br label exit
+exit:
+ret i64 %17
+}
+
