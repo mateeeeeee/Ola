@@ -19,10 +19,10 @@ namespace ola
 
 		std::vector<BasicBlock*> blocks;
 		DT.VisitReversePostOrder([&](DominatorTreeNode const* node) -> Bool
-		{
-			blocks.push_back(node->GetBasicBlock());
-			return true;
-		});
+			{
+				blocks.push_back(node->GetBasicBlock());
+				return true;
+			});
 
 		std::unordered_map<Value*, Uint64> ValueNumberMap;
 		std::unordered_map<Uint64, Value*> NumberValueMap;
@@ -33,36 +33,48 @@ namespace ola
 		std::unordered_map<Value*, Instruction*> LastStoreToMemory;
 
 		auto AssignNewVN = [&](Value* V) -> Uint64
-		{
-			Uint64 vn = NextVN++;
-			ValueNumberMap[V] = vn;
-			NumberValueMap[vn] = V;
-			return vn;
-		};
-		auto AssignConstantVN = [&](Constant* C) -> Uint64
-		{
-			if (auto it = ValueNumberMap.find(C); it != ValueNumberMap.end())
 			{
-				return it->second;
-			}
-			return AssignNewVN(C);
-		};
+				Uint64 vn = NextVN++;
+				ValueNumberMap[V] = vn;
+				NumberValueMap[vn] = V;
+				return vn;
+			};
+		auto AssignConstantVN = [&](Constant* C) -> Uint64
+			{
+				if (auto it = ValueNumberMap.find(C); it != ValueNumberMap.end())
+				{
+					return it->second;
+				}
+				return AssignNewVN(C);
+			};
 
 		for (auto ArgIt = F.ArgBegin(); ArgIt != F.ArgEnd(); ++ArgIt)
 		{
 			AssignNewVN(*ArgIt);
 		}
 
-		std::vector<Instruction*> ToErase;
-		std::vector<Instruction*> PhiNodes;
+		// First pass: assign value numbers to all phi nodes
 		for (BasicBlock* BB : blocks)
 		{
 			for (Instruction& I : *BB)
 			{
 				if (I.GetOpcode() == Opcode::Phi)
 				{
-					PhiNodes.push_back(&I);
-					continue;
+					AssignNewVN(&I);
+				}
+			}
+		}
+
+		std::vector<Instruction*> ToErase;
+
+		// Second pass: process non-phi instructions
+		for (BasicBlock* BB : blocks)
+		{
+			for (Instruction& I : *BB)
+			{
+				if (I.GetOpcode() == Opcode::Phi)
+				{
+					continue; 
 				}
 
 				if (I.GetOpcode() == Opcode::Alloca)
@@ -117,8 +129,15 @@ namespace ola
 					Value* ptr = I.GetOperand(0);
 					if (ptr)
 					{
-						Instruction* last_store = LastStoreToMemory[ptr]; 
-						hash.Combine(reinterpret_cast<Uintptr>(last_store));
+						auto store_it = LastStoreToMemory.find(ptr);
+						if (store_it != LastStoreToMemory.end())
+						{
+							auto store_vn_it = ValueNumberMap.find(store_it->second);
+							if (store_vn_it != ValueNumberMap.end())
+							{
+								hash.Combine(store_vn_it->second);
+							}
+						}
 					}
 				}
 
@@ -162,53 +181,93 @@ namespace ola
 			}
 		}
 
-		for (Instruction* Phi : PhiNodes)
+		// Third pass: process phi nodes
+		for (BasicBlock* BB : blocks)
 		{
-			for (Uint32 i = 0; i < Phi->GetNumOperands(); ++i)
+			for (Instruction& I : *BB)
 			{
-				if (Value* op = Phi->GetOperand(i))
+				if (I.GetOpcode() != Opcode::Phi)
 				{
-					if (Constant* C = dyn_cast<Constant>(op); C && !ValueNumberMap.contains(C))
+					continue;
+				}
+
+				Instruction* Phi = &I;
+
+				for (Uint32 i = 0; i < Phi->GetNumOperands(); ++i)
+				{
+					if (Value* op = Phi->GetOperand(i))
 					{
-						AssignConstantVN(C);
+						if (Constant* C = dyn_cast<Constant>(op); C && !ValueNumberMap.contains(C))
+						{
+							AssignConstantVN(C);
+						}
 					}
 				}
-			}
 
-			std::vector<Uint64> operand_vns;
-			for (Uint32 i = 0; i < Phi->GetNumOperands(); ++i)
-			{
-				if (Value* op = Phi->GetOperand(i); op && !isa<BasicBlock>(op))
+				std::vector<std::pair<Uint64, Uint64>> operand_block_pairs;
+				for (Uint32 i = 0; i < Phi->GetNumOperands(); i += 2)
 				{
-					auto it = ValueNumberMap.find(op);
-					OLA_ASSERT(it != ValueNumberMap.end() && "Phi operand VN not assigned!");
-					operand_vns.push_back(it->second);
+					Value* value_op = Phi->GetOperand(i);
+					Value* block_op = Phi->GetOperand(i + 1);
+
+					if (value_op && block_op && isa<BasicBlock>(block_op))
+					{
+						auto val_it = ValueNumberMap.find(value_op);
+						auto block_it = ValueNumberMap.find(block_op);
+
+						if (val_it == ValueNumberMap.end())
+						{
+							AssignNewVN(value_op);
+							val_it = ValueNumberMap.find(value_op);
+						}
+						if (block_it == ValueNumberMap.end())
+						{
+							AssignNewVN(block_op);
+							block_it = ValueNumberMap.find(block_op);
+						}
+
+						operand_block_pairs.push_back({ val_it->second, block_it->second });
+					}
 				}
-			}
 
-			HashState hash{};
-			hash.Combine(Opcode::Phi);
-			for (Uint64 ovn : operand_vns)
-			{
-				hash.Combine(ovn);
-			}
-			Uint64 expr_hash = hash;
+				std::sort(operand_block_pairs.begin(), operand_block_pairs.end());
 
-			auto it = ExpressionNumberMap.find(expr_hash);
-			if (it != ExpressionNumberMap.end())
-			{
-				Uint64 existing_vn = it->second;
-				Value* existing_value = NumberValueMap[existing_vn];
+				HashState hash{};
+				hash.Combine(Opcode::Phi);
+				for (auto const& [val_vn, block_vn] : operand_block_pairs)
+				{
+					hash.Combine(val_vn);
+					hash.Combine(block_vn);
+				}
+				Uint64 expr_hash = hash;
 
-				ValueNumberMap[Phi] = existing_vn;
-				Phi->ReplaceAllUsesWith(existing_value);
-				ToErase.push_back(Phi);
-				Changed = true;
-			}
-			else
-			{
-				Uint64 new_vn = AssignNewVN(Phi);
-				ExpressionNumberMap[expr_hash] = new_vn;
+				auto it = ExpressionNumberMap.find(expr_hash);
+				if (it != ExpressionNumberMap.end())
+				{
+					Uint64 existing_vn = it->second;
+					Value* existing_value = NumberValueMap[existing_vn];
+
+					if (Instruction* existing_inst = dyn_cast<Instruction>(existing_value))
+					{
+						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB))
+						{
+							Uint64 phi_vn = ValueNumberMap[Phi];
+							ExpressionNumberMap[expr_hash] = phi_vn;
+							continue;
+						}
+					}
+
+					Uint64 phi_vn = ValueNumberMap[Phi];
+					ValueNumberMap[Phi] = existing_vn;
+					Phi->ReplaceAllUsesWith(existing_value);
+					ToErase.push_back(Phi);
+					Changed = true;
+				}
+				else
+				{
+					Uint64 phi_vn = ValueNumberMap[Phi];
+					ExpressionNumberMap[expr_hash] = phi_vn;
+				}
 			}
 		}
 

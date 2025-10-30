@@ -1,104 +1,44 @@
-external FileOpen
-
-external FileClose
-
-external FileIsOpen
-
-external FileReadInt
-
-external FileReadFloat
-
-external FileReadChar
-
-external FileReadLine
-
-external FileRead
-
-external FileWriteInt
-
-external FileWriteFloat
-
-external FileWriteChar
-
-external FileWriteString
-
-external FileWriteLine
-
-external FileWrite
-
-external FileTell
-
-external FileSeek
-
-external FileRewind
-
-external FileEOF
-
-external FileError
-
-external FileClearError
-
-external FileFlush
-
-external FileExists
-
-external FileDelete
-
-external FileRename
-
-external FileSize
-
-external zero storage SEEK_SET_VALUE of size 8
-
-external zero storage SEEK_CUR_VALUE of size 8
-
-external zero storage SEEK_END_VALUE of size 8
-
-external zero storage MODE_READ of size 8
-
-external zero storage MODE_WRITE of size 8
-
-external zero storage MODE_APPEND of size 8
-
-external zero storage MODE_READ_WRITE of size 8
-
-external zero storage MODE_WRITE_READ of size 8
-
-external zero storage MODE_APPEND_READ of size 8
-
-external zero storage MODE_READ_BINARY of size 8
-
-external zero storage MODE_WRITE_BINARY of size 8
-
-external zero storage MODE_APPEND_BINARY of size 8
-
-external main: 
+internal f: 
 label0: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 56
-InstStore - i64 stack -8, i64 reg 14
-InstLoadGlobalAddress - i64 reg 14, __StringLiteral1
-InstMove - i64 reg 4, i64 reg 14
-InstLoadGlobalAddress - i64 reg 14, __StringLiteral0
-InstMove - i64 reg 3, i64 reg 14
-InstCall - 
-InstMove - i64 reg 14, i64 reg 0
-InstStore - i64 stack -24, i64 reg 14
-InstStore - i64 stack -16, i64 imm 0
-InstJump - label2
+InstJump - label1
 
 label1: 
+InstMove - i8 reg 0, i64 imm 1
+InstRet - 
 
+external main: 
 label2: 
+InstPush - i64 reg 2
+InstMove - i64 reg 2, i64 reg 1
+InstSub - i64 reg 1, i64 imm 49
+InstStore - i64 stack -8, i64 reg 14
+InstCall - 
+InstMove - i8 reg 14, i8 reg 0
+InstStore - i8 stack -17, i8 reg 14
+InstLoad - i8 reg 14, i8 stack -17
+InstTest - i8 reg 14, i8 reg 14
+InstJNE - label3
+InstJump - label6
+
+label3: 
+InstStore - i64 stack -16, i64 imm 5
+InstJump - label8
+
+label4: 
+
+label5: 
+
+label6: 
+InstStore - i64 stack -16, i64 imm 10
+InstJump - label8
+
+label7: 
+
+label8: 
 InstLoad - i64 reg 14, i64 stack -16
 InstMove - i64 reg 0, i64 reg 14
 InstLoad - i64 reg 14, i64 stack -8
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
-
-internal data storage __StringLiteral0
-
-internal data storage __StringLiteral1
 

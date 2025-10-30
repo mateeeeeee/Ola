@@ -73,9 +73,12 @@ namespace ola
 		call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
 		ctx.EmitInst(call_inst);
 		IRType const* return_type = CI->GetType();
-		if (return_type->IsVoid()) return;
+		if (return_type->IsVoid())
+		{
+			return;
+		}
 
-		const auto return_reg = ctx.VirtualReg(return_type);
+		MachineOperand const return_reg = ctx.VirtualReg(return_type);
 		MachineOperand arch_return_reg;
 		if (return_type->IsFloat()) 
 		{
@@ -83,7 +86,7 @@ namespace ola
 		}
 		else 
 		{
-			arch_return_reg = MachineOperand::ISAReg(x64::RAX, MachineType::Int64);
+			arch_return_reg = MachineOperand::ISAReg(x64::RAX, return_reg.GetType());
 		}
 		ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
 		ctx.MapOperand(CI, return_reg);
@@ -313,7 +316,8 @@ namespace ola
 				}
 				else 
 				{
-					return_register = MachineOperand::ISAReg(x64::RAX, MachineType::Int64);
+					MachineType const return_type = V->GetType()->IsBoolean() ? MachineType::Int8 : MachineType::Int64;
+					return_register = MachineOperand::ISAReg(x64::RAX, return_type);
 				}
 
 				MachineInstruction copy_instruction(InstMove);

@@ -1,11 +1,12 @@
-import std.file;
 
-public int main()
+bool f() {return true;}
+
+public noopt int main()
 {
-	FileHandle file = FileOpen("abc.txt", "w");
-	//bool res = FileIsOpen(file);
-	//FileWriteLine(file, "Hello, World!");
-    //FileWriteInt(file, 42);
-	//FileClose(file);
-	return 0;
+	bool cond = f();
+	if(cond)
+	{
+		return 5;
+	}
+	return 10;
 }
