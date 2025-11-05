@@ -1,9 +1,11 @@
 #include <fstream>
 #include "x64Target.h"
+#include "x64SysV.h"
 #include "Backend/Custom/Codegen/x64/x64.h"
 #include "x64TargetFrameInfo.h"
-#include "x64TargetInstInfo.h"
-#include "x64AsmPrinter.h"
+#include "Backend/Custom/Codegen/x64/x64TargetInstInfo.h"
+#include "Backend/Custom/Codegen/x64/x64TargetISelInfo.h"
+#include "Backend/Custom/Codegen/x64/x64AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
@@ -13,7 +15,6 @@
 
 namespace ola
 {
-	// TODO: Implement SysV ABI-specific data layout
 	class SysV_x64TargetDataLayout : public TargetDataLayout
 	{
 	public:
@@ -36,30 +37,6 @@ namespace ola
 		}
 	};
 
-	// TODO: Implement SysV ABI-specific instruction selection
-	class SysV_x64TargetISelInfo : public TargetISelInfo
-	{
-	public:
-		virtual Bool LowerInstruction(Instruction* I, MachineContext& ctx) const override
-		{
-			// TODO: Implement SysV-specific lowering if needed
-			return false;
-		}
-
-		virtual void LegalizeInstruction(InstLegalizeContext& legalize_ctx, MachineContext& lowering_ctx) const override
-		{
-			// TODO: Copy implementation from Microsoft and adjust for SysV calling convention
-			OLA_ASSERT_MSG(false, "SysV x64 ABI not yet implemented!");
-		}
-
-		virtual void PostLegalizeInstruction(InstLegalizeContext& legalize_ctx) const override
-		{
-			// TODO: Copy implementation from Microsoft
-			OLA_ASSERT_MSG(false, "SysV x64 ABI not yet implemented!");
-		}
-	};
-
-	// TODO: Implement SysV ABI-specific register info
 	class SysV_x64TargetRegisterInfo : public TargetRegisterInfo
 	{
 	public:
@@ -153,12 +130,12 @@ namespace ola
 
 		virtual Bool IsCallerSaved(Uint32 r) const override
 		{
-			return x64_IsCallerSaved(r);
+			return x64_SysV_IsCallerSaved(r);
 		}
 
 		virtual Bool IsCalleeSaved(Uint32 r) const override
 		{
-			return x64_IsCalleeSaved(r);
+			return x64_SysV_IsCalleeSaved(r);
 		}
 
 	private:
@@ -174,7 +151,7 @@ namespace ola
 
 	TargetInstInfo const& SysV_x64Target::GetInstInfo() const
 	{
-		static SysV_x64TargetInstInfo sysv_x64_target_inst_info{};
+		static x64TargetInstInfo sysv_x64_target_inst_info{};
 		return sysv_x64_target_inst_info;
 	}
 
@@ -186,7 +163,7 @@ namespace ola
 
 	TargetISelInfo const& SysV_x64Target::GetISelInfo() const
 	{
-		static SysV_x64TargetISelInfo sysv_x64_target_isel_info{};
+		static x64TargetISelInfo sysv_x64_target_isel_info{};
 		return sysv_x64_target_isel_info;
 	}
 
@@ -199,7 +176,7 @@ namespace ola
 	void SysV_x64Target::EmitAssembly(MachineModule& M, std::string_view file) const
 	{
 		std::ofstream asm_stream(file.data());
-		SysV_x64AsmPrinter asm_printer(asm_stream);
+		x64AsmPrinter asm_printer(asm_stream);
 		asm_printer.PrintModule(M);
 	}
 

@@ -24,7 +24,6 @@ namespace ola
 		ARM64_ISARegEnd = ARM64_FPREnd
 	};
 
-	// ARM64-specific instructions
 	enum ARM64Instruction : Uint32
 	{
 		ARM64_InstAdrp = 0x1000,

@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	class Microsoft_x64TargetInstInfo : public TargetInstInfo
+	class x64TargetInstInfo : public TargetInstInfo
 	{
 	public:
 		virtual InstInfo GetInstInfo(Uint32 opcode) const override;

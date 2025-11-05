@@ -12,22 +12,20 @@
 
 namespace ola
 {
-	//Stack layout for x64 Microsoft ABI
+	//Stack layout for x64 SysV ABI
 	//Higher memory addresses
 	//+ ------------------------------------ +
 	//| Caller - saved registers(if spilled) | < -Saved by caller before call
 	//+ ------------------------------------ +
-	//| 7th argument etc					 | <- Pushed by caller before call
-	//| 6th argument						 | <- Pushed by caller before call
-	//| 5th argument						 | <- Pushed by caller before call
-	//+ ------------------------------------ +
-	//| Shadow Space(32B)					 | <- Allocated by caller before CALL
+	//| 7th argument etc					 | <- Pushed by caller before call (for integer args)
 	//+ ------------------------------------ +
 	//| Return Address						 | <- Pushed by CALL instruction
 	//+ ------------------------------------ +
 	//| Old RBP(if used)					 | <- Pushed by callee (if using frame pointer)
-	//| Callee - saved registers			 | <- Saved by callee(if needed)  
+	//| Callee - saved registers			 | <- Saved by callee(if needed)
 	//| Local variables + register spills	 | <- Allocated by callee
+	//+ ------------------------------------ +
+	//| Red Zone (128 bytes)				 | <- Available without explicit allocation
 	//+ ------------------------------------ +
 	//Lower memory addresses(stack grows downward)
 	
@@ -43,25 +41,38 @@ namespace ola
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
-			if (idx >= 4) 
+
+			if (arg_operand.GetType() != MachineType::Float64)
 			{
-				Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8; 
-				MachineInstruction copy_arg_to_stack(opcode);
-				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
-				ctx.EmitInst(copy_arg_to_stack);
-			}
-			else 
-			{
-				if (arg_operand.GetType() != MachineType::Float64)
+				// SysV x64 ABI: Integer arguments go in RDI, RSI, RDX, RCX, R8, R9 (6 registers)
+				if (idx >= 6)
 				{
-					static constexpr x64Register arg_regs[] = { x64_RCX, x64_RDX, x64_R8, x64_R9 };
+					Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8;
+					MachineInstruction copy_arg_to_stack(opcode);
+					copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+					ctx.EmitInst(copy_arg_to_stack);
+				}
+				else
+				{
+					static constexpr x64Register arg_regs[] = { x64_RDI, x64_RSI, x64_RDX, x64_RCX, x64_R8, x64_R9 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
 				}
+			}
+			else
+			{
+				// SysV x64 ABI: Float arguments go in XMM0-XMM7 (8 registers)
+				if (idx >= 8)
+				{
+					Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8;
+					MachineInstruction copy_arg_to_stack(opcode);
+					copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+					ctx.EmitInst(copy_arg_to_stack);
+				}
 				else
 				{
-					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3 };
+					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3, x64_XMM4, x64_XMM5, x64_XMM6, x64_XMM7 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
@@ -96,10 +107,11 @@ namespace ola
 	{
 		using enum MachineType;
 
-		if (MF.HasCallInstructions()) MF.AllocateArgumentStack(32);
-		if (MF.GetMaxCallArgCount() > 4)
+		// SysV x64 ABI: No shadow space allocation (unlike Microsoft x64)
+		// Only allocate stack space for arguments beyond the 6 integer registers
+		if (MF.GetMaxCallArgCount() > 6)
 		{
-			MF.AllocateArgumentStack((MF.GetMaxCallArgCount() - 4) * 8);
+			MF.AllocateArgumentStack((MF.GetMaxCallArgCount() - 6) * 8);
 		}
 
 		MachineOperand rbp = MachineOperand::ISAReg(x64_RBP, Int64);
@@ -123,29 +135,44 @@ namespace ola
 		Uint32 arg_idx = 0;
 		for (MachineOperand const& arg : MF.Args())
 		{
-			if (arg_idx < 4)
+			if (arg.GetType() != Float64)
 			{
-				if (arg.GetType() != Float64)
+				// SysV x64 ABI: First 6 integer arguments in RDI, RSI, RDX, RCX, R8, R9
+				if (arg_idx < 6)
 				{
-					static constexpr x64Register arg_regs[] = { x64_RCX, x64_RDX, x64_R8, x64_R9 };
+					static constexpr x64Register arg_regs[] = { x64_RDI, x64_RSI, x64_RDX, x64_RCX, x64_R8, x64_R9 };
 					MachineInstruction copy_arg_to_reg(InstMove);
 					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
 				}
 				else
 				{
-					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3 };
+					// Arguments 7+ are on the stack
+					// Stack layout: [return addr (8)] + [old RBP (8)] = 16 bytes base
 					MachineInstruction copy_arg_to_reg(InstMove);
-					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					Int32 offset = 16 + (arg_idx - 6) * 8;
+					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
 				}
 			}
 			else
 			{
-				MachineInstruction copy_arg_to_reg(InstMove);
-				Int32 offset = 8 + 40 + (arg_idx - 4) * 8;
-				copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
-				ctx.EmitInst(copy_arg_to_reg);
+				// SysV x64 ABI: First 8 float arguments in XMM0-XMM7
+				if (arg_idx < 8)
+				{
+					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3, x64_XMM4, x64_XMM5, x64_XMM6, x64_XMM7 };
+					MachineInstruction copy_arg_to_reg(InstMove);
+					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					ctx.EmitInst(copy_arg_to_reg);
+				}
+				else
+				{
+					// Arguments 9+ are on the stack
+					MachineInstruction copy_arg_to_reg(InstMove);
+					Int32 offset = 16 + (arg_idx - 8) * 8;
+					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
+					ctx.EmitInst(copy_arg_to_reg);
+				}
 			}
 			++arg_idx;
 		}

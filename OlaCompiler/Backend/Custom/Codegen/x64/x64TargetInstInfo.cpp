@@ -5,7 +5,7 @@
 namespace ola
 {
 
-	InstInfo SysV_x64TargetInstInfo::GetInstInfo(Uint32 opcode) const
+	InstInfo x64TargetInstInfo::GetInstInfo(Uint32 opcode) const
 	{
 		InstInfo inst_info{};
 		switch (opcode)
@@ -112,7 +112,7 @@ namespace ola
 		return inst_info;
 	}
 
-	std::string SysV_x64TargetInstInfo::GetInstName(Uint32 opcode) const
+	std::string x64TargetInstInfo::GetInstName(Uint32 opcode) const
 	{
 		OLA_ASSERT(opcode > ISASpecificBegin);
 		switch (opcode)

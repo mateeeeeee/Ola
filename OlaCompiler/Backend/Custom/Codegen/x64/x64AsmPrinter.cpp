@@ -1,8 +1,8 @@
 #include <format>
 #include "x64AsmPrinter.h"
 #include "Backend/Custom/Codegen/x64/x64.h"
-#include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
+#include "Backend/Custom/Codegen/Target.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
 #include "Backend/Custom/Codegen/MachineFunction.h"
@@ -59,7 +59,7 @@ namespace ola
 		return "";
 	}
 
-	void Microsoft_x64AsmPrinter::PrintModule(MachineModule const& M)
+	void x64AsmPrinter::PrintModule(MachineModule const& M)
 	{
 		EmitPreamble(".intel_syntax noprefix\n");
 
@@ -293,7 +293,7 @@ namespace ola
 	}
 
 
-	std::string Microsoft_x64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
+	std::string x64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
@@ -307,7 +307,7 @@ namespace ola
 		return fp_constant_pool[value];
 	}
 
-	std::string Microsoft_x64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
+	std::string x64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))
