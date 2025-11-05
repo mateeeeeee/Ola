@@ -28,6 +28,7 @@ namespace ola
 			cli_parser.AddArg(true, "-i", "--input");
 			cli_parser.AddArg(true, "--directory");
 			cli_parser.AddArg(true, "-o", "--output");
+			cli_parser.AddArg(true, "--target");
 		}
 		CLIParseResult cli_result = cli_parser.Parse(argc, argv);
 
@@ -83,6 +84,31 @@ namespace ola
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;
 		if (cli_result["--O2"]) opt_level = OptimizationLevel::O2;
 		if (cli_result["--O3"]) opt_level = OptimizationLevel::O3;
+
+		std::string target_str = cli_result["--target"].AsStringOr("");
+		if (target_str == "x64-ms")
+		{
+			target_arch = TargetArch::x64_Microsoft;
+		}
+		else if (target_str == "x64-sysv")
+		{
+			target_arch = TargetArch::x64_SysV;
+		}
+		else if (target_str == "arm64")
+		{
+			target_arch = TargetArch::ARM64;
+		}
+		else if (!target_str.empty())
+		{
+#if OLA_PLATFORM_WINDOWS
+			target_arch = TargetArch::x64_Microsoft;
+#elif OLA_PLATFORM_MACOS
+			target_arch = TargetArch::ARM64;
+#else
+			target_arch = TargetArch::x64_SysV;
+#endif
+		}
+
 		return true;
 	}
 }

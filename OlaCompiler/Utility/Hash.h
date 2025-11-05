@@ -8,7 +8,7 @@ namespace ola
 	public:
 		HashState() : value(0) {}
 
-		void Combine(Uint64 hash)
+		void Combine(Usize hash)
 		{
 			value ^= hash + 0x9e3779b9 + (value << 6) + (value >> 2);
 		}

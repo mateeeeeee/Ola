@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 
 namespace ola
 {
@@ -22,6 +23,7 @@ namespace ola
 	using Uint		= unsigned int;
 	using Float		= float;
 	using Float64   = double;
+	using Usize		= std::size_t;
 	using Uintptr	= std::uintptr_t;
 	using Intptr	= std::intptr_t;
 }

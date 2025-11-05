@@ -15,7 +15,9 @@
 #include "Backend/Custom/IR/IRPassManager.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
-#include "Backend/Custom/Codegen/x64/x64Target.h"
+#include "Backend/Custom/Codegen/x64/Microsoft/x64Target.h"
+#include "Backend/Custom/Codegen/x64/SysV/x64Target.h"
+#include "Backend/Custom/Codegen/Arm64/ARM64Target.h"
 #include "Utility/DebugVisitor.h"
 #include "Utility/Command.h"
 #include "autogen/OlaConfig.h"
@@ -49,6 +51,7 @@ namespace ola
 		struct TUCompilationOptions
 		{
 			OptimizationLevel opt_level;
+			TargetArch target_arch;
 			Bool use_llvm_backend;
 			Bool dump_ast;
 			Bool dump_cfg;
@@ -57,7 +60,7 @@ namespace ola
 			Bool print_domfrontier;
 		};
 
-		void CompileTranslationUnit(FrontendContext& context, 
+		void CompileTranslationUnit(FrontendContext& context,
 			std::string_view source_file, std::string_view ir_file, std::string_view mir_file, std::string_view assembly_file,
 			TUCompilationOptions const& opts)
 		{
@@ -134,8 +137,28 @@ namespace ola
 
 				ir_module.Print(ir_file);
 
-				x64Target x64_target{};
-				MachineModule machine_module(ir_module, x64_target, analysis_manager);
+				Target* x64_target = nullptr;
+				Microsoft_x64Target ms_target{};
+				SysV_x64Target sysv_target{};
+				ARM64Target arm64_target{};
+
+				switch (opts.target_arch)
+				{
+				case TargetArch::x64_Microsoft:
+					x64_target = &ms_target;
+					break;
+				case TargetArch::x64_SysV:
+					x64_target = &sysv_target;
+					break;
+				case TargetArch::ARM64:
+					x64_target = &arm64_target;
+					break;
+				default:
+					OLA_ASSERT_MSG(false, "Invalid target architecture!");
+					break;
+				}
+
+				MachineModule machine_module(ir_module, *x64_target, analysis_manager);
 				if(!mir_file.empty())
 				{
 					machine_module.EmitMIR(mir_file);
@@ -166,13 +189,18 @@ namespace ola
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
 		std::string output_file = compile_request.GetOutputFile();
-		
-		switch (compile_request.GetOutputType())
+		output_file += ".exe";
+
+		TargetArch target_arch = compile_request.GetTargetArch();
+		if (target_arch == TargetArch::Default)
 		{
-		case CompilerOutput::Exe:  output_file += ".exe"; break;
-		case CompilerOutput::Dll:
-		case CompilerOutput::Lib:
-			OLA_ASSERT_MSG(false, "DLL and LIB outputs are not yet supported!");
+#if OLA_PLATFORM_WINDOWS
+			target_arch = TargetArch::x64_Microsoft;
+#elif OLA_PLATFORM_MACOS
+			target_arch = TargetArch::ARM64;
+#else
+			target_arch = TargetArch::x64_SysV;
+#endif
 		}
 
 		FrontendContext context{};
@@ -191,6 +219,7 @@ namespace ola
 			TUCompilationOptions tu_comp_opts
 			{
 				.opt_level = opt_level,
+				.target_arch = target_arch,
 				.use_llvm_backend = !no_llvm,
 				.dump_ast = ast_dump,
 				.dump_cfg = cfg_dump,

@@ -1,11 +1,11 @@
-#include "x64.h"
 #include "x64TargetInstInfo.h"
+#include "Backend/Custom/Codegen/x64/x64.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola
 {
 
-	InstInfo x64TargetInstInfo::GetInstInfo(Uint32 opcode) const
+	InstInfo SysV_x64TargetInstInfo::GetInstInfo(Uint32 opcode) const
 	{
 		InstInfo inst_info{};
 		switch (opcode)
@@ -32,8 +32,8 @@ namespace ola
 		case InstZExt:
 		case InstF2S:
 		case InstS2F:
-		case x64::InstLoadFP:
-		case x64::InstMoveFP:
+		case x64_InstLoadFP:
+		case x64_InstMoveFP:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -41,7 +41,7 @@ namespace ola
 		}
 		break;
 		case InstStore:
-		case x64::InstStoreFP:
+		case x64_InstStoreFP:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagUse);
@@ -69,7 +69,7 @@ namespace ola
 		case InstFSub:
 		case InstFMul:
 		case InstFDiv:
-		case x64::InstXorFP:
+		case x64_InstXorFP:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
@@ -88,22 +88,22 @@ namespace ola
 		case InstNeg:
 		case InstNot:
 		case InstFNeg:
-		case x64::InstSetE:
-		case x64::InstSetNE:
-		case x64::InstSetGT:
-		case x64::InstSetGE:
-		case x64::InstSetLT:
-		case x64::InstSetLE:
-		case x64::InstSetA:
-		case x64::InstSetAE:
-		case x64::InstSetB:
-		case x64::InstSetBE:
+		case x64_InstSetE:
+		case x64_InstSetNE:
+		case x64_InstSetGT:
+		case x64_InstSetGE:
+		case x64_InstSetLT:
+		case x64_InstSetLE:
+		case x64_InstSetA:
+		case x64_InstSetAE:
+		case x64_InstSetB:
+		case x64_InstSetBE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 		}
 		break;
-		case x64::InstCqo:
+		case x64_InstCqo:
 		{
 			inst_info.SetOperandCount(0);
 		}
@@ -112,26 +112,26 @@ namespace ola
 		return inst_info;
 	}
 
-	std::string x64TargetInstInfo::GetInstName(Uint32 opcode) const
+	std::string SysV_x64TargetInstInfo::GetInstName(Uint32 opcode) const
 	{
 		OLA_ASSERT(opcode > ISASpecificBegin);
 		switch (opcode)
 		{
-		case x64::InstSetE:		return "x64::SetE";
-		case x64::InstSetNE:	return "x64::SetNE";
-		case x64::InstSetGT:	return "x64::SetGT";
-		case x64::InstSetGE:	return "x64::SetGE";
-		case x64::InstSetLT:	return "x64::SetLT";
-		case x64::InstSetLE:	return "x64::SetLE";
-		case x64::InstSetA:		return "x64::SetA";
-		case x64::InstSetAE:	return "x64::SetAE";
-		case x64::InstSetB:		return "x64::SetB";
-		case x64::InstSetBE:	return "x64::SetBE";
-		case x64::InstCqo:		return "x64::Cqo";
-		case x64::InstMoveFP:	return "x64::MoveFP";
-		case x64::InstStoreFP:	return "x64::StoreFP";
-		case x64::InstLoadFP:	return "x64::LoadFP";
-		case x64::InstXorFP:	return "x64::XorFP";
+		case x64_InstSetE:		return "x64_SetE";
+		case x64_InstSetNE:	return "x64_SetNE";
+		case x64_InstSetGT:	return "x64_SetGT";
+		case x64_InstSetGE:	return "x64_SetGE";
+		case x64_InstSetLT:	return "x64_SetLT";
+		case x64_InstSetLE:	return "x64_SetLE";
+		case x64_InstSetA:		return "x64_SetA";
+		case x64_InstSetAE:	return "x64_SetAE";
+		case x64_InstSetB:		return "x64_SetB";
+		case x64_InstSetBE:	return "x64_SetBE";
+		case x64_InstCqo:		return "x64_Cqo";
+		case x64_InstMoveFP:	return "x64_MoveFP";
+		case x64_InstStoreFP:	return "x64_StoreFP";
+		case x64_InstLoadFP:	return "x64_LoadFP";
+		case x64_InstXorFP:	return "x64_XorFP";
 		}
 		return "";
 	}

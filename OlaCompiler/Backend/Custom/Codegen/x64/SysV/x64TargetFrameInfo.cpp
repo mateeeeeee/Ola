@@ -1,5 +1,5 @@
-#include "x64.h"
 #include "x64TargetFrameInfo.h"
+#include "Backend/Custom/Codegen/x64/x64.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/RegisterAllocator.h"
@@ -31,7 +31,7 @@ namespace ola
 	//+ ------------------------------------ +
 	//Lower memory addresses(stack grows downward)
 	
-	void x64TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
 		Function* callee = CI->GetCalleeAsFunction();
 		OLA_ASSERT(callee);
@@ -54,14 +54,14 @@ namespace ola
 			{
 				if (arg_operand.GetType() != MachineType::Float64)
 				{
-					static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
+					static constexpr x64Register arg_regs[] = { x64_RCX, x64_RDX, x64_R8, x64_R9 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
 				}
 				else
 				{
-					static constexpr x64::Register arg_regs[] = { x64::XMM0, x64::XMM1, x64::XMM2, x64::XMM3 };
+					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
@@ -82,17 +82,17 @@ namespace ola
 		MachineOperand arch_return_reg;
 		if (return_type->IsFloat()) 
 		{
-			arch_return_reg = MachineOperand::ISAReg(x64::XMM0, MachineType::Float64);
+			arch_return_reg = MachineOperand::ISAReg(x64_XMM0, MachineType::Float64);
 		}
 		else 
 		{
-			arch_return_reg = MachineOperand::ISAReg(x64::RAX, return_reg.GetType());
+			arch_return_reg = MachineOperand::ISAReg(x64_RAX, return_reg.GetType());
 		}
 		ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
 		ctx.MapOperand(CI, return_reg);
 	}
 
-	void x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
 
@@ -102,8 +102,8 @@ namespace ola
 			MF.AllocateArgumentStack((MF.GetMaxCallArgCount() - 4) * 8);
 		}
 
-		MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, Int64);
-		MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, Int64);
+		MachineOperand rbp = MachineOperand::ISAReg(x64_RBP, Int64);
+		MachineOperand rsp = MachineOperand::ISAReg(x64_RSP, Int64);
 
 		if (MF.GetStackAllocationSize() > 0)
 		{
@@ -127,14 +127,14 @@ namespace ola
 			{
 				if (arg.GetType() != Float64)
 				{
-					static constexpr x64::Register arg_regs[] = { x64::RCX, x64::RDX, x64::R8, x64::R9 };
+					static constexpr x64Register arg_regs[] = { x64_RCX, x64_RDX, x64_R8, x64_R9 };
 					MachineInstruction copy_arg_to_reg(InstMove);
 					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
 				}
 				else
 				{
-					static constexpr x64::Register arg_regs[] = { x64::XMM0, x64::XMM1, x64::XMM2, x64::XMM3 };
+					static constexpr x64Register arg_regs[] = { x64_XMM0, x64_XMM1, x64_XMM2, x64_XMM3 };
 					MachineInstruction copy_arg_to_reg(InstMove);
 					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
@@ -151,7 +151,7 @@ namespace ola
 		}
 	}
 
-	void x64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
@@ -162,7 +162,7 @@ namespace ola
 		//try to find stack allocation
 		insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 			{
-				if (MI.GetOpcode() == InstSub && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == x64::RSP) return true;
+				if (MI.GetOpcode() == InstSub && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == x64_RSP) return true;
 				return false;
 			});
 		if (insert_point != insert_list.end())
@@ -179,8 +179,8 @@ namespace ola
 			Uint32 new_stack_allocation = MF.GetStackAllocationSize() + stack_adjustment;
 			if (new_stack_allocation > 0)
 			{
-				MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, MachineType::Int64);
-				MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, MachineType::Int64);
+				MachineOperand rbp = MachineOperand::ISAReg(x64_RBP, MachineType::Int64);
+				MachineOperand rsp = MachineOperand::ISAReg(x64_RSP, MachineType::Int64);
 
 				MachineInstruction push_rbp(InstPush);
 				push_rbp.SetOp<0>(rbp);
@@ -241,12 +241,12 @@ namespace ola
 
 	}
 
-	void x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		if (MF.GetStackAllocationSize() > 0)
 		{
-			MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, MachineType::Int64);
-			MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, MachineType::Int64);
+			MachineOperand rbp = MachineOperand::ISAReg(x64_RBP, MachineType::Int64);
+			MachineOperand rsp = MachineOperand::ISAReg(x64_RSP, MachineType::Int64);
 
 			MachineInstruction reset_rbp(InstMove);
 			reset_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
@@ -259,7 +259,7 @@ namespace ola
 		ctx.EmitInst(MachineInstruction(InstRet));
 	}
 
-	void x64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
 		if (!MF.GetCalleeSavedArgs().empty())
 		{
@@ -267,8 +267,8 @@ namespace ola
 			std::list<MachineInstruction>::iterator insert_point = insert_list.end();
 			insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 				{
-					if (MI.GetOpcode() == InstMove && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == x64::RSP
-						&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == x64::RBP)
+					if (MI.GetOpcode() == InstMove && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == x64_RSP
+						&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == x64_RBP)
 					{
 						return true;
 					}
@@ -287,8 +287,8 @@ namespace ola
 			}
 			if (missing_epilogue)
 			{
-				MachineOperand rbp = MachineOperand::ISAReg(x64::RBP, MachineType::Int64);
-				MachineOperand rsp = MachineOperand::ISAReg(x64::RSP, MachineType::Int64);
+				MachineOperand rbp = MachineOperand::ISAReg(x64_RBP, MachineType::Int64);
+				MachineOperand rsp = MachineOperand::ISAReg(x64_RSP, MachineType::Int64);
 
 				MachineInstruction set_rbp(InstMove);
 				set_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
@@ -301,7 +301,7 @@ namespace ola
 		}
 	}
 
-	void x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const
+	void SysV_x64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const
 	{
 		if (RI->GetNumOperands() > 0)
 		{
@@ -312,12 +312,12 @@ namespace ola
 				MachineOperand return_register;
 				if (V->GetType()->IsFloat())
 				{
-					return_register = MachineOperand::ISAReg(x64::XMM0, MachineType::Float64);
+					return_register = MachineOperand::ISAReg(x64_XMM0, MachineType::Float64);
 				}
 				else 
 				{
 					MachineType const return_type = V->GetType()->IsBoolean() ? MachineType::Int8 : MachineType::Int64;
-					return_register = MachineOperand::ISAReg(x64::RAX, return_type);
+					return_register = MachineOperand::ISAReg(x64_RAX, return_type);
 				}
 
 				MachineInstruction copy_instruction(InstMove);

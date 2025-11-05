@@ -16,7 +16,7 @@ namespace ola
 
 		CompilerFlags GetCompilerFlags() const { return compiler_flags; }
 		OptimizationLevel GetOptimizationLevel() const { return opt_level; }
-		CompilerOutput GetOutputType() const { return output_type; }
+		TargetArch GetTargetArch() const { return target_arch; }
 		std::string_view GetInputDirectory() const { return input_directory; }
 		std::string const& GetOutputFile() const { return output_file; }
 		std::vector<std::string> const& GetSourceFiles() const { return input_files; }
@@ -24,7 +24,7 @@ namespace ola
 	private:
 		CompilerFlags compiler_flags = CompilerFlag_None;
 		OptimizationLevel opt_level = OptimizationLevel::O0;
-		CompilerOutput output_type = CompilerOutput::Exe;
+		TargetArch target_arch = TargetArch::Default;
 		std::string input_directory;
 		std::vector<std::string> input_files;
 		std::string output_file;

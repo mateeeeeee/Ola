@@ -28,11 +28,12 @@ namespace ola
 		O3
 	};
 
-	enum class CompilerOutput : Uint8
+	enum class TargetArch : Uint8
 	{
-		Exe,
-		Dll,
-		Lib
+		Default,
+		x64_Microsoft,
+		x64_SysV,
+		ARM64
 	};
 
 }

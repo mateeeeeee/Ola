@@ -1,6 +1,6 @@
 #include <format>
 #include "x64AsmPrinter.h"
-#include "x64.h"
+#include "Backend/Custom/Codegen/x64/x64.h"
 #include "x64TargetFrameInfo.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
@@ -32,11 +32,11 @@ namespace ola
 			OLA_ASSERT_MSG(IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
 			if (dereference)
 			{
-				return std::format("{} [{}]", GetOperandPrefix(MO), x64::GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
+				return std::format("{} [{}]", GetOperandPrefix(MO), x64_GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
 			}
 			else
 			{
-				return x64::GetRegisterString(MO.GetReg().reg, MO.GetType());
+				return x64_GetRegisterString(MO.GetReg().reg, MO.GetType());
 			}
 		}
 		else if (MO.IsImmediate())
@@ -51,15 +51,15 @@ namespace ola
 		else if (MO.IsStackObject())
 		{
 			Int32 stack_offset = MO.GetStackOffset();
-			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), stack_offset);
-			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr), -stack_offset);
-			else						return std::format("{} [{}]", GetOperandPrefix(MO), GetRegisterString(x64::RBP, MachineType::Ptr));
+			if (stack_offset > 0)		return std::format("{} [{} + {}]", GetOperandPrefix(MO), x64_GetRegisterString(x64_RBP, MachineType::Ptr), stack_offset);
+			else if (stack_offset < 0)	return std::format("{} [{} - {}]", GetOperandPrefix(MO), x64_GetRegisterString(x64_RBP, MachineType::Ptr), -stack_offset);
+			else						return std::format("{} [{}]", GetOperandPrefix(MO), x64_GetRegisterString(x64_RBP, MachineType::Ptr));
 		}
 		OLA_ASSERT(false);
 		return "";
 	}
 
-	void x64AsmPrinter::PrintModule(MachineModule const& M)
+	void Microsoft_x64AsmPrinter::PrintModule(MachineModule const& M)
 	{
 		EmitPreamble(".intel_syntax noprefix\n");
 
@@ -88,7 +88,7 @@ namespace ola
 					{
 						if (MI.IsDead()) continue;
 						Uint32 opcode = MI.GetOpcode();
-						Char const* opcode_string = x64::GetOpcodeString(opcode);
+						Char const* opcode_string = x64_GetOpcodeString(opcode);
 						switch (opcode)
 						{
 						case InstPush:
@@ -97,16 +97,16 @@ namespace ola
 						case InstNeg:
 						case InstNot:
 						case InstSDiv:
-						case x64::InstSetE:
-						case x64::InstSetNE:
-						case x64::InstSetGT:
-						case x64::InstSetGE:
-						case x64::InstSetLT:
-						case x64::InstSetLE:
-						case x64::InstSetA:
-						case x64::InstSetAE:
-						case x64::InstSetB:
-						case x64::InstSetBE:
+						case x64_InstSetE:
+						case x64_InstSetNE:
+						case x64_InstSetGT:
+						case x64_InstSetGE:
+						case x64_InstSetLT:
+						case x64_InstSetLE:
+						case x64_InstSetA:
+						case x64_InstSetAE:
+						case x64_InstSetB:
+						case x64_InstSetBE:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));
@@ -123,7 +123,7 @@ namespace ola
 						}
 						break;
 						case InstRet:
-						case x64::InstCqo:
+						case x64_InstCqo:
 						{
 							EmitText("{}", opcode_string);
 						}
@@ -142,7 +142,7 @@ namespace ola
 						case InstFSub:
 						case InstFMul:
 						case InstFDiv:
-						case x64::InstXorFP:
+						case x64_InstXorFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
@@ -187,14 +187,14 @@ namespace ola
 							}
 						}
 						break;
-						case x64::InstStoreFP:
+						case x64_InstStoreFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1, true), GetOperandString(op2));
 						}
 						break;
-						case x64::InstLoadFP:
+						case x64_InstLoadFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
@@ -203,7 +203,7 @@ namespace ola
 						break;
 						case InstF2S:
 						case InstFCmp:
-						case x64::InstMoveFP:
+						case x64_InstMoveFP:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
@@ -293,7 +293,7 @@ namespace ola
 	}
 
 
-	std::string x64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
+	std::string Microsoft_x64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
@@ -307,7 +307,7 @@ namespace ola
 		return fp_constant_pool[value];
 	}
 
-	std::string x64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
+	std::string Microsoft_x64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))

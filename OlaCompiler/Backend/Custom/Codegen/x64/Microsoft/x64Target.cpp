@@ -1,6 +1,6 @@
 #include <fstream>
 #include "x64Target.h"
-#include "x64.h"
+#include "Backend/Custom/Codegen/x64/x64.h"
 #include "x64TargetFrameInfo.h"
 #include "x64TargetInstInfo.h"
 #include "x64AsmPrinter.h"
@@ -13,7 +13,7 @@
 
 namespace ola
 {
-	class x64TargetDataLayout : public TargetDataLayout
+	class Microsoft_x64TargetDataLayout : public TargetDataLayout
 	{
 	public:
 		virtual Bool   IsLittleEndian() const override { return true; }
@@ -35,7 +35,7 @@ namespace ola
 		}
 	};
 
-	class x64TargetISelInfo : public TargetISelInfo
+	class Microsoft_x64TargetISelInfo : public TargetISelInfo
 	{
 	public:
 		virtual Bool LowerInstruction(Instruction* I, MachineContext& ctx) const override
@@ -50,11 +50,11 @@ namespace ola
 					MachineOperand op2 = ctx.GetOperand(BI->GetRHS());
 
 					MachineInstruction move_to_rax(InstMove);
-					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64::RAX, MachineType::Int64));
+					move_to_rax.SetOp<0>(MachineOperand::ISAReg(x64_RAX, MachineType::Int64));
 					move_to_rax.SetOp<1>(op1);
 					ctx.EmitInst(move_to_rax);
 
-					MachineInstruction cqo(x64::InstCqo);
+					MachineInstruction cqo(x64_InstCqo);
 					ctx.EmitInst(cqo);
 
 					if (op2.IsImmediate())
@@ -79,14 +79,14 @@ namespace ola
 					{
 						MachineInstruction move_quotient(InstMove);
 						move_quotient.SetOp<0>(dst);
-						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64::RAX, MachineType::Int64));
+						move_quotient.SetOp<1>(MachineOperand::ISAReg(x64_RAX, MachineType::Int64));
 						ctx.EmitInst(move_quotient);
 					}
 					else if (opcode == Opcode::SRem)
 					{
 						MachineInstruction move_remainder(InstMove);
 						move_remainder.SetOp<0>(dst);
-						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64::RDX, MachineType::Int64));
+						move_remainder.SetOp<1>(MachineOperand::ISAReg(x64_RDX, MachineType::Int64));
 						ctx.EmitInst(move_remainder);
 					}
 					ctx.MapOperand(BI, dst);
@@ -166,7 +166,7 @@ namespace ola
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOp<0>(tmp);
-					MI.SetOpcode(x64::InstMoveFP);
+					MI.SetOpcode(x64_InstMoveFP);
 
 					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
@@ -238,10 +238,10 @@ namespace ola
 				if (!op2.IsImmediate())
 				{
 					MachineInstruction MI3(InstMove);
-					MI3.SetOp<0>(MachineOperand::ISAReg(x64::Register::RCX, op2.GetType()));
+					MI3.SetOp<0>(MachineOperand::ISAReg(x64_RCX, op2.GetType()));
 					MI3.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI3);
-					MI.SetOp<1>(MachineOperand::ISAReg(x64::Register::RCX, MachineType::Int8));
+					MI.SetOp<1>(MachineOperand::ISAReg(x64_RCX, MachineType::Int8));
 				}
 			}
 			break;
@@ -310,12 +310,12 @@ namespace ola
 							CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
 							switch (cmp_op)
 							{
-							case CompareOp::ICmpEQ:  return x64::InstSetE;
-							case CompareOp::ICmpNE:  return x64::InstSetNE;
-							case CompareOp::ICmpSGT: return x64::InstSetGT;
-							case CompareOp::ICmpSGE: return x64::InstSetGE;
-							case CompareOp::ICmpSLT: return x64::InstSetLT;
-							case CompareOp::ICmpSLE: return x64::InstSetLE;
+							case CompareOp::ICmpEQ:  return x64_InstSetE;
+							case CompareOp::ICmpNE:  return x64_InstSetNE;
+							case CompareOp::ICmpSGT: return x64_InstSetGT;
+							case CompareOp::ICmpSGE: return x64_InstSetGE;
+							case CompareOp::ICmpSLT: return x64_InstSetLT;
+							case CompareOp::ICmpSLE: return x64_InstSetLE;
 							}
 							OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 							return InstUnknown;
@@ -358,7 +358,7 @@ namespace ola
 				MachineOperand op2 = MI.GetOperand(2);
 
 				MI.SetOp<1>(op2);
-				MachineInstruction MI2(x64::InstMoveFP);
+				MachineInstruction MI2(x64_InstMoveFP);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(op1);
 
@@ -368,7 +368,7 @@ namespace ola
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
 					
-					MachineInstruction MI3(x64::InstMoveFP);
+					MachineInstruction MI3(x64_InstMoveFP);
 					MI3.SetOp<0>(tmp);
 					MI3.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI3);
@@ -382,18 +382,18 @@ namespace ola
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
 
-				MachineInstruction MI2(x64::InstMoveFP);
+				MachineInstruction MI2(x64_InstMoveFP);
 				MI2.SetOp<0>(dst);
 				MI2.SetOp<1>(src);
 				instructions.insert(instruction_iter, MI2);
 
-				MachineInstruction MI3(x64::InstMoveFP);
+				MachineInstruction MI3(x64_InstMoveFP);
 				MachineOperand neg_mask = lowering_ctx.VirtualReg(MachineType::Float64);
 				MI3.SetOp<0>(neg_mask);
 				MI3.SetOp<1>(MachineOperand::Immediate(0x8000000000000000, MachineType::Float64));
 				instructions.insert(instruction_iter, MI3);
 
-				MI.SetOpcode(x64::InstXorFP);
+				MI.SetOpcode(x64_InstXorFP);
 				MI.SetOp<0>(dst);
 				MI.SetOp<1>(neg_mask);
 			}
@@ -436,12 +436,12 @@ namespace ola
 						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
 						switch (cmp_op)
 						{
-						case CompareOp::FCmpOEQ: return x64::InstSetE;
-						case CompareOp::FCmpONE: return x64::InstSetNE;
-						case CompareOp::FCmpOGT: return x64::InstSetA;
-						case CompareOp::FCmpOGE: return x64::InstSetAE;
-						case CompareOp::FCmpOLT: return x64::InstSetB;
-						case CompareOp::FCmpOLE: return x64::InstSetBE;
+						case CompareOp::FCmpOEQ: return x64_InstSetE;
+						case CompareOp::FCmpONE: return x64_InstSetNE;
+						case CompareOp::FCmpOGT: return x64_InstSetA;
+						case CompareOp::FCmpOGE: return x64_InstSetAE;
+						case CompareOp::FCmpOLT: return x64_InstSetB;
+						case CompareOp::FCmpOLE: return x64_InstSetBE;
 						}
 						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 						return InstUnknown;
@@ -541,33 +541,33 @@ namespace ola
 				MachineOperand src = MI.GetOperand(1);
 				if (src.GetType() == MachineType::Float64 && MI.GetOpcode() == InstStore)
 				{
-					MI.SetOpcode(x64::InstStoreFP);
+					MI.SetOpcode(x64_InstStoreFP);
 				}
 				else if (dst.GetType() == MachineType::Float64 && MI.GetOpcode() == InstLoad)
 				{
-					MI.SetOpcode(x64::InstLoadFP);
+					MI.SetOpcode(x64_InstLoadFP);
 				}
 				else if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 				{
-					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64::InstMoveFP);
+					if (MI.GetOpcode() == InstMove) MI.SetOpcode(x64_InstMoveFP);
 				}
 			}
 		}
 	};
 
-	class x64TargetRegisterInfo : public TargetRegisterInfo
+	class Microsoft_x64TargetRegisterInfo : public TargetRegisterInfo
 	{
 	public:
-		x64TargetRegisterInfo()
+		Microsoft_x64TargetRegisterInfo()
 		{
-			gp_regs.reserve(x64::GPREnd - x64::GPRBegin + 1);
-			for (Uint32 r = x64::GPRBegin; r < x64::GPREnd; ++r)
+			gp_regs.reserve(x64_GPREnd - x64_GPRBegin + 1);
+			for (Uint32 r = x64_GPRBegin; r < x64_GPREnd; ++r)
 			{
 				gp_regs.push_back(r); //skip rbp, rsp
 			}
 
-			fp_regs.reserve(x64::FPREnd - x64::FPRBegin + 1);
-			for (Uint32 r = x64::FPRBegin; r < x64::FPREnd; ++r)
+			fp_regs.reserve(x64_FPREnd - x64_FPRBegin + 1);
+			for (Uint32 r = x64_FPRBegin; r < x64_FPREnd; ++r)
 			{
 				fp_regs.push_back(r);
 			}
@@ -575,23 +575,23 @@ namespace ola
 
 		virtual Uint32 GetStackPointerRegister() const override
 		{
-			return x64::RSP;
+			return x64_RSP;
 		}
 		virtual Uint32 GetGPScratchRegister() const override
 		{
-			return x64::R15;
+			return x64_R15;
 		}
 		virtual Uint32 GetFPScratchRegister() const override
 		{
-			return x64::XMM15;
+			return x64_XMM15;
 		}
 		virtual Uint32 GetFramePointerRegister() const override
 		{
-			return x64::RBP;
+			return x64_RBP;
 		}
 		virtual Uint32 GetReturnRegister() const override
 		{
-			return x64::RAX;
+			return x64_RAX;
 		}
 
 		virtual std::vector<Uint32> const& GetGPRegisters() const override
@@ -648,12 +648,12 @@ namespace ola
 
 		virtual Bool IsCallerSaved(Uint32 r) const override
 		{
-			return x64::IsCallerSaved(r);
+			return x64_IsCallerSaved(r);
 		}
 
 		virtual Bool IsCalleeSaved(Uint32 r) const override
 		{
-			return x64::IsCalleeSaved(r);
+			return x64_IsCalleeSaved(r);
 		}
 
 	private:
@@ -661,40 +661,40 @@ namespace ola
 		std::vector<Uint32> fp_regs;
 	};
 
-	TargetDataLayout const& x64Target::GetDataLayout() const
+	TargetDataLayout const& Microsoft_x64Target::GetDataLayout() const
 	{
-		static x64TargetDataLayout x64_target_data_layout{};
+		static Microsoft_x64TargetDataLayout x64_target_data_layout{};
 		return x64_target_data_layout;
 	}
 
-	TargetInstInfo const& x64Target::GetInstInfo() const
+	TargetInstInfo const& Microsoft_x64Target::GetInstInfo() const
 	{
-		static x64TargetInstInfo x64_target_inst_info{};
+		static Microsoft_x64TargetInstInfo x64_target_inst_info{};
 		return x64_target_inst_info;
 	}
 
-	TargetRegisterInfo const& x64Target::GetRegisterInfo() const
+	TargetRegisterInfo const& Microsoft_x64Target::GetRegisterInfo() const
 	{
-		static x64TargetRegisterInfo x64_target_reg_info{};
+		static Microsoft_x64TargetRegisterInfo x64_target_reg_info{};
 		return x64_target_reg_info;
 	}
 
-	TargetISelInfo const& x64Target::GetISelInfo() const
+	TargetISelInfo const& Microsoft_x64Target::GetISelInfo() const
 	{
-		static x64TargetISelInfo x64_target_isel_info{};
+		static Microsoft_x64TargetISelInfo x64_target_isel_info{};
 		return x64_target_isel_info;
 	}
 
-	TargetFrameInfo const& x64Target::GetFrameInfo() const
+	TargetFrameInfo const& Microsoft_x64Target::GetFrameInfo() const
 	{
-		static x64TargetFrameInfo x64_target_frame_info{};
+		static Microsoft_x64TargetFrameInfo x64_target_frame_info{};
 		return x64_target_frame_info;
 	}
 
-	void x64Target::EmitAssembly(MachineModule& M, std::string_view file) const
+	void Microsoft_x64Target::EmitAssembly(MachineModule& M, std::string_view file) const
 	{
 		std::ofstream asm_stream(file.data());
-		x64AsmPrinter asm_printer(asm_stream);
+		Microsoft_x64AsmPrinter asm_printer(asm_stream);
 		asm_printer.PrintModule(M);
 	}
 
