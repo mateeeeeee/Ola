@@ -1,0 +1,161 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Ola Compiler",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/Ola",
+            "args": [
+                // Add your compiler arguments here, e.g.:
+                // "${workspaceFolder}/test.ola"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release Ola Compiler",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/Ola",
+            "args": [
+                // Add your compiler arguments here, e.g.:
+                // "${workspaceFolder}/test.ola"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug Ola Compiler (with file)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/Ola",
+            "args": [
+                "${file}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release Ola Compiler (with file)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/Ola",
+            "args": [
+                "${file}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug OlaTests",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release OlaTests",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/OlaTests",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug OlaTests (filter)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": [
+                "--gtest_filter=*"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release OlaTests (filter)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/OlaTests",
+            "args": [
+                "--gtest_filter=*"
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug OlaPlayground",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaPlayground",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release OlaPlayground",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/OlaPlayground",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug Ola Compiler (C++)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/Ola",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release Ola Compiler (C++)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/Ola",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Debug OlaTests (C++)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Release OlaTests (C++)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/OlaTests",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build Ola (Release)"
+        }
+    ]
+}

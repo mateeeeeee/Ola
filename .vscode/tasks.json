@@ -1,0 +1,158 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Ola (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build/debug",
+                "--config",
+                "Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure CMake (Debug)"
+            ]
+        },
+        {
+            "label": "Build Ola (Release)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build/release",
+                "--config",
+                "Release"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure CMake (Release)"
+            ]
+        },
+        {
+            "label": "Configure CMake (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "${workspaceFolder}/build/debug",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure CMake (Release)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "${workspaceFolder}/build/release",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean Build (Debug)",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "${workspaceFolder}/build"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean Build (Release)",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "${workspaceFolder}/build-release"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild Ola (Debug)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean Build (Debug)",
+                "Build Ola (Debug)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild Ola (Release)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean Build (Release)",
+                "Build Ola (Release)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run OlaTests (Debug)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": [],
+            "group": "test",
+            "problemMatcher": [],
+            "dependsOn": [
+                "Build Ola (Debug)"
+            ]
+        },
+        {
+            "label": "Run OlaTests (Release)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build-release/bin/OlaTests",
+            "args": [],
+            "group": "test",
+            "problemMatcher": [],
+            "dependsOn": [
+                "Build Ola (Release)"
+            ]
+        },
+        {
+            "label": "Run Ola Compiler (Debug)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/debug/bin/Ola",
+            "args": [
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "Build Ola (Debug)"
+            ]
+        },
+        {
+            "label": "Run Ola Compiler (Release)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build-release/bin/Ola",
+            "args": [
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "dependsOn": [
+                "Build Ola (Release)"
+            ]
+        }
+    ]
+}
