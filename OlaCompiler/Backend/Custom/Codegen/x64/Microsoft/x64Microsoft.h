@@ -8,7 +8,6 @@ namespace ola
 	{
 		switch (r)
 		{
-		// Integer caller-saved registers
 		case x64_RAX:
 		case x64_RCX:
 		case x64_RDX:
@@ -16,7 +15,6 @@ namespace ola
 		case x64_R9:
 		case x64_R10:
 		case x64_R11:
-		// XMM0-XMM5 are caller-saved in Microsoft x64
 		case x64_XMM0:
 		case x64_XMM1:
 		case x64_XMM2:
@@ -33,17 +31,15 @@ namespace ola
 	{
 		switch (r)
 		{
-		// Integer callee-saved registers
 		case x64_RBX:
 		case x64_RBP:
 		case x64_RSP:
-		case x64_RDI:  // Microsoft treats RDI as callee-saved
-		case x64_RSI:  // Microsoft treats RSI as callee-saved
+		case x64_RDI:  
+		case x64_RSI:  
 		case x64_R12:
 		case x64_R13:
 		case x64_R14:
 		case x64_R15:
-		// XMM6-XMM15 are callee-saved in Microsoft x64
 		case x64_XMM6:
 		case x64_XMM7:
 		case x64_XMM8:

@@ -20,6 +20,7 @@ namespace ola
 			cli_parser.AddArg(false, "--nollvm");
 			cli_parser.AddArg(false, "--test");
 			cli_parser.AddArg(false, "--timeout");
+			cli_parser.AddArg(false, "-c", "--no-run");
 			cli_parser.AddArg(false, "--Od");
 			cli_parser.AddArg(false, "--O0");
 			cli_parser.AddArg(false, "--O1");
@@ -79,6 +80,7 @@ namespace ola
 		if (cli_result["--emit-asm"])			compiler_flags |= CompilerFlag_EmitASM;
 		if (cli_result["--domfrontier"])		compiler_flags |= CompilerFlag_PrintDomFrontier;
 		if (cli_result["--timeout"])			compiler_flags |= CompilerFlag_TimeoutDetection;
+		if (cli_result["-c"])					compiler_flags |= CompilerFlag_NoRun;
 
 		if (cli_result["--O0"] || cli_result["--Od"]) opt_level = OptimizationLevel::O0;
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;

@@ -180,6 +180,7 @@ namespace ola
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
 		Bool const print_domfrontier = compile_request.GetCompilerFlags() & CompilerFlag_PrintDomFrontier;
 		Bool const timeout_detection = compile_request.GetCompilerFlags() & CompilerFlag_TimeoutDetection;
+		Bool const no_run = compile_request.GetCompilerFlags() & CompilerFlag_NoRun;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -256,15 +257,19 @@ namespace ola
 			GenerateGraphVizImages(input_directory, !no_llvm);
 		}
 		
-		std::string link_cmd = "clang "; 
+		std::string link_cmd = "clang ";
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
 		link_cmd += OLA_STATIC_LIB_PATH;
 		link_cmd += " -o " + output_file;
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
 		ExecuteCommand(link_cmd.c_str());
 
-		std::string const& exe_cmd = output_file;
-		Int res = timeout_detection ? ExecuteCommand_NonBlocking(exe_cmd.c_str(), 1.0f) : ExecuteCommand(exe_cmd.c_str());
+		Int res = 0;
+		if (!no_run)
+		{
+			std::string const& exe_cmd = output_file;
+			res = timeout_detection ? ExecuteCommand_NonBlocking(exe_cmd.c_str(), 1.0f) : ExecuteCommand(exe_cmd.c_str());
+		}
 		fs::current_path(cur_path);
 		return res;
 
