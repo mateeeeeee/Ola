@@ -271,35 +271,65 @@ namespace ola
 			GenerateGraphVizImages(input_directory, !no_llvm);
 		}
 
-		std::string link_cmd = "clang ";
-#if OLA_PLATFORM_MACOS
-		// On macOS, explicitly specify architecture when linking
-		if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+		Bool const build_static_lib = compile_request.GetCompilerFlags() & CompilerFlag_StaticLib;
+		if (build_static_lib)
 		{
-			link_cmd += "-arch x86_64 ";
-		}
-		else if (target_arch == TargetArch::ARM64)
-		{
-			link_cmd += "-arch arm64 ";
-		}
-#endif
-		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
-		link_cmd += OLA_STATIC_LIB_PATH;
-		link_cmd += " -o " + output_file;
+			std::string lib_output = output_file;
 #if OLA_PLATFORM_WINDOWS
-		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
+			if (!lib_output.ends_with(".lib"))
+			{
+				lib_output += ".lib";
+			}
+			std::string ar_cmd = "lib /OUT:" + lib_output + " ";
+#else
+			if (!lib_output.ends_with(".a"))
+			{
+				lib_output += ".a";
+			}
+			std::string ar_cmd = "ar rcs " + lib_output + " ";
 #endif
-		ExecuteCommand(link_cmd.c_str());
+			for (auto const& obj_file : object_files) ar_cmd += obj_file + " ";
+			ExecuteCommand(ar_cmd.c_str());
+		}
+		else
+		{
+			// Link executable
+			std::string link_cmd = "clang ";
+#if OLA_PLATFORM_MACOS
+			// On macOS, explicitly specify architecture when linking
+			if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+			{
+				link_cmd += "-arch x86_64 ";
+			}
+			else if (target_arch == TargetArch::ARM64)
+			{
+				link_cmd += "-arch arm64 ";
+			}
+#endif
+			for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
+
+			auto const& libraries = compile_request.GetLibraries();
+			for (auto const& lib : libraries) link_cmd += lib + " ";
+
+			link_cmd += OLA_STATIC_LIB_PATH;
+			link_cmd += " -o " + output_file;
+#if OLA_PLATFORM_WINDOWS
+			link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
+#endif
+			ExecuteCommand(link_cmd.c_str());
+		}
 
 		Int res = 0;
 		if (!no_run)
 		{
 			std::string exe_cmd = output_file;
+#if !OLA_PLATFORM_WINDOWS
 			// Prefix with ./ if it's a relative path without directory separators
-			if (exe_cmd.find('/') == std::string::npos && exe_cmd.find('\\') == std::string::npos)
+			if (exe_cmd.find('/') == std::string::npos)
 			{
 				exe_cmd = "./" + exe_cmd;
 			}
+#endif
 #if OLA_PLATFORM_MACOS
 			// Use Rosetta 2 to run x64 SysV executables on macOS (Apple Silicon)
 			if (target_arch == TargetArch::x64_SysV)

@@ -20,6 +20,7 @@ namespace ola
 		std::string_view GetInputDirectory() const { return input_directory; }
 		std::string const& GetOutputFile() const { return output_file; }
 		std::vector<std::string> const& GetSourceFiles() const { return input_files; }
+		std::vector<std::string> const& GetLibraries() const { return libraries; }
 
 	private:
 		CompilerFlags compiler_flags = CompilerFlag_None;
@@ -28,5 +29,6 @@ namespace ola
 		std::string input_directory;
 		std::vector<std::string> input_files;
 		std::string output_file;
+		std::vector<std::string> libraries;
 	};
 }

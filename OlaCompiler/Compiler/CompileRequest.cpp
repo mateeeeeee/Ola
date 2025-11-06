@@ -30,6 +30,8 @@ namespace ola
 			cli_parser.AddArg(true, "--directory");
 			cli_parser.AddArg(true, "-o", "--output");
 			cli_parser.AddArg(true, "--target");
+			cli_parser.AddArg(false, "--lib");
+			cli_parser.AddArg(true, "-l");
 		}
 		CLIParseResult cli_result = cli_parser.Parse(argc, argv);
 
@@ -81,6 +83,9 @@ namespace ola
 		if (cli_result["--domfrontier"])		compiler_flags |= CompilerFlag_PrintDomFrontier;
 		if (cli_result["--timeout"])			compiler_flags |= CompilerFlag_TimeoutDetection;
 		if (cli_result["-c"])					compiler_flags |= CompilerFlag_NoRun;
+		if (cli_result["--lib"])				compiler_flags |= CompilerFlag_StaticLib;
+
+		libraries = cli_result["-l"].AsStrings();
 
 		if (cli_result["--O0"] || cli_result["--Od"]) opt_level = OptimizationLevel::O0;
 		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;
@@ -101,7 +106,6 @@ namespace ola
 #if OLA_PLATFORM_MACOS
 			target_arch = TargetArch::ARM64;
 #else
-			// Warn and fallback to native target on non-macOS platforms
 			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");
 #if OLA_PLATFORM_WINDOWS
 			target_arch = TargetArch::x64_Microsoft;
