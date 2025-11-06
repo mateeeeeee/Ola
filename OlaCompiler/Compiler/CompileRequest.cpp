@@ -95,11 +95,7 @@ namespace ola
 		std::string target_str = cli_result["--target"].AsStringOr("");
 		if (target_str == "x64")
 		{
-#if OLA_PLATFORM_WINDOWS
-			target_arch = TargetArch::x64_Microsoft;
-#else
-			target_arch = TargetArch::x64_SysV;
-#endif
+			target_arch = TargetArch::x64;
 		}
 		else if (target_str == "arm64")
 		{
@@ -107,23 +103,13 @@ namespace ola
 			target_arch = TargetArch::ARM64;
 #else
 			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");
-#if OLA_PLATFORM_WINDOWS
-			target_arch = TargetArch::x64_Microsoft;
-#else
-			target_arch = TargetArch::x64_SysV;
-#endif
+			target_arch = TargetArch::x64;
 #endif
 		}
 		else if (!target_str.empty())
 		{
 			OLA_WARN("Unknown target '{}'. Using default target for this platform.", target_str);
-#if OLA_PLATFORM_WINDOWS
-			target_arch = TargetArch::x64_Microsoft;
-#elif OLA_PLATFORM_MACOS
-			target_arch = TargetArch::ARM64;
-#else
-			target_arch = TargetArch::x64_SysV;
-#endif
+			target_arch = TargetArch::Default;
 		}
 
 		return true;

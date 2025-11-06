@@ -17,8 +17,14 @@ namespace ola
 
 		void Extend(Uint64 val)
 		{
-			if (val < begin) begin = val;
-			else if (val > end) end = val;
+			if (val < begin) 
+			{
+				begin = val;
+			}
+			else if (val > end) 
+			{
+				end = val;
+			}
 		}
 	};
 

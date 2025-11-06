@@ -1,61 +1,863 @@
 Module ID : test.ola
 
-define internal @g i8() {
-entry:
-%0 = alloca i8
-store 1, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%1 = load i8, ptr %0
-ret i8 %1
-}
+declare @Assert void(i8)
 
 
-define internal @f i64() {
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @global_int_1 ptr 5
+
+
+define internal @global_int_2 ptr 10
+
+
+define internal @global_int_3 ptr 7
+
+
+define internal @global_int_4 ptr 20
+
+
+define internal @global_sub_1 ptr 15
+
+
+define internal @global_sub_2 ptr 7
+
+
+define internal @global_sub_3 ptr 3
+
+
+define internal @global_sub_4 ptr 30
+
+
+define internal @global_float_1 ptr 3.5
+
+
+define internal @global_float_2 ptr 2.5
+
+
+define internal @global_float_3 ptr 1.2
+
+
+define internal @global_float_4 ptr 5
+
+
+define internal @global_composite_add_a ptr 5
+
+
+define internal @global_composite_add_b ptr 10
+
+
+define internal @global_composite_sub_a ptr 15
+
+
+define internal @global_composite_sub_b ptr 7
+
+
+define internal @global_composite_fadd_a ptr 3.5
+
+
+define internal @global_composite_fadd_b ptr 2.5
+
+
+define internal @global_composite_fsub_a ptr 5
+
+
+define internal @global_composite_fsub_b ptr 2.5
+
+
+define internal @global_composite_mix_add_int ptr 5
+
+
+define internal @global_composite_mix_add_float ptr 3.5
+
+
+define internal @global_composite_mix_sub_int ptr 15
+
+
+define internal @global_composite_mix_sub_float ptr 5
+
+
+define internal @TestIntAddition void() {
 entry:
 %0 = alloca i64
-store 5, ptr %0
-br label exit
-return:
-br label exit
-exit:
+store 15, ptr %0
 %1 = load i64, ptr %0
-ret i64 %1
+%2 = icmp eq i64 %1, 15
+call i8 %2, @Assert
+%3 = alloca i64
+store 5, ptr %3
+%4 = alloca i64
+store 10, ptr %4
+%5 = load i64, ptr %3
+%6 = load i64, ptr %4
+%7 = add i64 %5, %6
+%8 = alloca i64
+store i64 %7, ptr %8
+%9 = load i64, ptr %8
+%10 = icmp eq i64 %9, 15
+call i8 %10, @Assert
+%11 = load i64, ptr @global_int_1
+%12 = load i64, ptr @global_int_2
+%13 = add i64 %11, %12
+%14 = alloca i64
+store i64 %13, ptr %14
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 15
+call i8 %16, @Assert
+%17 = load i64, ptr @global_int_1
+%18 = load i64, ptr %4
+%19 = add i64 %17, %18
+%20 = alloca i64
+store i64 %19, ptr %20
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 15
+call i8 %22, @Assert
+%23 = load i64, ptr %3
+%24 = load i64, ptr @global_int_3
+%25 = add i64 %23, %24
+%26 = alloca i64
+store i64 %25, ptr %26
+%27 = load i64, ptr %26
+%28 = icmp eq i64 %27, 12
+call i8 %28, @Assert
+%29 = alloca i64
+store 5, ptr %29
+%30 = load i64, ptr %29
+%31 = add i64 %30, 10
+store i64 %31, ptr %29
+%32 = load i64, ptr %29
+%33 = icmp eq i64 %32, 15
+call i8 %33, @Assert
+%34 = alloca i64
+store 5, ptr %34
+%35 = alloca i64
+store 10, ptr %35
+%36 = load i64, ptr %34
+%37 = load i64, ptr %35
+%38 = add i64 %36, %37
+store i64 %38, ptr %34
+%39 = load i64, ptr %34
+%40 = icmp eq i64 %39, 15
+call i8 %40, @Assert
+%41 = load i64, ptr @global_composite_add_a
+%42 = load i64, ptr @global_composite_add_b
+%43 = add i64 %41, %42
+store i64 %43, ptr @global_composite_add_a
+%44 = load i64, ptr @global_composite_add_a
+%45 = icmp eq i64 %44, 15
+call i8 %45, @Assert
+%46 = load i64, ptr @global_composite_add_b
+%47 = add i64 %46, 5
+store i64 %47, ptr @global_composite_add_b
+%48 = load i64, ptr @global_composite_add_b
+%49 = icmp eq i64 %48, 15
+call i8 %49, @Assert
+%50 = alloca i64
+store 5, ptr %50
+%51 = load i64, ptr @global_composite_add_a
+%52 = load i64, ptr %50
+%53 = add i64 %51, %52
+store i64 %53, ptr @global_composite_add_a
+%54 = load i64, ptr @global_composite_add_a
+%55 = icmp eq i64 %54, 20
+call i8 %55, @Assert
+br label exit
+exit:
+ret 
 }
 
 
-define internal @add__I__I i64(i64 %a,i64 %b) {
+define internal @TestIntSubtraction void() {
 entry:
 %0 = alloca i64
-store i64 %a, ptr %0
-%1 = alloca i64
-store i64 %b, ptr %1
-%2 = alloca i64
-%3 = load i64, ptr %0
-%4 = load i64, ptr %1
-%5 = add i64 %3, %4
-store i64 %5, ptr %2
-br label exit
-return:
+store 8, ptr %0
+%1 = load i64, ptr %0
+%2 = icmp eq i64 %1, 8
+call i8 %2, @Assert
+%3 = alloca i64
+store 15, ptr %3
+%4 = alloca i64
+store 7, ptr %4
+%5 = load i64, ptr %3
+%6 = load i64, ptr %4
+%7 = sub i64 %5, %6
+%8 = alloca i64
+store i64 %7, ptr %8
+%9 = load i64, ptr %8
+%10 = icmp eq i64 %9, 8
+call i8 %10, @Assert
+%11 = load i64, ptr @global_sub_1
+%12 = load i64, ptr @global_sub_2
+%13 = sub i64 %11, %12
+%14 = alloca i64
+store i64 %13, ptr %14
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 8
+call i8 %16, @Assert
+%17 = load i64, ptr @global_sub_4
+%18 = load i64, ptr %4
+%19 = sub i64 %17, %18
+%20 = alloca i64
+store i64 %19, ptr %20
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 23
+call i8 %22, @Assert
+%23 = load i64, ptr %3
+%24 = load i64, ptr @global_sub_3
+%25 = sub i64 %23, %24
+%26 = alloca i64
+store i64 %25, ptr %26
+%27 = load i64, ptr %26
+%28 = icmp eq i64 %27, 12
+call i8 %28, @Assert
+%29 = alloca i64
+store 15, ptr %29
+%30 = load i64, ptr %29
+%31 = sub i64 %30, 7
+store i64 %31, ptr %29
+%32 = load i64, ptr %29
+%33 = icmp eq i64 %32, 8
+call i8 %33, @Assert
+%34 = alloca i64
+store 15, ptr %34
+%35 = alloca i64
+store 7, ptr %35
+%36 = load i64, ptr %34
+%37 = load i64, ptr %35
+%38 = sub i64 %36, %37
+store i64 %38, ptr %34
+%39 = load i64, ptr %34
+%40 = icmp eq i64 %39, 8
+call i8 %40, @Assert
+%41 = load i64, ptr @global_composite_sub_a
+%42 = load i64, ptr @global_composite_sub_b
+%43 = sub i64 %41, %42
+store i64 %43, ptr @global_composite_sub_a
+%44 = load i64, ptr @global_composite_sub_a
+%45 = icmp eq i64 %44, 8
+call i8 %45, @Assert
+%46 = load i64, ptr @global_composite_sub_b
+%47 = sub i64 %46, 7
+store i64 %47, ptr @global_composite_sub_b
+%48 = load i64, ptr @global_composite_sub_b
+%49 = icmp eq i64 %48, 0
+call i8 %49, @Assert
+%50 = alloca i64
+store 7, ptr %50
+%51 = load i64, ptr @global_composite_sub_a
+%52 = load i64, ptr %50
+%53 = sub i64 %51, %52
+store i64 %53, ptr @global_composite_sub_a
+%54 = load i64, ptr @global_composite_sub_a
+%55 = icmp eq i64 %54, 1
+call i8 %55, @Assert
 br label exit
 exit:
-%6 = load i64, ptr %2
-ret i64 %6
+ret 
+}
+
+
+define internal @TestFloatAddition void() {
+entry:
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = alloca f64
+store 6, ptr %1
+%2 = load f64, ptr %1
+%3 = fcmp ogt f64 %2, 5.9999
+%4 = load f64, ptr %1
+%5 = fcmp olt f64 %4, 6.0001
+%6 = and i8 %3, %5
+%7 = icmp ne i8 %6, 0
+call i8 %7, @Assert
+%8 = alloca f64
+store 3.5, ptr %8
+%9 = alloca f64
+store 2.5, ptr %9
+%10 = load f64, ptr %8
+%11 = load f64, ptr %9
+%12 = fadd f64 %10, %11
+%13 = alloca f64
+store f64 %12, ptr %13
+%14 = load f64, ptr %13
+%15 = fcmp ogt f64 %14, 5.9999
+%16 = load f64, ptr %13
+%17 = fcmp olt f64 %16, 6.0001
+%18 = and i8 %15, %17
+%19 = icmp ne i8 %18, 0
+call i8 %19, @Assert
+%20 = load f64, ptr @global_float_1
+%21 = load f64, ptr @global_float_2
+%22 = fadd f64 %20, %21
+%23 = alloca f64
+store f64 %22, ptr %23
+%24 = load f64, ptr %23
+%25 = fcmp ogt f64 %24, 5.9999
+%26 = load f64, ptr %23
+%27 = fcmp olt f64 %26, 6.0001
+%28 = and i8 %25, %27
+%29 = icmp ne i8 %28, 0
+call i8 %29, @Assert
+%30 = load f64, ptr @global_float_1
+%31 = load f64, ptr %9
+%32 = fadd f64 %30, %31
+%33 = alloca f64
+store f64 %32, ptr %33
+%34 = load f64, ptr %33
+%35 = fcmp ogt f64 %34, 5.9999
+%36 = load f64, ptr %33
+%37 = fcmp olt f64 %36, 6.0001
+%38 = and i8 %35, %37
+%39 = icmp ne i8 %38, 0
+call i8 %39, @Assert
+%40 = load f64, ptr %8
+%41 = load f64, ptr @global_float_3
+%42 = fadd f64 %40, %41
+%43 = alloca f64
+store f64 %42, ptr %43
+%44 = load f64, ptr %43
+%45 = fcmp ogt f64 %44, 4.6999
+%46 = load f64, ptr %43
+%47 = fcmp olt f64 %46, 4.7001
+%48 = and i8 %45, %47
+%49 = icmp ne i8 %48, 0
+call i8 %49, @Assert
+%50 = alloca f64
+store 3.5, ptr %50
+%51 = load f64, ptr %50
+%52 = fadd f64 %51, 2.5
+store f64 %52, ptr %50
+%53 = load f64, ptr %50
+%54 = fcmp ogt f64 %53, 5.9999
+%55 = load f64, ptr %50
+%56 = fcmp olt f64 %55, 6.0001
+%57 = and i8 %54, %56
+%58 = icmp ne i8 %57, 0
+call i8 %58, @Assert
+%59 = alloca f64
+store 3.5, ptr %59
+%60 = alloca f64
+store 2.5, ptr %60
+%61 = load f64, ptr %59
+%62 = load f64, ptr %60
+%63 = fadd f64 %61, %62
+store f64 %63, ptr %59
+%64 = load f64, ptr %59
+%65 = fcmp ogt f64 %64, 5.9999
+%66 = load f64, ptr %59
+%67 = fcmp olt f64 %66, 6.0001
+%68 = and i8 %65, %67
+%69 = icmp ne i8 %68, 0
+call i8 %69, @Assert
+%70 = load f64, ptr @global_composite_fadd_a
+%71 = load f64, ptr @global_composite_fadd_b
+%72 = fadd f64 %70, %71
+store f64 %72, ptr @global_composite_fadd_a
+%73 = load f64, ptr @global_composite_fadd_a
+%74 = fcmp ogt f64 %73, 5.9999
+%75 = load f64, ptr @global_composite_fadd_a
+%76 = fcmp olt f64 %75, 6.0001
+%77 = and i8 %74, %76
+%78 = icmp ne i8 %77, 0
+call i8 %78, @Assert
+%79 = load f64, ptr @global_composite_fadd_b
+%80 = fadd f64 %79, 3.5
+store f64 %80, ptr @global_composite_fadd_b
+%81 = load f64, ptr @global_composite_fadd_b
+%82 = fcmp ogt f64 %81, 5.9999
+%83 = load f64, ptr @global_composite_fadd_b
+%84 = fcmp olt f64 %83, 6.0001
+%85 = and i8 %82, %84
+%86 = icmp ne i8 %85, 0
+call i8 %86, @Assert
+%87 = alloca f64
+store 2.5, ptr %87
+%88 = load f64, ptr @global_composite_fadd_a
+%89 = load f64, ptr %87
+%90 = fadd f64 %88, %89
+store f64 %90, ptr @global_composite_fadd_a
+%91 = load f64, ptr @global_composite_fadd_a
+%92 = fcmp ogt f64 %91, 8.4999
+%93 = load f64, ptr @global_composite_fadd_a
+%94 = fcmp olt f64 %93, 8.5001
+%95 = and i8 %92, %94
+%96 = icmp ne i8 %95, 0
+call i8 %96, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestFloatSubtraction void() {
+entry:
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = alloca f64
+store 2.5, ptr %1
+%2 = load f64, ptr %1
+%3 = fcmp ogt f64 %2, 2.4999
+%4 = load f64, ptr %1
+%5 = fcmp olt f64 %4, 2.5001
+%6 = and i8 %3, %5
+%7 = icmp ne i8 %6, 0
+call i8 %7, @Assert
+%8 = alloca f64
+store 5, ptr %8
+%9 = alloca f64
+store 2.5, ptr %9
+%10 = load f64, ptr %8
+%11 = load f64, ptr %9
+%12 = fsub f64 %10, %11
+%13 = alloca f64
+store f64 %12, ptr %13
+%14 = load f64, ptr %13
+%15 = fcmp ogt f64 %14, 2.4999
+%16 = load f64, ptr %13
+%17 = fcmp olt f64 %16, 2.5001
+%18 = and i8 %15, %17
+%19 = icmp ne i8 %18, 0
+call i8 %19, @Assert
+%20 = load f64, ptr @global_float_4
+%21 = load f64, ptr @global_float_2
+%22 = fsub f64 %20, %21
+%23 = alloca f64
+store f64 %22, ptr %23
+%24 = load f64, ptr %23
+%25 = fcmp ogt f64 %24, 2.4999
+%26 = load f64, ptr %23
+%27 = fcmp olt f64 %26, 2.5001
+%28 = and i8 %25, %27
+%29 = icmp ne i8 %28, 0
+call i8 %29, @Assert
+%30 = load f64, ptr @global_float_4
+%31 = load f64, ptr %9
+%32 = fsub f64 %30, %31
+%33 = alloca f64
+store f64 %32, ptr %33
+%34 = load f64, ptr %33
+%35 = fcmp ogt f64 %34, 2.4999
+%36 = load f64, ptr %33
+%37 = fcmp olt f64 %36, 2.5001
+%38 = and i8 %35, %37
+%39 = icmp ne i8 %38, 0
+call i8 %39, @Assert
+%40 = load f64, ptr %8
+%41 = load f64, ptr @global_float_3
+%42 = fsub f64 %40, %41
+%43 = alloca f64
+store f64 %42, ptr %43
+%44 = load f64, ptr %43
+%45 = fcmp ogt f64 %44, 3.7999
+%46 = load f64, ptr %43
+%47 = fcmp olt f64 %46, 3.8001
+%48 = and i8 %45, %47
+%49 = icmp ne i8 %48, 0
+call i8 %49, @Assert
+%50 = alloca f64
+store 5, ptr %50
+%51 = load f64, ptr %50
+%52 = fsub f64 %51, 2.5
+store f64 %52, ptr %50
+%53 = load f64, ptr %50
+%54 = fcmp ogt f64 %53, 2.4999
+%55 = load f64, ptr %50
+%56 = fcmp olt f64 %55, 2.5001
+%57 = and i8 %54, %56
+%58 = icmp ne i8 %57, 0
+call i8 %58, @Assert
+%59 = alloca f64
+store 5, ptr %59
+%60 = alloca f64
+store 2.5, ptr %60
+%61 = load f64, ptr %59
+%62 = load f64, ptr %60
+%63 = fsub f64 %61, %62
+store f64 %63, ptr %59
+%64 = load f64, ptr %59
+%65 = fcmp ogt f64 %64, 2.4999
+%66 = load f64, ptr %59
+%67 = fcmp olt f64 %66, 2.5001
+%68 = and i8 %65, %67
+%69 = icmp ne i8 %68, 0
+call i8 %69, @Assert
+%70 = load f64, ptr @global_composite_fsub_a
+%71 = load f64, ptr @global_composite_fsub_b
+%72 = fsub f64 %70, %71
+store f64 %72, ptr @global_composite_fsub_a
+%73 = load f64, ptr @global_composite_fsub_a
+%74 = fcmp ogt f64 %73, 2.4999
+%75 = load f64, ptr @global_composite_fsub_a
+%76 = fcmp olt f64 %75, 2.5001
+%77 = and i8 %74, %76
+%78 = icmp ne i8 %77, 0
+call i8 %78, @Assert
+%79 = load f64, ptr @global_composite_fsub_b
+%80 = fsub f64 %79, 2.5
+store f64 %80, ptr @global_composite_fsub_b
+%81 = fneg f64 1e-04
+%82 = load f64, ptr @global_composite_fsub_b
+%83 = fcmp ogt f64 %82, %81
+%84 = load f64, ptr @global_composite_fsub_b
+%85 = fcmp olt f64 %84, 1e-04
+%86 = and i8 %83, %85
+%87 = icmp ne i8 %86, 0
+call i8 %87, @Assert
+%88 = alloca f64
+store 2.5, ptr %88
+%89 = load f64, ptr @global_composite_fsub_a
+%90 = load f64, ptr %88
+%91 = fsub f64 %89, %90
+store f64 %91, ptr @global_composite_fsub_a
+%92 = fneg f64 1e-04
+%93 = load f64, ptr @global_composite_fsub_a
+%94 = fcmp ogt f64 %93, %92
+%95 = load f64, ptr @global_composite_fsub_a
+%96 = fcmp olt f64 %95, 1e-04
+%97 = and i8 %94, %96
+%98 = icmp ne i8 %97, 0
+call i8 %98, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestMixedTypeAddition void() {
+entry:
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = load i64, ptr @global_int_1
+%2 = s2f i64 %1
+%3 = load f64, ptr @global_float_1
+%4 = fadd f64 %2, %3
+%5 = alloca f64
+store f64 %4, ptr %5
+%6 = load f64, ptr %5
+%7 = fcmp ogt f64 %6, 8.4999
+%8 = load f64, ptr %5
+%9 = fcmp olt f64 %8, 8.5001
+%10 = and i8 %7, %9
+%11 = icmp ne i8 %10, 0
+call i8 %11, @Assert
+%12 = alloca i64
+store 5, ptr %12
+%13 = load i64, ptr %12
+%14 = s2f i64 %13
+%15 = load f64, ptr @global_float_2
+%16 = fadd f64 %14, %15
+%17 = alloca f64
+store f64 %16, ptr %17
+%18 = load f64, ptr %17
+%19 = fcmp ogt f64 %18, 7.4999
+%20 = load f64, ptr %17
+%21 = fcmp olt f64 %20, 7.5001
+%22 = and i8 %19, %21
+%23 = icmp ne i8 %22, 0
+call i8 %23, @Assert
+%24 = alloca f64
+store 2.5, ptr %24
+%25 = load i64, ptr @global_int_2
+%26 = s2f i64 %25
+%27 = load f64, ptr %24
+%28 = fadd f64 %26, %27
+%29 = alloca f64
+store f64 %28, ptr %29
+%30 = load f64, ptr %29
+%31 = fcmp ogt f64 %30, 12.4999
+%32 = load f64, ptr %29
+%33 = fcmp olt f64 %32, 12.5001
+%34 = and i8 %31, %33
+%35 = icmp ne i8 %34, 0
+call i8 %35, @Assert
+%36 = s2f i64 10
+%37 = load f64, ptr @global_float_3
+%38 = fadd f64 %36, %37
+%39 = alloca f64
+store f64 %38, ptr %39
+%40 = load f64, ptr %39
+%41 = fcmp ogt f64 %40, 11.1999
+%42 = load f64, ptr %39
+%43 = fcmp olt f64 %42, 11.2001
+%44 = and i8 %41, %43
+%45 = icmp ne i8 %44, 0
+call i8 %45, @Assert
+%46 = load i64, ptr @global_int_3
+%47 = s2f i64 %46
+%48 = fadd f64 %47, 3.5
+%49 = alloca f64
+store f64 %48, ptr %49
+%50 = load f64, ptr %49
+%51 = fcmp ogt f64 %50, 10.4999
+%52 = load f64, ptr %49
+%53 = fcmp olt f64 %52, 10.5001
+%54 = and i8 %51, %53
+%55 = icmp ne i8 %54, 0
+call i8 %55, @Assert
+%56 = load i64, ptr %12
+%57 = s2f i64 %56
+%58 = fadd f64 %57, 1.5
+%59 = alloca f64
+store f64 %58, ptr %59
+%60 = load f64, ptr %59
+%61 = fcmp ogt f64 %60, 6.4999
+%62 = load f64, ptr %59
+%63 = fcmp olt f64 %62, 6.5001
+%64 = and i8 %61, %63
+%65 = icmp ne i8 %64, 0
+call i8 %65, @Assert
+%66 = alloca f64
+store 3.5, ptr %66
+%67 = s2f i64 5
+%68 = load f64, ptr %66
+%69 = fadd f64 %68, %67
+store f64 %69, ptr %66
+%70 = load f64, ptr %66
+%71 = fcmp ogt f64 %70, 8.4999
+%72 = load f64, ptr %66
+%73 = fcmp olt f64 %72, 8.5001
+%74 = and i8 %71, %73
+%75 = icmp ne i8 %74, 0
+call i8 %75, @Assert
+%76 = alloca i64
+store 5, ptr %76
+%77 = load i64, ptr %76
+%78 = s2f i64 %77
+%79 = fadd f64 %78, 2.5
+%80 = f2s f64 %79
+store i64 %80, ptr %76
+%81 = load i64, ptr %76
+%82 = icmp eq i64 %81, 7
+call i8 %82, @Assert
+%83 = alloca i64
+store 5, ptr %83
+%84 = load i64, ptr %83
+%85 = s2f i64 %84
+%86 = load f64, ptr @global_composite_mix_add_float
+%87 = fadd f64 %86, %85
+store f64 %87, ptr @global_composite_mix_add_float
+%88 = load f64, ptr @global_composite_mix_add_float
+%89 = fcmp ogt f64 %88, 8.4999
+%90 = load f64, ptr @global_composite_mix_add_float
+%91 = fcmp olt f64 %90, 8.5001
+%92 = and i8 %89, %91
+%93 = icmp ne i8 %92, 0
+call i8 %93, @Assert
+%94 = alloca f64
+store 2.5, ptr %94
+%95 = load i64, ptr @global_composite_mix_add_int
+%96 = s2f i64 %95
+%97 = load f64, ptr %94
+%98 = fadd f64 %96, %97
+%99 = f2s f64 %98
+store i64 %99, ptr @global_composite_mix_add_int
+%100 = load i64, ptr @global_composite_mix_add_int
+%101 = icmp eq i64 %100, 7
+call i8 %101, @Assert
+%102 = s2f i64 5
+%103 = load f64, ptr @global_composite_mix_add_float
+%104 = fadd f64 %103, %102
+store f64 %104, ptr @global_composite_mix_add_float
+%105 = load f64, ptr @global_composite_mix_add_float
+%106 = fcmp ogt f64 %105, 13.4999
+%107 = load f64, ptr @global_composite_mix_add_float
+%108 = fcmp olt f64 %107, 13.5001
+%109 = and i8 %106, %108
+%110 = icmp ne i8 %109, 0
+call i8 %110, @Assert
+%111 = load i64, ptr @global_composite_mix_add_int
+%112 = s2f i64 %111
+%113 = fadd f64 %112, 2.5
+%114 = f2s f64 %113
+store i64 %114, ptr @global_composite_mix_add_int
+%115 = load i64, ptr @global_composite_mix_add_int
+%116 = icmp eq i64 %115, 9
+call i8 %116, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestMixedTypeSubtraction void() {
+entry:
+%0 = alloca f64
+store 1e-04, ptr %0
+%1 = load i64, ptr @global_int_3
+%2 = s2f i64 %1
+%3 = load f64, ptr @global_float_4
+%4 = fsub f64 %3, %2
+%5 = alloca f64
+store f64 %4, ptr %5
+%6 = fneg f64 2.0001
+%7 = load f64, ptr %5
+%8 = fcmp ogt f64 %7, %6
+%9 = fneg f64 1.9999
+%10 = load f64, ptr %5
+%11 = fcmp olt f64 %10, %9
+%12 = and i8 %8, %11
+%13 = icmp ne i8 %12, 0
+call i8 %13, @Assert
+%14 = alloca f64
+store 5, ptr %14
+%15 = load i64, ptr @global_int_2
+%16 = s2f i64 %15
+%17 = load f64, ptr %14
+%18 = fsub f64 %17, %16
+%19 = alloca f64
+store f64 %18, ptr %19
+%20 = fneg f64 5.0001
+%21 = load f64, ptr %19
+%22 = fcmp ogt f64 %21, %20
+%23 = fneg f64 4.9999
+%24 = load f64, ptr %19
+%25 = fcmp olt f64 %24, %23
+%26 = and i8 %22, %25
+%27 = icmp ne i8 %26, 0
+call i8 %27, @Assert
+%28 = alloca i64
+store 3, ptr %28
+%29 = load i64, ptr %28
+%30 = s2f i64 %29
+%31 = load f64, ptr @global_float_2
+%32 = fsub f64 %31, %30
+%33 = alloca f64
+store f64 %32, ptr %33
+%34 = fneg f64 0.5001
+%35 = load f64, ptr %33
+%36 = fcmp ogt f64 %35, %34
+%37 = fneg f64 0.4999
+%38 = load f64, ptr %33
+%39 = fcmp olt f64 %38, %37
+%40 = and i8 %36, %39
+%41 = icmp ne i8 %40, 0
+call i8 %41, @Assert
+%42 = load i64, ptr @global_int_1
+%43 = s2f i64 %42
+%44 = fsub f64 7.5, %43
+%45 = alloca f64
+store f64 %44, ptr %45
+%46 = load f64, ptr %45
+%47 = fcmp ogt f64 %46, 2.4999
+%48 = load f64, ptr %45
+%49 = fcmp olt f64 %48, 2.5001
+%50 = and i8 %47, %49
+%51 = icmp ne i8 %50, 0
+call i8 %51, @Assert
+%52 = s2f i64 2
+%53 = load f64, ptr @global_float_1
+%54 = fsub f64 %53, %52
+%55 = alloca f64
+store f64 %54, ptr %55
+%56 = load f64, ptr %55
+%57 = fcmp ogt f64 %56, 1.4999
+%58 = load f64, ptr %55
+%59 = fcmp olt f64 %58, 1.5001
+%60 = and i8 %57, %59
+%61 = icmp ne i8 %60, 0
+call i8 %61, @Assert
+%62 = s2f i64 2
+%63 = load f64, ptr %14
+%64 = fsub f64 %63, %62
+%65 = alloca f64
+store f64 %64, ptr %65
+%66 = load f64, ptr %65
+%67 = fcmp ogt f64 %66, 2.9999
+%68 = load f64, ptr %65
+%69 = fcmp olt f64 %68, 3.0001
+%70 = and i8 %67, %69
+%71 = icmp ne i8 %70, 0
+call i8 %71, @Assert
+%72 = alloca f64
+store 5, ptr %72
+%73 = s2f i64 3
+%74 = load f64, ptr %72
+%75 = fsub f64 %74, %73
+store f64 %75, ptr %72
+%76 = load f64, ptr %72
+%77 = fcmp ogt f64 %76, 1.9999
+%78 = load f64, ptr %72
+%79 = fcmp olt f64 %78, 2.0001
+%80 = and i8 %77, %79
+%81 = icmp ne i8 %80, 0
+call i8 %81, @Assert
+%82 = alloca i64
+store 15, ptr %82
+%83 = load i64, ptr %82
+%84 = s2f i64 %83
+%85 = fsub f64 %84, 2.5
+%86 = f2s f64 %85
+store i64 %86, ptr %82
+%87 = load i64, ptr %82
+%88 = icmp eq i64 %87, 12
+call i8 %88, @Assert
+%89 = alloca i64
+store 3, ptr %89
+%90 = load i64, ptr %89
+%91 = s2f i64 %90
+%92 = load f64, ptr @global_composite_mix_sub_float
+%93 = fsub f64 %92, %91
+store f64 %93, ptr @global_composite_mix_sub_float
+%94 = load f64, ptr @global_composite_mix_sub_float
+%95 = fcmp ogt f64 %94, 1.9999
+%96 = load f64, ptr @global_composite_mix_sub_float
+%97 = fcmp olt f64 %96, 2.0001
+%98 = and i8 %95, %97
+%99 = icmp ne i8 %98, 0
+call i8 %99, @Assert
+%100 = alloca f64
+store 2.5, ptr %100
+%101 = load i64, ptr @global_composite_mix_sub_int
+%102 = s2f i64 %101
+%103 = load f64, ptr %100
+%104 = fsub f64 %102, %103
+%105 = f2s f64 %104
+store i64 %105, ptr @global_composite_mix_sub_int
+%106 = load i64, ptr @global_composite_mix_sub_int
+%107 = icmp eq i64 %106, 12
+call i8 %107, @Assert
+%108 = s2f i64 2
+%109 = load f64, ptr @global_composite_mix_sub_float
+%110 = fsub f64 %109, %108
+store f64 %110, ptr @global_composite_mix_sub_float
+%111 = fneg f64 1e-04
+%112 = load f64, ptr @global_composite_mix_sub_float
+%113 = fcmp ogt f64 %112, %111
+%114 = load f64, ptr @global_composite_mix_sub_float
+%115 = fcmp olt f64 %114, 1e-04
+%116 = and i8 %113, %115
+%117 = icmp ne i8 %116, 0
+call i8 %117, @Assert
+%118 = load i64, ptr @global_composite_mix_sub_int
+%119 = s2f i64 %118
+%120 = fsub f64 %119, 2.5
+%121 = f2s f64 %120
+store i64 %121, ptr @global_composite_mix_sub_int
+%122 = load i64, ptr @global_composite_mix_sub_int
+%123 = icmp eq i64 %122, 9
+call i8 %123, @Assert
+br label exit
+exit:
+ret 
 }
 
 
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = call i64 5, 3, @add__I__I
-store i64 %1, ptr %0
+call ptr @TestIntAddition
+call ptr @TestIntSubtraction
+call ptr @TestFloatAddition
+call ptr @TestFloatSubtraction
+call ptr @TestMixedTypeAddition
+call ptr @TestMixedTypeSubtraction
+store 0, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%2 = load i64, ptr %0
-ret i64 %2
+%1 = load i64, ptr %0
+ret i64 %1
 }
 

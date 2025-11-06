@@ -144,11 +144,12 @@ namespace ola
 
 				switch (opts.target_arch)
 				{
-				case TargetArch::x64_Microsoft:
+				case TargetArch::x64:
+#if OLA_PLATFORM_WINDOWS
 					x64_target = &ms_target;
-					break;
-				case TargetArch::x64_SysV:
+#else
 					x64_target = &sysv_target;
+#endif
 					break;
 				case TargetArch::ARM64:
 					x64_target = &arm64_target;
@@ -198,11 +199,11 @@ namespace ola
 		if (target_arch == TargetArch::Default)
 		{
 #if OLA_PLATFORM_WINDOWS
-			target_arch = TargetArch::x64_Microsoft;
+			target_arch = TargetArch::x64;
 #elif OLA_PLATFORM_MACOS
 			target_arch = TargetArch::ARM64;
 #else
-			target_arch = TargetArch::x64_SysV;
+			target_arch = TargetArch::x64;
 #endif
 		}
 
@@ -217,7 +218,7 @@ namespace ola
 			if (no_llvm) ir_file = file_name + ".oll";
 			else		 ir_file = file_name + ".ll";
 			std::string assembly_file = file_name + ".s";
-			std::string mir_file = emit_asm ? file_name + ".omll" : "";
+			std::string mir_file = emit_mir ? file_name + ".omll" : "";
 
 			TUCompilationOptions tu_comp_opts
 			{
@@ -237,7 +238,7 @@ namespace ola
 			std::string assembly_cmd = "clang -c ";
 #if OLA_PLATFORM_MACOS
 			// On macOS, explicitly specify architecture when assembling
-			if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+			if (target_arch == TargetArch::x64)
 			{
 				assembly_cmd += "-arch x86_64 ";
 			}
@@ -297,7 +298,7 @@ namespace ola
 			std::string link_cmd = "clang ";
 #if OLA_PLATFORM_MACOS
 			// On macOS, explicitly specify architecture when linking
-			if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+			if (target_arch == TargetArch::x64)
 			{
 				link_cmd += "-arch x86_64 ";
 			}
@@ -331,8 +332,8 @@ namespace ola
 			}
 #endif
 #if OLA_PLATFORM_MACOS
-			// Use Rosetta 2 to run x64 SysV executables on macOS (Apple Silicon)
-			if (target_arch == TargetArch::x64_SysV)
+			// Use Rosetta 2 to run x64 executables on macOS (Apple Silicon)
+			if (target_arch == TargetArch::x64)
 			{
 				exe_cmd = "arch -x86_64 " + exe_cmd;
 			}

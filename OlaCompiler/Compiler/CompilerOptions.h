@@ -33,8 +33,7 @@ namespace ola
 	enum class TargetArch : Uint8
 	{
 		Default,
-		x64_Microsoft,
-		x64_SysV,
+		x64,
 		ARM64
 	};
 

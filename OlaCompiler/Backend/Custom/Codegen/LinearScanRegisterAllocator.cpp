@@ -29,7 +29,13 @@ namespace ola
 		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
 		//use callee saved regs because we can save them and restore them in prologue and epilogue of a function
 		gp_regs = target_reg_info.GetGPCalleeSavedRegisters();
+
+		OLA_TODO("This is temp hack because x64 SysV does not have callee saved FP registers which is causing issues with register allocation");
+		#if OLA_PLATFORM_WINDOWS
 		fp_regs = target_reg_info.GetFPCalleeSavedRegisters();
+		#else
+		fp_regs = target_reg_info.GetFPRegisters();
+		#endif
 		frame_register = target_reg_info.GetFramePointerRegister();
 		for (LiveInterval& LI : live_intervals)
 		{
@@ -56,8 +62,16 @@ namespace ola
 				}
 				vreg2reg_map[LI.vreg] = LI.reg;
 
-				active.push_back(&LI);
-				std::sort(active.begin(), active.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
+				if (LI.is_float)
+				{
+					active_fp.push_back(&LI);
+					std::sort(active_fp.begin(), active_fp.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
+				}
+				else
+				{
+					active_gp.push_back(&LI);
+					std::sort(active_gp.begin(), active_gp.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
+				}
 			}
 		}
 		Finalize(MF, live_intervals);
@@ -71,21 +85,35 @@ namespace ola
 	//			add register[j] to pool of free registers
 	void LinearScanRegisterAllocator::ExpireOldIntervals(LiveInterval& LI)
 	{
-		Uint32 i = 0;
-		for (; i < active.size(); ++i)
+		if (LI.is_float)
 		{
-			LiveInterval* interval = active[i];
-			if (interval->end >= LI.begin) break;
-			if (interval->is_float)
+			Uint32 i = 0;
+			for (; i < active_fp.size(); ++i)
 			{
+				LiveInterval* interval = active_fp[i];
+				if (interval->end >= LI.begin)
+				{
+					break;
+				}
 				fp_regs.push_back(interval->reg);
 			}
-			else
+			active_fp = std::vector<LiveInterval*>(active_fp.begin() + i, active_fp.end());
+		}
+		else
+		{
+			Uint32 i = 0;
+			for (; i < active_gp.size(); ++i)
 			{
+				LiveInterval* interval = active_gp[i];
+				if (interval->end >= LI.begin)
+				{
+					break;
+				}
+
 				gp_regs.push_back(interval->reg);
 			}
+			active_gp = std::vector<LiveInterval*>(active_gp.begin() + i, active_gp.end());
 		}
-		active = std::vector<LiveInterval*>(active.begin() + i, active.end());
 	}
 
 	//SpillAtInterval(i)
@@ -99,21 +127,53 @@ namespace ola
 	//		location[i] ← new stack location
 	void LinearScanRegisterAllocator::SpillAtInterval(LiveInterval& LI)
 	{
-		auto spill = active.back();
-		if (spill->end > LI.end)
+		if (LI.is_float)
 		{
+			if(active_fp.empty())
+			{
+				LI.spilled = true;
+				return;
+			}
+
+			auto spill = active_fp.back();
+			if (spill->end <= LI.end)
+			{
+				LI.spilled = true;
+				return;
+			}
+
 			Uint32 vreg = LI.vreg;
 			LI.reg = spill->reg;
 			vreg2reg_map[LI.vreg] = LI.reg;
 			spill->spilled = true;
 			vreg2reg_map.erase(spill->vreg);
-			active.pop_back();
-			active.push_back(&LI);
-			sort(active.begin(), active.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
+			active_fp.pop_back();
+			active_fp.push_back(&LI);
+			sort(active_fp.begin(), active_fp.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
 		}
 		else
 		{
-			LI.spilled = true;
+			if(active_gp.empty())
+			{
+				LI.spilled = true;
+				return;
+			}
+
+			auto spill = active_gp.back();
+			if (spill->end <= LI.end)
+			{
+				LI.spilled = true;
+				return;
+			}
+
+			Uint32 vreg = LI.vreg;
+			LI.reg = spill->reg;
+			vreg2reg_map[LI.vreg] = LI.reg;
+			spill->spilled = true;
+			vreg2reg_map.erase(spill->vreg);
+			active_gp.pop_back();
+			active_gp.push_back(&LI);
+			sort(active_gp.begin(), active_gp.end(), [](LiveInterval* L, LiveInterval* R) { return L->end < R->end; });
 		}
 	}
 
@@ -129,7 +189,10 @@ namespace ola
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO)) continue;
+					if (!IsOperandVReg(MO))
+					{
+						continue;
+					}
 
 					Uint32 vreg_id = MO.GetReg().reg;
 					if (vreg2reg_map.contains(vreg_id))
@@ -146,7 +209,7 @@ namespace ola
 						}
 						else
 						{
-							MachineOperand& new_stack_loc = MF.AllocateLocalStack(MachineType::Int64);
+							MachineOperand& new_stack_loc = MF.AllocateLocalStack(MO.GetType());
 							vreg_stack_map[vreg_id] = &new_stack_loc;
 							MI.SetOperand(idx, new_stack_loc);
 						}

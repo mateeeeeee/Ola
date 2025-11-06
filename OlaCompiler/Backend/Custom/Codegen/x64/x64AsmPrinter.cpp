@@ -47,10 +47,8 @@ namespace ola
 		{
 			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
 #if OLA_PLATFORM_MACOS
-			if (MO.GetRelocable()->IsFunction())
-			{
-				symbol = "_" + symbol;
-			}
+			// On macOS, all C symbols need underscore prefix
+			symbol = "_" + symbol;
 #endif
 			return MO.GetRelocable()->IsFunction() ? symbol
 				: std::format("{} {}[rip]", GetOperandPrefix(MO), symbol);
@@ -190,7 +188,11 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsRelocable())
 							{
-								EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), op2.GetRelocable()->GetSymbol());
+								std::string symbol = std::string(op2.GetRelocable()->GetSymbol());
+#if OLA_PLATFORM_MACOS
+								symbol = "_" + symbol;
+#endif
+								EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), symbol);
 							}
 							else
 							{

@@ -15,7 +15,7 @@ Int main()
 {
 	OLA_LOG_INIT();
 	CompileRequest compile_request{};
-	Char const* argv[] = { "-i", "test", "--target", TARGET, OPT_LEVEL, BACKEND, "--timeout",  "--emit-asm", "--emit-mir", "--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test"};
+	Char const* argv[] = { "-i", "test", "--target", TARGET, OPT_LEVEL, BACKEND, "--timeout",  "--emit-asm", "--emit-ir", "--directory", OLA_PLAYGROUND_PATH"Test"};
 	if (compile_request.Parse(OLA_ARRAYSIZE(argv), const_cast<Char**>(argv)))
 	{
 		Int compile_result = Compile(compile_request);

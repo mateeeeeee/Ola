@@ -23,7 +23,6 @@ namespace ola
 		std::unordered_set<MachineBasicBlock*> visited;
 
 		block_stack.push(MF.Blocks().front().get());
-
 		while (!block_stack.empty()) 
 		{
 			MachineBasicBlock* block = block_stack.top();
@@ -97,7 +96,11 @@ namespace ola
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO)) continue;
+					if (!IsOperandVReg(MO)) 
+					{
+						continue;
+					}
+
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float_reg = MO.GetType() == MachineType::Float64;
 
@@ -134,7 +137,10 @@ namespace ola
 		std::vector<LiveInterval> live_intervals;
 		for (auto&& [vreg, interval] : live_interval_map)
 		{
-			if (interval.begin > interval.end) std::swap(interval.begin, interval.end);
+			if (interval.begin > interval.end) 
+			{
+				std::swap(interval.begin, interval.end);
+			}
 			live_intervals.push_back(LiveInterval{ .begin = interval.begin, .end = interval.end, .vreg = vreg, .spilled = false, .is_float = interval.is_float });
 		}
 

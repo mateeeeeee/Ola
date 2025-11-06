@@ -5,7 +5,7 @@
 
 namespace ola
 {
-	class LiveInterval;
+	struct LiveInterval;
 	class LinearScanRegisterAllocator : public RegisterAllocator
 	{
 	public:
@@ -14,7 +14,8 @@ namespace ola
 		virtual void AssignRegisters(MachineFunction&) override;
 
 	private:
-		std::vector<LiveInterval*> active;
+		std::vector<LiveInterval*> active_gp;
+		std::vector<LiveInterval*> active_fp;
 		std::vector<Uint32> gp_regs;
 		std::vector<Uint32> fp_regs;
 		Uint32 frame_register;
