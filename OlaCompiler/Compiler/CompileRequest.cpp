@@ -88,20 +88,31 @@ namespace ola
 		if (cli_result["--O3"]) opt_level = OptimizationLevel::O3;
 
 		std::string target_str = cli_result["--target"].AsStringOr("");
-		if (target_str == "x64-ms")
+		if (target_str == "x64")
 		{
+#if OLA_PLATFORM_WINDOWS
 			target_arch = TargetArch::x64_Microsoft;
-		}
-		else if (target_str == "x64-sysv")
-		{
+#else
 			target_arch = TargetArch::x64_SysV;
+#endif
 		}
 		else if (target_str == "arm64")
 		{
+#if OLA_PLATFORM_MACOS
 			target_arch = TargetArch::ARM64;
+#else
+			// Warn and fallback to native target on non-macOS platforms
+			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");
+#if OLA_PLATFORM_WINDOWS
+			target_arch = TargetArch::x64_Microsoft;
+#else
+			target_arch = TargetArch::x64_SysV;
+#endif
+#endif
 		}
 		else if (!target_str.empty())
 		{
+			OLA_WARN("Unknown target '{}'. Using default target for this platform.", target_str);
 #if OLA_PLATFORM_WINDOWS
 			target_arch = TargetArch::x64_Microsoft;
 #elif OLA_PLATFORM_MACOS

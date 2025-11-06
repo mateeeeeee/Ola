@@ -21,5 +21,11 @@ if(MSVC)
 target_link_libraries(OlaLib PRIVATE legacy_stdio_definitions)
 endif()
 
+if(APPLE)
+    set_target_properties(OlaLib PROPERTIES
+        OSX_ARCHITECTURES "arm64;x86_64"
+    )
+endif()
+
 install(TARGETS OlaLib DESTINATION lib)
 install(FILES ${HEADERS} DESTINATION include/OlaLib)

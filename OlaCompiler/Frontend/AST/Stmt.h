@@ -294,9 +294,10 @@ namespace ola
 		virtual void Accept(ASTVisitor&) const override;
 
 		static Bool ClassOf(Stmt const* stmt) { return stmt->GetStmtKind() == StmtKind::Case; }
+		
 	private:
-		Int64 value;
 		Bool is_default;
+		Int64 value;
 	};
 
 	class SwitchStmt final : public Stmt

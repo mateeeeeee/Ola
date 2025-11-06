@@ -1,21 +1,61 @@
 Module ID : test.ola
 
-define external @main i64() {
+define internal @g i8() {
 entry:
-br label entry.split.split.split
-entry.split.split.split:
-%0 = zext i8 1
-%1 = icmp sgt i64 %0, 0
-br i8 %1, label if.then, label if.else
-if.then:
-br label if.end
-if.else:
-br label if.end
-if.end:
-%2 = phi i64 [ 15, if.else ], [ 15, if.then ]
-%3 = add i64 %2, 15
+%0 = alloca i8
+store 1, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 %3
+%1 = load i8, ptr %0
+ret i8 %1
+}
+
+
+define internal @f i64() {
+entry:
+%0 = alloca i64
+store 5, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%1 = load i64, ptr %0
+ret i64 %1
+}
+
+
+define internal @add__I__I i64(i64 %a,i64 %b) {
+entry:
+%0 = alloca i64
+store i64 %a, ptr %0
+%1 = alloca i64
+store i64 %b, ptr %1
+%2 = alloca i64
+%3 = load i64, ptr %0
+%4 = load i64, ptr %1
+%5 = add i64 %3, %4
+store i64 %5, ptr %2
+br label exit
+return:
+br label exit
+exit:
+%6 = load i64, ptr %2
+ret i64 %6
+}
+
+
+define external @main i64() {
+entry:
+%0 = alloca i64
+%1 = call i64 5, 3, @add__I__I
+store i64 %1, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%2 = load i64, ptr %0
+ret i64 %2
 }
 

@@ -1217,8 +1217,8 @@ namespace ola
 		SourceLocation loc = current_token->GetLocation();
 		QualType type{};
 		std::string_view identifier = current_token->GetData();
-		if (current_token->IsTypename() && current_token->IsNot(TokenKind::KW_auto)
-		|| (current_token->Is(TokenKind::identifier) && sema->sema_ctx.tag_sym_table.LookUp(identifier) != nullptr))
+		if ((current_token->IsTypename() && current_token->IsNot(TokenKind::KW_auto)) || 
+			(current_token->Is(TokenKind::identifier) && sema->sema_ctx.tag_sym_table.LookUp(identifier) != nullptr))
 		{
 			ParseTypeQualifier(type);
 			ParseTypeSpecifier(type);

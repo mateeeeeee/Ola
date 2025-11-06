@@ -25,13 +25,13 @@ namespace ola
 			switch (static_cast<x64Section>(section))
 			{
 			case x64Section_Text:
-				return ".section .text";
+				return ".text";
 			case x64Section_Data:
-				return ".section .data";
+				return ".data";
 			case x64Section_ReadOnly:
 				return ".section .rodata";
 			case x64Section_BSS:
-				return ".section .bss";
+				return ".bss";
 			case x64Section_Preamble:
 			default:
 				return "";

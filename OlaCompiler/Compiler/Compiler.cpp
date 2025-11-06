@@ -190,7 +190,9 @@ namespace ola
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
 		std::string output_file = compile_request.GetOutputFile();
+#if OLA_PLATFORM_WINDOWS
 		output_file += ".exe";
+#endif
 
 		TargetArch target_arch = compile_request.GetTargetArch();
 		if (target_arch == TargetArch::Default)
@@ -230,9 +232,21 @@ namespace ola
 			};
 			CompileTranslationUnit(context, source_file, ir_file, mir_file, assembly_file, tu_comp_opts);
 
-			std::string object_file = file_name + ".obj";  
+			std::string object_file = file_name + ".obj";
 			object_files[i] = object_file;
-			std::string assembly_cmd = std::format("clang -c {} -o {}", assembly_file, object_file);
+			std::string assembly_cmd = "clang -c ";
+#if OLA_PLATFORM_MACOS
+			// On macOS, explicitly specify architecture when assembling
+			if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+			{
+				assembly_cmd += "-arch x86_64 ";
+			}
+			else if (target_arch == TargetArch::ARM64)
+			{
+				assembly_cmd += "-arch arm64 ";
+			}
+#endif
+			assembly_cmd += std::format("{} -o {}", assembly_file, object_file);
 			Int assembly_exit_code = ExecuteCommand(assembly_cmd.c_str());
 
 			if (!emit_ir)
@@ -256,19 +270,45 @@ namespace ola
 		{
 			GenerateGraphVizImages(input_directory, !no_llvm);
 		}
-		
+
 		std::string link_cmd = "clang ";
+#if OLA_PLATFORM_MACOS
+		// On macOS, explicitly specify architecture when linking
+		if (target_arch == TargetArch::x64_Microsoft || target_arch == TargetArch::x64_SysV)
+		{
+			link_cmd += "-arch x86_64 ";
+		}
+		else if (target_arch == TargetArch::ARM64)
+		{
+			link_cmd += "-arch arm64 ";
+		}
+#endif
 		for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
 		link_cmd += OLA_STATIC_LIB_PATH;
 		link_cmd += " -o " + output_file;
+#if OLA_PLATFORM_WINDOWS
 		link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
+#endif
 		ExecuteCommand(link_cmd.c_str());
 
 		Int res = 0;
 		if (!no_run)
 		{
-			std::string const& exe_cmd = output_file;
+			std::string exe_cmd = output_file;
+			// Prefix with ./ if it's a relative path without directory separators
+			if (exe_cmd.find('/') == std::string::npos && exe_cmd.find('\\') == std::string::npos)
+			{
+				exe_cmd = "./" + exe_cmd;
+			}
+#if OLA_PLATFORM_MACOS
+			// Use Rosetta 2 to run x64 SysV executables on macOS (Apple Silicon)
+			if (target_arch == TargetArch::x64_SysV)
+			{
+				exe_cmd = "arch -x86_64 " + exe_cmd;
+			}
+#endif
 			res = timeout_detection ? ExecuteCommand_NonBlocking(exe_cmd.c_str(), 1.0f) : ExecuteCommand(exe_cmd.c_str());
+			OLA_INFO("Program exited with code: {}", res);
 		}
 		fs::current_path(cur_path);
 		return res;

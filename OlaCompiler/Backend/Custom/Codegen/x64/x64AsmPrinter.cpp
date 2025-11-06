@@ -45,8 +45,15 @@ namespace ola
 		}
 		else if (MO.IsRelocable())
 		{
-			return MO.GetRelocable()->IsFunction() ? std::string(MO.GetRelocable()->GetSymbol())
-				: std::format("{} {}[rip]", GetOperandPrefix(MO), MO.GetRelocable()->GetSymbol());
+			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
+#if OLA_PLATFORM_MACOS
+			if (MO.GetRelocable()->IsFunction())
+			{
+				symbol = "_" + symbol;
+			}
+#endif
+			return MO.GetRelocable()->IsFunction() ? symbol
+				: std::format("{} {}[rip]", GetOperandPrefix(MO), symbol);
 		}
 		else if (MO.IsStackObject())
 		{
@@ -73,14 +80,18 @@ namespace ola
 			if (relocable->IsFunction())
 			{
 				MachineFunction& MF = *static_cast<MachineFunction*>(relocable);
+				std::string symbol_name(MF.GetSymbol());
+#if OLA_PLATFORM_MACOS
+				symbol_name = "_" + symbol_name;
+#endif
 				if (global.GetLinkage() == Linkage::External)
 				{
-					if(!MF.IsDeclaration()) EmitText(".globl {}\n", MF.GetSymbol());
-					else EmitText(".extern {}\n", MF.GetSymbol());
+					if(!MF.IsDeclaration()) EmitText(".globl {}\n", symbol_name);
+					else EmitText(".extern {}\n", symbol_name);
 				}
 				if (MF.IsDeclaration()) continue;
 
-				EmitText("{}:", MF.GetSymbol());
+				EmitText("{}:", symbol_name);
 				for (auto& MBB : MF.Blocks())
 				{
 					EmitText("{}:", MBB->GetSymbol());
@@ -246,9 +257,14 @@ namespace ola
 				MachineDataStorage& MDS = *static_cast<MachineDataStorage*>(relocable);
 				auto const& storage = MDS.GetStorage();
 
+				std::string data_symbol(relocable->GetSymbol());
+#if OLA_PLATFORM_MACOS
+				data_symbol = "_" + data_symbol;
+#endif
+
 				if (MDS.IsReadOnly())
 				{
-					EmitReadOnly("{}:", relocable->GetSymbol());
+					EmitReadOnly("{}:", data_symbol);
 					for (auto const& element : storage)
 					{
 						std::visit([&](auto&& arg)
@@ -265,7 +281,7 @@ namespace ola
 				}
 				else
 				{
-					EmitData("{}:", relocable->GetSymbol());
+					EmitData("{}:", data_symbol);
 					for (auto const& element : storage)
 					{
 						std::visit([&](auto&& arg)
@@ -284,7 +300,11 @@ namespace ola
 			else if (relocable->IsZeroStorage())
 			{
 				MachineZeroStorage& MZS = *static_cast<MachineZeroStorage*>(relocable);
-				EmitBSS("{}:", relocable->GetSymbol());
+				std::string bss_symbol(relocable->GetSymbol());
+#if OLA_PLATFORM_MACOS
+				bss_symbol = "_" + bss_symbol;
+#endif
+				EmitBSS("{}:", bss_symbol);
 				EmitBSS(".zero {}", MZS.GetSize());
 			}
 			else OLA_ASSERT_MSG(false, "Invalid relocable kind!");

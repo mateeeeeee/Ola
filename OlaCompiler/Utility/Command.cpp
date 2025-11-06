@@ -5,6 +5,8 @@
 #include <tlhelp32.h>
 #include <chrono>
 #include <thread>
+#else
+#include <sys/wait.h>
 #endif
 #include "Command.h"
 #include "Core/Log.h"
@@ -53,12 +55,25 @@ namespace ola
 
 	Int ExecuteCommand(Char const* cmd)
 	{
-		return std::system(cmd);
+		Int status = std::system(cmd);
+#if _WIN32
+		return status;
+#else
+		if (WIFEXITED(status))
+		{
+			return WEXITSTATUS(status);
+		}
+		else if (WIFSIGNALED(status))
+		{
+			return 128 + WTERMSIG(status);
+		}
+		return status;
+#endif
 	}
 
 	Int ExecuteCommand_NonBlocking(Char const* cmd, Float timeout)
 	{
-#if _WIN32
+#if OLA_PLATFORM_WINDOWS
 		STARTUPINFO si{};
 		si.cb = sizeof(si);
 		PROCESS_INFORMATION pi{};

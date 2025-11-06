@@ -50,10 +50,10 @@ namespace ola
 		static Bool ClassOf(IRType const* T) { return false; }
 
 	private:
+		IRContext& ctx;
 		IRTypeKind kind;
 		Uint32 align;
 		Uint32 size;
-		IRContext& ctx;
 
 	protected:
 		IRType(IRContext& ctx, IRTypeKind kind)   : ctx(ctx), kind(kind), align(), size() {}

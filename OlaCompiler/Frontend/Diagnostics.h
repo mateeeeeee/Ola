@@ -53,6 +53,6 @@ namespace ola
 		Bool warnings_as_errors = false;
 		Bool exit_on_error = false;
 		SourceLocation loc;
-		Bool error_reported = false;
+		OLA_MAYBE_UNUSED Bool error_reported = false;
 	};
 }
