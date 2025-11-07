@@ -31,11 +31,11 @@ namespace ola
 		gp_regs = target_reg_info.GetGPCalleeSavedRegisters();
 
 		OLA_TODO("This is temp hack because x64 SysV does not have callee saved FP registers which is causing issues with register allocation");
-		#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 		fp_regs = target_reg_info.GetFPCalleeSavedRegisters();
-		#else
+#else
 		fp_regs = target_reg_info.GetFPRegisters();
-		#endif
+#endif
 		frame_register = target_reg_info.GetFramePointerRegister();
 		for (LiveInterval& LI : live_intervals)
 		{

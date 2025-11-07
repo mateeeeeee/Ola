@@ -73,7 +73,7 @@ namespace ola
 
 	Int ExecuteCommand_NonBlocking(Char const* cmd, Float timeout)
 	{
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 		STARTUPINFO si{};
 		si.cb = sizeof(si);
 		PROCESS_INFORMATION pi{};

@@ -145,7 +145,7 @@ namespace ola
 				switch (opts.target_arch)
 				{
 				case TargetArch::x64:
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 					x64_target = &ms_target;
 #else
 					x64_target = &sysv_target;
@@ -191,16 +191,16 @@ namespace ola
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
 		std::string output_file = compile_request.GetOutputFile();
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 		output_file += ".exe";
 #endif
 
 		TargetArch target_arch = compile_request.GetTargetArch();
 		if (target_arch == TargetArch::Default)
 		{
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 			target_arch = TargetArch::x64;
-#elif OLA_PLATFORM_MACOS
+#elif defined(OLA_PLATFORM_MACOS)
 			target_arch = TargetArch::ARM64;
 #else
 			target_arch = TargetArch::x64;
@@ -236,8 +236,7 @@ namespace ola
 			std::string object_file = file_name + ".obj";
 			object_files[i] = object_file;
 			std::string assembly_cmd = "clang -c ";
-#if OLA_PLATFORM_MACOS
-			// On macOS, explicitly specify architecture when assembling
+#if defined(OLA_PLATFORM_MACOS)
 			if (target_arch == TargetArch::x64)
 			{
 				assembly_cmd += "-arch x86_64 ";
@@ -276,7 +275,7 @@ namespace ola
 		if (build_static_lib)
 		{
 			std::string lib_output = output_file;
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 			if (!lib_output.ends_with(".lib"))
 			{
 				lib_output += ".lib";
@@ -296,8 +295,7 @@ namespace ola
 		{
 			// Link executable
 			std::string link_cmd = "clang ";
-#if OLA_PLATFORM_MACOS
-			// On macOS, explicitly specify architecture when linking
+#if defined(OLA_PLATFORM_MACOS)
 			if (target_arch == TargetArch::x64)
 			{
 				link_cmd += "-arch x86_64 ";
@@ -314,7 +312,7 @@ namespace ola
 
 			link_cmd += OLA_STATIC_LIB_PATH;
 			link_cmd += " -o " + output_file;
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 			link_cmd += " -Xlinker /SUBSYSTEM:CONSOLE";
 #endif
 			ExecuteCommand(link_cmd.c_str());
@@ -324,14 +322,14 @@ namespace ola
 		if (!no_run)
 		{
 			std::string exe_cmd = output_file;
-#if !OLA_PLATFORM_WINDOWS
+#if !defined(OLA_PLATFORM_WINDOWS)
 			// Prefix with ./ if it's a relative path without directory separators
 			if (exe_cmd.find('/') == std::string::npos)
 			{
 				exe_cmd = "./" + exe_cmd;
 			}
 #endif
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 			// Use Rosetta 2 to run x64 executables on macOS (Apple Silicon)
 			if (target_arch == TargetArch::x64)
 			{

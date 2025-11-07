@@ -50,25 +50,12 @@
 
 
 #if defined(_WIN32) || defined(_WIN64)
-#define OLA_PLATFORM_WINDOWS 1
+#define OLA_PLATFORM_WINDOWS
 #elif defined(__linux__)
-#define OLA_PLATFORM_LINUX 1
+#define OLA_PLATFORM_LINUX
 #elif defined(__APPLE__)
-#define OLA_PLATFORM_MACOS 1
+#define OLA_PLATFORM_MACOS
 #endif
-
-#ifndef OLA_PLATFORM_WINDOWS
-#define OLA_PLATFORM_WINDOWS 0
-#endif
-
-#ifndef OLA_PLATFORM_LINUX
-#define OLA_PLATFORM_LINUX 0
-#endif
-
-#ifndef OLA_PLATFORM_MACOS
-#define OLA_PLATFORM_MACOS 0
-#endif
-
 
 template<typename T, int N>
 constexpr int _ArraySize(T(&arr)[N])

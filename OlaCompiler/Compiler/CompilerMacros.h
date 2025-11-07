@@ -36,7 +36,7 @@
 
 #endif
 
-#if OLA_PLATFORM_WINDOWS
+#if defined(OLA_PLATFORM_WINDOWS)
 	#if DEBUG
 		#define OLA_STATIC_LIB_PATH OLA_PATH_CONCAT(OLA_BINARY_PATH, "Debug/olalib.lib")
 	#else

@@ -24,20 +24,17 @@ namespace ola
 		{
 			switch (static_cast<x64Section>(section))
 			{
-			case x64Section_Text:
-				return ".text";
-			case x64Section_Data:
-				return ".data";
+			case x64Section_Text: return ".text";
+			case x64Section_Data: return ".data";
 			case x64Section_ReadOnly:
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 				return ".section __TEXT,__const";
-#elif OLA_PLATFORM_WINDOWS
+#elif defined(OLA_PLATFORM_WINDOWS)
 				return ".section .rdata";
 #else
 				return ".section .rodata";
 #endif
-			case x64Section_BSS:
-				return ".bss";
+			case x64Section_BSS: return ".bss";
 			case x64Section_Preamble:
 			default:
 				return "";

@@ -8,7 +8,7 @@
 using namespace ola;
 
 static constexpr Char const* BACKEND = "--nollvm";
-static constexpr Char const* OPT_LEVEL = "--O0";
+static constexpr Char const* OPT_LEVEL = "--O2";
 static constexpr Char const* TARGET = "x64";
 
 Int main()
