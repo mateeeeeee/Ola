@@ -1,19 +1,16 @@
 import std.assert;
-import std.io;
 
 int g = 9;
 ref int ReturnRef()
 {
 	return g;
 }
-int ReturnValue()
-{
-	return g;
-}
+
 
 public int main()
 {
-	int gRefCopy = ReturnRef();
-	gRefCopy++;
-	return g;
+	ref int gRef = ReturnRef();
+	gRef++;
+	Assert(g == 10);
+	return 0;
 }

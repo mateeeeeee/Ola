@@ -54,17 +54,17 @@ int ReturnValue()
 
 void TestRefReturnSimple()
 {
-	//ref int gRef = ReturnRef();
-	//gRef++;
-	//Assert(g == 10);
+	ref int gRef = ReturnRef();
+	gRef++;
+	Assert(g == 10);
 
 	int gRefCopy = ReturnRef();
 	gRefCopy++;
-	Assert(g == 9);
+	Assert(g == 10);
 	
 	int gValue = ReturnValue();
 	gValue++;
-	Assert(g == 9);
+	Assert(g == 10);
 }
 
 

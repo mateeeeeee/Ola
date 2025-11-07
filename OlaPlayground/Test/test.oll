@@ -6,52 +6,30 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-declare @PrintInt void(i64)
-
-
-declare @PrintFloat void(f64)
-
-
-declare @PrintChar void(i8)
-
-
-declare @PrintString void(ptr)
-
-
-declare @ReadInt i64()
-
-
-declare @ReadFloat f64()
-
-
-declare @ReadChar i8()
-
-
-declare @ReadString void(ptr,i64)
-
-
 define internal @g ptr 9
 
 
 define external @main i64() {
 entry:
-%0 = alloca i64
 br label entry.inlined
 entry.split:
-%1 = load i64, ptr %2
-%3 = alloca ptr
-store i64 %1, ptr %3
-store ptr @g, ptr %0
+%0 = load i64, ptr %1
+%2 = alloca ptr
+store i64 %0, ptr %2
+%3 = add i64 %0, 1
+store i64 %3, ptr %1
+%4 = load i64, ptr @g
+%5 = icmp eq i64 %4, 10
+call i8 %5, @Assert
 br label exit
 exit.inlined:
-%2 = load ptr, ptr %4
+%1 = load ptr, ptr %6
 br label entry.split
 entry.inlined:
-%4 = alloca ptr
-store ptr @g, ptr %4
+%6 = alloca ptr
+store ptr @g, ptr %6
 br label exit.inlined
 exit:
-%5 = load i64, ptr %0
-ret i64 %5
+ret i64 0
 }
 

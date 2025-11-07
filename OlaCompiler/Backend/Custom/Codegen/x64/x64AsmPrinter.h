@@ -27,12 +27,10 @@ namespace ola
 			case x64Section_Text: return ".text";
 			case x64Section_Data: return ".data";
 			case x64Section_ReadOnly:
-#if defined(OLA_PLATFORM_MACOS)
-				return ".section __TEXT,__const";
-#elif defined(OLA_PLATFORM_WINDOWS)
-				return ".section .rdata";
-#else
+#if defined(OLA_PLATFORM_WINDOWS)
 				return ".section .rodata";
+#else
+				return ".section __TEXT,__const";
 #endif
 			case x64Section_BSS: return ".bss";
 			case x64Section_Preamble:

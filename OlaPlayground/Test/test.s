@@ -1,6 +1,6 @@
 .intel_syntax noprefix
 
-.section .rdata
+.section .rodata
 
 g:
 .quad 9
@@ -12,37 +12,29 @@ g:
 
 .extern AssertMsg
 
-.extern PrintInt
-
-.extern PrintFloat
-
-.extern PrintChar
-
-.extern PrintString
-
-.extern ReadInt
-
-.extern ReadFloat
-
-.extern ReadChar
-
-.extern ReadString
-
 .globl main
 
 main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 40
+sub rsp, 72
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
 jmp label3
 label1:
 mov r13, qword ptr [r14]
 mov qword ptr [rbp - 32], r13
-mov r13, qword ptr g[rip]
-mov qword ptr [rbp - 24], r13
+mov r12, r13
+add r12, 1
+mov qword ptr [r14], r12
+mov r12, qword ptr g[rip]
+cmp r12, 10
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
 jmp label4
 label2:
 mov r14, qword ptr [rbp - 40]
@@ -52,10 +44,10 @@ lea r14, [rip + g]
 mov qword ptr [rbp - 40], r14
 jmp label2
 label4:
-mov r13, qword ptr [rbp - 24]
-mov rax, r13
+mov rax, 0
 mov r14, qword ptr [rbp - 8]
 mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
 mov rsp, rbp
 pop rbp
 ret
