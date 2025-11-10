@@ -332,16 +332,14 @@ namespace ola
 
 				if (ret_it != insts.end())
 				{
-					MachineInstruction reset_rbp(InstMove);
-					reset_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
-					auto insert_it = ctx.EmitInst(ret_it, reset_rbp);
+					MachineInstruction reset_stack(InstMove);
+					reset_stack.SetOp<0>(rsp).SetOp<1>(rbp);
+					auto mov_insert_it = ctx.EmitInst(ret_it, reset_stack); 
 
 					MachineInstruction pop_rbp(InstPop);
 					pop_rbp.SetOp<0>(rbp);
-					ctx.EmitInst(insert_it, pop_rbp);
-
-					mov_it = ret_it;
-					--mov_it;
+					ctx.EmitInst(std::next(mov_insert_it), pop_rbp);
+					mov_it = mov_insert_it;
 				}
 			}
 

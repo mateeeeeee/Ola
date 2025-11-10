@@ -94,28 +94,17 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 80
+sub rsp, 48
 mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 32], 0
 lea r14, [rip + __StringLiteral1]
 mov rdx, r14
 lea r14, [rip + __StringLiteral0]
 mov rcx, r14
 call FileOpen
 mov r14, rax
-mov qword ptr [rbp - 40], r14
-mov r14, qword ptr [rbp - 40]
-mov rcx, r14
-call FileReadInt
-mov r14, rax
-mov qword ptr [rbp - 48], r14
-mov r14, qword ptr [rbp - 48]
-mov qword ptr [rbp - 24], r14
-jmp label2
+jmp label1
 label1:
-label2:
-mov r14, qword ptr [rbp - 24]
-mov rax, r14
+mov rax, 9
 mov r14, qword ptr [rbp - 8]
 mov rsp, rbp
 pop rbp

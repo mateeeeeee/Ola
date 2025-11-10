@@ -4,6 +4,5 @@ import std.file;
 public int main() 
 { 
 	FileHandle f = FileOpen("alo.txt", "r");
-	int k = FileReadInt(f);
-	return k; 
+	return 9; 
 }
