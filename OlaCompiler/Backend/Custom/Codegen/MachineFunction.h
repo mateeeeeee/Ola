@@ -71,6 +71,14 @@ namespace ola
 		{
 			return has_call_instructions;
 		}
+		void SetHasFrame(Bool frame)
+		{
+			has_frame = frame;
+		}
+		Bool HasFrame() const
+		{
+			return has_frame;
+		}
 
 		virtual RelocableKind GetRelocableKind() const override
 		{
@@ -83,6 +91,7 @@ namespace ola
 		std::vector<MachineOperand> args;
 		Int32 local_stack_offset = 0;
 		Int32 argument_stack_offset = 0;
+		Bool has_frame = false;
 		std::vector<MachineOperand> local_stack_objects;
 		std::vector<std::tuple<Uint32, Int32, MachineType>> callee_saved_args;
 

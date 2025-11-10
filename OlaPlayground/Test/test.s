@@ -2,15 +2,91 @@
 
 .section .rodata
 
-g:
-.quad 9
+__StringLiteral0:
+.string "alo.txt"
 
 
+__StringLiteral1:
+.string "r"
+
+
+.bss
+
+SEEK_SET_VALUE:
+.zero 8
+SEEK_CUR_VALUE:
+.zero 8
+SEEK_END_VALUE:
+.zero 8
+MODE_READ:
+.zero 8
+MODE_WRITE:
+.zero 8
+MODE_APPEND:
+.zero 8
+MODE_READ_WRITE:
+.zero 8
+MODE_WRITE_READ:
+.zero 8
+MODE_APPEND_READ:
+.zero 8
+MODE_READ_BINARY:
+.zero 8
+MODE_WRITE_BINARY:
+.zero 8
+MODE_APPEND_BINARY:
+.zero 8
 .text
 
-.extern Assert
+.extern FileOpen
 
-.extern AssertMsg
+.extern FileClose
+
+.extern FileIsOpen
+
+.extern FileReadInt
+
+.extern FileReadFloat
+
+.extern FileReadChar
+
+.extern FileReadLine
+
+.extern FileRead
+
+.extern FileWriteInt
+
+.extern FileWriteFloat
+
+.extern FileWriteChar
+
+.extern FileWriteString
+
+.extern FileWriteLine
+
+.extern FileWrite
+
+.extern FileTell
+
+.extern FileSeek
+
+.extern FileRewind
+
+.extern FileEOF
+
+.extern FileError
+
+.extern FileClearError
+
+.extern FileFlush
+
+.extern FileExists
+
+.extern FileDelete
+
+.extern FileRename
+
+.extern FileSize
 
 .globl main
 
@@ -18,36 +94,29 @@ main:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 72
+sub rsp, 80
 mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-jmp label3
-label1:
-mov r13, qword ptr [r14]
-mov qword ptr [rbp - 32], r13
-mov r12, r13
-add r12, 1
-mov qword ptr [r14], r12
-mov r12, qword ptr g[rip]
-cmp r12, 10
-sete r12b
-and r12b, 1
-mov cl, r12b
-call Assert
-jmp label4
-label2:
-mov r14, qword ptr [rbp - 40]
-jmp label1
-label3:
-lea r14, [rip + g]
+mov qword ptr [rbp - 32], 0
+lea r14, [rip + __StringLiteral1]
+mov rdx, r14
+lea r14, [rip + __StringLiteral0]
+mov rcx, r14
+call FileOpen
+mov r14, rax
 mov qword ptr [rbp - 40], r14
+mov r14, qword ptr [rbp - 40]
+mov rcx, r14
+call FileReadInt
+mov r14, rax
+mov qword ptr [rbp - 48], r14
+mov r14, qword ptr [rbp - 48]
+mov qword ptr [rbp - 24], r14
 jmp label2
-label4:
-mov rax, 0
+label1:
+label2:
+mov r14, qword ptr [rbp - 24]
+mov rax, r14
 mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
 mov rsp, rbp
 pop rbp
 ret

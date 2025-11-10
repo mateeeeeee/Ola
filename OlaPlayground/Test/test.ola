@@ -1,16 +1,9 @@
-import std.assert;
 
-int g = 9;
-ref int ReturnRef()
-{
-	return g;
-}
+import std.file; 
 
-
-public int main()
-{
-	ref int gRef = ReturnRef();
-	gRef++;
-	Assert(g == 10);
-	return 0;
+public int main() 
+{ 
+	FileHandle f = FileOpen("alo.txt", "r");
+	int k = FileReadInt(f);
+	return k; 
 }

@@ -1,35 +1,141 @@
 Module ID : test.ola
 
-declare @Assert void(i8)
+declare @FileOpen i64(ptr,ptr)
 
 
-declare @AssertMsg void(i8,ptr)
+declare @FileClose i8(i64)
 
 
-define internal @g ptr 9
+declare @FileIsOpen i8(i64)
+
+
+declare @FileReadInt i64(i64)
+
+
+declare @FileReadFloat f64(i64)
+
+
+declare @FileReadChar i8(i64)
+
+
+declare @FileReadLine i8(i64,ptr,i64)
+
+
+declare @FileRead i64(i64,ptr,i64)
+
+
+declare @FileWriteInt i8(i64,i64)
+
+
+declare @FileWriteFloat i8(i64,f64)
+
+
+declare @FileWriteChar i8(i64,i8)
+
+
+declare @FileWriteString i8(i64,ptr)
+
+
+declare @FileWriteLine i8(i64,ptr)
+
+
+declare @FileWrite i64(i64,ptr,i64)
+
+
+declare @FileTell i64(i64)
+
+
+declare @FileSeek i8(i64,i64,i64)
+
+
+declare @FileRewind void(i64)
+
+
+declare @FileEOF i8(i64)
+
+
+declare @FileError i8(i64)
+
+
+declare @FileClearError void(i64)
+
+
+declare @FileFlush i8(i64)
+
+
+declare @FileExists i8(ptr)
+
+
+declare @FileDelete i8(ptr)
+
+
+declare @FileRename i8(ptr,ptr)
+
+
+declare @FileSize i64(ptr)
+
+
+declare @SEEK_SET_VALUE ptr
+
+
+declare @SEEK_CUR_VALUE ptr
+
+
+declare @SEEK_END_VALUE ptr
+
+
+declare @MODE_READ ptr
+
+
+declare @MODE_WRITE ptr
+
+
+declare @MODE_APPEND ptr
+
+
+declare @MODE_READ_WRITE ptr
+
+
+declare @MODE_WRITE_READ ptr
+
+
+declare @MODE_APPEND_READ ptr
+
+
+declare @MODE_READ_BINARY ptr
+
+
+declare @MODE_WRITE_BINARY ptr
+
+
+declare @MODE_APPEND_BINARY ptr
 
 
 define external @main i64() {
 entry:
-br label entry.inlined
-entry.split:
-%0 = load i64, ptr %1
-%2 = alloca ptr
-store i64 %0, ptr %2
-%3 = add i64 %0, 1
-store i64 %3, ptr %1
-%4 = load i64, ptr @g
-%5 = icmp eq i64 %4, 10
-call i8 %5, @Assert
+%0 = alloca i64
+%1 = alloca i64
+store 0, ptr %1
+%2 = call ptr @__StringLiteral0, @__StringLiteral1, @FileOpen
+%3 = alloca i64
+store i64 %2, ptr %3
+%4 = load i64, ptr %3
+%5 = call i64 %4, @FileReadInt
+%6 = alloca i64
+store i64 %5, ptr %6
+%7 = load i64, ptr %6
+store i64 %7, ptr %0
 br label exit
-exit.inlined:
-%1 = load ptr, ptr %6
-br label entry.split
-entry.inlined:
-%6 = alloca ptr
-store ptr @g, ptr %6
-br label exit.inlined
+return:
+br label exit
 exit:
-ret i64 0
+%8 = load i64, ptr %0
+ret i64 %8
 }
+
+
+define internal @__StringLiteral0 ptr alo.txt
+
+
+define internal @__StringLiteral1 ptr r
 

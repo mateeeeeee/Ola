@@ -25,6 +25,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
     - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
+  * std library: `io`, `math`, `assert`, `string`, `file`
   * LLVM backend
   * Custom backend
     - Custom IR
@@ -43,7 +44,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
 The project consists of the following parts:
 1. **Ola Library**:
    - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. It includes essential components like:
-     - `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olamemory.h`
+     - `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olafile.h`
    
 2. **Ola Compiler**:
    - The core of the Ola project, implemented as a **static library** (`OlaCompiler`) with the following components:
