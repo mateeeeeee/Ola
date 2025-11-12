@@ -225,26 +225,26 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/x64/x64TargetInstInfo.cpp
   Backend/Custom/Codegen/x64/x64TargetISelInfo.h
   Backend/Custom/Codegen/x64/x64TargetISelInfo.cpp
-  Backend/Custom/Codegen/x64/Microsoft/x64Microsoft.h
-  Backend/Custom/Codegen/x64/Microsoft/x64Target.h
-  Backend/Custom/Codegen/x64/Microsoft/x64Target.cpp
-  Backend/Custom/Codegen/x64/Microsoft/x64TargetFrameInfo.h
-  Backend/Custom/Codegen/x64/Microsoft/x64TargetFrameInfo.cpp
-  Backend/Custom/Codegen/x64/SysV/x64SysV.h
-  Backend/Custom/Codegen/x64/SysV/x64Target.h
-  Backend/Custom/Codegen/x64/SysV/x64Target.cpp
-  Backend/Custom/Codegen/x64/SysV/x64TargetFrameInfo.h
-  Backend/Custom/Codegen/x64/SysV/x64TargetFrameInfo.cpp
-  Backend/Custom/Codegen/Arm64/Arm64.h
-  Backend/Custom/Codegen/Arm64/arm64.cpp
-  Backend/Custom/Codegen/Arm64/ARM64Target.h
-  Backend/Custom/Codegen/Arm64/ARM64Target.cpp
-  Backend/Custom/Codegen/Arm64/ARM64TargetFrameInfo.h
-  Backend/Custom/Codegen/Arm64/ARM64TargetFrameInfo.cpp
-  Backend/Custom/Codegen/Arm64/ARM64TargetInstInfo.h
-  Backend/Custom/Codegen/Arm64/ARM64TargetInstInfo.cpp
-  Backend/Custom/Codegen/Arm64/ARM64AsmPrinter.h
-  Backend/Custom/Codegen/Arm64/ARM64AsmPrinter.cpp
+  Backend/Custom/Codegen/x64/Microsoft/Microsoft_x64.h
+  Backend/Custom/Codegen/x64/Microsoft/Microsoft_x64Target.h
+  Backend/Custom/Codegen/x64/Microsoft/Microsoft_x64Target.cpp
+  Backend/Custom/Codegen/x64/Microsoft/Microsoft_x64TargetFrameInfo.h
+  Backend/Custom/Codegen/x64/Microsoft/Microsoft_x64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/x64/SysV/SysV_x64.h
+  Backend/Custom/Codegen/x64/SysV/SysV_x64Target.h
+  Backend/Custom/Codegen/x64/SysV/SysV_x64Target.cpp
+  Backend/Custom/Codegen/x64/SysV/SysV_x64TargetFrameInfo.h
+  Backend/Custom/Codegen/x64/SysV/SysV_x64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/ARM64/ARM64.h
+  Backend/Custom/Codegen/ARM64/ARM64.cpp
+  Backend/Custom/Codegen/ARM64/ARM64Target.h
+  Backend/Custom/Codegen/ARM64/ARM64Target.cpp
+  Backend/Custom/Codegen/ARM64/ARM64TargetFrameInfo.h
+  Backend/Custom/Codegen/ARM64/ARM64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/ARM64/ARM64TargetInstInfo.h
+  Backend/Custom/Codegen/ARM64/ARM64TargetInstInfo.cpp
+  Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.h
+  Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.cpp
 )
 
 if(LLVM_FOUND)

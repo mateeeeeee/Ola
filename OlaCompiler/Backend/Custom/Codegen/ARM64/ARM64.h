@@ -43,13 +43,6 @@ namespace ola
 		ARM64_InstBL,
 		ARM64_InstBr,
 		ARM64_InstBlr,
-		ARM64_InstRet,
-		ARM64_InstBEq,
-		ARM64_InstBNe,
-		ARM64_InstBGt,
-		ARM64_InstBGe,
-		ARM64_InstBLt,
-		ARM64_InstBLe,
 	};
 
 	inline constexpr Bool ARM64_IsISAReg(Uint32 reg)

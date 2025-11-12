@@ -1,4 +1,4 @@
-#include "Arm64.h"
+#include "ARM64.h"
 #include "Backend/Custom/Codegen/MachineOperand.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 
@@ -24,6 +24,8 @@ namespace ola
 		case InstLoad:   return "ldr";
 		case InstStore:  return "str";
 		case InstJump:   return "b";
+		case InstJE:     return "b.eq";
+		case InstJNE:    return "b.ne";
 		case InstRet:    return "ret";
 		case InstCall:   return "bl";
 		case InstICmp:   return "cmp";
@@ -51,13 +53,6 @@ namespace ola
 		case ARM64_InstBL:     return "bl";
 		case ARM64_InstBr:     return "br";
 		case ARM64_InstBlr:    return "blr";
-		case ARM64_InstRet:    return "ret";
-		case ARM64_InstBEq:    return "b.eq";
-		case ARM64_InstBNe:    return "b.ne";
-		case ARM64_InstBGt:    return "b.gt";
-		case ARM64_InstBGe:    return "b.ge";
-		case ARM64_InstBLt:    return "b.lt";
-		case ARM64_InstBLe:    return "b.le";
 		default:
 			OLA_ASSERT(false);
 			return "unknown";

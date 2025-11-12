@@ -4,5 +4,9 @@ import std.file;
 public int main() 
 { 
 	FileHandle f = FileOpen("alo.txt", "r");
+	if (FileIsOpen(f))
+	{
+		
+	}
 	return 9; 
 }
