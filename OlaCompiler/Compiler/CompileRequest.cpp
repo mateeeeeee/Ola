@@ -99,7 +99,7 @@ namespace ola
 		}
 		else if (target_str == "arm64")
 		{
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 			target_arch = TargetArch::ARM64;
 #else
 			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");

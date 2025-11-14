@@ -4,113 +4,171 @@
 
 namespace ola
 {
-    InstInfo ARM64TargetInstInfo::GetInstInfo(Uint32 opcode) const
-    {
-        InstInfo inst_info{};
-        switch (opcode)
-        {
-        case InstPush:
-        case InstSDiv:
-        case InstSRem:
-        {
-            inst_info.SetOperandCount(1);
-            inst_info.SetOpFlag(0, OperandFlagUse);
-        }
-        break;
-        case InstPop:
-        {
-            inst_info.SetOperandCount(1);
-            inst_info.SetOpFlag(0, OperandFlagDef);
-        }
-        break;
-        case InstMove:
-        case InstLoad:
-        case InstLoadGlobalAddress:
-        case InstCMoveEQ:
-        case InstCMoveNE:
-        case InstZExt:
-        case InstF2S:
-        case InstS2F:
-        case ARM64_InstFmov:
-        case ARM64_InstUcvtf:
-        case ARM64_InstFcvtzs:
-        case ARM64_InstAdrp:
-        case ARM64_InstLdr:
-        case ARM64_InstLdp:
-        case ARM64_InstMovz:
-        case ARM64_InstMovk:
-        {
-            inst_info.SetOperandCount(2);
-            inst_info.SetOpFlag(0, OperandFlagDef);
-            inst_info.SetOpFlag(1, OperandFlagUse);
-        }
-        break;
-        case InstStore:
-        case ARM64_InstStr:
-        case ARM64_InstStp:
-        {
-            inst_info.SetOperandCount(2);
-            inst_info.SetOpFlag(0, OperandFlagUse);
-            inst_info.SetOpFlag(1, OperandFlagUse);
-        }
-        break;
-        case InstJump:
-        case InstJE:
-        case InstJNE:
-        case ARM64_InstBL:
-        case ARM64_InstBr:
-        case ARM64_InstBlr:
-        {
-            inst_info.SetOperandCount(1);
-            inst_info.SetOpFlag(0, OperandFlagNone);
-        }
-        break;
-        case InstAdd:
-        case InstSub:
-        case InstShl:
-        case InstAShr:
-        case InstLShr:
-        case InstAnd:
-        case InstOr:
-        case InstXor:
-        case InstSMul:
-        case InstFAdd:
-        case InstFSub:
-        case InstFMul:
-        case InstFDiv:
-        {
-            inst_info.SetOperandCount(2);
-            inst_info.SetOpFlag(0, OperandFlagDef);
-            inst_info.SetOpFlag(1, OperandFlagUse);
-        }
-        break;
-        case InstTest:
-        case InstICmp:
-        case InstFCmp:
-        case ARM64_InstCmp:
-        {
-            inst_info.SetOperandCount(2);
-            inst_info.SetOpFlag(0, OperandFlagUse);
-            inst_info.SetOpFlag(1, OperandFlagUse);
-        }
-        break;
-        case InstNeg:
-        case InstNot:
-        case InstFNeg:
-        case ARM64_InstCset:
-        {
-            inst_info.SetOperandCount(1);
-            inst_info.SetOpFlag(0, OperandFlagDef);
-        }
-        break;
-        default:
-            break;
-        }
-        return inst_info;
-    }
+	InstInfo ARM64TargetInstInfo::GetInstInfo(Uint32 opcode) const
+	{
+		InstInfo inst_info{};
+		switch (opcode)
+		{
+		case InstPush:
+		case InstSDiv:
+		case InstSRem:
+		case InstUDiv:
+		case InstURem:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+		}
+		break;
+		case InstPop:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
+		case InstMove:
+		case InstLoad:
+		case InstLoadGlobalAddress:
+		case InstCMoveEQ:
+		case InstCMoveNE:
+		case InstZExt:
+		case InstF2S:
+		case InstS2F:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		case InstStore:
+		case InstICmp:
+		case InstFCmp:
+		case InstTest:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
 
-    std::string ARM64TargetInstInfo::GetInstName(Uint32 opcode) const
-    {
-        return ARM64_GetOpcodeString(opcode);
-    }
+		case InstAdd:
+		case InstSub:
+		case InstShl:
+		case InstAShr:
+		case InstLShr:
+		case InstAnd:
+		case InstOr:
+		case InstXor:
+		case InstSMul:
+		case InstUMul:
+		case InstFAdd:
+		case InstFSub:
+		case InstFMul:
+		case InstFDiv:
+		{
+			inst_info.SetOperandCount(3);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+			inst_info.SetOpFlag(2, OperandFlagUse);
+
+		}
+		break;
+
+		case InstNeg:
+		case InstNot:
+		case InstFNeg:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
+		case InstJump:
+		case InstJE:
+		case InstJNE:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagNone);
+			inst_info.SetInstFlag(InstFlagTerminator);
+			inst_info.SetInstFlag(InstFlagBranch);
+		}
+		break;
+		case InstCall:
+		{
+			inst_info.SetOperandCount(0);
+			inst_info.SetInstFlag(InstFlagCall);
+		}
+		break;
+		case InstRet:
+		{
+			inst_info.SetOperandCount(0);
+			inst_info.SetInstFlag(InstFlagTerminator);
+		}
+		break;
+		case ARM64_InstAdrp:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagNone); 
+		}
+		break;
+		case ARM64_InstStp:
+		{
+			inst_info.SetOperandCount(3);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+			inst_info.SetOpFlag(2, OperandFlagUse);		}
+		break;
+		case ARM64_InstLdp:
+		{
+			// ldp Xd1, Xd2, [Xn, #offset] - load pair
+			inst_info.SetOperandCount(3);
+			inst_info.SetOpFlag(0, OperandFlagDef); 
+			inst_info.SetOpFlag(1, OperandFlagDef);  	
+			inst_info.SetOpFlag(2, OperandFlagUse);
+		}
+		break;
+		case ARM64_InstMovz:
+		case ARM64_InstMovk:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagNone); 
+		}
+		break;
+		case ARM64_InstCset:
+		case ARM64_InstCsetEQ:
+		case ARM64_InstCsetNE:
+		case ARM64_InstCsetGT:
+		case ARM64_InstCsetGE:
+		case ARM64_InstCsetLT:
+		case ARM64_InstCsetLE:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
+
+		case ARM64_InstMrs:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagNone);
+		}
+		break;
+		case ARM64_InstMsr:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagNone);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		default:
+			break;
+		}
+		return inst_info;
+	}
+
+	std::string ARM64TargetInstInfo::GetInstName(Uint32 opcode) const
+	{
+		return ARM64_GetOpcodeString(opcode);
+	}
 }

@@ -8,16 +8,17 @@ namespace ola
 	{
 		switch (opcode)
 		{
-		// Common instructions
 		case InstAdd:    return "add";
 		case InstSub:    return "sub";
 		case InstSMul:   return "mul";
 		case InstSDiv:   return "sdiv";
+		case InstUDiv:   return "udiv";
 		case InstAnd:    return "and";
 		case InstOr:     return "orr";
 		case InstXor:    return "eor";
 		case InstShl:    return "lsl";
 		case InstAShr:   return "asr";
+		case InstLShr:   return "lsr";
 		case InstNeg:    return "neg";
 		case InstNot:    return "mvn";
 		case InstMove:   return "mov";
@@ -29,32 +30,32 @@ namespace ola
 		case InstRet:    return "ret";
 		case InstCall:   return "bl";
 		case InstICmp:   return "cmp";
+		case InstFCmp:   return "fcmp";
 		case InstFAdd:   return "fadd";
 		case InstFSub:   return "fsub";
 		case InstFMul:   return "fmul";
 		case InstFDiv:   return "fdiv";
-		case InstFCmp:   return "fcmp";
+		case InstFNeg:   return "fneg";
 		case InstS2F:    return "scvtf";
 		case InstF2S:    return "fcvtzs";
+		case InstZExt:   return "uxtb";
 
-		// ARM64-specific instructions
 		case ARM64_InstAdrp:   return "adrp";
-		case ARM64_InstLdr:    return "ldr";
-		case ARM64_InstStr:    return "str";
 		case ARM64_InstStp:    return "stp";
 		case ARM64_InstLdp:    return "ldp";
 		case ARM64_InstMovz:   return "movz";
 		case ARM64_InstMovk:   return "movk";
-		case ARM64_InstFmov:   return "fmov";
-		case ARM64_InstUcvtf:  return "ucvtf";
-		case ARM64_InstFcvtzs: return "fcvtzs";
-		case ARM64_InstCmp:    return "cmp";
 		case ARM64_InstCset:   return "cset";
-		case ARM64_InstBL:     return "bl";
-		case ARM64_InstBr:     return "br";
-		case ARM64_InstBlr:    return "blr";
+		case ARM64_InstCsetEQ: return "cset";
+		case ARM64_InstCsetNE: return "cset";
+		case ARM64_InstCsetGT: return "cset";
+		case ARM64_InstCsetGE: return "cset";
+		case ARM64_InstCsetLT: return "cset";
+		case ARM64_InstCsetLE: return "cset";
+		case ARM64_InstMrs:    return "mrs";
+		case ARM64_InstMsr:    return "msr";
+
 		default:
-			OLA_ASSERT(false);
 			return "unknown";
 		}
 	}
@@ -113,7 +114,6 @@ namespace ola
 
 	Bool ARM64_IsCallerSaved(Uint32 reg)
 	{
-		// ARM64 AAPCS: x0-x18 and v0-v7, v16-v31 are caller-saved
 		if (ARM64_IsGPR(reg))
 		{
 			return reg >= ARM64_X0 && reg <= ARM64_X18;

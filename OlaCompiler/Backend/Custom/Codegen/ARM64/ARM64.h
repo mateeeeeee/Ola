@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Backend/Custom/Codegen/MachineOperand.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola
 {
@@ -26,23 +27,20 @@ namespace ola
 
 	enum ARM64Instruction : Uint32
 	{
-		ARM64_InstAdrp = 0x1000,
-		ARM64_InstLdr,
-		ARM64_InstStr,
+		ARM64_InstAdrp = ISASpecificBegin,
 		ARM64_InstStp,
 		ARM64_InstLdp,
 		ARM64_InstMovz,
 		ARM64_InstMovk,
-		ARM64_InstFmov,
-		ARM64_InstUcvtf,
-		ARM64_InstFcvtzs,
+		ARM64_InstCset,
+		ARM64_InstCsetEQ,
+		ARM64_InstCsetNE,
+		ARM64_InstCsetGT,
+		ARM64_InstCsetGE,
+		ARM64_InstCsetLT,
+		ARM64_InstCsetLE,
 		ARM64_InstMrs,
 		ARM64_InstMsr,
-		ARM64_InstCmp,
-		ARM64_InstCset,
-		ARM64_InstBL,
-		ARM64_InstBr,
-		ARM64_InstBlr,
 	};
 
 	inline constexpr Bool ARM64_IsISAReg(Uint32 reg)

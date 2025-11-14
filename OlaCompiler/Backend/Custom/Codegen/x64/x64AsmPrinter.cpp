@@ -46,7 +46,7 @@ namespace ola
 		else if (MO.IsRelocable())
 		{
 			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 			// On macOS, all C symbols need underscore prefix
 			symbol = "_" + symbol;
 #endif
@@ -79,7 +79,7 @@ namespace ola
 			{
 				MachineFunction& MF = *static_cast<MachineFunction*>(relocable);
 				std::string symbol_name(MF.GetSymbol());
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 				symbol_name = "_" + symbol_name;
 #endif
 				if (global.GetLinkage() == Linkage::External)
@@ -189,7 +189,7 @@ namespace ola
 							if (op2.IsRelocable())
 							{
 								std::string symbol = std::string(op2.GetRelocable()->GetSymbol());
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 								symbol = "_" + symbol;
 #endif
 								EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), symbol);
@@ -260,7 +260,7 @@ namespace ola
 				auto const& storage = MDS.GetStorage();
 
 				std::string data_symbol(relocable->GetSymbol());
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 				data_symbol = "_" + data_symbol;
 #endif
 
@@ -303,7 +303,7 @@ namespace ola
 			{
 				MachineZeroStorage& MZS = *static_cast<MachineZeroStorage*>(relocable);
 				std::string bss_symbol(relocable->GetSymbol());
-#if OLA_PLATFORM_MACOS
+#if defined(OLA_PLATFORM_MACOS)
 				bss_symbol = "_" + bss_symbol;
 #endif
 				EmitBSS("{}:", bss_symbol);

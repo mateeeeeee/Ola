@@ -48,12 +48,14 @@ namespace ola
 			MachineInstruction& MI = legalize_ctx.instruction;
 			auto& instructions = legalize_ctx.instructions;
 			auto& instruction_iter = legalize_ctx.instruction_iterator;
+
 			switch (MI.GetOpcode())
 			{
 			case InstMove:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
+
 				if (src.IsMemoryOperand() && dst.IsMemoryOperand())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
@@ -66,160 +68,184 @@ namespace ola
 				}
 			}
 			break;
+
 			case InstStore:
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				if (src.IsImmediate() && (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64))
+
+				if (src.IsImmediate() && src.GetType() == MachineType::Float64)
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
-					MI.SetOp<0>(tmp);
-					MI.SetOpcode(ARM64_InstFmov);
-
-					MachineInstruction MI2(InstStore);
-					MI2.SetOp<0>(dst);
-					MI2.SetOp<1>(tmp);
-					instructions.insert(++instruction_iter, MI2);
-				}
-				else if (dst.GetType() == MachineType::Ptr && src.IsMemoryOperand())
-				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
-					MI.SetOp<0>(tmp);
-					MI.SetOp<1>(src);
-					MI.SetOpcode(InstLoadGlobalAddress);
-
-					MachineInstruction MI2(InstStore);
-					MI2.SetOp<0>(dst);
-					MI2.SetOp<1>(tmp);
-
-					++instruction_iter;
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);
 					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
 				}
-				else if (src.IsRelocable())
+				else if (src.IsMemoryOperand())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
-					MI.SetOp<0>(tmp);
-					MI.SetOp<1>(src);
-					MI.SetOpcode(InstLoad);
-
-					MachineInstruction MI2(InstStore);
-					MI2.SetOp<0>(dst);
-					MI2.SetOp<1>(tmp);
-					instructions.insert(++instruction_iter, MI2);
+					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
+			}
+			break;
+			case InstFAdd:
+			case InstFSub:
+			case InstFMul:
+			case InstFDiv:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				// can't have immediate operands (need to load from memory/register)
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<2>(tmp);
+				}
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
 				}
 			}
 			break;
 			case InstICmp:
 			{
+				// ARM64: cmp + cset pattern
 				if (!MI.GetOperand(2).IsUndefined())
 				{
 					MachineOperand dst = MI.GetOperand(0);
 					MachineOperand op1 = MI.GetOperand(1);
 					MachineOperand op2 = MI.GetOperand(2);
 					MachineOperand compare_op = MI.GetOperand(3);
+					//cmp op1, op2
+					MI.SetOp<0>(op1);
+					MI.SetOp<1>(op2);
 
-					auto GetOppositeCondition = [](MachineOperand compare_op) -> CompareOp
+					//cset dst, condition
+					auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 					{
 						OLA_ASSERT(compare_op.IsImmediate());
 						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
 						switch (cmp_op)
 						{
-						case CompareOp::ICmpEQ: return CompareOp::ICmpEQ;
-						case CompareOp::ICmpNE: return CompareOp::ICmpNE;
-						case CompareOp::ICmpSGT: return CompareOp::ICmpSLT;
-						case CompareOp::ICmpSGE: return CompareOp::ICmpSLE;
-						case CompareOp::ICmpSLT: return CompareOp::ICmpSGT;
-						case CompareOp::ICmpSLE: return CompareOp::ICmpSGE;
-						case CompareOp::ICmpULT: return CompareOp::ICmpUGT;
-						case CompareOp::ICmpULE: return CompareOp::ICmpUGE;
-						case CompareOp::ICmpUGT: return CompareOp::ICmpULT;
-						case CompareOp::ICmpUGE: return CompareOp::ICmpULE;
+						case CompareOp::ICmpEQ:  return ARM64_InstCsetEQ;
+						case CompareOp::ICmpNE:  return ARM64_InstCsetNE;
+						case CompareOp::ICmpSGT: return ARM64_InstCsetGT;
+						case CompareOp::ICmpSGE: return ARM64_InstCsetGE;
+						case CompareOp::ICmpSLT: return ARM64_InstCsetLT;
+						case CompareOp::ICmpSLE: return ARM64_InstCsetLE;
 						}
-						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
-						return CompareOp::ICmpEQ;
+						OLA_ASSERT_MSG(false, "Invalid compare operation!");
+						return ARM64_InstCset;
 					};
 
-					MI.SetOp<0>(op1).SetOp<1>(op2);
-					if (op1.IsImmediate())
-					{
-						OLA_ASSERT(!op2.IsImmediate());
-						MI.SetOp<0>(op2);
-						MI.SetOp<1>(op1);
-						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Other);
-					}
-
-					MachineInstruction cset(ARM64_InstCset);
-					cset.SetOp<0>(dst);
-					cset.SetOp<1>(compare_op);
-					instructions.insert(++instruction_iter, cset);
-
-					MachineInstruction andInst(InstAnd);
-					andInst.SetOp<0>(dst);
-					andInst.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
-					instructions.insert(instruction_iter++, andInst);
+					MachineInstruction MI2(GetCsetCondition(compare_op));
+					MI2.SetOp<0>(dst);
+					instructions.insert(++instruction_iter, MI2);
 				}
 			}
 			break;
 			case InstFCmp:
 			{
-				if (!MI.GetOperand(2).IsUndefined())
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+				MachineOperand compare_op = MI.GetOperand(3);
+				//fcmp op1, op2
+				MI.SetOp<0>(op1);
+				MI.SetOp<1>(op2);
+				//cset dst, condition
+				auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 				{
-					MachineOperand dst = MI.GetOperand(0);
-					MachineOperand op1 = MI.GetOperand(1);
-					MachineOperand op2 = MI.GetOperand(2);
-					MachineOperand compare_op = MI.GetOperand(3);
-
-					auto GetOppositeCondition = [](MachineOperand compare_op) -> CompareOp
+					OLA_ASSERT(compare_op.IsImmediate());
+					CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+					switch (cmp_op)
 					{
-						OLA_ASSERT(compare_op.IsImmediate());
-						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
-						switch (cmp_op)
-						{
-						case CompareOp::FCmpOEQ: return CompareOp::FCmpOEQ;
-						case CompareOp::FCmpONE: return CompareOp::FCmpONE;
-						case CompareOp::FCmpOGT: return CompareOp::FCmpOLT;
-						case CompareOp::FCmpOGE: return CompareOp::FCmpOLE;
-						case CompareOp::FCmpOLT: return CompareOp::FCmpOGT;
-						case CompareOp::FCmpOLE: return CompareOp::FCmpOGE;
-						case CompareOp::FCmpUEQ: return CompareOp::FCmpUEQ;
-						case CompareOp::FCmpUNE: return CompareOp::FCmpUNE;
-						case CompareOp::FCmpUGT: return CompareOp::FCmpULT;
-						case CompareOp::FCmpUGE: return CompareOp::FCmpULE;
-						case CompareOp::FCmpULT: return CompareOp::FCmpUGT;
-						case CompareOp::FCmpULE: return CompareOp::FCmpUGE;
-						}
-						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
-						return CompareOp::FCmpOEQ;
-					};
-
-					MI.SetOp<0>(op1).SetOp<1>(op2);
-					if (op1.IsImmediate())
-					{
-						OLA_ASSERT(!op2.IsImmediate());
-						MI.SetOp<0>(op2);
-						MI.SetOp<1>(op1);
-						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Other);
+					case CompareOp::FCmpOEQ: return ARM64_InstCsetEQ;
+					case CompareOp::FCmpONE: return ARM64_InstCsetNE;
+					case CompareOp::FCmpOGT: return ARM64_InstCsetGT;
+					case CompareOp::FCmpOGE: return ARM64_InstCsetGE;
+					case CompareOp::FCmpOLT: return ARM64_InstCsetLT;
+					case CompareOp::FCmpOLE: return ARM64_InstCsetLE;
 					}
+					OLA_ASSERT_MSG(false, "Invalid compare operation!");
+					return ARM64_InstCset;
+				};
 
-					MachineInstruction cset(ARM64_InstCset);
-					cset.SetOp<0>(dst);
-					cset.SetOp<1>(compare_op);
-					instructions.insert(++instruction_iter, cset);
+				MachineInstruction MI2(GetCsetCondition(compare_op));
+				MI2.SetOp<0>(dst);
+				instructions.insert(++instruction_iter, MI2);
+			}
+			break;
 
-					MachineInstruction andInst(InstAnd);
-					andInst.SetOp<0>(dst);
-					andInst.SetOp<1>(MachineOperand::Immediate(1, MachineType::Int8));
-					instructions.insert(instruction_iter++, andInst);
+			case InstCMoveEQ:
+			case InstCMoveNE:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);
+					MI.SetOp<1>(tmp);
+					instructions.insert(instruction_iter, MI2);
 				}
 			}
 			break;
-			default:
-				break;
 			}
 		}
 
 		virtual void PostLegalizeInstruction(InstLegalizeContext& legalize_ctx) const override
 		{
+			MachineInstruction& MI = legalize_ctx.instruction;
+			auto& instructions = legalize_ctx.instructions;
+			auto& instruction_iter = legalize_ctx.instruction_iterator;
+
+			auto GetScratchReg = [&legalize_ctx](MachineType type)
+			{
+				if (type == MachineType::Float64)
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetFPScratchRegister(), type);
+				}
+				else
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetGPScratchRegister(), type);
+				}
+			};
+
+			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+
+				if (dst.IsMemoryOperand() && src.IsMemoryOperand())
+				{
+					auto scratch = GetScratchReg(dst.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(scratch);
+					MI2.SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(scratch);
+					MI.SetOpcode(InstStore);
+				}
+			}
 		}
 	};
 
