@@ -13,7 +13,10 @@ namespace ola
 
 	IRModule::~IRModule()
 	{
-		for (GlobalValue* GV : globals) delete GV;
+		for (GlobalValue* GV : globals)
+		{
+			delete GV;
+		}
 	}
 
 	

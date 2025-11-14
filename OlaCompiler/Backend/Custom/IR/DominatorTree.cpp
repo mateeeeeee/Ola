@@ -37,7 +37,10 @@ namespace ola
 					{
 						return idoms.contains(pred) && idoms[pred].dominator != invalid_dom;
 					});
-				if (res == end(predecessors)) continue;
+				if (res == end(predecessors)) 
+				{
+					continue;
+				}
 
 				BasicBlock* idom = *res;
 				Uint64 idom_idx = idoms[idom].postorder_index;
@@ -45,11 +48,17 @@ namespace ola
 				// all other predecessors
 				for (auto* p : predecessors) 
 				{
-					if (idom == p) continue;
+					if (idom == p)
+					{
+						continue;
+					}
 					// Only consider nodes reachable in the forward traversal.
 					// Otherwise the intersection doesn't make sense and will never
 					// terminate.
-					if (!idoms.contains(p)) continue;
+					if (!idoms.contains(p))
+					{
+						continue;
+					}
 					if (idoms[p].dominator != invalid_dom) 
 					{
 						Uint64 finger1 = idoms[p].postorder_index;
@@ -145,7 +154,10 @@ namespace ola
 
 	void DominatorTree::ResetDepthFirstIndicesRecursive(DominatorTreeNode* node, Int& index)
 	{
-		if (!node) return;
+		if (!node)
+		{
+			return;
+		}
 
 		node->dfs_preorder_index = ++index;
 		for (DominatorTreeNode* child : *node)
@@ -161,7 +173,11 @@ namespace ola
 		std::function<void(BasicBlock*, std::set<BasicBlock const*>&)> DFSPostOrder =
 			[&](BasicBlock* node, std::set<BasicBlock const*>& visited)
 			{
-				if (!node || visited.count(node)) return;
+				if (!node || visited.count(node)) 
+				{
+					return;
+				}
+
 				visited.insert(node);
 				for (auto* succ : cfg.GetSuccessors(node))
 				{ 

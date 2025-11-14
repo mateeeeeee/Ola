@@ -59,7 +59,10 @@ namespace ola
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
 		param_decl->SetType(type);
-		if (!name.empty()) sema_ctx.decl_sym_table.Insert(param_decl.get());
+		if (!name.empty())
+		{
+			sema_ctx.decl_sym_table.Insert(param_decl.get());
+		}
 		return param_decl;
 	}
 
@@ -263,7 +266,10 @@ namespace ola
 		}
 		UniqueEnumDeclPtr enum_decl = MakeUnique<EnumDecl>(name, loc);
 		enum_decl->SetEnumMembers(std::move(enum_members));
-		if (!name.empty()) sema_ctx.tag_sym_table.Insert(enum_decl.get());
+		if (!name.empty())
+		{
+			sema_ctx.tag_sym_table.Insert(enum_decl.get());
+		}
 		return enum_decl;
 	}
 
@@ -487,7 +493,10 @@ namespace ola
 				return nullptr;
 			}
 		}
-		else var_decl->SetType(array_type->GetElementType());
+		else
+		{
+			var_decl->SetType(array_type->GetElementType());
+		}
 		var_decl->SetInitExpr(ActOnArrayAccessExpr(loc, std::move(array_identifier), MakeUnique<DeclRefExpr>(foreach_index_decl.get(), loc)));
 
 		UniqueStmtPtr init_stmt = MakeUnique<DeclStmt>(std::move(foreach_index_decl));
@@ -530,7 +539,10 @@ namespace ola
 
 	UniqueCaseStmtPtr Sema::ActOnCaseStmt(SourceLocation const& loc, UniqueExprPtr&& case_expr)
 	{
-		if (sema_ctx.case_callback_stack.empty()) diagnostics.Report(loc, case_stmt_outside_switch);
+		if (sema_ctx.case_callback_stack.empty())
+		{
+			diagnostics.Report(loc, case_stmt_outside_switch);
+		}
 
 		UniqueCaseStmtPtr case_stmt = nullptr;
 		if (!case_expr)
@@ -539,7 +551,10 @@ namespace ola
 		}
 		else
 		{
-			if (!case_expr->IsConstexpr()) diagnostics.Report(case_value_not_constexpr);
+			if (!case_expr->IsConstexpr())
+			{
+				diagnostics.Report(case_value_not_constexpr);
+			}
 			case_stmt = MakeUnique<CaseStmt>(case_expr->EvaluateConstexpr());
 		}
 		sema_ctx.case_callback_stack.back()(case_stmt.get());
@@ -559,7 +574,7 @@ namespace ola
 					diagnostics.Report(loc, duplicate_default_case);
 					return nullptr;
 				}
-				else default_found = true;
+				default_found = true;
 			}
 			else
 			{
@@ -569,7 +584,7 @@ namespace ola
 					diagnostics.Report(loc, duplicate_case_value, case_value);
 					return nullptr;
 				}
-				else case_value_found[case_value] = true;
+				case_value_found[case_value] = true;
 			}
 		}
 
@@ -846,8 +861,14 @@ namespace ola
 		}
 
 		QualType expr_type{};
-		if (true_type.GetTypePtr() == false_type.GetTypePtr()) expr_type = true_type;
-		else diagnostics.Report(loc, ternary_expr_types_incompatible);
+		if (true_type.GetTypePtr() == false_type.GetTypePtr())
+		{
+			expr_type = true_type;
+		}
+		else
+		{
+			diagnostics.Report(loc, ternary_expr_types_incompatible);
+		}
 
 		UniqueTernaryExprPtr ternary_expr = MakeUnique<TernaryExpr>(loc);
 		ternary_expr->SetType(expr_type);
@@ -866,7 +887,10 @@ namespace ola
 			std::vector<FunctionDecl const*> candidate_decls{};
 			for (Decl* decl : found_decls)
 			{
-				if (isoneof<FunctionDecl, MethodDecl>(decl)) candidate_decls.push_back(cast<FunctionDecl>(decl));
+				if (isoneof<FunctionDecl, MethodDecl>(decl))
+				{
+					candidate_decls.push_back(cast<FunctionDecl>(decl));
+				}
 			}
 
 			std::vector<FunctionDecl const*> match_decls = ResolveCall(candidate_decls, args);
@@ -911,7 +935,10 @@ namespace ola
 				method_call_expr->SetType(match_func_type->GetReturnType());
 				method_call_expr->SetArgs(std::move(args));
 				method_call_expr->SetCallee(std::move(member_expr));
-				if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+				if (isa<RefType>(method_call_expr->GetType()))
+				{
+					method_call_expr->SetLValue();
+				}
 				return method_call_expr;
 			}
 			else
@@ -920,7 +947,10 @@ namespace ola
 				func_call_expr->SetType(match_func_type->GetReturnType());
 				func_call_expr->SetArgs(std::move(args));
 				func_call_expr->SetCallee(MakeUnique<DeclRefExpr>(match_decl, loc));
-				if (isa<RefType>(func_call_expr->GetType())) func_call_expr->SetLValue();
+				if (isa<RefType>(func_call_expr->GetType()))
+				{
+					func_call_expr->SetLValue();
+				}
 				return func_call_expr;
 			}
 		}
@@ -939,7 +969,13 @@ namespace ola
 
 			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(sema_ctx.current_class_name);
 			std::vector<ConstructorDecl const*> candidate_decls;
-			for(Decl* decl : decls) if (isa<ConstructorDecl>(decl)) candidate_decls.push_back(cast<ConstructorDecl>(decl));
+			for (Decl* decl : decls)
+			{
+				if (isa<ConstructorDecl>(decl))
+				{
+					candidate_decls.push_back(cast<ConstructorDecl>(decl));
+				}
+			}
 			std::vector<ConstructorDecl const*> match_decls = ResolveCall(candidate_decls, args);
 
 			if (match_decls.empty())
@@ -980,7 +1016,11 @@ namespace ola
 			method_call_expr->SetType(match_func_type->GetReturnType());
 			method_call_expr->SetArgs(std::move(args));
 			method_call_expr->SetCallee(std::move(member_expr));
-			if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+
+			if (isa<RefType>(method_call_expr->GetType()))
+			{
+				method_call_expr->SetLValue();
+			}
 			return method_call_expr;
 		}
 		else if (isa<SuperExpr>(func_expr.get()))
@@ -1036,7 +1076,10 @@ namespace ola
 			method_call_expr->SetType(match_func_type->GetReturnType());
 			method_call_expr->SetArgs(std::move(args));
 			method_call_expr->SetCallee(std::move(member_expr));
-			if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+			if (isa<RefType>(method_call_expr->GetType()))
+			{
+				method_call_expr->SetLValue();
+			}
 			return method_call_expr;
 		}
 		diagnostics.Report(loc, invalid_function_call);
@@ -1109,7 +1152,10 @@ namespace ola
 			if (ClassDecl const* base_class_decl = sema_ctx.current_base_class)
 			{
 				std::vector<MethodDecl const*> method_decls = base_class_decl->FindMethodDecls(name);
-				if (!method_decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+				if (!method_decls.empty())
+				{
+					return MakeUnique<IdentifierExpr>(name, loc);
+				}
 			}
 		}
 		else
@@ -1117,8 +1163,14 @@ namespace ola
 			if (Decl* decl = sema_ctx.decl_sym_table.LookUp(name))
 			{
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
-				if (decl->IsMember()) return ActOnFieldAccess(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
-				else return decl_ref;
+				if (decl->IsMember())
+				{
+					return ActOnFieldAccess(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
+				}
+				else
+				{
+					return decl_ref;
+				}
 			}
 			else if (ClassDecl const* base_class_decl = sema_ctx.current_base_class)
 			{
@@ -1164,7 +1216,10 @@ namespace ola
 				if (overloaded_symbol)
 				{
 					std::vector<MethodDecl const*> method_decls = class_decl->FindMethodDecls(name);
-					if (!method_decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+					if (!method_decls.empty())
+					{
+						return MakeUnique<IdentifierExpr>(name, loc);
+					}
 				}
 				else
 				{
@@ -1180,7 +1235,10 @@ namespace ola
 				if (overloaded_symbol)
 				{
 					std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(name);
-					if (!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+					if (!decls.empty())
+					{
+						return MakeUnique<IdentifierExpr>(name, loc);
+					}
 				}
 				else
 				{
@@ -1196,7 +1254,10 @@ namespace ola
 				if (overloaded_symbol)
 				{
 					std::vector<MethodDecl const*> decls = base_class_decl->FindMethodDecls(name);
-					if (!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
+					if (!decls.empty())
+					{
+						return MakeUnique<IdentifierExpr>(name, loc);
+					}
 				}
 				else
 				{
@@ -1294,7 +1355,10 @@ namespace ola
 
 		Bool const class_type_is_const = class_expr->GetType().IsConst();
 		QualType expr_type = field_name->GetType();
-		if (class_type_is_const) expr_type.AddConst();
+		if (class_type_is_const)
+		{
+			expr_type.AddConst();
+		}
 
 		UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
 		member_expr->SetClassExpr(std::move(class_expr));
@@ -1383,7 +1447,10 @@ namespace ola
 		method_call_expr->SetType(match_decl_type->GetReturnType());
 		method_call_expr->SetArgs(std::move(args));
 		method_call_expr->SetCallee(std::move(member_expr));
-		if (isa<RefType>(method_call_expr->GetType())) method_call_expr->SetLValue();
+		if (isa<RefType>(method_call_expr->GetType()))
+		{
+			method_call_expr->SetLValue();
+		}
 		return method_call_expr;
 	}
 
@@ -1617,8 +1684,14 @@ namespace ola
 		else if ((has_init && !has_type_specifier))
 		{
 			QualType var_type(init_expr->GetType());
-			if (is_ref_type) var_type = RefType::Get(ctx, var_type);
-			if (type.IsConst()) var_type.AddConst();
+			if (is_ref_type)
+			{
+				var_type = RefType::Get(ctx, var_type);
+			}
+			if (type.IsConst())
+			{
+				var_type.AddConst();
+			}
 			var_decl->SetType(var_type);
 		}
 		else
@@ -1669,7 +1742,10 @@ namespace ola
 		{
 			FuncType const* func_type = decl->GetFuncType();
 			std::span<QualType const> param_types = func_type->GetParams();
-			if (args.size() != param_types.size()) continue;
+			if (args.size() != param_types.size())
+			{
+				continue;
+			}
 
 			Bool incompatible_arg = false;
 			for (Uint64 i = 0; i < param_types.size(); ++i)
@@ -1687,7 +1763,10 @@ namespace ola
 					break;
 				}
 			}
-			if (incompatible_arg) continue;
+			if (incompatible_arg)
+			{
+				continue;
+			}
 
 			Uint32 current_conversions_needed = 0;
 			for (Uint64 i = 0; i < param_types.size(); ++i)

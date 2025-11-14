@@ -63,7 +63,10 @@ namespace ola
 			++param_arg;
 		}
 
-		if (!function_decl.HasDefinition()) return;
+		if (!function_decl.HasDefinition())
+		{
+			return;
+		}
 		
 		VisitFunctionDeclCommon(function_decl, llvm_function);
 	}
@@ -257,8 +260,14 @@ namespace ola
 						llvm::Type* init_expr_type = ConvertToIRType(init_expr->GetType());
 						llvm::AllocaInst* alloc = builder.CreateAlloca(GetPointerType(llvm_element_type), nullptr);
 						llvm::Value* ptr = nullptr;
-						if (init_expr_type->isArrayTy()) ptr = builder.CreateInBoundsGEP(init_expr_type, value_map[init_expr], { zero, zero });
-						else ptr = builder.CreateLoad(init_expr_type, value_map[init_expr]);
+						if (init_expr_type->isArrayTy())
+						{
+							ptr = builder.CreateInBoundsGEP(init_expr_type, value_map[init_expr], { zero, zero });
+						}
+						else
+						{
+							ptr = builder.CreateLoad(init_expr_type, value_map[init_expr]);
+						}
 						builder.CreateStore(ptr, alloc);
 						value_map[&var_decl] = alloc;
 					}
@@ -410,7 +419,10 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(EnumDecl const& enum_decl, Uint32)
 	{
-		for (auto const& enum_member : enum_decl.GetEnumMembers()) enum_member->Accept(*this);
+		for (auto const& enum_member : enum_decl.GetEnumMembers())
+		{
+			enum_member->Accept(*this);
+		}
 	}
 
 	void LLVMIRVisitor::Visit(EnumMemberDecl const& enum_member_decl, Uint32)
@@ -425,8 +437,14 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(ClassDecl const& class_decl, Uint32)
 	{
-		for (auto& field  : class_decl.GetFields()) field->Accept(*this);
-		for (auto& method : class_decl.GetMethods()) method->Accept(*this);
+		for (auto& field : class_decl.GetFields())
+		{
+			field->Accept(*this);
+		}
+		for (auto& method : class_decl.GetMethods())
+		{
+			method->Accept(*this);
+		}
 
 		if (class_decl.IsPolymorphic())
 		{
@@ -442,7 +460,10 @@ namespace ola
 					llvm::Function* method_fn = cast<llvm::Function>(method_value);
 					vtable_function_ptrs.push_back(method_fn);
 				}
-				else vtable_function_ptrs.push_back(llvm::Constant::getNullValue(GetPointerType(void_type)));
+				else
+				{
+					vtable_function_ptrs.push_back(llvm::Constant::getNullValue(GetPointerType(void_type)));
+				}
 			}
 
 			std::string vtable_name = "VTable_";
@@ -462,17 +483,26 @@ namespace ola
 
 	void LLVMIRVisitor::Visit(CompoundStmt const& compound_stmt, Uint32)
 	{
-		for (auto const& stmt : compound_stmt.GetStmts()) stmt->Accept(*this);
+		for (auto const& stmt : compound_stmt.GetStmts())
+		{
+			stmt->Accept(*this);
+		}
 	}
 
 	void LLVMIRVisitor::Visit(DeclStmt const& decl_stmt, Uint32)
 	{
-		for(auto const& decl : decl_stmt.GetDecls())  decl->Accept(*this);
+		for (auto const& decl : decl_stmt.GetDecls())
+		{
+			decl->Accept(*this);
+		}
 	}
 
 	void LLVMIRVisitor::Visit(ExprStmt const& expr_stmt, Uint32)
 	{
-		if (expr_stmt.GetExpr()) expr_stmt.GetExpr()->Accept(*this);
+		if (expr_stmt.GetExpr())
+		{
+			expr_stmt.GetExpr()->Accept(*this);
+		}
 	}
 
 	void LLVMIRVisitor::Visit(NullStmt const& null_stmt, Uint32) {}
@@ -513,12 +543,18 @@ namespace ola
 
 		end_blocks.push_back(end_block);
 		then_stmt->Accept(*this);
-		if(!then_block->getTerminator()) builder.CreateBr(end_block);
+		if (!then_block->getTerminator())
+		{
+			builder.CreateBr(end_block);
+		}
 		if (else_stmt)
 		{
 			builder.SetInsertPoint(else_block);
 			else_stmt->Accept(*this);
-			if (!else_block->getTerminator()) builder.CreateBr(end_block);
+			if (!else_block->getTerminator())
+			{
+				builder.CreateBr(end_block);
+			}
 		}
 		end_blocks.pop_back();
 
@@ -555,7 +591,10 @@ namespace ola
 		llvm::BasicBlock* iter_block = llvm::BasicBlock::Create(context, "for.iter", function, exit_block);
 		llvm::BasicBlock* end_block  = llvm::BasicBlock::Create(context, "for.end", function, exit_block);
 
-		if (init_stmt) init_stmt->Accept(*this);
+		if (init_stmt)
+		{
+			init_stmt->Accept(*this);
+		}
 		builder.CreateBr(cond_block);
 
 		builder.SetInsertPoint(cond_block);
@@ -584,7 +623,10 @@ namespace ola
 		builder.CreateBr(iter_block);
 
 		builder.SetInsertPoint(iter_block);
-		if (iter_expr) iter_expr->Accept(*this);
+		if (iter_expr)
+		{
+			iter_expr->Accept(*this);
+		}
 		builder.CreateBr(cond_block);
 
 		builder.SetInsertPoint(end_block);
@@ -1122,8 +1164,14 @@ namespace ola
 			llvm::Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
 			llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
-			if (arg_type->isPointerTy()) args.push_back(arg_value);
-			else args.push_back(Load(arg_type, arg_value));
+			if (arg_type->isPointerTy())
+			{
+				args.push_back(arg_value);
+			}
+			else
+			{
+				args.push_back(Load(arg_type, arg_value));
+			}
 			
 			arg_index++;
 		}
@@ -1135,7 +1183,11 @@ namespace ola
 	void LLVMIRVisitor::Visit(InitializerListExpr const& initializer_list_expr, Uint32)
 	{
 		UniqueExprPtrList const& init_expr_list = initializer_list_expr.GetInitList();
-		for (auto const& element_expr : init_expr_list) element_expr->Accept(*this);
+		for (auto const& element_expr : init_expr_list)
+		{
+			element_expr->Accept(*this);
+		}
+
 		if (initializer_list_expr.IsConstexpr())
 		{
 			ArrayType const* array_type = cast<ArrayType>(initializer_list_expr.GetType());
@@ -1145,8 +1197,14 @@ namespace ola
 			std::vector<llvm::Constant*> array_init_list(array_type->GetArraySize());
 			for (Uint64 i = 0; i < array_type->GetArraySize(); ++i)
 			{
-				if (i < init_expr_list.size())  array_init_list[i] = llvm::dyn_cast<llvm::Constant>(value_map[init_expr_list[i].get()]);
-				else array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
+				if (i < init_expr_list.size())
+				{
+					array_init_list[i] = llvm::dyn_cast<llvm::Constant>(value_map[init_expr_list[i].get()]);
+				}
+				else
+				{
+					array_init_list[i] = llvm::Constant::getNullValue(llvm_element_type);
+				}
 			}
 			llvm::Constant* constant_array = llvm::ConstantArray::get(llvm::dyn_cast<llvm::ArrayType>(llvm_array_type), array_init_list);
 			value_map[&initializer_list_expr] = constant_array;
@@ -1315,9 +1373,18 @@ namespace ola
 
 	void LLVMIRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
 	{
-		if (func_decl.IsInline()) func->addFnAttr(llvm::Attribute::AlwaysInline);
-		else if (func_decl.IsNoInline()) func->addFnAttr(llvm::Attribute::NoInline);
-		if (func_decl.IsNoOpt()) func->addFnAttr(llvm::Attribute::OptimizeNone);
+		if (func_decl.IsInline())
+		{
+			func->addFnAttr(llvm::Attribute::AlwaysInline);
+		}
+		else if (func_decl.IsNoInline())
+		{
+			func->addFnAttr(llvm::Attribute::NoInline);
+		}
+		if (func_decl.IsNoOpt())
+		{
+			func->addFnAttr(llvm::Attribute::OptimizeNone);
+		}
 
 		llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(context, "entry", func);
 		builder.SetInsertPoint(entry_block);
@@ -1338,7 +1405,10 @@ namespace ola
 			}
 		}
 
-		if (!func->getReturnType()->isVoidTy()) return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
+		if (!func->getReturnType()->isVoidTy())
+		{
+			return_value = builder.CreateAlloca(func->getReturnType(), nullptr);
+		}
 		exit_block = llvm::BasicBlock::Create(context, "exit", func);
 
 		auto const& labels = func_decl.GetLabels();
@@ -1352,18 +1422,32 @@ namespace ola
 		func_decl.GetBodyStmt()->Accept(*this);
 
 		builder.SetInsertPoint(exit_block);
-		if (!func->getReturnType()->isVoidTy()) builder.CreateRet(Load(func->getReturnType(), return_value));
-		else builder.CreateRetVoid();
+		if (!func->getReturnType()->isVoidTy())
+		{
+			builder.CreateRet(Load(func->getReturnType(), return_value));
+		}
+		else
+		{
+			builder.CreateRetVoid();
+		}
 
 		std::vector<llvm::BasicBlock*> empty_blocks{};
-		for (auto&& block : *func) if (block.empty()) empty_blocks.push_back(&block);
+		for (auto&& block : *func)
+		{
+			if (block.empty())
+			{
+				empty_blocks.push_back(&block);
+			}
+		}
 
 		for (llvm::BasicBlock* empty_block : empty_blocks)
 		{
 			builder.SetInsertPoint(empty_block);
 			builder.CreateAlloca(llvm::IntegerType::get(context, 1), nullptr, "nop");
 			if (empty_block_successors.contains(empty_block))
-				 builder.CreateBr(empty_block_successors[empty_block]);
+			{
+				builder.CreateBr(empty_block_successors[empty_block]);
+			}
 			else builder.CreateBr(exit_block);
 		}
 
@@ -1436,8 +1520,14 @@ namespace ola
 		case TypeKind::Array:
 		{
 			ArrayType const* array_type = cast<ArrayType>(type);
-			if (array_type->GetArraySize() > 0) return llvm::ArrayType::get(ConvertToIRType(array_type->GetElementType()), array_type->GetArraySize());
-			else return GetPointerType(ConvertToIRType(array_type->GetElementType()));
+			if (array_type->GetArraySize() > 0)
+			{
+				return llvm::ArrayType::get(ConvertToIRType(array_type->GetElementType()), array_type->GetArraySize());
+			}
+			else
+			{
+				return GetPointerType(ConvertToIRType(array_type->GetElementType()));
+			}
 		}
 		case TypeKind::Function:
 		{
@@ -1448,7 +1538,10 @@ namespace ola
 			Bool return_type_struct = return_type->isStructTy();
 
 			std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
-			if (return_type_struct) param_types.push_back(return_type->getPointerTo());
+			if (return_type_struct)
+			{
+				param_types.push_back(return_type->getPointerTo());
+			}
 
 			for (auto const& func_param_type : function_params)
 			{
@@ -1478,10 +1571,12 @@ namespace ola
 		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*>;
 		static LLVMStructTypeMap struct_type_map;
 
-		if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
+		if (struct_type_map.contains(class_decl))
+		{
+			return struct_type_map[class_decl];
+		}
 
 		llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
-
 		UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 		std::vector<llvm::Type*> llvm_member_types;
 		if (class_decl->IsPolymorphic())
@@ -1491,10 +1586,16 @@ namespace ola
 		ClassDecl const* curr_class_decl = class_decl;
 		while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 		{
-			for (auto const& field : base_class_decl->GetFields()) llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+			for (auto const& field : base_class_decl->GetFields())
+			{
+				llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+			}
 			curr_class_decl = base_class_decl;
 		}
-		for (auto const& field : fields) llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+		for (auto const& field : fields)
+		{
+			llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+		}
 		llvm_class_type->setBody(llvm_member_types, false);
 		struct_type_map[class_decl] = llvm_class_type;
 		return llvm_class_type;
@@ -1508,7 +1609,10 @@ namespace ola
 		Bool return_type_struct = return_type->isStructTy();
 
 		std::vector<llvm::Type*> param_types; param_types.reserve(function_params.size());
-		if (return_type_struct) param_types.push_back(return_type->getPointerTo());
+		if (return_type_struct)
+		{
+			param_types.push_back(return_type->getPointerTo());
+		}
 
 		param_types.push_back(class_type->getPointerTo());
 		for (auto const& func_param_type : function_params)
@@ -1525,16 +1629,19 @@ namespace ola
 		{
 			return ConvertToIRType(class_expr_type);
 		}
-		else if (isa<RefType>(class_expr_type))
+		if (isa<RefType>(class_expr_type))
 		{
 			RefType const* ref_type = cast<RefType>(class_expr_type);
 			if (isa<ClassType>(ref_type->GetReferredType()))
 			{
 				return ConvertToIRType(ref_type->GetReferredType());
 			}
-			else return nullptr;
+			return nullptr;
 		}
-		else return nullptr;
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	llvm::PointerType* LLVMIRVisitor::GetPointerType(llvm::Type* type)
@@ -1546,8 +1653,13 @@ namespace ola
 	{
 		llvm::Type* llvm_type = nullptr;
 		if (RefType const* ref_type = dyn_cast<RefType>(type))
-			 llvm_type = ConvertToIRType(ref_type->GetReferredType());
-		else llvm_type = ConvertToIRType(type);
+		{
+			llvm_type = ConvertToIRType(ref_type->GetReferredType());
+		}
+		else
+		{
+			llvm_type = ConvertToIRType(type);
+		}
 		return Load(llvm_type, ptr);
 	}
 

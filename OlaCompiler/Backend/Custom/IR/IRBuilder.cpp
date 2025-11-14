@@ -71,8 +71,15 @@ namespace ola
 		{
 			block->SetName(name);
 		}
-		if (before) blocks.Insert(before->GetIterator(), block);
-		else		blocks.PushBack(block);
+
+		if (before)
+		{
+			blocks.Insert(before->GetIterator(), block);
+		}
+		else
+		{
+			blocks.PushBack(block);
+		}
 		return block;
 	}
 

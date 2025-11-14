@@ -13,7 +13,7 @@ namespace ola
 		return pointee_type->GetContext().GetPointerType(pointee_type);
 	}
 
-	IRPtrType* IRPtrType::Get(IRContext& ctx, IRType* pointee_type /*= nullptr*/)
+	IRPtrType* IRPtrType::Get(IRContext& ctx, IRType* pointee_type)
 	{
 		return ctx.GetPointerType(pointee_type);
 	}
@@ -62,10 +62,19 @@ namespace ola
 		{
 			offset = AlignTo(offset, member_type->GetAlign());
 			offset += member_type->GetSize();
-			if (GetAlign() < member_type->GetAlign()) SetAlign(member_type->GetAlign());
+			if (GetAlign() < member_type->GetAlign())
+			{
+				SetAlign(member_type->GetAlign());
+			}
 		}
-		if (offset == 0) offset = 1;
-		if (GetAlign()) offset = AlignTo(offset, GetAlign());
+		if (offset == 0)
+		{
+			offset = 1;
+		}
+		if (GetAlign())
+		{
+			offset = AlignTo(offset, GetAlign());
+		}
 		SetSize(offset);
 	}
 

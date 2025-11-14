@@ -9,7 +9,7 @@ namespace ola
 	using UniquePtr = std::unique_ptr<T>;
 
 	template<typename Type, typename... Args>
-	inline UniquePtr<Type> MakeUnique(Args&&... args)
+	OLA_FORCEINLINE UniquePtr<Type> MakeUnique(Args&&... args)
 	{
 		return std::make_unique<Type>(std::forward<Args>(args)...);
 	}

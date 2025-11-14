@@ -72,7 +72,10 @@ namespace ola
 			TokenPtr start_token = current_token;
 			do
 			{
-				if (current_token->IsNot(TokenKind::identifier)) diagnostics.Report(current_token->GetLocation(), unexpected_token);
+				if (current_token->IsNot(TokenKind::identifier))
+				{
+					diagnostics.Report(current_token->GetLocation(), unexpected_token);
+				}
 				++current_token;
 			} while (Consume(TokenKind::period));
 			Expect(TokenKind::semicolon);
@@ -107,7 +110,9 @@ namespace ola
 		for (auto const& token : tokens)
 		{
 			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline))
+			{
 				preprocessed_tokens.push_back(token);
+			}
 		}
 		std::swap(preprocessed_tokens, tokens);
 	}
@@ -117,9 +122,11 @@ namespace ola
 		std::vector<Token> preprocessed_tokens{};
 		for (auto const& token : tokens)
 		{
-			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline, TokenKind::KW_import) 
-			 && !token.HasFlag(TokenFlag_PartOfImportDirective))
+			if (!token.IsOneOf(TokenKind::comment, TokenKind::newline, TokenKind::KW_import)
+				&& !token.HasFlag(TokenFlag_PartOfImportDirective))
+			{
 				preprocessed_tokens.push_back(token);
+			}
 		}
 		std::swap(preprocessed_tokens, tokens);
 	}

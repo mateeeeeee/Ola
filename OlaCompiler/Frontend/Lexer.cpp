@@ -26,9 +26,15 @@ namespace ola
 			if (!tokens.empty())
 			{
 				auto const& prev_token = tokens.back();
-				if (prev_token.Is(TokenKind::newline)) current_token.SetFlag(TokenFlag_BeginningOfLine);
+				if (prev_token.Is(TokenKind::newline))
+				{
+					current_token.SetFlag(TokenFlag_BeginningOfLine);
+				}
 			}
-			else current_token.SetFlag(TokenFlag_BeginningOfLine);
+			else
+			{
+				current_token.SetFlag(TokenFlag_BeginningOfLine);
+			}
 
 			tokens.push_back(current_token);
 		} while (current_token.IsNot(TokenKind::eof));
@@ -128,7 +134,10 @@ namespace ola
 		{
 			tmp_ptr++;
 			Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c); });
-			if (std::isalpha(*tmp_ptr)) return false;
+			if (std::isalpha(*tmp_ptr)) 
+			{
+				return false;
+			}
 			FillToken(t, TokenKind::float_number, tmp_ptr);
 			UpdatePointersAndLocation();
 			return true;

@@ -17,7 +17,10 @@ namespace ola
 				Value* V = value->GetOperand(idx);
 				return PatternMatchContext<Value>(V);
 			}
-			else return PatternMatchContext<Value>(nullptr);
+			else
+			{
+				return PatternMatchContext<Value>(nullptr);
+			}
 		}
 		ValueT* value;
 	};
@@ -230,9 +233,18 @@ namespace ola
 
 		OLA_NODISCARD Bool TryMatch(PatternMatchContext<BinaryInst> const& ctx) const
 		{
-			if (inst_opcode != ctx.value->GetOpcode()) return false;
-			if (left_operand_matcher(ctx.GetOperandContext(0)) && right_operand_matcher(ctx.GetOperandContext(1))) return true;
-			if constexpr (Commutative) return left_operand_matcher(ctx.GetOperandContext(1)) && right_operand_matcher(ctx.GetOperandContext(0));
+			if (inst_opcode != ctx.value->GetOpcode())
+			{
+				return false;
+			}
+			if (left_operand_matcher(ctx.GetOperandContext(0)) && right_operand_matcher(ctx.GetOperandContext(1)))
+			{
+				return true;
+			}
+			if constexpr (Commutative)
+			{
+				return left_operand_matcher(ctx.GetOperandContext(1)) && right_operand_matcher(ctx.GetOperandContext(0));
+			}
 			return false;
 		}
 

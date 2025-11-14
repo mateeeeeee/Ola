@@ -11,6 +11,7 @@ namespace ola
 	class ImportProcessor
 	{
 		using TokenPtr = std::vector<Token>::iterator;
+
 	public:
 		ImportProcessor(FrontendContext* context, Diagnostics& diagnostics);
 		void ProcessImports(std::vector<Token>&& tokens);

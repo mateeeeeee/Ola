@@ -9,12 +9,18 @@ namespace ola
 	{
 		if (isa<GlobalValue>(V))
 		{
-			if (!global_name_map.contains(V)) RegisterValue(V);
+			if (!global_name_map.contains(V))
+			{
+				RegisterValue(V);
+			}
 			return global_name_map[V];
 		}
 		else
 		{
-			if (!local_name_map.contains(V)) RegisterValue(V);
+			if (!local_name_map.contains(V))
+			{
+				RegisterValue(V);
+			}
 			return local_name_map[V];
 		}
 	}
@@ -30,7 +36,10 @@ namespace ola
 		if (isa<GlobalValue>(V))
 		{
 			std::string prefixed_name = GetPrefixedName(V);
-			if (global_name_map.contains(V)) return;
+			if (global_name_map.contains(V))
+			{
+				return;
+			}
 
 			if (global_slot_map.contains(prefixed_name))
 			{
@@ -47,7 +56,10 @@ namespace ola
 		else
 		{
 			std::string prefixed_name = GetPrefixedName(V);
-			if (local_name_map.contains(V)) return;
+			if (local_name_map.contains(V)) 
+			{
+				return;
+			}
 
 			if (local_slot_map.contains(prefixed_name))
 			{
@@ -58,7 +70,10 @@ namespace ola
 			{
 				local_slot_map[prefixed_name]++;
 				local_name_map[V] = prefixed_name;
-				if (prefixed_name.size() <= 1) local_name_map[V] += "0";
+				if (prefixed_name.size() <= 1)
+				{
+					local_name_map[V] += "0";
+				}
 			}
 		}
 	}
@@ -130,7 +145,10 @@ namespace ola
 				Emit(" %{}", F->GetArg(i)->GetName());
 				Emit(",");
 			}
-			if (param_count > 0) PopOutput<1>();
+			if (param_count > 0)
+			{
+				PopOutput<1>();
+			}
 			Emit(")");
 		}
 		EmitLn(" {{");
@@ -194,7 +212,10 @@ namespace ola
 				PrintOperand(Phi->GetIncomingBlock(i), false);
 				Emit(" ], ");
 			}
-			if (I.GetNumOperands() > 0) PopOutput<2>();
+			if (I.GetNumOperands() > 0)
+			{
+				PopOutput<2>();
+			}
 
 		}
 		else if (I.GetNumOperands() > 0)
@@ -222,7 +243,10 @@ namespace ola
 				PrintOperand(Op.GetValue(), print_all_types);
 				Emit(", ");
 			}
-			if(I.GetNumOperands() > 0) PopOutput<2>();
+			if (I.GetNumOperands() > 0)
+			{
+				PopOutput<2>();
+			}
 		}
 		EmitNewline();
 	}
@@ -252,15 +276,19 @@ namespace ola
 
 	void PrinterBase::PrintConstant(Constant const* V)
 	{
-		if (!V) return;
+		if (!V)
+		{
+			return;
+		}
+
 		OLA_ASSERT(isa<Constant>(V));
 		Constant const* C = cast<Constant>(V);
 		ConstantID const_id = C->GetConstantID();
 		switch (const_id)
 		{
-		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue()); break;
-		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue()); break;
-		case ConstantID::String:	 Emit("{}", cast<ConstantString>(C)->GetValue()); break;
+		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue());	break;
+		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue());		break;
+		case ConstantID::String:	 Emit("{}", cast<ConstantString>(C)->GetValue());	break;
 		case ConstantID::Array:
 		{
 			ConstantArray const* CA = cast<ConstantArray>(C);
@@ -282,9 +310,9 @@ namespace ola
 		std::string type_string;
 		switch (type->GetKind())
 		{
-		case IRTypeKind::Void:		Emit("void"); break;
-		case IRTypeKind::Float:		Emit("f64");  break;
-		case IRTypeKind::Pointer:	Emit("ptr");  break;
+		case IRTypeKind::Void:		Emit("void");	break;
+		case IRTypeKind::Float:		Emit("f64");	break;
+		case IRTypeKind::Pointer:	Emit("ptr");	break;
 		case IRTypeKind::Label:		Emit("label");  break;
 		case IRTypeKind::Integer:
 		{
@@ -314,7 +342,10 @@ namespace ola
 				PrintType(func_type->GetParamType(i));
 				Emit(",");
 			}
-			if(param_count > 0) PopOutput<1>();
+			if (param_count > 0)
+			{
+				PopOutput<1>();
+			}
 			Emit(")");
 		}
 		break;

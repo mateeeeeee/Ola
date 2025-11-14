@@ -21,7 +21,6 @@ namespace ola
 		}
 		case IRTypeKind::Pointer:
 		{
-			
 		}
 		default:
 			OLA_ASSERT(false);

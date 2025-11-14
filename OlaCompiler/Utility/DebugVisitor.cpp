@@ -17,6 +17,7 @@ namespace ola
 			}
 			return indentation;
 		}
+
 		constexpr std::string BinaryExprKindToString(BinaryExprKind kind)
 		{
 			switch (kind)
@@ -66,6 +67,7 @@ namespace ola
 				return "invalid";
 			}
 		}
+
 		constexpr std::string UnaryExprKindToString(UnaryExprKind kind)
 		{
 			switch (kind)

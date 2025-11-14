@@ -51,7 +51,10 @@ namespace ola
 		{
 			for (Instruction const& I : bb)
 			{
-				if (I.GetOpcode() == Opcode::Call) return true;
+				if (I.GetOpcode() == Opcode::Call)
+				{
+					return true;
+				}
 			}
 		}
 		return false;

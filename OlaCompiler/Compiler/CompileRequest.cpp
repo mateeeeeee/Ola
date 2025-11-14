@@ -87,10 +87,10 @@ namespace ola
 
 		libraries = cli_result["-l"].AsStrings();
 
-		if (cli_result["--O0"] || cli_result["--Od"]) opt_level = OptimizationLevel::O0;
-		if (cli_result["--O1"]) opt_level = OptimizationLevel::O1;
-		if (cli_result["--O2"]) opt_level = OptimizationLevel::O2;
-		if (cli_result["--O3"]) opt_level = OptimizationLevel::O3;
+		if (cli_result["--O0"] || cli_result["--Od"])	opt_level = OptimizationLevel::O0;
+		if (cli_result["--O1"])							opt_level = OptimizationLevel::O1;
+		if (cli_result["--O2"])							opt_level = OptimizationLevel::O2;
+		if (cli_result["--O3"])							opt_level = OptimizationLevel::O3;
 
 		std::string target_str = cli_result["--target"].AsStringOr("");
 		if (target_str == "x64")

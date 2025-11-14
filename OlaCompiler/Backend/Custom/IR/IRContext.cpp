@@ -57,7 +57,10 @@ namespace ola
 	{
 		for (auto const& pointer_type : pointer_types)
 		{
-			if (pointer_type->GetPointeeType() == pointee_type) return pointer_type;
+			if (pointer_type->GetPointeeType() == pointee_type)
+			{
+				return pointer_type;
+			}
 		}
 		IRPtrType* new_type = new(this) IRPtrType(*this, pointee_type);
 		pointer_types.push_back(new_type);
@@ -68,7 +71,10 @@ namespace ola
 	{
 		for (auto const& array_type : array_types)
 		{
-			if (array_type->GetElementType() == base_type && array_type->GetArraySize() == array_size) return array_type;
+			if (array_type->GetElementType() == base_type && array_type->GetArraySize() == array_size)
+			{
+				return array_type;
+			}
 		}
 		IRArrayType* new_type = new(this) IRArrayType(*this, base_type, array_size);
 		array_types.push_back(new_type);
@@ -79,8 +85,15 @@ namespace ola
 	{
 		for (auto const& function_type : function_types)
 		{
-			if (function_type->GetReturnType() != ret_type) continue;
-			if (function_type->GetParamCount() != param_types.size()) continue;
+			if (function_type->GetReturnType() != ret_type)
+			{
+				continue;
+			}
+			if (function_type->GetParamCount() != param_types.size())
+			{
+				continue;
+			}
+
 			Uint64 const param_count = function_type->GetParamCount();
 			Bool incompatible = false;
 			for (Uint64 i = 0; i < param_count; ++i)
@@ -91,7 +104,10 @@ namespace ola
 					break;
 				}
 			}
-			if (!incompatible) return function_type;
+			if (!incompatible)
+			{
+				return function_type;
+			}
 		}
 		function_types.push_back(new(this) IRFuncType(*this, ret_type, param_types));
 		return function_types.back();
@@ -101,8 +117,16 @@ namespace ola
 	{
 		for (auto const& struct_type : struct_types)
 		{
-			if (struct_type->GetName() != name) continue;
-			if (struct_type->GetMemberCount() != member_types.size()) continue;
+			if (struct_type->GetName() != name)
+			{
+				continue;
+			}
+
+			if (struct_type->GetMemberCount() != member_types.size())
+			{
+				continue;
+			}
+
 			Uint64 const member_count = struct_type->GetMemberCount();
 			Bool incompatible = false;
 			for (Uint64 i = 0; i < member_count; ++i)
@@ -113,7 +137,10 @@ namespace ola
 					break;
 				}
 			}
-			if (!incompatible) return struct_type;
+			if (!incompatible)
+			{
+				return struct_type;
+			}
 		}
 		struct_types.push_back(new(this) IRStructType(*this, name, member_types));
 		return struct_types.back();
@@ -121,21 +148,30 @@ namespace ola
 
 	ConstantString* IRContext::GetString(std::string_view str)
 	{
-		if (constant_strings.contains(str)) return constant_strings[str];
+		if (constant_strings.contains(str))
+		{
+			return constant_strings[str];
+		}
 		constant_strings[str] = new ConstantString(*this, str);
 		return constant_strings[str];
 	}
 
 	ConstantInt* IRContext::GetInt64(Int64 value)
 	{
-		if (constant_ints64.contains(value)) return constant_ints64[value];
+		if (constant_ints64.contains(value))
+		{
+			return constant_ints64[value];
+		}
 		constant_ints64[value] = new ConstantInt(int8_type, value);
 		return constant_ints64[value];
 	}
 
 	ConstantInt* IRContext::GetInt8(Int8 value)
 	{
-		if (constant_ints8.contains(value)) return constant_ints8[value];
+		if (constant_ints8.contains(value))
+		{
+			return constant_ints8[value];
+		}
 		constant_ints8[value] = new ConstantInt(int1_type, value);
 		return constant_ints8[value];
 	}
@@ -145,13 +181,15 @@ namespace ola
 	{
 		OLA_ASSERT(type->IsInteger());
 		IRIntType* int_type = cast<IRIntType>(type);
-		if (int_type->GetWidth() == 8) return GetInt64(value);
-		else return GetInt8(value);
+		return (int_type->GetWidth() == 8) ? GetInt64(value) : GetInt8(value);
 	}
 
 	ConstantFloat* IRContext::GetFloat(Float64 value)
 	{
-		if (constant_floats.contains(value)) return constant_floats[value];
+		if (constant_floats.contains(value))
+		{
+			return constant_floats[value];
+		}
 		constant_floats[value] = new ConstantFloat(float_type, value);
 		return constant_floats[value];
 	}
@@ -175,9 +213,7 @@ namespace ola
 	{
 		if (isa<IRIntType>(type))
 		{
-			IRIntType* int_type = cast<IRIntType>(type);
-			if (int_type->GetWidth() == 8) return GetInt64(0);
-			else return GetInt8(0);
+			return GetInt(type, 0);
 		}
 		else if (isa<IRFloatType>(type))
 		{

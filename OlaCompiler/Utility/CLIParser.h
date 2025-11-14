@@ -10,6 +10,7 @@ namespace ola
 	class CLIArg
 	{
 		friend class CLIParser;
+
 	public:
 		CLIArg() = default;
 		CLIArg(std::vector<std::string>&& prefixes, Bool has_value) : prefixes(std::move(prefixes)), has_value(has_value) {}
@@ -17,16 +18,28 @@ namespace ola
 		Bool AsBool(Bool default_value = false) const
 		{
 			OLA_ASSERT(has_value);
-			if (values.empty()) return default_value;
-			if (values[0] == "true" || values[0] == "1") return true;
-			if (values[0] == "false" || values[0] == "0") return false;
+			if (values.empty())
+			{
+				return default_value;
+			}
+			if (values[0] == "true" || values[0] == "1")
+			{
+				return true;
+			}
+			if (values[0] == "false" || values[0] == "0")
+			{
+				return false;
+			}
 			OLA_ASSERT_MSG(false, "Invalid bool argument!");
 			OLA_UNREACHABLE();
 		}
 		Bool AsBoolOr(Bool def) const
 		{
-			if (IsPresent()) return AsBool();
-			else return def;
+			if (IsPresent())
+			{
+				return AsBool();
+			}
+			return def;
 		}
 
 		Int AsInt() const
@@ -36,8 +49,11 @@ namespace ola
 		}
 		Int AsIntOr(Int def) const
 		{
-			if (IsPresent()) return AsInt();
-			else return def;
+			if (IsPresent())
+			{
+				return AsInt();
+			}
+			return def;
 		}
 
 		Float AsFloat() const
@@ -47,8 +63,11 @@ namespace ola
 		}
 		Float AsFloatOr(Float def) const
 		{
-			if (IsPresent()) return AsFloat();
-			else return def;
+			if (IsPresent())
+			{
+				return AsFloat();
+			}
+			return def;
 		}
 
 		std::string AsString() const
@@ -58,8 +77,11 @@ namespace ola
 		}
 		std::string AsStringOr(std::string const& def) const
 		{
-			if (IsPresent()) return AsString();
-			else return def;
+			if (IsPresent())
+			{
+				return AsString();
+			}
+			return def;
 		}
 
 		std::vector<std::string> AsStrings() const
@@ -79,10 +101,11 @@ namespace ola
 
 	private:
 		std::vector<std::string> prefixes;
-		Bool has_value;
+		Bool has_value{};
 		std::vector<std::string> values;
 		Bool is_present = false;
 
+	private:
 		void AddValue(std::string const& value)
 		{
 			OLA_ASSERT(has_value);

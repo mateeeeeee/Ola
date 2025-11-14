@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
-#include "Tests.h"
+#define LLVM_BACKEND 0
+#include "Compiler/CompilerMacros.h"
 
 
 TEST(Operators, Additive)

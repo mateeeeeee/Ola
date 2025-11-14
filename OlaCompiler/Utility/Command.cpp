@@ -1,5 +1,5 @@
 #include <cstdlib>
-#if _WIN32
+#if defined(OLA_PLATFORM_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tlhelp32.h>
@@ -16,11 +16,14 @@ namespace ola
 {
 	namespace
 	{
-#if _WIN32
+#if defined(OLA_PLATFORM_WINDOWS)
 		void KillProcessAndChildren(DWORD pid)
 		{
 			HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-			if (hSnapShot == INVALID_HANDLE_VALUE) return;
+			if (hSnapShot == INVALID_HANDLE_VALUE)
+			{
+				return;
+			}
 
 			PROCESSENTRY32 pe32;
 			pe32.dwSize = sizeof(PROCESSENTRY32);
@@ -56,7 +59,7 @@ namespace ola
 	Int ExecuteCommand(Char const* cmd)
 	{
 		Int status = std::system(cmd);
-#if _WIN32
+#if defined(OLA_PLATFORM_WINDOWS)
 		return status;
 #else
 		if (WIFEXITED(status))

@@ -2,10 +2,6 @@ set(SOURCE
   Tests.cpp
 )
 
-set(HEADERS
-  Tests.h
-)
-
 set(OLA_LLVM_TESTS
 	Tests/LLVM/test_ternary.ola
 	Tests/LLVM/test_while.ola
@@ -70,9 +66,9 @@ set(OLA_CUSTOM_TESTS
 	Tests/Custom/test_returns.ola
 )
 
-add_executable(OlaTests ${SOURCE} ${HEADERS} ${OLA_LLVM_TESTS} ${OLA_CUSTOM_TESTS})
+add_executable(OlaTests ${SOURCE} ${OLA_LLVM_TESTS} ${OLA_CUSTOM_TESTS})
 
-source_group(" " FILES ${SOURCE} ${HEADERS})
+source_group(" " FILES ${SOURCE})
 source_group("Tests/LLVM" FILES ${OLA_LLVM_TESTS})
 source_group("Tests/Custom" FILES ${OLA_CUSTOM_TESTS})
 

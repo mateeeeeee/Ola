@@ -21,6 +21,7 @@ namespace ola
 	public:
 
 		FrontendContext();
+		OLA_NONCOPYABLE_NONMOVABLE(FrontendContext)
 		~FrontendContext();
 
 		VoidType*  GetVoidType()  const  { return void_type;  }

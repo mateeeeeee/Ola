@@ -9,7 +9,10 @@ namespace ola
 		OLA_ASSERT_MSG(Contains(BB), "Exiting block must be part of the loop");
 		for (auto const* Succ : BB->GetSuccessors())
 		{
-			if (!Contains(Succ)) return true;
+			if (!Contains(Succ))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -19,7 +22,10 @@ namespace ola
 		OLA_ASSERT_MSG(Contains(BB), "Block does not belong to the loop");
 		for (auto const* Succ : BB->GetSuccessors())
 		{
-			if (Succ == GetHeader()) return true;
+			if (Succ == GetHeader())
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -30,7 +36,10 @@ namespace ola
 		BasicBlock* Header = GetHeader();
 		for (BasicBlock* Pred : Header->GetPredecessors()) 
 		{
-			if (Contains(Pred)) NumBackEdges++;
+			if (Contains(Pred))
+			{
+				NumBackEdges++;
+			}
 		}
 		return NumBackEdges;
 	}
@@ -93,7 +102,10 @@ namespace ola
 		{
 			for (BasicBlock* Predecessor : EB->GetPredecessors())
 			{
-				if (!Contains(Predecessor)) return false;
+				if (!Contains(Predecessor))
+				{
+					return false;
+				}
 			}
 		}
 		return true;
@@ -116,18 +128,30 @@ namespace ola
 	BasicBlock* Loop::GetLoopPreheader() const
 	{
 		BasicBlock* header = GetHeader();
-		if (!header) return nullptr;
+		if (!header)
+		{
+			return nullptr;
+		}
 
 		auto const& preds = header->GetPredecessors();
 
 		BasicBlock* preheader = nullptr;
 		for (BasicBlock* pred : preds) 
 		{
-			if (Contains(pred)) continue;
-			if (preheader) return nullptr;
+			if (Contains(pred))
+			{
+				continue;
+			}
+			if (preheader)
+			{
+				return nullptr;
+			}
 			preheader = pred;
 		}
-		if (!preheader) return nullptr;
+		if (!preheader)
+		{
+			return nullptr;
+		}
 
 		if (preheader->GetSuccessors().size() != 1)
 		{
@@ -139,17 +163,25 @@ namespace ola
 	BasicBlock* Loop::GetLoopPredecessor() const
 	{
 		BasicBlock* header = GetHeader();
-		if (!header) return nullptr;
-
+		if (!header)
+		{
+			return nullptr;
+		}
 
 		auto const& preds = header->GetPredecessors();
-
 		// We need exactly one predecessor from outside the loop
 		BasicBlock* predecessor = nullptr;
 		for (BasicBlock* pred : preds) 
 		{
-			if (Contains(pred)) continue;
-			if (predecessor) return nullptr;
+			if (Contains(pred))
+			{
+				continue;
+			}
+
+			if (predecessor)
+			{
+				return nullptr;
+			}
 			predecessor = pred;
 		}
 		return predecessor; 
@@ -158,14 +190,24 @@ namespace ola
 	BasicBlock* Loop::GetLoopLatch() const
 	{
 		BasicBlock* header = GetHeader();
-		if (!header) return nullptr;
+		if (!header) 
+		{
+			return nullptr;
+		}
 
 		BasicBlock* latch = nullptr;
 
 		for (BasicBlock* pred : header->GetPredecessors()) 
 		{
-			if (!Contains(pred)) continue;
-			if (latch) return nullptr;
+			if (!Contains(pred))
+			{
+				continue;
+			}
+
+			if (latch)
+			{
+				return nullptr;
+			}
 			latch = pred;
 		}
 		return latch;
@@ -174,7 +216,7 @@ namespace ola
 	void Loop::GetLoopLatches(std::vector<BasicBlock*>& LoopLatches) const
 	{
 		BasicBlock* header = GetHeader();
-		for (const auto Pred : header->GetPredecessors())
+		for (auto const Pred : header->GetPredecessors())
 		{
 			if (Contains(Pred))
 			{
@@ -185,7 +227,11 @@ namespace ola
 
 	void Loop::AddChildLoop(Loop* NewChild)
 	{
-		if (NewChild->ParentLoop == this) return; OLA_TODO("This should not happen?");
+		if (NewChild->ParentLoop == this)
+		{
+			OLA_TODO("This should not happen?");
+			return; 
+		}
 		OLA_ASSERT_MSG(!NewChild->ParentLoop, "NewChild already has a parent!");
 		NewChild->ParentLoop = static_cast<Loop*>(this);
 		SubLoops.push_back(NewChild);

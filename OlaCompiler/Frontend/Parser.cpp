@@ -49,14 +49,26 @@ namespace ola
 		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
-			if (IsFunctionDeclaration()) global_decl_list.push_back(ParseFunctionDeclaration());
-			else global_decl_list = ParseExternVariableDeclaration();
+			if (IsFunctionDeclaration())
+			{
+				global_decl_list.push_back(ParseFunctionDeclaration());
+			}
+			else
+			{
+				global_decl_list = ParseExternVariableDeclaration();
+			}
 		}
 		else
 		{
 			DeclVisibility visibility = DeclVisibility::Private;
-			if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-			else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+			if (Consume(TokenKind::KW_public))
+			{
+				visibility = DeclVisibility::Public;
+			}
+			else if (Consume(TokenKind::KW_private))
+			{
+				visibility = DeclVisibility::Private;
+			}
 
 			if (Consume(TokenKind::KW_class))
 			{
@@ -83,12 +95,14 @@ namespace ola
 				else
 				{
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(visibility);
-					for (auto& variable_decl : variable_decls) global_decl_list.push_back(std::move(variable_decl));
+					for (auto& variable_decl : variable_decls)
+					{
+						global_decl_list.push_back(std::move(variable_decl));
+					}
 				}
 			}
 			global_decl_list.back()->SetVisibility(visibility);
 		}
-
 		return global_decl_list;
 	}
 
@@ -105,7 +119,10 @@ namespace ola
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
@@ -113,7 +130,10 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma))
+				{
+					Diag(function_params_missing_coma);
+				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(param_decl->GetType());
@@ -140,7 +160,10 @@ namespace ola
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
@@ -149,7 +172,10 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma))
+				{
+					Diag(function_params_missing_coma);
+				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(param_decl->GetType());
@@ -172,8 +198,14 @@ namespace ola
 	UniqueMethodDeclPtr Parser::ParseMethodDeclaration()
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
-		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public))
+		{
+			visibility = DeclVisibility::Public;
+		}
+		else if (Consume(TokenKind::KW_private))
+		{
+			visibility = DeclVisibility::Private;
+		}
 
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -187,7 +219,10 @@ namespace ola
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
@@ -195,7 +230,10 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma))
+				{
+					Diag(function_params_missing_coma);
+				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(param_decl->GetType());
@@ -213,8 +251,14 @@ namespace ola
 	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
-		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public))
+		{
+			visibility = DeclVisibility::Public;
+		}
+		else if (Consume(TokenKind::KW_private))
+		{
+			visibility = DeclVisibility::Private;
+		}
 
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -229,7 +273,10 @@ namespace ola
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
@@ -237,7 +284,10 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma))
+				{
+					Diag(function_params_missing_coma);
+				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(param_decl->GetType());
@@ -247,14 +297,23 @@ namespace ola
 			ParseMethodAttributes(method_attrs);
 			if (first_pass)
 			{
-				if (Consume(TokenKind::semicolon)) return nullptr;
+				if (Consume(TokenKind::semicolon))
+				{
+					return nullptr;
+				}
 
 				Int32 brace_count = 0;
 				Expect(TokenKind::left_brace); ++brace_count;
 				while (brace_count != 0)
 				{
-					if (Consume(TokenKind::left_brace))  ++brace_count;
-					else if (Consume(TokenKind::right_brace)) --brace_count;
+					if (Consume(TokenKind::left_brace))
+					{
+						++brace_count;
+					}
+					else if (Consume(TokenKind::right_brace))
+					{
+						--brace_count;
+					}
 					else current_token++;
 				}
 			}
@@ -289,7 +348,10 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
-				if (!param_types.empty() && !Consume(TokenKind::comma)) Diag(function_params_missing_coma);
+				if (!param_types.empty() && !Consume(TokenKind::comma))
+				{
+					Diag(function_params_missing_coma);
+				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
 				param_types.emplace_back(param_decl->GetType());
@@ -298,14 +360,23 @@ namespace ola
 			function_type.SetType(FuncType::Get(context, VoidType::Get(context), param_types));
 			if (first_pass)
 			{
-				if (Consume(TokenKind::semicolon)) return nullptr;
+				if (Consume(TokenKind::semicolon))
+				{
+					return nullptr;
+				}
 
 				Int32 brace_count = 0;
 				Expect(TokenKind::left_brace); ++brace_count;
 				while (brace_count != 0)
 				{
-					if (Consume(TokenKind::left_brace))  ++brace_count;
-					else if (Consume(TokenKind::right_brace)) --brace_count;
+					if (Consume(TokenKind::left_brace))
+					{
+						++brace_count;
+					}
+					else if (Consume(TokenKind::right_brace)) 
+					{
+						--brace_count;
+					}
 					else current_token++;
 				}
 			}
@@ -349,16 +420,21 @@ namespace ola
 		ParseTypeSpecifier(variable_type);
 		do
 		{
-			if (!var_decl_list.empty()) Expect(TokenKind::comma);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (!var_decl_list.empty())
+			{
+				Expect(TokenKind::comma);
+			}
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 			SourceLocation const& loc = current_token->GetLocation();
 			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
 			{
-				if (current_token->Is(TokenKind::left_brace)) init_expr = ParseInitializerListExpression();
-				else init_expr = ParseAssignmentExpression();
+				init_expr = (current_token->Is(TokenKind::left_brace)) ? ParseInitializerListExpression() : ParseAssignmentExpression();
 			}
 			else if (Consume(TokenKind::left_round))
 			{
@@ -369,13 +445,15 @@ namespace ola
 					{
 						UniqueExprPtr arg_expr = ParseAssignmentExpression();
 						args.push_back(std::move(arg_expr));
-						if (Consume(TokenKind::right_round)) break;
+						if (Consume(TokenKind::right_round))
+						{
+							break;
+						}
 						Expect(TokenKind::comma);
 					}
 				}
 				init_expr = sema->ActOnConstructorExpr(loc, variable_type, std::move(args));
 			}
-
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 			var_decl_list.push_back(std::move(var_decl));
 
@@ -387,8 +465,14 @@ namespace ola
 	UniqueFieldDeclPtrList Parser::ParseFieldDeclaration(Bool first_pass)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
-		if (Consume(TokenKind::KW_public)) visibility = DeclVisibility::Public;
-		else if (Consume(TokenKind::KW_private)) visibility = DeclVisibility::Private;
+		if (Consume(TokenKind::KW_public))
+		{
+			visibility = DeclVisibility::Public;
+		}
+		else if (Consume(TokenKind::KW_private))
+		{
+			visibility = DeclVisibility::Private;
+		}
 
 		UniqueFieldDeclPtrList member_var_decl_list;
 		QualType variable_type{};
@@ -396,16 +480,21 @@ namespace ola
 		ParseTypeSpecifier(variable_type);
 		do
 		{
-			if (!member_var_decl_list.empty()) Expect(TokenKind::comma);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (!member_var_decl_list.empty())
+			{
+				Expect(TokenKind::comma);
+			}
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 			SourceLocation const& loc = current_token->GetLocation();
 			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueExprPtr init_expr = nullptr;
 			if (Consume(TokenKind::equal))
 			{
-				if (current_token->Is(TokenKind::left_brace)) init_expr = ParseInitializerListExpression();
-				else init_expr = ParseAssignmentExpression();
+				init_expr = current_token->Is(TokenKind::left_brace) ? ParseInitializerListExpression() : ParseAssignmentExpression();
 			}
 			if (first_pass)
 			{
@@ -425,8 +514,14 @@ namespace ola
 		ParseTypeSpecifier(variable_type);
 		do
 		{
-			if (!var_decl_list.empty()) Expect(TokenKind::comma);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (!var_decl_list.empty())
+			{
+				Expect(TokenKind::comma);
+			}
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 			SourceLocation const& loc = current_token->GetLocation();
 			std::string_view name = current_token->GetData(); ++current_token;
 
@@ -454,10 +549,12 @@ namespace ola
 		while (true)
 		{
 			std::string enum_value_name;
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier))
+			{
+				Diag(expected_identifier);
+			}
 			SourceLocation loc = current_token->GetLocation();
 			enum_value_name = current_token->GetData(); ++current_token;
-
 			if (Consume(TokenKind::equal))
 			{
 				UniqueExprPtr enum_value_expr = ParseAssignmentExpression();
@@ -469,7 +566,10 @@ namespace ola
 				enum_members.push_back(sema->ActOnEnumMemberDecl(enum_value_name, loc, val++));
 			}
 
-			if (Consume(TokenKind::right_brace)) break;
+			if (Consume(TokenKind::right_brace))
+			{
+				break;
+			}
 			Expect(TokenKind::comma);
 		}
 		Expect(TokenKind::semicolon);
@@ -481,7 +581,10 @@ namespace ola
 	{
 		std::string alias_name = "";
 		SourceLocation loc = current_token->GetLocation();
-		if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+		if (current_token->IsNot(TokenKind::identifier))
+		{
+			Diag(expected_identifier);
+		}
 		alias_name = current_token->GetData();
 		++current_token;
 
@@ -504,7 +607,10 @@ namespace ola
 			class_name = current_token->GetData();
 			++current_token;
 		}
-		else Expect(TokenKind::identifier);
+		else
+		{
+			Expect(TokenKind::identifier);
+		}
 		
 		Bool const final = Consume(TokenKind::KW_final);
 		ClassDecl const* base_class = nullptr;
@@ -546,7 +652,10 @@ namespace ola
 							if (current_token->Is(TokenKind::identifier))
 							{
 								UniqueConstructorDeclPtr constructor = ParseConstructorDefinition(first_pass);
-								if (!first_pass) member_functions.push_back(std::move(constructor));
+								if (!first_pass)
+								{
+									member_functions.push_back(std::move(constructor));
+								}
 								continue;
 							}
 
@@ -554,12 +663,21 @@ namespace ola
 							if (is_function_declaration)
 							{
 								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
-								if (!first_pass) member_functions.push_back(std::move(member_function));
+								if (!first_pass)
+								{
+									member_functions.push_back(std::move(member_function));
+								}
 							}
 							else
 							{
 								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
-								if (first_pass) for (auto& var_decl : var_decls) member_variables.push_back(std::move(var_decl));
+								if (first_pass)
+								{
+									for (auto& var_decl : var_decls)
+									{
+										member_variables.push_back(std::move(var_decl));
+									}
+								}
 							}
 						}
 						Expect(TokenKind::semicolon);
@@ -585,7 +703,10 @@ namespace ola
 			class_name = current_token->GetData();
 			++current_token;
 		}
-		else Expect(TokenKind::identifier);
+		else
+		{
+			Expect(TokenKind::identifier);
+		}
 		UniqueFieldDeclPtrList member_variables;
 		UniqueMethodDeclPtrList member_functions;
 		{
@@ -625,7 +746,10 @@ namespace ola
 		case TokenKind::KW_default: return ParseCaseStatement();
 		case TokenKind::KW_goto: return ParseGotoStatement();
 		case TokenKind::identifier:
-			if ((current_token + 1)->Is(TokenKind::colon)) return ParseLabelStatement();
+			if ((current_token + 1)->Is(TokenKind::colon))
+			{
+				return ParseLabelStatement();
+			}
 			return ParseExpressionStatement();
 		default:
 			return ParseExpressionStatement();
@@ -656,7 +780,10 @@ namespace ola
 				else
 				{
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
-					for (auto& variable_decl : variable_decls) stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
+					for (auto& variable_decl : variable_decls)
+					{
+						stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
+					}
 				}
 			}
 			else
@@ -671,7 +798,10 @@ namespace ola
 
 	UniqueExprStmtPtr Parser::ParseExpressionStatement()
 	{
-		if (Consume(TokenKind::semicolon)) return MakeUnique<NullStmt>();
+		if (Consume(TokenKind::semicolon))
+		{
+			return MakeUnique<NullStmt>();
+		}
 		UniqueExprPtr expr = ParseExpression();
 		Expect(TokenKind::semicolon);
 		return sema->ActOnExprStmt(std::move(expr));
@@ -690,8 +820,10 @@ namespace ola
 		UniqueExprPtr cond_expr = ParseParenthesizedExpression();
 		UniqueStmtPtr then_stmt = ParseStatement();
 		UniqueStmtPtr else_stmt = nullptr;
-		if (Consume(TokenKind::KW_else)) else_stmt = ParseStatement();
-		
+		if (Consume(TokenKind::KW_else))
+		{
+			else_stmt = ParseStatement();
+		}
 		return sema->ActOnIfStmt(std::move(cond_expr), std::move(then_stmt), std::move(else_stmt));
 	}
 
@@ -722,10 +854,16 @@ namespace ola
 		{
 			UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
 			UniqueDeclPtrList decl_list; decl_list.reserve(variable_decls.size());
-			for (auto& variable_decl : variable_decls) decl_list.push_back(std::move(variable_decl));
+			for (auto& variable_decl : variable_decls)
+			{
+				decl_list.push_back(std::move(variable_decl));
+			}
 			init_stmt = MakeUnique<DeclStmt>(std::move(decl_list));
 		}
-		else init_stmt = ParseExpressionStatement();
+		else
+		{
+			init_stmt = ParseExpressionStatement();
+		}
 
 		UniqueExprPtr cond_expr = nullptr;
 		if (!Consume(TokenKind::semicolon))
@@ -769,7 +907,10 @@ namespace ola
 				name = current_token->GetData();
 				++current_token;
 			}
-			else Diag(expected_identifier);
+			else
+			{
+				Diag(expected_identifier);
+			}
 			var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::None);
 		}
 		Expect(TokenKind::colon);
@@ -816,8 +957,14 @@ namespace ola
 	{
 		SourceLocation loc = current_token->GetLocation();
 		UniqueExprPtr case_value = nullptr;
-		if (Consume(TokenKind::KW_case)) case_value = ParseExpression();
-		else Expect(TokenKind::KW_default);
+		if (Consume(TokenKind::KW_case))
+		{
+			case_value = ParseExpression();
+		}
+		else
+		{
+			Expect(TokenKind::KW_default);
+		}
 		Expect(TokenKind::colon);
 		return sema->ActOnCaseStmt(loc, std::move(case_value));
 	}
@@ -863,7 +1010,6 @@ namespace ola
 		{
 			SourceLocation loc = current_token->GetLocation();
 			UniqueExprPtr rhs = (this->*ParseFn)();
-
 			UniqueBinaryExprPtr parent = sema->ActOnBinaryExpr(OpK, loc, std::move(lhs), std::move(rhs));
 			lhs = std::move(parent);
 		}
@@ -1125,7 +1271,10 @@ namespace ola
 					{
 						UniqueExprPtr arg_expr = ParseAssignmentExpression();
 						args.push_back(std::move(arg_expr));
-						if (Consume(TokenKind::right_round)) break;
+						if (Consume(TokenKind::right_round))
+						{
+							break;
+						}
 						Expect(TokenKind::comma);
 					}
 				}
@@ -1168,7 +1317,10 @@ namespace ola
 						{
 							UniqueExprPtr arg_expr = ParseAssignmentExpression();
 							args.push_back(std::move(arg_expr));
-							if (Consume(TokenKind::right_round)) break;
+							if (Consume(TokenKind::right_round))
+							{
+								break;
+							}
 							Expect(TokenKind::comma);
 						}
 					}
@@ -1275,8 +1427,14 @@ namespace ola
 	{
 		OLA_ASSERT(current_token->IsOneOf(TokenKind::KW_true, TokenKind::KW_false));
 		Bool value = false;
-		if (current_token->Is(TokenKind::KW_false)) value = false;
-		else if (current_token->Is(TokenKind::KW_true)) value = true;
+		if (current_token->Is(TokenKind::KW_false))
+		{
+			value = false;
+		}
+		else if (current_token->Is(TokenKind::KW_true))
+		{
+			value = true;
+		}
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnBoolLiteral(value, loc);
@@ -1334,9 +1492,19 @@ namespace ola
 		{
 			while (true)
 			{
-				if (current_token->Is(TokenKind::left_brace)) expr_list.push_back(ParseInitializerListExpression());
-				else expr_list.push_back(ParseAssignmentExpression());
-				if (Consume(TokenKind::right_brace)) break;
+				if (current_token->Is(TokenKind::left_brace))
+				{
+					expr_list.push_back(ParseInitializerListExpression());
+				}
+				else
+				{
+					expr_list.push_back(ParseAssignmentExpression());
+				}
+
+				if (Consume(TokenKind::right_brace))
+				{
+					break;
+				}
 				Expect(TokenKind::comma);
 			}
 		}
@@ -1450,7 +1618,10 @@ namespace ola
 
 	void Parser::ParseTypeQualifier(QualType& type)
 	{
-		if (Consume(TokenKind::KW_const)) type.AddConst();
+		if (Consume(TokenKind::KW_const))
+		{
+			type.AddConst();
+		}
 	}
 
 	void Parser::ParseTypeSpecifier(QualType& type, Bool array_size_forbidden, Bool allow_ref)
@@ -1479,16 +1650,25 @@ namespace ola
 				{
 					Bool const is_const = type.IsConst();
 					type = tag_decl->GetType();
-					if (is_const) type.AddConst();
+					if (is_const)
+					{
+						type.AddConst();
+					}
 				}
 				else if (isa<ClassDecl>(tag_decl))
 				{
 					ClassDecl* class_decl = cast<ClassDecl>(tag_decl);
 					type.SetType(ClassType::Get(context, class_decl));
 				}
-				else Diag(invalid_type_specifier);
+				else
+				{
+					Diag(invalid_type_specifier);
+				}
 			}
-			else Diag(invalid_type_specifier);
+			else
+			{
+				Diag(invalid_type_specifier);
+			}
 		}
 		break;
 		default:
@@ -1599,7 +1779,7 @@ namespace ola
 		{
 			++current_token; return true;
 		}
-		else return false;
+		return false;
 	}
 	template<typename... Ts>
 	Bool Parser::Consume(TokenKind k, Ts... ts)
@@ -1608,7 +1788,7 @@ namespace ola
 		{
 			++current_token; return true;
 		}
-		else return false;
+		return false;
 	}
 
 	Bool Parser::Expect(TokenKind k)

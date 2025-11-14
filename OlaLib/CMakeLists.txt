@@ -11,9 +11,18 @@ set(HEADERS
   olafile.h
 )
 
-add_library(OlaLib ${SOURCE} ${HEADERS})
+set(OLA_STD_FILES
+    std/assert.ola
+    std/file.ola
+    std/io.ola
+    std/math.ola
+    std/string.ola
+)
+
+add_library(OlaLib ${SOURCE} ${HEADERS} ${OLA_STD_FILES})
 
 source_group(" " FILES ${SOURCE} ${HEADERS})
+source_group("std" FILES ${OLA_STD_FILES})
 
 target_include_directories(OlaLib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

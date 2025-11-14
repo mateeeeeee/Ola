@@ -23,15 +23,20 @@ namespace ola
 		Bool Insert(SymType* symbol)
 		{
 			std::string name_key(symbol->GetName());
-			if (sym_map.contains(name_key)) return false;
-			if (overload_sym_map.contains(name_key)) return false;
+			if (sym_map.contains(name_key) || overload_sym_map.contains(name_key))
+			{
+				return false;
+			}
 			sym_map[name_key] = symbol;
 			return true;
 		}
 		Bool Insert_Overload(SymType* symbol)
 		{
 			std::string name_key(symbol->GetName());
-			if (sym_map.contains(name_key)) return false;
+			if (sym_map.contains(name_key))
+			{
+				return false;
+			}
 			overload_sym_map[name_key].push_back(symbol);
 			return true;
 		}
@@ -42,11 +47,11 @@ namespace ola
 			{
 				return sym_map[name_key];
 			}
-			else if (overload_sym_map.contains(name_key) && !overload_sym_map[name_key].empty())
+			if (overload_sym_map.contains(name_key) && !overload_sym_map[name_key].empty())
 			{
 				return overload_sym_map[name_key][0];
 			}
-			else return nullptr;
+			return nullptr;
 		}
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
@@ -96,7 +101,10 @@ namespace ola
 		{
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
-				if (SymType* sym = scope->LookUp(sym_name)) return sym;
+				if (SymType* sym = scope->LookUp(sym_name))
+				{
+					return sym;
+				}
 			}
 			return nullptr;
 		}
@@ -105,13 +113,19 @@ namespace ola
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
 				SymType* sym = scope->LookUp(sym_name);
-				if (sym && sym->IsMember()) return sym;
+				if (sym && sym->IsMember())
+				{
+					return sym;
+				}
 			}
 			return nullptr;
 		}
 		SymType* LookUpCurrentScope(std::string_view sym_name)
 		{
-			if (SymType* sym = scopes.back().LookUp(sym_name)) return sym;
+			if (SymType* sym = scopes.back().LookUp(sym_name))
+			{
+				return sym;
+			}
 			return nullptr;
 		}
 
@@ -120,7 +134,10 @@ namespace ola
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
 				std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name);
-				for (SymType* sym : syms) if (sym->IsMember()) return syms;
+				for (SymType* sym : syms) if (sym->IsMember())
+				{
+					return syms;
+				}
 			}
 			return scopes.back().LookUp_Overload(sym_name);
 		}
@@ -128,7 +145,10 @@ namespace ola
 		{
 			for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope)
 			{
-				if (std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name); !syms.empty()) return syms;
+				if (std::vector<SymType*>& syms = scope->LookUp_Overload(sym_name); !syms.empty())
+				{
+					return syms;
+				}
 			}
 			return scopes.back().LookUp_Overload(sym_name);
 		}

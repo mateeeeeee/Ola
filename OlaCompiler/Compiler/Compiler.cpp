@@ -75,7 +75,10 @@ namespace ola
 			Parser parser(&context, diagnostics);
 			parser.Parse(import_processor.GetProcessedTokens());
 			AST const* ast = parser.GetAST();
-			if (opts.dump_ast) DebugVisitor debug_ast(ast);
+			if (opts.dump_ast)
+			{
+				OLA_MAYBE_UNUSED DebugVisitor debug_ast(ast);
+			}
 
 			if (opts.use_llvm_backend)
 			{
@@ -186,7 +189,10 @@ namespace ola
 
 		fs::path cur_path = fs::current_path();
 		std::string input_directory(compile_request.GetInputDirectory());
-		if(!input_directory.empty()) fs::current_path(input_directory);
+		if (!input_directory.empty())
+		{
+			fs::current_path(input_directory);
+		}
 
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 		std::vector<std::string> object_files(source_files.size());
@@ -194,7 +200,6 @@ namespace ola
 #if defined(OLA_PLATFORM_WINDOWS)
 		output_file += ".exe";
 #endif
-
 		TargetArch target_arch = compile_request.GetTargetArch();
 		if (target_arch == TargetArch::Default)
 		{
@@ -212,11 +217,16 @@ namespace ola
 		{
 			std::string file_name = fs::path(source_files[i]).stem().string();
 			std::string file_ext = fs::path(source_files[i]).extension().string();
-
 			std::string source_file = source_files[i]; source_file += ".ola";
 			std::string ir_file;
-			if (no_llvm) ir_file = file_name + ".oll";
-			else		 ir_file = file_name + ".ll";
+			if (no_llvm)
+			{
+				ir_file = file_name + ".oll";
+			}
+			else
+			{
+				ir_file = file_name + ".ll";
+			}
 			std::string assembly_file = file_name + ".s";
 			std::string mir_file = emit_mir ? file_name + ".omll" : "";
 
@@ -288,7 +298,10 @@ namespace ola
 			}
 			std::string ar_cmd = "ar rcs " + lib_output + " ";
 #endif
-			for (auto const& obj_file : object_files) ar_cmd += obj_file + " ";
+			for (auto const& obj_file : object_files)
+			{
+				ar_cmd += obj_file + " ";
+			}
 			ExecuteCommand(ar_cmd.c_str());
 		}
 		else
@@ -305,10 +318,16 @@ namespace ola
 				link_cmd += "-arch arm64 ";
 			}
 #endif
-			for (auto const& obj_file : object_files) link_cmd += obj_file + " ";
+			for (auto const& obj_file : object_files)
+			{
+				link_cmd += obj_file + " ";
+			}
 
 			auto const& libraries = compile_request.GetLibraries();
-			for (auto const& lib : libraries) link_cmd += lib + " ";
+			for (auto const& lib : libraries)
+			{
+				link_cmd += lib + " ";
+			}
 
 			link_cmd += OLA_STATIC_LIB_PATH;
 			link_cmd += " -o " + output_file;

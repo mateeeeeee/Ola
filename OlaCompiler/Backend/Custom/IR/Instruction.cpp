@@ -263,20 +263,29 @@ namespace ola
 	}
 	BasicBlock* SwitchInst::GetCaseBlock(Uint32 case_idx) const
 	{
-		if (case_idx >= case_values.size()) return nullptr;
+		if (case_idx >= case_values.size())
+		{
+			return nullptr;
+		}
 		return case_values[case_idx].GetCaseBlock();
 	}
 
 	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<Function>(callee)->GetReturnType(), {})
 	{
-		for (Value* arg : args) AddOperand(arg);
+		for (Value* arg : args)
+		{
+			AddOperand(arg);
+		}
 		AddOperand(callee);
 	}
 
 	Function* CallInst::GetCalleeAsFunction() const
 	{
-		if (Function* F = dyn_cast<Function>(GetCallee())) return F;
-		else return nullptr;
+		if (Function* F = dyn_cast<Function>(GetCallee()))
+		{
+			return F;
+		}
+		return nullptr;
 	}
 	Function* CallInst::GetCaller() const
 	{
@@ -321,7 +330,10 @@ namespace ola
 		source_element_type = cast<IRPtrType>(base->GetType())->GetPointeeType(); 
 
 		AddOperand(base);
-		for (Value* index : indices) AddOperand(index);
+		for (Value* index : indices)
+		{
+			AddOperand(index);
+		}
 	}
 
 	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})

@@ -18,7 +18,9 @@ namespace ola
 		explicit DepthFirstTreeIterator(NodeT* node) : current(node)
 		{
 			if (current && current->begin() != current->end())
+			{
 				parent_iterators.emplace(std::make_pair(current, current->begin()));
+			}
 		}
 
 		Bool operator==(DepthFirstTreeIterator const& it) const 
@@ -52,7 +54,10 @@ namespace ola
 	private:
 		void MoveToNextNode()
 		{
-			if (!current) return;
+			if (!current)
+			{
+				return;
+			}
 
 			if (parent_iterators.empty()) 
 			{
@@ -63,8 +68,14 @@ namespace ola
 			auto& next_it = parent_iterators.top();
 			current = *next_it.second;
 			++next_it.second;
-			if (next_it.first->end() == next_it.second) parent_iterators.pop();
-			if (current->begin() != current->end()) parent_iterators.emplace(std::make_pair(current, current->begin()));
+			if (next_it.first->end() == next_it.second)
+			{
+				parent_iterators.pop();
+			}
+			if (current->begin() != current->end())
+			{
+				parent_iterators.emplace(std::make_pair(current, current->begin()));
+			}
 		}
 	};
 

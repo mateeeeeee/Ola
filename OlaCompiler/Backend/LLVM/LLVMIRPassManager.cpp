@@ -36,7 +36,6 @@ namespace ola
 		PB.registerFunctionAnalyses(FAM);
 		PB.registerLoopAnalyses(LAM);
 		PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
-
 		llvm::ModulePassManager MPM;
 		switch (level)
 		{
@@ -52,7 +51,10 @@ namespace ola
 		}
 
 		llvm::FunctionPassManager FPM;
-		if(opts.domfrontier_print) FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
+		if (opts.domfrontier_print)
+		{
+			FPM.addPass(llvm::DominanceFrontierPrinterPass(llvm::errs()));
+		}
 		MPM.addPass(llvm::createModuleToFunctionPassAdaptor(std::move(FPM)));
 		MPM.run(module, MAM);
 		if (!VerifyLLVMModule(module))
