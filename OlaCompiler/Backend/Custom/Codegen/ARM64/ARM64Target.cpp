@@ -74,7 +74,7 @@ namespace ola
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
 
-				if (src.IsImmediate() && src.GetType() == MachineType::Float64)
+				if (src.IsImmediate())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MachineInstruction MI2(InstMove);

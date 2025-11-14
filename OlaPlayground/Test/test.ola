@@ -1,12 +1,11 @@
 
-import std.file; 
+
+int add(int a, int b)
+{
+	return a + b;
+}
 
 public int main() 
 { 
-	FileHandle f = FileOpen("alo.txt", "r");
-	if (FileIsOpen(f))
-	{
-		
-	}
-	return 9; 
+	return add(2,3);
 }

@@ -12,6 +12,9 @@
 
 namespace ola
 {
+	static constexpr Uint32 FP_LR_SAVE_SIZE = 16;
+	static constexpr Uint32 STACK_ALIGNMENT = 16;
+
 	// ARM64 AAPCS (ARM Architecture Procedure Call Standard)
 	// Integer arguments: X0-X7 (8 registers)
 	// Float arguments: V0-V7 (8 registers)
@@ -26,13 +29,11 @@ namespace ola
 		MachineGlobal const* global = ctx.GetGlobal(callee);
 
 		MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
-
 		for (Int32 idx = CI->ArgSize() - 1; idx >= 0; --idx)
 		{
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
-
 			if (arg_operand.GetType() != MachineType::Float64)
 			{
 				if (idx >= 8)
@@ -108,19 +109,22 @@ namespace ola
 
 		if (MF.GetStackAllocationSize() > 0)
 		{
+			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
+			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+
+			MachineInstruction allocate_stack(InstSub);
+			allocate_stack.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, Int64));
+			ctx.EmitInst(allocate_stack);
+
 			MachineInstruction stp_fp_lr(ARM64_InstStp);
 			stp_fp_lr.SetOp<0>(fp);
 			stp_fp_lr.SetOp<1>(lr);
-			stp_fp_lr.SetOp<2>(MachineOperand::StackObject(-16, Ptr));
+			stp_fp_lr.SetOp<2>(MachineOperand::StackObject(MF.GetStackAllocationSize(), Ptr));
 			ctx.EmitInst(stp_fp_lr);
 
-			MachineInstruction set_fp(InstMove);
-			set_fp.SetOp<0>(fp).SetOp<1>(sp);
+			MachineInstruction set_fp(InstAdd);
+			set_fp.SetOp<0>(fp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(MF.GetStackAllocationSize(), Int64));
 			ctx.EmitInst(set_fp);
-
-			MachineInstruction allocate_stack(InstSub);
-			allocate_stack.SetOp<0>(sp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize(), Int64));
-			ctx.EmitInst(allocate_stack);
 		}
 
 		Uint32 arg_idx = 0;
@@ -138,7 +142,7 @@ namespace ola
 				else
 				{
 					MachineInstruction copy_arg_to_reg(InstMove);
-					Int32 offset = 16 + (arg_idx - 8) * 8;
+					Int32 offset = FP_LR_SAVE_SIZE + (arg_idx - 8) * 8;
 					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
 				}
@@ -155,7 +159,7 @@ namespace ola
 				else
 				{
 					MachineInstruction copy_arg_to_reg(InstMove);
-					Int32 offset = 16 + (arg_idx - 8) * 8;
+					Int32 offset = FP_LR_SAVE_SIZE + (arg_idx - 8) * 8;
 					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
 				}
@@ -169,7 +173,7 @@ namespace ola
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
 		Uint32 const stack_adjustment = (gp_regs.size() + fp_regs.size()) * 8;
-		Uint32 const aligned_stack_adjustment = OLA_ALIGN_UP(stack_adjustment, 16);
+		Uint32 const aligned_stack_adjustment = OLA_ALIGN_UP(stack_adjustment, STACK_ALIGNMENT);
 
 		std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
 		std::list<MachineInstruction>::iterator insert_point = insert_list.begin();
@@ -183,31 +187,45 @@ namespace ola
 		if (insert_point != insert_list.end())
 		{
 			MachineInstruction& MI = *insert_point;
-			OLA_ASSERT(MI.GetOp<1>().IsImmediate());
-			MI.SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + aligned_stack_adjustment, MachineType::Int64));
+			OLA_ASSERT(MI.GetOp<2>().IsImmediate());
+			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
+			Uint32 aligned_total = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+			MI.SetOp<2>(MachineOperand::Immediate(aligned_total + aligned_stack_adjustment, MachineType::Int64));
 			++insert_point;
+
+			if (insert_point != insert_list.end() && insert_point->GetOpcode() == ARM64_InstStp)
+			{
+				++insert_point;
+			}
+			if (insert_point != insert_list.end() &&
+				(insert_point->GetOpcode() == InstAdd || insert_point->GetOpcode() == InstMove) &&
+				insert_point->GetOp<0>().IsReg() && insert_point->GetOp<0>().GetReg().reg == ARM64_X29)
+			{
+				++insert_point;
+			}
 		}
 		else
 		{
 			OLA_ASSERT(MF.GetStackAllocationSize() == 0);
-			Uint32 new_stack_allocation = MF.GetStackAllocationSize() + aligned_stack_adjustment;
-			if (new_stack_allocation > 0)
+			Uint32 total_stack = aligned_stack_adjustment + FP_LR_SAVE_SIZE;
+			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+			if (aligned_stack > 0)
 			{
 				MachineOperand fp = MachineOperand::ISAReg(ARM64_X29, MachineType::Int64);
 				MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
 				MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
 
-				MachineInstruction stp_fp_lr(ARM64_InstStp);
-				stp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(-16, MachineType::Ptr));
-				insert_point = ctx.EmitInst(insert_list.begin(), stp_fp_lr); ++insert_point;
-
-				MachineInstruction set_fp(InstMove);
-				set_fp.SetOp<0>(fp).SetOp<1>(sp);
-				insert_point = ctx.EmitInst(insert_point, set_fp); ++insert_point;
-
 				MachineInstruction allocate_stack(InstSub);
-				allocate_stack.SetOp<0>(sp).SetOp<1>(MachineOperand::Immediate(new_stack_allocation, MachineType::Int64));
-				insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
+				allocate_stack.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, MachineType::Int64));
+				insert_point = ctx.EmitInst(insert_list.begin(), allocate_stack); ++insert_point;
+
+				MachineInstruction stp_fp_lr(ARM64_InstStp);
+				stp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(aligned_stack - FP_LR_SAVE_SIZE, MachineType::Ptr));
+				insert_point = ctx.EmitInst(insert_point, stp_fp_lr); ++insert_point;
+
+				MachineInstruction set_fp(InstAdd);
+				set_fp.SetOp<0>(fp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack - FP_LR_SAVE_SIZE, MachineType::Int64));
+				insert_point = ctx.EmitInst(insert_point, set_fp); ++insert_point;
 			}
 		}
 
@@ -266,15 +284,18 @@ namespace ola
 			MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
 			MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
 
-			MachineInstruction reset_sp(InstMove);
-			reset_sp.SetOp<0>(sp).SetOp<1>(fp);
-			ctx.EmitInst(reset_sp);
+			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
+			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
 
 			MachineInstruction ldp_fp_lr(ARM64_InstLdp);
 			ldp_fp_lr.SetOp<0>(fp);
 			ldp_fp_lr.SetOp<1>(lr);
-			ldp_fp_lr.SetOp<2>(MachineOperand::StackObject(16, MachineType::Ptr));
+			ldp_fp_lr.SetOp<2>(MachineOperand::StackObject(MF.GetStackAllocationSize(), MachineType::Ptr));
 			ctx.EmitInst(ldp_fp_lr);
+
+			MachineInstruction restore_sp(InstAdd);
+			restore_sp.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, MachineType::Int64));
+			ctx.EmitInst(restore_sp);
 		}
 		ctx.EmitInst(MachineInstruction(InstRet));
 	}
@@ -288,8 +309,8 @@ namespace ola
 
 			insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 				{
-					if (MI.GetOpcode() == InstMove && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_SP
-						&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM64_X29)
+					if (MI.GetOpcode() == ARM64_InstLdp && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_X29
+						&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM64_X30)
 					{
 						return true;
 					}
@@ -297,9 +318,26 @@ namespace ola
 				});
 
 			Bool missing_epilogue = (insert_point == insert_list.end());
-			if (missing_epilogue) 
+			if (missing_epilogue)
 			{
 				--insert_point;
+			}
+
+			auto add_sp_it = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
+				{
+					return MI.GetOpcode() == InstAdd &&
+						MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_SP &&
+						MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM64_SP;
+				});
+
+			Uint32 callee_saved_size = (MF.GetCalleeSavedArgs().size()) * 8;
+			Uint32 aligned_callee_saved = OLA_ALIGN_UP(callee_saved_size, STACK_ALIGNMENT);
+
+			if (add_sp_it != insert_list.end())
+			{
+				OLA_ASSERT(add_sp_it->GetOp<2>().IsImmediate());
+				Uint32 current_amount = add_sp_it->GetOp<2>().GetImmediate();
+				add_sp_it->SetOp<2>(MachineOperand::Immediate(current_amount + aligned_callee_saved, MachineType::Int64));
 			}
 
 			for (auto const& [reg, offset, type] : MF.GetCalleeSavedArgs())
@@ -317,13 +355,17 @@ namespace ola
 				MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
 				MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
 
-				MachineInstruction set_sp(InstMove);
-				set_sp.SetOp<0>(sp).SetOp<1>(fp);
-				insert_point = ctx.EmitInst(insert_point, set_sp); ++insert_point;
+				Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE + callee_saved_size;
+				Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+				Uint32 fp_offset = MF.GetStackAllocationSize() + aligned_callee_saved;
 
 				MachineInstruction ldp_fp_lr(ARM64_InstLdp);
-				ldp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(16, MachineType::Ptr));
+				ldp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(fp_offset, MachineType::Ptr));
 				insert_point = ctx.EmitInst(insert_point, ldp_fp_lr); ++insert_point;
+
+				MachineInstruction restore_sp(InstAdd);
+				restore_sp.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, MachineType::Int64));
+				insert_point = ctx.EmitInst(insert_point, restore_sp); ++insert_point;
 			}
 		}
 	}

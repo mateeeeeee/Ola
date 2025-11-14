@@ -1,127 +1,35 @@
 Module ID : test.ola
 
-declare @FileOpen i64(ptr,ptr)
-
-
-declare @FileClose i8(i64)
-
-
-declare @FileIsOpen i8(i64)
-
-
-declare @FileReadInt i64(i64)
-
-
-declare @FileReadFloat f64(i64)
-
-
-declare @FileReadChar i8(i64)
-
-
-declare @FileReadLine i8(i64,ptr,i64)
-
-
-declare @FileRead i64(i64,ptr,i64)
-
-
-declare @FileWriteInt i8(i64,i64)
-
-
-declare @FileWriteFloat i8(i64,f64)
-
-
-declare @FileWriteChar i8(i64,i8)
-
-
-declare @FileWriteString i8(i64,ptr)
-
-
-declare @FileWriteLine i8(i64,ptr)
-
-
-declare @FileWrite i64(i64,ptr,i64)
-
-
-declare @FileTell i64(i64)
-
-
-declare @FileSeek i8(i64,i64,i64)
-
-
-declare @FileRewind void(i64)
-
-
-declare @FileEOF i8(i64)
-
-
-declare @FileError i8(i64)
-
-
-declare @FileClearError void(i64)
-
-
-declare @FileFlush i8(i64)
-
-
-declare @FileExists i8(ptr)
-
-
-declare @FileDelete i8(ptr)
-
-
-declare @FileRename i8(ptr,ptr)
-
-
-declare @FileSize i64(ptr)
-
-
-declare @SEEK_SET_VALUE ptr
-
-
-declare @SEEK_CUR_VALUE ptr
-
-
-declare @SEEK_END_VALUE ptr
-
-
-declare @MODE_READ ptr
-
-
-declare @MODE_WRITE ptr
-
-
-declare @MODE_APPEND ptr
-
-
-declare @MODE_READ_WRITE ptr
-
-
-declare @MODE_WRITE_READ ptr
-
-
-declare @MODE_APPEND_READ ptr
-
-
-declare @MODE_READ_BINARY ptr
-
-
-declare @MODE_WRITE_BINARY ptr
-
-
-declare @MODE_APPEND_BINARY ptr
+define internal @add__I__I i64(i64 %a,i64 %b) {
+entry:
+%0 = alloca i64
+store i64 %a, ptr %0
+%1 = alloca i64
+store i64 %b, ptr %1
+%2 = alloca i64
+%3 = load i64, ptr %0
+%4 = load i64, ptr %1
+%5 = add i64 %3, %4
+store i64 %5, ptr %2
+br label exit
+return:
+br label exit
+exit:
+%6 = load i64, ptr %2
+ret i64 %6
+}
 
 
 define external @main i64() {
 entry:
-%0 = call ptr @__StringLiteral0, @__StringLiteral1, @FileOpen
+%0 = alloca i64
+%1 = call i64 2, 3, @add__I__I
+store i64 %1, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 9
+%2 = load i64, ptr %0
+ret i64 %2
 }
-
-
-define internal @__StringLiteral0 ptr alo.txt
-
-
-define internal @__StringLiteral1 ptr r
 

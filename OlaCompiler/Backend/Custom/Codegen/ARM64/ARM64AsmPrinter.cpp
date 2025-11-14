@@ -146,6 +146,7 @@ namespace ola
 							EmitText("{}", opcode_string);
 						}
 						break;
+						case InstAdd:
 						case InstSub:
 						case InstAnd:
 						case InstOr:
@@ -155,12 +156,19 @@ namespace ola
 						case InstLShr:
 						case InstSMul:
 						case InstUMul:
-						case InstICmp:
-						case InstFCmp:
 						case InstFAdd:
 						case InstFSub:
 						case InstFMul:
 						case InstFDiv:
+						{
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& op1 = MI.GetOp<1>();
+							MachineOperand const& op2 = MI.GetOp<2>();
+							EmitText("{} {}, {}, {}", opcode_string, GetOperandString(dst), GetOperandString(op1), GetOperandString(op2));
+						}
+						break;
+						case InstICmp:
+						case InstFCmp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
@@ -270,7 +278,25 @@ namespace ola
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
 							MachineOperand const& addr = MI.GetOp<2>();
-							EmitText("{} {}, {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2), GetOperandString(addr));
+
+							std::string addr_str;
+							if (addr.IsStackObject())
+							{
+								Int32 offset = addr.GetStackOffset();
+								if (offset >= 0)
+								{
+									addr_str = std::format("[sp, #{}]", offset);
+								}
+								else
+								{
+									addr_str = GetOperandString(addr);
+								}
+							}
+							else
+							{
+								addr_str = GetOperandString(addr);
+							}
+							EmitText("{} {}, {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2), addr_str);
 						}
 						break;
 						case ARM64_InstAdrp:
