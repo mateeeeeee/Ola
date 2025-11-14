@@ -35,7 +35,10 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
       - instruction legalization
       - register allocation
     - x86-64 code generation
-    - Class support still not complete
+      - Microsoft ABI
+      - SysV ABI (wip)
+    - ARM64 code generation (wip)
+    - Class support not complete yet
 	
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
