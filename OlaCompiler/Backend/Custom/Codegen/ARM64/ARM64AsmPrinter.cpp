@@ -108,8 +108,6 @@ namespace ola
 						case InstNeg:
 						case InstNot:
 						case InstFNeg:
-						case InstSDiv:
-						case InstUDiv:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));
@@ -156,6 +154,10 @@ namespace ola
 						case InstLShr:
 						case InstSMul:
 						case InstUMul:
+						case InstSDiv:
+						case InstUDiv:
+						case InstSRem:
+						case InstURem:
 						case InstFAdd:
 						case InstFSub:
 						case InstFMul:
@@ -266,6 +268,7 @@ namespace ola
 						case InstF2S:
 						case InstS2F:
 						case InstZExt:
+						case ARM64_InstFMov:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();

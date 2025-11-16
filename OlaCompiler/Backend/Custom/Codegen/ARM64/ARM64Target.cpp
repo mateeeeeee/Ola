@@ -55,6 +55,10 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
+				if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
+				{
+					MI.SetOpcode(ARM64_InstFMov);
+				}
 
 				if (src.IsMemoryOperand() && dst.IsMemoryOperand())
 				{
@@ -201,6 +205,24 @@ namespace ola
 				if (src.IsImmediate())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);
+					MI.SetOp<1>(tmp);
+					instructions.insert(instruction_iter, MI2);
+				}
+			}
+			break;
+			case InstS2F:
+			case InstF2S:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				// scvtf/fcvtzs can't take immediate operands - must be in register
+				if (src.IsImmediate())
+				{
+					MachineType src_type = (MI.GetOpcode() == InstS2F) ? MachineType::Int64 : MachineType::Float64;
+					MachineOperand tmp = lowering_ctx.VirtualReg(src_type);
 					MachineInstruction MI2(InstMove);
 					MI2.SetOp<0>(tmp);
 					MI2.SetOp<1>(src);

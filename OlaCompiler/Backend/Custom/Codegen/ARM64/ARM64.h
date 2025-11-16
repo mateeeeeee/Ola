@@ -32,6 +32,7 @@ namespace ola
 		ARM64_InstLdp,
 		ARM64_InstMovz,
 		ARM64_InstMovk,
+		ARM64_InstFMov,
 		ARM64_InstCset,
 		ARM64_InstCsetEQ,
 		ARM64_InstCsetNE,

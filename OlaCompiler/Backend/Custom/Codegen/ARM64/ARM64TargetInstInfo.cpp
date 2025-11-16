@@ -10,10 +10,6 @@ namespace ola
 		switch (opcode)
 		{
 		case InstPush:
-		case InstSDiv:
-		case InstSRem:
-		case InstUDiv:
-		case InstURem:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagUse);
@@ -60,6 +56,10 @@ namespace ola
 		case InstXor:
 		case InstSMul:
 		case InstUMul:
+		case InstSDiv:
+		case InstUDiv:
+		case InstSRem:
+		case InstURem:
 		case InstFAdd:
 		case InstFSub:
 		case InstFMul:
@@ -131,7 +131,14 @@ namespace ola
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
-			inst_info.SetOpFlag(1, OperandFlagNone); 
+			inst_info.SetOpFlag(1, OperandFlagNone);
+		}
+		break;
+		case ARM64_InstFMov:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
 		case ARM64_InstCset:
