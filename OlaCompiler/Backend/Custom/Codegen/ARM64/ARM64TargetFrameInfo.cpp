@@ -111,6 +111,7 @@ namespace ola
 		{
 			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+			Uint32 fp_lr_offset = aligned_stack - FP_LR_SAVE_SIZE;
 
 			MachineInstruction allocate_stack(InstSub);
 			allocate_stack.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, Int64));
@@ -119,11 +120,11 @@ namespace ola
 			MachineInstruction stp_fp_lr(ARM64_InstStp);
 			stp_fp_lr.SetOp<0>(fp);
 			stp_fp_lr.SetOp<1>(lr);
-			stp_fp_lr.SetOp<2>(MachineOperand::StackObject(MF.GetStackAllocationSize(), Ptr));
+			stp_fp_lr.SetOp<2>(MachineOperand::StackObject(fp_lr_offset, Ptr));
 			ctx.EmitInst(stp_fp_lr);
 
 			MachineInstruction set_fp(InstAdd);
-			set_fp.SetOp<0>(fp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(MF.GetStackAllocationSize(), Int64));
+			set_fp.SetOp<0>(fp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(fp_lr_offset, Int64));
 			ctx.EmitInst(set_fp);
 		}
 
@@ -286,11 +287,12 @@ namespace ola
 
 			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+			Uint32 fp_lr_offset = aligned_stack - FP_LR_SAVE_SIZE;
 
 			MachineInstruction ldp_fp_lr(ARM64_InstLdp);
 			ldp_fp_lr.SetOp<0>(fp);
 			ldp_fp_lr.SetOp<1>(lr);
-			ldp_fp_lr.SetOp<2>(MachineOperand::StackObject(MF.GetStackAllocationSize(), MachineType::Ptr));
+			ldp_fp_lr.SetOp<2>(MachineOperand::StackObject(fp_lr_offset, MachineType::Ptr));
 			ctx.EmitInst(ldp_fp_lr);
 
 			MachineInstruction restore_sp(InstAdd);
@@ -357,7 +359,7 @@ namespace ola
 
 				Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE + callee_saved_size;
 				Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
-				Uint32 fp_offset = MF.GetStackAllocationSize() + aligned_callee_saved;
+				Uint32 fp_offset = aligned_stack - FP_LR_SAVE_SIZE;
 
 				MachineInstruction ldp_fp_lr(ARM64_InstLdp);
 				ldp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(fp_offset, MachineType::Ptr));

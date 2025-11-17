@@ -263,7 +263,8 @@ namespace ola
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();
 							Char const* cond = (opcode == InstCMoveEQ) ? "eq" : "ne";
-							EmitText("csel {}, {}, {}, {}", GetOperandString(dst), GetOperandString(src), GetOperandString(dst), cond);
+							Char const* inst = (dst.GetType() == MachineType::Float64) ? "fcsel" : "csel";
+							EmitText("{} {}, {}, {}, {}", inst, GetOperandString(dst), GetOperandString(src), GetOperandString(dst), cond);
 						}
 						break;
 						case InstF2S:

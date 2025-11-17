@@ -55,20 +55,46 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
+
+				if ((dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64) && src.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(src);  
+					instructions.insert(instruction_iter, MI2);
+
+					MI.SetOpcode(ARM64_InstFMov);
+					MI.SetOp<1>(tmp);  
+					break;
+				}
+
 				if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 				{
 					MI.SetOpcode(ARM64_InstFMov);
 				}
 
-				if (src.IsMemoryOperand() && dst.IsMemoryOperand())
+				if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+					MI.SetOpcode(InstLoad);
 					MI.SetOp<0>(tmp);
+					MI.SetOp<1>(src);
 
-					MachineInstruction MI2(InstMove);
+					MachineInstruction MI2(InstStore);
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
+				}
+				else if (dst.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstStore);
+					MI.SetOp<0>(dst);
+					MI.SetOp<1>(src);
+				}
+				else if (src.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstLoad);
 				}
 			}
 			break;
@@ -170,10 +196,28 @@ namespace ola
 				MachineOperand op1 = MI.GetOperand(1);
 				MachineOperand op2 = MI.GetOperand(2);
 				MachineOperand compare_op = MI.GetOperand(3);
-				//fcmp op1, op2
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					op2 = tmp;
+				}
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					op1 = tmp;
+				}
+
 				MI.SetOp<0>(op1);
 				MI.SetOp<1>(op2);
-				//cset dst, condition
 				auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 				{
 					OLA_ASSERT(compare_op.IsImmediate());

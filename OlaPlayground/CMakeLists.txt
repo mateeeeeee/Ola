@@ -5,10 +5,6 @@ set(SOURCE
 
 set(TEST_FILES
 	Test/test.ola
-	Test/test.ll
-	Test/test.s
-	Test/test.oll
-	Test/test.omll
 )
 
 add_executable(OlaPlayground ${SOURCE} ${TEST_FILES})

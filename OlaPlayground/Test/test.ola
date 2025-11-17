@@ -1,10 +1,83 @@
+import std.assert;
+
+
+int Add(int a, int b)
+{
+    return a + b;
+}
+
+int AddThreeNumbers(int a, int b, int c)
+{
+    return a + b + c;
+}
+
+int AddFourNumbers(int a, int b, int c, int d)
+{
+    return a + b + c + d;
+}
+
+int AddSixNumbers(int a, int b, int c, int d, int e, int f)
+{
+    return a + b + c + d + e + f;
+}
+
+int AddTenNumbers(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j)
+{
+	return a + b + c + d + e + f + g + h + i + j;
+}
+
+int AlternatingSum(int a, int b, int c, int d, int e, int f)
+{
+    return a - b + c - d + e - f;
+}
+
+float AddFloats(float a, float b)
+{
+    return a + b;
+}
+
+float AddIntAndFloat(int a, float b, float c)
+{
+    return a + b + c;
+}
+
+float ConditionSum(float a, float b, float c, float d, bool e)
+{
+    return e ? a + b : c + d;
+}
+
+int AddBooleans(bool a, bool b, bool c, bool d)
+{
+    return a + b + c + d;  // Implicit conversion (true = 1, false = 0)
+}
+
+
+void TestIntCalls()
+{
+    Assert(Add(1, 2) == 3);
+    Assert(AddThreeNumbers(1,2,3) == 6);
+    Assert(AddFourNumbers(1,2,3,4) == 10);
+    Assert(AddSixNumbers(1,2,3,4,5,6) == 21);
+    Assert(AlternatingSum(1,2,3,4,5,6) == -3);
+}
+void TestFloatCalls()
+{
+    Assert(AddFloats(1.0, 2.0) == 3.0);
+    Assert(AddIntAndFloat(1, 2.0, 3.0) == 6.0);
+    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, true) == 3.0);
+    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, false) == 7.0);
+    Assert(AddTenNumbers(1,2,3,4,5,6,7,8,9,10) == 55);
+}
+
+void TestBoolCalls()
+{
+    Assert(AddBooleans(true, false, true, false) == 2);
+}
 
 public int main()
 {
-	int sum = 0;
-    for (int i = 1; i <= 5; i++)
-    {
-        sum += i;
-    }
-	return sum;
+    TestIntCalls();
+    TestFloatCalls();
+    TestBoolCalls();
+    return 0;
 }
