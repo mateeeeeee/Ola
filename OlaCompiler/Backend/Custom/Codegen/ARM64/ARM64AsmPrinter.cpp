@@ -171,6 +171,7 @@ namespace ola
 						break;
 						case InstICmp:
 						case InstFCmp:
+						case InstTest:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();

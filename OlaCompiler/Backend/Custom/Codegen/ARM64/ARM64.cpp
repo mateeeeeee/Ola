@@ -31,6 +31,7 @@ namespace ola
 		case InstCall:   return "bl";
 		case InstICmp:   return "cmp";
 		case InstFCmp:   return "fcmp";
+		case InstTest:   return "tst";
 		case InstFAdd:   return "fadd";
 		case InstFSub:   return "fsub";
 		case InstFMul:   return "fmul";
@@ -97,8 +98,8 @@ namespace ola
 			case ARM64_X26: return is_64bit ? "x26" : "w26";
 			case ARM64_X27: return is_64bit ? "x27" : "w27";
 			case ARM64_X28: return is_64bit ? "x28" : "w28";
-			case ARM64_X29: return "x29"; // FP
-			case ARM64_X30: return "x30"; // LR
+			case ARM64_X29: return is_64bit ? "x29" : "w29"; // FP
+			case ARM64_X30: return is_64bit ? "x30" : "w30"; // LR
 			case ARM64_SP:  return "sp";
 			default: OLA_ASSERT(false); return "x?";
 			}
