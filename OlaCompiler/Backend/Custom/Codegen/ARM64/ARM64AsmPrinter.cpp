@@ -183,20 +183,22 @@ namespace ola
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();
 
+							std::string opcode_suffix = (dst.GetType() == MachineType::Int8) ? "b" : "";
+
 							if (src.IsStackObject())
 							{
-								EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
+								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src));
 							}
 							else if (src.IsRelocable())
 							{
 								std::string symbol = GetOperandString(src);
 								std::string dst_str = GetOperandString(dst);
 								EmitText("adrp {}, {}@PAGE", dst_str, symbol);
-								EmitText("{} {}, [x{}, {}@PAGEOFF]", opcode_string, dst_str, dst_str, symbol);
+								EmitText("{}{} {}, [x{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
 							}
 							else
 							{
-								EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src, true));
+								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src, true));
 							}
 						}
 						break;
@@ -205,13 +207,15 @@ namespace ola
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();
 
+							std::string opcode_suffix = (src.GetType() == MachineType::Int8) ? "b" : "";
+
 							if (dst.IsStackObject())
 							{
-								EmitText("{} {}, {}", opcode_string, GetOperandString(src), GetOperandString(dst));
+								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
 							}
 							else
 							{
-								EmitText("{} {}, {}", opcode_string, GetOperandString(src), GetOperandString(dst, true));
+								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst, true));
 							}
 						}
 						break;

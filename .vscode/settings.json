@@ -69,7 +69,8 @@
         "locale": "cpp",
         "mutex": "cpp",
         "__hash_table": "cpp",
-        "__node_handle": "cpp"
+        "__node_handle": "cpp",
+        "list": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

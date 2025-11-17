@@ -74,6 +74,42 @@ namespace ola
 					MI.SetOpcode(ARM64_InstFMov);
 				}
 
+				if (src.IsImmediate() && dst.IsMemoryOperand())
+				{
+					if (src.GetType() == MachineType::Float64)
+					{
+						MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+						MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp_int);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+
+						MachineInstruction MI3(ARM64_InstFMov);
+						MI3.SetOp<0>(tmp_fp);
+						MI3.SetOp<1>(tmp_int);
+						instructions.insert(instruction_iter, MI3);
+
+						MI.SetOpcode(InstStore);
+						MI.SetOp<0>(dst);
+						MI.SetOp<1>(tmp_fp);
+					}
+					else
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+
+						MI.SetOpcode(InstStore);
+						MI.SetOp<0>(dst);
+						MI.SetOp<1>(tmp);
+					}
+					break;
+				}
+
 				if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
@@ -106,12 +142,32 @@ namespace ola
 
 				if (src.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
-					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
-					MI2.SetOp<1>(src);
-					instructions.insert(instruction_iter, MI2);
-					MI.SetOp<1>(tmp);
+					if (src.GetType() == MachineType::Float64)
+					{
+						MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+						MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp_int);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+
+						MachineInstruction MI3(ARM64_InstFMov);
+						MI3.SetOp<0>(tmp_fp);
+						MI3.SetOp<1>(tmp_int);
+						instructions.insert(instruction_iter, MI3);
+
+						MI.SetOp<1>(tmp_fp);
+					}
+					else
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+						MI.SetOp<1>(tmp);
+					}
 				}
 				else if (src.IsMemoryOperand())
 				{
@@ -135,27 +191,42 @@ namespace ola
 				// can't have immediate operands (need to load from memory/register)
 				if (op2.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
 					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
+					MI2.SetOp<0>(tmp_int);
 					MI2.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI2);
-					MI.SetOp<2>(tmp);
+
+					MachineInstruction MI3(ARM64_InstFMov);
+					MI3.SetOp<0>(tmp_fp);
+					MI3.SetOp<1>(tmp_int);
+					instructions.insert(instruction_iter, MI3);
+
+					MI.SetOp<2>(tmp_fp);
 				}
 				if (op1.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
 					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
+					MI2.SetOp<0>(tmp_int);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
-					MI.SetOp<1>(tmp);
+
+					MachineInstruction MI3(ARM64_InstFMov);
+					MI3.SetOp<0>(tmp_fp);
+					MI3.SetOp<1>(tmp_int);
+					instructions.insert(instruction_iter, MI3);
+
+					MI.SetOp<1>(tmp_fp);
 				}
 			}
 			break;
 			case InstICmp:
 			{
-				// ARM64: cmp + cset pattern
 				if (!MI.GetOperand(2).IsUndefined())
 				{
 					MachineOperand dst = MI.GetOperand(0);
@@ -166,7 +237,6 @@ namespace ola
 					MI.SetOp<0>(op1);
 					MI.SetOp<1>(op2);
 
-					//cset dst, condition
 					auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 					{
 						OLA_ASSERT(compare_op.IsImmediate());
@@ -199,21 +269,37 @@ namespace ola
 
 				if (op2.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
 					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
+					MI2.SetOp<0>(tmp_int);
 					MI2.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI2);
-					op2 = tmp;
+
+					MachineInstruction MI3(ARM64_InstFMov);
+					MI3.SetOp<0>(tmp_fp);
+					MI3.SetOp<1>(tmp_int);
+					instructions.insert(instruction_iter, MI3);
+
+					op2 = tmp_fp;
 				}
 				if (op1.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Float64);
+					MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
 					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
+					MI2.SetOp<0>(tmp_int);
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
-					op1 = tmp;
+
+					MachineInstruction MI3(ARM64_InstFMov);
+					MI3.SetOp<0>(tmp_fp);
+					MI3.SetOp<1>(tmp_int);
+					instructions.insert(instruction_iter, MI3);
+
+					op1 = tmp_fp;
 				}
 
 				MI.SetOp<0>(op1);
@@ -248,12 +334,32 @@ namespace ola
 				MachineOperand src = MI.GetOperand(1);
 				if (src.IsImmediate())
 				{
-					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
-					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
-					MI2.SetOp<1>(src);
-					MI.SetOp<1>(tmp);
-					instructions.insert(instruction_iter, MI2);
+					if (src.GetType() == MachineType::Float64)
+					{
+						MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+						MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp_int);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+
+						MachineInstruction MI3(ARM64_InstFMov);
+						MI3.SetOp<0>(tmp_fp);
+						MI3.SetOp<1>(tmp_int);
+						instructions.insert(instruction_iter, MI3);
+
+						MI.SetOp<1>(tmp_fp);
+					}
+					else
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp);
+						MI2.SetOp<1>(src);
+						MI.SetOp<1>(tmp);
+						instructions.insert(instruction_iter, MI2);
+					}
 				}
 			}
 			break;
@@ -262,16 +368,35 @@ namespace ola
 			{
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
-				// scvtf/fcvtzs can't take immediate operands - must be in register
 				if (src.IsImmediate())
 				{
 					MachineType src_type = (MI.GetOpcode() == InstS2F) ? MachineType::Int64 : MachineType::Float64;
-					MachineOperand tmp = lowering_ctx.VirtualReg(src_type);
-					MachineInstruction MI2(InstMove);
-					MI2.SetOp<0>(tmp);
-					MI2.SetOp<1>(src);
-					MI.SetOp<1>(tmp);
-					instructions.insert(instruction_iter, MI2);
+					if (src_type == MachineType::Float64)
+					{
+						MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+						MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp_int);
+						MI2.SetOp<1>(src);
+						instructions.insert(instruction_iter, MI2);
+
+						MachineInstruction MI3(ARM64_InstFMov);
+						MI3.SetOp<0>(tmp_fp);
+						MI3.SetOp<1>(tmp_int);
+						instructions.insert(instruction_iter, MI3);
+
+						MI.SetOp<1>(tmp_fp);
+					}
+					else
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(src_type);
+						MachineInstruction MI2(InstMove);
+						MI2.SetOp<0>(tmp);
+						MI2.SetOp<1>(src);
+						MI.SetOp<1>(tmp);
+						instructions.insert(instruction_iter, MI2);
+					}
 				}
 			}
 			break;
@@ -326,13 +451,20 @@ namespace ola
 			gp_regs.reserve(ARM64_GPREnd - ARM64_GPRBegin + 1);
 			for (Uint32 r = ARM64_GPRBegin; r <= ARM64_GPREnd; ++r)
 			{
-				if (r != ARM64_SP && r != ARM64_X29) gp_regs.push_back(r);
+				// SP, X29 (FP), X30 (LR), X16 (GP scratch)
+				if (r != ARM64_SP && r != ARM64_X29 && r != ARM64_X30 && r != ARM64_X16) 
+				{
+					gp_regs.push_back(r);
+				}
 			}
 
 			fp_regs.reserve(ARM64_FPREnd - ARM64_FPRBegin + 1);
 			for (Uint32 r = ARM64_FPRBegin; r <= ARM64_FPREnd; ++r)
 			{
-				fp_regs.push_back(r);
+				if (r != ARM64_V31) 
+				{
+					fp_regs.push_back(r);
+				}
 			}
 		}
 
