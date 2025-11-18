@@ -106,10 +106,15 @@ namespace ola
 						switch (opcode)
 						{
 						case InstNeg:
-						case InstNot:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));
+						}
+						break;
+						case InstNot:
+						{
+							MachineOperand const& op = MI.GetOp<0>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
 						}
 						break;
 						case InstFNeg:

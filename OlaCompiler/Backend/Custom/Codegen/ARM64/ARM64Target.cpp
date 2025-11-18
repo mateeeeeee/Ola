@@ -541,6 +541,35 @@ namespace ola
 				}
 			}
 			break;
+			case InstAnd:
+			case InstOr:
+			case InstXor:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op2.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<2>(tmp);
+				}
+			}
+			break;
 			}
 		}
 
