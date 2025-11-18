@@ -406,3 +406,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Ola log files
+olalog.txt
+

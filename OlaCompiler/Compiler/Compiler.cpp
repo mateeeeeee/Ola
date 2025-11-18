@@ -357,6 +357,16 @@ namespace ola
 #endif
 			res = timeout_detection ? ExecuteCommand_NonBlocking(exe_cmd.c_str(), 1.0f) : ExecuteCommand(exe_cmd.c_str());
 			OLA_INFO("Program exited with code: {}", res);
+
+			if (timeout_detection && fs::exists(output_file))
+			{
+				std::error_code ec;
+				fs::remove(output_file, ec);
+				if (ec)
+				{
+					OLA_WARN("Failed to remove test executable '{}': {}", output_file, ec.message());
+				}
+			}
 		}
 		fs::current_path(cur_path);
 		return res;

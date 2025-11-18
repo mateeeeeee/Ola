@@ -107,10 +107,15 @@ namespace ola
 						{
 						case InstNeg:
 						case InstNot:
-						case InstFNeg:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
 							EmitText("{} {}", opcode_string, GetOperandString(op));
+						}
+						break;
+						case InstFNeg:
+						{
+							MachineOperand const& op = MI.GetOp<0>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
 						}
 						break;
 						case InstJump:
@@ -193,8 +198,16 @@ namespace ola
 							{
 								std::string symbol = GetOperandString(src);
 								std::string dst_str = GetOperandString(dst);
-								EmitText("adrp {}, {}@PAGE", dst_str, symbol);
-								EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
+								if (dst.GetType() == MachineType::Float64)
+								{
+									EmitText("adrp x16, {}@PAGE", symbol);
+									EmitText("{}{} {}, [x16, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, symbol);
+								}
+								else
+								{
+									EmitText("adrp {}, {}@PAGE", dst_str, symbol);
+									EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
+								}
 							}
 							else
 							{
@@ -217,8 +230,6 @@ namespace ola
 							{
 								std::string symbol = GetOperandString(dst);
 								std::string src_str = GetOperandString(src);
-								// Need a temporary register to hold the address
-								// Use x16 as a temporary (IP0 register, scratch register)
 								EmitText("adrp x16, {}@PAGE", symbol);
 								EmitText("{}{} {}, [x16, {}@PAGEOFF]", opcode_string, opcode_suffix, src_str, symbol);
 							}
@@ -240,9 +251,16 @@ namespace ola
 								{
 									EmitText("{} {}, #{}", opcode_string, GetOperandString(dst), imm);
 								}
-								else
+								else if (imm < 0 && imm >= -65536)
 								{
 									EmitText("{} {}, #{}", opcode_string, GetOperandString(dst), imm);
+								}
+								else
+								{
+									std::string pool_label = GetIntConstantPoolEntry(imm);
+									std::string dst_str = GetOperandString(dst);
+									EmitText("adrp {}, {}@PAGE", dst_str, pool_label);
+									EmitText("ldr {}, [{}, {}@PAGEOFF]", dst_str, dst_str, pool_label);
 								}
 							}
 							else

@@ -400,6 +400,29 @@ namespace ola
 				}
 			}
 			break;
+			case InstFNeg:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsImmediate())
+				{
+					MachineOperand tmp_int = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand tmp_fp = lowering_ctx.VirtualReg(MachineType::Float64);
+
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp_int);
+					MI2.SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+
+					MachineInstruction MI3(ARM64_InstFMov);
+					MI3.SetOp<0>(tmp_fp);
+					MI3.SetOp<1>(tmp_int);
+					instructions.insert(instruction_iter, MI3);
+
+					MI.SetOp<1>(tmp_fp);
+				}
+			}
+			break;
 			}
 		}
 

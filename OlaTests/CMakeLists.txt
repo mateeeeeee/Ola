@@ -80,4 +80,16 @@ target_link_libraries(OlaTests PRIVATE gtest_main)
 target_include_directories(OlaTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(OlaTests PRIVATE ${CMAKE_SOURCE_DIR}/OlaCompiler/)
 
+# Configure the path to Ola executable for tests
+if(CMAKE_CONFIGURATION_TYPES)
+    set(OLA_EXE_PATH "$<TARGET_FILE:Ola>")
+else()
+    set(OLA_EXE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Ola${CMAKE_EXECUTABLE_SUFFIX}")
+endif()
+
+target_compile_definitions(OlaTests PRIVATE
+    OLA_EXE_PATH="${OLA_EXE_PATH}"
+    OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+)
+
 
