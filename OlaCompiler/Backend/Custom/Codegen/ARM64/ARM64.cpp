@@ -11,6 +11,7 @@ namespace ola
 		case InstAdd:    return "add";
 		case InstSub:    return "sub";
 		case InstSMul:   return "mul";
+		case InstUMul:   return "mul";
 		case InstSDiv:   return "sdiv";
 		case InstUDiv:   return "udiv";
 		case InstAnd:    return "and";
@@ -47,6 +48,7 @@ namespace ola
 		case ARM64_InstMovz:   return "movz";
 		case ARM64_InstMovk:   return "movk";
 		case ARM64_InstFMov:   return "fmov";
+		case ARM64_InstMsub:   return "msub";
 		case ARM64_InstCset:   return "cset";
 		case ARM64_InstCsetEQ: return "cset";
 		case ARM64_InstCsetNE: return "cset";

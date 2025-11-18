@@ -448,6 +448,80 @@ namespace ola
 				}
 			}
 			break;
+			case InstSRem:
+			case InstURem:
+			{
+				// ARM64 doesn't have remainder instruction, expand to:
+				// rem = a - (a / b) * b
+				// Using msub: rem = a - (quotient * b)
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+					MachineInstruction mov_inst(InstMove);
+					mov_inst.SetOp<0>(tmp);
+					mov_inst.SetOp<1>(op1);
+					instructions.insert(instruction_iter, mov_inst);
+					op1 = tmp;
+				}
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op2.GetType());
+					MachineInstruction mov_inst(InstMove);
+					mov_inst.SetOp<0>(tmp);
+					mov_inst.SetOp<1>(op2);
+					instructions.insert(instruction_iter, mov_inst);
+					op2 = tmp;
+				}
+
+				Uint32 div_opcode = (MI.GetOpcode() == InstSRem) ? InstSDiv : InstUDiv;
+
+				MachineOperand quotient = lowering_ctx.VirtualReg(dst.GetType());
+				MachineInstruction div_inst(div_opcode);
+				div_inst.SetOp<0>(quotient).SetOp<1>(op1).SetOp<2>(op2);
+				instructions.insert(instruction_iter, div_inst);
+
+				MI.SetOpcode(ARM64_InstMsub);
+				MI.SetOp<0>(dst);
+				MI.SetOp<1>(quotient);
+				MI.SetOp<2>(op2);
+				MI.SetOp<3>(op1);
+			}
+			break;
+			case InstSMul:
+			case InstUMul:
+			case InstSDiv:
+			case InstUDiv:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op2.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<2>(tmp);
+				}
+
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
+			}
+			break;
 			}
 		}
 

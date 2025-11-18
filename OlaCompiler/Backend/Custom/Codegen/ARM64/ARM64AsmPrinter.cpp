@@ -371,6 +371,16 @@ namespace ola
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
+						case ARM64_InstMsub:
+						{
+							//msub Xd, Xn, Xm, Xa  =>  Xd = Xa - (Xn * Xm)
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& op1 = MI.GetOp<1>();
+							MachineOperand const& op2 = MI.GetOp<2>();
+							MachineOperand const& op3 = MI.GetOp<3>();
+							EmitText("{} {}, {}, {}, {}", opcode_string, GetOperandString(dst), GetOperandString(op1), GetOperandString(op2), GetOperandString(op3));
+						}
+						break;
 
 						default:
 							OLA_ASSERT_MSG(false, "Unhandled ARM64 instruction in assembly printer!");

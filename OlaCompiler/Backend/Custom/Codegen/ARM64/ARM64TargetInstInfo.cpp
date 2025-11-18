@@ -168,6 +168,15 @@ namespace ola
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
+		case ARM64_InstMsub:
+		{
+			inst_info.SetOperandCount(4);
+			inst_info.SetOpFlag(0, OperandFlagDef);  // Xd (destination)
+			inst_info.SetOpFlag(1, OperandFlagUse);  // Xn (multiplicand)
+			inst_info.SetOpFlag(2, OperandFlagUse);  // Xm (multiplier)
+			inst_info.SetOpFlag(3, OperandFlagUse);  // Xa (minuend)
+		}
+		break;
 		default:
 			break;
 		}
