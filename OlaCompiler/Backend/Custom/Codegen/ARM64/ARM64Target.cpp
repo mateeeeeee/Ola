@@ -237,6 +237,31 @@ namespace ola
 					MI.SetOp<0>(op1);
 					MI.SetOp<1>(op2);
 
+					if (op1.IsImmediate())
+					{
+						OLA_ASSERT(!op2.IsImmediate());
+						MI.SetOp<0>(op2);
+						MI.SetOp<1>(op1);
+
+						auto GetOppositeCondition = [](MachineOperand compare_op) -> CompareOp
+						{
+							OLA_ASSERT(compare_op.IsImmediate());
+							CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
+							switch (cmp_op)
+							{
+							case CompareOp::ICmpEQ:  return CompareOp::ICmpEQ;
+							case CompareOp::ICmpNE:  return CompareOp::ICmpNE;
+							case CompareOp::ICmpSGT: return CompareOp::ICmpSLE;
+							case CompareOp::ICmpSGE: return CompareOp::ICmpSLT;
+							case CompareOp::ICmpSLT: return CompareOp::ICmpSGE;
+							case CompareOp::ICmpSLE: return CompareOp::ICmpSGT;
+							}
+							OLA_ASSERT_MSG(false, "Invalid compare operation!");
+							return CompareOp::ICmpEQ;
+						};
+						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Int64);
+					}
+
 					auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 					{
 						OLA_ASSERT(compare_op.IsImmediate());
