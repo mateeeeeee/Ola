@@ -108,7 +108,7 @@ namespace ola
 						case InstNeg:
 						{
 							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("{} {}", opcode_string, GetOperandString(op));
+							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
 						}
 						break;
 						case InstNot:
