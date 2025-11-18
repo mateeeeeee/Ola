@@ -1,4 +1,4 @@
- import std.assert;
+import std.assert;
 
 // Globals for addition tests
 int global_int_1 = 5;

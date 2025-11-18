@@ -194,7 +194,7 @@ namespace ola
 								std::string symbol = GetOperandString(src);
 								std::string dst_str = GetOperandString(dst);
 								EmitText("adrp {}, {}@PAGE", dst_str, symbol);
-								EmitText("{}{} {}, [x{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
+								EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
 							}
 							else
 							{
@@ -212,6 +212,15 @@ namespace ola
 							if (dst.IsStackObject())
 							{
 								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
+							}
+							else if (dst.IsRelocable())
+							{
+								std::string symbol = GetOperandString(dst);
+								std::string src_str = GetOperandString(src);
+								// Need a temporary register to hold the address
+								// Use x16 as a temporary (IP0 register, scratch register)
+								EmitText("adrp x16, {}@PAGE", symbol);
+								EmitText("{}{} {}, [x16, {}@PAGEOFF]", opcode_string, opcode_suffix, src_str, symbol);
 							}
 							else
 							{
