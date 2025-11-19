@@ -77,8 +77,9 @@ namespace ola
 		case InstNot:
 		case InstFNeg:
 		{
-			inst_info.SetOperandCount(1);
+			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
 		case InstJump:

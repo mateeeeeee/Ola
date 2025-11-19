@@ -107,20 +107,23 @@ namespace ola
 						{
 						case InstNeg:
 						{
-							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstNot:
 						{
-							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstFNeg:
 						{
-							MachineOperand const& op = MI.GetOp<0>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op), GetOperandString(op));
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
 						}
 						break;
 						case InstJump:
