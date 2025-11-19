@@ -210,8 +210,10 @@ namespace ola
 								}
 								else
 								{
-									EmitText("adrp {}, {}@PAGE", dst_str, symbol);
-									EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_str, symbol);
+									// For adrp and base addressing, we always need the X register version
+									std::string dst_x_str = ARM64_GetRegisterString(dst.GetReg().reg, MachineType::Ptr);
+									EmitText("adrp {}, {}@PAGE", dst_x_str, symbol);
+									EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_x_str, symbol);
 								}
 							}
 							else
@@ -286,6 +288,19 @@ namespace ola
 								//ADRP loads page address, ADD adds page offset
 								EmitText("adrp {}, {}@PAGE", dst_str, symbol);
 								EmitText("add {}, {}, {}@PAGEOFF", dst_str, dst_str, symbol);
+							}
+							else if (src.IsStackObject())
+							{
+								Int32 stack_offset = src.GetStackOffset();
+								std::string dst_str = GetOperandString(dst);
+								if (stack_offset >= 0)
+								{
+									EmitText("add {}, x29, #{}", dst_str, stack_offset);
+								}
+								else
+								{
+									EmitText("sub {}, x29, #{}", dst_str, -stack_offset);
+								}
 							}
 							else
 							{

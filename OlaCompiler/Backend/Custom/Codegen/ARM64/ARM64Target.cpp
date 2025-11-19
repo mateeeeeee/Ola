@@ -262,6 +262,22 @@ namespace ola
 						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Int64);
 					}
 
+					// ARM64 cmp only supports 12-bit unsigned immediates (0-4095)
+					MachineOperand cmp_op2 = MI.GetOperand(1);
+					if (cmp_op2.IsImmediate())
+					{
+						Int64 imm = cmp_op2.GetImmediate();
+						if (imm < 0 || imm > 4095)
+						{
+							MachineOperand tmp = lowering_ctx.VirtualReg(cmp_op2.GetType());
+							MachineInstruction mov_inst(InstMove);
+							mov_inst.SetOp<0>(tmp);
+							mov_inst.SetOp<1>(cmp_op2);
+							instructions.insert(instruction_iter, mov_inst);
+							MI.SetOp<1>(tmp);
+						}
+					}
+
 					auto GetCsetCondition = [](MachineOperand compare_op) -> Uint32
 					{
 						OLA_ASSERT(compare_op.IsImmediate());
