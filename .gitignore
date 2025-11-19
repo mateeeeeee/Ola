@@ -26,14 +26,15 @@ OlaTests/Tests/LLVM/*.exe
 OlaTests/Tests/LLVM/*.s
 OlaTests/Tests/LLVM/*.ll
 OlaTests/Tests/Custom/*.exe
+OlaTests/Tests/Custom/*.obj
 OlaTests/Tests/Custom/*.s
 OlaTests/Tests/Custom/*.ll
 OlaTests/Tests/Custom/*.oll
-OlaTests/Tests/Custom/*.exe
 OlaTests/Tests/*.s
 OlaTests/Tests/*.ll
 OlaTests/Tests/*.oll
 OlaTests/Tests/*.exe
+OlaTests/Tests/*.obj
 OlaCompiler/OlaCompiler.args.json
 
 # OlaPlayground compilation artifacts

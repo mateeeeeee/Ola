@@ -126,7 +126,7 @@ namespace ola
 			else if (C->GetConstantID() == ConstantID::Integer)
 			{
 				ConstantInt const* CI = cast<ConstantInt>(C);
-				MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), MachineType::Int64);
+				MachineOperand imm = MachineOperand::Immediate(CI->GetValue(), GetOperandType(CI->GetType()));
 				return imm;
 			}
 			else if (C->GetConstantID() == ConstantID::Float)
