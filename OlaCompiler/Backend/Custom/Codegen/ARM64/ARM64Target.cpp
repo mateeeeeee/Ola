@@ -110,7 +110,21 @@ namespace ola
 					break;
 				}
 
-				if (dst.IsMemoryOperand() && src.IsMemoryOperand())
+				if (dst.GetType() == MachineType::Ptr && src.IsMemoryOperand())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
+					MI.SetOp<0>(tmp);
+					MI.SetOp<1>(src);
+					MI.SetOpcode(InstLoadGlobalAddress);
+
+					MachineInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+
+					++instruction_iter;
+					instructions.insert(instruction_iter, MI2);
+				}
+				else if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 					MI.SetOpcode(InstLoad);
@@ -121,6 +135,10 @@ namespace ola
 					MI2.SetOp<0>(dst);
 					MI2.SetOp<1>(tmp);
 					instructions.insert(++instruction_iter, MI2);
+				}
+				else if (dst.GetType() == MachineType::Ptr && (src.IsRelocable() || src.IsStackObject()))
+				{
+					MI.SetOpcode(InstLoadGlobalAddress);
 				}
 				else if (dst.IsMemoryOperand())
 				{
@@ -140,7 +158,21 @@ namespace ola
 				MachineOperand dst = MI.GetOperand(0);
 				MachineOperand src = MI.GetOperand(1);
 
-				if (src.IsImmediate())
+				if (dst.GetType() == MachineType::Ptr && src.IsMemoryOperand())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(dst.GetType());
+					MI.SetOp<0>(tmp);
+					MI.SetOp<1>(src);
+					MI.SetOpcode(InstLoadGlobalAddress);
+
+					MachineInstruction MI2(InstStore);
+					MI2.SetOp<0>(dst);
+					MI2.SetOp<1>(tmp);
+
+					++instruction_iter;
+					instructions.insert(instruction_iter, MI2);
+				}
+				else if (src.IsImmediate())
 				{
 					if (src.GetType() == MachineType::Float64)
 					{
@@ -464,6 +496,16 @@ namespace ola
 				}
 			}
 			break;
+			case InstZExt:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsImmediate())
+				{
+					MI.SetOpcode(InstMove);
+				}
+			}
+			break;
 			case InstSRem:
 			case InstURem:
 			{
@@ -506,6 +548,24 @@ namespace ola
 				MI.SetOp<1>(quotient);
 				MI.SetOp<2>(op2);
 				MI.SetOp<3>(op1);
+			}
+			break;
+			case InstAdd:
+			case InstSub:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				if (op1.IsImmediate())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
 			}
 			break;
 			case InstSMul:
