@@ -437,10 +437,22 @@ namespace ola
 			if (src.GetType() == MachineType::Int8)
 			{
 				MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int64);
-				MachineInstruction MI2(InstZExt);
-				MI2.SetOp<0>(tmp).SetOp<1>(src);
-				instructions.insert(instruction_iter, MI2);
-				MI.SetOp<1>(tmp);
+				// If source is immediate, use Move instead of ZExt
+				if (src.IsImmediate())
+				{
+					src.SetType(MachineType::Int64);
+					MachineInstruction MI2(InstMove);
+					MI2.SetOp<0>(tmp).SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
+				else
+				{
+					MachineInstruction MI2(InstZExt);
+					MI2.SetOp<0>(tmp).SetOp<1>(src);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+				}
 			}
 		}
 		break;
@@ -450,8 +462,6 @@ namespace ola
 			MachineOperand op1 = MI.GetOperand(1);
 			if (op1.IsImmediate())
 			{
-				op1.SetType(dst.GetType());
-				MI.SetOp<1>(op1);
 				MI.SetOpcode(InstMove);
 			}
 		}
