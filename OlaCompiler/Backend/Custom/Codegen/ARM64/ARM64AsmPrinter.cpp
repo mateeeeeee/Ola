@@ -436,6 +436,7 @@ namespace ola
 								else if constexpr (std::is_same_v<T, std::string>)	EmitReadOnly(".string \"{}\"", arg);
 							}, element);
 					}
+					EmitReadOnly(".p2align 3");  
 					EmitReadOnly("\n");
 				}
 				else
@@ -453,6 +454,7 @@ namespace ola
 								else if constexpr (std::is_same_v<T, std::string>)	EmitData(".string \"{}\"", arg);
 							}, element);
 					}
+					EmitData(".p2align 3");  
 					EmitData("\n");
 				}
 			}

@@ -149,7 +149,13 @@ namespace ola
 		}
 		Bool HasPhiInsts() const
 		{
-			for (auto const& BB : block_list) if (BB.PhiInsts().size() > 0) return true;
+			for (auto const& BB : block_list) 
+			{
+				if (BB.PhiInsts().size() > 0) 
+				{
+					return true;
+				}
+			}
 			return false;
 		}
 

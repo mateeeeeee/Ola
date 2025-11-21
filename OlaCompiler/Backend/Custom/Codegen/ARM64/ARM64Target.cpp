@@ -557,6 +557,30 @@ namespace ola
 				MachineOperand op1 = MI.GetOperand(1);
 				MachineOperand op2 = MI.GetOperand(2);
 
+				// Handle memory/stack operands - load into temp register
+				if (op2.IsMemoryOperand() || op2.IsStackObject())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op2.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<2>(tmp);
+					op2 = tmp;
+				}
+
+				if (op1.IsMemoryOperand() || op1.IsStackObject())
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(tmp);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(tmp);
+					op1 = tmp;
+				}
+
+				// Handle immediate operands
 				if (op1.IsImmediate())
 				{
 					MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
@@ -681,6 +705,33 @@ namespace ola
 					instructions.insert(instruction_iter, MI2);
 					MI.SetOp<1>(scratch);
 					MI.SetOpcode(InstStore);
+				}
+			}
+			else if (MI.GetOpcode() == InstAdd || MI.GetOpcode() == InstSub)
+			{
+				// Handle spilled stack operands from register allocation
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand op1 = MI.GetOperand(1);
+				MachineOperand op2 = MI.GetOperand(2);
+
+				if (op2.IsMemoryOperand() || op2.IsStackObject())
+				{
+					auto scratch = GetScratchReg(op2.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(scratch);
+					MI2.SetOp<1>(op2);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<2>(scratch);
+				}
+
+				if (op1.IsMemoryOperand() || op1.IsStackObject())
+				{
+					auto scratch = GetScratchReg(op1.GetType());
+					MachineInstruction MI2(InstLoad);
+					MI2.SetOp<0>(scratch);
+					MI2.SetOp<1>(op1);
+					instructions.insert(instruction_iter, MI2);
+					MI.SetOp<1>(scratch);
 				}
 			}
 		}

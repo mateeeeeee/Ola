@@ -44,10 +44,19 @@ namespace ola
 	Bool FunctionInlinerPass::ShouldInline(CallInst* CI)
 	{
 		Function* Callee = CI->GetCalleeAsFunction(); 
-		if (!Callee || Callee->IsDeclaration()) return false;
-		if (CI->GetBasicBlock()->GetFunction() == Callee) return false;
-		if (Callee->IsNoInline())  return false;
-		return (Callee->Blocks().Size() <= 3) || Callee->IsForceInline();
+		if (!Callee || Callee->IsDeclaration()) 
+		{
+			return false;
+		}
+		if (CI->GetBasicBlock()->GetFunction() == Callee) 
+		{
+			return false;
+		}
+		if (Callee->IsNoInline())  
+		{
+			return false;
+		}
+		return (Callee->Blocks().Size() <= 3 && Callee->GetInstructionCount() <= 9) || Callee->IsForceInline();
 	}
 
 	Bool FunctionInlinerPass::InlineFunction(CallInst* CI)

@@ -211,8 +211,7 @@ namespace ola
 		}
 		else
 		{
-			OLA_ASSERT(MF.GetStackAllocationSize() == 0);
-			Uint32 total_stack = aligned_stack_adjustment + FP_LR_SAVE_SIZE;
+			Uint32 total_stack = MF.GetStackAllocationSize() + aligned_stack_adjustment + FP_LR_SAVE_SIZE;
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
 			if (aligned_stack > 0)
 			{
