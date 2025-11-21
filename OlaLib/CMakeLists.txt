@@ -31,9 +31,12 @@ target_link_libraries(OlaLib PRIVATE legacy_stdio_definitions)
 endif()
 
 if(APPLE)
-    set_target_properties(OlaLib PROPERTIES
-        OSX_ARCHITECTURES "arm64;x86_64"
-    )
+    # Don't build universal binary when ASan is enabled
+    if(NOT ENABLE_ASAN)
+        set_target_properties(OlaLib PROPERTIES
+            OSX_ARCHITECTURES "arm64;x86_64"
+        )
+    endif()
 endif()
 
 install(TARGETS OlaLib DESTINATION lib)

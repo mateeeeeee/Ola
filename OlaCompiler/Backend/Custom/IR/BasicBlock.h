@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <algorithm>
 #include "Instruction.h"
 #include "Utility/IntrusiveList.h"
 
@@ -43,6 +44,14 @@ namespace ola
 		{
 			phi->InsertBefore(this, instructions.begin());
 			phi_nodes.push_back(phi);
+		}
+		void RemovePhiInst(PhiInst* phi)
+		{
+			auto it = std::find(phi_nodes.begin(), phi_nodes.end(), phi);
+			if (it != phi_nodes.end())
+			{
+				phi_nodes.erase(it);
+			}
 		}
 		auto const& PhiInsts() const { return phi_nodes; }
 		Bool HasPhiInsts() const { return !phi_nodes.empty(); }

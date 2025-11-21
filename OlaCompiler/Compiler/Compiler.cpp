@@ -318,6 +318,9 @@ namespace ola
 				link_cmd += "-arch arm64 ";
 			}
 #endif
+#if defined(OLA_ENABLE_ASAN)
+			link_cmd += "-fsanitize=address ";
+#endif
 			for (auto const& obj_file : object_files)
 			{
 				link_cmd += obj_file + " ";

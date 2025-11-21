@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <span>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include "Value.h"

@@ -163,6 +163,11 @@ namespace ola
 	}
 	IListIterator<Instruction> Instruction::EraseFromParent()
 	{
+		// If this is a phi instruction, remove it from the basic block's phi_nodes list
+		if (PhiInst* Phi = dyn_cast<PhiInst>(this))
+		{
+			basic_block->RemovePhiInst(Phi);
+		}
 		return basic_block->Instructions().Erase(this);
 	}
 

@@ -4,6 +4,7 @@
 #include "CFGAnalysisPass.h"
 #include "DominatorTreeAnalysisPass.h"
 #include "DominanceFrontierAnalysisPass.h"
+#include "LoopAnalysisPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 
 namespace ola
@@ -25,6 +26,7 @@ namespace ola
 			FAM.InvalidateCache<CFGAnalysisPass>(F);
 			FAM.InvalidateCache<DominatorTreeAnalysisPass>(F);
 			FAM.InvalidateCache<DominanceFrontierAnalysisPass>(F);
+			FAM.InvalidateCache<LoopAnalysisPass>(F);
 		}
 		Changed |= SimplifyPHIs(F);
 		return Changed;

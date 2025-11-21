@@ -8,6 +8,7 @@ namespace ola
 
 	Bool LoopAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
+		LI.Clear();  // Clear old loop info before recomputing
 		DominatorTree const& DT = FAM.GetResult<DominatorTreeAnalysisPass>(F);
 		DT.VisitPostOrder([&](DominatorTreeNode const* DTNode) -> Bool 
 		{

@@ -5,6 +5,9 @@
     "cmake.configureSettings": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
     },
+    "cmake.configureArgs": [
+        "-DENABLE_ASAN=ON"
+    ],
     "files.associations": {
         "*.h": "cpp",
         "*.cpp": "cpp",

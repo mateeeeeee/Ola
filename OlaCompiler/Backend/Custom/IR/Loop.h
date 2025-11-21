@@ -234,6 +234,16 @@ namespace ola
 		}
 		void RemoveBlock(BasicBlock* BB);
 
+		void Clear()
+		{
+			for (Loop* L : TopLevelLoops)
+			{
+				delete L;
+			}
+			TopLevelLoops.clear();
+			BBMap.clear();
+		}
+
 	private:
 		std::vector<Loop*> TopLevelLoops;
 		std::unordered_map<BasicBlock const*, Loop*> BBMap;

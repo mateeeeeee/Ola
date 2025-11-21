@@ -10,6 +10,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(ENABLE_LLVM "Enable LLVM backend" ON)
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_PLAYGROUND "Build playground executable" ON)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -44,6 +45,19 @@ endif()
 if(MSVC)
 	add_compile_options(/MP)  # Multi-processor compilation
 	add_definitions(/MT)
+endif()
+
+# AddressSanitizer support
+if(ENABLE_ASAN)
+	if(MSVC)
+		add_compile_options(/fsanitize=address)
+		add_link_options(/fsanitize=address)
+	else()
+		add_compile_options(-fsanitize=address -fno-omit-frame-pointer -g)
+		add_link_options(-fsanitize=address)
+	endif()
+	add_compile_definitions(OLA_ENABLE_ASAN=1)
+	message(STATUS "AddressSanitizer enabled")
 endif()
 
 # Define DEBUG/RELEASE macros
