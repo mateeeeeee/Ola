@@ -82,7 +82,7 @@ target_include_directories(OlaTests PRIVATE ${CMAKE_SOURCE_DIR}/OlaCompiler/)
 
 # Configure the path to Ola executable for tests
 if(CMAKE_CONFIGURATION_TYPES)
-    set(OLA_EXE_PATH "$<TARGET_FILE:Ola>")
+    set(OLA_EXE_PATH "$<TARGET_FILE:OlaDriver>")
 else()
     set(OLA_EXE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Ola${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
