@@ -1,83 +1,76 @@
 import std.assert;
 
-
-int Add(int a, int b)
+void IntByValue(int a)
 {
-    return a + b;
+	++a;
 }
 
-int AddThreeNumbers(int a, int b, int c)
+void IntByRef(ref int a)
 {
-    return a + b + c;
+	++a;
 }
 
-int AddFourNumbers(int a, int b, int c, int d)
+void TestRefSimple()
 {
-    return a + b + c + d;
+	//passing T variable to ref T function parameter
+	int a = 9;
+	IntByRef(a);
+	Assert(a == 10);
+	
+	//assigning T to ref T variable 
+	ref int b = a;
+	++b;
+	Assert(a == 11);
+	
+	//assigning ref T to T variable
+	int c = b;
+	++c;
+	Assert(c == 12);
+	Assert(a == 11);
+	
+	//assigning ref T to ref T variable 
+	ref int d = b; 
+	++d;
+	Assert(a == 12);
+	
+	//passing ref T variable to ref T function parameter
+	IntByRef(d);
+	Assert(a == 13);
+	
+	//passing ref T variable to T function parameter
+	IntByValue(d);
+	Assert(a == 13);
 }
 
-int AddSixNumbers(int a, int b, int c, int d, int e, int f)
+int g = 9;
+ref int ReturnRef()
 {
-    return a + b + c + d + e + f;
+	return g;
+}
+int ReturnValue()
+{
+	return g;
 }
 
-int AddTenNumbers(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j)
+void TestRefReturnSimple()
 {
-	return a + b + c + d + e + f + g + h + i + j;
+	ref int gRef = ReturnRef();
+	gRef++;
+	Assert(g == 10);
+
+	int gRefCopy = ReturnRef();
+	gRefCopy++;
+	Assert(g == 10);
+	
+	int gValue = ReturnValue();
+	gValue++;
+	Assert(g == 10);
 }
 
-int AlternatingSum(int a, int b, int c, int d, int e, int f)
-{
-    return a - b + c - d + e - f;
-}
-
-float AddFloats(float a, float b)
-{
-    return a + b;
-}
-
-float AddIntAndFloat(int a, float b, float c)
-{
-    return a + b + c;
-}
-
-float ConditionSum(float a, float b, float c, float d, bool e)
-{
-    return e ? a + b : c + d;
-}
-
-int AddBooleans(bool a, bool b, bool c, bool d)
-{
-    return a + b + c + d;  // Implicit conversion (true = 1, false = 0)
-}
-
-
-void TestIntCalls()
-{
-    Assert(Add(1, 2) == 3);
-    Assert(AddThreeNumbers(1,2,3) == 6);
-    Assert(AddFourNumbers(1,2,3,4) == 10);
-    Assert(AddSixNumbers(1,2,3,4,5,6) == 21);
-    Assert(AlternatingSum(1,2,3,4,5,6) == -3);
-}
-void TestFloatCalls()
-{
-    Assert(AddFloats(1.0, 2.0) == 3.0);
-    Assert(AddIntAndFloat(1, 2.0, 3.0) == 6.0);
-    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, true) == 3.0);
-    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, false) == 7.0);
-    Assert(AddTenNumbers(1,2,3,4,5,6,7,8,9,10) == 55);
-}
-
-void TestBoolCalls()
-{
-    Assert(AddBooleans(true, false, true, false) == 2);
-}
 
 public int main()
 {
-    TestIntCalls();
-    TestFloatCalls();
-    TestBoolCalls();
-    return 0;
+	TestRefSimple();
+	TestRefReturnSimple();
+	return 0;
 }

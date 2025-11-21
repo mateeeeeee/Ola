@@ -97,7 +97,11 @@ namespace ola
 
 	MachineOperand MachineContext::GetOperand(Value const* V)
 	{
-		if (value_map.contains(V)) return value_map[V];
+		if (value_map.contains(V)) 
+		{
+			return value_map[V];
+		}
+		
 		if (Constant const* C = dyn_cast<Constant>(V))
 		{
 			if (C->GetConstantID() == ConstantID::Global)
