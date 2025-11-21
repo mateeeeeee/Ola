@@ -450,9 +450,12 @@ namespace ola
 			MachineOperand op1 = MI.GetOperand(1);
 			if (op1.IsImmediate())
 			{
+				op1.SetType(dst.GetType());
+				MI.SetOp<1>(op1);
 				MI.SetOpcode(InstMove);
 			}
 		}
+		break;
 		}
 	}
 
