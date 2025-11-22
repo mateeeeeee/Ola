@@ -1,4 +1,5 @@
 #include <list>
+#include <unordered_map>
 #include "GlobalAttributeInferPass.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -28,35 +29,74 @@ namespace ola
 		{
 			if (Function* F = dyn_cast<Function>(G))
 			{
+				std::unordered_map<Value*, GlobalVariable*> AddressHolder;
+				for (GlobalValue* GV : Module.Globals())
+				{
+					if (GlobalVariable* GVar = dyn_cast<GlobalVariable>(GV))
+					{
+						AddressHolder[GVar] = GVar;
+					}
+				}
+
+				// Pass 1: Find direct stores to globals
 				for (BasicBlock& BB : *F)
 				{
-					for (Instruction& I : BB)
+					for (Instruction const& I : BB)
 					{
-						// Direct store to global
-						if (StoreInst* SI = dyn_cast<StoreInst>(&I))
+						if (StoreInst const* SI = dyn_cast<StoreInst>(&I))
 						{
-							Value* AddressOperand = SI->GetAddressOp();
-							Worklist.remove_if([&](GlobalVariable* GV) { return GV == AddressOperand; });
-						}
-
-						// Check all operands - if a global is used as a value (not just store destination),
-						// its address has escaped and could be modified indirectly
-						for (Use& U : I.Operands())
-						{
-							if (GlobalVariable* GV = dyn_cast<GlobalVariable>(U.Get()))
+							Value* AddressOp = SI->GetAddressOp();
+							if (GlobalVariable* GV = dyn_cast<GlobalVariable>(AddressOp))
 							{
-								// Special case: StoreInst uses the address operand, but that's OK
-								// We only care if it's used in other ways (address-taken)
-								if (StoreInst* SI = dyn_cast<StoreInst>(&I))
+								Worklist.remove_if([&](GlobalVariable* GV2) { return GV2 == GV; });
+							}
+						}
+					}
+				}
+
+				Bool changed = true;
+				while (changed)
+				{
+					changed = false;
+					for (BasicBlock& BB : *F)
+					{
+						for (Instruction& I : BB)
+						{
+							if (LoadInst* LI = dyn_cast<LoadInst>(&I))
+							{
+								Value* LoadAddr = LI->GetAddressOp();
+								if (LI->GetType()->IsPointer())
 								{
-									if (&U == &SI->GetOperandUse(1))  // Address operand
+									for (BasicBlock& BB2 : *F)
 									{
-										continue;  // This is the store destination, not address-taken
+										for (Instruction& I2 : BB2)
+										{
+											if (StoreInst* SI = dyn_cast<StoreInst>(&I2))
+											{
+												if (SI->GetAddressOp() == LoadAddr)
+												{
+													Value* StoredValue = SI->GetValueOp();
+													if (auto it = AddressHolder.find(StoredValue); it != AddressHolder.end())
+													{
+														if (AddressHolder.find(LI) == AddressHolder.end())
+														{
+															AddressHolder[LI] = it->second;
+															changed = true;
+														}
+													}
+												}
+											}
+										}
 									}
 								}
-
-								// Global is used as a value - its address escapes
-								Worklist.remove_if([&](GlobalVariable* GV2) { return GV2 == GV; });
+							}
+							else if (StoreInst* SI = dyn_cast<StoreInst>(&I))
+							{
+								Value* StoreAddr = SI->GetAddressOp();
+								if (auto it = AddressHolder.find(StoreAddr); it != AddressHolder.end())
+								{
+									Worklist.remove_if([&](GlobalVariable* GV2) { return GV2 == it->second; });
+								}
 							}
 						}
 					}
