@@ -1,18 +1,4 @@
-import std.assert;
-
-int g = 9;
-
-int h = 15;
-
-ref int ReturnRef()
-{
-	return g;
-}
-
 public int main()
 {
-	ref int gRef = ReturnRef();
-	gRef++;
-	Assert(g == 10);
-	return h;
+	return 0b1010;
 }

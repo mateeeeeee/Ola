@@ -138,6 +138,11 @@ TEST(Misc, ImplicitCasts)
 	EXPECT_EQ(OLA_TEST(-i test_implicitcasts), 0);
 }
 
+TEST(Misc, Literals)
+{
+	EXPECT_EQ(OLA_TEST(-i test_literals), 0);
+}
+
 TEST(Classes, Inheritance)
 {
 	EXPECT_EQ(OLA_TEST(-i test_inheritance), 0);

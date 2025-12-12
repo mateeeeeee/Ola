@@ -129,12 +129,46 @@ namespace ola
 	Bool Lexer::LexNumber(Token& t)
 	{
 		Char const* tmp_ptr = cur_ptr;
+
+		if (*tmp_ptr == '0' && tmp_ptr + 1 != nullptr)
+		{
+			Char next_char = *(tmp_ptr + 1);
+			if (next_char == 'b' || next_char == 'B')
+			{
+				tmp_ptr += 2; 
+				Consume(tmp_ptr, [](Char c) -> Bool { return c == '0' || c == '1'; });
+				if (std::isalnum(*tmp_ptr))
+				{
+					UpdatePointersAndLocation();
+					diagnostics.Report(loc, invalid_number_literal);
+					return false;
+				}
+				FillToken(t, TokenKind::int_number, tmp_ptr);
+				UpdatePointersAndLocation();
+				return true;
+			}
+			else if (next_char == 'x' || next_char == 'X')
+			{
+				tmp_ptr += 2; 
+				Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'); });
+				if (std::isalnum(*tmp_ptr))
+				{
+					UpdatePointersAndLocation();
+					diagnostics.Report(loc, invalid_number_literal);
+					return false;
+				}
+				FillToken(t, TokenKind::int_number, tmp_ptr);
+				UpdatePointersAndLocation();
+				return true;
+			}
+		}
+
 		Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c); });
 		if (*tmp_ptr == '.')
 		{
 			tmp_ptr++;
 			Consume(tmp_ptr, [](Char c) -> Bool { return std::isdigit(c); });
-			if (std::isalpha(*tmp_ptr)) 
+			if (std::isalpha(*tmp_ptr))
 			{
 				return false;
 			}

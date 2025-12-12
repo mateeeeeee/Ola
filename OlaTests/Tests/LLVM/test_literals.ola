@@ -1,0 +1,112 @@
+import std.assert;
+
+// Test binary literals
+int binary_test_1 = 0b1010;      // Should equal 10
+int binary_test_2 = 0b11111111;  // Should equal 255
+int binary_test_3 = 0b0;         // Should equal 0
+int binary_test_4 = 0b1;         // Should equal 1
+int binary_test_5 = 0B1100;      // Test uppercase B, should equal 12
+
+// Test hexadecimal literals
+int hex_test_1 = 0xff;           // Should equal 255
+int hex_test_2 = 0xFFEA;         // Should equal 65514
+int hex_test_3 = 0x0;            // Should equal 0
+int hex_test_4 = 0x1A;           // Should equal 26
+int hex_test_5 = 0X2B;           // Test uppercase X, should equal 43
+
+// Test decimal for comparison
+int decimal_test_1 = 255;
+int decimal_test_2 = 10;
+int decimal_test_3 = 26;
+
+void TestBinaryLiterals()
+{
+    // Test basic binary literals
+    Assert(binary_test_1 == 10);
+    Assert(binary_test_2 == 255);
+    Assert(binary_test_3 == 0);
+    Assert(binary_test_4 == 1);
+    Assert(binary_test_5 == 12);
+
+    // Test binary literals in expressions
+    int local_binary = 0b1111;  // Should equal 15
+    Assert(local_binary == 15);
+
+    // Test binary literal arithmetic
+    int result = 0b1010 + 0b0101;  // 10 + 5 = 15
+    Assert(result == 15);
+
+    // Test binary compared to decimal
+    Assert(0b1111 == 15);
+    Assert(0b11111111 == decimal_test_1);  // Both should be 255
+}
+
+void TestHexLiterals()
+{
+    // Test basic hexadecimal literals
+    Assert(hex_test_1 == 255);
+    Assert(hex_test_2 == 65514);
+    Assert(hex_test_3 == 0);
+    Assert(hex_test_4 == 26);
+    Assert(hex_test_5 == 43);
+
+    // Test hex literals in expressions
+    int local_hex = 0xA;  // Should equal 10
+    Assert(local_hex == 10);
+
+    // Test hex literal arithmetic
+    int result = 0xA + 0x5;  // 10 + 5 = 15
+    Assert(result == 15);
+
+    // Test hex compared to decimal
+    Assert(0xFF == decimal_test_1);  // Both should be 255
+    Assert(0x1A == decimal_test_3);  // Both should be 26
+}
+
+void TestMixedLiterals()
+{
+    // Test mixing different literal types
+    int result1 = 0b1010 + 10 + 0xA;  // 10 + 10 + 10 = 30
+    Assert(result1 == 30);
+
+    // Test equivalence across bases
+    Assert(0b11111111 == 0xFF);     // 255 in both binary and hex
+    Assert(0b1010 == 10);           // 10 in binary and decimal
+    Assert(0xA == 10);              // 10 in hex and decimal
+
+    // Test in variables
+    int bin_val = 0b1100;   // 12
+    int hex_val = 0xC;      // 12
+    int dec_val = 12;       // 12
+
+    Assert(bin_val == hex_val);
+    Assert(hex_val == dec_val);
+    Assert(bin_val == dec_val);
+}
+
+void TestLargerValues()
+{
+    // Test larger binary values
+    int large_binary = 0b11111111111111111111111111111111;  // 32 ones = 4294967295 (if unsigned) or -1 (if signed)
+
+    // Test larger hex values
+    int large_hex = 0xFFFFFFFF;  // Should be same as above
+
+    // Test specific large values
+    int hex_large1 = 0x12345678;
+    int hex_large2 = 0xABCDEF00;
+
+    // These should be valid, exact values depend on int size and signedness
+    // Just testing that they parse correctly
+    Assert(large_binary == large_hex);  // Should be equivalent
+}
+
+public int main()
+{
+    TestBinaryLiterals();
+    TestHexLiterals();
+    TestMixedLiterals();
+    TestLargerValues();
+
+    return 0;
+}
