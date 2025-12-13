@@ -140,29 +140,28 @@ namespace ola
 
 				ir_module.Print(ir_file);
 
-				Target* x64_target = nullptr;
+				Target* target = nullptr;
 				Microsoft_x64Target ms_target{};
 				SysV_x64Target sysv_target{};
 				ARM64Target arm64_target{};
-
 				switch (opts.target_arch)
 				{
 				case TargetArch::x64:
 #if defined(OLA_PLATFORM_WINDOWS)
-					x64_target = &ms_target;
+					target = &ms_target;
 #else
-					x64_target = &sysv_target;
+					target = &sysv_target;
 #endif
 					break;
 				case TargetArch::ARM64:
-					x64_target = &arm64_target;
+					target = &arm64_target;
 					break;
 				default:
 					OLA_ASSERT_MSG(false, "Invalid target architecture!");
 					break;
 				}
 
-				MachineModule machine_module(ir_module, *x64_target, analysis_manager);
+				MachineModule machine_module(ir_module, *target, analysis_manager);
 				if(!mir_file.empty())
 				{
 					machine_module.EmitMIR(mir_file);
