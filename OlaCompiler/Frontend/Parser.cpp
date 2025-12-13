@@ -1399,7 +1399,15 @@ namespace ola
 	{
 		OLA_ASSERT(current_token->Is(TokenKind::int_number));
 		std::string_view string_number = current_token->GetData();
-		Int64 value = std::stoll(current_token->GetData().data(), nullptr, 0);
+		Int64 value = 0;
+		if (string_number.size() > 2 && string_number[0] == '0' && (string_number[1] == 'b' || string_number[1] == 'B'))
+		{
+			value = std::stoll(std::string(string_number.substr(2)), nullptr, 2);
+		}
+		else
+		{
+			value = std::stoll(current_token->GetData().data(), nullptr, 0);
+		}
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnIntLiteral(value, loc);
