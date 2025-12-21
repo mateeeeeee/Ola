@@ -8,8 +8,7 @@ int main(int argc, char** argv)
 	ola::CompileRequest compile_request{};
 	if (compile_request.Parse(argc, argv))
 	{
-		ola::Int compile_result = ola::Compile(compile_request);
-		return compile_result;
+		return ola::Compile(compile_request);
 	}
 	return 0;
 }
