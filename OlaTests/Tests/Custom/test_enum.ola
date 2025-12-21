@@ -9,6 +9,26 @@ enum Color
 
 Color globalColor = Red;
 
+// Test basic enum value assignment and comparison
+void TestEnumBasic()
+{
+    Color c1 = Red;
+    Color c2 = Green;
+    Color c3 = Blue;
+
+    Assert(c1 == Red);
+    Assert(c2 == Green);
+    Assert(c3 == Blue);
+
+    // Reassignment
+    c1 = Blue;
+    Assert(c1 == Blue);
+
+    // Compare two variables
+    c1 = Green;
+    Assert(c1 == c2);
+}
+
 public int TestEnumValues()
 {
     Color color = Blue;
@@ -74,13 +94,129 @@ public int TestLocalEnumDeclaration()
     return 0;
 }
 
-public int main()
+// Test enum as function parameter
+Color IdentityColor(Color c)
+{
+    return c;
+}
+
+void TestEnumFunctionParam()
+{
+    Color c = Green;
+    Color result = IdentityColor(c);
+    Assert(result == Green);
+
+    result = IdentityColor(Blue);
+    Assert(result == Blue);
+}
+
+// Test enum in conditions
+void TestEnumConditions()
+{
+    Color c = Red;
+
+    if (c == Red)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+
+    c = Blue;
+    if (c == Red)
+    {
+        Assert(false);
+    }
+    else if (c == Green)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
+}
+
+// Test enum inequality
+void TestEnumInequality()
+{
+    Color c1 = Red;
+    Color c2 = Blue;
+
+    Assert(c1 != c2);
+    Assert(c1 != Green);
+    Assert(c1 != Blue);
+
+    c1 = Blue;
+    Assert(c1 == c2);
+}
+
+// Test global enum
+void TestGlobalEnum()
 {
     Assert(globalColor == Red);
-    TestLocalEnumDeclaration();
+
+    globalColor = Blue;
+    Assert(globalColor == Blue);
+
+    globalColor = Red; // Reset
+}
+
+// Test enum in array
+void TestEnumArray()
+{
+    Color[3] colors = {Red, Green, Blue};
+    Assert(colors[0] == Red);
+    Assert(colors[1] == Green);
+    Assert(colors[2] == Blue);
+
+    colors[0] = Blue;
+    Assert(colors[0] == Blue);
+}
+
+// Test enum in loop
+void TestEnumLoop()
+{
+    Color[4] palette = {Red, Green, Blue, Red};
+    int redCount = 0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (palette[i] == Red)
+        {
+            redCount++;
+        }
+    }
+    Assert(redCount == 2);
+}
+
+// Test enum ternary
+void TestEnumTernary()
+{
+    Color c = Red;
+    Color result = c == Red ? Green : Blue;
+    Assert(result == Green);
+
+    result = c == Blue ? Green : Red;
+    Assert(result == Red);
+}
+
+public int main()
+{
+    TestEnumBasic();
     TestEnumValues();
     TestEnumValuesAfterModification();
     TestEnumSwitch();
+    TestLocalEnumDeclaration();
+    TestEnumFunctionParam();
+    TestEnumConditions();
+    TestEnumInequality();
+    TestGlobalEnum();
+    TestEnumArray();
+    TestEnumLoop();
+    TestEnumTernary();
 
     return 0;
 }
