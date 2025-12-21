@@ -1,4 +1,4 @@
-import std.Assert;
+import std.assert;
 
 int f(int a)
 {
@@ -10,7 +10,7 @@ int f(int a, int b)
 }
 
 
-public int main() 
+public int main()
 {
     Assert(f(1) == 1);
     Assert(f(1,2) == 2);

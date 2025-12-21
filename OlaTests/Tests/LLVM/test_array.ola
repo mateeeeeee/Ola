@@ -1,5 +1,7 @@
 import std.assert;
 
+// ========== Helper Functions ==========
+
 private void modifyArray(int[] arr)
 {
 	arr[0] = 100;
@@ -20,30 +22,91 @@ private int sumOfArray(int[] arr, int size)
 	return sum;
 }
 
-auto GlobalArray1 = {1,1,1};
-int[5] GlobalArray2 = {1,2,3};
-int[3] GlobalArray3 = {10,20,30};
-int[2][2] Global2dArray = { {1,2}, {3,4}}; 
+// ========== Global Arrays ==========
 
-public int main()
+auto GlobalArray1 = {1, 1, 1};
+int[5] GlobalArray2 = {1, 2, 3};
+int[3] GlobalArray3 = {10, 20, 30};
+float[3] GlobalFloatArray = {1.5, 2.5, 3.5};
+bool[4] GlobalBoolArray = {true, false, true, false};
+int[2][2] Global2dArray = { {1,2}, {3,4}};
+
+// ========== Basic Array Tests ==========
+
+void TestGlobalArrays()
 {
 	Assert(length(GlobalArray1) == 3);
-	Assert(sizeof(GlobalArray2) == 40);
-	Assert(GlobalArray3[0] == 10);
+	Assert(GlobalArray1[0] == 1);
+	Assert(GlobalArray1[1] == 1);
+	Assert(GlobalArray1[2] == 1);
 
-	int[10] LocalArray1 = {1,2};
+	Assert(sizeof(GlobalArray2) == 40);
+	Assert(GlobalArray2[0] == 1);
+	Assert(GlobalArray2[1] == 2);
+	Assert(GlobalArray2[2] == 3);
+	Assert(GlobalArray2[3] == 0); // Uninitialized
+	Assert(GlobalArray2[4] == 0);
+
+	Assert(GlobalArray3[0] == 10);
+	Assert(GlobalArray3[1] == 20);
+	Assert(GlobalArray3[2] == 30);
+}
+
+void TestLocalArrays()
+{
+	int[10] LocalArray1 = {1, 2};
 	Assert(sizeof(LocalArray1) == 80);
+	Assert(LocalArray1[0] == 1);
+	Assert(LocalArray1[1] == 2);
+	Assert(LocalArray1[2] == 0);
 	Assert(LocalArray1[6] == 0);
 	Assert(sumOfArray(LocalArray1, length(LocalArray1)) == 3);
 
-	int[3] LocalArray2 = {-5,0,5};
+	int[3] LocalArray2 = {-5, 0, 5};
+	Assert(LocalArray2[0] == -5);
 	Assert(LocalArray2[1] == 0);
+	Assert(LocalArray2[2] == 5);
 	Assert(length(LocalArray2) == 3);
+}
 
+void TestFloatArrays()
+{
+	Assert(GlobalFloatArray[0] > 1.4999 && GlobalFloatArray[0] < 1.5001);
+	Assert(GlobalFloatArray[1] > 2.4999 && GlobalFloatArray[1] < 2.5001);
+	Assert(GlobalFloatArray[2] > 3.4999 && GlobalFloatArray[2] < 3.5001);
+
+	float[4] localFloats = {0.5, 1.0, 1.5, 2.0};
+	Assert(localFloats[0] > 0.4999 && localFloats[0] < 0.5001);
+	Assert(localFloats[3] > 1.9999 && localFloats[3] < 2.0001);
+
+	float sum = localFloats[0] + localFloats[1] + localFloats[2] + localFloats[3];
+	Assert(sum > 4.9999 && sum < 5.0001);
+}
+
+void TestBoolArrays()
+{
+	Assert(GlobalBoolArray[0] == true);
+	Assert(GlobalBoolArray[1] == false);
+	Assert(GlobalBoolArray[2] == true);
+	Assert(GlobalBoolArray[3] == false);
+
+	bool[3] localBools = {true, true, false};
+	Assert(localBools[0] == true);
+	Assert(localBools[1] == true);
+	Assert(localBools[2] == false);
+}
+
+// ========== Array Slices (LLVM Only) ==========
+
+void TestArraySlices()
+{
+	int[3] LocalArray2 = {-5, 0, 5};
 	int[] LocalArray3 = LocalArray2;
+
 	modifyArrayCopy(LocalArray2);
 	Assert(LocalArray2[0] == -5);
 	Assert(LocalArray3[0] == -5);
+
 	modifyArray(LocalArray2);
 	Assert(LocalArray2[0] == 100);
 	Assert(LocalArray3[0] == 100);
@@ -51,10 +114,15 @@ public int main()
 	LocalArray3[0] = 1000;
 	Assert(LocalArray2[0] == 1000);
 	Assert(LocalArray3[0] == 1000);
+}
 
+// ========== 2D Arrays (LLVM Only) ==========
+
+void Test2DArrays()
+{
 	int sum2d = 0;
 	int globalSum2d = 0;
-	int[2][2] int2d = { {1,2}, {3,4}}; 
+	int[2][2] int2d = { {1,2}, {3,4}};
 	for(int i = 0; i < 2; ++i)
 	{
 		for(int j = 0; j < 2; ++j)
@@ -63,8 +131,320 @@ public int main()
 			globalSum2d += Global2dArray[i][j];
 		}
 	}
-	Assert(sum2d == 10);  
-	Assert(globalSum2d == 10);  
-	
+	Assert(sum2d == 10);
+	Assert(globalSum2d == 10);
+
+	// Test individual access
+	Assert(int2d[0][0] == 1);
+	Assert(int2d[0][1] == 2);
+	Assert(int2d[1][0] == 3);
+	Assert(int2d[1][1] == 4);
+
+	// Modify 2D array
+	int2d[0][0] = 100;
+	Assert(int2d[0][0] == 100);
+}
+
+// ========== Array Modification ==========
+
+void TestArrayModification()
+{
+	int[5] arr = {1, 2, 3, 4, 5};
+
+	arr[0] = 10;
+	Assert(arr[0] == 10);
+
+	arr[4] = 50;
+	Assert(arr[4] == 50);
+
+	arr[2] = arr[0] + arr[4];
+	Assert(arr[2] == 60);
+
+	arr[1] *= 2;
+	Assert(arr[1] == 4);
+
+	arr[3]++;
+	Assert(arr[3] == 5);
+
+	++arr[3];
+	Assert(arr[3] == 6);
+}
+
+// ========== Array in Expressions ==========
+
+void TestArrayExpressions()
+{
+	int[5] arr = {10, 20, 30, 40, 50};
+
+	int sum = arr[0] + arr[1] + arr[2] + arr[3] + arr[4];
+	Assert(sum == 150);
+
+	int product = arr[0] * arr[1];
+	Assert(product == 200);
+
+	int diff = arr[4] - arr[0];
+	Assert(diff == 40);
+
+	bool greater = arr[4] > arr[0];
+	Assert(greater == true);
+
+	int avg = (arr[0] + arr[1] + arr[2]) / 3;
+	Assert(avg == 20);
+}
+
+// ========== Array with Variables as Index ==========
+
+void TestArrayVariableIndex()
+{
+	int[5] arr = {100, 200, 300, 400, 500};
+
+	int i = 0;
+	Assert(arr[i] == 100);
+
+	i = 2;
+	Assert(arr[i] == 300);
+
+	int j = 4;
+	Assert(arr[j] == 500);
+
+	// Index from expression
+	int k = 1;
+	Assert(arr[k + 1] == 300);
+	Assert(arr[j - 2] == 300);
+}
+
+// ========== Array in Loops ==========
+
+void TestArrayInLoops()
+{
+	int[5] arr = {1, 2, 3, 4, 5};
+
+	int sum = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		sum += arr[i];
+	}
+	Assert(sum == 15);
+
+	// Modify in loop
+	for (int i = 0; i < 5; i++)
+	{
+		arr[i] *= 2;
+	}
+	Assert(arr[0] == 2);
+	Assert(arr[1] == 4);
+	Assert(arr[2] == 6);
+	Assert(arr[3] == 8);
+	Assert(arr[4] == 10);
+
+	// Find max
+	int max = arr[0];
+	for (int i = 1; i < 5; i++)
+	{
+		if (arr[i] > max)
+		{
+			max = arr[i];
+		}
+	}
+	Assert(max == 10);
+}
+
+// ========== Array with While Loop ==========
+
+void TestArrayWhileLoop()
+{
+	int[5] arr = {5, 4, 3, 2, 1};
+
+	int i = 0;
+	int sum = 0;
+	while (i < 5)
+	{
+		sum += arr[i];
+		i++;
+	}
+	Assert(sum == 15);
+
+	// Find first even
+	i = 0;
+	while (i < 5)
+	{
+		if (arr[i] % 2 == 0)
+		{
+			break;
+		}
+		i++;
+	}
+	Assert(arr[i] == 4);
+}
+
+// ========== Array Length and Sizeof ==========
+
+void TestArrayLengthSizeof()
+{
+	int[10] intArr;
+	Assert(length(intArr) == 10);
+	Assert(sizeof(intArr) == 80);
+
+	float[5] floatArr;
+	Assert(length(floatArr) == 5);
+	Assert(sizeof(floatArr) == 40);
+
+	bool[8] boolArr;
+	Assert(length(boolArr) == 8);
+	Assert(sizeof(boolArr) == 8);
+}
+
+// ========== Array Negative Values ==========
+
+void TestArrayNegativeValues()
+{
+	int[5] arr = {-10, -5, 0, 5, 10};
+
+	Assert(arr[0] == -10);
+	Assert(arr[1] == -5);
+	Assert(arr[2] == 0);
+	Assert(arr[3] == 5);
+	Assert(arr[4] == 10);
+
+	int sum = arr[0] + arr[1] + arr[2] + arr[3] + arr[4];
+	Assert(sum == 0);
+
+	arr[0] = -arr[4];
+	Assert(arr[0] == -10);
+}
+
+// ========== Auto Type Array ==========
+
+void TestAutoArray()
+{
+	auto arr = {10, 20, 30, 40, 50};
+	Assert(length(arr) == 5);
+	Assert(arr[0] == 10);
+	Assert(arr[4] == 50);
+
+	int sum = 0;
+	for (int i = 0; i < length(arr); i++)
+	{
+		sum += arr[i];
+	}
+	Assert(sum == 150);
+}
+
+// ========== Array Boundary Cases ==========
+
+void TestArrayBoundary()
+{
+	int[1] single = {42};
+	Assert(single[0] == 42);
+	Assert(length(single) == 1);
+
+	int[10] large = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	Assert(large[0] == 1);
+	Assert(large[9] == 10);
+
+	int sum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		sum += large[i];
+	}
+	Assert(sum == 55);
+}
+
+// ========== Array Element Swap ==========
+
+void TestArraySwap()
+{
+	int[5] arr = {1, 2, 3, 4, 5};
+
+	// Swap first and last
+	int temp = arr[0];
+	arr[0] = arr[4];
+	arr[4] = temp;
+
+	Assert(arr[0] == 5);
+	Assert(arr[4] == 1);
+	Assert(arr[1] == 2);
+	Assert(arr[2] == 3);
+	Assert(arr[3] == 4);
+}
+
+// ========== Array with Ternary ==========
+
+void TestArrayTernary()
+{
+	int[3] arr = {10, 20, 30};
+
+	int max = arr[0] > arr[1] ? arr[0] : arr[1];
+	Assert(max == 20);
+
+	max = max > arr[2] ? max : arr[2];
+	Assert(max == 30);
+
+	int index = true ? 0 : 2;
+	Assert(arr[index] == 10);
+}
+
+// ========== Array Assignment from Array ==========
+
+void TestArrayAssignment()
+{
+	int[3] arr1 = {1, 2, 3};
+	int[3] arr2;
+
+	// Copy element by element
+	for (int i = 0; i < 3; i++)
+	{
+		arr2[i] = arr1[i];
+	}
+
+	Assert(arr2[0] == 1);
+	Assert(arr2[1] == 2);
+	Assert(arr2[2] == 3);
+
+	// Modify arr1, arr2 should be unchanged
+	arr1[0] = 100;
+	Assert(arr1[0] == 100);
+	Assert(arr2[0] == 1);
+}
+
+// ========== Array Accumulation ==========
+
+void TestArrayAccumulation()
+{
+	int[5] arr = {0, 0, 0, 0, 0};
+
+	for (int i = 0; i < 100; i++)
+	{
+		arr[i % 5]++;
+	}
+
+	Assert(arr[0] == 20);
+	Assert(arr[1] == 20);
+	Assert(arr[2] == 20);
+	Assert(arr[3] == 20);
+	Assert(arr[4] == 20);
+}
+
+public int main()
+{
+	TestGlobalArrays();
+	TestLocalArrays();
+	TestFloatArrays();
+	TestBoolArrays();
+	TestArraySlices();
+	Test2DArrays();
+	TestArrayModification();
+	TestArrayExpressions();
+	TestArrayVariableIndex();
+	TestArrayInLoops();
+	TestArrayWhileLoop();
+	TestArrayLengthSizeof();
+	TestArrayNegativeValues();
+	TestAutoArray();
+	TestArrayBoundary();
+	TestArraySwap();
+	TestArrayTernary();
+	TestArrayAssignment();
+	TestArrayAccumulation();
 	return 0;
 }

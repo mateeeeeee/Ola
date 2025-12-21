@@ -1,4 +1,357 @@
+import std.assert;
+
+// Global float variables
+float globalFloat1 = 10.0;
+float globalFloat2 = 3.5;
+float globalFloat3 = 2.5;
+const float PI = 3.14159;
+const float HALF = 0.5;
+
+void TestFloatLiterals()
+{
+	float a = 1.0;
+	float b = 0.5;
+	float c = 100.25;
+	float d = 0.001;
+
+	Assert(a > 0.9999 && a < 1.0001);
+	Assert(b > 0.4999 && b < 0.5001);
+	Assert(c > 100.2499 && c < 100.2501);
+	Assert(d > 0.0009 && d < 0.0011);
+}
+
+void TestFloatNegatives()
+{
+	float a = -1.0;
+	float b = -0.5;
+	float c = -100.25;
+
+	Assert(a < -0.9999 && a > -1.0001);
+	Assert(b < -0.4999 && b > -0.5001);
+	Assert(c < -100.2499 && c > -100.2501);
+
+	float d = -a;
+	Assert(d > 0.9999 && d < 1.0001);
+}
+
+void TestFloatAddition()
+{
+	// Local + local
+	float a = 3.5;
+	float b = 2.5;
+	float c = a + b;
+	Assert(c > 5.9999 && c < 6.0001);
+
+	// Local + literal
+	float d = a + 1.5;
+	Assert(d > 4.9999 && d < 5.0001);
+
+	// Local + global
+	float e = a + globalFloat2;
+	Assert(e > 6.9999 && e < 7.0001);
+
+	// Global + global
+	float f = globalFloat1 + globalFloat2;
+	Assert(f > 13.4999 && f < 13.5001);
+
+	// Compound addition
+	float g = 5.0;
+	g += 2.5;
+	Assert(g > 7.4999 && g < 7.5001);
+
+	g += globalFloat3;
+	Assert(g > 9.9999 && g < 10.0001);
+}
+
+void TestFloatSubtraction()
+{
+	// Local - local
+	float a = 10.0;
+	float b = 3.5;
+	float c = a - b;
+	Assert(c > 6.4999 && c < 6.5001);
+
+	// Local - literal
+	float d = a - 2.5;
+	Assert(d > 7.4999 && d < 7.5001);
+
+	// Local - global
+	float e = a - globalFloat2;
+	Assert(e > 6.4999 && e < 6.5001);
+
+	// Global - global
+	float f = globalFloat1 - globalFloat2;
+	Assert(f > 6.4999 && f < 6.5001);
+
+	// Compound subtraction
+	float g = 10.0;
+	g -= 2.5;
+	Assert(g > 7.4999 && g < 7.5001);
+
+	g -= globalFloat3;
+	Assert(g > 4.9999 && g < 5.0001);
+}
+
+void TestFloatMultiplication()
+{
+	// Local * local
+	float a = 2.5;
+	float b = 4.0;
+	float c = a * b;
+	Assert(c > 9.9999 && c < 10.0001);
+
+	// Local * literal
+	float d = a * 2.0;
+	Assert(d > 4.9999 && d < 5.0001);
+
+	// Local * global
+	float e = a * globalFloat3;
+	Assert(e > 6.2499 && e < 6.2501);
+
+	// Global * global
+	float f = globalFloat2 * globalFloat3;
+	Assert(f > 8.7499 && f < 8.7501);
+
+	// Compound multiplication
+	float g = 2.0;
+	g *= 2.5;
+	Assert(g > 4.9999 && g < 5.0001);
+
+	g *= 2.0;
+	Assert(g > 9.9999 && g < 10.0001);
+}
+
+void TestFloatDivision()
+{
+	// Local / local
+	float a = 10.0;
+	float b = 4.0;
+	float c = a / b;
+	Assert(c > 2.4999 && c < 2.5001);
+
+	// Local / literal
+	float d = a / 2.0;
+	Assert(d > 4.9999 && d < 5.0001);
+
+	// Local / global
+	float e = a / globalFloat3;
+	Assert(e > 3.9999 && e < 4.0001);
+
+	// Global / global
+	float f = globalFloat1 / globalFloat3;
+	Assert(f > 3.9999 && f < 4.0001);
+
+	// Compound division
+	float g = 20.0;
+	g /= 2.0;
+	Assert(g > 9.9999 && g < 10.0001);
+
+	g /= globalFloat3;
+	Assert(g > 3.9999 && g < 4.0001);
+}
+
+void TestFloatComparisons()
+{
+	float a = 5.5;
+	float b = 3.5;
+	float c = 5.5;
+
+	Assert(a > b);
+	Assert(b < a);
+	Assert(a >= c);
+	Assert(a <= c);
+	Assert(a == c);
+	Assert(a != b);
+
+	// Compare with globals
+	Assert(globalFloat1 > globalFloat2);
+	Assert(globalFloat2 < globalFloat1);
+	Assert(globalFloat2 == globalFloat2);
+
+	// Compare with literals
+	Assert(a > 5.0);
+	Assert(a < 6.0);
+}
+
+void TestIntToFloat()
+{
+	int i = 5;
+	float f = i;
+	Assert(f > 4.9999 && f < 5.0001);
+
+	float g = 10 + 0.5;
+	Assert(g > 10.4999 && g < 10.5001);
+
+	int j = 3;
+	float h = j * 2.5;
+	Assert(h > 7.4999 && h < 7.5001);
+}
+
+void TestFloatToInt()
+{
+	float f = 5.7;
+	int i = f;
+	Assert(i == 5);
+
+	float g = 10.9;
+	int j = g;
+	Assert(j == 10);
+
+	float h = -3.7;
+	int k = h;
+	Assert(k == -3);
+}
+
+void TestFloatInConditions()
+{
+	float a = 5.5;
+
+	if (a > 5.0)
+	{
+		Assert(true);
+	}
+	else
+	{
+		Assert(false);
+	}
+
+	if (a < 5.0)
+	{
+		Assert(false);
+	}
+	else
+	{
+		Assert(true);
+	}
+
+	float b = 0.0;
+	if (b == 0.0)
+	{
+		Assert(true);
+	}
+	else
+	{
+		Assert(false);
+	}
+}
+
+void TestFloatInLoops()
+{
+	float sum = 0.0;
+	for (int i = 0; i < 5; i++)
+	{
+		sum += 1.5;
+	}
+	Assert(sum > 7.4999 && sum < 7.5001);
+
+	float product = 1.0;
+	int count = 0;
+	while (count < 3)
+	{
+		product *= 2.0;
+		count++;
+	}
+	Assert(product > 7.9999 && product < 8.0001);
+}
+
+void TestFloatTernary()
+{
+	float a = 5.5;
+	float b = 3.5;
+
+	float max = a > b ? a : b;
+	Assert(max > 5.4999 && max < 5.5001);
+
+	float min = a < b ? a : b;
+	Assert(min > 3.4999 && min < 3.5001);
+}
+
+void TestFloatExpressions()
+{
+	float a = 2.0;
+	float b = 3.0;
+	float c = 4.0;
+
+	// Complex expression
+	float result = (a + b) * c;
+	Assert(result > 19.9999 && result < 20.0001);
+
+	result = a * b + c;
+	Assert(result > 9.9999 && result < 10.0001);
+
+	result = a + b * c;
+	Assert(result > 13.9999 && result < 14.0001);
+
+	result = (a + b) / c;
+	Assert(result > 1.2499 && result < 1.2501);
+}
+
+void TestFloatArrays()
+{
+	float[3] arr = {1.5, 2.5, 3.5};
+	Assert(arr[0] > 1.4999 && arr[0] < 1.5001);
+	Assert(arr[1] > 2.4999 && arr[1] < 2.5001);
+	Assert(arr[2] > 3.4999 && arr[2] < 3.5001);
+
+	float sum = arr[0] + arr[1] + arr[2];
+	Assert(sum > 7.4999 && sum < 7.5001);
+
+	arr[0] = 10.0;
+	Assert(arr[0] > 9.9999 && arr[0] < 10.0001);
+}
+
+void TestFloatZero()
+{
+	float zero = 0.0;
+	Assert(zero > -0.0001 && zero < 0.0001);
+
+	float a = 5.0;
+	float b = a + zero;
+	Assert(b > 4.9999 && b < 5.0001);
+
+	float c = a * zero;
+	Assert(c > -0.0001 && c < 0.0001);
+}
+
+void TestFloatSmallValues()
+{
+	float small = 0.001;
+	float smaller = 0.0001;
+
+	Assert(small > smaller);
+
+	float sum = small + smaller;
+	Assert(sum > 0.00109 && sum < 0.00111);
+}
+
+void TestFloatLargeValues()
+{
+	float large = 1000000.0;
+	float half = large / 2.0;
+	Assert(half > 499999.9 && half < 500000.1);
+
+	float doubled = large * 2.0;
+	Assert(doubled > 1999999.9 && doubled < 2000000.1);
+}
+
 public int main()
 {
-    return 0;
+	TestFloatLiterals();
+	TestFloatNegatives();
+	TestFloatAddition();
+	TestFloatSubtraction();
+	TestFloatMultiplication();
+	TestFloatDivision();
+	TestFloatComparisons();
+	TestIntToFloat();
+	TestFloatToInt();
+	TestFloatInConditions();
+	TestFloatInLoops();
+	TestFloatTernary();
+	TestFloatExpressions();
+	TestFloatArrays();
+	TestFloatZero();
+	TestFloatSmallValues();
+	TestFloatLargeValues();
+	return 0;
 }
