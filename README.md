@@ -37,7 +37,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
     - x86-64 code generation
       - Microsoft ABI
       - SysV ABI (wip)
-    - ARM64 code generation (wip)
+    - ARM64 code generation
     - Class support not complete yet
 	
 ## Architecture
