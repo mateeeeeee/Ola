@@ -3,9 +3,8 @@ import std.assert;
 int GlobalInt = 7;
 float GlobalFloat = 14.0;
 
-public int main()
+void TestLocalInt()
 {
-    // Local variables
     int a = 5;
     int b = -a;
     Assert(b == -5);
@@ -13,37 +12,99 @@ public int main()
     int c = 10;
     int d = +c;
     Assert(d == 10);
+}
 
+void TestLocalFloat()
+{
     float f = 10.0;
     float g = +f;
     Assert(g == 10.0);
 
     float e = -f;
     Assert(e == -10.0);
+}
 
+void TestGlobals()
+{
     int globalNegate = -GlobalInt;
-    Assert(globalNegate == -7); 
+    Assert(globalNegate == -7);
 
     int globalIdentity = +GlobalInt;
-    Assert(globalIdentity == 7); // GlobalInt is 7
-    
+    Assert(globalIdentity == 7);
+
     float globalFloatNegate = -GlobalFloat;
-    Assert(globalFloatNegate == -14.0); 
-    
+    Assert(globalFloatNegate == -14.0);
+
     float globalFloatIdentity = +GlobalFloat;
-    Assert(globalFloatIdentity == 14.0); 
-    
+    Assert(globalFloatIdentity == 14.0);
+}
+
+void TestLiterals()
+{
     int literalNegate = -8;
-    Assert(literalNegate == -8); 
-    
+    Assert(literalNegate == -8);
+
     int literalIdentity = +8;
-    Assert(literalIdentity == 8); 
-    
+    Assert(literalIdentity == 8);
+
     float literalFloatNegate = -3.5;
-    Assert(literalFloatNegate == -3.5); 
-    
+    Assert(literalFloatNegate == -3.5);
+
     float literalFloatIdentity = +3.5;
     Assert(literalFloatIdentity == 3.5);
+}
+
+void TestDoubleNegation()
+{
+    int a = 5;
+    int b = -(-a);
+    Assert(b == 5);
+
+    int c = -10;
+    int d = -c;
+    Assert(d == 10);
+
+    float f = 3.5;
+    float g = -(-f);
+    Assert(g == 3.5);
+}
+
+void TestNegationInExpressions()
+{
+    int a = 5;
+    int b = 3;
+
+    int sum = a + (-b);
+    Assert(sum == 2);
+
+    int diff = (-a) - (-b);
+    Assert(diff == -2);
+
+    float f = 2.5;
+    float result = -f * 2.0;
+    Assert(result == -5.0);
+}
+
+void TestZero()
+{
+    int zero = 0;
+    Assert(-zero == 0);
+    Assert(+zero == 0);
+
+    float fzero = 0.0;
+    Assert(-fzero == 0.0);
+    Assert(+fzero == 0.0);
+}
+
+public int main()
+{
+    TestLocalInt();
+    TestLocalFloat();
+    TestGlobals();
+    TestLiterals();
+    TestDoubleNegation();
+    TestNegationInExpressions();
+    TestZero();
 
     return 0;
 }
