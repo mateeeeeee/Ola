@@ -24,6 +24,7 @@ void TestImplicitCastAssignInit()
     Assert(floatVal == 1.0);
 }
 
+// LLVM-specific parameter cast tests
 void TestImplicitCastParamBool(bool boolParam)
 {
     Assert(boolParam == true);
@@ -49,7 +50,7 @@ void TestImplicitCastParam()
     TestImplicitCastParamBool(farg);
     TestImplicitCastParamBool(1);
     TestImplicitCastParamBool(1.0);
-    
+
     TestImplicitCastParamInt(barg);
     TestImplicitCastParamInt(farg);
     TestImplicitCastParamInt(true);
@@ -61,10 +62,224 @@ void TestImplicitCastParam()
     TestImplicitCastParamFloat(true);
 }
 
+// Test int to float in expressions
+void TestIntToFloatExpressions()
+{
+    int a = 5;
+    float b = 2.5;
+
+    float result = a + b;
+    Assert(result > 7.4999 && result < 7.5001);
+
+    result = a * b;
+    Assert(result > 12.4999 && result < 12.5001);
+
+    result = a - b;
+    Assert(result > 2.4999 && result < 2.5001);
+
+    result = a / b;
+    Assert(result > 1.9999 && result < 2.0001);
+}
+
+// Test float to int truncation
+void TestFloatToIntTruncation()
+{
+    float f1 = 5.9;
+    int i1 = f1;
+    Assert(i1 == 5);
+
+    float f2 = -3.7;
+    int i2 = f2;
+    Assert(i2 == -3);
+
+    float f3 = 0.99;
+    int i3 = f3;
+    Assert(i3 == 0);
+}
+
+// Test bool to int
+void TestBoolToInt()
+{
+    bool t = true;
+    bool f = false;
+
+    int it = t;
+    int iff = f;
+
+    Assert(it == 1);
+    Assert(iff == 0);
+
+    // In expressions
+    int sum = t + t + f;
+    Assert(sum == 2);
+}
+
+// Test int to bool
+void TestIntToBool()
+{
+    int zero = 0;
+    int positive = 42;
+    int negative = -5;
+
+    bool b1 = zero;
+    bool b2 = positive;
+    bool b3 = negative;
+
+    Assert(b1 == false);
+    Assert(b2 == true);
+    Assert(b3 == true);
+}
+
+// Test implicit cast in function parameter
+float AddFloats(float a, float b)
+{
+    return a + b;
+}
+
+void TestImplicitCastFunctionParam()
+{
+    int a = 5;
+    int b = 3;
+
+    float result = AddFloats(a, b);
+    Assert(result > 7.9999 && result < 8.0001);
+
+    result = AddFloats(a, 2.5);
+    Assert(result > 7.4999 && result < 7.5001);
+}
+
+// Test implicit cast in comparisons
+void TestImplicitCastComparisons()
+{
+    int i = 5;
+    float f = 5.0;
+
+    Assert(i == f);
+    Assert(f == i);
+
+    f = 5.5;
+    Assert(i < f);
+    Assert(f > i);
+
+    f = 4.5;
+    Assert(i > f);
+    Assert(f < i);
+}
+
+// Test implicit cast in conditions
+void TestImplicitCastConditions()
+{
+    int i = 1;
+    if (i)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+
+    i = 0;
+    if (i)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
+
+    float f = 0.0;
+    if (f)
+    {
+        Assert(false);
+    }
+    else
+    {
+        Assert(true);
+    }
+
+    f = 0.001;
+    if (f)
+    {
+        Assert(true);
+    }
+    else
+    {
+        Assert(false);
+    }
+}
+
+// Test implicit cast in ternary condition
+void TestImplicitCastTernary()
+{
+    int i = 10;
+
+    // Int condition in ternary
+    int result = i ? 1 : 0;
+    Assert(result == 1);
+
+    i = 0;
+    result = i ? 1 : 0;
+    Assert(result == 0);
+
+    float f = 1.5;
+    result = f ? 1 : 0;
+    Assert(result == 1);
+
+    f = 0.0;
+    result = f ? 1 : 0;
+    Assert(result == 0);
+}
+
+// Test implicit cast with arrays
+void TestImplicitCastArrays()
+{
+    int[3] intArr = {1, 2, 3};
+    float[3] floatArr;
+
+    for (int i = 0; i < 3; i++)
+    {
+        floatArr[i] = intArr[i];
+    }
+
+    Assert(floatArr[0] > 0.9999 && floatArr[0] < 1.0001);
+    Assert(floatArr[1] > 1.9999 && floatArr[1] < 2.0001);
+    Assert(floatArr[2] > 2.9999 && floatArr[2] < 3.0001);
+}
+
+// Test compound assignment with implicit cast
+void TestImplicitCastCompound()
+{
+    float f = 10.0;
+    int i = 3;
+
+    f += i;
+    Assert(f > 12.9999 && f < 13.0001);
+
+    f -= i;
+    Assert(f > 9.9999 && f < 10.0001);
+
+    f *= i;
+    Assert(f > 29.9999 && f < 30.0001);
+
+    f /= i;
+    Assert(f > 9.9999 && f < 10.0001);
+}
 
 public int main()
 {
     TestImplicitCastAssignInit();
     TestImplicitCastParam();
+    TestIntToFloatExpressions();
+    TestFloatToIntTruncation();
+    TestBoolToInt();
+    TestIntToBool();
+    TestImplicitCastFunctionParam();
+    TestImplicitCastComparisons();
+    TestImplicitCastConditions();
+    TestImplicitCastTernary();
+    TestImplicitCastArrays();
+    TestImplicitCastCompound();
     return 0;
 }
