@@ -86,11 +86,91 @@ void TestTernaryOperatorBools()
     Assert(resultImmediate == 1);
 }
 
+// Test ternary in expressions
+void TestTernaryInExpressions()
+{
+    int a = 5;
+    int b = 10;
+
+    int sum = (a > b ? a : b) + 5;
+    Assert(sum == 15);
+
+    int product = 2 * (a < b ? a : b);
+    Assert(product == 10);
+
+    int diff = (true ? 20 : 10) - (false ? 5 : 3);
+    Assert(diff == 17);
+}
+
+// Test ternary with different conditions
+void TestTernaryConditions()
+{
+    int a = 10;
+    int b = 5;
+
+    // Greater than
+    int r1 = a > b ? 1 : 0;
+    Assert(r1 == 1);
+
+    // Less than
+    int r2 = a < b ? 1 : 0;
+    Assert(r2 == 0);
+
+    // Equal
+    int r3 = a == 10 ? 1 : 0;
+    Assert(r3 == 1);
+
+    // Not equal
+    int r4 = a != b ? 1 : 0;
+    Assert(r4 == 1);
+
+    // Greater or equal
+    int r5 = a >= 10 ? 1 : 0;
+    Assert(r5 == 1);
+
+    // Less or equal
+    int r6 = b <= 5 ? 1 : 0;
+    Assert(r6 == 1);
+}
+
+// Test ternary assignment
+void TestTernaryAssignment()
+{
+    int x;
+    bool cond = true;
+
+    x = cond ? 100 : 200;
+    Assert(x == 100);
+
+    cond = false;
+    x = cond ? 100 : 200;
+    Assert(x == 200);
+}
+
+// Test ternary with arrays
+void TestTernaryArrays()
+{
+    int[3] arr = {10, 20, 30};
+
+    int val = arr[0] > arr[1] ? arr[0] : arr[1];
+    Assert(val == 20);
+
+    int idx = true ? 0 : 2;
+    Assert(arr[idx] == 10);
+
+    idx = false ? 0 : 2;
+    Assert(arr[idx] == 30);
+}
+
 public int main()
 {
     TestTernaryOperatorIntegers();
     TestTernaryOperatorFloats();
     TestTernaryOperatorBools();
+    TestTernaryInExpressions();
+    TestTernaryConditions();
+    TestTernaryAssignment();
+    TestTernaryArrays();
 
     return 0;
 }
