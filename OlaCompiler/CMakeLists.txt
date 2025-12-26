@@ -235,6 +235,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/x64/SysV/SysV_x64Target.cpp
   Backend/Custom/Codegen/x64/SysV/SysV_x64TargetFrameInfo.h
   Backend/Custom/Codegen/x64/SysV/SysV_x64TargetFrameInfo.cpp
+  Backend/Custom/Codegen/x64/x64Tiles.h
+  Backend/Custom/Codegen/x64/x64Tiles.cpp
   Backend/Custom/Codegen/ARM64/ARM64.h
   Backend/Custom/Codegen/ARM64/ARM64.cpp
   Backend/Custom/Codegen/ARM64/ARM64Target.h
@@ -245,6 +247,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ARM64/ARM64TargetInstInfo.cpp
   Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.h
   Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.cpp
+  Backend/Custom/Codegen/ARM64/ARM64Tiles.h
+  Backend/Custom/Codegen/ARM64/ARM64Tiles.cpp
   Backend/Custom/Codegen/ISelTree/ISelNode.h
   Backend/Custom/Codegen/ISelTree/ISelNode.cpp
   Backend/Custom/Codegen/ISelTree/ISelForest.h
@@ -253,6 +257,12 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ISelTree/ISelTile.cpp
   Backend/Custom/Codegen/ISelTree/ISelTiler.h
   Backend/Custom/Codegen/ISelTree/ISelTiler.cpp
+  Backend/Custom/Codegen/ISelTree/ISelTreeGen.h
+  Backend/Custom/Codegen/ISelTree/ISelTreeGen.cpp
+  Backend/Custom/Codegen/ISelTree/ISelTreeMerge.h
+  Backend/Custom/Codegen/ISelTree/ISelTreeMerge.cpp
+  Backend/Custom/Codegen/ISelTree/Tiles/CommonTiles.h
+  Backend/Custom/Codegen/ISelTree/Tiles/CommonTiles.cpp
 )
 
 if(LLVM_FOUND)

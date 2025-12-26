@@ -48,7 +48,10 @@ namespace ola
 		case ARM64_InstMovz:   return "movz";
 		case ARM64_InstMovk:   return "movk";
 		case ARM64_InstFMov:   return "fmov";
+		case ARM64_InstMadd:   return "madd";
 		case ARM64_InstMsub:   return "msub";
+		case ARM64_InstFMadd:  return "fmadd";
+		case ARM64_InstFMsub:  return "fmsub";
 		case ARM64_InstCset:   return "cset";
 		case ARM64_InstCsetEQ: return "cset";
 		case ARM64_InstCsetNE: return "cset";
@@ -58,6 +61,10 @@ namespace ola
 		case ARM64_InstCsetLE: return "cset";
 		case ARM64_InstMrs:    return "mrs";
 		case ARM64_InstMsr:    return "msr";
+		case ARM64_InstAddShifted: return "add";
+		case ARM64_InstSubShifted: return "sub";
+		case ARM64_InstLdrShifted: return "ldr";
+		case ARM64_InstStrShifted: return "str";
 
 		default:
 			return "unknown";

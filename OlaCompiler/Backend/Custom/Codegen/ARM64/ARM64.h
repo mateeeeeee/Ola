@@ -33,7 +33,10 @@ namespace ola
 		ARM64_InstMovz,
 		ARM64_InstMovk,
 		ARM64_InstFMov,
+		ARM64_InstMadd,
 		ARM64_InstMsub,
+		ARM64_InstFMadd,
+		ARM64_InstFMsub,
 		ARM64_InstCset,
 		ARM64_InstCsetEQ,
 		ARM64_InstCsetNE,
@@ -43,6 +46,10 @@ namespace ola
 		ARM64_InstCsetLE,
 		ARM64_InstMrs,
 		ARM64_InstMsr,
+		ARM64_InstAddShifted,
+		ARM64_InstSubShifted,
+		ARM64_InstLdrShifted,
+		ARM64_InstStrShifted
 	};
 
 	inline constexpr Bool ARM64_IsISAReg(Uint32 reg)

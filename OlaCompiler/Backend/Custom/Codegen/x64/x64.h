@@ -49,7 +49,8 @@ namespace ola
 		x64_InstMoveFP,
 		x64_InstStoreFP,
 		x64_InstLoadFP,
-		x64_InstXorFP
+		x64_InstXorFP,
+		x64_InstLea
 	};
 
 	inline Char const* x64_GetOpcodeString(Uint32 opcode)
@@ -105,6 +106,7 @@ namespace ola
 		case InstFMul:    return "mulsd";
 		case InstFDiv:    return "divsd";
 		case x64_InstXorFP:   return "xorpd";
+		case x64_InstLea:     return "lea";
 		case InstZExt:    return "movzx";
 		}
 		return "";
