@@ -245,6 +245,14 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ARM64/ARM64TargetInstInfo.cpp
   Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.h
   Backend/Custom/Codegen/ARM64/ARM64AsmPrinter.cpp
+  Backend/Custom/Codegen/ISelTree/ISelNode.h
+  Backend/Custom/Codegen/ISelTree/ISelNode.cpp
+  Backend/Custom/Codegen/ISelTree/ISelForest.h
+  Backend/Custom/Codegen/ISelTree/ISelForest.cpp
+  Backend/Custom/Codegen/ISelTree/ISelTile.h
+  Backend/Custom/Codegen/ISelTree/ISelTile.cpp
+  Backend/Custom/Codegen/ISelTree/ISelTiler.h
+  Backend/Custom/Codegen/ISelTree/ISelTiler.cpp
 )
 
 if(LLVM_FOUND)

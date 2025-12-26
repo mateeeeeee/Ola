@@ -410,3 +410,6 @@ FodyWeavers.xsd
 # Ola log files
 olalog.txt
 
+# Local/private files
+*.local.md
+
