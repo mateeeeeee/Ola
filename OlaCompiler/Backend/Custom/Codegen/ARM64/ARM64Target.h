@@ -8,6 +8,7 @@ namespace ola
 	public:
 		ARM64Target() = default;
 
+		virtual TargetArch GetArch() const override { return TargetArch::ARM64; }
 		virtual TargetDataLayout const& GetDataLayout() const override;
 		virtual TargetInstInfo const& GetInstInfo() const override;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const override;

@@ -2,19 +2,13 @@
 #include <vector>
 #include <memory>
 #include "ISelNode.h"
+#include "Backend/Custom/Codegen/Target.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 #include "Utility/RTTI.h"
 
 namespace ola
 {
-	enum class TargetArch
-	{
-		All,
-		x64,
-		ARM64
-	};
-
 	struct TileResult
 	{
 		std::vector<MachineInstruction> instructions;

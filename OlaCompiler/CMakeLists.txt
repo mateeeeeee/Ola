@@ -261,6 +261,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ISelTree/ISelTreeGen.cpp
   Backend/Custom/Codegen/ISelTree/ISelTreeMerge.h
   Backend/Custom/Codegen/ISelTree/ISelTreeMerge.cpp
+  Backend/Custom/Codegen/ISelTree/ISelDriver.h
+  Backend/Custom/Codegen/ISelTree/ISelDriver.cpp
   Backend/Custom/Codegen/ISelTree/Tiles/CommonTiles.h
   Backend/Custom/Codegen/ISelTree/Tiles/CommonTiles.cpp
 )

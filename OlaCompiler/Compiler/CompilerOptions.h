@@ -1,5 +1,6 @@
 #pragma once
 #include "Utility/EnumOperators.h"
+#include "Backend/Custom/Codegen/Target.h"
 
 namespace ola
 {
@@ -28,13 +29,6 @@ namespace ola
 		O1,
 		O2,
 		O3
-	};
-
-	enum class TargetArch : Uint8
-	{
-		Default,
-		x64,
-		ARM64
 	};
 
 }

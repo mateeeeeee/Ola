@@ -2,6 +2,7 @@
 #include <iosfwd>
 #include "MachineGlobal.h"
 #include "MachineContext.h"
+#include "ISelTree/ISelDriver.h"
 
 namespace ola
 {
@@ -42,6 +43,9 @@ namespace ola
 		Target const& GetTarget() const { return target; }
 		auto   const& GetGlobals() const { return globals; }
 
+		void SetISelMode(ISelMode mode) { isel_mode = mode; }
+		ISelMode GetISelMode() const { return isel_mode; }
+
 		void EmitMIR(std::string_view mir_file);
 		void EmitAssembly(std::string_view assembly_file);
 
@@ -50,6 +54,7 @@ namespace ola
 		MachineContext machine_ctx;
 		Target const& target;
 		FunctionAnalysisManager& FAM;
+		ISelMode isel_mode = ISelMode::Legacy;
 
 	private:
 		void LowerModule(IRModule*);

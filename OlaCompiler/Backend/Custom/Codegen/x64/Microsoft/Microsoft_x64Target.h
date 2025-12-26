@@ -8,6 +8,7 @@ namespace ola
 	public:
 		Microsoft_x64Target() = default;
 
+		virtual TargetArch GetArch() const override { return TargetArch::x64; }
 		virtual TargetDataLayout const& GetDataLayout() const override;
 		virtual TargetInstInfo const& GetInstInfo() const override;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const override;
