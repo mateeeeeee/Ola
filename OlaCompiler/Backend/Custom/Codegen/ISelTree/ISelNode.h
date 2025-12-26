@@ -3,6 +3,7 @@
 #include <vector>
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/MachineOperand.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola
 {
@@ -398,20 +399,18 @@ namespace ola
 		MachineType type;
 	};
 
-	class MachineInstruction;
-
 	class ISelAsmNode final : public ISelNode
 	{
 	public:
-		explicit ISelAsmNode(std::vector<MachineInstruction*> instructions)
+		explicit ISelAsmNode(std::vector<MachineInstruction> instructions)
 			: ISelNode(ISelNodeKind::Asm)
 			, instructions(std::move(instructions))
 		{}
 
 		void Accept(ISelNodeVisitor* visitor) override;
 
-		std::vector<MachineInstruction*>& Instructions() { return instructions; }
-		std::vector<MachineInstruction*> const& Instructions() const { return instructions; }
+		std::vector<MachineInstruction>& Instructions() { return instructions; }
+		std::vector<MachineInstruction> const& Instructions() const { return instructions; }
 
 		static Bool ClassOf(ISelNode const* N)
 		{
@@ -419,7 +418,7 @@ namespace ola
 		}
 
 	private:
-		std::vector<MachineInstruction*> instructions;
+		std::vector<MachineInstruction> instructions;
 	};
 
 	class ISelNodeVisitor

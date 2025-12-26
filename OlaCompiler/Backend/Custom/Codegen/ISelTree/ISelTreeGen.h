@@ -57,13 +57,18 @@ namespace ola
 		void EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
 
 		void AddTree(ISelNodePtr tree, std::vector<ISelNode*> const& leaves, Bool has_memory);
+		void AddAsmNode(std::vector<MachineInstruction> instructions);
 		void CountUses(BasicBlock& BB);
 		MachineType GetMachineTypeForValue(Value* V) const;
+
+		template<typename Func>
+		std::vector<MachineInstruction> CaptureEmittedInstructions(Func&& f);
 
 	private:
 		MachineContext& ctx;
 		ISelForest forest;
 		ISelValueMap value_map;
 		ISelUseCount use_count;
+		std::vector<MachineInstruction> pending_leaf_instructions;
 	};
 }

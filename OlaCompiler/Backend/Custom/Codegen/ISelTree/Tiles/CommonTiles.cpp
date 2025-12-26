@@ -177,8 +177,10 @@ namespace ola
 
 		Uint32 cmp_opcode = IsFloatCompare(matched_cmp->GetCompareOp()) ? InstFCmp : InstICmp;
 		MachineInstruction cmp(cmp_opcode);
-		cmp.SetOp<0>(left_op);
-		cmp.SetOp<1>(right_op);
+		cmp.SetOp<0>(matched_reg->GetRegister());
+		cmp.SetOp<1>(left_op);
+		cmp.SetOp<2>(right_op);
+		cmp.SetOp<3>(MachineOperand::Immediate((Uint32)matched_cmp->GetCompareOp(), MachineType::Other));
 		result.instructions.push_back(cmp);
 
 		result.success = true;

@@ -84,8 +84,7 @@ namespace ola
 				load_addr.SetOp<0>(reg->GetRegister());
 				load_addr.SetOp<1>(MachineOperand::Relocable(MG->GetRelocable()));
 
-				std::vector<MachineInstruction*> insts;
-				ctx.EmitInst(load_addr);
+				pending_leaf_instructions.push_back(load_addr);
 
 				return reg;
 			}
@@ -122,6 +121,12 @@ namespace ola
 
 	void ISelTreeGen::AddTree(ISelNodePtr tree, std::vector<ISelNode*> const& leaves, Bool has_memory)
 	{
+		if (!pending_leaf_instructions.empty())
+		{
+			auto asm_node = std::make_unique<ISelAsmNode>(std::move(pending_leaf_instructions));
+			forest.AddTree(std::move(asm_node), {}, false);
+			pending_leaf_instructions.clear();
+		}
 		forest.AddTree(std::move(tree), leaves, has_memory);
 	}
 
@@ -308,75 +313,92 @@ namespace ola
 
 	void ISelTreeGen::ProcessBranchInst(BranchInst& I)
 	{
-		BasicBlock* src_block = I.GetBasicBlock();
-
-		if (I.IsUnconditional())
+		auto captured = CaptureEmittedInstructions([&]()
 		{
-			BasicBlock* target = I.GetTrueTarget();
-			EmitJumpWithPhiCopies(InstJump, target, src_block);
-		}
-		else
-		{
-			BasicBlock* true_target = I.GetTrueTarget();
-			BasicBlock* false_target = I.GetFalseTarget();
+			BasicBlock* src_block = I.GetBasicBlock();
 
-			MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
+			if (I.IsUnconditional())
+			{
+				BasicBlock* target = I.GetTrueTarget();
+				EmitJumpWithPhiCopies(InstJump, target, src_block);
+			}
+			else
+			{
+				BasicBlock* true_target = I.GetTrueTarget();
+				BasicBlock* false_target = I.GetFalseTarget();
 
-			MachineInstruction test(InstTest);
-			test.SetOp<0>(cond_op);
-			test.SetOp<1>(cond_op);
-			ctx.EmitInst(test);
+				MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
 
-			EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
-			EmitJumpWithPhiCopies(InstJump, false_target, src_block);
-		}
+				MachineInstruction test(InstTest);
+				test.SetOp<0>(cond_op);
+				test.SetOp<1>(cond_op);
+				ctx.EmitInst(test);
+
+				EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
+				EmitJumpWithPhiCopies(InstJump, false_target, src_block);
+			}
+		});
+		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessReturnInst(ReturnInst& I)
 	{
-		Target const& target = ctx.GetModule().GetTarget();
-		target.GetFrameInfo().EmitReturn(&I, ctx);
+		auto captured = CaptureEmittedInstructions([&]()
+		{
+			Target const& target = ctx.GetModule().GetTarget();
+			target.GetFrameInfo().EmitReturn(&I, ctx);
+		});
+		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessSwitchInst(SwitchInst& I)
 	{
 		if (I.GetNumCases() == 0) return;
-		BasicBlock* src_block = I.GetBasicBlock();
-		MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
 
-		for (auto const& case_val : I.Cases())
+		auto captured = CaptureEmittedInstructions([&]()
 		{
-			BasicBlock* case_block = case_val.GetCaseBlock();
+			BasicBlock* src_block = I.GetBasicBlock();
+			MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
 
-			if (!cond_op.IsImmediate())
+			for (auto const& case_val : I.Cases())
 			{
-				MachineInstruction cmp(InstICmp);
-				cmp.SetOp<0>(cond_op);
-				cmp.SetOp<1>(MachineOperand::Immediate(case_val.GetCaseValue(), cond_op.GetType()));
-				ctx.EmitInst(cmp);
+				BasicBlock* case_block = case_val.GetCaseBlock();
 
-				EmitJumpWithPhiCopies(InstJE, case_block, src_block);
-			}
-			else
-			{
-				Int64 imm = cond_op.GetImmediate();
-				if (imm == case_val.GetCaseValue())
+				if (!cond_op.IsImmediate())
 				{
-					EmitJumpWithPhiCopies(InstJump, case_block, src_block);
+					MachineInstruction cmp(InstICmp);
+					cmp.SetOp<0>(cond_op);
+					cmp.SetOp<1>(MachineOperand::Immediate(case_val.GetCaseValue(), cond_op.GetType()));
+					ctx.EmitInst(cmp);
+
+					EmitJumpWithPhiCopies(InstJE, case_block, src_block);
+				}
+				else
+				{
+					Int64 imm = cond_op.GetImmediate();
+					if (imm == case_val.GetCaseValue())
+					{
+						EmitJumpWithPhiCopies(InstJump, case_block, src_block);
+					}
 				}
 			}
-		}
 
-		if (BasicBlock* default_block = I.GetDefaultCase())
-		{
-			EmitJumpWithPhiCopies(InstJump, default_block, src_block);
-		}
+			if (BasicBlock* default_block = I.GetDefaultCase())
+			{
+				EmitJumpWithPhiCopies(InstJump, default_block, src_block);
+			}
+		});
+		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessCallInst(CallInst& I)
 	{
-		Target const& target = ctx.GetModule().GetTarget();
-		target.GetFrameInfo().EmitCall(&I, ctx);
+		auto captured = CaptureEmittedInstructions([&]()
+		{
+			Target const& target = ctx.GetModule().GetTarget();
+			target.GetFrameInfo().EmitCall(&I, ctx);
+		});
+		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessSelectInst(SelectInst& I)
@@ -405,7 +427,6 @@ namespace ola
 	void ISelTreeGen::ProcessAllocaInst(AllocaInst& I)
 	{
 		// Allocas are pre-mapped to stack slots in MachineModule::LowerFunction
-		// Nothing to do here
 	}
 
 	void ISelTreeGen::ProcessGetElementPtrInst(GetElementPtrInst& I)
@@ -413,17 +434,12 @@ namespace ola
 		ISelNodePtr base = CreateNodeForValue(I.GetBaseOperand());
 		std::vector<ISelNode*> leaves = { base.get() };
 
-		// For now, create a simple address computation
-		// This will be enhanced to build proper address nodes
 		ISelNodePtr current = std::move(base);
-
 		for (Uint32 i = 0; i < I.GetNumIndices(); ++i)
 		{
 			Value* idx = I.GetIndex(i);
 			ISelNodePtr idx_node = CreateNodeForValue(idx);
 			leaves.push_back(idx_node.get());
-
-			// Add index computation
 			auto add = std::make_unique<ISelBinaryOpNode>(
 				Opcode::Add,
 				std::move(current),
@@ -443,7 +459,26 @@ namespace ola
 
 	void ISelTreeGen::ProcessPtrAddInst(PtrAddInst& I)
 	{
-		ISelNodePtr base = CreateNodeForValue(I.GetBase());
+		Value* base_value = I.GetBase();
+		ISelNodePtr base;
+
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsArray())
+		{
+			MachineOperand base_op = ctx.GetOperand(base_value);
+			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+
+			MachineInstruction load_addr(InstLoadGlobalAddress);
+			load_addr.SetOp<0>(reg->GetRegister());
+			load_addr.SetOp<1>(base_op);
+
+			pending_leaf_instructions.push_back(load_addr);
+			base = std::move(reg);
+		}
+		else
+		{
+			base = CreateNodeForValue(base_value);
+		}
+
 		ISelNodePtr offset = CreateNodeForValue(I.GetOffset());
 
 		std::vector<ISelNode*> leaves = { base.get(), offset.get() };
@@ -467,7 +502,6 @@ namespace ola
 	{
 		// PHI operands are pre-mapped before ISel runs in MachineModule::LowerFunction
 		// PHI copies are handled at branches via EmitJumpWithPhiCopies
-		// Nothing to do here
 	}
 
 	void ISelTreeGen::EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
@@ -525,5 +559,43 @@ namespace ola
 		MachineInstruction MI(jump_opcode);
 		MI.SetOp<0>(dst_operand);
 		ctx.EmitInst(MI);
+	}
+
+	void ISelTreeGen::AddAsmNode(std::vector<MachineInstruction> instructions)
+	{
+		if (instructions.empty()) 
+		{
+			return;
+		}
+		auto asm_node = std::make_unique<ISelAsmNode>(std::move(instructions));
+		forest.AddTree(std::move(asm_node), {}, false);
+	}
+
+	template<typename Func>
+	std::vector<MachineInstruction> ISelTreeGen::CaptureEmittedInstructions(Func&& f)
+	{
+		MachineBasicBlock* block = ctx.GetCurrentBasicBlock();
+		auto& inst_list = block->Instructions();
+
+		auto start_it = inst_list.end();
+		Uint64 start_size = inst_list.size();
+
+		// Execute the function (which emits to the basic block)
+		f();
+
+		std::vector<MachineInstruction> captured;
+		Uint64 new_size = inst_list.size();
+		if (new_size > start_size)
+		{
+			auto it = inst_list.begin();
+			std::advance(it, start_size);
+			while (it != inst_list.end())
+			{
+				captured.push_back(std::move(*it));
+				it = inst_list.erase(it);
+			}
+		}
+
+		return captured;
 	}
 }

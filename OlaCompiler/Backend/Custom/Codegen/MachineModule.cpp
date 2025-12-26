@@ -205,6 +205,7 @@ namespace ola
 		if (isel_mode == ISelMode::TreePattern)
 		{
 			ISelDriver isel_driver(machine_ctx, target.GetArch());
+			isel_driver.SetMode(ISelMode::TreePattern);
 			for (BasicBlock* BB : DT.Blocks())
 			{
 				MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);

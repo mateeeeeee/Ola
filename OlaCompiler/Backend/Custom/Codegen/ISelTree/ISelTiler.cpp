@@ -25,15 +25,15 @@ namespace ola
 
 			if (auto* asm_node = dyn_cast<ISelAsmNode>(current))
 			{
-				for (auto* inst : asm_node->Instructions())
+				for (MachineInstruction& inst : asm_node->Instructions())
 				{
-					if (inst) all_instructions.push_back(*inst);
+					all_instructions.push_back(inst);
 				}
 				continue;
 			}
 
 			Bool matched = false;
-			for (auto& tile : tiles)
+			for (ISelTilePtr& tile : tiles)
 			{
 				if (!TileMatchesArch(tile.get())) continue;
 
