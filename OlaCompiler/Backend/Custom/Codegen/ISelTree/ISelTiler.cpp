@@ -59,7 +59,7 @@ namespace ola
 
 			if (!matched)
 			{
-				OLA_WARN("ISel: No tile matched for node kind {}", static_cast<Uint32>(current->GetKind()));
+				OLA_ASSERT_MSG(false, "ISel: No tile matched for node");
 			}
 		}
 

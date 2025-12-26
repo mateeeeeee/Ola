@@ -201,18 +201,33 @@ namespace ola
 
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));
 		frame_info.EmitPrologue(MF, machine_ctx);
-		for (BasicBlock* BB : DT.Blocks()) 
+
+		if (isel_mode == ISelMode::TreePattern)
 		{
-			MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
-			machine_ctx.SetCurrentBasicBlock(MBB);
-			for (Instruction& I : *BB)
+			ISelDriver isel_driver(machine_ctx, target.GetArch());
+			for (BasicBlock* BB : DT.Blocks())
 			{
-				if (!isel_info.LowerInstruction(&I, machine_ctx))
+				MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
+				machine_ctx.SetCurrentBasicBlock(MBB);
+				isel_driver.SelectBasicBlock(*BB);
+			}
+		}
+		else
+		{
+			for (BasicBlock* BB : DT.Blocks())
+			{
+				MachineBasicBlock* MBB = machine_ctx.GetBlock(BB);
+				machine_ctx.SetCurrentBasicBlock(MBB);
+				for (Instruction& I : *BB)
 				{
-					LowerInstruction(&I);
+					if (!isel_info.LowerInstruction(&I, machine_ctx))
+					{
+						LowerInstruction(&I);
+					}
 				}
 			}
 		}
+
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetLastBlock()));
 		frame_info.EmitEpilogue(MF, machine_ctx);
 	}

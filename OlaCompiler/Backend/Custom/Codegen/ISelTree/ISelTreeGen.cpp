@@ -1,3 +1,5 @@
+#include <unordered_set>
+#include <unordered_map>
 #include "ISelTreeGen.h"
 #include "Backend/Custom/IR/BasicBlock.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -7,6 +9,8 @@
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
 #include "Backend/Custom/Codegen/MachineGlobal.h"
 #include "Backend/Custom/Codegen/MachineRelocable.h"
+#include "Backend/Custom/Codegen/MachineModule.h"
+#include "Backend/Custom/Codegen/Target.h"
 #include "Utility/RTTI.h"
 
 namespace ola
@@ -304,19 +308,18 @@ namespace ola
 
 	void ISelTreeGen::ProcessBranchInst(BranchInst& I)
 	{
-		MachineBasicBlock* true_mbb = ctx.GetBlock(I.GetTrueTarget());
+		BasicBlock* src_block = I.GetBasicBlock();
 
 		if (I.IsUnconditional())
 		{
-			MachineInstruction jmp(InstJump);
-			jmp.SetOp<0>(MachineOperand::Relocable(true_mbb));
-			ctx.EmitInst(jmp);
+			BasicBlock* target = I.GetTrueTarget();
+			EmitJumpWithPhiCopies(InstJump, target, src_block);
 		}
 		else
 		{
-			MachineBasicBlock* false_mbb = ctx.GetBlock(I.GetFalseTarget());
+			BasicBlock* true_target = I.GetTrueTarget();
+			BasicBlock* false_target = I.GetFalseTarget();
 
-			ISelNodePtr cond = CreateNodeForValue(I.GetCondition());
 			MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
 
 			MachineInstruction test(InstTest);
@@ -324,61 +327,56 @@ namespace ola
 			test.SetOp<1>(cond_op);
 			ctx.EmitInst(test);
 
-			MachineInstruction jne(InstJNE);
-			jne.SetOp<0>(MachineOperand::Relocable(true_mbb));
-			ctx.EmitInst(jne);
-
-			MachineInstruction jmp(InstJump);
-			jmp.SetOp<0>(MachineOperand::Relocable(false_mbb));
-			ctx.EmitInst(jmp);
+			EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
+			EmitJumpWithPhiCopies(InstJump, false_target, src_block);
 		}
 	}
 
 	void ISelTreeGen::ProcessReturnInst(ReturnInst& I)
 	{
-		if (!I.IsVoid())
-		{
-			ISelNodePtr ret_val = CreateNodeForValue(I.GetReturnValue());
-		}
-		MachineInstruction ret(InstRet);
-		ctx.EmitInst(ret);
+		Target const& target = ctx.GetModule().GetTarget();
+		target.GetFrameInfo().EmitReturn(&I, ctx);
 	}
 
 	void ISelTreeGen::ProcessSwitchInst(SwitchInst& I)
 	{
+		if (I.GetNumCases() == 0) return;
+		BasicBlock* src_block = I.GetBasicBlock();
 		MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
-		MachineBasicBlock* default_mbb = ctx.GetBlock(I.GetDefaultCase());
 
 		for (auto const& case_val : I.Cases())
 		{
-			MachineBasicBlock* case_mbb = ctx.GetBlock(case_val.GetCaseBlock());
+			BasicBlock* case_block = case_val.GetCaseBlock();
 
-			MachineInstruction cmp(InstICmp);
-			cmp.SetOp<0>(cond_op);
-			cmp.SetOp<1>(MachineOperand::Immediate(case_val.GetCaseValue(), cond_op.GetType()));
-			ctx.EmitInst(cmp);
+			if (!cond_op.IsImmediate())
+			{
+				MachineInstruction cmp(InstICmp);
+				cmp.SetOp<0>(cond_op);
+				cmp.SetOp<1>(MachineOperand::Immediate(case_val.GetCaseValue(), cond_op.GetType()));
+				ctx.EmitInst(cmp);
 
-			MachineInstruction je(InstJE);
-			je.SetOp<0>(MachineOperand::Relocable(case_mbb));
-			ctx.EmitInst(je);
+				EmitJumpWithPhiCopies(InstJE, case_block, src_block);
+			}
+			else
+			{
+				Int64 imm = cond_op.GetImmediate();
+				if (imm == case_val.GetCaseValue())
+				{
+					EmitJumpWithPhiCopies(InstJump, case_block, src_block);
+				}
+			}
 		}
 
-		MachineInstruction jmp(InstJump);
-		jmp.SetOp<0>(MachineOperand::Relocable(default_mbb));
-		ctx.EmitInst(jmp);
+		if (BasicBlock* default_block = I.GetDefaultCase())
+		{
+			EmitJumpWithPhiCopies(InstJump, default_block, src_block);
+		}
 	}
 
 	void ISelTreeGen::ProcessCallInst(CallInst& I)
 	{
-		// Calls are handled specially - delegate to TargetFrameInfo
-		// For now, just mark that this instruction produces a value
-		if (!I.GetType()->IsVoid())
-		{
-			MachineOperand result_reg = ctx.VirtualReg(GetMachineTypeForValue(&I));
-			auto reg = std::make_unique<ISelRegisterNode>(result_reg);
-			value_map.MapValue(&I, reg.get());
-			ctx.MapOperand(&I, result_reg);
-		}
+		Target const& target = ctx.GetModule().GetTarget();
+		target.GetFrameInfo().EmitCall(&I, ctx);
 	}
 
 	void ISelTreeGen::ProcessSelectInst(SelectInst& I)
@@ -406,11 +404,8 @@ namespace ola
 
 	void ISelTreeGen::ProcessAllocaInst(AllocaInst& I)
 	{
-		MachineOperand result_reg = ctx.VirtualReg(MachineType::Ptr);
-		auto reg = std::make_unique<ISelRegisterNode>(result_reg);
-
-		value_map.MapValue(&I, reg.get());
-		ctx.MapOperand(&I, result_reg);
+		// Allocas are pre-mapped to stack slots in MachineModule::LowerFunction
+		// Nothing to do here
 	}
 
 	void ISelTreeGen::ProcessGetElementPtrInst(GetElementPtrInst& I)
@@ -470,20 +465,65 @@ namespace ola
 
 	void ISelTreeGen::ProcessPhiInst(PhiInst& I)
 	{
-		MachineOperand result_reg = ctx.VirtualReg(GetMachineTypeForValue(&I));
-		auto phi = std::make_unique<ISelPhiNode>(GetMachineTypeForValue(&I));
+		// PHI operands are pre-mapped before ISel runs in MachineModule::LowerFunction
+		// PHI copies are handled at branches via EmitJumpWithPhiCopies
+		// Nothing to do here
+	}
 
-		for (Uint32 i = 0; i < I.GetNumIncomingValues(); ++i)
+	void ISelTreeGen::EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
+	{
+		OLA_ASSERT(jump_opcode >= InstJump && jump_opcode <= InstJNE);
+
+		std::vector<MachineOperand> dst_operands;
+		std::vector<MachineOperand> src_operands;
+		for (auto const& Phi : dst->PhiInsts())
 		{
-			ISelNodePtr val = CreateNodeForValue(I.GetIncomingValue(i));
-			phi->AddIncoming(std::move(val), I.GetIncomingBlock(i));
+			Value* V = Phi->GetIncomingValueForBlock(src);
+			if (V)
+			{
+				src_operands.push_back(ctx.GetOperand(V));
+				dst_operands.push_back(ctx.GetOperand(Phi));
+			}
 		}
 
-		auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(phi));
+		if (!src_operands.empty())
+		{
+			std::unordered_set<MachineOperand> needs_staging_set;
+			std::unordered_set<MachineOperand> dst_set(dst_operands.begin(), dst_operands.end());
 
-		value_map.MapValue(&I, reg.get());
-		ctx.MapOperand(&I, result_reg);
+			for (MachineOperand const& src_op : src_operands)
+			{
+				if (dst_set.contains(src_op)) needs_staging_set.insert(src_op);
+			}
 
-		AddTree(std::move(reg), {}, false);
+			std::unordered_map<MachineOperand, MachineOperand> dirty_reg_map;
+			for (Int i = dst_operands.size() - 1; i >= 0; --i)
+			{
+				MachineOperand src_arg;
+				if (auto iter = dirty_reg_map.find(src_operands[i]); iter != dirty_reg_map.end()) src_arg = iter->second;
+				else src_arg = src_operands[i];
+
+				MachineOperand const& dst_arg = dst_operands[i];
+				if (src_arg == dst_arg) continue;
+
+				if (needs_staging_set.count(dst_arg))
+				{
+					MachineOperand intermediate = ctx.VirtualReg(dst_arg.GetType());
+					MachineInstruction tmp_copy(InstMove);
+					tmp_copy.SetOp<0>(intermediate).SetOp<1>(dst_arg);
+					ctx.EmitInst(tmp_copy);
+					dirty_reg_map.emplace(dst_arg, intermediate);
+				}
+
+				MachineInstruction copy(InstMove);
+				copy.SetOp<0>(dst_arg).SetOp<1>(src_arg);
+				ctx.EmitInst(copy);
+			}
+		}
+
+		MachineOperand dst_operand = MachineOperand::Relocable(ctx.GetBlock(dst));
+		MachineInstruction MI(jump_opcode);
+		MI.SetOp<0>(dst_operand);
+		ctx.EmitInst(MI);
 	}
 }

@@ -54,6 +54,8 @@ namespace ola
 		void ProcessPtrAddInst(PtrAddInst& I);
 		void ProcessPhiInst(PhiInst& I);
 
+		void EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
+
 		void AddTree(ISelNodePtr tree, std::vector<ISelNode*> const& leaves, Bool has_memory);
 		void CountUses(BasicBlock& BB);
 		MachineType GetMachineTypeForValue(Value* V) const;
