@@ -1,5 +1,5 @@
-#include "SysV_x64TargetFrameInfo.h"
-#include "Backend/Custom/Codegen/x64/x64.h"
+#include "SysV_X86TargetFrameInfo.h"
+#include "Backend/Custom/Codegen/X86/X86.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/RegisterAllocator.h"

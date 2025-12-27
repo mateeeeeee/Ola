@@ -1,6 +1,6 @@
 #include <format>
-#include "x64AsmPrinter.h"
-#include "Backend/Custom/Codegen/x64/x64.h"
+#include "X86AsmPrinter.h"
+#include "Backend/Custom/Codegen/X86/X86.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/Target.h"
 #include "Backend/Custom/Codegen/MachineModule.h"

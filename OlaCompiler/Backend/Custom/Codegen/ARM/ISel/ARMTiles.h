@@ -1,6 +1,6 @@
 #pragma once
-#include "Backend/Custom/Codegen/ISelTree/ISelTile.h"
-#include "Backend/Custom/Codegen/ISelTree/ISelNode.h"
+#include "Backend/Custom/Codegen/ISel/ISelTile.h"
+#include "Backend/Custom/Codegen/ISel/ISelNode.h"
 
 namespace ola
 {
@@ -125,5 +125,5 @@ namespace ola
 		Int64 shift_amount = 0;
 	};
 
-	void RegisterARM64Tiles(class ISelTiler& tiler);
+	void RegisterARMTiles(class ISelTiler& tiler);
 }

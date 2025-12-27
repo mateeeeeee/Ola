@@ -1,11 +1,11 @@
 #include <fstream>
-#include "Microsoft_x64Target.h"
-#include "Microsoft_x64.h"
-#include "Backend/Custom/Codegen/x64/x64.h"
-#include "Microsoft_x64TargetFrameInfo.h"
-#include "Backend/Custom/Codegen/x64/x64TargetInstInfo.h"
-#include "Backend/Custom/Codegen/x64/x64TargetISelInfo.h"
-#include "Backend/Custom/Codegen/x64/x64AsmPrinter.h"
+#include "Microsoft_X86Target.h"
+#include "Microsoft_X86.h"
+#include "Backend/Custom/Codegen/X86/X86.h"
+#include "Microsoft_X86TargetFrameInfo.h"
+#include "Backend/Custom/Codegen/X86/X86TargetInstInfo.h"
+#include "Backend/Custom/Codegen/X86/X86TargetISelInfo.h"
+#include "Backend/Custom/Codegen/X86/X86AsmPrinter.h"
 #include "Backend/Custom/IR/IRType.h"
 
 namespace ola

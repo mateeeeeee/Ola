@@ -65,12 +65,12 @@ bin/
 [Rr]elease/
 [Rr]eleases/
 x64/
-!OlaCompiler/Backend/Custom/Codegen/x64/
 x86/
+!OlaCompiler/Backend/Custom/Codegen/X86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
+!OlaCompiler/Backend/Custom/Codegen/ARM/
 [Aa][Rr][Mm]64/
-!OlaCompiler/Backend/Custom/Codegen/Arm64/
 bld/
 [Bb]in/
 [Oo]bj/

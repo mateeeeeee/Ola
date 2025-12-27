@@ -1,17 +1,20 @@
 #include "ISelDriver.h"
 #include "Tiles/CommonTiles.h"
-#include "Backend/Custom/Codegen/x64/x64Tiles.h"
-#include "Backend/Custom/Codegen/ARM64/ARM64Tiles.h"
+#include "Backend/Custom/Codegen/Target.h"
+#include "Backend/Custom/Codegen/X86/ISel/X86Tiles.h"
+#include "Backend/Custom/Codegen/ARM/ISel/ARMTiles.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
 
 namespace ola
 {
-	ISelDriver::ISelDriver(MachineContext& ctx, TargetArch arch)
+	ISelDriver::ISelDriver(MachineContext& ctx, Target const& target, ISelMode mode)
 		: ctx(ctx)
-		, arch(arch)
+		, target(target)
+		, mode(mode)
+		, legacy(ctx, target)
 		, tree_gen(ctx)
-		, tiler(arch)
+		, tiler(target.GetArch())
 	{
 		RegisterTiles();
 	}
@@ -20,13 +23,13 @@ namespace ola
 	{
 		RegisterCommonTiles(tiler);
 
-		switch (arch)
+		switch (target.GetArch())
 		{
 		case TargetArch::x64:
-			Registerx64Tiles(tiler);
+			RegisterX86Tiles(tiler);
 			break;
 		case TargetArch::ARM64:
-			RegisterARM64Tiles(tiler);
+			RegisterARMTiles(tiler);
 			break;
 		default:
 			break;
@@ -37,6 +40,7 @@ namespace ola
 	{
 		if (mode == ISelMode::Legacy)
 		{
+			legacy.SelectBasicBlock(BB);
 			return;
 		}
 

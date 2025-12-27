@@ -1,5 +1,5 @@
-#include "ARM64TargetFrameInfo.h"
-#include "Backend/Custom/Codegen/ARM64/ARM64.h"
+#include "ARMTargetFrameInfo.h"
+#include "Backend/Custom/Codegen/ARM/ARM.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/RegisterAllocator.h"

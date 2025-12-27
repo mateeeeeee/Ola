@@ -1,6 +1,6 @@
-#include "x64Tiles.h"
-#include "x64.h"
-#include "Backend/Custom/Codegen/ISelTree/ISelTiler.h"
+#include "X86Tiles.h"
+#include "../X86.h"
+#include "Backend/Custom/Codegen/ISel/ISelTiler.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Utility/RTTI.h"
 
@@ -534,7 +534,7 @@ namespace ola
 		return result;
 	}
 
-	void Registerx64Tiles(ISelTiler& tiler)
+	void RegisterX86Tiles(ISelTiler& tiler)
 	{
 		tiler.RegisterTile(std::make_unique<x64LeaBaseIndexScaleDispTile>());
 		tiler.RegisterTile(std::make_unique<x64LeaBaseIndexScaleTile>());

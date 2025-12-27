@@ -1,6 +1,6 @@
 #pragma once
-#include "Backend/Custom/Codegen/ISelTree/ISelTile.h"
-#include "Backend/Custom/Codegen/ISelTree/ISelNode.h"
+#include "Backend/Custom/Codegen/ISel/ISelTile.h"
+#include "Backend/Custom/Codegen/ISel/ISelNode.h"
 
 namespace ola
 {

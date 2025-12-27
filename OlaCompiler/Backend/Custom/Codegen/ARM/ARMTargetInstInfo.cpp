@@ -1,5 +1,5 @@
-#include "ARM64TargetInstInfo.h"
-#include "Backend/Custom/Codegen/ARM64/ARM64.h"
+#include "ARMTargetInstInfo.h"
+#include "Backend/Custom/Codegen/ARM/ARM.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola

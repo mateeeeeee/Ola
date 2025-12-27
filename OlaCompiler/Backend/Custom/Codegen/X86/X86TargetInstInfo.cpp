@@ -1,5 +1,5 @@
-#include "x64TargetInstInfo.h"
-#include "Backend/Custom/Codegen/x64/x64.h"
+#include "X86TargetInstInfo.h"
+#include "Backend/Custom/Codegen/X86/X86.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 
 namespace ola

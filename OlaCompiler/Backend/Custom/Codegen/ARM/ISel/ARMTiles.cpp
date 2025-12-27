@@ -1,6 +1,6 @@
-#include "ARM64Tiles.h"
-#include "ARM64.h"
-#include "Backend/Custom/Codegen/ISelTree/ISelTiler.h"
+#include "ARMTiles.h"
+#include "../ARM.h"
+#include "Backend/Custom/Codegen/ISel/ISelTiler.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Utility/RTTI.h"
 
@@ -577,7 +577,7 @@ namespace ola
 		return result;
 	}
 
-	void RegisterARM64Tiles(ISelTiler& tiler)
+	void RegisterARMTiles(ISelTiler& tiler)
 	{
 		tiler.RegisterTile(std::make_unique<ARM64MaddTile>());
 		tiler.RegisterTile(std::make_unique<ARM64MsubTile>());

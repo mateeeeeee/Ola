@@ -1,5 +1,5 @@
-#include "x64TargetISelInfo.h"
-#include "x64.h"
+#include "X86TargetISelInfo.h"
+#include "X86.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
