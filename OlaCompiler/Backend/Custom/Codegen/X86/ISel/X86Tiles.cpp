@@ -1,5 +1,5 @@
 #include "X86Tiles.h"
-#include "../X86.h"
+#include "Backend/Custom/Codegen/X86/X86.h"
 #include "Backend/Custom/Codegen/ISel/ISelTiler.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Utility/RTTI.h"
