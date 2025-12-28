@@ -32,6 +32,7 @@ set(OLA_LLVM_TESTS
 	Tests/LLVM/test_overloading.ola
 	Tests/LLVM/test_constructors.ola
 	Tests/LLVM/test_returns.ola
+	Tests/LLVM/test_literals.ola
 )
 
 set(OLA_CUSTOM_TESTS
@@ -64,6 +65,7 @@ set(OLA_CUSTOM_TESTS
 	Tests/Custom/test_overloading.ola
 	Tests/Custom/test_constructors.ola
 	Tests/Custom/test_returns.ola
+	Tests/Custom/test_literals.ola
 )
 
 add_executable(OlaTests ${SOURCE} ${OLA_LLVM_TESTS} ${OLA_CUSTOM_TESTS})
