@@ -8,7 +8,7 @@ namespace ola
 {
 	namespace
 	{
-		Bool IsValidARM64ShiftAmount(Int64 amount)
+		Bool IsValidARMShiftAmount(Int64 amount)
 		{
 			return amount == 0 || amount == 1 || amount == 2 || amount == 3;
 		}
@@ -26,7 +26,7 @@ namespace ola
 		}
 	}
 
-	Bool ARM64MaddTile::Match(ISelNode* node)
+	Bool ARMMaddTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -67,7 +67,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64MaddTile::Apply(MachineContext& ctx)
+	TileResult ARMMaddTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -75,7 +75,7 @@ namespace ola
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand add_op = ResolveOperand(addend, ctx, result.worklist);
 
-		MachineInstruction madd(ARM64_InstMadd);
+		MachineInstruction madd(ARM_InstMadd);
 		madd.SetOp<0>(matched_reg->GetRegister());
 		madd.SetOp<1>(ml);
 		madd.SetOp<2>(mr);
@@ -86,7 +86,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64MsubTile::Match(ISelNode* node)
+	Bool ARMMsubTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -106,7 +106,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64MsubTile::Apply(MachineContext& ctx)
+	TileResult ARMMsubTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -114,7 +114,7 @@ namespace ola
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand min_op = ResolveOperand(minuend, ctx, result.worklist);
 
-		MachineInstruction msub(ARM64_InstMsub);
+		MachineInstruction msub(ARM_InstMsub);
 		msub.SetOp<0>(matched_reg->GetRegister());
 		msub.SetOp<1>(ml);
 		msub.SetOp<2>(mr);
@@ -125,7 +125,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64FMaddTile::Match(ISelNode* node)
+	Bool ARMFMaddTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -166,7 +166,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64FMaddTile::Apply(MachineContext& ctx)
+	TileResult ARMFMaddTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -174,7 +174,7 @@ namespace ola
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand add_op = ResolveOperand(addend, ctx, result.worklist);
 
-		MachineInstruction fmadd(ARM64_InstFMadd);
+		MachineInstruction fmadd(ARM_InstFMadd);
 		fmadd.SetOp<0>(matched_reg->GetRegister());
 		fmadd.SetOp<1>(ml);
 		fmadd.SetOp<2>(mr);
@@ -185,7 +185,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64FMsubTile::Match(ISelNode* node)
+	Bool ARMFMsubTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -205,7 +205,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64FMsubTile::Apply(MachineContext& ctx)
+	TileResult ARMFMsubTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -213,7 +213,7 @@ namespace ola
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand min_op = ResolveOperand(minuend, ctx, result.worklist);
 
-		MachineInstruction fmsub(ARM64_InstFMsub);
+		MachineInstruction fmsub(ARM_InstFMsub);
 		fmsub.SetOp<0>(matched_reg->GetRegister());
 		fmsub.SetOp<1>(ml);
 		fmsub.SetOp<2>(mr);
@@ -224,7 +224,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64LoadShiftedTile::Match(ISelNode* node)
+	Bool ARMLoadShiftedTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -339,7 +339,7 @@ namespace ola
 		if (!shift_imm) return false;
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARM64ShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount)) return false;
 
 		matched_reg = reg;
 		matched_load = load;
@@ -351,14 +351,14 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64LoadShiftedTile::Apply(MachineContext& ctx)
+	TileResult ARMLoadShiftedTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
-		MachineInstruction ldr(ARM64_InstLdrShifted);
+		MachineInstruction ldr(ARM_InstLdrShifted);
 		ldr.SetOp<0>(matched_reg->GetRegister());
 		ldr.SetOp<1>(base_op);
 		ldr.SetOp<2>(index_op);
@@ -369,7 +369,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64StoreShiftedTile::Match(ISelNode* node)
+	Bool ARMStoreShiftedTile::Match(ISelNode* node)
 	{
 		auto* store = dyn_cast<ISelStoreNode>(node);
 		if (!store) return false;
@@ -481,7 +481,7 @@ namespace ola
 		if (!shift_imm) return false;
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARM64ShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount)) return false;
 
 		matched_store = store;
 		matched_add = add;
@@ -493,7 +493,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64StoreShiftedTile::Apply(MachineContext& ctx)
+	TileResult ARMStoreShiftedTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -501,7 +501,7 @@ namespace ola
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
-		MachineInstruction str(ARM64_InstStrShifted);
+		MachineInstruction str(ARM_InstStrShifted);
 		str.SetOp<0>(value_op);
 		str.SetOp<1>(base_op);
 		str.SetOp<2>(index_op);
@@ -512,7 +512,7 @@ namespace ola
 		return result;
 	}
 
-	Bool ARM64AddShiftedTile::Match(ISelNode* node)
+	Bool ARMAddShiftedTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -548,7 +548,7 @@ namespace ola
 		if (!shift_imm) return false;
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARM64ShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount)) return false;
 
 		matched_reg = reg;
 		matched_add = add;
@@ -559,14 +559,14 @@ namespace ola
 		return true;
 	}
 
-	TileResult ARM64AddShiftedTile::Apply(MachineContext& ctx)
+	TileResult ARMAddShiftedTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand shifted_op = ResolveOperand(shifted_operand, ctx, result.worklist);
 
-		MachineInstruction add(ARM64_InstAddShifted);
+		MachineInstruction add(ARM_InstAddShifted);
 		add.SetOp<0>(matched_reg->GetRegister());
 		add.SetOp<1>(base_op);
 		add.SetOp<2>(shifted_op);
@@ -579,12 +579,12 @@ namespace ola
 
 	void RegisterARMTiles(ISelTiler& tiler)
 	{
-		tiler.RegisterTile(std::make_unique<ARM64MaddTile>());
-		tiler.RegisterTile(std::make_unique<ARM64MsubTile>());
-		tiler.RegisterTile(std::make_unique<ARM64FMaddTile>());
-		tiler.RegisterTile(std::make_unique<ARM64FMsubTile>());
-		tiler.RegisterTile(std::make_unique<ARM64LoadShiftedTile>());
-		tiler.RegisterTile(std::make_unique<ARM64StoreShiftedTile>());
-		tiler.RegisterTile(std::make_unique<ARM64AddShiftedTile>());
+		tiler.RegisterTile(std::make_unique<ARMMaddTile>());
+		tiler.RegisterTile(std::make_unique<ARMMsubTile>());
+		tiler.RegisterTile(std::make_unique<ARMFMaddTile>());
+		tiler.RegisterTile(std::make_unique<ARMFMsubTile>());
+		tiler.RegisterTile(std::make_unique<ARMLoadShiftedTile>());
+		tiler.RegisterTile(std::make_unique<ARMStoreShiftedTile>());
+		tiler.RegisterTile(std::make_unique<ARMAddShiftedTile>());
 	}
 }

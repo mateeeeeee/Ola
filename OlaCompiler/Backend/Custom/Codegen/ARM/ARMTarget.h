@@ -3,12 +3,12 @@
 
 namespace ola
 {
-	class ARM64Target : public Target
+	class ARMTarget : public Target
 	{
 	public:
-		ARM64Target() = default;
+		ARMTarget() = default;
 
-		virtual TargetArch GetArch() const override { return TargetArch::ARM64; }
+		virtual TargetArch GetArch() const override { return TargetArch::ARM; }
 		virtual TargetDataLayout const& GetDataLayout() const override;
 		virtual TargetInstInfo const& GetInstInfo() const override;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const override;

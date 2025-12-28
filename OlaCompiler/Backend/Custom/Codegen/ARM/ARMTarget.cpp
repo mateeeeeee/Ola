@@ -13,7 +13,7 @@
 
 namespace ola
 {
-	class ARM64TargetDataLayout : public TargetDataLayout
+	class ARMTargetDataLayout : public TargetDataLayout
 	{
 	public:
 		virtual Bool   IsLittleEndian() const override { return true; }
@@ -35,7 +35,7 @@ namespace ola
 		}
 	};
 
-	class ARM64TargetISelInfo : public TargetISelInfo
+	class ARMTargetISelInfo : public TargetISelInfo
 	{
 	public:
 		virtual Bool LowerInstruction(Instruction* I, MachineContext& ctx) const override
@@ -64,14 +64,14 @@ namespace ola
 					MI2.SetOp<1>(src);  
 					instructions.insert(instruction_iter, MI2);
 
-					MI.SetOpcode(ARM64_InstFMov);
+					MI.SetOpcode(ARM_InstFMov);
 					MI.SetOp<1>(tmp);  
 					break;
 				}
 
 				if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 				{
-					MI.SetOpcode(ARM64_InstFMov);
+					MI.SetOpcode(ARM_InstFMov);
 				}
 
 				if (src.IsImmediate() && dst.IsMemoryOperand())
@@ -86,7 +86,7 @@ namespace ola
 						MI2.SetOp<1>(src);
 						instructions.insert(instruction_iter, MI2);
 
-						MachineInstruction MI3(ARM64_InstFMov);
+						MachineInstruction MI3(ARM_InstFMov);
 						MI3.SetOp<0>(tmp_fp);
 						MI3.SetOp<1>(tmp_int);
 						instructions.insert(instruction_iter, MI3);
@@ -184,7 +184,7 @@ namespace ola
 						MI2.SetOp<1>(src);
 						instructions.insert(instruction_iter, MI2);
 
-						MachineInstruction MI3(ARM64_InstFMov);
+						MachineInstruction MI3(ARM_InstFMov);
 						MI3.SetOp<0>(tmp_fp);
 						MI3.SetOp<1>(tmp_int);
 						instructions.insert(instruction_iter, MI3);
@@ -231,7 +231,7 @@ namespace ola
 					MI2.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI2);
 
-					MachineInstruction MI3(ARM64_InstFMov);
+					MachineInstruction MI3(ARM_InstFMov);
 					MI3.SetOp<0>(tmp_fp);
 					MI3.SetOp<1>(tmp_int);
 					instructions.insert(instruction_iter, MI3);
@@ -248,7 +248,7 @@ namespace ola
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
 
-					MachineInstruction MI3(ARM64_InstFMov);
+					MachineInstruction MI3(ARM_InstFMov);
 					MI3.SetOp<0>(tmp_fp);
 					MI3.SetOp<1>(tmp_int);
 					instructions.insert(instruction_iter, MI3);
@@ -294,7 +294,7 @@ namespace ola
 						compare_op = MachineOperand::Immediate((Uint32)GetOppositeCondition(compare_op), MachineType::Int64);
 					}
 
-					// ARM64 cmp only supports 12-bit unsigned immediates (0-4095)
+					// ARM cmp only supports 12-bit unsigned immediates (0-4095)
 					MachineOperand cmp_op2 = MI.GetOperand(1);
 					if (cmp_op2.IsImmediate())
 					{
@@ -316,15 +316,15 @@ namespace ola
 						CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
 						switch (cmp_op)
 						{
-						case CompareOp::ICmpEQ:  return ARM64_InstCsetEQ;
-						case CompareOp::ICmpNE:  return ARM64_InstCsetNE;
-						case CompareOp::ICmpSGT: return ARM64_InstCsetGT;
-						case CompareOp::ICmpSGE: return ARM64_InstCsetGE;
-						case CompareOp::ICmpSLT: return ARM64_InstCsetLT;
-						case CompareOp::ICmpSLE: return ARM64_InstCsetLE;
+						case CompareOp::ICmpEQ:  return ARM_InstCsetEQ;
+						case CompareOp::ICmpNE:  return ARM_InstCsetNE;
+						case CompareOp::ICmpSGT: return ARM_InstCsetGT;
+						case CompareOp::ICmpSGE: return ARM_InstCsetGE;
+						case CompareOp::ICmpSLT: return ARM_InstCsetLT;
+						case CompareOp::ICmpSLE: return ARM_InstCsetLE;
 						}
 						OLA_ASSERT_MSG(false, "Invalid compare operation!");
-						return ARM64_InstCset;
+						return ARM_InstCset;
 					};
 
 					MachineInstruction MI2(GetCsetCondition(compare_op));
@@ -350,7 +350,7 @@ namespace ola
 					MI2.SetOp<1>(op2);
 					instructions.insert(instruction_iter, MI2);
 
-					MachineInstruction MI3(ARM64_InstFMov);
+					MachineInstruction MI3(ARM_InstFMov);
 					MI3.SetOp<0>(tmp_fp);
 					MI3.SetOp<1>(tmp_int);
 					instructions.insert(instruction_iter, MI3);
@@ -367,7 +367,7 @@ namespace ola
 					MI2.SetOp<1>(op1);
 					instructions.insert(instruction_iter, MI2);
 
-					MachineInstruction MI3(ARM64_InstFMov);
+					MachineInstruction MI3(ARM_InstFMov);
 					MI3.SetOp<0>(tmp_fp);
 					MI3.SetOp<1>(tmp_int);
 					instructions.insert(instruction_iter, MI3);
@@ -383,15 +383,15 @@ namespace ola
 					CompareOp cmp_op = (CompareOp)compare_op.GetImmediate();
 					switch (cmp_op)
 					{
-					case CompareOp::FCmpOEQ: return ARM64_InstCsetEQ;
-					case CompareOp::FCmpONE: return ARM64_InstCsetNE;
-					case CompareOp::FCmpOGT: return ARM64_InstCsetGT;
-					case CompareOp::FCmpOGE: return ARM64_InstCsetGE;
-					case CompareOp::FCmpOLT: return ARM64_InstCsetLT;
-					case CompareOp::FCmpOLE: return ARM64_InstCsetLE;
+					case CompareOp::FCmpOEQ: return ARM_InstCsetEQ;
+					case CompareOp::FCmpONE: return ARM_InstCsetNE;
+					case CompareOp::FCmpOGT: return ARM_InstCsetGT;
+					case CompareOp::FCmpOGE: return ARM_InstCsetGE;
+					case CompareOp::FCmpOLT: return ARM_InstCsetLT;
+					case CompareOp::FCmpOLE: return ARM_InstCsetLE;
 					}
 					OLA_ASSERT_MSG(false, "Invalid compare operation!");
-					return ARM64_InstCset;
+					return ARM_InstCset;
 				};
 
 				MachineInstruction MI2(GetCsetCondition(compare_op));
@@ -417,7 +417,7 @@ namespace ola
 						MI2.SetOp<1>(src);
 						instructions.insert(instruction_iter, MI2);
 
-						MachineInstruction MI3(ARM64_InstFMov);
+						MachineInstruction MI3(ARM_InstFMov);
 						MI3.SetOp<0>(tmp_fp);
 						MI3.SetOp<1>(tmp_int);
 						instructions.insert(instruction_iter, MI3);
@@ -454,7 +454,7 @@ namespace ola
 						MI2.SetOp<1>(src);
 						instructions.insert(instruction_iter, MI2);
 
-						MachineInstruction MI3(ARM64_InstFMov);
+						MachineInstruction MI3(ARM_InstFMov);
 						MI3.SetOp<0>(tmp_fp);
 						MI3.SetOp<1>(tmp_int);
 						instructions.insert(instruction_iter, MI3);
@@ -487,7 +487,7 @@ namespace ola
 					MI2.SetOp<1>(src);
 					instructions.insert(instruction_iter, MI2);
 
-					MachineInstruction MI3(ARM64_InstFMov);
+					MachineInstruction MI3(ARM_InstFMov);
 					MI3.SetOp<0>(tmp_fp);
 					MI3.SetOp<1>(tmp_int);
 					instructions.insert(instruction_iter, MI3);
@@ -509,7 +509,7 @@ namespace ola
 			case InstSRem:
 			case InstURem:
 			{
-				// ARM64 doesn't have remainder instruction, expand to:
+				// ARM doesn't have remainder instruction, expand to:
 				// rem = a - (a / b) * b
 				// Using msub: rem = a - (quotient * b)
 				MachineOperand dst = MI.GetOperand(0);
@@ -543,7 +543,7 @@ namespace ola
 				div_inst.SetOp<0>(quotient).SetOp<1>(op1).SetOp<2>(op2);
 				instructions.insert(instruction_iter, div_inst);
 
-				MI.SetOpcode(ARM64_InstMsub);
+				MI.SetOpcode(ARM_InstMsub);
 				MI.SetOp<0>(dst);
 				MI.SetOp<1>(quotient);
 				MI.SetOp<2>(op2);
@@ -737,28 +737,28 @@ namespace ola
 		}
 	};
 
-	class ARM64TargetRegisterInfo : public TargetRegisterInfo
+	class ARMTargetRegisterInfo : public TargetRegisterInfo
 	{
 		std::vector<Uint32> gp_regs;
 		std::vector<Uint32> fp_regs;
 
 	public:
-		ARM64TargetRegisterInfo()
+		ARMTargetRegisterInfo()
 		{
-			gp_regs.reserve(ARM64_GPREnd - ARM64_GPRBegin + 1);
-			for (Uint32 r = ARM64_GPRBegin; r <= ARM64_GPREnd; ++r)
+			gp_regs.reserve(ARM_GPREnd - ARM_GPRBegin + 1);
+			for (Uint32 r = ARM_GPRBegin; r <= ARM_GPREnd; ++r)
 			{
 				// SP, X29 (FP), X30 (LR), X16 (GP scratch)
-				if (r != ARM64_SP && r != ARM64_X29 && r != ARM64_X30 && r != ARM64_X16) 
+				if (r != ARM_SP && r != ARM_X29 && r != ARM_X30 && r != ARM_X16) 
 				{
 					gp_regs.push_back(r);
 				}
 			}
 
-			fp_regs.reserve(ARM64_FPREnd - ARM64_FPRBegin + 1);
-			for (Uint32 r = ARM64_FPRBegin; r <= ARM64_FPREnd; ++r)
+			fp_regs.reserve(ARM_FPREnd - ARM_FPRBegin + 1);
+			for (Uint32 r = ARM_FPRBegin; r <= ARM_FPREnd; ++r)
 			{
-				if (r != ARM64_V31) 
+				if (r != ARM_V31) 
 				{
 					fp_regs.push_back(r);
 				}
@@ -767,23 +767,23 @@ namespace ola
 
 		virtual Uint32 GetStackPointerRegister() const override
 		{
-			return ARM64_SP;
+			return ARM_SP;
 		}
 		virtual Uint32 GetGPScratchRegister() const override
 		{
-			return ARM64_X16;
+			return ARM_X16;
 		}
 		virtual Uint32 GetFPScratchRegister() const override
 		{
-			return ARM64_V31;
+			return ARM_V31;
 		}
 		virtual Uint32 GetFramePointerRegister() const override
 		{
-			return ARM64_X29;
+			return ARM_X29;
 		}
 		virtual Uint32 GetReturnRegister() const override
 		{
-			return ARM64_X0;
+			return ARM_X0;
 		}
 
 		virtual std::vector<Uint32> const& GetGPRegisters() const override
@@ -796,7 +796,7 @@ namespace ola
 			std::vector<Uint32> gp_caller_saved_regs;
 			for (Uint32 reg : gp_regs)
 			{
-				if (ARM64_IsCallerSaved(reg)) gp_caller_saved_regs.push_back(reg);
+				if (ARM_IsCallerSaved(reg)) gp_caller_saved_regs.push_back(reg);
 			}
 			return gp_caller_saved_regs;
 		}
@@ -805,7 +805,7 @@ namespace ola
 			std::vector<Uint32> gp_callee_saved_regs;
 			for (Uint32 reg : gp_regs)
 			{
-				if (!ARM64_IsCallerSaved(reg) && reg != GetStackPointerRegister()
+				if (!ARM_IsCallerSaved(reg) && reg != GetStackPointerRegister()
 					&& reg != GetFramePointerRegister() && reg != GetGPScratchRegister())
 				{
 					gp_callee_saved_regs.push_back(reg);
@@ -824,7 +824,7 @@ namespace ola
 			std::vector<Uint32> fp_caller_saved_regs;
 			for (Uint32 reg : fp_regs)
 			{
-				if (ARM64_IsCallerSaved(reg)) fp_caller_saved_regs.push_back(reg);
+				if (ARM_IsCallerSaved(reg)) fp_caller_saved_regs.push_back(reg);
 			}
 			return fp_caller_saved_regs;
 		}
@@ -834,7 +834,7 @@ namespace ola
 			std::vector<Uint32> fp_callee_saved_regs;
 			for (Uint32 reg : fp_regs)
 			{
-				if (!ARM64_IsCallerSaved(reg) && reg != GetFPScratchRegister())
+				if (!ARM_IsCallerSaved(reg) && reg != GetFPScratchRegister())
 				{
 					fp_callee_saved_regs.push_back(reg);
 				}
@@ -844,49 +844,49 @@ namespace ola
 
 		virtual Bool IsCallerSaved(Uint32 reg) const override
 		{
-			return ARM64_IsCallerSaved(reg);
+			return ARM_IsCallerSaved(reg);
 		}
 
 		virtual Bool IsCalleeSaved(Uint32 reg) const override
 		{
-			return !ARM64_IsCallerSaved(reg);
+			return !ARM_IsCallerSaved(reg);
 		}
 	};
 
-	TargetDataLayout const& ARM64Target::GetDataLayout() const
+	TargetDataLayout const& ARMTarget::GetDataLayout() const
 	{
-		static ARM64TargetDataLayout arm64_target_data_layout{};
+		static ARMTargetDataLayout arm64_target_data_layout{};
 		return arm64_target_data_layout;
 	}
 
-	TargetInstInfo const& ARM64Target::GetInstInfo() const
+	TargetInstInfo const& ARMTarget::GetInstInfo() const
 	{
-		static ARM64TargetInstInfo arm64_target_inst_info{};
+		static ARMTargetInstInfo arm64_target_inst_info{};
 		return arm64_target_inst_info;
 	}
 
-	TargetRegisterInfo const& ARM64Target::GetRegisterInfo() const
+	TargetRegisterInfo const& ARMTarget::GetRegisterInfo() const
 	{
-		static ARM64TargetRegisterInfo arm64_target_register_info{};
+		static ARMTargetRegisterInfo arm64_target_register_info{};
 		return arm64_target_register_info;
 	}
 
-	TargetISelInfo const& ARM64Target::GetISelInfo() const
+	TargetISelInfo const& ARMTarget::GetISelInfo() const
 	{
-		static ARM64TargetISelInfo arm64_target_isel_info{};
+		static ARMTargetISelInfo arm64_target_isel_info{};
 		return arm64_target_isel_info;
 	}
 
-	TargetFrameInfo const& ARM64Target::GetFrameInfo() const
+	TargetFrameInfo const& ARMTarget::GetFrameInfo() const
 	{
-		static ARM64TargetFrameInfo arm64_target_frame_info{};
+		static ARMTargetFrameInfo arm64_target_frame_info{};
 		return arm64_target_frame_info;
 	}
 
-	void ARM64Target::EmitAssembly(MachineModule& M, std::string_view file) const
+	void ARMTarget::EmitAssembly(MachineModule& M, std::string_view file) const
 	{
 		std::ofstream asm_stream(file.data());
-		ARM64AsmPrinter asm_printer(asm_stream);
+		ARMAsmPrinter asm_printer(asm_stream);
 		asm_printer.PrintModule(M);
 	}
 }

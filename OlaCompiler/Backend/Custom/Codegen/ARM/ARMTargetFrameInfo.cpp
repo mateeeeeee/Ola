@@ -15,14 +15,14 @@ namespace ola
 	static constexpr Uint32 FP_LR_SAVE_SIZE = 16;
 	static constexpr Uint32 STACK_ALIGNMENT = 16;
 
-	// ARM64 AAPCS (ARM Architecture Procedure Call Standard)
+	// ARM AAPCS (ARM Architecture Procedure Call Standard)
 	// Integer arguments: X0-X7 (8 registers)
 	// Float arguments: V0-V7 (8 registers)
 	// Return values: X0 (integer), V0 (float)
 	// FP = X29, LR = X30, SP = stack pointer
 	// Stack must be 16-byte aligned
 
-	void ARM64TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
 		Function* callee = CI->GetCalleeAsFunction();
 		OLA_ASSERT(callee);
@@ -45,7 +45,7 @@ namespace ola
 				}
 				else
 				{
-					static constexpr ARM64Register arg_regs[] = { ARM64_X0, ARM64_X1, ARM64_X2, ARM64_X3, ARM64_X4, ARM64_X5, ARM64_X6, ARM64_X7 };
+					static constexpr ARMRegister arg_regs[] = { ARM_X0, ARM_X1, ARM_X2, ARM_X3, ARM_X4, ARM_X5, ARM_X6, ARM_X7 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
@@ -62,7 +62,7 @@ namespace ola
 				}
 				else
 				{
-					static constexpr ARM64Register arg_regs[] = { ARM64_V0, ARM64_V1, ARM64_V2, ARM64_V3, ARM64_V4, ARM64_V5, ARM64_V6, ARM64_V7 };
+					static constexpr ARMRegister arg_regs[] = { ARM_V0, ARM_V1, ARM_V2, ARM_V3, ARM_V4, ARM_V5, ARM_V6, ARM_V7 };
 					MachineInstruction mov(opcode);
 					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
 					ctx.EmitInst(mov);
@@ -84,17 +84,17 @@ namespace ola
 		MachineOperand arch_return_reg;
 		if (return_type->IsFloat())
 		{
-			arch_return_reg = MachineOperand::ISAReg(ARM64_V0, MachineType::Float64);
+			arch_return_reg = MachineOperand::ISAReg(ARM_V0, MachineType::Float64);
 		}
 		else
 		{
-			arch_return_reg = MachineOperand::ISAReg(ARM64_X0, return_reg.GetType());
+			arch_return_reg = MachineOperand::ISAReg(ARM_X0, return_reg.GetType());
 		}
 		ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(return_reg).SetOp<1>(arch_return_reg));
 		ctx.MapOperand(CI, return_reg);
 	}
 
-	void ARM64TargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitPrologue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		using enum MachineType;
 
@@ -103,9 +103,9 @@ namespace ola
 			MF.AllocateArgumentStack((MF.GetMaxCallArgCount() - 8) * 8);
 		}
 
-		MachineOperand fp = MachineOperand::ISAReg(ARM64_X29, Int64);
-		MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, Int64);
-		MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, Int64);
+		MachineOperand fp = MachineOperand::ISAReg(ARM_X29, Int64);
+		MachineOperand lr = MachineOperand::ISAReg(ARM_X30, Int64);
+		MachineOperand sp = MachineOperand::ISAReg(ARM_SP, Int64);
 
 		if (MF.GetStackAllocationSize() > 0)
 		{
@@ -117,7 +117,7 @@ namespace ola
 			allocate_stack.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, Int64));
 			ctx.EmitInst(allocate_stack);
 
-			MachineInstruction stp_fp_lr(ARM64_InstStp);
+			MachineInstruction stp_fp_lr(ARM_InstStp);
 			stp_fp_lr.SetOp<0>(fp);
 			stp_fp_lr.SetOp<1>(lr);
 			stp_fp_lr.SetOp<2>(MachineOperand::StackObject(fp_lr_offset, Ptr));
@@ -135,7 +135,7 @@ namespace ola
 			{
 				if (arg_idx < 8)
 				{
-					static constexpr ARM64Register arg_regs[] = { ARM64_X0, ARM64_X1, ARM64_X2, ARM64_X3, ARM64_X4, ARM64_X5, ARM64_X6, ARM64_X7 };
+					static constexpr ARMRegister arg_regs[] = { ARM_X0, ARM_X1, ARM_X2, ARM_X3, ARM_X4, ARM_X5, ARM_X6, ARM_X7 };
 					MachineInstruction copy_arg_to_reg(InstMove);
 					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
@@ -152,7 +152,7 @@ namespace ola
 			{
 				if (arg_idx < 8)
 				{
-					static constexpr ARM64Register arg_regs[] = { ARM64_V0, ARM64_V1, ARM64_V2, ARM64_V3, ARM64_V4, ARM64_V5, ARM64_V6, ARM64_V7 };
+					static constexpr ARMRegister arg_regs[] = { ARM_V0, ARM_V1, ARM_V2, ARM_V3, ARM_V4, ARM_V5, ARM_V6, ARM_V7 };
 					MachineInstruction copy_arg_to_reg(InstMove);
 					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
@@ -169,7 +169,7 @@ namespace ola
 		}
 	}
 
-	void ARM64TargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitProloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
@@ -181,7 +181,7 @@ namespace ola
 
 		insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 			{
-				if (MI.GetOpcode() == InstSub && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_SP) return true;
+				if (MI.GetOpcode() == InstSub && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM_SP) return true;
 				return false;
 			});
 
@@ -196,14 +196,14 @@ namespace ola
 			++insert_point;
 
 			Uint32 new_fp_lr_offset = new_total - FP_LR_SAVE_SIZE;
-			if (insert_point != insert_list.end() && insert_point->GetOpcode() == ARM64_InstStp)
+			if (insert_point != insert_list.end() && insert_point->GetOpcode() == ARM_InstStp)
 			{
 				insert_point->SetOp<2>(MachineOperand::StackObject(new_fp_lr_offset, MachineType::Ptr));
 				++insert_point;
 			}
 			if (insert_point != insert_list.end() &&
 				(insert_point->GetOpcode() == InstAdd || insert_point->GetOpcode() == InstMove) &&
-				insert_point->GetOp<0>().IsReg() && insert_point->GetOp<0>().GetReg().reg == ARM64_X29)
+				insert_point->GetOp<0>().IsReg() && insert_point->GetOp<0>().GetReg().reg == ARM_X29)
 			{
 				insert_point->SetOp<2>(MachineOperand::Immediate(new_fp_lr_offset, MachineType::Int64));
 				++insert_point;
@@ -215,15 +215,15 @@ namespace ola
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
 			if (aligned_stack > 0)
 			{
-				MachineOperand fp = MachineOperand::ISAReg(ARM64_X29, MachineType::Int64);
-				MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
-				MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
+				MachineOperand fp = MachineOperand::ISAReg(ARM_X29, MachineType::Int64);
+				MachineOperand lr = MachineOperand::ISAReg(ARM_X30, MachineType::Int64);
+				MachineOperand sp = MachineOperand::ISAReg(ARM_SP, MachineType::Int64);
 
 				MachineInstruction allocate_stack(InstSub);
 				allocate_stack.SetOp<0>(sp).SetOp<1>(sp).SetOp<2>(MachineOperand::Immediate(aligned_stack, MachineType::Int64));
 				insert_point = ctx.EmitInst(insert_list.begin(), allocate_stack); ++insert_point;
 
-				MachineInstruction stp_fp_lr(ARM64_InstStp);
+				MachineInstruction stp_fp_lr(ARM_InstStp);
 				stp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(aligned_stack - FP_LR_SAVE_SIZE, MachineType::Ptr));
 				insert_point = ctx.EmitInst(insert_point, stp_fp_lr); ++insert_point;
 
@@ -280,19 +280,19 @@ namespace ola
 		}
 	}
 
-	void ARM64TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
 	{
 		if (MF.GetStackAllocationSize() > 0)
 		{
-			MachineOperand fp = MachineOperand::ISAReg(ARM64_X29, MachineType::Int64);
-			MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
-			MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
+			MachineOperand fp = MachineOperand::ISAReg(ARM_X29, MachineType::Int64);
+			MachineOperand lr = MachineOperand::ISAReg(ARM_X30, MachineType::Int64);
+			MachineOperand sp = MachineOperand::ISAReg(ARM_SP, MachineType::Int64);
 
 			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
 			Uint32 fp_lr_offset = aligned_stack - FP_LR_SAVE_SIZE;
 
-			MachineInstruction ldp_fp_lr(ARM64_InstLdp);
+			MachineInstruction ldp_fp_lr(ARM_InstLdp);
 			ldp_fp_lr.SetOp<0>(fp);
 			ldp_fp_lr.SetOp<1>(lr);
 			ldp_fp_lr.SetOp<2>(MachineOperand::StackObject(fp_lr_offset, MachineType::Ptr));
@@ -305,15 +305,15 @@ namespace ola
 		ctx.EmitInst(MachineInstruction(InstRet));
 	}
 
-	void ARM64TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
 		std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
 		std::list<MachineInstruction>::iterator insert_point = insert_list.end();
 
 		insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 			{
-				if (MI.GetOpcode() == ARM64_InstLdp && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_X29
-					&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM64_X30)
+				if (MI.GetOpcode() == ARM_InstLdp && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM_X29
+					&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM_X30)
 				{
 					return true;
 				}
@@ -333,8 +333,8 @@ namespace ola
 			auto add_sp_it = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 				{
 					return MI.GetOpcode() == InstAdd &&
-						MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM64_SP &&
-						MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM64_SP;
+						MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == ARM_SP &&
+						MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM_SP;
 				});
 
 			if (!missing_epilogue && aligned_callee_saved > 0)
@@ -365,15 +365,15 @@ namespace ola
 
 		if (missing_epilogue)
 		{
-			MachineOperand fp = MachineOperand::ISAReg(ARM64_X29, MachineType::Int64);
-			MachineOperand lr = MachineOperand::ISAReg(ARM64_X30, MachineType::Int64);
-			MachineOperand sp = MachineOperand::ISAReg(ARM64_SP, MachineType::Int64);
+			MachineOperand fp = MachineOperand::ISAReg(ARM_X29, MachineType::Int64);
+			MachineOperand lr = MachineOperand::ISAReg(ARM_X30, MachineType::Int64);
+			MachineOperand sp = MachineOperand::ISAReg(ARM_SP, MachineType::Int64);
 
 			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE + callee_saved_size;
 			Uint32 aligned_stack = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
 			Uint32 fp_offset = aligned_stack - FP_LR_SAVE_SIZE;
 
-			MachineInstruction ldp_fp_lr(ARM64_InstLdp);
+			MachineInstruction ldp_fp_lr(ARM_InstLdp);
 			ldp_fp_lr.SetOp<0>(fp).SetOp<1>(lr).SetOp<2>(MachineOperand::StackObject(fp_offset, MachineType::Ptr));
 			insert_point = ctx.EmitInst(insert_point, ldp_fp_lr); ++insert_point;
 
@@ -383,7 +383,7 @@ namespace ola
 		}
 	}
 
-	void ARM64TargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const
+	void ARMTargetFrameInfo::EmitReturn(ReturnInst* RI, MachineContext& ctx) const
 	{
 		if (RI->GetNumOperands() > 0)
 		{
@@ -394,12 +394,12 @@ namespace ola
 				MachineOperand return_register;
 				if (V->GetType()->IsFloat())
 				{
-					return_register = MachineOperand::ISAReg(ARM64_V0, MachineType::Float64);
+					return_register = MachineOperand::ISAReg(ARM_V0, MachineType::Float64);
 				}
 				else
 				{
 					MachineType const return_type = V->GetType()->IsBoolean() ? MachineType::Int8 : MachineType::Int64;
-					return_register = MachineOperand::ISAReg(ARM64_X0, return_type);
+					return_register = MachineOperand::ISAReg(ARM_X0, return_type);
 				}
 
 				MachineInstruction copy_instruction(InstMove);

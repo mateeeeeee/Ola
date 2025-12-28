@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	class ARM64TargetInstInfo : public TargetInstInfo
+	class ARMTargetInstInfo : public TargetInstInfo
 	{
 	public:
 		virtual InstInfo GetInstInfo(Uint32 opcode) const override;

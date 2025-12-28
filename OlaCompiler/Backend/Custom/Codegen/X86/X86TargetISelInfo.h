@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	class x64TargetISelInfo : public TargetISelInfo
+	class X86TargetISelInfo : public TargetISelInfo
 	{
 	public:
 		virtual Bool LowerInstruction(Instruction* I, MachineContext& ctx) const override;

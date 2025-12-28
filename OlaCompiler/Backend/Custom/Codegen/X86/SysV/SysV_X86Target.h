@@ -3,12 +3,12 @@
 
 namespace ola
 {
-	class SysV_x64Target : public Target
+	class SysV_X86Target : public Target
 	{
 	public:
-		SysV_x64Target() = default;
+		SysV_X86Target() = default;
 
-		virtual TargetArch GetArch() const override { return TargetArch::x64; }
+		virtual TargetArch GetArch() const override { return TargetArch::X86; }
 		virtual TargetDataLayout const& GetDataLayout() const override;
 		virtual TargetInstInfo const& GetInstInfo() const override;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const override;

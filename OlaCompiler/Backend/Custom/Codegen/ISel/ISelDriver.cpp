@@ -25,10 +25,10 @@ namespace ola
 
 		switch (target.GetArch())
 		{
-		case TargetArch::x64:
+		case TargetArch::X86:
 			RegisterX86Tiles(tiler);
 			break;
-		case TargetArch::ARM64:
+		case TargetArch::ARM:
 			RegisterARMTiles(tiler);
 			break;
 		default:
@@ -45,11 +45,8 @@ namespace ola
 		}
 
 		ISelForest forest = tree_gen.GenerateTrees(BB);
-
 		tree_merge.MergeTrees(forest);
-
 		std::vector<MachineInstruction> instructions = tiler.TileForest(forest, ctx);
-
 		for (MachineInstruction& inst : instructions)
 		{
 			ctx.EmitInst(inst);

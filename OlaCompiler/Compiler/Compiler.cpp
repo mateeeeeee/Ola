@@ -141,20 +141,20 @@ namespace ola
 				ir_module.Print(ir_file);
 
 				Target* target = nullptr;
-				Microsoft_x64Target ms_target{};
-				SysV_x64Target sysv_target{};
-				ARM64Target arm64_target{};
+				Microsoft_X86Target ms_target{};
+				SysV_X86Target sysv_target{};
+				ARMTarget arm_target{};
 				switch (opts.target_arch)
 				{
-				case TargetArch::x64:
+				case TargetArch::X86:
 #if defined(OLA_PLATFORM_WINDOWS)
 					target = &ms_target;
 #else
 					target = &sysv_target;
 #endif
 					break;
-				case TargetArch::ARM64:
-					target = &arm64_target;
+				case TargetArch::ARM:
+					target = &arm_target;
 					break;
 				default:
 					OLA_ASSERT_MSG(false, "Invalid target architecture!");
@@ -203,11 +203,11 @@ namespace ola
 		if (target_arch == TargetArch::Default)
 		{
 #if defined(OLA_PLATFORM_WINDOWS)
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 #elif defined(OLA_PLATFORM_MACOS)
-			target_arch = TargetArch::ARM64;
+			target_arch = TargetArch::ARM;
 #else
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 #endif
 		}
 
@@ -246,11 +246,11 @@ namespace ola
 			object_files[i] = object_file;
 			std::string assembly_cmd = "clang -c ";
 #if defined(OLA_PLATFORM_MACOS)
-			if (target_arch == TargetArch::x64)
+			if (target_arch == TargetArch::X86)
 			{
 				assembly_cmd += "-arch x86_64 ";
 			}
-			else if (target_arch == TargetArch::ARM64)
+			else if (target_arch == TargetArch::ARM)
 			{
 				assembly_cmd += "-arch arm64 ";
 			}
@@ -308,11 +308,11 @@ namespace ola
 			// Link executable
 			std::string link_cmd = "clang ";
 #if defined(OLA_PLATFORM_MACOS)
-			if (target_arch == TargetArch::x64)
+			if (target_arch == TargetArch::X86)
 			{
 				link_cmd += "-arch x86_64 ";
 			}
-			else if (target_arch == TargetArch::ARM64)
+			else if (target_arch == TargetArch::ARM)
 			{
 				link_cmd += "-arch arm64 ";
 			}
@@ -351,8 +351,8 @@ namespace ola
 			}
 #endif
 #if defined(OLA_PLATFORM_MACOS)
-			// Use Rosetta 2 to run x64 executables on macOS (Apple Silicon)
-			if (target_arch == TargetArch::x64)
+			// Use Rosetta 2 to run X86 executables on macOS (Apple Silicon)
+			if (target_arch == TargetArch::X86)
 			{
 				exe_cmd = "arch -x86_64 " + exe_cmd;
 			}

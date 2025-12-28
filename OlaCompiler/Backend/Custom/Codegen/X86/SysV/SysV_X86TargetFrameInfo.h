@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	class SysV_x64TargetFrameInfo : public TargetFrameInfo
+	class SysV_X86TargetFrameInfo : public TargetFrameInfo
 	{
 	public:
 		virtual void EmitCall(CallInst* CI, MachineContext& ctx) const override;

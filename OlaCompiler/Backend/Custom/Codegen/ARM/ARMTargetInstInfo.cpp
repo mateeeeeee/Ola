@@ -4,7 +4,7 @@
 
 namespace ola
 {
-	InstInfo ARM64TargetInstInfo::GetInstInfo(Uint32 opcode) const
+	InstInfo ARMTargetInstInfo::GetInstInfo(Uint32 opcode) const
 	{
 		InstInfo inst_info{};
 		switch (opcode)
@@ -104,21 +104,21 @@ namespace ola
 			inst_info.SetInstFlag(InstFlagTerminator);
 		}
 		break;
-		case ARM64_InstAdrp:
+		case ARM_InstAdrp:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagNone); 
 		}
 		break;
-		case ARM64_InstStp:
+		case ARM_InstStp:
 		{
 			inst_info.SetOperandCount(3);
 			inst_info.SetOpFlag(0, OperandFlagUse);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 			inst_info.SetOpFlag(2, OperandFlagUse);		}
 		break;
-		case ARM64_InstLdp:
+		case ARM_InstLdp:
 		{
 			// ldp Xd1, Xd2, [Xn, #offset] - load pair
 			inst_info.SetOperandCount(3);
@@ -127,49 +127,49 @@ namespace ola
 			inst_info.SetOpFlag(2, OperandFlagUse);
 		}
 		break;
-		case ARM64_InstMovz:
-		case ARM64_InstMovk:
+		case ARM_InstMovz:
+		case ARM_InstMovk:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagNone);
 		}
 		break;
-		case ARM64_InstFMov:
+		case ARM_InstFMov:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
-		case ARM64_InstCset:
-		case ARM64_InstCsetEQ:
-		case ARM64_InstCsetNE:
-		case ARM64_InstCsetGT:
-		case ARM64_InstCsetGE:
-		case ARM64_InstCsetLT:
-		case ARM64_InstCsetLE:
+		case ARM_InstCset:
+		case ARM_InstCsetEQ:
+		case ARM_InstCsetNE:
+		case ARM_InstCsetGT:
+		case ARM_InstCsetGE:
+		case ARM_InstCsetLT:
+		case ARM_InstCsetLE:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 		}
 		break;
 
-		case ARM64_InstMrs:
+		case ARM_InstMrs:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagNone);
 		}
 		break;
-		case ARM64_InstMsr:
+		case ARM_InstMsr:
 		{
 			inst_info.SetOperandCount(2);
 			inst_info.SetOpFlag(0, OperandFlagNone);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
 		break;
-		case ARM64_InstMsub:
+		case ARM_InstMsub:
 		{
 			inst_info.SetOperandCount(4);
 			inst_info.SetOpFlag(0, OperandFlagDef);  // Xd (destination)
@@ -184,8 +184,8 @@ namespace ola
 		return inst_info;
 	}
 
-	std::string ARM64TargetInstInfo::GetInstName(Uint32 opcode) const
+	std::string ARMTargetInstInfo::GetInstName(Uint32 opcode) const
 	{
-		return ARM64_GetOpcodeString(opcode);
+		return ARM_GetOpcodeString(opcode);
 	}
 }

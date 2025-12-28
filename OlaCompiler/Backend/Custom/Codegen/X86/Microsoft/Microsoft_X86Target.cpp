@@ -10,7 +10,7 @@
 
 namespace ola
 {
-	class Microsoft_x64TargetDataLayout : public TargetDataLayout
+	class Microsoft_X86TargetDataLayout : public TargetDataLayout
 	{
 	public:
 		virtual Bool   IsLittleEndian() const override { return true; }
@@ -32,19 +32,19 @@ namespace ola
 		}
 	};
 
-	class Microsoft_x64TargetRegisterInfo : public TargetRegisterInfo
+	class Microsoft_X86TargetRegisterInfo : public TargetRegisterInfo
 	{
 	public:
-		Microsoft_x64TargetRegisterInfo()
+		Microsoft_X86TargetRegisterInfo()
 		{
-			gp_regs.reserve(x64_GPREnd - x64_GPRBegin + 1);
-			for (Uint32 r = x64_GPRBegin; r < x64_GPREnd; ++r)
+			gp_regs.reserve(X86_GPREnd - X86_GPRBegin + 1);
+			for (Uint32 r = X86_GPRBegin; r < X86_GPREnd; ++r)
 			{
 				gp_regs.push_back(r); //skip rbp, rsp
 			}
 
-			fp_regs.reserve(x64_FPREnd - x64_FPRBegin + 1);
-			for (Uint32 r = x64_FPRBegin; r < x64_FPREnd; ++r)
+			fp_regs.reserve(X86_FPREnd - X86_FPRBegin + 1);
+			for (Uint32 r = X86_FPRBegin; r < X86_FPREnd; ++r)
 			{
 				fp_regs.push_back(r);
 			}
@@ -52,23 +52,23 @@ namespace ola
 
 		virtual Uint32 GetStackPointerRegister() const override
 		{
-			return x64_RSP;
+			return X86_RSP;
 		}
 		virtual Uint32 GetGPScratchRegister() const override
 		{
-			return x64_R15;
+			return X86_R15;
 		}
 		virtual Uint32 GetFPScratchRegister() const override
 		{
-			return x64_XMM15;
+			return X86_XMM15;
 		}
 		virtual Uint32 GetFramePointerRegister() const override
 		{
-			return x64_RBP;
+			return X86_RBP;
 		}
 		virtual Uint32 GetReturnRegister() const override
 		{
-			return x64_RAX;
+			return X86_RAX;
 		}
 
 		virtual std::vector<Uint32> const& GetGPRegisters() const override
@@ -125,12 +125,12 @@ namespace ola
 
 		virtual Bool IsCallerSaved(Uint32 r) const override
 		{
-			return x64_IsCallerSaved(r);
+			return X86_IsCallerSaved(r);
 		}
 
 		virtual Bool IsCalleeSaved(Uint32 r) const override
 		{
-			return x64_IsCalleeSaved(r);
+			return X86_IsCalleeSaved(r);
 		}
 
 	private:
@@ -138,40 +138,40 @@ namespace ola
 		std::vector<Uint32> fp_regs;
 	};
 
-	TargetDataLayout const& Microsoft_x64Target::GetDataLayout() const
+	TargetDataLayout const& Microsoft_X86Target::GetDataLayout() const
 	{
-		static Microsoft_x64TargetDataLayout x64_target_data_layout{};
-		return x64_target_data_layout;
+		static Microsoft_X86TargetDataLayout X86_target_data_layout{};
+		return X86_target_data_layout;
 	}
 
-	TargetInstInfo const& Microsoft_x64Target::GetInstInfo() const
+	TargetInstInfo const& Microsoft_X86Target::GetInstInfo() const
 	{
-		static x64TargetInstInfo x64_target_inst_info{};
-		return x64_target_inst_info;
+		static X86TargetInstInfo X86_target_inst_info{};
+		return X86_target_inst_info;
 	}
 
-	TargetRegisterInfo const& Microsoft_x64Target::GetRegisterInfo() const
+	TargetRegisterInfo const& Microsoft_X86Target::GetRegisterInfo() const
 	{
-		static Microsoft_x64TargetRegisterInfo x64_target_reg_info{};
-		return x64_target_reg_info;
+		static Microsoft_X86TargetRegisterInfo X86_target_reg_info{};
+		return X86_target_reg_info;
 	}
 
-	TargetISelInfo const& Microsoft_x64Target::GetISelInfo() const
+	TargetISelInfo const& Microsoft_X86Target::GetISelInfo() const
 	{
-		static x64TargetISelInfo x64_target_isel_info{};
-		return x64_target_isel_info;
+		static X86TargetISelInfo X86_target_isel_info{};
+		return X86_target_isel_info;
 	}
 
-	TargetFrameInfo const& Microsoft_x64Target::GetFrameInfo() const
+	TargetFrameInfo const& Microsoft_X86Target::GetFrameInfo() const
 	{
-		static Microsoft_x64TargetFrameInfo x64_target_frame_info{};
-		return x64_target_frame_info;
+		static Microsoft_X86TargetFrameInfo X86_target_frame_info{};
+		return X86_target_frame_info;
 	}
 
-	void Microsoft_x64Target::EmitAssembly(MachineModule& M, std::string_view file) const
+	void Microsoft_X86Target::EmitAssembly(MachineModule& M, std::string_view file) const
 	{
 		std::ofstream asm_stream(file.data());
-		x64AsmPrinter asm_printer(asm_stream);
+		X86AsmPrinter asm_printer(asm_stream);
 		asm_printer.PrintModule(M);
 	}
 

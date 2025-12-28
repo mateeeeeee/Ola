@@ -14,14 +14,14 @@ namespace ola
 	{
 		if (MO.IsReg())
 		{
-			OLA_ASSERT_MSG(ARM64_IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
+			OLA_ASSERT_MSG(ARM_IsISAReg(MO.GetReg().reg), "Virtual register should not exist after register allocation!");
 			if (is_address)
 			{
-				return std::format("[{}]", ARM64_GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
+				return std::format("[{}]", ARM_GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
 			}
 			else
 			{
-				return ARM64_GetRegisterString(MO.GetReg().reg, MO.GetType());
+				return ARM_GetRegisterString(MO.GetReg().reg, MO.GetType());
 			}
 		}
 		else if (MO.IsImmediate())
@@ -52,17 +52,17 @@ namespace ola
 	{
 		switch (opcode)
 		{
-		case ARM64_InstCsetEQ: return "eq";
-		case ARM64_InstCsetNE: return "ne";
-		case ARM64_InstCsetGT: return "gt";
-		case ARM64_InstCsetGE: return "ge";
-		case ARM64_InstCsetLT: return "lt";
-		case ARM64_InstCsetLE: return "le";
+		case ARM_InstCsetEQ: return "eq";
+		case ARM_InstCsetNE: return "ne";
+		case ARM_InstCsetGT: return "gt";
+		case ARM_InstCsetGE: return "ge";
+		case ARM_InstCsetLT: return "lt";
+		case ARM_InstCsetLE: return "le";
 		default: return "";
 		}
 	}
 
-	void ARM64AsmPrinter::PrintModule(MachineModule const& M)
+	void ARMAsmPrinter::PrintModule(MachineModule const& M)
 	{
 		EmitPreamble("");
 
@@ -101,7 +101,7 @@ namespace ola
 							continue;
 						}
 						Uint32 opcode = MI.GetOpcode();
-						Char const* opcode_string = ARM64_GetOpcodeString(opcode);
+						Char const* opcode_string = ARM_GetOpcodeString(opcode);
 
 						switch (opcode)
 						{
@@ -214,7 +214,7 @@ namespace ola
 								else
 								{
 									// For adrp and base addressing, we always need the X register version
-									std::string dst_x_str = ARM64_GetRegisterString(dst.GetReg().reg, MachineType::Ptr);
+									std::string dst_x_str = ARM_GetRegisterString(dst.GetReg().reg, MachineType::Ptr);
 									EmitText("adrp {}, {}@PAGE", dst_x_str, symbol);
 									EmitText("{}{} {}, [{}, {}@PAGEOFF]", opcode_string, opcode_suffix, dst_str, dst_x_str, symbol);
 								}
@@ -324,15 +324,15 @@ namespace ola
 						case InstF2S:
 						case InstS2F:
 						case InstZExt:
-						case ARM64_InstFMov:
+						case ARM_InstFMov:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
 						}
 						break;
-						case ARM64_InstStp:
-						case ARM64_InstLdp:
+						case ARM_InstStp:
+						case ARM_InstLdp:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
@@ -358,43 +358,43 @@ namespace ola
 							EmitText("{} {}, {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2), addr_str);
 						}
 						break;
-						case ARM64_InstAdrp:
+						case ARM_InstAdrp:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& src = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));
 						}
 						break;
-						case ARM64_InstMovz:
-						case ARM64_InstMovk:
+						case ARM_InstMovz:
+						case ARM_InstMovk:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							MachineOperand const& imm = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(imm));
 						}
 						break;
-						case ARM64_InstCset:
-						case ARM64_InstCsetEQ:
-						case ARM64_InstCsetNE:
-						case ARM64_InstCsetGT:
-						case ARM64_InstCsetGE:
-						case ARM64_InstCsetLT:
-						case ARM64_InstCsetLE:
+						case ARM_InstCset:
+						case ARM_InstCsetEQ:
+						case ARM_InstCsetNE:
+						case ARM_InstCsetGT:
+						case ARM_InstCsetGE:
+						case ARM_InstCsetLT:
+						case ARM_InstCsetLE:
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							std::string cond = GetConditionString(opcode);
 							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), cond);
 						}
 						break;
-						case ARM64_InstMrs:
-						case ARM64_InstMsr:
+						case ARM_InstMrs:
+						case ARM_InstMsr:
 						{
 							MachineOperand const& op1 = MI.GetOp<0>();
 							MachineOperand const& op2 = MI.GetOp<1>();
 							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2));
 						}
 						break;
-						case ARM64_InstMsub:
+						case ARM_InstMsub:
 						{
 							//msub Xd, Xn, Xm, Xa  =>  Xd = Xa - (Xn * Xm)
 							MachineOperand const& dst = MI.GetOp<0>();
@@ -406,7 +406,7 @@ namespace ola
 						break;
 
 						default:
-							OLA_ASSERT_MSG(false, "Unhandled ARM64 instruction in assembly printer!");
+							OLA_ASSERT_MSG(false, "Unhandled ARM instruction in assembly printer!");
 						}
 					}
 				}
@@ -473,7 +473,7 @@ namespace ola
 		Finalize();
 	}
 
-	std::string ARM64AsmPrinter::GetFPConstantPoolEntry(Int64 value)
+	std::string ARMAsmPrinter::GetFPConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
@@ -487,7 +487,7 @@ namespace ola
 		return fp_constant_pool[value];
 	}
 
-	std::string ARM64AsmPrinter::GetIntConstantPoolEntry(Int64 value)
+	std::string ARMAsmPrinter::GetIntConstantPoolEntry(Int64 value)
 	{
 		static std::unordered_map<Int64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))

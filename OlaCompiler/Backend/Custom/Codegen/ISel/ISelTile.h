@@ -32,12 +32,12 @@ namespace ola
 	protected:
 		MachineOperand ResolveOperand(ISelNode* node, MachineContext& ctx, std::vector<ISelNode*>& worklist);
 
-		static Bool IsValidx64Scale(Int64 scale)
+		static Bool IsValidX86Scale(Int64 scale)
 		{
 			return scale == 1 || scale == 2 || scale == 4 || scale == 8;
 		}
 
-		static Bool IsSpecialx64Scale(Int64 scale)
+		static Bool IsSpecialX86Scale(Int64 scale)
 		{
 			return scale == 3 || scale == 5 || scale == 9;
 		}

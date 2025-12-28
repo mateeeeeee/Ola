@@ -5,69 +5,69 @@
 
 namespace ola
 {
-	enum ARM64Register : Uint32
+	enum ARMRegister : Uint32
 	{
-		ARM64_GPRBegin,
-		ARM64_X0 = ARM64_GPRBegin, ARM64_X1, ARM64_X2, ARM64_X3, ARM64_X4, ARM64_X5, ARM64_X6, ARM64_X7,
-		ARM64_X8, ARM64_X9, ARM64_X10, ARM64_X11, ARM64_X12, ARM64_X13, ARM64_X14, ARM64_X15,
-		ARM64_X16, ARM64_X17, ARM64_X18, ARM64_X19, ARM64_X20, ARM64_X21, ARM64_X22, ARM64_X23,
-		ARM64_X24, ARM64_X25, ARM64_X26, ARM64_X27, ARM64_X28, ARM64_X29, ARM64_X30, ARM64_SP,
-		ARM64_GPREnd = ARM64_SP,
+		ARM_GPRBegin,
+		ARM_X0 = ARM_GPRBegin, ARM_X1, ARM_X2, ARM_X3, ARM_X4, ARM_X5, ARM_X6, ARM_X7,
+		ARM_X8, ARM_X9, ARM_X10, ARM_X11, ARM_X12, ARM_X13, ARM_X14, ARM_X15,
+		ARM_X16, ARM_X17, ARM_X18, ARM_X19, ARM_X20, ARM_X21, ARM_X22, ARM_X23,
+		ARM_X24, ARM_X25, ARM_X26, ARM_X27, ARM_X28, ARM_X29, ARM_X30, ARM_SP,
+		ARM_GPREnd = ARM_SP,
 
-		ARM64_FPRBegin,
-		ARM64_V0 = ARM64_FPRBegin, ARM64_V1, ARM64_V2, ARM64_V3, ARM64_V4, ARM64_V5, ARM64_V6, ARM64_V7,
-		ARM64_V8, ARM64_V9, ARM64_V10, ARM64_V11, ARM64_V12, ARM64_V13, ARM64_V14, ARM64_V15,
-		ARM64_V16, ARM64_V17, ARM64_V18, ARM64_V19, ARM64_V20, ARM64_V21, ARM64_V22, ARM64_V23,
-		ARM64_V24, ARM64_V25, ARM64_V26, ARM64_V27, ARM64_V28, ARM64_V29, ARM64_V30, ARM64_V31,
-		ARM64_FPREnd = ARM64_V31,
+		ARM_FPRBegin,
+		ARM_V0 = ARM_FPRBegin, ARM_V1, ARM_V2, ARM_V3, ARM_V4, ARM_V5, ARM_V6, ARM_V7,
+		ARM_V8, ARM_V9, ARM_V10, ARM_V11, ARM_V12, ARM_V13, ARM_V14, ARM_V15,
+		ARM_V16, ARM_V17, ARM_V18, ARM_V19, ARM_V20, ARM_V21, ARM_V22, ARM_V23,
+		ARM_V24, ARM_V25, ARM_V26, ARM_V27, ARM_V28, ARM_V29, ARM_V30, ARM_V31,
+		ARM_FPREnd = ARM_V31,
 
-		ARM64_ISARegBegin = ARM64_GPRBegin,
-		ARM64_ISARegEnd = ARM64_FPREnd
+		ARM_ISARegBegin = ARM_GPRBegin,
+		ARM_ISARegEnd = ARM_FPREnd
 	};
 
-	enum ARM64Instruction : Uint32
+	enum ARMInstruction : Uint32
 	{
-		ARM64_InstAdrp = ISASpecificBegin,
-		ARM64_InstStp,
-		ARM64_InstLdp,
-		ARM64_InstMovz,
-		ARM64_InstMovk,
-		ARM64_InstFMov,
-		ARM64_InstMadd,
-		ARM64_InstMsub,
-		ARM64_InstFMadd,
-		ARM64_InstFMsub,
-		ARM64_InstCset,
-		ARM64_InstCsetEQ,
-		ARM64_InstCsetNE,
-		ARM64_InstCsetGT,
-		ARM64_InstCsetGE,
-		ARM64_InstCsetLT,
-		ARM64_InstCsetLE,
-		ARM64_InstMrs,
-		ARM64_InstMsr,
-		ARM64_InstAddShifted,
-		ARM64_InstSubShifted,
-		ARM64_InstLdrShifted,
-		ARM64_InstStrShifted
+		ARM_InstAdrp = ISASpecificBegin,
+		ARM_InstStp,
+		ARM_InstLdp,
+		ARM_InstMovz,
+		ARM_InstMovk,
+		ARM_InstFMov,
+		ARM_InstMadd,
+		ARM_InstMsub,
+		ARM_InstFMadd,
+		ARM_InstFMsub,
+		ARM_InstCset,
+		ARM_InstCsetEQ,
+		ARM_InstCsetNE,
+		ARM_InstCsetGT,
+		ARM_InstCsetGE,
+		ARM_InstCsetLT,
+		ARM_InstCsetLE,
+		ARM_InstMrs,
+		ARM_InstMsr,
+		ARM_InstAddShifted,
+		ARM_InstSubShifted,
+		ARM_InstLdrShifted,
+		ARM_InstStrShifted
 	};
 
-	inline constexpr Bool ARM64_IsISAReg(Uint32 reg)
+	inline constexpr Bool ARM_IsISAReg(Uint32 reg)
 	{
-		return reg >= ARM64_ISARegBegin && reg <= ARM64_ISARegEnd;
+		return reg >= ARM_ISARegBegin && reg <= ARM_ISARegEnd;
 	}
 
-	inline constexpr Bool ARM64_IsGPR(Uint32 reg)
+	inline constexpr Bool ARM_IsGPR(Uint32 reg)
 	{
-		return reg >= ARM64_GPRBegin && reg <= ARM64_GPREnd;
+		return reg >= ARM_GPRBegin && reg <= ARM_GPREnd;
 	}
 
-	inline constexpr Bool ARM64_IsFPR(Uint32 reg)
+	inline constexpr Bool ARM_IsFPR(Uint32 reg)
 	{
-		return reg >= ARM64_FPRBegin && reg <= ARM64_FPREnd;
+		return reg >= ARM_FPRBegin && reg <= ARM_FPREnd;
 	}
 
-	Char const* ARM64_GetOpcodeString(Uint32 opcode);
-	std::string ARM64_GetRegisterString(Uint32 reg, MachineType type);
-	Bool ARM64_IsCallerSaved(Uint32 reg);
+	Char const* ARM_GetOpcodeString(Uint32 opcode);
+	std::string ARM_GetRegisterString(Uint32 reg, MachineType type);
+	Bool ARM_IsCallerSaved(Uint32 reg);
 }

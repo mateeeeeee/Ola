@@ -3,7 +3,7 @@
 
 namespace ola
 {
-	class ARM64TargetFrameInfo : public TargetFrameInfo
+	class ARMTargetFrameInfo : public TargetFrameInfo
 	{
 	public:
 		virtual void EmitCall(CallInst* CI, MachineContext& ctx) const override;

@@ -3,57 +3,57 @@
 
 namespace ola
 {
-	enum x64Register : Uint32
+	enum X86Register : Uint32
 	{
-		x64_GPRBegin,
-		x64_RAX = x64_GPRBegin, x64_RSP, x64_RBP, x64_RCX, x64_RDX, x64_RBX, x64_RSI, x64_RDI,
-		x64_R8, x64_R9, x64_R10, x64_R11, x64_R12, x64_R13, x64_R14, x64_R15,
-		x64_GPREnd,
-		x64_FPRBegin,
-		x64_XMM0 = x64_FPRBegin, x64_XMM1, x64_XMM2, x64_XMM3, x64_XMM4, x64_XMM5, x64_XMM6, x64_XMM7,
-		x64_XMM8, x64_XMM9, x64_XMM10, x64_XMM11, x64_XMM12, x64_XMM13, x64_XMM14, x64_XMM15,
-		x64_FPREnd,
-		x64_FLAGS,
-		x64_FFLAGS,
+		X86_GPRBegin,
+		X86_RAX = X86_GPRBegin, X86_RSP, X86_RBP, X86_RCX, X86_RDX, X86_RBX, X86_RSI, X86_RDI,
+		X86_R8, X86_R9, X86_R10, X86_R11, X86_R12, X86_R13, X86_R14, X86_R15,
+		X86_GPREnd,
+		X86_FPRBegin,
+		X86_XMM0 = X86_FPRBegin, X86_XMM1, X86_XMM2, X86_XMM3, X86_XMM4, X86_XMM5, X86_XMM6, X86_XMM7,
+		X86_XMM8, X86_XMM9, X86_XMM10, X86_XMM11, X86_XMM12, X86_XMM13, X86_XMM14, X86_XMM15,
+		X86_FPREnd,
+		X86_FLAGS,
+		X86_FFLAGS,
 	};
 
-	inline constexpr Bool x64_IsGPRReg(Uint32 r)
+	inline constexpr Bool X86_IsGPRReg(Uint32 r)
 	{
-		return r >= x64_GPRBegin && r <= x64_GPREnd;
+		return r >= X86_GPRBegin && r <= X86_GPREnd;
 	}
-	inline constexpr Bool x64_IsFPRReg(Uint32 r)
+	inline constexpr Bool X86_IsFPRReg(Uint32 r)
 	{
-		return r >= x64_FPRBegin && r <= x64_FPREnd;
+		return r >= X86_FPRBegin && r <= X86_FPREnd;
 	}
 
 	// Caller-saved and callee-saved register classification is ABI-specific.
-	// Include "Microsoft/x64Microsoft.h" for Microsoft x64 ABI
-	// Include "SysV/x64SysV.h" for SysV x64 ABI
+	// Include "Microsoft/X86Microsoft.h" for Microsoft X86 ABI
+	// Include "SysV/X86SysV.h" for SysV X86 ABI
 
-	enum x64Inst : Uint32
+	enum X86Inst : Uint32
 	{
-		x64InstBegin = ISASpecificBegin,
-		x64_InstSetE,
-		x64_InstSetNE,
-		x64_InstSetGT,
-		x64_InstSetGE,
-		x64_InstSetLT,
-		x64_InstSetLE,
+		X86InstBegin = ISASpecificBegin,
+		X86_InstSetE,
+		X86_InstSetNE,
+		X86_InstSetGT,
+		X86_InstSetGE,
+		X86_InstSetLT,
+		X86_InstSetLE,
 
-		x64_InstSetA,
-		x64_InstSetAE,
-		x64_InstSetB,
-		x64_InstSetBE,
+		X86_InstSetA,
+		X86_InstSetAE,
+		X86_InstSetB,
+		X86_InstSetBE,
 
-		x64_InstCqo,
-		x64_InstMoveFP,
-		x64_InstStoreFP,
-		x64_InstLoadFP,
-		x64_InstXorFP,
-		x64_InstLea
+		X86_InstCqo,
+		X86_InstMoveFP,
+		X86_InstStoreFP,
+		X86_InstLoadFP,
+		X86_InstXorFP,
+		X86_InstLea
 	};
 
-	inline Char const* x64_GetOpcodeString(Uint32 opcode)
+	inline Char const* X86_GetOpcodeString(Uint32 opcode)
 	{
 		switch (opcode)
 		{
@@ -75,16 +75,16 @@ namespace ola
 		case InstSub:     return "sub";
 		case InstICmp:    return "cmp";
 		case InstFCmp:    return "comisd";
-		case x64_InstSetE:    return "sete";
-		case x64_InstSetNE:	  return "setne";
-		case x64_InstSetGT:	  return "setg";
-		case x64_InstSetGE:	  return "setge";
-		case x64_InstSetLT:	  return "setl";
-		case x64_InstSetLE:	  return "setle";
-		case x64_InstSetA:	  return "seta";
-		case x64_InstSetAE:   return "setae";
-		case x64_InstSetB:    return "setb";
-		case x64_InstSetBE:   return "setbe";
+		case X86_InstSetE:    return "sete";
+		case X86_InstSetNE:	  return "setne";
+		case X86_InstSetGT:	  return "setg";
+		case X86_InstSetGE:	  return "setge";
+		case X86_InstSetLT:	  return "setl";
+		case X86_InstSetLE:	  return "setle";
+		case X86_InstSetA:	  return "seta";
+		case X86_InstSetAE:   return "setae";
+		case X86_InstSetB:    return "setb";
+		case X86_InstSetBE:   return "setbe";
 		case InstShl:	  return "shl";
 		case InstAShr:    return "sar";
 		case InstLShr:    return "shr";
@@ -95,24 +95,24 @@ namespace ola
 		case InstNot:	  return "not";
 		case InstSMul:    return "imul";
 		case InstSDiv:    return "idiv";
-		case x64_InstCqo:     return "cqo";
-		case x64_InstStoreFP:
-		case x64_InstLoadFP:
-		case x64_InstMoveFP:  return "movsd";
+		case X86_InstCqo:     return "cqo";
+		case X86_InstStoreFP:
+		case X86_InstLoadFP:
+		case X86_InstMoveFP:  return "movsd";
 		case InstF2S:     return "cvttsd2si";
 		case InstS2F:     return "cvtsi2sd";
 		case InstFAdd:    return "addsd";
 		case InstFSub:    return "subsd";
 		case InstFMul:    return "mulsd";
 		case InstFDiv:    return "divsd";
-		case x64_InstXorFP:   return "xorpd";
-		case x64_InstLea:     return "lea";
+		case X86_InstXorFP:   return "xorpd";
+		case X86_InstLea:     return "lea";
 		case InstZExt:    return "movzx";
 		}
 		return "";
 	}
 
-	inline Char const* x64_GetRegisterString(Uint32 r, MachineType type)
+	inline Char const* X86_GetRegisterString(Uint32 r, MachineType type)
 	{
 		using enum MachineType;
 		switch (type)
@@ -120,63 +120,63 @@ namespace ola
 		case Int8:
 			switch (r)
 			{
-			case x64_RAX: return "al";
-			case x64_RCX: return "cl";
-			case x64_RDX: return "dl";
-			case x64_RBX: return "bl";
-			case x64_RSI: return "sil";
-			case x64_RDI: return "dil";
-			case x64_R8:  return "r8b";
-			case x64_R9:  return "r9b";
-			case x64_R10: return "r10b";
-			case x64_R11: return "r11b";
-			case x64_R12: return "r12b";
-			case x64_R13: return "r13b";
-			case x64_R14: return "r14b";
-			case x64_R15: return "r15b";
+			case X86_RAX: return "al";
+			case X86_RCX: return "cl";
+			case X86_RDX: return "dl";
+			case X86_RBX: return "bl";
+			case X86_RSI: return "sil";
+			case X86_RDI: return "dil";
+			case X86_R8:  return "r8b";
+			case X86_R9:  return "r9b";
+			case X86_R10: return "r10b";
+			case X86_R11: return "r11b";
+			case X86_R12: return "r12b";
+			case X86_R13: return "r13b";
+			case X86_R14: return "r14b";
+			case X86_R15: return "r15b";
 			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
 			}
 		case Int64:
 		case Ptr:
 			switch (r)
 			{
-			case x64_RAX: return "rax";
-			case x64_RCX: return "rcx";
-			case x64_RDX: return "rdx";
-			case x64_RBX: return "rbx";
-			case x64_RSP: return "rsp";
-			case x64_RBP: return "rbp";
-			case x64_RSI: return "rsi";
-			case x64_RDI: return "rdi";
-			case x64_R8:  return "r8";
-			case x64_R9:  return "r9";
-			case x64_R10: return "r10";
-			case x64_R11: return "r11";
-			case x64_R12: return "r12";
-			case x64_R13: return "r13";
-			case x64_R14: return "r14";
-			case x64_R15: return "r15";
+			case X86_RAX: return "rax";
+			case X86_RCX: return "rcx";
+			case X86_RDX: return "rdx";
+			case X86_RBX: return "rbx";
+			case X86_RSP: return "rsp";
+			case X86_RBP: return "rbp";
+			case X86_RSI: return "rsi";
+			case X86_RDI: return "rdi";
+			case X86_R8:  return "r8";
+			case X86_R9:  return "r9";
+			case X86_R10: return "r10";
+			case X86_R11: return "r11";
+			case X86_R12: return "r12";
+			case X86_R13: return "r13";
+			case X86_R14: return "r14";
+			case X86_R15: return "r15";
 			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
 			}
 		case Float64:
 			switch (r)
 			{
-			case x64_XMM0: return "xmm0";
-			case x64_XMM1: return "xmm1";
-			case x64_XMM2: return "xmm2";
-			case x64_XMM3: return "xmm3";
-			case x64_XMM4: return "xmm4";
-			case x64_XMM5: return "xmm5";
-			case x64_XMM6: return "xmm6";
-			case x64_XMM7: return "xmm7";
-			case x64_XMM8: return "xmm8";
-			case x64_XMM9: return "xmm9";
-			case x64_XMM10: return "xmm10";
-			case x64_XMM11: return "xmm11";
-			case x64_XMM12: return "xmm12";
-			case x64_XMM13: return "xmm13";
-			case x64_XMM14: return "xmm14";
-			case x64_XMM15: return "xmm15";
+			case X86_XMM0: return "xmm0";
+			case X86_XMM1: return "xmm1";
+			case X86_XMM2: return "xmm2";
+			case X86_XMM3: return "xmm3";
+			case X86_XMM4: return "xmm4";
+			case X86_XMM5: return "xmm5";
+			case X86_XMM6: return "xmm6";
+			case X86_XMM7: return "xmm7";
+			case X86_XMM8: return "xmm8";
+			case X86_XMM9: return "xmm9";
+			case X86_XMM10: return "xmm10";
+			case X86_XMM11: return "xmm11";
+			case X86_XMM12: return "xmm12";
+			case X86_XMM13: return "xmm13";
+			case X86_XMM14: return "xmm14";
+			case X86_XMM15: return "xmm15";
 			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
 			}
 		default:

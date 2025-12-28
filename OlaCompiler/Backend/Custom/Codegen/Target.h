@@ -10,8 +10,8 @@ namespace ola
 	{
 		Default,
 		All = Default,
-		x64,
-		ARM64
+		X86,
+		ARM
 	};
 
 	class IRType;

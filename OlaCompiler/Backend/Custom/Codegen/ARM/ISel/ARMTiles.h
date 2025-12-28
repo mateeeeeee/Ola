@@ -4,12 +4,12 @@
 
 namespace ola
 {
-	class ARM64MaddTile : public ISelTile
+	class ARMMaddTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 20; }
 
 	private:
@@ -21,12 +21,12 @@ namespace ola
 		ISelNode* addend = nullptr;
 	};
 
-	class ARM64MsubTile : public ISelTile
+	class ARMMsubTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 20; }
 
 	private:
@@ -38,12 +38,12 @@ namespace ola
 		ISelNode* minuend = nullptr;
 	};
 
-	class ARM64FMaddTile : public ISelTile
+	class ARMFMaddTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 20; }
 
 	private:
@@ -55,12 +55,12 @@ namespace ola
 		ISelNode* addend = nullptr;
 	};
 
-	class ARM64FMsubTile : public ISelTile
+	class ARMFMsubTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 20; }
 
 	private:
@@ -72,12 +72,12 @@ namespace ola
 		ISelNode* minuend = nullptr;
 	};
 
-	class ARM64LoadShiftedTile : public ISelTile
+	class ARMLoadShiftedTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 25; }
 
 	private:
@@ -90,12 +90,12 @@ namespace ola
 		Int64 shift_amount = 0;
 	};
 
-	class ARM64StoreShiftedTile : public ISelTile
+	class ARMStoreShiftedTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 25; }
 
 	private:
@@ -108,12 +108,12 @@ namespace ola
 		Int64 shift_amount = 0;
 	};
 
-	class ARM64AddShiftedTile : public ISelTile
+	class ARMAddShiftedTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::ARM64; }
+		TargetArch GetTarget() const override { return TargetArch::ARM; }
 		Int GetPriority() const override { return 15; }
 
 	private:

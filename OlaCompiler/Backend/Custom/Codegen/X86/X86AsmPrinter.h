@@ -3,37 +3,37 @@
 
 namespace ola
 {
-	enum x64Section : Uint32
+	enum X86Section : Uint32
 	{
-		x64Section_Preamble,
-		x64Section_ReadOnly,
-		x64Section_BSS,
-		x64Section_Data,
-		x64Section_Text
+		X86Section_Preamble,
+		X86Section_ReadOnly,
+		X86Section_BSS,
+		X86Section_Data,
+		X86Section_Text
 	};
 
 	class MachineModule;
-	class x64AsmPrinter : public AsmPrinter
+	class X86AsmPrinter : public AsmPrinter
 	{
 	public:
-		x64AsmPrinter(std::ostream& os) : AsmPrinter(os) {}
+		X86AsmPrinter(std::ostream& os) : AsmPrinter(os) {}
 		virtual void PrintModule(MachineModule const& M) override;
 
 	private:
 		virtual std::string GetSectionLabel(SectionId section) const override
 		{
-			switch (static_cast<x64Section>(section))
+			switch (static_cast<X86Section>(section))
 			{
-			case x64Section_Text: return ".text";
-			case x64Section_Data: return ".data";
-			case x64Section_ReadOnly:
+			case X86Section_Text: return ".text";
+			case X86Section_Data: return ".data";
+			case X86Section_ReadOnly:
 #if defined(OLA_PLATFORM_WINDOWS)
 				return ".section .rodata";
 #else
 				return ".section __TEXT,__const";
 #endif
-			case x64Section_BSS: return ".bss";
-			case x64Section_Preamble:
+			case X86Section_BSS: return ".bss";
+			case X86Section_Preamble:
 			default:
 				return "";
 			}
@@ -45,27 +45,27 @@ namespace ola
 		template<typename... Args>
 		void EmitPreamble(Char const* fmt, Args&&... args)
 		{
-			Emit<x64Section_Preamble>(fmt, std::forward<Args>(args)...);
+			Emit<X86Section_Preamble>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
 		void EmitText(Char const* fmt, Args&&... args)
 		{
-			Emit<x64Section_Text>(fmt, std::forward<Args>(args)...);
+			Emit<X86Section_Text>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
 		void EmitData(Char const* fmt, Args&&... args)
 		{
-			Emit<x64Section_Data>(fmt, std::forward<Args>(args)...);
+			Emit<X86Section_Data>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
 		void EmitReadOnly(Char const* fmt, Args&&... args)
 		{
-			Emit<x64Section_ReadOnly>(fmt, std::forward<Args>(args)...);
+			Emit<X86Section_ReadOnly>(fmt, std::forward<Args>(args)...);
 		}
 		template<typename... Args>
 		void EmitBSS(Char const* fmt, Args&&... args)
 		{
-			Emit<x64Section_BSS>(fmt, std::forward<Args>(args)...);
+			Emit<X86Section_BSS>(fmt, std::forward<Args>(args)...);
 		}
 	};
 }

@@ -4,12 +4,12 @@
 
 namespace ola
 {
-	class x64LeaBaseIndexScaleTile : public ISelTile
+	class X86LeaBaseIndexScaleTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 20; }
 
 	private:
@@ -21,12 +21,12 @@ namespace ola
 		Int64 scale = 0;
 	};
 
-	class x64LeaBaseDispTile : public ISelTile
+	class X86LeaBaseDispTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 15; }
 
 	private:
@@ -36,12 +36,12 @@ namespace ola
 		Int64 displacement = 0;
 	};
 
-	class x64LeaIndexScaleDispTile : public ISelTile
+	class X86LeaIndexScaleDispTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 18; }
 
 	private:
@@ -53,12 +53,12 @@ namespace ola
 		Int64 displacement = 0;
 	};
 
-	class x64LeaBaseIndexScaleDispTile : public ISelTile
+	class X86LeaBaseIndexScaleDispTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 25; }
 
 	private:
@@ -72,12 +72,12 @@ namespace ola
 		Int64 displacement = 0;
 	};
 
-	class x64MulByConstTile : public ISelTile
+	class X86MulByConstTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 15; }
 
 	private:
@@ -87,12 +87,12 @@ namespace ola
 		Int64 multiplier = 0;
 	};
 
-	class x64LoadBaseIndexScaleTile : public ISelTile
+	class X86LoadBaseIndexScaleTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 25; }
 
 	private:
@@ -105,12 +105,12 @@ namespace ola
 		Int64 scale = 0;
 	};
 
-	class x64StoreBaseIndexScaleTile : public ISelTile
+	class X86StoreBaseIndexScaleTile : public ISelTile
 	{
 	public:
 		Bool Match(ISelNode* node) override;
 		TileResult Apply(MachineContext& ctx) override;
-		TargetArch GetTarget() const override { return TargetArch::x64; }
+		TargetArch GetTarget() const override { return TargetArch::X86; }
 		Int GetPriority() const override { return 25; }
 
 	private:

@@ -6,7 +6,7 @@
 
 namespace ola
 {
-	Bool x64LeaBaseIndexScaleTile::Match(ISelNode* node)
+	Bool X86LeaBaseIndexScaleTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -54,7 +54,7 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidx64Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val)) return false;
 
 		matched_reg = reg;
 		matched_add = add;
@@ -65,14 +65,14 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64LeaBaseIndexScaleTile::Apply(MachineContext& ctx)
+	TileResult X86LeaBaseIndexScaleTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
-		MachineInstruction lea(x64_InstLea);
+		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(base_op);
 		lea.SetOp<2>(index_op);
@@ -84,7 +84,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64LeaBaseDispTile::Match(ISelNode* node)
+	Bool X86LeaBaseDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -116,13 +116,13 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64LeaBaseDispTile::Apply(MachineContext& ctx)
+	TileResult X86LeaBaseDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 
-		MachineInstruction lea(x64_InstLea);
+		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(base_op);
 		lea.SetOp<2>(MachineOperand::Undefined());
@@ -134,7 +134,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64LeaIndexScaleDispTile::Match(ISelNode* node)
+	Bool X86LeaIndexScaleDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -184,7 +184,7 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidx64Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val)) return false;
 
 		matched_reg = reg;
 		matched_add = add;
@@ -195,13 +195,13 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64LeaIndexScaleDispTile::Apply(MachineContext& ctx)
+	TileResult X86LeaIndexScaleDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
-		MachineInstruction lea(x64_InstLea);
+		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(MachineOperand::Undefined());
 		lea.SetOp<2>(index_op);
@@ -213,7 +213,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64LeaBaseIndexScaleDispTile::Match(ISelNode* node)
+	Bool X86LeaBaseIndexScaleDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -287,7 +287,7 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidx64Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val)) return false;
 
 		matched_reg = reg;
 		outer_add = outer;
@@ -300,14 +300,14 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64LeaBaseIndexScaleDispTile::Apply(MachineContext& ctx)
+	TileResult X86LeaBaseIndexScaleDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
-		MachineInstruction lea(x64_InstLea);
+		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(base_op);
 		lea.SetOp<2>(index_op);
@@ -319,7 +319,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64MulByConstTile::Match(ISelNode* node)
+	Bool X86MulByConstTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -343,7 +343,7 @@ namespace ola
 		if (!imm || !op) return false;
 
 		Int64 val = imm->GetImmediate();
-		if (!IsSpecialx64Scale(val)) return false;
+		if (!IsSpecialX86Scale(val)) return false;
 
 		matched_reg = reg;
 		matched_mul = mul;
@@ -352,7 +352,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64MulByConstTile::Apply(MachineContext& ctx)
+	TileResult X86MulByConstTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -360,7 +360,7 @@ namespace ola
 
 		Int64 scale_val = multiplier - 1;
 
-		MachineInstruction lea(x64_InstLea);
+		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(op);
 		lea.SetOp<2>(op);
@@ -372,7 +372,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64LoadBaseIndexScaleTile::Match(ISelNode* node)
+	Bool X86LoadBaseIndexScaleTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
 		if (!reg || !reg->HasSource()) return false;
@@ -423,7 +423,7 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidx64Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val)) return false;
 
 		matched_reg = reg;
 		matched_load = load;
@@ -435,7 +435,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64LoadBaseIndexScaleTile::Apply(MachineContext& ctx)
+	TileResult X86LoadBaseIndexScaleTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -454,7 +454,7 @@ namespace ola
 		return result;
 	}
 
-	Bool x64StoreBaseIndexScaleTile::Match(ISelNode* node)
+	Bool X86StoreBaseIndexScaleTile::Match(ISelNode* node)
 	{
 		auto* store = dyn_cast<ISelStoreNode>(node);
 		if (!store) return false;
@@ -502,7 +502,7 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidx64Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val)) return false;
 
 		matched_store = store;
 		matched_add = add;
@@ -514,7 +514,7 @@ namespace ola
 		return true;
 	}
 
-	TileResult x64StoreBaseIndexScaleTile::Apply(MachineContext& ctx)
+	TileResult X86StoreBaseIndexScaleTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
 
@@ -536,12 +536,12 @@ namespace ola
 
 	void RegisterX86Tiles(ISelTiler& tiler)
 	{
-		tiler.RegisterTile(std::make_unique<x64LeaBaseIndexScaleDispTile>());
-		tiler.RegisterTile(std::make_unique<x64LeaBaseIndexScaleTile>());
-		tiler.RegisterTile(std::make_unique<x64LeaIndexScaleDispTile>());
-		tiler.RegisterTile(std::make_unique<x64LeaBaseDispTile>());
-		tiler.RegisterTile(std::make_unique<x64MulByConstTile>());
-		tiler.RegisterTile(std::make_unique<x64LoadBaseIndexScaleTile>());
-		tiler.RegisterTile(std::make_unique<x64StoreBaseIndexScaleTile>());
+		tiler.RegisterTile(std::make_unique<X86LeaBaseIndexScaleDispTile>());
+		tiler.RegisterTile(std::make_unique<X86LeaBaseIndexScaleTile>());
+		tiler.RegisterTile(std::make_unique<X86LeaIndexScaleDispTile>());
+		tiler.RegisterTile(std::make_unique<X86LeaBaseDispTile>());
+		tiler.RegisterTile(std::make_unique<X86MulByConstTile>());
+		tiler.RegisterTile(std::make_unique<X86LoadBaseIndexScaleTile>());
+		tiler.RegisterTile(std::make_unique<X86StoreBaseIndexScaleTile>());
 	}
 }
