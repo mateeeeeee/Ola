@@ -95,15 +95,15 @@ namespace ola
 		std::string target_str = cli_result["--target"].AsStringOr("");
 		if (target_str == "x64")
 		{
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 		}
 		else if (target_str == "arm64")
 		{
 #if defined(OLA_PLATFORM_MACOS)
-			target_arch = TargetArch::ARM64;
+			target_arch = TargetArch::ARM;
 #else
 			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 #endif
 		}
 		else if (!target_str.empty())

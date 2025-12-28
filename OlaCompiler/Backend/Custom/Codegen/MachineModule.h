@@ -2,27 +2,13 @@
 #include <iosfwd>
 #include "MachineGlobal.h"
 #include "MachineContext.h"
+#include "ISel/ISelDriver.h"
 
 namespace ola
 {
 	class IRModule;
 	class Function;
-	class Instruction;
-	class GlobalValue;
-	class UnaryInst;
-	class BinaryInst;
-	class ReturnInst;
-	class BranchInst;
-	class LoadInst;
-	class StoreInst;
-	class ReturnInst;
-	class CallInst;
-	class AllocaInst;
-	class GetElementPtrInst;
-	class SwitchInst;
-	class PtrAddInst;
-	class SelectInst;
-	class PhiInst;
+	class BasicBlock;
 	template<typename UnitT>
 	class AnalysisManager;
 	using FunctionAnalysisManager = AnalysisManager<Function>;
@@ -42,6 +28,9 @@ namespace ola
 		Target const& GetTarget() const { return target; }
 		auto   const& GetGlobals() const { return globals; }
 
+		void SetISelMode(ISelMode mode) { isel_mode = mode; }
+		ISelMode GetISelMode() const { return isel_mode; }
+
 		void EmitMIR(std::string_view mir_file);
 		void EmitAssembly(std::string_view assembly_file);
 
@@ -50,26 +39,11 @@ namespace ola
 		MachineContext machine_ctx;
 		Target const& target;
 		FunctionAnalysisManager& FAM;
+		ISelMode isel_mode = ISelMode::Legacy;
 
 	private:
 		void LowerModule(IRModule*);
 		void LowerFunction(Function*);
-		void LowerInstruction(Instruction*);
-
-		void LowerUnary(UnaryInst*);
-		void LowerBinary(BinaryInst*);
-		void LowerCompare(CompareInst*);
-		void LowerRet(ReturnInst*);
-		void LowerBranch(BranchInst*);
-		void LowerLoad(LoadInst*);
-		void LowerStore(StoreInst*);
-		void LowerCall(CallInst*);
-		void LowerCast(CastInst*);
-		void LowerGEP(GetElementPtrInst*);
-		void LowerPtrAdd(PtrAddInst*);
-		void LowerSwitch(SwitchInst*);
-		void LowerSelect(SelectInst*);
-		void EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
 
 		void LegalizeInstructions(MachineFunction& MF);
 		void PostLegalizeInstructions(MachineFunction& MF);

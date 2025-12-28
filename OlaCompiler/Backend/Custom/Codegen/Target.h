@@ -6,6 +6,14 @@
 
 namespace ola
 {
+	enum class TargetArch : Uint8
+	{
+		Default,
+		All = Default,
+		X86,
+		ARM
+	};
+
 	class IRType;
 	class Instruction;
 	class CallInst;
@@ -132,6 +140,7 @@ namespace ola
 	{
 	public:
 		virtual ~Target() = default;
+		virtual TargetArch GetArch() const = 0;
 		virtual TargetDataLayout const& GetDataLayout() const = 0;
 		virtual TargetInstInfo const& GetInstInfo() const = 0;
 		virtual TargetRegisterInfo const& GetRegisterInfo() const = 0;
