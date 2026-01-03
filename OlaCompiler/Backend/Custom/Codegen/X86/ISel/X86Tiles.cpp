@@ -9,14 +9,19 @@ namespace ola
 	Bool X86LeaBaseIndexScaleTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add)
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* mul = nullptr;
 		ISelNode* base_node = nullptr;
-
 		if (auto* left_mul = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_mul->GetOpcode() == Opcode::SMul)
@@ -36,7 +41,11 @@ namespace ola
 				}
 			}
 		}
-		if (!mul) return false;
+
+		if (!mul)
+		{
+			return false;
+		}
 
 		ISelImmediateNode* scale_imm = nullptr;
 		ISelNode* index_node = nullptr;
@@ -54,7 +63,10 @@ namespace ola
 		if (!scale_imm || !index_node) return false;
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidX86Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val))
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -87,10 +99,16 @@ namespace ola
 	Bool X86LeaBaseDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add)
+		{
+			return false;
+		}
 
 		ISelImmediateNode* imm = nullptr;
 		ISelNode* base_node = nullptr;
@@ -105,9 +123,15 @@ namespace ola
 			imm = right_imm;
 			base_node = add->GetLeft();
 		}
-		if (!imm || !base_node) return false;
+		if (!imm || !base_node)
+		{
+			return false;
+		}
 
-		if (isa<ISelBinaryOpNode>(base_node)) return false;
+		if (isa<ISelBinaryOpNode>(base_node))
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -119,7 +143,6 @@ namespace ola
 	TileResult X86LeaBaseDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 
 		MachineInstruction lea(X86_InstLea);
@@ -137,14 +160,19 @@ namespace ola
 	Bool X86LeaIndexScaleDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add)
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* mul = nullptr;
 		ISelImmediateNode* disp_imm = nullptr;
-
 		if (auto* left_mul = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_mul->GetOpcode() == Opcode::SMul)
@@ -166,11 +194,13 @@ namespace ola
 				}
 			}
 		}
-		if (!mul || !disp_imm) return false;
+		if (!mul || !disp_imm)
+		{
+			return false;
+		}
 
 		ISelImmediateNode* scale_imm = nullptr;
 		ISelNode* index_node = nullptr;
-
 		if (auto* imm = dyn_cast<ISelImmediateNode>(mul->GetLeft()))
 		{
 			scale_imm = imm;
@@ -181,10 +211,16 @@ namespace ola
 			scale_imm = imm;
 			index_node = mul->GetLeft();
 		}
-		if (!scale_imm || !index_node) return false;
+		if (!scale_imm || !index_node)
+		{
+			return false;
+		}
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidX86Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val))
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -198,7 +234,6 @@ namespace ola
 	TileResult X86LeaIndexScaleDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
 		MachineInstruction lea(X86_InstLea);
@@ -216,14 +251,19 @@ namespace ola
 	Bool X86LeaBaseIndexScaleDispTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* outer = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!outer || outer->GetOpcode() != Opcode::Add) return false;
+		if (!outer || outer->GetOpcode() != Opcode::Add)
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* inner = nullptr;
 		ISelImmediateNode* disp_imm = nullptr;
-
 		if (auto* left_add = dyn_cast<ISelBinaryOpNode>(outer->GetLeft()))
 		{
 			if (left_add->GetOpcode() == Opcode::Add)
@@ -245,11 +285,13 @@ namespace ola
 				}
 			}
 		}
-		if (!inner || !disp_imm) return false;
+		if (!inner || !disp_imm)
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* mul = nullptr;
 		ISelNode* base_node = nullptr;
-
 		if (auto* left_mul = dyn_cast<ISelBinaryOpNode>(inner->GetLeft()))
 		{
 			if (left_mul->GetOpcode() == Opcode::SMul)
@@ -269,7 +311,10 @@ namespace ola
 				}
 			}
 		}
-		if (!mul || !base_node) return false;
+		if (!mul || !base_node)
+		{
+			return false;
+		}
 
 		ISelImmediateNode* scale_imm = nullptr;
 		ISelNode* index_node = nullptr;
@@ -284,10 +329,16 @@ namespace ola
 			scale_imm = imm;
 			index_node = mul->GetLeft();
 		}
-		if (!scale_imm || !index_node) return false;
+		if (!scale_imm || !index_node)
+		{
+			return false;
+		}
 
 		Int64 scale_val = scale_imm->GetImmediate();
-		if (!IsValidX86Scale(scale_val)) return false;
+		if (!IsValidX86Scale(scale_val))
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		outer_add = outer;
@@ -303,7 +354,6 @@ namespace ola
 	TileResult X86LeaBaseIndexScaleDispTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
@@ -322,10 +372,16 @@ namespace ola
 	Bool X86MulByConstTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* mul = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!mul || mul->GetOpcode() != Opcode::SMul) return false;
+		if (!mul || mul->GetOpcode() != Opcode::SMul)
+		{
+			return false;
+		}
 
 		ISelImmediateNode* imm = nullptr;
 		ISelNode* op = nullptr;
@@ -340,10 +396,17 @@ namespace ola
 			imm = right_imm;
 			op = mul->GetLeft();
 		}
-		if (!imm || !op) return false;
+
+		if (!imm || !op)
+		{
+			return false;
+		}
 
 		Int64 val = imm->GetImmediate();
-		if (!IsSpecialX86Scale(val)) return false;
+		if (!IsSpecialX86Scale(val))
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_mul = mul;
@@ -355,9 +418,7 @@ namespace ola
 	TileResult X86MulByConstTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand op = ResolveOperand(operand, ctx, result.worklist);
-
 		Int64 scale_val = multiplier - 1;
 
 		MachineInstruction lea(X86_InstLea);

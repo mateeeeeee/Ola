@@ -43,7 +43,7 @@ namespace ola
 
 		Bool HasMemoryOp(ISelNode* tree) const
 		{
-			return memory_trees.count(tree) > 0;
+			return memory_trees.contains(tree);
 		}
 
 		Bool IsEmpty() const { return trees.empty(); }

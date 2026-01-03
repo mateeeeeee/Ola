@@ -9,8 +9,11 @@ namespace ola
 	{
 	public:
 		ISelTreeMerge() = default;
-
 		void MergeTrees(ISelForest& forest);
+
+	private:
+		std::unordered_map<Uint32, ISelRegisterNode*> reg_to_def;
+		std::unordered_map<ISelNode*, Uint32> use_counts;
 
 	private:
 		void BuildDefMap(ISelForest& forest);
@@ -19,14 +22,9 @@ namespace ola
 		void CountUsesInNode(ISelNode* node);
 
 		Bool CanMerge(ISelRegisterNode* producer, ISelNode* consumer, ISelForest& forest) const;
-
 		void PerformMerge(ISelForest& forest);
 		void TryMergeIntoNode(ISelNode* node, ISelForest& forest);
 
 		ISelRegisterNode* FindDefiningTree(MachineOperand const& reg) const;
-
-	private:
-		std::unordered_map<Uint32, ISelRegisterNode*> reg_to_def;
-		std::unordered_map<ISelNode*, Uint32> use_counts;
 	};
 }

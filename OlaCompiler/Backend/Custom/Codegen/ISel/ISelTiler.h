@@ -19,18 +19,19 @@ namespace ola
 			tiles.push_back(std::move(tile));
 			SortTiles();
 		}
-
 		template<typename T, typename... Args>
 		void AddTile(Args&&... args)
 		{
 			RegisterTile(std::make_unique<T>(std::forward<Args>(args)...));
 		}
-
 		std::vector<MachineInstruction> TileTree(ISelNode* tree, MachineContext& ctx);
-
 		std::vector<MachineInstruction> TileForest(ISelForest& forest, MachineContext& ctx);
 
 		TargetArch GetArch() const { return arch; }
+
+	private:
+		TargetArch arch;
+		std::vector<ISelTilePtr> tiles;
 
 	private:
 		void SortTiles()
@@ -47,9 +48,5 @@ namespace ola
 			TargetArch tile_arch = tile->GetTarget();
 			return tile_arch == TargetArch::All || tile_arch == arch;
 		}
-
-	private:
-		TargetArch arch;
-		std::vector<ISelTilePtr> tiles;
 	};
 }

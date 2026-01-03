@@ -19,9 +19,10 @@ namespace ola
 			ISelNode* current = worklist.back();
 			worklist.pop_back();
 
-			if (!current) continue;
-
-			if (isa<ISelImmediateNode>(current)) continue;
+			if (!current || isa<ISelImmediateNode>(current))
+			{
+				continue;
+			}
 
 			if (auto* asm_node = dyn_cast<ISelAsmNode>(current))
 			{
@@ -35,7 +36,10 @@ namespace ola
 			Bool matched = false;
 			for (ISelTilePtr& tile : tiles)
 			{
-				if (!TileMatchesArch(tile.get())) continue;
+				if (!TileMatchesArch(tile.get()))
+				{
+					continue;
+				}
 
 				if (tile->Match(current))
 				{
@@ -69,7 +73,6 @@ namespace ola
 	std::vector<MachineInstruction> ISelTiler::TileForest(ISelForest& forest, MachineContext& ctx)
 	{
 		std::vector<MachineInstruction> all_instructions;
-
 		for (auto& tree : forest.Trees())
 		{
 			auto insts = TileTree(tree.get(), ctx);
@@ -79,7 +82,6 @@ namespace ola
 				insts.end()
 			);
 		}
-
 		return all_instructions;
 	}
 }

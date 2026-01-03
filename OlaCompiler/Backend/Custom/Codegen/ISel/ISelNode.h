@@ -41,7 +41,6 @@ namespace ola
 		ISelNodeKind kind;
 		Value* original_value;
 	};
-
 	using ISelNodePtr = std::unique_ptr<ISelNode>;
 
 	class ISelRegisterNode final : public ISelNode

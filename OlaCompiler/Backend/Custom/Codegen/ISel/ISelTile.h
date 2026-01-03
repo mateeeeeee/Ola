@@ -20,13 +20,9 @@ namespace ola
 	{
 	public:
 		virtual ~ISelTile() = default;
-
 		virtual Bool Match(ISelNode* node) = 0;
-
 		virtual TileResult Apply(MachineContext& ctx) = 0;
-
 		virtual TargetArch GetTarget() const { return TargetArch::All; }
-
 		virtual Int GetPriority() const = 0;
 
 	protected:
@@ -66,6 +62,5 @@ namespace ola
 			return dyn_cast<ISelCompareNode>(reg->GetSource());
 		}
 	};
-
 	using ISelTilePtr = std::unique_ptr<ISelTile>;
 }

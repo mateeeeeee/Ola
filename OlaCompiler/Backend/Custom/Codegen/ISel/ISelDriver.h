@@ -25,9 +25,6 @@ namespace ola
 		ISelMode GetMode() const { return mode; }
 
 	private:
-		void RegisterTiles();
-
-	private:
 		MachineContext& ctx;
 		Target const& target;
 		ISelMode mode;
@@ -36,5 +33,8 @@ namespace ola
 		ISelTreeGen tree_gen;
 		ISelTreeMerge tree_merge;
 		ISelTiler tiler;
+
+	private:
+		void RegisterTiles();
 	};
 }

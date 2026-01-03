@@ -34,6 +34,13 @@ namespace ola
 		ISelUseCount const& GetUseCount() const { return use_count; }
 
 	private:
+		MachineContext& ctx;
+		ISelForest forest;
+		ISelValueMap value_map;
+		ISelUseCount use_count;
+		std::vector<MachineInstruction> pending_leaf_instructions;
+
+	private:
 		ISelNodePtr CreateNodeForValue(Value* V);
 		ISelNodePtr CreateLeafNode(Value* V);
 
@@ -63,12 +70,5 @@ namespace ola
 
 		template<typename Func>
 		std::vector<MachineInstruction> CaptureEmittedInstructions(Func&& f);
-
-	private:
-		MachineContext& ctx;
-		ISelForest forest;
-		ISelValueMap value_map;
-		ISelUseCount use_count;
-		std::vector<MachineInstruction> pending_leaf_instructions;
 	};
 }

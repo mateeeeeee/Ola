@@ -24,12 +24,14 @@ namespace ola
 	{
 	public:
 		explicit ISelLegacy(MachineContext& ctx, Target const& target);
-
 		void SelectBasicBlock(BasicBlock& BB);
 
 	private:
-		void LowerInstruction(Instruction* I);
+		MachineContext& ctx;
+		Target const& target;
 
+	private:
+		void LowerInstruction(Instruction* I);
 		void LowerUnary(UnaryInst*);
 		void LowerBinary(BinaryInst*);
 		void LowerCompare(CompareInst*);
@@ -44,9 +46,5 @@ namespace ola
 		void LowerSwitch(SwitchInst*);
 		void LowerSelect(SelectInst*);
 		void EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
-
-	private:
-		MachineContext& ctx;
-		Target const& target;
 	};
 }
