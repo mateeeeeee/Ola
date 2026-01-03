@@ -29,14 +29,19 @@ namespace ola
 	Bool ARMMaddTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add) 
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* mul = nullptr;
 		ISelNode* add_operand = nullptr;
-
 		if (auto* left_mul = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_mul->GetOpcode() == Opcode::SMul)
@@ -56,7 +61,10 @@ namespace ola
 				}
 			}
 		}
-		if (!mul || !add_operand) return false;
+		if (!mul || !add_operand) 
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -70,7 +78,6 @@ namespace ola
 	TileResult ARMMaddTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand ml = ResolveOperand(mul_left, ctx, result.worklist);
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand add_op = ResolveOperand(addend, ctx, result.worklist);
@@ -89,13 +96,22 @@ namespace ola
 	Bool ARMMsubTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource()) 
+		{
+			return false;
+		}
 
 		auto* sub = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!sub || sub->GetOpcode() != Opcode::Sub) return false;
+		if (!sub || sub->GetOpcode() != Opcode::Sub) 
+		{
+			return false;
+		}
 
 		auto* mul = dyn_cast<ISelBinaryOpNode>(sub->GetRight());
-		if (!mul || mul->GetOpcode() != Opcode::SMul) return false;
+		if (!mul || mul->GetOpcode() != Opcode::SMul)
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_sub = sub;
@@ -109,7 +125,6 @@ namespace ola
 	TileResult ARMMsubTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand ml = ResolveOperand(mul_left, ctx, result.worklist);
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand min_op = ResolveOperand(minuend, ctx, result.worklist);
@@ -120,7 +135,6 @@ namespace ola
 		msub.SetOp<2>(mr);
 		msub.SetOp<3>(min_op);
 		result.instructions.push_back(msub);
-
 		result.success = true;
 		return result;
 	}
@@ -128,14 +142,19 @@ namespace ola
 	Bool ARMFMaddTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource()) 
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::FAdd) return false;
+		if (!add || add->GetOpcode() != Opcode::FAdd) 
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* mul = nullptr;
 		ISelNode* add_operand = nullptr;
-
 		if (auto* left_mul = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_mul->GetOpcode() == Opcode::FMul)
@@ -155,7 +174,10 @@ namespace ola
 				}
 			}
 		}
-		if (!mul || !add_operand) return false;
+		if (!mul || !add_operand) 
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -169,7 +191,6 @@ namespace ola
 	TileResult ARMFMaddTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand ml = ResolveOperand(mul_left, ctx, result.worklist);
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand add_op = ResolveOperand(addend, ctx, result.worklist);
@@ -180,7 +201,6 @@ namespace ola
 		fmadd.SetOp<2>(mr);
 		fmadd.SetOp<3>(add_op);
 		result.instructions.push_back(fmadd);
-
 		result.success = true;
 		return result;
 	}
@@ -188,13 +208,22 @@ namespace ola
 	Bool ARMFMsubTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource()) 
+		{
+			return false;
+		}
 
 		auto* sub = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!sub || sub->GetOpcode() != Opcode::FSub) return false;
+		if (!sub || sub->GetOpcode() != Opcode::FSub) 
+		{
+			return false;
+		}
 
 		auto* mul = dyn_cast<ISelBinaryOpNode>(sub->GetRight());
-		if (!mul || mul->GetOpcode() != Opcode::FMul) return false;
+		if (!mul || mul->GetOpcode() != Opcode::FMul) 
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_sub = sub;
@@ -208,7 +237,6 @@ namespace ola
 	TileResult ARMFMsubTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand ml = ResolveOperand(mul_left, ctx, result.worklist);
 		MachineOperand mr = ResolveOperand(mul_right, ctx, result.worklist);
 		MachineOperand min_op = ResolveOperand(minuend, ctx, result.worklist);
@@ -219,7 +247,6 @@ namespace ola
 		fmsub.SetOp<2>(mr);
 		fmsub.SetOp<3>(min_op);
 		result.instructions.push_back(fmsub);
-
 		result.success = true;
 		return result;
 	}
@@ -227,17 +254,25 @@ namespace ola
 	Bool ARMLoadShiftedTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource()) 
+		{
+			return false;
+		}
 
 		auto* load = dyn_cast<ISelLoadNode>(reg->GetSource());
-		if (!load) return false;
+		if (!load) 
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(load->GetAddress());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add) 
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* shift = nullptr;
 		ISelNode* base_node = nullptr;
-
 		if (auto* left_shift = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_shift->GetOpcode() == Opcode::Shl)
@@ -336,10 +371,16 @@ namespace ola
 		}
 
 		auto* shift_imm = dyn_cast<ISelImmediateNode>(shift->GetRight());
-		if (!shift_imm) return false;
+		if (!shift_imm) 
+		{
+			return false;
+		}
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARMShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount)) 
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_load = load;
@@ -372,14 +413,19 @@ namespace ola
 	Bool ARMStoreShiftedTile::Match(ISelNode* node)
 	{
 		auto* store = dyn_cast<ISelStoreNode>(node);
-		if (!store) return false;
+		if (!store) 
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(store->GetAddress());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add) 
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* shift = nullptr;
 		ISelNode* base_node = nullptr;
-
 		if (auto* left_shift = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_shift->GetOpcode() == Opcode::Shl)
@@ -478,10 +524,16 @@ namespace ola
 		}
 
 		auto* shift_imm = dyn_cast<ISelImmediateNode>(shift->GetRight());
-		if (!shift_imm) return false;
+		if (!shift_imm) 
+		{
+			return false;
+		}
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARMShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount))
+		{
+			return false;
+		}
 
 		matched_store = store;
 		matched_add = add;
@@ -496,7 +548,6 @@ namespace ola
 	TileResult ARMStoreShiftedTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand value_op = ResolveOperand(value, ctx, result.worklist);
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
@@ -507,7 +558,6 @@ namespace ola
 		str.SetOp<2>(index_op);
 		str.SetOp<3>(MachineOperand::Immediate(shift_amount, MachineType::Int64));
 		result.instructions.push_back(str);
-
 		result.success = true;
 		return result;
 	}
@@ -515,14 +565,19 @@ namespace ola
 	Bool ARMAddShiftedTile::Match(ISelNode* node)
 	{
 		auto* reg = dyn_cast<ISelRegisterNode>(node);
-		if (!reg || !reg->HasSource()) return false;
+		if (!reg || !reg->HasSource())
+		{
+			return false;
+		}
 
 		auto* add = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
-		if (!add || add->GetOpcode() != Opcode::Add) return false;
+		if (!add || add->GetOpcode() != Opcode::Add)
+		{
+			return false;
+		}
 
 		ISelBinaryOpNode* shift = nullptr;
 		ISelNode* base_node = nullptr;
-
 		if (auto* left_shift = dyn_cast<ISelBinaryOpNode>(add->GetLeft()))
 		{
 			if (left_shift->GetOpcode() == Opcode::Shl)
@@ -545,10 +600,16 @@ namespace ola
 		if (!shift) return false;
 
 		auto* shift_imm = dyn_cast<ISelImmediateNode>(shift->GetRight());
-		if (!shift_imm) return false;
+		if (!shift_imm) 
+		{
+			return false;
+		}
 
 		Int64 amount = shift_imm->GetImmediate();
-		if (!IsValidARMShiftAmount(amount)) return false;
+		if (!IsValidARMShiftAmount(amount)) 
+		{
+			return false;
+		}
 
 		matched_reg = reg;
 		matched_add = add;
@@ -562,7 +623,6 @@ namespace ola
 	TileResult ARMAddShiftedTile::Apply(MachineContext& ctx)
 	{
 		TileResult result;
-
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand shifted_op = ResolveOperand(shifted_operand, ctx, result.worklist);
 
@@ -572,7 +632,6 @@ namespace ola
 		add.SetOp<2>(shifted_op);
 		add.SetOp<3>(MachineOperand::Immediate(shift_amount, MachineType::Int64));
 		result.instructions.push_back(add);
-
 		result.success = true;
 		return result;
 	}
