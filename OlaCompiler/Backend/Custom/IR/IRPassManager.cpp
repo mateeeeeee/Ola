@@ -25,35 +25,16 @@ namespace ola
 
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
-		for (GlobalValue* G : M.Globals())
-		{
-			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
-			{
-				FAM.RegisterPass<CFGAnalysisPass>(*F);
-				FAM.RegisterPass<DominatorTreeAnalysisPass>(*F);
-				FAM.RegisterPass<DominanceFrontierAnalysisPass>(*F);
-				FAM.RegisterPass<LoopAnalysisPass>(*F);
-			}
-		}
-
+		RegisterAnalysisPasses();
+		
 		if (level >= OptimizationLevel::O1)
 		{
+			Uint32 const max_iterations = level >= OptimizationLevel::O2 ? 5 : 2;
 			RunEarlyOptimizationPipeline();
-			if (level >= OptimizationLevel::O2)
-			{
-				RunMainOptimizationLoop(5);
-			}
-			else
-			{
-				RunMainOptimizationLoop(2);
-			}
+			RunMainOptimizationLoop(max_iterations);
 			RunLateOptimizationPipeline();
 		}
-
-		if (opts.cfg_print || opts.domtree_print || opts.domfrontier_print)
-		{
-			RunDebugPasses(opts);
-		}
+		RunDebugPasses(opts);
 
 		if (level >= OptimizationLevel::O1)
 		{
@@ -69,7 +50,6 @@ namespace ola
 	void IRPassManager::RunEarlyOptimizationPipeline()
 	{
 		FunctionPassManager FPM;
-
 		FPM.AddPass(CreateFunctionInlinerPass());
 		FPM.AddPass(CreateMem2RegPass());
 		FPM.AddPass(CreateDCEPass());
@@ -112,7 +92,6 @@ namespace ola
 	void IRPassManager::RunLateOptimizationPipeline()
 	{
 		FunctionPassManager FPM;
-
 		FPM.AddPass(CreateDCEPass());
 		FPM.AddPass(CreateSimplifyCFGPass());
 		FPM.AddPass(CreateDCEPass());
@@ -127,9 +106,18 @@ namespace ola
 	void IRPassManager::RunDebugPasses(IRPassOptions const& opts)
 	{
 		FunctionPassManager FPM;
-		if (opts.cfg_print) FPM.AddPass(CreateCFGPrinterPass());
-		if (opts.domtree_print) FPM.AddPass(CreateDominatorTreePrinterPass());
-		if (opts.domfrontier_print) FPM.AddPass(CreateDominanceFrontierPrinterPass());
+		if (opts.cfg_print) 
+		{
+			FPM.AddPass(CreateCFGPrinterPass());
+		}
+		if (opts.domtree_print) 
+		{
+			FPM.AddPass(CreateDominatorTreePrinterPass());
+		}
+		if (opts.domfrontier_print) 
+		{
+			FPM.AddPass(CreateDominanceFrontierPrinterPass());
+		}
 
 		if (!FPM.IsEmpty())
 		{
@@ -140,4 +128,18 @@ namespace ola
 			MPM.Run(M, MAM);
 		}
 	}
-}
+
+	void IRPassManager::RegisterAnalysisPasses() 
+	{
+		for (GlobalValue* G : M.Globals())
+		{
+			if (Function* F = dyn_cast<Function>(G); F && !F->IsDeclaration())
+			{
+				FAM.RegisterPass<CFGAnalysisPass>(*F);
+				FAM.RegisterPass<DominatorTreeAnalysisPass>(*F);
+				FAM.RegisterPass<DominanceFrontierAnalysisPass>(*F);
+				FAM.RegisterPass<LoopAnalysisPass>(*F);
+			}
+		}
+	}
+} 

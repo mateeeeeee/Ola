@@ -33,5 +33,6 @@ namespace ola
 		void RunMainOptimizationLoop(Uint32 max_iterations);
 		void RunLateOptimizationPipeline();
 		void RunDebugPasses(IRPassOptions const& opts);
+		void RegisterAnalysisPasses();
 	};
 }
