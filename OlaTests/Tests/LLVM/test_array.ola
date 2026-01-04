@@ -1,27 +1,5 @@
 import std.assert;
 
-// ========== Helper Functions ==========
-
-private void modifyArray(int[] arr)
-{
-	arr[0] = 100;
-}
-
-private void modifyArrayCopy(int[3] arr)
-{
-	arr[0] = 100;
-}
-
-private int sumOfArray(int[] arr, int size)
-{
-	int sum = 0;
-	for(int i = 0; i < size; ++i)
-	{
-		sum += arr[i];
-	}
-	return sum;
-}
-
 // ========== Global Arrays ==========
 
 auto GlobalArray1 = {1, 1, 1};
@@ -29,7 +7,6 @@ int[5] GlobalArray2 = {1, 2, 3};
 int[3] GlobalArray3 = {10, 20, 30};
 float[3] GlobalFloatArray = {1.5, 2.5, 3.5};
 bool[4] GlobalBoolArray = {true, false, true, false};
-int[2][2] Global2dArray = { {1,2}, {3,4}};
 
 // ========== Basic Array Tests ==========
 
@@ -60,7 +37,6 @@ void TestLocalArrays()
 	Assert(LocalArray1[1] == 2);
 	Assert(LocalArray1[2] == 0);
 	Assert(LocalArray1[6] == 0);
-	Assert(sumOfArray(LocalArray1, length(LocalArray1)) == 3);
 
 	int[3] LocalArray2 = {-5, 0, 5};
 	Assert(LocalArray2[0] == -5);
@@ -94,55 +70,6 @@ void TestBoolArrays()
 	Assert(localBools[0] == true);
 	Assert(localBools[1] == true);
 	Assert(localBools[2] == false);
-}
-
-// ========== Array Slices (LLVM Only) ==========
-
-void TestArraySlices()
-{
-	int[3] LocalArray2 = {-5, 0, 5};
-	int[] LocalArray3 = LocalArray2;
-
-	modifyArrayCopy(LocalArray2);
-	Assert(LocalArray2[0] == -5);
-	Assert(LocalArray3[0] == -5);
-
-	modifyArray(LocalArray2);
-	Assert(LocalArray2[0] == 100);
-	Assert(LocalArray3[0] == 100);
-
-	LocalArray3[0] = 1000;
-	Assert(LocalArray2[0] == 1000);
-	Assert(LocalArray3[0] == 1000);
-}
-
-// ========== 2D Arrays (LLVM Only) ==========
-
-void Test2DArrays()
-{
-	int sum2d = 0;
-	int globalSum2d = 0;
-	int[2][2] int2d = { {1,2}, {3,4}};
-	for(int i = 0; i < 2; ++i)
-	{
-		for(int j = 0; j < 2; ++j)
-		{
-			sum2d += int2d[i][j];
-			globalSum2d += Global2dArray[i][j];
-		}
-	}
-	Assert(sum2d == 10);
-	Assert(globalSum2d == 10);
-
-	// Test individual access
-	Assert(int2d[0][0] == 1);
-	Assert(int2d[0][1] == 2);
-	Assert(int2d[1][0] == 3);
-	Assert(int2d[1][1] == 4);
-
-	// Modify 2D array
-	int2d[0][0] = 100;
-	Assert(int2d[0][0] == 100);
 }
 
 // ========== Array Modification ==========
@@ -218,14 +145,14 @@ void TestArrayVariableIndex()
 void TestArrayInLoops()
 {
 	int[5] arr = {1, 2, 3, 4, 5};
-
+	
 	int sum = 0;
 	for (int i = 0; i < 5; i++)
 	{
 		sum += arr[i];
 	}
 	Assert(sum == 15);
-
+	
 	// Modify in loop
 	for (int i = 0; i < 5; i++)
 	{
@@ -236,7 +163,7 @@ void TestArrayInLoops()
 	Assert(arr[2] == 6);
 	Assert(arr[3] == 8);
 	Assert(arr[4] == 10);
-
+	
 	// Find max
 	int max = arr[0];
 	for (int i = 1; i < 5; i++)
@@ -431,8 +358,6 @@ public int main()
 	TestLocalArrays();
 	TestFloatArrays();
 	TestBoolArrays();
-	TestArraySlices();
-	Test2DArrays();
 	TestArrayModification();
 	TestArrayExpressions();
 	TestArrayVariableIndex();

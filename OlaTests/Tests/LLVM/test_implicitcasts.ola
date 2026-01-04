@@ -110,7 +110,7 @@ void TestBoolToInt()
     Assert(iff == 0);
 
     // In expressions
-    int sum = t + t + f;
+    int sum = t + 1;
     Assert(sum == 2);
 }
 

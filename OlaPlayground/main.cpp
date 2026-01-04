@@ -9,7 +9,7 @@ using namespace ola;
 
 static constexpr Char const* BACKEND = "--nollvm";
 static constexpr Char const* OPT_LEVEL = "--O3";
-static constexpr Char const* TARGET = "arm64";
+static constexpr Char const* TARGET = "x64";
 
 Int main()
 {

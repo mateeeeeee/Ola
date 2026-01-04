@@ -504,7 +504,7 @@ namespace ola
 		break;
 		}
 
-		if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
+		if ((MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore) || MI.GetOpcode() == InstLoadGlobalAddress)
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
@@ -533,7 +533,10 @@ namespace ola
 			}
 			else if (dst.GetType() == MachineType::Float64 || src.GetType() == MachineType::Float64)
 			{
-				if (MI.GetOpcode() == InstMove) MI.SetOpcode(X86_InstMoveFP);
+				if (MI.GetOpcode() == InstMove)
+				{
+					MI.SetOpcode(X86_InstMoveFP);
+				}
 			}
 		}
 	}

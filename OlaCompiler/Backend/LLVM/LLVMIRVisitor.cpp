@@ -1242,6 +1242,13 @@ namespace ola
 			}
 			else OLA_ASSERT(false);
 		}
+		else if (llvm::GlobalVariable* global_var = dyn_cast<llvm::GlobalVariable>(array_value))
+		{
+			llvm::Type* global_type = global_var->getValueType();
+			OLA_ASSERT(global_type->isArrayTy());
+			llvm::Value* ptr = builder.CreateGEP(global_type, global_var, { zero, index_value });
+			value_map[&array_access_expr] = ptr;
+		}
 		else 
 		{
 			Type const* array_expr_type = array_expr->GetType();
