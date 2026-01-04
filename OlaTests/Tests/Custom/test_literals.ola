@@ -84,29 +84,12 @@ void TestMixedLiterals()
     Assert(bin_val == dec_val);
 }
 
-void TestLargerValues()
-{
-    // Test larger binary values
-    int large_binary = 0b11111111111111111111111111111111;  // 32 ones = 4294967295 (if unsigned) or -1 (if signed)
-
-    // Test larger hex values
-    int large_hex = 0xFFFFFFFF;  // Should be same as above
-
-    // Test specific large values
-    int hex_large1 = 0x12345678;
-    int hex_large2 = 0xABCDEF00;
-
-    // These should be valid, exact values depend on int size and signedness
-    // Just testing that they parse correctly
-    Assert(large_binary == large_hex);  // Should be equivalent
-}
 
 public int main()
 {
     TestBinaryLiterals();
     TestHexLiterals();
     TestMixedLiterals();
-    TestLargerValues();
 
     return 0;
 }

@@ -9,6 +9,7 @@ namespace ola
 	{
 		CLIParser cli_parser{};
 		{
+			cli_parser.AddArg(false, "-h", "--help");
 			cli_parser.AddArg(false, "--ast");
 			cli_parser.AddArg(false, "--cfg");
 			cli_parser.AddArg(false, "--callgraph");
@@ -34,6 +35,38 @@ namespace ola
 			cli_parser.AddArg(true, "-l");
 		}
 		CLIParseResult cli_result = cli_parser.Parse(argc, argv);
+
+		if(cli_result["-h"])
+		{
+			OLA_INFO("Ola Compiler");
+			OLA_INFO("Usage: ola-compiler [options]");
+			OLA_INFO("Options:");
+			OLA_INFO("  -h, --help               Show this help message");
+			OLA_INFO("  -i, --input <files>      Input Ola source files");
+			OLA_INFO("  -o, --output <file>      Output file name");
+			OLA_INFO("      --directory <dir>    Input directory for test mode");
+			OLA_INFO("      --ast                Dump Abstract Syntax Tree (AST)");
+			OLA_INFO("      --cfg                Dump Control Flow Graph (CFG)");
+			OLA_INFO("      --callgraph          Dump Call Graph");
+			OLA_INFO("      --domtree            Dump Dominator Tree");
+			OLA_INFO("      --domfrontier        Print Dominance Frontier");
+			OLA_INFO("      --emit-ir            Emit IR");
+			OLA_INFO("      --emit-mir           Emit Machine IR");
+			OLA_INFO("      --emit-asm           Emit Assembly code");
+			OLA_INFO("      --nollvm            Disable LLVM backend");
+			OLA_INFO("      --test               Enable test mode with predefined test cases");
+			OLA_INFO("      --timeout            Enable timeout detection");
+			OLA_INFO("  -c, --no-run             Compile only, do not run the output");
+			OLA_INFO("      --Od                 Optimization level: O0 (disable optimizations)");
+			OLA_INFO("      --O0                 Optimization level: O0 (disable optimizations)");
+			OLA_INFO("      --O1                 Optimization level: O1");
+			OLA_INFO("      --O2                 Optimization level: O2");
+			OLA_INFO("      --O3                 Optimization level: O3");
+			OLA_INFO("      --target <arch>      Target architecture (x64, arm64)");
+			OLA_INFO("      --lib                Build as static library");
+			OLA_INFO("  -l <libs>                Libraries to link against");
+			return false;
+		}
 
 		input_files = cli_result["-i"].AsStrings();
 		output_file = cli_result["-o"].AsStringOr("");
@@ -95,15 +128,15 @@ namespace ola
 		std::string target_str = cli_result["--target"].AsStringOr("");
 		if (target_str == "x64")
 		{
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 		}
 		else if (target_str == "arm64")
 		{
 #if defined(OLA_PLATFORM_MACOS)
-			target_arch = TargetArch::ARM64;
+			target_arch = TargetArch::ARM;
 #else
 			OLA_WARN("Target 'arm64' is only supported on macOS. Falling back to native target 'x64'.");
-			target_arch = TargetArch::x64;
+			target_arch = TargetArch::X86;
 #endif
 		}
 		else if (!target_str.empty())
