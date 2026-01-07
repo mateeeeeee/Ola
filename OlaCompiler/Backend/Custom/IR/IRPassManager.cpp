@@ -16,6 +16,7 @@
 #include "Passes/FunctionPassManagerModuleAdaptor.h"
 #include "Passes/LoopAnalysisPass.h"
 #include "Passes/LoopInvariantCodeMotionPass.h"
+#include "Passes/LoopUnrollPass.h"
 #include "Passes/FunctionInlinerPass.h"
 
 namespace ola
@@ -72,6 +73,7 @@ namespace ola
 			FPM.AddPass(CreateCSEPass());
 			FPM.AddPass(CreateDCEPass());
 			FPM.AddPass(CreateLICMPass());
+			//FPM.AddPass(CreateLoopUnrollPass());
 			FPM.AddPass(CreateSimplifyCFGPass());
 			//FPM.AddPass(CreateGVNPass());
 			FPM.AddPass(CreateDCEPass());

@@ -201,7 +201,7 @@ namespace ola
 		Loop* GetLoopFor(BasicBlock const* BB) const;
 		Loop const* operator[](BasicBlock const* BB) const { return GetLoopFor(BB); }
 
-		Uint32 getLoopDepth(BasicBlock const* BB) const
+		Uint32 GetLoopDepth(BasicBlock const* BB) const
 		{
 			Loop const* L = GetLoopFor(BB);
 			return L ? L->GetLoopDepth() : 0;

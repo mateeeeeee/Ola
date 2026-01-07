@@ -39,9 +39,9 @@ OlaCompiler/OlaCompiler.args.json
 
 # OlaPlayground compilation artifacts
 OlaPlayground/Test/*.exe
-OlaPlayground/Test/*.s
-OlaPlayground/Test/*.ll
-OlaPlayground/Test/*.oll
+# OlaPlayground/Test/*.s
+# OlaPlayground/Test/*.ll
+# OlaPlayground/Test/*.oll
 OlaPlayground/Test/*.omll
 OlaPlayground/Test/*.obj
 OlaPlayground/Test/*.txt

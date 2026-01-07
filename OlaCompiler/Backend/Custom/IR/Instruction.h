@@ -290,6 +290,15 @@ namespace ola
 			return basic_block;
 		}
 
+		void SetParent(BasicBlock* BB)
+		{
+			basic_block = BB;
+		}
+		BasicBlock* GetParent() const
+		{
+			return basic_block;
+		}
+
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, IListIterator<Instruction> IT);
 		IListIterator<Instruction> InsertBefore(BasicBlock* BB, Instruction* I);
 

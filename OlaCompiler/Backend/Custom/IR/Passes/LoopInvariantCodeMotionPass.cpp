@@ -19,7 +19,10 @@ namespace ola
 		for (Loop* L : LI) 
 		{
 			BasicBlock* LoopPreheader = L->GetLoopPreheader();
-			if (!LoopPreheader) continue;
+			if (!LoopPreheader) 
+			{
+				continue;
+			}
 
 			Bool LocalChanged;
 			do {

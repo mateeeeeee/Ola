@@ -167,6 +167,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/LoopAnalysisPass.cpp
   Backend/Custom/IR/Passes/LoopInvariantCodeMotionPass.h
   Backend/Custom/IR/Passes/LoopInvariantCodeMotionPass.cpp
+  Backend/Custom/IR/Passes/LoopUnrollPass.h
+  Backend/Custom/IR/Passes/LoopUnrollPass.cpp
   Backend/Custom/IR/Passes/DominanceFrontierAnalysisPass.h
   Backend/Custom/IR/Passes/DominanceFrontierAnalysisPass.cpp
   Backend/Custom/IR/Passes/CFGAnalysisPass.h
