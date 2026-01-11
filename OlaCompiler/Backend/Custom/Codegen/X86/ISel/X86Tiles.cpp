@@ -15,8 +15,10 @@ namespace ola
 
 		Bool IsValidLeaOperand(MachineOperand const& op)
 		{
-			if (op.IsUndefined()) return true;  
-			return op.IsReg();  
+			if (op.IsUndefined()) return true;
+			if (!op.IsReg()) return false;
+			if (op.GetType() == MachineType::Int8) return false;
+			return true;
 		}
 	}
 

@@ -454,7 +454,8 @@ namespace ola
 			if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 			{
 				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
+				Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+				MachineInstruction MI2(load_opcode);
 				MI2.SetOp<0>(scratch).SetOp<1>(src);
 				instructions.insert(instruction_iter, MI2);
 				MI.SetOp<1>(scratch);

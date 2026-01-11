@@ -44,7 +44,8 @@ namespace ola
 				if (tile->Match(current))
 				{
 					TileResult result = tile->Apply(ctx);
-
+					if (!result.success) continue;  
+					
 					all_instructions.insert(
 						all_instructions.begin(),
 						result.instructions.begin(),
