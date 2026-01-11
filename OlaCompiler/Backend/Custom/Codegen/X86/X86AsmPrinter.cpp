@@ -248,7 +248,80 @@ namespace ola
 							}
 						}
 						break;
-						default: 
+						case X86_InstLea:
+						{
+							// lea dst, [base + index*scale + disp]
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& base = MI.GetOp<1>();
+							MachineOperand const& index = MI.GetOp<2>();
+							MachineOperand const& scale = MI.GetOp<3>();
+							MachineOperand const& disp = MI.GetOp<4>();
+
+							std::string addr;
+							Bool has_base = !base.IsUndefined();
+							Bool has_index = !index.IsUndefined();
+							Int64 scale_val = scale.GetImmediate();
+							Int64 disp_val = disp.GetImmediate();
+
+							if (has_base && has_index)
+							{
+								if (scale_val == 1)
+								{
+									if (disp_val == 0)
+										addr = std::format("[{} + {}]", GetOperandString(base), GetOperandString(index));
+									else if (disp_val > 0)
+										addr = std::format("[{} + {} + {}]", GetOperandString(base), GetOperandString(index), disp_val);
+									else
+										addr = std::format("[{} + {} - {}]", GetOperandString(base), GetOperandString(index), -disp_val);
+								}
+								else
+								{
+									if (disp_val == 0)
+										addr = std::format("[{} + {}*{}]", GetOperandString(base), GetOperandString(index), scale_val);
+									else if (disp_val > 0)
+										addr = std::format("[{} + {}*{} + {}]", GetOperandString(base), GetOperandString(index), scale_val, disp_val);
+									else
+										addr = std::format("[{} + {}*{} - {}]", GetOperandString(base), GetOperandString(index), scale_val, -disp_val);
+								}
+							}
+							else if (has_base)
+							{
+								if (disp_val == 0)
+									addr = std::format("[{}]", GetOperandString(base));
+								else if (disp_val > 0)
+									addr = std::format("[{} + {}]", GetOperandString(base), disp_val);
+								else
+									addr = std::format("[{} - {}]", GetOperandString(base), -disp_val);
+							}
+							else if (has_index)
+							{
+								if (scale_val == 1)
+								{
+									if (disp_val == 0)
+										addr = std::format("[{}]", GetOperandString(index));
+									else if (disp_val > 0)
+										addr = std::format("[{} + {}]", GetOperandString(index), disp_val);
+									else
+										addr = std::format("[{} - {}]", GetOperandString(index), -disp_val);
+								}
+								else
+								{
+									if (disp_val == 0)
+										addr = std::format("[{}*{}]", GetOperandString(index), scale_val);
+									else if (disp_val > 0)
+										addr = std::format("[{}*{} + {}]", GetOperandString(index), scale_val, disp_val);
+									else
+										addr = std::format("[{}*{} - {}]", GetOperandString(index), scale_val, -disp_val);
+								}
+							}
+							else
+							{
+								addr = std::format("[{}]", disp_val);
+							}
+							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), addr);
+						}
+						break;
+						default:
 							OLA_ASSERT(false);
 						}
 					}
