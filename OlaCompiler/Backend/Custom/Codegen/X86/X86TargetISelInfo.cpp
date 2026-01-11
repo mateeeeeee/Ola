@@ -11,60 +11,7 @@ namespace ola
 {
 	Bool X86TargetISelInfo::LowerInstruction(Instruction* I, MachineContext& ctx) const
 	{
-		if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
-		{
-			Opcode opcode = I->GetOpcode();
-			if (opcode == Opcode::SDiv || opcode == Opcode::SRem)
-			{
-				MachineOperand dst = ctx.VirtualReg(BI->GetType());
-				MachineOperand op1 = ctx.GetOperand(BI->GetLHS());
-				MachineOperand op2 = ctx.GetOperand(BI->GetRHS());
-
-				MachineInstruction move_to_rax(InstMove);
-				move_to_rax.SetOp<0>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
-				move_to_rax.SetOp<1>(op1);
-				ctx.EmitInst(move_to_rax);
-
-				MachineInstruction cqo(X86_InstCqo);
-				ctx.EmitInst(cqo);
-
-				if (op2.IsImmediate())
-				{
-					MachineOperand op2_reg = ctx.VirtualReg(BI->GetType());
-					MachineInstruction move_to_reg(InstMove);
-					move_to_reg.SetOp<0>(op2_reg);
-					move_to_reg.SetOp<1>(op2);
-					ctx.EmitInst(move_to_reg);
-					MachineInstruction idiv(InstSDiv);
-					idiv.SetOp<0>(op2_reg);
-					ctx.EmitInst(idiv);
-				}
-				else
-				{
-					MachineInstruction idiv(InstSDiv);
-					idiv.SetOp<0>(op2);
-					ctx.EmitInst(idiv);
-				}
-
-				if (opcode == Opcode::SDiv)
-				{
-					MachineInstruction move_quotient(InstMove);
-					move_quotient.SetOp<0>(dst);
-					move_quotient.SetOp<1>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
-					ctx.EmitInst(move_quotient);
-				}
-				else if (opcode == Opcode::SRem)
-				{
-					MachineInstruction move_remainder(InstMove);
-					move_remainder.SetOp<0>(dst);
-					move_remainder.SetOp<1>(MachineOperand::ISAReg(X86_RDX, MachineType::Int64));
-					ctx.EmitInst(move_remainder);
-				}
-				ctx.MapOperand(BI, dst);
-				return true;
-			}
-		}
-		else if (SelectInst* SI = dyn_cast<SelectInst>(I))
+		if (SelectInst* SI = dyn_cast<SelectInst>(I))
 		{
 			if (SI->GetType()->IsFloat())
 			{

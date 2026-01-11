@@ -123,5 +123,172 @@ namespace ola
 		Int64 scale = 0;
 	};
 
+	class X86LoadBaseDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 20; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelLoadNode* matched_load = nullptr;
+		ISelNode* base = nullptr;
+		Int64 displacement = 0;
+	};
+
+	class X86LoadIndexScaleDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 22; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelLoadNode* matched_load = nullptr;
+		ISelBinaryOpNode* matched_mul = nullptr;
+		ISelNode* index = nullptr;
+		Int64 scale = 0;
+		Int64 displacement = 0;
+	};
+
+	// Load with full addressing: mov dst, [base + index*scale + disp]
+	class X86LoadBaseIndexScaleDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 30; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelLoadNode* matched_load = nullptr;
+		ISelBinaryOpNode* outer_add = nullptr;
+		ISelBinaryOpNode* inner_add = nullptr;
+		ISelBinaryOpNode* matched_mul = nullptr;
+		ISelNode* base = nullptr;
+		ISelNode* index = nullptr;
+		Int64 scale = 0;
+		Int64 displacement = 0;
+	};
+
+	class X86StoreBaseDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 20; }
+
+	private:
+		ISelStoreNode* matched_store = nullptr;
+		ISelNode* base = nullptr;
+		ISelNode* value = nullptr;
+		Int64 displacement = 0;
+	};
+
+	class X86StoreIndexScaleDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 22; }
+
+	private:
+		ISelStoreNode* matched_store = nullptr;
+		ISelBinaryOpNode* matched_mul = nullptr;
+		ISelNode* index = nullptr;
+		ISelNode* value = nullptr;
+		Int64 scale = 0;
+		Int64 displacement = 0;
+	};
+
+	class X86StoreBaseIndexScaleDispTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 30; }
+
+	private:
+		ISelStoreNode* matched_store = nullptr;
+		ISelBinaryOpNode* outer_add = nullptr;
+		ISelBinaryOpNode* inner_add = nullptr;
+		ISelBinaryOpNode* matched_mul = nullptr;
+		ISelNode* base = nullptr;
+		ISelNode* index = nullptr;
+		ISelNode* value = nullptr;
+		Int64 scale = 0;
+		Int64 displacement = 0;
+	};
+
+	class X86LeaBITile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 12; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelBinaryOpNode* matched_add = nullptr;
+		ISelNode* base = nullptr;
+		ISelNode* index = nullptr;
+	};
+
+	class X86LeaBIDTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 17; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelBinaryOpNode* outer_add = nullptr;
+		ISelBinaryOpNode* inner_add = nullptr;
+		ISelNode* base = nullptr;
+		ISelNode* index = nullptr;
+		Int64 displacement = 0;
+	};
+
+	class X86DivTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 10; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelBinaryOpNode* matched_div = nullptr;
+		ISelNode* dividend = nullptr;
+		ISelNode* divisor = nullptr;
+	};
+
+	class X86RemTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		TargetArch GetTarget() const override { return TargetArch::X86; }
+		Int GetPriority() const override { return 10; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelBinaryOpNode* matched_rem = nullptr;
+		ISelNode* dividend = nullptr;
+		ISelNode* divisor = nullptr;
+	};
+
 	void RegisterX86Tiles(class ISelTiler& tiler);
 }

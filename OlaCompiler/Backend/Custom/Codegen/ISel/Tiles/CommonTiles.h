@@ -86,5 +86,18 @@ namespace ola
 		ISelSelectNode* matched_select = nullptr;
 	};
 
+	class MulOneTile : public ISelTile
+	{
+	public:
+		Bool Match(ISelNode* node) override;
+		TileResult Apply(MachineContext& ctx) override;
+		Int GetPriority() const override { return 8; }
+
+	private:
+		ISelRegisterNode* matched_reg = nullptr;
+		ISelBinaryOpNode* matched_mul = nullptr;
+		ISelNode* operand = nullptr;
+	};
+
 	void RegisterCommonTiles(class ISelTiler& tiler);
 }

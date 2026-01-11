@@ -117,7 +117,11 @@ namespace ola
 			return false;
 		}
 
-		if (forest.HasMemoryOp(producer) || forest.HasMemoryOp(consumer))
+		// Only block merging if the producer has a memory operation (load/store).
+		// Address calculations (producer without memory ops) can safely merge into
+		// loads/stores. The consumer having a memory op is fine - we're just inlining
+		// address calculations into the load/store pattern.
+		if (forest.HasMemoryOp(producer))
 		{
 			return false;
 		}
