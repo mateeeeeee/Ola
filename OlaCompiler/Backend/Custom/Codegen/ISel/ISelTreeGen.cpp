@@ -132,6 +132,13 @@ namespace ola
 
 	void ISelTreeGen::ProcessInstruction(Instruction& I)
 	{
+		// Check for target-specific lowering first, like X86 SelectInst for Floats
+		Target const& target = ctx.GetModule().GetTarget();
+		if (target.GetISelInfo().LowerInstruction(&I, ctx))
+		{
+			return;
+		}
+
 		if (auto* BI = dyn_cast<BinaryInst>(&I))
 		{
 			ProcessBinaryInst(*BI);

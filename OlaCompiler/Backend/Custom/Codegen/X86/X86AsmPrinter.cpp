@@ -16,13 +16,26 @@ namespace ola
 		switch (MO.GetType())
 		{
 		case MachineType::Int8:  return "byte ptr";
-		case MachineType::Int64: 
-		case MachineType::Float64: 
+		case MachineType::Int64:
+		case MachineType::Float64:
 		case MachineType::Ptr:
 		case MachineType::Other: return "qword ptr";
 		}
 		OLA_ASSERT_MSG(false, "There should be no Undef operands at this point");
 		return "";
+	}
+
+	static std::string GetOperandPrefixForType(MachineType type)
+	{
+		switch (type)
+		{
+		case MachineType::Int8:  return "byte ptr";
+		case MachineType::Int64:
+		case MachineType::Float64:
+		case MachineType::Ptr:
+		case MachineType::Other: return "qword ptr";
+		}
+		return "qword ptr";
 	}
 
 	static std::string GetOperandString(MachineOperand const& MO, Bool dereference = false)
@@ -61,6 +74,50 @@ namespace ola
 			else						return std::format("{} [{}]", GetOperandPrefix(MO), X86_GetRegisterString(X86_RBP, MachineType::Ptr));
 		}
 		OLA_ASSERT(false);
+		return "";
+	}
+
+	static std::string GetMemoryOperandWithType(MachineOperand const& MO, MachineType type)
+	{
+		std::string prefix = GetOperandPrefixForType(type);
+		if (MO.IsReg())
+		{
+			return std::format("{} [{}]", prefix, X86_GetRegisterString(MO.GetReg().reg, MachineType::Ptr));
+		}
+		else if (MO.IsStackObject())
+		{
+			Int32 stack_offset = MO.GetStackOffset();
+			if (stack_offset > 0)		return std::format("{} [{} + {}]", prefix, X86_GetRegisterString(X86_RBP, MachineType::Ptr), stack_offset);
+			else if (stack_offset < 0)	return std::format("{} [{} - {}]", prefix, X86_GetRegisterString(X86_RBP, MachineType::Ptr), -stack_offset);
+			else						return std::format("{} [{}]", prefix, X86_GetRegisterString(X86_RBP, MachineType::Ptr));
+		}
+		else if (MO.IsRelocable())
+		{
+			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
+#if defined(OLA_PLATFORM_MACOS)
+			symbol = "_" + symbol;
+#endif
+			return std::format("{} {}[rip]", prefix, symbol);
+		}
+		OLA_ASSERT(false);
+		return "";
+	}
+
+	static std::string GetLeaOperandString(MachineOperand const& MO)
+	{
+		if (MO.IsReg())
+		{
+			return X86_GetRegisterString(MO.GetReg().reg, MachineType::Ptr);
+		}
+		else if (MO.IsStackObject())
+		{
+			// For stack objects in LEA, we need to reference them as rbp-relative
+			// But LEA expects register operands. This shouldn't happen in well-formed LEA.
+			// If it does, we need to emit the rbp + offset calculation
+			Int32 stack_offset = MO.GetStackOffset();
+			return X86_GetRegisterString(X86_RBP, MachineType::Ptr);
+		}
+		OLA_ASSERT_MSG(false, "LEA operand should be a register");
 		return "";
 	}
 
@@ -160,16 +217,16 @@ namespace ola
 						break;
 						case InstStore:
 						{
-							MachineOperand const& op1 = MI.GetOp<0>();
-							MachineOperand const& op2 = MI.GetOp<1>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op1, true), GetOperandString(op2));
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetMemoryOperandWithType(dst, src.GetType()), GetOperandString(src));
 						}
 						break;
 						case InstLoad:
 						{
-							MachineOperand const& op1 = MI.GetOp<0>();
-							MachineOperand const& op2 = MI.GetOp<1>();
-							EmitText("{} {}, {}", opcode_string, GetOperandString(op1), GetOperandString(op2, true));
+							MachineOperand const& dst = MI.GetOp<0>();
+							MachineOperand const& src = MI.GetOp<1>();
+							EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetMemoryOperandWithType(src, dst.GetType()));
 						}
 						break;
 						case InstMove:

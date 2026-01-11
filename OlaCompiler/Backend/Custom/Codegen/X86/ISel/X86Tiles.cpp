@@ -12,6 +12,12 @@ namespace ola
 		{
 			return op == Opcode::SMul;
 		}
+
+		Bool IsValidLeaOperand(MachineOperand const& op)
+		{
+			if (op.IsUndefined()) return true;  
+			return op.IsReg();  
+		}
 	}
 
 	Bool X86LeaBaseIndexScaleTile::Match(ISelNode* node)
@@ -99,6 +105,12 @@ namespace ola
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
+		if (!IsValidLeaOperand(base_op) || !IsValidLeaOperand(index_op))
+		{
+			result.success = false;
+			return result;
+		}
+
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(base_op);
@@ -164,6 +176,12 @@ namespace ola
 	{
 		TileResult result;
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
+
+		if (!IsValidLeaOperand(base_op))
+		{
+			result.success = false;
+			return result;
+		}
 
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
@@ -262,6 +280,12 @@ namespace ola
 	{
 		TileResult result;
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
+
+		if (!IsValidLeaOperand(index_op))
+		{
+			result.success = false;
+			return result;
+		}
 
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
@@ -393,6 +417,12 @@ namespace ola
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
 
+		if (!IsValidLeaOperand(base_op) || !IsValidLeaOperand(index_op))
+		{
+			result.success = false;
+			return result;
+		}
+
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
 		lea.SetOp<1>(base_op);
@@ -457,6 +487,13 @@ namespace ola
 	{
 		TileResult result;
 		MachineOperand op = ResolveOperand(operand, ctx, result.worklist);
+
+		if (!IsValidLeaOperand(op))
+		{
+			result.success = false;
+			return result;
+		}
+
 		Int64 scale_val = multiplier - 1;
 
 		MachineInstruction lea(X86_InstLea);
@@ -507,6 +544,12 @@ namespace ola
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
+
+		if (!IsValidLeaOperand(base_op) || !IsValidLeaOperand(index_op))
+		{
+			result.success = false;
+			return result;
+		}
 
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
@@ -586,6 +629,12 @@ namespace ola
 
 		MachineOperand base_op = ResolveOperand(base, ctx, result.worklist);
 		MachineOperand index_op = ResolveOperand(index, ctx, result.worklist);
+
+		if (!IsValidLeaOperand(base_op) || !IsValidLeaOperand(index_op))
+		{
+			result.success = false;
+			return result;
+		}
 
 		MachineInstruction lea(X86_InstLea);
 		lea.SetOp<0>(matched_reg->GetRegister());
