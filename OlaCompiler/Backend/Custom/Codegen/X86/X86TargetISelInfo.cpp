@@ -486,9 +486,7 @@ namespace ola
 			}
 		};
 
-		switch (MI.GetOpcode())
-		{
-		case InstMove:
+		if (MI.GetOpcode() == InstMove)
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
@@ -501,14 +499,12 @@ namespace ola
 				MI.SetOpcode(InstLoad);
 			}
 		}
-		break;
-		}
 
-		if ((MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore) || MI.GetOpcode() == InstLoadGlobalAddress)
+		if (MI.GetOpcode() == InstMove || MI.GetOpcode() == InstLoadGlobalAddress || MI.GetOpcode() == X86_InstLea)
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
-			if (dst.IsMemoryOperand() && src.IsMemoryOperand()) //this can happen if register spilling occurs
+			if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 			{
 				auto scratch = GetScratchReg(dst.GetType());
 				MachineInstruction MI2(InstLoad);
@@ -518,6 +514,37 @@ namespace ola
 				MI.SetOpcode(InstStore);
 			}
 		}
+
+		if (MI.GetOpcode() == InstLoad)
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			if (dst.IsMemoryOperand())
+			{
+				auto scratch = GetScratchReg(dst.GetType());
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(scratch).SetOp<1>(src);
+				instructions.insert(instruction_iter, MI2);
+				MI.SetOp<1>(scratch);
+				MI.SetOpcode(InstStore);
+			}
+		}
+
+		if (MI.GetOpcode() == InstStore)
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			if (src.IsMemoryOperand())
+			{
+				auto scratch = GetScratchReg(dst.GetType());
+				MachineInstruction MI2(InstLoad);
+				MI2.SetOp<0>(scratch).SetOp<1>(src);
+				instructions.insert(instruction_iter, MI2);
+				MI.SetOp<1>(scratch);
+				MI.SetOpcode(InstStore);
+			}
+		}
+
 
 		if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 		{
