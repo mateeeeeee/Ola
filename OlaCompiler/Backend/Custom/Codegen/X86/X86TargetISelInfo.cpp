@@ -447,52 +447,79 @@ namespace ola
 			}
 		}
 
-		if (MI.GetOpcode() == InstMove || MI.GetOpcode() == InstLoadGlobalAddress || MI.GetOpcode() == X86_InstLea)
+		if (MI.GetOpcode() == InstLoad && MI.GetOperand(0).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(dst.GetType());
+			Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MI.SetOp<0>(scratch);
+			MI.SetOpcode(load_opcode);
+			MachineInstruction MI2(store_opcode);
+			MI2.SetOp<0>(dst).SetOp<1>(scratch);
+			instructions.insert(++instruction_iter, MI2);
+		}
+		else if (MI.GetOpcode() == InstStore && MI.GetOperand(1).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(src.GetType());
+			Uint32 load_opcode = (src.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (src.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MachineInstruction MI2(load_opcode);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
+			MI.SetOpcode(store_opcode);
+		}
+		else if (MI.GetOpcode() == InstMove && MI.GetOperand(0).IsMemoryOperand() && MI.GetOperand(1).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(dst.GetType());
+			Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MachineInstruction MI2(load_opcode);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
+			MI.SetOpcode(store_opcode);
+		}
+
+		if (MI.GetOpcode() == X86_InstMoveFP)
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
 			if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 			{
-				auto scratch = GetScratchReg(dst.GetType());
-				Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
-				MachineInstruction MI2(load_opcode);
+				auto scratch = GetScratchReg(MachineType::Float64);
+				MachineInstruction MI2(X86_InstLoadFP);
 				MI2.SetOp<0>(scratch).SetOp<1>(src);
 				instructions.insert(instruction_iter, MI2);
 				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
+				MI.SetOpcode(X86_InstStoreFP);
 			}
 		}
 
-		if (MI.GetOpcode() == InstLoad)
+		if (MI.GetOpcode() == X86_InstLoadFP && MI.GetOperand(0).IsMemoryOperand())
 		{
 			MachineOperand dst = MI.GetOperand(0);
-			MachineOperand src = MI.GetOperand(1);
-			if (dst.IsMemoryOperand())
-			{
-				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
-				MI2.SetOp<0>(scratch).SetOp<1>(src);
-				instructions.insert(instruction_iter, MI2);
-				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
-			}
+			auto scratch = GetScratchReg(MachineType::Float64);
+			MI.SetOp<0>(scratch);
+			MachineInstruction MI2(X86_InstStoreFP);
+			MI2.SetOp<0>(dst).SetOp<1>(scratch);
+			instructions.insert(++instruction_iter, MI2);
 		}
-
-		if (MI.GetOpcode() == InstStore)
+		if (MI.GetOpcode() == X86_InstStoreFP && MI.GetOperand(1).IsMemoryOperand())
 		{
-			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
-			if (src.IsMemoryOperand())
-			{
-				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
-				MI2.SetOp<0>(scratch).SetOp<1>(src);
-				instructions.insert(instruction_iter, MI2);
-				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
-			}
+			auto scratch = GetScratchReg(MachineType::Float64);
+			MachineInstruction MI2(X86_InstLoadFP);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
 		}
-
 
 		if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 		{
