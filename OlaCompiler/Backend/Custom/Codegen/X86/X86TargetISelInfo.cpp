@@ -11,7 +11,60 @@ namespace ola
 {
 	Bool X86TargetISelInfo::LowerInstruction(Instruction* I, MachineContext& ctx) const
 	{
-		if (SelectInst* SI = dyn_cast<SelectInst>(I))
+		if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
+		{
+			Opcode opcode = I->GetOpcode();
+			if (opcode == Opcode::SDiv || opcode == Opcode::SRem)
+			{
+				MachineOperand dst = ctx.VirtualReg(BI->GetType());
+				MachineOperand op1 = ctx.GetOperand(BI->GetLHS());
+				MachineOperand op2 = ctx.GetOperand(BI->GetRHS());
+
+				MachineInstruction move_to_rax(InstMove);
+				move_to_rax.SetOp<0>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
+				move_to_rax.SetOp<1>(op1);
+				ctx.EmitInst(move_to_rax);
+
+				MachineInstruction cqo(X86_InstCqo);
+				ctx.EmitInst(cqo);
+
+				if (op2.IsImmediate())
+				{
+					MachineOperand op2_reg = ctx.VirtualReg(BI->GetType());
+					MachineInstruction move_to_reg(InstMove);
+					move_to_reg.SetOp<0>(op2_reg);
+					move_to_reg.SetOp<1>(op2);
+					ctx.EmitInst(move_to_reg);
+					MachineInstruction idiv(InstSDiv);
+					idiv.SetOp<0>(op2_reg);
+					ctx.EmitInst(idiv);
+				}
+				else
+				{
+					MachineInstruction idiv(InstSDiv);
+					idiv.SetOp<0>(op2);
+					ctx.EmitInst(idiv);
+				}
+
+				if (opcode == Opcode::SDiv)
+				{
+					MachineInstruction move_quotient(InstMove);
+					move_quotient.SetOp<0>(dst);
+					move_quotient.SetOp<1>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
+					ctx.EmitInst(move_quotient);
+				}
+				else if (opcode == Opcode::SRem)
+				{
+					MachineInstruction move_remainder(InstMove);
+					move_remainder.SetOp<0>(dst);
+					move_remainder.SetOp<1>(MachineOperand::ISAReg(X86_RDX, MachineType::Int64));
+					ctx.EmitInst(move_remainder);
+				}
+				ctx.MapOperand(BI, dst);
+				return true;
+			}
+		}
+		else if (SelectInst* SI = dyn_cast<SelectInst>(I))
 		{
 			if (SI->GetType()->IsFloat())
 			{
@@ -35,7 +88,7 @@ namespace ola
 				MachineBasicBlock* MBB = ctx.GetCurrentBasicBlock();
 				MachineFunction* MF = MBB->GetFunction();
 				auto Where = std::find_if(MF->Blocks().begin(), MF->Blocks().end(),
-										  [MBB](const auto& block) { return block.get() == MBB; });
+					[MBB](const auto& block) { return block.get() == MBB; });
 				++Where;
 				auto& inserted = *MF->Blocks().insert(Where, std::make_unique<MachineBasicBlock>(MF, ctx.GetLabel()));
 				MachineBasicBlock* SkipBlock = inserted.get();
@@ -262,7 +315,7 @@ namespace ola
 				MachineFunction* MF = MBB->GetFunction();
 
 				auto Where = std::find_if(MF->Blocks().begin(), MF->Blocks().end(),
-										  [MBB](const auto& block) { return block.get() == MBB; });
+					[MBB](const auto& block) { return block.get() == MBB; });
 				++Where;
 
 				auto& inserted = *MF->Blocks().insert(Where, std::make_unique<MachineBasicBlock>(MF, lowering_ctx.GetLabel()));
@@ -460,16 +513,16 @@ namespace ola
 		auto& instructions = legalize_ctx.instructions;
 		auto& instruction_iter = legalize_ctx.instruction_iterator;
 		auto GetScratchReg = [&legalize_ctx](MachineType type)
-		{
-			if (type == MachineType::Float64)
 			{
-				return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetFPScratchRegister(), type);
-			}
-			else
-			{
-				return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetGPScratchRegister(), type);
-			}
-		};
+				if (type == MachineType::Float64)
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetFPScratchRegister(), type);
+				}
+				else
+				{
+					return MachineOperand::ISAReg(legalize_ctx.target_reg_info.GetGPScratchRegister(), type);
+				}
+			};
 
 		if (MI.GetOpcode() == InstMove)
 		{
@@ -568,7 +621,7 @@ namespace ola
 				instructions.insert(instruction_iter, load_index);
 				MI.SetOp<2>(scratch);
 			}
-			
+
 			if (MI.GetOpcode() == X86_InstLea && dst.IsMemoryOperand())
 			{
 				auto scratch = GetScratchReg(MachineType::Int64);
@@ -605,7 +658,8 @@ namespace ola
 			MI.SetOp<1>(scratch);
 			MI.SetOpcode(store_opcode);
 		}
-		else if (MI.GetOpcode() == InstMove && MI.GetOperand(0).IsMemoryOperand() && MI.GetOperand(1).IsMemoryOperand())
+		else if ((MI.GetOpcode() == InstMove || MI.GetOpcode() == InstLoadGlobalAddress) 
+			   && MI.GetOperand(0).IsMemoryOperand() && MI.GetOperand(1).IsMemoryOperand())
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
