@@ -58,6 +58,7 @@ namespace ola
 			Bool dump_callgraph;
 			Bool dump_domtree;
 			Bool print_domfrontier;
+			Bool isel_legacy;
 		};
 
 		void CompileTranslationUnit(FrontendContext& context,
@@ -162,6 +163,10 @@ namespace ola
 				}
 
 				MachineModule machine_module(ir_module, *target, analysis_manager);
+				if (opts.isel_legacy)
+				{
+					machine_module.SetISelMode(ISelMode::Legacy);
+				}
 				if(!mir_file.empty())
 				{
 					machine_module.EmitMIR(mir_file);
@@ -184,6 +189,7 @@ namespace ola
 		Bool const print_domfrontier = compile_request.GetCompilerFlags() & CompilerFlag_PrintDomFrontier;
 		Bool const timeout_detection = compile_request.GetCompilerFlags() & CompilerFlag_TimeoutDetection;
 		Bool const no_run = compile_request.GetCompilerFlags() & CompilerFlag_NoRun;
+		Bool const isel_legacy = compile_request.GetCompilerFlags() & CompilerFlag_ISelLegacy;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -239,6 +245,7 @@ namespace ola
 				.dump_callgraph = callgraph_dump,
 				.dump_domtree = domtree_dump,
 				.print_domfrontier = print_domfrontier,
+				.isel_legacy = isel_legacy,
 			};
 			CompileTranslationUnit(context, source_file, ir_file, mir_file, assembly_file, tu_comp_opts);
 

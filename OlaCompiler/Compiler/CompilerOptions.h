@@ -18,7 +18,8 @@ namespace ola
 		CompilerFlag_EmitMIR = 0x100,
 		CompilerFlag_TimeoutDetection = 0x200,
 		CompilerFlag_NoRun = 0x400,
-		CompilerFlag_StaticLib = 0x800
+		CompilerFlag_StaticLib = 0x800,
+		CompilerFlag_ISelLegacy = 0x1000
 	};
 	ENABLE_ENUM_BIT_OPERATORS(CompilerFlags);
 
