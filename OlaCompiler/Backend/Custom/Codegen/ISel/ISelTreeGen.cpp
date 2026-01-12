@@ -78,15 +78,25 @@ namespace ola
 			MachineGlobal* MG = ctx.GetGlobal(GV);
 			if (MG)
 			{
-				auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+				MachineType value_type = GetMachineTypeForValue(V);
+				auto addr_reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
 
 				MachineInstruction load_addr(InstLoadGlobalAddress);
-				load_addr.SetOp<0>(reg->GetRegister());
+				load_addr.SetOp<0>(addr_reg->GetRegister());
 				load_addr.SetOp<1>(MachineOperand::Relocable(MG->GetRelocable()));
-
 				pending_leaf_instructions.push_back(load_addr);
 
-				return reg;
+				if (value_type != MachineType::Ptr)
+				{
+					auto value_reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(value_type));
+					MachineInstruction load_val(InstLoad);
+					load_val.SetOp<0>(value_reg->GetRegister());
+					load_val.SetOp<1>(addr_reg->GetRegister());
+					pending_leaf_instructions.push_back(load_val);
+					return value_reg;
+				}
+
+				return addr_reg;
 			}
 		}
 
@@ -132,6 +142,8 @@ namespace ola
 
 	void ISelTreeGen::ProcessInstruction(Instruction& I)
 	{
+		// Check for target-specific lowering first, like X86 SelectInst for Floats
+		Target const& target = ctx.GetModule().GetTarget();
 		if (auto* BI = dyn_cast<BinaryInst>(&I))
 		{
 			ProcessBinaryInst(*BI);
@@ -431,30 +443,104 @@ namespace ola
 
 	void ISelTreeGen::ProcessGetElementPtrInst(GetElementPtrInst& I)
 	{
-		ISelNodePtr base = CreateNodeForValue(I.GetBaseOperand());
-		std::vector<ISelNode*> leaves = { base.get() };
-
-		ISelNodePtr current = std::move(base);
-		for (Uint32 i = 0; i < I.GetNumIndices(); ++i)
+		Value* base_value = I.GetBaseOperand();
+		ISelNodePtr base;
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsArray())
 		{
-			Value* idx = I.GetIndex(i);
-			ISelNodePtr idx_node = CreateNodeForValue(idx);
-			leaves.push_back(idx_node.get());
-			auto add = std::make_unique<ISelBinaryOpNode>(
-				Opcode::Add,
-				std::move(current),
-				std::move(idx_node)
-			);
-			current = std::move(add);
+			MachineOperand base_op = ctx.GetOperand(base_value);
+			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+
+			MachineInstruction load_addr(InstLoadGlobalAddress);
+			load_addr.SetOp<0>(reg->GetRegister());
+			load_addr.SetOp<1>(base_op);
+
+			pending_leaf_instructions.push_back(load_addr);
+			base = std::move(reg);
+		}
+		else
+		{
+			base = CreateNodeForValue(base_value);
 		}
 
-		MachineOperand result_reg = ctx.VirtualReg(MachineType::Ptr);
-		auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(current));
+		Uint32 num_indices = I.GetNumIndices();
+		if (num_indices == 0)
+		{
+			if (auto* base_reg = dyn_cast<ISelRegisterNode>(base.get()))
+			{
+				value_map.MapValue(&I, base_reg);
+				ctx.MapOperand(&I, base_reg->GetRegister());
+				if (!pending_leaf_instructions.empty())
+				{
+					auto asm_node = std::make_unique<ISelAsmNode>(std::move(pending_leaf_instructions));
+					forest.AddTree(std::move(asm_node), {}, false);
+					pending_leaf_instructions.clear();
+				}
+			}
+			return;
+		}
 
-		value_map.MapValue(&I, reg.get());
-		ctx.MapOperand(&I, result_reg);
+		MachineOperand current_reg;
+		if (auto* base_reg = dyn_cast<ISelRegisterNode>(base.get()))
+		{
+			current_reg = base_reg->GetRegister();
+		}
+		else
+		{
+			current_reg = ctx.VirtualReg(MachineType::Ptr);
+		}
 
-		AddTree(std::move(reg), leaves, false);
+		IRType* current_type = I.GetType();
+		Uint32 idx_num = 0;
+		for (Value* index : I.Indices())
+		{
+			ISelNodePtr left = std::make_unique<ISelRegisterNode>(current_reg);
+			ISelNodePtr idx_node = CreateNodeForValue(index);
+
+			// Determine element size for scaling
+			Uint32 element_size = 1;
+			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
+			{
+				element_size = array_type->GetElementType()->GetSize();
+				current_type = array_type->GetElementType();
+			}
+			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
+			{
+				element_size = pointer_type->GetPointeeType()->GetSize();
+				current_type = pointer_type->GetPointeeType();
+			}
+
+			ISelNodePtr scale_imm = std::make_unique<ISelImmediateNode>(element_size, MachineType::Int64);
+			auto mul = std::make_unique<ISelBinaryOpNode>(
+				Opcode::SMul,
+				std::move(idx_node),
+				std::move(scale_imm)
+			);
+			MachineOperand scaled_offset_reg = ctx.VirtualReg(MachineType::Int64);
+			auto scaled_reg = std::make_unique<ISelRegisterNode>(scaled_offset_reg, std::move(mul));
+			AddTree(std::move(scaled_reg), {}, false);
+
+			ISelNodePtr scaled_offset_node = std::make_unique<ISelRegisterNode>(scaled_offset_reg);
+			std::vector<ISelNode*> leaves = { left.get(), scaled_offset_node.get() };
+
+			auto add = std::make_unique<ISelBinaryOpNode>(
+				Opcode::Add,
+				std::move(left),
+				std::move(scaled_offset_node)
+			);
+
+			MachineOperand result_reg = ctx.VirtualReg(MachineType::Ptr);
+			auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(add));
+
+			if (idx_num == num_indices - 1)
+			{
+				value_map.MapValue(&I, reg.get());
+				ctx.MapOperand(&I, result_reg);
+			}
+
+			AddTree(std::move(reg), leaves, false);
+			current_reg = result_reg;
+			++idx_num;
+		}
 	}
 
 	void ISelTreeGen::ProcessPtrAddInst(PtrAddInst& I)

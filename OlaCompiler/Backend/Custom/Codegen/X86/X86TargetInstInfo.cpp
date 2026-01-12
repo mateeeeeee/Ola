@@ -108,6 +108,16 @@ namespace ola
 			inst_info.SetOperandCount(0);
 		}
 		break;
+		case X86_InstLea:
+		{
+			inst_info.SetOperandCount(5);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+			inst_info.SetOpFlag(2, OperandFlagUse);
+			inst_info.SetOpFlag(3, OperandFlagNone);
+			inst_info.SetOpFlag(4, OperandFlagNone);
+		}
+		break;
 		}
 		return inst_info;
 	}
@@ -132,6 +142,7 @@ namespace ola
 		case X86_InstStoreFP:	return "X86_StoreFP";
 		case X86_InstLoadFP:	return "X86_LoadFP";
 		case X86_InstXorFP:	return "X86_XorFP";
+		case X86_InstLea:		return "X86_Lea";
 		}
 		return "";
 	}

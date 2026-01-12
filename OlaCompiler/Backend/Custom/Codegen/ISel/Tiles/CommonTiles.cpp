@@ -248,8 +248,67 @@ namespace ola
 		return result;
 	}
 
+	Bool MulOneTile::Match(ISelNode* node)
+	{
+		matched_reg = nullptr;
+		matched_mul = nullptr;
+		operand = nullptr;
+
+		auto* reg = dyn_cast<ISelRegisterNode>(node);
+		if (!reg || !reg->HasSource()) return false;
+
+		auto* mul = dyn_cast<ISelBinaryOpNode>(reg->GetSource());
+		if (!mul) return false;
+		if (mul->GetOpcode() != Opcode::SMul) return false;
+
+		ISelImmediateNode* imm = nullptr;
+		ISelNode* op = nullptr;
+
+		if (auto* left_imm = dyn_cast<ISelImmediateNode>(mul->GetLeft()))
+		{
+			if (left_imm->GetImmediate() == 1)
+			{
+				imm = left_imm;
+				op = mul->GetRight();
+			}
+		}
+		if (!imm)
+		{
+			if (auto* right_imm = dyn_cast<ISelImmediateNode>(mul->GetRight()))
+			{
+				if (right_imm->GetImmediate() == 1)
+				{
+					imm = right_imm;
+					op = mul->GetLeft();
+				}
+			}
+		}
+		if (!imm || !op) return false;
+
+		matched_reg = reg;
+		matched_mul = mul;
+		operand = op;
+		return true;
+	}
+
+	TileResult MulOneTile::Apply(MachineContext& ctx)
+	{
+		TileResult result;
+
+		MachineOperand src_op = ResolveOperand(operand, ctx, result.worklist);
+
+		MachineInstruction mov(InstMove);
+		mov.SetOp<0>(matched_reg->GetRegister());
+		mov.SetOp<1>(src_op);
+		result.instructions.push_back(mov);
+
+		result.success = true;
+		return result;
+	}
+
 	void RegisterCommonTiles(ISelTiler& tiler)
 	{
+		tiler.RegisterTile(std::make_unique<MulOneTile>());
 		tiler.RegisterTile(std::make_unique<MoveTile>());
 		tiler.RegisterTile(std::make_unique<LoadTile>());
 		tiler.RegisterTile(std::make_unique<StoreTile>());

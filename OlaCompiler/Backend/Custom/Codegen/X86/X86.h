@@ -114,10 +114,9 @@ namespace ola
 
 	inline Char const* X86_GetRegisterString(Uint32 r, MachineType type)
 	{
-		using enum MachineType;
 		switch (type)
 		{
-		case Int8:
+		case MachineType::Int8:
 			switch (r)
 			{
 			case X86_RAX: return "al";
@@ -136,8 +135,8 @@ namespace ola
 			case X86_R15: return "r15b";
 			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
 			}
-		case Int64:
-		case Ptr:
+		case MachineType::Int64:
+		case MachineType::Ptr:
 			switch (r)
 			{
 			case X86_RAX: return "rax";
@@ -158,7 +157,7 @@ namespace ola
 			case X86_R15: return "r15";
 			default: OLA_ASSERT_MSG(false, "Invalid register/type combination!");  return "";
 			}
-		case Float64:
+		case MachineType::Float64:
 			switch (r)
 			{
 			case X86_XMM0: return "xmm0";

@@ -11,60 +11,7 @@ namespace ola
 {
 	Bool X86TargetISelInfo::LowerInstruction(Instruction* I, MachineContext& ctx) const
 	{
-		if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
-		{
-			Opcode opcode = I->GetOpcode();
-			if (opcode == Opcode::SDiv || opcode == Opcode::SRem)
-			{
-				MachineOperand dst = ctx.VirtualReg(BI->GetType());
-				MachineOperand op1 = ctx.GetOperand(BI->GetLHS());
-				MachineOperand op2 = ctx.GetOperand(BI->GetRHS());
-
-				MachineInstruction move_to_rax(InstMove);
-				move_to_rax.SetOp<0>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
-				move_to_rax.SetOp<1>(op1);
-				ctx.EmitInst(move_to_rax);
-
-				MachineInstruction cqo(X86_InstCqo);
-				ctx.EmitInst(cqo);
-
-				if (op2.IsImmediate())
-				{
-					MachineOperand op2_reg = ctx.VirtualReg(BI->GetType());
-					MachineInstruction move_to_reg(InstMove);
-					move_to_reg.SetOp<0>(op2_reg);
-					move_to_reg.SetOp<1>(op2);
-					ctx.EmitInst(move_to_reg);
-					MachineInstruction idiv(InstSDiv);
-					idiv.SetOp<0>(op2_reg);
-					ctx.EmitInst(idiv);
-				}
-				else
-				{
-					MachineInstruction idiv(InstSDiv);
-					idiv.SetOp<0>(op2);
-					ctx.EmitInst(idiv);
-				}
-
-				if (opcode == Opcode::SDiv)
-				{
-					MachineInstruction move_quotient(InstMove);
-					move_quotient.SetOp<0>(dst);
-					move_quotient.SetOp<1>(MachineOperand::ISAReg(X86_RAX, MachineType::Int64));
-					ctx.EmitInst(move_quotient);
-				}
-				else if (opcode == Opcode::SRem)
-				{
-					MachineInstruction move_remainder(InstMove);
-					move_remainder.SetOp<0>(dst);
-					move_remainder.SetOp<1>(MachineOperand::ISAReg(X86_RDX, MachineType::Int64));
-					ctx.EmitInst(move_remainder);
-				}
-				ctx.MapOperand(BI, dst);
-				return true;
-			}
-		}
-		else if (SelectInst* SI = dyn_cast<SelectInst>(I))
+		if (SelectInst* SI = dyn_cast<SelectInst>(I))
 		{
 			if (SI->GetType()->IsFloat())
 			{
@@ -308,7 +255,45 @@ namespace ola
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
-			if (src.IsImmediate())
+
+			if (dst.GetType() == MachineType::Float64)
+			{
+				MachineBasicBlock* MBB = lowering_ctx.GetCurrentBasicBlock();
+				MachineFunction* MF = MBB->GetFunction();
+
+				auto Where = std::find_if(MF->Blocks().begin(), MF->Blocks().end(),
+										  [MBB](const auto& block) { return block.get() == MBB; });
+				++Where;
+
+				auto& inserted = *MF->Blocks().insert(Where, std::make_unique<MachineBasicBlock>(MF, lowering_ctx.GetLabel()));
+				MachineBasicBlock* ContinuationBlock = inserted.get();
+
+				Uint32 jump_opcode = (MI.GetOpcode() == InstCMoveNE) ? InstJE : InstJNE;
+				MI.SetOpcode(jump_opcode);
+				MI.SetOp<0>(MachineOperand::Relocable(ContinuationBlock));
+				MI.SetOp<1>(MachineOperand::Undefined());
+
+				MachineInstruction mov(X86_InstMoveFP);
+				mov.SetOp<0>(dst);
+				mov.SetOp<1>(src);
+				++instruction_iter;
+				instruction_iter = instructions.insert(instruction_iter, mov);
+
+				MachineInstruction jmp(InstJump);
+				jmp.SetOp<0>(MachineOperand::Relocable(ContinuationBlock));
+				++instruction_iter;
+				instruction_iter = instructions.insert(instruction_iter, jmp);
+
+				auto& cont_instructions = ContinuationBlock->Instructions();
+				auto move_start = instruction_iter;
+				++move_start;
+				while (move_start != instructions.end())
+				{
+					cont_instructions.push_back(std::move(*move_start));
+					move_start = instructions.erase(move_start);
+				}
+			}
+			else if (src.IsImmediate())
 			{
 				MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 				MachineInstruction MI2(InstMove);
@@ -500,51 +485,173 @@ namespace ola
 			}
 		}
 
-		if (MI.GetOpcode() == InstMove || MI.GetOpcode() == InstLoadGlobalAddress || MI.GetOpcode() == X86_InstLea)
+		// LEA format: lea dst, [base + index*scale + disp]
+		// Op 0: dst, Op 1: base, Op 2: index, Op 3: scale, Op 4: disp
+		if (MI.GetOpcode() == X86_InstLea)
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand base = MI.GetOperand(1);
+			MachineOperand index = MI.GetOperand(2);
+			MachineOperand scale = MI.GetOperand(3);
+			MachineOperand disp = MI.GetOperand(4);
+			Bool base_is_mem = base.IsMemoryOperand();
+			Bool index_is_mem = !index.IsUndefined() && index.IsMemoryOperand();
+			if (base_is_mem && index_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				Int64 scale_val = scale.GetImmediate();
+				Int64 disp_val = disp.GetImmediate();
+
+				// mov scratch, [base]
+				MachineInstruction load_base(InstLoad);
+				load_base.SetOp<0>(scratch).SetOp<1>(base);
+				instructions.insert(instruction_iter, load_base);
+				if (scale_val == 1)
+				{
+					// add scratch, [index] - x86 supports mem source
+					MachineInstruction add_index(InstAdd);
+					add_index.SetOp<0>(scratch).SetOp<1>(index);
+					instructions.insert(instruction_iter, add_index);
+				}
+				else
+				{
+					// For scale > 1, use dst as temp if available
+					if (!dst.IsMemoryOperand())
+					{
+						MachineInstruction load_index(InstLoad);
+						load_index.SetOp<0>(dst).SetOp<1>(index);
+						instructions.insert(instruction_iter, load_index);
+
+						MachineInstruction mul_scale(InstSMul);
+						mul_scale.SetOp<0>(dst).SetOp<1>(MachineOperand::Immediate(scale_val, MachineType::Int64));
+						instructions.insert(instruction_iter, mul_scale);
+
+						MachineInstruction add_result(InstAdd);
+						add_result.SetOp<0>(scratch).SetOp<1>(dst);
+						instructions.insert(instruction_iter, add_result);
+					}
+				}
+
+				if (disp_val != 0)
+				{
+					MachineInstruction add_disp(InstAdd);
+					add_disp.SetOp<0>(scratch).SetOp<1>(MachineOperand::Immediate(disp_val, MachineType::Int64));
+					instructions.insert(instruction_iter, add_disp);
+				}
+
+				if (dst.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstStore);
+					MI.SetOp<0>(dst);
+					MI.SetOp<1>(scratch);
+				}
+				else
+				{
+					MI.SetOpcode(InstMove);
+					MI.SetOp<0>(dst);
+					MI.SetOp<1>(scratch);
+				}
+			}
+			else if (base_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MachineInstruction load_base(InstLoad);
+				load_base.SetOp<0>(scratch).SetOp<1>(base);
+				instructions.insert(instruction_iter, load_base);
+				MI.SetOp<1>(scratch);
+			}
+			else if (index_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MachineInstruction load_index(InstLoad);
+				load_index.SetOp<0>(scratch).SetOp<1>(index);
+				instructions.insert(instruction_iter, load_index);
+				MI.SetOp<2>(scratch);
+			}
+			
+			if (MI.GetOpcode() == X86_InstLea && dst.IsMemoryOperand())
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MI.SetOp<0>(scratch);
+				MachineInstruction store_result(InstStore);
+				store_result.SetOp<0>(dst).SetOp<1>(scratch);
+				instructions.insert(++instruction_iter, store_result);
+			}
+		}
+
+		if (MI.GetOpcode() == InstLoad && MI.GetOperand(0).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(dst.GetType());
+			Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MI.SetOp<0>(scratch);
+			MI.SetOpcode(load_opcode);
+			MachineInstruction MI2(store_opcode);
+			MI2.SetOp<0>(dst).SetOp<1>(scratch);
+			instructions.insert(++instruction_iter, MI2);
+		}
+		else if (MI.GetOpcode() == InstStore && MI.GetOperand(1).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(src.GetType());
+			Uint32 load_opcode = (src.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (src.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MachineInstruction MI2(load_opcode);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
+			MI.SetOpcode(store_opcode);
+		}
+		else if (MI.GetOpcode() == InstMove && MI.GetOperand(0).IsMemoryOperand() && MI.GetOperand(1).IsMemoryOperand())
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand src = MI.GetOperand(1);
+			auto scratch = GetScratchReg(dst.GetType());
+			Uint32 load_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstLoadFP : InstLoad;
+			Uint32 store_opcode = (dst.GetType() == MachineType::Float64) ? X86_InstStoreFP : InstStore;
+			MachineInstruction MI2(load_opcode);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
+			MI.SetOpcode(store_opcode);
+		}
+
+		if (MI.GetOpcode() == X86_InstMoveFP)
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
 			if (dst.IsMemoryOperand() && src.IsMemoryOperand())
 			{
-				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
+				auto scratch = GetScratchReg(MachineType::Float64);
+				MachineInstruction MI2(X86_InstLoadFP);
 				MI2.SetOp<0>(scratch).SetOp<1>(src);
 				instructions.insert(instruction_iter, MI2);
 				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
+				MI.SetOpcode(X86_InstStoreFP);
 			}
 		}
 
-		if (MI.GetOpcode() == InstLoad)
+		if (MI.GetOpcode() == X86_InstLoadFP && MI.GetOperand(0).IsMemoryOperand())
 		{
 			MachineOperand dst = MI.GetOperand(0);
-			MachineOperand src = MI.GetOperand(1);
-			if (dst.IsMemoryOperand())
-			{
-				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
-				MI2.SetOp<0>(scratch).SetOp<1>(src);
-				instructions.insert(instruction_iter, MI2);
-				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
-			}
+			auto scratch = GetScratchReg(MachineType::Float64);
+			MI.SetOp<0>(scratch);
+			MachineInstruction MI2(X86_InstStoreFP);
+			MI2.SetOp<0>(dst).SetOp<1>(scratch);
+			instructions.insert(++instruction_iter, MI2);
 		}
-
-		if (MI.GetOpcode() == InstStore)
+		if (MI.GetOpcode() == X86_InstStoreFP && MI.GetOperand(1).IsMemoryOperand())
 		{
-			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
-			if (src.IsMemoryOperand())
-			{
-				auto scratch = GetScratchReg(dst.GetType());
-				MachineInstruction MI2(InstLoad);
-				MI2.SetOp<0>(scratch).SetOp<1>(src);
-				instructions.insert(instruction_iter, MI2);
-				MI.SetOp<1>(scratch);
-				MI.SetOpcode(InstStore);
-			}
+			auto scratch = GetScratchReg(MachineType::Float64);
+			MachineInstruction MI2(X86_InstLoadFP);
+			MI2.SetOp<0>(scratch).SetOp<1>(src);
+			instructions.insert(instruction_iter, MI2);
+			MI.SetOp<1>(scratch);
 		}
-
 
 		if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 		{
@@ -553,6 +660,14 @@ namespace ola
 			if (src.GetType() == MachineType::Float64 && MI.GetOpcode() == InstStore)
 			{
 				MI.SetOpcode(X86_InstStoreFP);
+				if (src.IsImmediate())
+				{
+					auto scratch = GetScratchReg(MachineType::Float64);
+					MachineInstruction load_imm(X86_InstMoveFP);
+					load_imm.SetOp<0>(scratch).SetOp<1>(src);
+					instructions.insert(instruction_iter, load_imm);
+					MI.SetOp<1>(scratch);
+				}
 			}
 			else if (dst.GetType() == MachineType::Float64 && MI.GetOpcode() == InstLoad)
 			{
