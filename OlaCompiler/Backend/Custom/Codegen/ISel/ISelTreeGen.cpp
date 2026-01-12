@@ -78,15 +78,25 @@ namespace ola
 			MachineGlobal* MG = ctx.GetGlobal(GV);
 			if (MG)
 			{
-				auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+				MachineType value_type = GetMachineTypeForValue(V);
+				auto addr_reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
 
 				MachineInstruction load_addr(InstLoadGlobalAddress);
-				load_addr.SetOp<0>(reg->GetRegister());
+				load_addr.SetOp<0>(addr_reg->GetRegister());
 				load_addr.SetOp<1>(MachineOperand::Relocable(MG->GetRelocable()));
-
 				pending_leaf_instructions.push_back(load_addr);
 
-				return reg;
+				if (value_type != MachineType::Ptr)
+				{
+					auto value_reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(value_type));
+					MachineInstruction load_val(InstLoad);
+					load_val.SetOp<0>(value_reg->GetRegister());
+					load_val.SetOp<1>(addr_reg->GetRegister());
+					pending_leaf_instructions.push_back(load_val);
+					return value_reg;
+				}
+
+				return addr_reg;
 			}
 		}
 
