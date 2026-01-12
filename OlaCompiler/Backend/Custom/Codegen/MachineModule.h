@@ -39,7 +39,7 @@ namespace ola
 		MachineContext machine_ctx;
 		Target const& target;
 		FunctionAnalysisManager& FAM;
-		ISelMode isel_mode = ISelMode::TreePattern;
+		ISelMode isel_mode = ISelMode::Legacy;
 
 	private:
 		void LowerModule(IRModule*);
