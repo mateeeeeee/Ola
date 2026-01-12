@@ -447,6 +447,100 @@ namespace ola
 			}
 		}
 
+		// LEA format: lea dst, [base + index*scale + disp]
+		// Op 0: dst, Op 1: base, Op 2: index, Op 3: scale, Op 4: disp
+		if (MI.GetOpcode() == X86_InstLea)
+		{
+			MachineOperand dst = MI.GetOperand(0);
+			MachineOperand base = MI.GetOperand(1);
+			MachineOperand index = MI.GetOperand(2);
+			MachineOperand scale = MI.GetOperand(3);
+			MachineOperand disp = MI.GetOperand(4);
+			Bool base_is_mem = base.IsMemoryOperand();
+			Bool index_is_mem = !index.IsUndefined() && index.IsMemoryOperand();
+			if (base_is_mem && index_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				Int64 scale_val = scale.GetImmediate();
+				Int64 disp_val = disp.GetImmediate();
+
+				// mov scratch, [base]
+				MachineInstruction load_base(InstLoad);
+				load_base.SetOp<0>(scratch).SetOp<1>(base);
+				instructions.insert(instruction_iter, load_base);
+				if (scale_val == 1)
+				{
+					// add scratch, [index] - x86 supports mem source
+					MachineInstruction add_index(InstAdd);
+					add_index.SetOp<0>(scratch).SetOp<1>(index);
+					instructions.insert(instruction_iter, add_index);
+				}
+				else
+				{
+					// For scale > 1, use dst as temp if available
+					if (!dst.IsMemoryOperand())
+					{
+						MachineInstruction load_index(InstLoad);
+						load_index.SetOp<0>(dst).SetOp<1>(index);
+						instructions.insert(instruction_iter, load_index);
+
+						MachineInstruction mul_scale(InstSMul);
+						mul_scale.SetOp<0>(dst).SetOp<1>(MachineOperand::Immediate(scale_val, MachineType::Int64));
+						instructions.insert(instruction_iter, mul_scale);
+
+						MachineInstruction add_result(InstAdd);
+						add_result.SetOp<0>(scratch).SetOp<1>(dst);
+						instructions.insert(instruction_iter, add_result);
+					}
+				}
+
+				if (disp_val != 0)
+				{
+					MachineInstruction add_disp(InstAdd);
+					add_disp.SetOp<0>(scratch).SetOp<1>(MachineOperand::Immediate(disp_val, MachineType::Int64));
+					instructions.insert(instruction_iter, add_disp);
+				}
+
+				if (dst.IsMemoryOperand())
+				{
+					MI.SetOpcode(InstStore);
+					MI.SetOp<0>(dst);
+					MI.SetOp<1>(scratch);
+				}
+				else
+				{
+					MI.SetOpcode(InstMove);
+					MI.SetOp<0>(dst);
+					MI.SetOp<1>(scratch);
+				}
+			}
+			else if (base_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MachineInstruction load_base(InstLoad);
+				load_base.SetOp<0>(scratch).SetOp<1>(base);
+				instructions.insert(instruction_iter, load_base);
+				MI.SetOp<1>(scratch);
+			}
+			else if (index_is_mem)
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MachineInstruction load_index(InstLoad);
+				load_index.SetOp<0>(scratch).SetOp<1>(index);
+				instructions.insert(instruction_iter, load_index);
+				MI.SetOp<2>(scratch);
+			}
+			
+			if (MI.GetOpcode() == X86_InstLea && dst.IsMemoryOperand())
+			{
+				auto scratch = GetScratchReg(MachineType::Int64);
+				MI.SetOp<0>(scratch);
+				MachineInstruction store_result(InstStore);
+				store_result.SetOp<0>(dst).SetOp<1>(scratch);
+				instructions.insert(++instruction_iter, store_result);
+			}
+		}
+
 		if (MI.GetOpcode() == InstLoad && MI.GetOperand(0).IsMemoryOperand())
 		{
 			MachineOperand dst = MI.GetOperand(0);
@@ -528,6 +622,14 @@ namespace ola
 			if (src.GetType() == MachineType::Float64 && MI.GetOpcode() == InstStore)
 			{
 				MI.SetOpcode(X86_InstStoreFP);
+				if (src.IsImmediate())
+				{
+					auto scratch = GetScratchReg(MachineType::Float64);
+					MachineInstruction load_imm(X86_InstMoveFP);
+					load_imm.SetOp<0>(scratch).SetOp<1>(src);
+					instructions.insert(instruction_iter, load_imm);
+					MI.SetOp<1>(scratch);
+				}
 			}
 			else if (dst.GetType() == MachineType::Float64 && MI.GetOpcode() == InstLoad)
 			{
