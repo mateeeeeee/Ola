@@ -13,12 +13,12 @@ public int main()
     float resultLocalGlobal = (c > GlobalFloatD) ? c : GlobalFloatD;
     Assert(resultLocalGlobal == 9.0);
 
-    //float resultGlobal = (GlobalFloatC > GlobalFloatD) ? GlobalFloatC : GlobalFloatD;
-    //Assert(resultGlobal == 9.0);
-    //
-    //float resultGlobalImmediate = (GlobalFloatC > 5.0) ? GlobalFloatC : 5.0;
-    //Assert(resultGlobalImmediate == 5.0);
-    //
+    float resultGlobal = (GlobalFloatC > GlobalFloatD) ? GlobalFloatC : GlobalFloatD;
+    Assert(resultGlobal == 9.0);
+    
+    float resultGlobalImmediate = (GlobalFloatC > 5.0) ? GlobalFloatC : 5.0;
+    Assert(resultGlobalImmediate == 5.0);
+    
     float resultImmediate = (7.0 > 2.0) ? 7.0 : 2.0;
     Assert(resultImmediate == 7.0);
 
