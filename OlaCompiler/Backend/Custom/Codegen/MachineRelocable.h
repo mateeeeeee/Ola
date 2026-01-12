@@ -18,6 +18,14 @@ namespace ola
 		virtual ~MachineRelocable() = default;
 
 		std::string_view GetSymbol() const { return symbol; }
+		std::string GetMangledSymbol() const
+		{
+#if defined(OLA_PLATFORM_MACOS)
+			return "_" + symbol;
+#else
+			return symbol;
+#endif
+		}
 		virtual RelocableKind GetRelocableKind() const = 0;
 
 		Bool IsFunction() const 	{ return GetRelocableKind() == RelocableKind::Function; }

@@ -58,11 +58,7 @@ namespace ola
 		}
 		else if (MO.IsRelocable())
 		{
-			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-			// On macOS, all C symbols need underscore prefix
-			symbol = "_" + symbol;
-#endif
+			std::string symbol = MO.GetRelocable()->GetMangledSymbol();
 			return MO.GetRelocable()->IsFunction() ? symbol
 				: std::format("{} {}[rip]", GetOperandPrefix(MO), symbol);
 		}
@@ -93,10 +89,7 @@ namespace ola
 		}
 		else if (MO.IsRelocable())
 		{
-			std::string symbol = std::string(MO.GetRelocable()->GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-			symbol = "_" + symbol;
-#endif
+			std::string symbol = MO.GetRelocable()->GetMangledSymbol();
 			return std::format("{} {}[rip]", prefix, symbol);
 		}
 		OLA_ASSERT(false);
@@ -135,10 +128,7 @@ namespace ola
 			if (relocable->IsFunction())
 			{
 				MachineFunction& MF = *static_cast<MachineFunction*>(relocable);
-				std::string symbol_name(MF.GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-				symbol_name = "_" + symbol_name;
-#endif
+				std::string symbol_name = MF.GetMangledSymbol();
 				if (global.GetLinkage() == Linkage::External)
 				{
 					if(!MF.IsDeclaration()) EmitText(".globl {}\n", symbol_name);
@@ -245,10 +235,7 @@ namespace ola
 							MachineOperand const& op2 = MI.GetOp<1>();
 							if (op2.IsRelocable())
 							{
-								std::string symbol = std::string(op2.GetRelocable()->GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-								symbol = "_" + symbol;
-#endif
+								std::string symbol = op2.GetRelocable()->GetMangledSymbol();
 								EmitText("{} {}, [rip + {}]", opcode_string, GetOperandString(op1), symbol);
 							}
 							else
@@ -389,10 +376,7 @@ namespace ola
 				MachineDataStorage& MDS = *static_cast<MachineDataStorage*>(relocable);
 				auto const& storage = MDS.GetStorage();
 
-				std::string data_symbol(relocable->GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-				data_symbol = "_" + data_symbol;
-#endif
+				std::string data_symbol = relocable->GetMangledSymbol();
 
 				if (MDS.IsReadOnly())
 				{
@@ -432,10 +416,7 @@ namespace ola
 			else if (relocable->IsZeroStorage())
 			{
 				MachineZeroStorage& MZS = *static_cast<MachineZeroStorage*>(relocable);
-				std::string bss_symbol(relocable->GetSymbol());
-#if defined(OLA_PLATFORM_MACOS)
-				bss_symbol = "_" + bss_symbol;
-#endif
+				std::string bss_symbol = relocable->GetMangledSymbol();
 				EmitBSS("{}:", bss_symbol);
 				EmitBSS(".zero {}", MZS.GetSize());
 			}
