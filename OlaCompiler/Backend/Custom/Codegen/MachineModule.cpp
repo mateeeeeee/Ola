@@ -218,6 +218,7 @@ namespace ola
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (auto& MBB : MF.Blocks())
 		{
+			machine_ctx.SetCurrentBasicBlock(MBB.get());
 			auto& instructions = MBB->Instructions();
 			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 			{
@@ -233,6 +234,7 @@ namespace ola
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (auto& MBB : MF.Blocks())
 		{
+			machine_ctx.SetCurrentBasicBlock(MBB.get());
 			auto& instructions = MBB->Instructions();
 			for (auto MIiterator = instructions.begin(); MIiterator != instructions.end(); MIiterator++)
 			{
