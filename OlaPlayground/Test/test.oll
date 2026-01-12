@@ -6,30 +6,248 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
+define internal @TestSizeofTypes void() {
+entry:
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofExpressions void() {
+entry:
+%0 = alloca i64
+store 42, ptr %0
+%1 = alloca f64
+store 3.14, ptr %1
+%2 = alloca i8
+store 1, ptr %2
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofArrays void() {
+entry:
+%0 = alloca i64[5]
+%1 = alloca f64[10]
+%2 = alloca i8[3]
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofInExpressions void() {
+entry:
+%0 = alloca i64
+store 17, ptr %0
+%1 = load i64, ptr %0
+%2 = icmp eq i64 %1, 17
+call i8 %2, @Assert
+%3 = alloca i64
+store 40, ptr %3
+%4 = load i64, ptr %3
+%5 = icmp eq i64 %4, 40
+call i8 %5, @Assert
+%6 = alloca i8
+store 1, ptr %6
+%7 = load i8, ptr %6
+%8 = icmp eq i8 %7, 1
+call i8 %8, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofInitializedArrays void() {
+entry:
+%0 = alloca i64[3]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+call i8 1, @Assert
+%4 = alloca f64[2]
+%5 = ptr add ptr %4, 0
+store 1, ptr %5
+%6 = ptr add ptr %4, 8
+store 2, ptr %6
+call i8 1, @Assert
+%7 = alloca i8[5]
+%8 = ptr add ptr %7, 0
+store 1, ptr %8
+%9 = ptr add ptr %7, 1
+store 0, ptr %9
+%10 = ptr add ptr %7, 2
+store 1, ptr %10
+%11 = ptr add ptr %7, 3
+store 0, ptr %11
+%12 = ptr add ptr %7, 4
+store 1, ptr %12
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofAutoArrays void() {
+entry:
+%0 = alloca i64[4]
+%1 = ptr add ptr %0, 0
+store 10, ptr %1
+%2 = ptr add ptr %0, 8
+store 20, ptr %2
+%3 = ptr add ptr %0, 16
+store 30, ptr %3
+%4 = ptr add ptr %0, 24
+store 40, ptr %4
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofInConditions void() {
+entry:
+br label if.then
+if.then:
+call i8 1, @Assert
+br label if.end
+if.else:
+call i8 0, @Assert
+br label if.end
+if.end:
+br label if.then1
+if.then1:
+call i8 1, @Assert
+br label if.end1
+if.else1:
+call i8 0, @Assert
+br label if.end1
+if.end1:
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofInLoops void() {
+entry:
+%0 = alloca i64[4]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = alloca i64
+store 0, ptr %5
+%6 = alloca i64
+store 8, ptr %6
+%7 = alloca i64
+store 0, ptr %7
+br label for.cond
+for.body:
+%8 = load i64, ptr %7
+%9 = gep ptr %0, 0, %8
+%10 = load i64, ptr %5
+%11 = load i64, ptr %9
+%12 = add i64 %10, %11
+store i64 %12, ptr %5
+br label for.iter
+for.cond:
+%13 = load i64, ptr %6
+%14 = sdiv i64 32, %13
+%15 = load i64, ptr %7
+%16 = icmp slt i64 %15, %14
+br i8 %16, label for.body, label for.end
+for.iter:
+%17 = load i64, ptr %7
+%18 = alloca ptr
+store i64 %17, ptr %18
+%19 = add i64 %17, 1
+store i64 %19, ptr %7
+br label for.cond
+for.end:
+%20 = load i64, ptr %5
+%21 = icmp eq i64 %20, 10
+call i8 %21, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofComparisons void() {
+entry:
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%0 = alloca i64[2]
+%1 = alloca i64[10]
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestSizeofVariousArrays void() {
+entry:
+%0 = alloca i64[1]
+%1 = alloca i64[2]
+%2 = alloca i64[5]
+%3 = alloca i64[10]
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = alloca f64
-store 2.5, ptr %1
-%2 = alloca f64
-store 3, ptr %2
-%3 = load f64, ptr %1
-%4 = load f64, ptr %2
-%5 = fcmp ogt f64 %3, %4
-%6 = load f64, ptr %1
-%7 = load f64, ptr %2
-%8 = select i8 %5, f64 %6, f64 %7
-%9 = alloca f64
-store f64 %8, ptr %9
-%10 = load f64, ptr %9
-%11 = fcmp ogt f64 %10, 2.5
-call i8 %11, @Assert
+call ptr @TestSizeofTypes
+call ptr @TestSizeofExpressions
+call ptr @TestSizeofArrays
+call ptr @TestSizeofInExpressions
+call ptr @TestSizeofInitializedArrays
+call ptr @TestSizeofAutoArrays
+call ptr @TestSizeofInConditions
+call ptr @TestSizeofInLoops
+call ptr @TestSizeofComparisons
+call ptr @TestSizeofVariousArrays
 store 0, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%12 = load i64, ptr %0
-ret i64 %12
+%1 = load i64, ptr %0
+ret i64 %1
 }
 

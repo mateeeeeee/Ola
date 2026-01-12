@@ -121,7 +121,7 @@ namespace ola
 		// Address calculations (producer without memory ops) can safely merge into
 		// loads/stores. The consumer having a memory op is fine - we're just inlining
 		// address calculations into the load/store pattern.
-		if (forest.HasMemoryOp(producer)  || forest.HasMemoryOp(consumer))
+		if (forest.HasMemoryOp(producer))//  || forest.HasMemoryOp(consumer))
 		{
 			return false;
 		}
