@@ -134,8 +134,15 @@ namespace ola
 	{
 		// Check for target-specific lowering first, like X86 SelectInst for Floats
 		Target const& target = ctx.GetModule().GetTarget();
-		if (target.GetISelInfo().LowerInstruction(&I, ctx))
+		Bool lowered = false;
+		auto captured = CaptureEmittedInstructions([&]()
 		{
+			lowered = target.GetISelInfo().LowerInstruction(&I, ctx);
+		});
+
+		if (lowered && !captured.empty())
+		{
+			AddAsmNode(std::move(captured));
 			return;
 		}
 
