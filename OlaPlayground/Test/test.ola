@@ -1,146 +1,26 @@
 import std.assert;
 
-void TestSizeofTypes()
-{
-    Assert(sizeof(int) == 8);
-    Assert(sizeof(float) == 8);
-    Assert(sizeof(bool) == 1);
-}
 
-void TestSizeofExpressions()
-{
-    int intVar = 42;
-    float floatVar = 3.14;
-    bool boolVar = true;
+float GlobalFloatC = 4.5;
+float GlobalFloatD = 9.0;
 
-    Assert(sizeof(intVar) == 8);
-    Assert(sizeof(floatVar) == 8);
-    Assert(sizeof(boolVar) == 1);
-}
-
-// Test sizeof with arrays
-void TestSizeofArrays()
-{
-    int[5] intArray;
-    float[10] floatArray;
-    bool[3] boolArray;
-
-    Assert(sizeof(intArray) == 40);  // 8 bytes per int * 5 ints
-    Assert(sizeof(floatArray) == 80);  // 8 bytes per float * 10 floats
-    Assert(sizeof(boolArray) == 3);  // 1 byte per bool * 3 bools
-}
-
-// Test sizeof in expressions
-void TestSizeofInExpressions()
-{
-    int totalSize = sizeof(int) + sizeof(float) + sizeof(bool);
-    Assert(totalSize == 17);  // 8 + 8 + 1
-
-    int arraySize = sizeof(int) * 5;
-    Assert(arraySize == 40);
-
-    bool isIntBigger = sizeof(int) > sizeof(bool);
-    Assert(isIntBigger == true);
-}
-
-// Test sizeof with initialized arrays
-void TestSizeofInitializedArrays()
-{
-    int[3] arr1 = {1, 2, 3};
-    Assert(sizeof(arr1) == 24);
-
-    float[2] arr2 = {1.0, 2.0};
-    Assert(sizeof(arr2) == 16);
-
-    bool[5] arr3 = {true, false, true, false, true};
-    Assert(sizeof(arr3) == 5);
-}
-
-// Test sizeof with auto arrays
-void TestSizeofAutoArrays()
-{
-    auto arr = {10, 20, 30, 40};
-    Assert(sizeof(arr) == 32);  // 4 ints * 8 bytes
-}
-
-// Test sizeof in conditions
-void TestSizeofInConditions()
-{
-    if (sizeof(int) == 8)
-    {
-        Assert(true);
-    }
-    else
-    {
-        Assert(false);
-    }
-
-    if (sizeof(bool) < sizeof(int))
-    {
-        Assert(true);
-    }
-    else
-    {
-        Assert(false);
-    }
-}
-
-// Test sizeof in loops
-void TestSizeofInLoops()
-{
-    int[4] arr = {1, 2, 3, 4};
-    int sum = 0;
-    int elementSize = sizeof(int);
-
-    for (int i = 0; i < sizeof(arr) / elementSize; i++)
-    {
-        sum += arr[i];
-    }
-    Assert(sum == 10);
-}
-
-// Test sizeof comparisons
-void TestSizeofComparisons()
-{
-    Assert(sizeof(int) == sizeof(float));
-    Assert(sizeof(bool) < sizeof(int));
-    Assert(sizeof(int) > sizeof(bool));
-    Assert(sizeof(bool) != sizeof(int));
-
-    int[2] smallArr;
-    int[10] largeArr;
-    Assert(sizeof(smallArr) < sizeof(largeArr));
-}
-
-// Test sizeof with different array sizes
-void TestSizeofVariousArrays()
-{
-    int[1] arr1;
-    int[2] arr2;
-    int[5] arr5;
-    int[10] arr10;
-
-    Assert(sizeof(arr1) == 8);
-    Assert(sizeof(arr2) == 16);
-    Assert(sizeof(arr5) == 40);
-    Assert(sizeof(arr10) == 80);
-
-    Assert(sizeof(arr2) == sizeof(arr1) * 2);
-    Assert(sizeof(arr10) == sizeof(arr5) * 2);
-}
 
 public int main()
 {
-    TestSizeofTypes();
-    TestSizeofExpressions();
-    TestSizeofArrays();
-    TestSizeofInExpressions();
-    TestSizeofInitializedArrays();
-    TestSizeofAutoArrays();
-    TestSizeofInConditions();
-    TestSizeofInLoops();
-    TestSizeofComparisons();
-    TestSizeofVariousArrays();
+    float c = 2.5;
+    float d = 3.0;
+
+    float resultLocalGlobal = (c > GlobalFloatD) ? c : GlobalFloatD;
+    Assert(resultLocalGlobal == 9.0);
+
+    float resultGlobal = (GlobalFloatC > GlobalFloatD) ? GlobalFloatC : GlobalFloatD;
+    Assert(resultGlobal == 9.0);
+
+    float resultGlobalImmediate = (GlobalFloatC > 5.0) ? GlobalFloatC : 5.0;
+    Assert(resultGlobalImmediate == 5.0);
+
+    float resultImmediate = (7.0 > 2.0) ? 7.0 : 2.0;
+    Assert(resultImmediate == 7.0);
 
     return 0;
 }
