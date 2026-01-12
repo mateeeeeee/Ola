@@ -35,48 +35,6 @@ InstJE - label3
 X86_MoveFP - f64 reg 30, f64 reg 29
 InstJump - label3
 
-label1: 
-
-label2: 
-InstLoad - i64 reg 14, i64 stack -48
-InstMove - i64 reg 0, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -8
-X86_LoadFP - f64 reg 31, f64 stack -16
-X86_LoadFP - f64 reg 30, f64 stack -24
-X86_LoadFP - f64 reg 29, f64 stack -32
-X86_LoadFP - f64 reg 28, f64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-label4: 
-X86_StoreFP - f64 stack -80, f64 reg 29
-X86_LoadFP - f64 reg 29, f64 stack -80
-InstFCmp - i8 reg 14, f64 reg 29
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstLoadGlobalAddress - ptr reg 14, GlobalFloatC
-X86_LoadFP - f64 reg 29, ptr reg 14
-InstLoadGlobalAddress - ptr reg 14, GlobalFloatC
-X86_LoadFP - f64 reg 28, ptr reg 14
-InstFCmp - i8 reg 14, f64 reg 29
-InstTest - i8 reg 14, i8 reg 14
-X86_MoveFP - f64 reg 29, f64 imm 4617315517961601024
-InstCMoveNE - f64 reg 29, f64 reg 28
-X86_StoreFP - f64 stack -88, f64 reg 29
-X86_LoadFP - f64 reg 29, f64 stack -88
-InstFCmp - i8 reg 14, f64 reg 29
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-X86_MoveFP - f64 reg 32, f64 imm 4619567317775286272
-X86_StoreFP - f64 stack -96, f64 reg 32
-X86_LoadFP - f64 reg 29, f64 stack -96
-InstFCmp - i8 reg 14, f64 reg 29
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstStore - i64 stack -48, i64 imm 0
-InstJump - label2
-
 label3: 
 X86_StoreFP - f64 stack -72, f64 reg 30
 X86_LoadFP - f64 reg 30, f64 stack -72
@@ -101,4 +59,58 @@ X86_MoveFP - f64 reg 29, f64 reg 31
 InstJE - label4
 X86_MoveFP - f64 reg 29, f64 reg 28
 InstJump - label4
+
+label4: 
+X86_StoreFP - f64 stack -80, f64 reg 29
+X86_LoadFP - f64 reg 29, f64 stack -80
+InstFCmp - f64 reg 29, f64 imm 4621256167635550208
+X86_SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstLoadGlobalAddress - ptr reg 14, GlobalFloatC
+X86_LoadFP - f64 reg 29, ptr reg 14
+InstLoadGlobalAddress - ptr reg 14, GlobalFloatC
+X86_LoadFP - f64 reg 28, ptr reg 14
+InstFCmp - f64 reg 29, f64 imm 4617315517961601024
+X86_SetA - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstTest - i8 reg 14, i8 reg 14
+X86_MoveFP - f64 reg 29, f64 imm 4617315517961601024
+InstJE - label5
+X86_MoveFP - f64 reg 29, f64 reg 28
+InstJump - label5
+
+label5: 
+X86_StoreFP - f64 stack -88, f64 reg 29
+X86_LoadFP - f64 reg 29, f64 stack -88
+InstFCmp - f64 reg 29, f64 imm 4617315517961601024
+X86_SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+X86_MoveFP - f64 reg 29, f64 imm 4619567317775286272
+X86_StoreFP - f64 stack -96, f64 reg 29
+X86_LoadFP - f64 reg 29, f64 stack -96
+InstFCmp - f64 reg 29, f64 imm 4619567317775286272
+X86_SetE - i8 reg 14
+InstAnd - i8 reg 14, i8 imm 1
+InstMove - i8 reg 3, i8 reg 14
+InstCall - 
+InstStore - i64 stack -48, i64 imm 0
+InstJump - label2
+
+label1: 
+
+label2: 
+InstLoad - i64 reg 14, i64 stack -48
+InstMove - i64 reg 0, i64 reg 14
+InstLoad - i64 reg 14, i64 stack -8
+X86_LoadFP - f64 reg 31, f64 stack -16
+X86_LoadFP - f64 reg 30, f64 stack -24
+X86_LoadFP - f64 reg 29, f64 stack -32
+X86_LoadFP - f64 reg 28, f64 stack -40
+InstMove - i64 reg 1, i64 reg 2
+InstPop - i64 reg 2
+InstRet - 
 
