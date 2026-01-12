@@ -255,7 +255,45 @@ namespace ola
 		{
 			MachineOperand dst = MI.GetOperand(0);
 			MachineOperand src = MI.GetOperand(1);
-			if (src.IsImmediate())
+
+			if (dst.GetType() == MachineType::Float64)
+			{
+				MachineBasicBlock* MBB = lowering_ctx.GetCurrentBasicBlock();
+				MachineFunction* MF = MBB->GetFunction();
+
+				auto Where = std::find_if(MF->Blocks().begin(), MF->Blocks().end(),
+										  [MBB](const auto& block) { return block.get() == MBB; });
+				++Where;
+
+				auto& inserted = *MF->Blocks().insert(Where, std::make_unique<MachineBasicBlock>(MF, lowering_ctx.GetLabel()));
+				MachineBasicBlock* ContinuationBlock = inserted.get();
+
+				Uint32 jump_opcode = (MI.GetOpcode() == InstCMoveNE) ? InstJE : InstJNE;
+				MI.SetOpcode(jump_opcode);
+				MI.SetOp<0>(MachineOperand::Relocable(ContinuationBlock));
+				MI.SetOp<1>(MachineOperand::Undefined());
+
+				MachineInstruction mov(X86_InstMoveFP);
+				mov.SetOp<0>(dst);
+				mov.SetOp<1>(src);
+				++instruction_iter;
+				instruction_iter = instructions.insert(instruction_iter, mov);
+
+				MachineInstruction jmp(InstJump);
+				jmp.SetOp<0>(MachineOperand::Relocable(ContinuationBlock));
+				++instruction_iter;
+				instruction_iter = instructions.insert(instruction_iter, jmp);
+
+				auto& cont_instructions = ContinuationBlock->Instructions();
+				auto move_start = instruction_iter;
+				++move_start;
+				while (move_start != instructions.end())
+				{
+					cont_instructions.push_back(std::move(*move_start));
+					move_start = instructions.erase(move_start);
+				}
+			}
+			else if (src.IsImmediate())
 			{
 				MachineOperand tmp = lowering_ctx.VirtualReg(src.GetType());
 				MachineInstruction MI2(InstMove);
