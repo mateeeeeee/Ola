@@ -204,54 +204,43 @@ namespace ola
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 
 				// Special handling for Store/Load where address operand is a spilled pointer vreg
-				// For Store: operand 0 is the address, if it's a spilled pointer, we need indirection
 				if (MI.GetOpcode() == InstStore)
 				{
+					// For Store operand 0 is the address, if it's a spilled pointer, we need indirection
 					MachineOperand& addr_op = MI.GetOperand(0);
 					if (IsOperandVReg(addr_op) && !vreg2reg_map.contains(addr_op.GetReg().reg))
 					{
-						// Address vreg is spilled - need to load the pointer first
+						// Address vreg is spilled, need to load the pointer first
 						Uint32 vreg_id = addr_op.GetReg().reg;
 						MachineOperand* spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
 
-						// Get scratch register for loading the pointer (always GP for addresses)
 						Uint32 scratch = target_reg_info.GetGPScratchRegister();
-
-						// Insert load instruction before the store
 						MachineInstruction load_inst(InstLoad);
 						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
 						load_inst.SetOp<1>(*spill_slot);
 						instructions.insert(it, load_inst);
-
-						// Replace address operand with scratch register
 						MI.SetOperand(0, MachineOperand::ISAReg(scratch, addr_op.GetType()));
 					}
 				}
-				// For Load: operand 1 is the address, if it's a spilled pointer, we need indirection
 				else if (MI.GetOpcode() == InstLoad)
 				{
+					// For Load: operand 1 is the address, if it's a spilled pointer, we need indirection
 					MachineOperand& addr_op = MI.GetOperand(1);
 					if (IsOperandVReg(addr_op) && !vreg2reg_map.contains(addr_op.GetReg().reg))
 					{
-						// Address vreg is spilled - need to load the pointer first
+						// Address vreg is spilled, need to load the pointer first
 						Uint32 vreg_id = addr_op.GetReg().reg;
 						MachineOperand* spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
 
-						// Get scratch register for loading the pointer (always GP for addresses)
 						Uint32 scratch = target_reg_info.GetGPScratchRegister();
-
-						// Insert load instruction before the load to get the pointer
 						MachineInstruction load_ptr_inst(InstLoad);
 						load_ptr_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
 						load_ptr_inst.SetOp<1>(*spill_slot);
 						instructions.insert(it, load_ptr_inst);
-
-						// Replace address operand with scratch register
 						MI.SetOperand(1, MachineOperand::ISAReg(scratch, addr_op.GetType()));
 					}
 				}
 
-				// Regular handling for all operands
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
