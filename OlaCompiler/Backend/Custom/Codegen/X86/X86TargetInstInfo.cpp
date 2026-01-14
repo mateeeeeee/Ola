@@ -128,20 +128,20 @@ namespace ola
 		switch (opcode)
 		{
 		case X86_InstSetE:		return "X86_SetE";
-		case X86_InstSetNE:	return "X86_SetNE";
-		case X86_InstSetGT:	return "X86_SetGT";
-		case X86_InstSetGE:	return "X86_SetGE";
-		case X86_InstSetLT:	return "X86_SetLT";
-		case X86_InstSetLE:	return "X86_SetLE";
+		case X86_InstSetNE:		return "X86_SetNE";
+		case X86_InstSetGT:		return "X86_SetGT";
+		case X86_InstSetGE:		return "X86_SetGE";
+		case X86_InstSetLT:		return "X86_SetLT";
+		case X86_InstSetLE:		return "X86_SetLE";
 		case X86_InstSetA:		return "X86_SetA";
-		case X86_InstSetAE:	return "X86_SetAE";
+		case X86_InstSetAE:		return "X86_SetAE";
 		case X86_InstSetB:		return "X86_SetB";
-		case X86_InstSetBE:	return "X86_SetBE";
+		case X86_InstSetBE:		return "X86_SetBE";
 		case X86_InstCqo:		return "X86_Cqo";
 		case X86_InstMoveFP:	return "X86_MoveFP";
 		case X86_InstStoreFP:	return "X86_StoreFP";
 		case X86_InstLoadFP:	return "X86_LoadFP";
-		case X86_InstXorFP:	return "X86_XorFP";
+		case X86_InstXorFP:		return "X86_XorFP";
 		case X86_InstLea:		return "X86_Lea";
 		}
 		return "";

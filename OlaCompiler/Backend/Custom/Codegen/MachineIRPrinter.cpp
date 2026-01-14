@@ -107,8 +107,8 @@ namespace ola
 		case MachineType::Int8:		Emit("i8 "); break;
 		case MachineType::Float64:	Emit("f64 "); break;
 		case MachineType::Ptr:		Emit("ptr "); break;
-		case MachineType::Other:	break;
-		case MachineType::Undef:
+		case MachineType::Other:	
+		case MachineType::Undef:	break;
 		default:
 			OLA_ASSERT(false);
 		}
