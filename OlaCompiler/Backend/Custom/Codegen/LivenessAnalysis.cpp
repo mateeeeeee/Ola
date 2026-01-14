@@ -64,16 +64,17 @@ namespace ola
 		for (MachineInstruction& MI : MBB->Instructions())
 		{
 			InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
-			// Process uses first (before defs for this instruction)
 			for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 			{
 				MachineOperand& MO = MI.GetOperand(idx);
-				if (!IsOperandVReg(MO)) continue;
+				if (!IsOperandVReg(MO))
+				{
+					continue;
+				}
 
 				Uint32 reg_id = GetRegAsUint(MO);
 				if (inst_info.HasOpFlag(idx, OperandFlagUse))
 				{
-					// If not already defined in this block, it's a use (upward exposed)
 					if (!info.def.contains(reg_id))
 					{
 						info.use.insert(reg_id);
@@ -81,11 +82,13 @@ namespace ola
 				}
 			}
 
-			// Then process defs
 			for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 			{
 				MachineOperand& MO = MI.GetOperand(idx);
-				if (!IsOperandVReg(MO)) continue;
+				if (!IsOperandVReg(MO))
+				{
+					continue;
+				}
 
 				Uint32 reg_id = GetRegAsUint(MO);
 				if (inst_info.HasOpFlag(idx, OperandFlagDef))
@@ -125,7 +128,6 @@ namespace ola
 				}
 			}
 
-			// Check if anything changed
 			if (new_live_out != info.live_out || new_live_in != info.live_in)
 			{
 				changed = true;
@@ -142,7 +144,6 @@ namespace ola
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 		CFGAnalysis(MF);
 
-		// Assign instruction numbers and track block boundaries
 		std::unordered_map<MachineBasicBlock*, Uint64> block_start_map;
 		std::unordered_map<MachineBasicBlock*, Uint64> block_end_map;
 		AssignInstNum(MF, result.instruction_numbering_map, block_start_map, block_end_map);
@@ -197,7 +198,10 @@ namespace ola
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO)) continue;
+					if (!IsOperandVReg(MO))
+					{
+						continue;
+					}
 
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float = MO.GetType() == MachineType::Float64;
@@ -220,7 +224,10 @@ namespace ola
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO)) continue;
+					if (!IsOperandVReg(MO))
+					{
+						continue;
+					}
 
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float = MO.GetType() == MachineType::Float64;

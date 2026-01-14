@@ -66,8 +66,6 @@ namespace ola
 		}
 
 		std::vector<Instruction*> ToErase;
-
-		// Second pass: process non-phi instructions
 		for (BasicBlock* BB : blocks)
 		{
 			for (Instruction& I : *BB)
@@ -175,32 +173,32 @@ namespace ola
 							continue;
 						}
 						
-						if (existing_inst->GetNumOperands() != I.GetNumOperands())
-						{
-							Uint64 new_vn = AssignNewVN(&I);
-							ExpressionNumberMap[expr_hash] = new_vn;
-							continue;
-						}
-						Bool operands_match = true;
-						for (Uint32 op_idx = 0; op_idx < I.GetNumOperands(); ++op_idx)
-						{
-							if (I.GetOperand(op_idx) != existing_inst->GetOperand(op_idx))
-							{
-								auto it1 = ValueNumberMap.find(I.GetOperand(op_idx));
-								auto it2 = ValueNumberMap.find(existing_inst->GetOperand(op_idx));
-								if (it1 == ValueNumberMap.end() || it2 == ValueNumberMap.end() || it1->second != it2->second)
-								{
-									operands_match = false;
-									break;
-								}
-							}
-						}
-						if (!operands_match)
-						{
-							Uint64 new_vn = AssignNewVN(&I);
-							ExpressionNumberMap[expr_hash] = new_vn;
-							continue;
-						}
+						//if (existing_inst->GetNumOperands() != I.GetNumOperands())
+						//{
+						//	Uint64 new_vn = AssignNewVN(&I);
+						//	ExpressionNumberMap[expr_hash] = new_vn;
+						//	continue;
+						//}
+						//Bool operands_match = true;
+						//for (Uint32 op_idx = 0; op_idx < I.GetNumOperands(); ++op_idx)
+						//{
+						//	if (I.GetOperand(op_idx) != existing_inst->GetOperand(op_idx))
+						//	{
+						//		auto it1 = ValueNumberMap.find(I.GetOperand(op_idx));
+						//		auto it2 = ValueNumberMap.find(existing_inst->GetOperand(op_idx));
+						//		if (it1 == ValueNumberMap.end() || it2 == ValueNumberMap.end() || it1->second != it2->second)
+						//		{
+						//			operands_match = false;
+						//			break;
+						//		}
+						//	}
+						//}
+						//if (!operands_match)
+						//{
+						//	Uint64 new_vn = AssignNewVN(&I);
+						//	ExpressionNumberMap[expr_hash] = new_vn;
+						//	continue;
+						//}
 					}
 
 					ValueNumberMap[&I] = existing_vn;

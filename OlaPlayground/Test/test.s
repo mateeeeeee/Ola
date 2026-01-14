@@ -122,7 +122,7 @@ TestMixedTypeAddition:
 label0:
 push rbp
 mov rbp, rsp
-sub rsp, 112
+sub rsp, 96
 mov qword ptr [rbp - 8], r14
 mov qword ptr [rbp - 16], r13
 mov qword ptr [rbp - 24], r12
@@ -131,7 +131,6 @@ movsd qword ptr [rbp - 40], xmm14
 movsd qword ptr [rbp - 48], xmm13
 movsd qword ptr [rbp - 56], xmm12
 movsd qword ptr [rbp - 64], xmm11
-movsd qword ptr [rbp - 72], xmm10
 lea r14, [rip + global_int_1]
 mov r13, qword ptr [r14]
 lea r14, [rip + global_float_1]
@@ -190,14 +189,14 @@ and r12b, 1
 mov cl, r12b
 call Assert
 lea r12, [rip + global_float_3]
-movsd xmm13, qword ptr [r12]
-cvtsi2sd xmm11, qword ptr [rip + _INT1]
-movsd xmm10, xmm11
-addsd xmm10, xmm13
-comisd xmm10, qword ptr [rip + _FP7]
+movsd xmm14, qword ptr [r12]
+cvtsi2sd xmm13, qword ptr [rip + _INT1]
+movsd xmm11, xmm13
+addsd xmm11, xmm14
+comisd xmm11, qword ptr [rip + _FP7]
 seta r12b
 and r12b, 1
-comisd xmm10, qword ptr [rip + _FP8]
+comisd xmm11, qword ptr [rip + _FP8]
 setb r13b
 and r13b, 1
 mov r14b, r12b
@@ -209,14 +208,14 @@ mov cl, r14b
 call Assert
 lea r14, [rip + global_int_3]
 mov r13, qword ptr [r14]
-cvtsi2sd xmm10, r13
-movsd xmm13, xmm10
-movsd xmm10, qword ptr [rip + _FP9]
-addsd xmm13, xmm10
-comisd xmm13, qword ptr [rip + _FP10]
+cvtsi2sd xmm11, r13
+movsd xmm14, xmm11
+movsd xmm11, qword ptr [rip + _FP9]
+addsd xmm14, xmm11
+comisd xmm14, qword ptr [rip + _FP10]
 seta r13b
 and r13b, 1
-comisd xmm13, qword ptr [rip + _FP11]
+comisd xmm14, qword ptr [rip + _FP11]
 setb r14b
 and r14b, 1
 mov r12b, r13b
@@ -226,13 +225,13 @@ setne r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-movsd xmm13, xmm12
-movsd xmm10, qword ptr [rip + _FP12]
-addsd xmm13, xmm10
-comisd xmm13, qword ptr [rip + _FP13]
+movsd xmm14, xmm12
+movsd xmm11, qword ptr [rip + _FP12]
+addsd xmm14, xmm11
+comisd xmm14, qword ptr [rip + _FP13]
 seta r12b
 and r12b, 1
-comisd xmm13, qword ptr [rip + _FP14]
+comisd xmm14, qword ptr [rip + _FP14]
 setb r14b
 and r14b, 1
 mov r13b, r12b
@@ -242,13 +241,13 @@ setne r13b
 and r13b, 1
 mov cl, r13b
 call Assert
-movsd xmm13, xmm12
-movsd xmm10, qword ptr [rip + _FP9]
-addsd xmm13, xmm10
-comisd xmm13, qword ptr [rip + _FP0]
+movsd xmm14, xmm12
+movsd xmm11, qword ptr [rip + _FP9]
+addsd xmm14, xmm11
+comisd xmm14, qword ptr [rip + _FP0]
 seta r13b
 and r13b, 1
-comisd xmm13, qword ptr [rip + _FP1]
+comisd xmm14, qword ptr [rip + _FP1]
 setb r14b
 and r14b, 1
 mov r12b, r13b
@@ -258,27 +257,27 @@ setne r12b
 and r12b, 1
 mov cl, r12b
 call Assert
-movsd xmm13, xmm12
-movsd xmm10, qword ptr [rip + _FP4]
-addsd xmm13, xmm10
-cvttsd2si r12, xmm13
+movsd xmm14, xmm12
+movsd xmm11, qword ptr [rip + _FP4]
+addsd xmm14, xmm11
+cvttsd2si r12, xmm14
 cmp r12, 7
 sete r12b
 and r12b, 1
 mov cl, r12b
 call Assert
 lea r12, [rip + global_composite_mix_add_float]
-movsd xmm13, qword ptr [r12]
+movsd xmm14, qword ptr [r12]
 lea r12, [rip + global_composite_mix_add_float]
-movsd xmm10, xmm13
-addsd xmm10, xmm12
-movsd qword ptr [r12], xmm10
+movsd xmm11, xmm14
+addsd xmm11, xmm12
+movsd qword ptr [r12], xmm11
 lea r12, [rip + global_composite_mix_add_float]
-movsd xmm10, qword ptr [r12]
-comisd xmm10, qword ptr [rip + _FP0]
+movsd xmm11, qword ptr [r12]
+comisd xmm11, qword ptr [rip + _FP0]
 seta r12b
 and r12b, 1
-comisd xmm10, qword ptr [rip + _FP1]
+comisd xmm11, qword ptr [rip + _FP1]
 setb r14b
 and r14b, 1
 mov r13b, r12b
@@ -289,7 +288,13 @@ and r13b, 1
 mov cl, r13b
 call Assert
 lea r13, [rip + global_composite_mix_add_int]
-cvttsd2si r14, xmm14
+mov r14, qword ptr [r13]
+lea r13, [rip + global_composite_mix_add_int]
+cvtsi2sd xmm14, r14
+movsd xmm13, xmm14
+movsd xmm14, qword ptr [rip + _FP4]
+addsd xmm13, xmm14
+cvttsd2si r14, xmm13
 mov qword ptr [r13], r14
 lea r14, [rip + global_composite_mix_add_int]
 mov r13, qword ptr [r14]
@@ -299,15 +304,15 @@ and r14b, 1
 mov cl, r14b
 call Assert
 lea r14, [rip + global_composite_mix_add_float]
-movsd xmm14, xmm10
-addsd xmm14, xmm12
-movsd qword ptr [r14], xmm14
+movsd xmm13, xmm11
+addsd xmm13, xmm12
+movsd qword ptr [r14], xmm13
 lea r14, [rip + global_composite_mix_add_float]
-movsd xmm14, qword ptr [r14]
-comisd xmm14, qword ptr [rip + _FP15]
+movsd xmm13, qword ptr [r14]
+comisd xmm13, qword ptr [rip + _FP15]
 seta r14b
 and r14b, 1
-comisd xmm14, qword ptr [rip + _FP16]
+comisd xmm13, qword ptr [rip + _FP16]
 setb r12b
 and r12b, 1
 mov dil, r14b
@@ -318,10 +323,10 @@ and dil, 1
 mov cl, dil
 call Assert
 lea rdi, [rip + global_composite_mix_add_int]
-cvtsi2sd xmm14, r13
-movsd xmm12, xmm14
-movsd xmm14, qword ptr [rip + _FP4]
-addsd xmm12, xmm14
+cvtsi2sd xmm13, r13
+movsd xmm12, xmm13
+movsd xmm13, qword ptr [rip + _FP4]
+addsd xmm12, xmm13
 cvttsd2si r13, xmm12
 mov qword ptr [rdi], r13
 lea r13, [rip + global_composite_mix_add_int]
@@ -341,7 +346,6 @@ movsd xmm14, qword ptr [rbp - 40]
 movsd xmm13, qword ptr [rbp - 48]
 movsd xmm12, qword ptr [rbp - 56]
 movsd xmm11, qword ptr [rbp - 64]
-movsd xmm10, qword ptr [rbp - 72]
 mov rsp, rbp
 pop rbp
 ret

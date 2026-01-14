@@ -22,7 +22,7 @@ internal TestMixedTypeAddition:
 label0: 
 InstPush - i64 reg 2
 InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 112
+InstSub - i64 reg 1, i64 imm 96
 InstStore - i64 stack -8, i64 reg 14
 InstStore - i64 stack -16, i64 reg 13
 InstStore - i64 stack -24, i64 reg 12
@@ -31,7 +31,6 @@ X86_StoreFP - f64 stack -40, f64 reg 31
 X86_StoreFP - f64 stack -48, f64 reg 30
 X86_StoreFP - f64 stack -56, f64 reg 29
 X86_StoreFP - f64 stack -64, f64 reg 28
-X86_StoreFP - f64 stack -72, f64 reg 27
 InstLoadGlobalAddress - ptr reg 14, global_int_1
 InstLoad - i64 reg 13, ptr reg 14
 InstLoadGlobalAddress - ptr reg 14, global_float_1
@@ -90,14 +89,14 @@ InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
 InstLoadGlobalAddress - ptr reg 12, global_float_3
-X86_LoadFP - f64 reg 30, ptr reg 12
-InstS2F - f64 reg 28, i64 imm 10
-X86_MoveFP - f64 reg 27, f64 reg 28
-InstFAdd - f64 reg 27, f64 reg 30
-InstFCmp - f64 reg 27, f64 imm 4622494601238081752
+X86_LoadFP - f64 reg 31, ptr reg 12
+InstS2F - f64 reg 30, i64 imm 10
+X86_MoveFP - f64 reg 28, f64 reg 30
+InstFAdd - f64 reg 28, f64 reg 31
+InstFCmp - f64 reg 28, f64 imm 4622494601238081752
 X86_SetA - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
-InstFCmp - f64 reg 27, f64 imm 4622494713828072437
+InstFCmp - f64 reg 28, f64 imm 4622494713828072437
 X86_SetB - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
 InstMove - i8 reg 14, i8 reg 12
@@ -109,14 +108,14 @@ InstMove - i8 reg 3, i8 reg 14
 InstCall - 
 InstLoadGlobalAddress - ptr reg 14, global_int_3
 InstLoad - i64 reg 13, ptr reg 14
-InstS2F - f64 reg 27, i64 reg 13
-X86_MoveFP - f64 reg 30, f64 reg 27
-X86_MoveFP - f64 reg 27, f64 imm 4615063718147915776
-InstFAdd - f64 reg 30, f64 reg 27
-InstFCmp - f64 reg 30, f64 imm 4622100536270686834
+InstS2F - f64 reg 28, i64 reg 13
+X86_MoveFP - f64 reg 31, f64 reg 28
+X86_MoveFP - f64 reg 28, f64 imm 4615063718147915776
+InstFAdd - f64 reg 31, f64 reg 28
+InstFCmp - f64 reg 31, f64 imm 4622100536270686834
 X86_SetA - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstFCmp - f64 reg 30, f64 imm 4622100648860677518
+InstFCmp - f64 reg 31, f64 imm 4622100648860677518
 X86_SetB - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 12, i8 reg 13
@@ -126,13 +125,13 @@ X86_SetNE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-X86_MoveFP - f64 reg 30, f64 reg 29
-X86_MoveFP - f64 reg 27, f64 imm 4609434218613702656
-InstFAdd - f64 reg 30, f64 reg 27
-InstFCmp - f64 reg 30, f64 imm 4619004255231874276
+X86_MoveFP - f64 reg 31, f64 reg 29
+X86_MoveFP - f64 reg 28, f64 imm 4609434218613702656
+InstFAdd - f64 reg 31, f64 reg 28
+InstFCmp - f64 reg 31, f64 imm 4619004255231874276
 X86_SetA - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
-InstFCmp - f64 reg 30, f64 imm 4619004480411855644
+InstFCmp - f64 reg 31, f64 imm 4619004480411855644
 X86_SetB - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 13, i8 reg 12
@@ -142,13 +141,13 @@ X86_SetNE - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
 InstMove - i8 reg 3, i8 reg 13
 InstCall - 
-X86_MoveFP - f64 reg 30, f64 reg 29
-X86_MoveFP - f64 reg 27, f64 imm 4615063718147915776
-InstFAdd - f64 reg 30, f64 reg 27
-InstFCmp - f64 reg 30, f64 imm 4620974636363844210
+X86_MoveFP - f64 reg 31, f64 reg 29
+X86_MoveFP - f64 reg 28, f64 imm 4615063718147915776
+InstFAdd - f64 reg 31, f64 reg 28
+InstFCmp - f64 reg 31, f64 imm 4620974636363844210
 X86_SetA - i8 reg 13
 InstAnd - i8 reg 13, i8 imm 1
-InstFCmp - f64 reg 30, f64 imm 4620974748953834894
+InstFCmp - f64 reg 31, f64 imm 4620974748953834894
 X86_SetB - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 12, i8 reg 13
@@ -158,27 +157,27 @@ X86_SetNE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
-X86_MoveFP - f64 reg 30, f64 reg 29
-X86_MoveFP - f64 reg 27, f64 imm 4612811918334230528
-InstFAdd - f64 reg 30, f64 reg 27
-InstF2S - i64 reg 12, f64 reg 30
+X86_MoveFP - f64 reg 31, f64 reg 29
+X86_MoveFP - f64 reg 28, f64 imm 4612811918334230528
+InstFAdd - f64 reg 31, f64 reg 28
+InstF2S - i64 reg 12, f64 reg 31
 InstICmp - i64 reg 12, i64 imm 7
 X86_SetE - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 3, i8 reg 12
 InstCall - 
 InstLoadGlobalAddress - ptr reg 12, global_composite_mix_add_float
-X86_LoadFP - f64 reg 30, ptr reg 12
+X86_LoadFP - f64 reg 31, ptr reg 12
 InstLoadGlobalAddress - ptr reg 12, global_composite_mix_add_float
-X86_MoveFP - f64 reg 27, f64 reg 30
-InstFAdd - f64 reg 27, f64 reg 29
-X86_StoreFP - ptr reg 12, f64 reg 27
+X86_MoveFP - f64 reg 28, f64 reg 31
+InstFAdd - f64 reg 28, f64 reg 29
+X86_StoreFP - ptr reg 12, f64 reg 28
 InstLoadGlobalAddress - ptr reg 12, global_composite_mix_add_float
-X86_LoadFP - f64 reg 27, ptr reg 12
-InstFCmp - f64 reg 27, f64 imm 4620974636363844210
+X86_LoadFP - f64 reg 28, ptr reg 12
+InstFCmp - f64 reg 28, f64 imm 4620974636363844210
 X86_SetA - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
-InstFCmp - f64 reg 27, f64 imm 4620974748953834894
+InstFCmp - f64 reg 28, f64 imm 4620974748953834894
 X86_SetB - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 13, i8 reg 12
@@ -189,7 +188,13 @@ InstAnd - i8 reg 13, i8 imm 1
 InstMove - i8 reg 3, i8 reg 13
 InstCall - 
 InstLoadGlobalAddress - ptr reg 13, global_composite_mix_add_int
-InstF2S - i64 reg 14, f64 reg 31
+InstLoad - i64 reg 14, ptr reg 13
+InstLoadGlobalAddress - ptr reg 13, global_composite_mix_add_int
+InstS2F - f64 reg 31, i64 reg 14
+X86_MoveFP - f64 reg 30, f64 reg 31
+X86_MoveFP - f64 reg 31, f64 imm 4612811918334230528
+InstFAdd - f64 reg 30, f64 reg 31
+InstF2S - i64 reg 14, f64 reg 30
 InstStore - ptr reg 13, i64 reg 14
 InstLoadGlobalAddress - ptr reg 14, global_composite_mix_add_int
 InstLoad - i64 reg 13, ptr reg 14
@@ -199,15 +204,15 @@ InstAnd - i8 reg 14, i8 imm 1
 InstMove - i8 reg 3, i8 reg 14
 InstCall - 
 InstLoadGlobalAddress - ptr reg 14, global_composite_mix_add_float
-X86_MoveFP - f64 reg 31, f64 reg 27
-InstFAdd - f64 reg 31, f64 reg 29
-X86_StoreFP - ptr reg 14, f64 reg 31
+X86_MoveFP - f64 reg 30, f64 reg 28
+InstFAdd - f64 reg 30, f64 reg 29
+X86_StoreFP - ptr reg 14, f64 reg 30
 InstLoadGlobalAddress - ptr reg 14, global_composite_mix_add_float
-X86_LoadFP - f64 reg 31, ptr reg 14
-InstFCmp - f64 reg 31, f64 imm 4623789386130950770
+X86_LoadFP - f64 reg 30, ptr reg 14
+InstFCmp - f64 reg 30, f64 imm 4623789386130950770
 X86_SetA - i8 reg 14
 InstAnd - i8 reg 14, i8 imm 1
-InstFCmp - f64 reg 31, f64 imm 4623789498720941454
+InstFCmp - f64 reg 30, f64 imm 4623789498720941454
 X86_SetB - i8 reg 12
 InstAnd - i8 reg 12, i8 imm 1
 InstMove - i8 reg 7, i8 reg 14
@@ -218,10 +223,10 @@ InstAnd - i8 reg 7, i8 imm 1
 InstMove - i8 reg 3, i8 reg 7
 InstCall - 
 InstLoadGlobalAddress - ptr reg 7, global_composite_mix_add_int
-InstS2F - f64 reg 31, i64 reg 13
-X86_MoveFP - f64 reg 29, f64 reg 31
-X86_MoveFP - f64 reg 31, f64 imm 4612811918334230528
-InstFAdd - f64 reg 29, f64 reg 31
+InstS2F - f64 reg 30, i64 reg 13
+X86_MoveFP - f64 reg 29, f64 reg 30
+X86_MoveFP - f64 reg 30, f64 imm 4612811918334230528
+InstFAdd - f64 reg 29, f64 reg 30
 InstF2S - i64 reg 13, f64 reg 29
 InstStore - ptr reg 7, i64 reg 13
 InstLoadGlobalAddress - ptr reg 13, global_composite_mix_add_int
@@ -242,7 +247,6 @@ X86_LoadFP - f64 reg 31, f64 stack -40
 X86_LoadFP - f64 reg 30, f64 stack -48
 X86_LoadFP - f64 reg 29, f64 stack -56
 X86_LoadFP - f64 reg 28, f64 stack -64
-X86_LoadFP - f64 reg 27, f64 stack -72
 InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 

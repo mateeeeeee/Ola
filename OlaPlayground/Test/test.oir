@@ -98,26 +98,29 @@ store f64 %50, ptr @global_composite_mix_add_float
 %54 = and i8 %52, %53
 %55 = icmp ne i8 %54, 0
 call i8 %55, @Assert
-%56 = f2s f64 %17
-store i64 %56, ptr @global_composite_mix_add_int
-%57 = load i64, ptr @global_composite_mix_add_int
-%58 = icmp eq i64 %57, 7
-call i8 %58, @Assert
-%59 = fadd f64 %51, %8
-store f64 %59, ptr @global_composite_mix_add_float
-%60 = load f64, ptr @global_composite_mix_add_float
-%61 = fcmp ogt f64 %60, 13.4999
-%62 = fcmp olt f64 %60, 13.5001
-%63 = and i8 %61, %62
-%64 = icmp ne i8 %63, 0
-call i8 %64, @Assert
-%65 = s2f i64 %57
-%66 = fadd f64 %65, 2.5
-%67 = f2s f64 %66
-store i64 %67, ptr @global_composite_mix_add_int
-%68 = load i64, ptr @global_composite_mix_add_int
-%69 = icmp eq i64 %68, 9
-call i8 %69, @Assert
+%56 = load i64, ptr @global_composite_mix_add_int
+%57 = s2f i64 %56
+%58 = fadd f64 %57, 2.5
+%59 = f2s f64 %58
+store i64 %59, ptr @global_composite_mix_add_int
+%60 = load i64, ptr @global_composite_mix_add_int
+%61 = icmp eq i64 %60, 7
+call i8 %61, @Assert
+%62 = fadd f64 %51, %8
+store f64 %62, ptr @global_composite_mix_add_float
+%63 = load f64, ptr @global_composite_mix_add_float
+%64 = fcmp ogt f64 %63, 13.4999
+%65 = fcmp olt f64 %63, 13.5001
+%66 = and i8 %64, %65
+%67 = icmp ne i8 %66, 0
+call i8 %67, @Assert
+%68 = s2f i64 %60
+%69 = fadd f64 %68, 2.5
+%70 = f2s f64 %69
+store i64 %70, ptr @global_composite_mix_add_int
+%71 = load i64, ptr @global_composite_mix_add_int
+%72 = icmp eq i64 %71, 9
+call i8 %72, @Assert
 br label exit
 exit:
 ret 

@@ -206,7 +206,7 @@ namespace ola
 				// Special handling for Store/Load where address operand is a spilled pointer vreg
 				if (MI.GetOpcode() == InstStore)
 				{
-					// For Store operand 0 is the address, if it's a spilled pointer, we need indirection
+					// For Stores operand 0 is the address, if it's a spilled pointer, we need indirection
 					MachineOperand& addr_op = MI.GetOperand(0);
 					if (IsOperandVReg(addr_op) && !vreg2reg_map.contains(addr_op.GetReg().reg))
 					{
@@ -224,7 +224,7 @@ namespace ola
 				}
 				else if (MI.GetOpcode() == InstLoad)
 				{
-					// For Load: operand 1 is the address, if it's a spilled pointer, we need indirection
+					// For Loads operand 1 is the address, if it's a spilled pointer, we need indirection
 					MachineOperand& addr_op = MI.GetOperand(1);
 					if (IsOperandVReg(addr_op) && !vreg2reg_map.contains(addr_op.GetReg().reg))
 					{
