@@ -1,107 +1,22 @@
-import std.assert;
+int compute(int a, int b)
+ {
+     int x = a * b + 10;  
+     if (a > 0)
+     {
+         int y = a * b + 10;  
+         return y + x;        
+     }
+     else
+     {
+         // Another basic block
+         int z = a * b + 10;  
+         return z - x;        
+     }
+ }
 
-// Globals for addition tests
-int global_int_1 = 5;
-int global_int_2 = 10;
-int global_int_3 = 7;
-int global_int_4 = 20;
-
-// Globals for subtraction tests
-int global_sub_1 = 15;
-int global_sub_2 = 7;
-int global_sub_3 = 3;
-int global_sub_4 = 30;
-
-// Globals for float tests
-float global_float_1 = 3.5;
-float global_float_2 = 2.5;
-float global_float_3 = 1.2;
-float global_float_4 = 5.0;
-
-// Globals for composite addition tests
-int global_composite_add_a = 5;
-int global_composite_add_b = 10;
-
-// Globals for composite subtraction tests
-int global_composite_sub_a = 15;
-int global_composite_sub_b = 7;
-
-// Globals for composite float addition tests
-float global_composite_fadd_a = 3.5;
-float global_composite_fadd_b = 2.5;
-
-// Globals for composite float subtraction tests
-float global_composite_fsub_a = 5.0;
-float global_composite_fsub_b = 2.5;
-
-// Globals for composite mixed tests
-int global_composite_mix_add_int = 5;
-float global_composite_mix_add_float = 3.5;
-int global_composite_mix_sub_int = 15;
-float global_composite_mix_sub_float = 5.0;
-
-void TestMixedTypeAddition()
-{
-    const float tolerance = 0.0001;
-    
-    // Global int + global float
-    float result1 = global_int_1 + global_float_1;
-    Assert(result1 > 8.4999 && result1 < 8.5001);
-
-    // Local int + global float
-    int local_int = 5;
-    float result2 = local_int + global_float_2;
-    Assert(result2 > 7.4999 && result2 < 7.5001);
-
-    // Global int + local float
-    float local_float = 2.5;
-    float result3 = global_int_2 + local_float;
-    Assert(result3 > 12.4999 && result3 < 12.5001);
-
-    // Literal int + global float
-    float result4 = 10 + global_float_3;
-    Assert(result4 > 11.1999 && result4 < 11.2001);
-
-    // Global int + literal float
-    float result5 = global_int_3 + 3.5;
-    Assert(result5 > 10.4999 && result5 < 10.5001);
-
-    // Local int + literal float
-    float result6 = local_int + 1.5;
-    Assert(result6 > 6.4999 && result6 < 6.5001);
-
-    // Composite float += int
-    float local_float2 = 3.5;
-    local_float2 += 5;
-    Assert(local_float2 > 8.4999 && local_float2 < 8.5001);
-
-    // Composite int += float
-    int local_int2 = 5;
-    local_int2 += 2.5;
-    Assert(local_int2 == 7); 
-
-    // Composite global float += local int
-    int local_int_3 = 5;
-    global_composite_mix_add_float += local_int_3;
-    Assert(global_composite_mix_add_float > 8.4999 && global_composite_mix_add_float < 8.5001);
-
-    // Composite global int += local float 
-    float local_float_3 = 2.5;
-    global_composite_mix_add_int += local_float_3;
-    Assert(global_composite_mix_add_int == 7); // Note: This assumes truncation or rounding down for int += float
-
-    // Composite global float += int literal
-    global_composite_mix_add_float += 5;
-    Assert(global_composite_mix_add_float > 13.4999 && global_composite_mix_add_float < 13.5001);
-
-    // Composite global int += float literal
-    global_composite_mix_add_int += 2.5;
-    Assert(global_composite_mix_add_int == 9);
-}
-
-
-public int main()
-{
-    TestMixedTypeAddition();
-    return 0;
-}
+ public int main()
+ {
+     int result1 = compute(5, 3);   
+     int result2 = compute(-1, 4);  
+     return result1 + result2;      
+ }
