@@ -29,10 +29,10 @@ OlaTests/Tests/Custom/*.exe
 OlaTests/Tests/Custom/*.obj
 OlaTests/Tests/Custom/*.s
 OlaTests/Tests/Custom/*.ll
-OlaTests/Tests/Custom/*.oll
+OlaTests/Tests/Custom/*.oir
 OlaTests/Tests/*.s
 OlaTests/Tests/*.ll
-OlaTests/Tests/*.oll
+OlaTests/Tests/*.oir
 OlaTests/Tests/*.exe
 OlaTests/Tests/*.obj
 OlaCompiler/OlaCompiler.args.json
@@ -41,8 +41,8 @@ OlaCompiler/OlaCompiler.args.json
 OlaPlayground/Test/*.exe
 //OlaPlayground/Test/*.s
 //OlaPlayground/Test/*.ll
-//OlaPlayground/Test/*.oll
-//OlaPlayground/Test/*.omll
+//OlaPlayground/Test/*.oir
+//OlaPlayground/Test/*.omir
 OlaPlayground/Test/*.obj
 OlaPlayground/Test/*.txt
 OlaPlayground/Test/test

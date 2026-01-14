@@ -226,14 +226,14 @@ namespace ola
 			std::string ir_file;
 			if (no_llvm)
 			{
-				ir_file = file_name + ".oll";
+				ir_file = file_name + ".oir";
 			}
 			else
 			{
 				ir_file = file_name + ".ll";
 			}
 			std::string assembly_file = file_name + ".s";
-			std::string mir_file = emit_mir ? file_name + ".omll" : "";
+			std::string mir_file = emit_mir ? file_name + ".omir" : "";
 
 			TUCompilationOptions tu_comp_opts
 			{
