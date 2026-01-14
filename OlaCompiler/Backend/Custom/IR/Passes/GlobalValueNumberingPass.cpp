@@ -166,39 +166,40 @@ namespace ola
 
 					if (Instruction* existing_inst = dyn_cast<Instruction>(existing_value))
 					{
-						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB))
+						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB) || existing_inst->GetNumOperands() != I.GetNumOperands())
 						{
 							Uint64 new_vn = AssignNewVN(&I);
 							ExpressionNumberMap[expr_hash] = new_vn;
 							continue;
 						}
-						
-						//if (existing_inst->GetNumOperands() != I.GetNumOperands())
-						//{
-						//	Uint64 new_vn = AssignNewVN(&I);
-						//	ExpressionNumberMap[expr_hash] = new_vn;
-						//	continue;
-						//}
-						//Bool operands_match = true;
-						//for (Uint32 op_idx = 0; op_idx < I.GetNumOperands(); ++op_idx)
-						//{
-						//	if (I.GetOperand(op_idx) != existing_inst->GetOperand(op_idx))
-						//	{
-						//		auto it1 = ValueNumberMap.find(I.GetOperand(op_idx));
-						//		auto it2 = ValueNumberMap.find(existing_inst->GetOperand(op_idx));
-						//		if (it1 == ValueNumberMap.end() || it2 == ValueNumberMap.end() || it1->second != it2->second)
-						//		{
-						//			operands_match = false;
-						//			break;
-						//		}
-						//	}
-						//}
-						//if (!operands_match)
-						//{
-						//	Uint64 new_vn = AssignNewVN(&I);
-						//	ExpressionNumberMap[expr_hash] = new_vn;
-						//	continue;
-						//}
+
+						Bool operands_match = true;
+						for (Uint32 op_idx = 0; op_idx < I.GetNumOperands(); ++op_idx)
+						{
+							if (I.GetOperand(op_idx) != existing_inst->GetOperand(op_idx))
+							{
+								if (!ValueNumberMap.contains(I.GetOperand(op_idx)) || 
+									!ValueNumberMap.contains(existing_inst->GetOperand(op_idx)))
+								{
+									operands_match = false;
+									break;
+								}
+
+								Uint64 const vn1 = ValueNumberMap[I.GetOperand(op_idx)];
+								Uint64 const vn2 = ValueNumberMap[existing_inst->GetOperand(op_idx)];
+								if (vn1 != vn2)
+								{
+									operands_match = false;
+									break;
+								}
+							}
+						}
+						if (!operands_match)
+						{
+							Uint64 new_vn = AssignNewVN(&I);
+							ExpressionNumberMap[expr_hash] = new_vn;
+							continue;
+						}
 					}
 
 					ValueNumberMap[&I] = existing_vn;
