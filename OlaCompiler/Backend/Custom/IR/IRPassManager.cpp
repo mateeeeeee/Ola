@@ -11,6 +11,7 @@
 #include "Passes/GlobalAttributeInferPass.h"
 #include "Passes/CFGAnalysisPass.h"
 #include "Passes/SimplifyCFGPass.h"
+#include "Passes/CriticalEdgeSplittingPass.h"
 #include "Passes/DominatorTreeAnalysisPass.h"
 #include "Passes/DominanceFrontierAnalysisPass.h"
 #include "Passes/FunctionPassManagerModuleAdaptor.h"
@@ -27,7 +28,7 @@ namespace ola
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
 		RegisterAnalysisPasses();
-		
+
 		if (level >= OptimizationLevel::O1)
 		{
 			Uint32 const max_iterations = level >= OptimizationLevel::O2 ? 5 : 2;
@@ -75,7 +76,7 @@ namespace ola
 			FPM.AddPass(CreateLICMPass());
 			//FPM.AddPass(CreateLoopUnrollPass());
 			FPM.AddPass(CreateSimplifyCFGPass());
-			//FPM.AddPass(CreateGVNPass());
+			FPM.AddPass(CreateGVNPass());
 			FPM.AddPass(CreateDCEPass());
 
 			IRModulePassManager MPM;
@@ -97,6 +98,7 @@ namespace ola
 		FPM.AddPass(CreateDCEPass());
 		FPM.AddPass(CreateSimplifyCFGPass());
 		FPM.AddPass(CreateDCEPass());
+		FPM.AddPass(CreateCriticalEdgeSplittingPass());
 
 		IRModulePassManager MPM;
 		MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));

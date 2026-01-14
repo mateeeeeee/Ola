@@ -733,6 +733,29 @@ namespace ola
 					instructions.insert(instruction_iter, MI2);
 					MI.SetOp<1>(scratch);
 				}
+
+				if (dst.IsMemoryOperand() || dst.IsStackObject())
+				{
+					auto scratch = GetScratchReg(dst.GetType());
+					MI.SetOp<0>(scratch);
+					MachineInstruction store_inst(InstStore);
+					store_inst.SetOp<0>(dst);
+					store_inst.SetOp<1>(scratch);
+					instructions.insert(++instruction_iter, store_inst);
+				}
+			}
+			else if (MI.GetOpcode() == InstLoadGlobalAddress)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				if (dst.IsMemoryOperand() || dst.IsStackObject())
+				{
+					auto scratch = GetScratchReg(dst.GetType());
+					MI.SetOp<0>(scratch);
+					MachineInstruction store_inst(InstStore);
+					store_inst.SetOp<0>(dst);
+					store_inst.SetOp<1>(scratch);
+					instructions.insert(++instruction_iter, store_inst);
+				}
 			}
 		}
 	};

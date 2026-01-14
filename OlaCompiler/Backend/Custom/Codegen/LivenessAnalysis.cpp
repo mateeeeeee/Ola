@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <stack>
 #include "LivenessAnalysis.h"
 #include "MachineFunction.h"
 #include "MachineBasicBlock.h"
@@ -18,44 +17,15 @@ namespace ola
 
 	static void AssignInstNum(MachineFunction& MF, std::unordered_map<MachineInstruction*, Uint64>& inst_number_map)
 	{
+		// Number instructions in their natural block order (linearized program order)
+		// This ensures all blocks get numbered, including fallthrough targets
 		Uint64 current = 0;
-		std::stack<MachineBasicBlock*> block_stack;
-		std::unordered_set<MachineBasicBlock*> visited;
-
-		block_stack.push(MF.Blocks().front().get());
-		while (!block_stack.empty()) 
+		for (auto& block : MF.Blocks())
 		{
-			MachineBasicBlock* block = block_stack.top();
-			block_stack.pop();
-
-			if (visited.contains(block))  continue; 
-			visited.insert(block);
-
-			Bool has_jump = false;
-			for (MachineInstruction& MI : block->Instructions()) 
+			for (MachineInstruction& MI : block->Instructions())
 			{
 				inst_number_map[&MI] = current;
-				current += 2; 
-				if (MI.GetOpcode() >= InstJump && MI.GetOpcode() <= InstJNE)
-				{
-					has_jump = true;
-					MachineOperand const& MO = MI.GetOp<0>();
-					OLA_ASSERT(MO.IsRelocable());
-					OLA_ASSERT(MO.GetRelocable()->IsBlock());
-					MachineBasicBlock* target = static_cast<MachineBasicBlock*>(MI.GetOp<0>().GetRelocable());
-					if (visited.find(target) == visited.end())
-					{
-						block_stack.push(target);
-					}
-				}
-			}
-
-			if (!has_jump) 
-			{
-				for (MachineBasicBlock* succ : block->Successors())
-				{
-					if (!visited.contains(succ)) block_stack.push(succ);
-				}
+				current += 2;
 			}
 		}
 	}

@@ -124,6 +124,7 @@ namespace ola
 
 				HashState hash{};
 				hash.Combine(I.GetOpcode());
+				hash.Combine(reinterpret_cast<Uint64>(I.GetType()));
 				if (I.GetOpcode() == Opcode::Load)
 				{
 					Value* ptr = I.GetOperand(0);
@@ -158,6 +159,13 @@ namespace ola
 					Uint64 existing_vn = it->second;
 					Value* existing_value = NumberValueMap[existing_vn];
 
+					if (existing_value->GetType() != I.GetType())
+					{
+						Uint64 new_vn = AssignNewVN(&I);
+						ExpressionNumberMap[expr_hash] = new_vn;
+						continue;
+					}
+
 					if (Instruction* existing_inst = dyn_cast<Instruction>(existing_value))
 					{
 						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB))
@@ -181,7 +189,6 @@ namespace ola
 			}
 		}
 
-		// Third pass: process phi nodes
 		for (BasicBlock* BB : blocks)
 		{
 			for (Instruction& I : *BB)

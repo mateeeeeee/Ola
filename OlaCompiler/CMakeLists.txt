@@ -175,6 +175,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/CFGAnalysisPass.cpp
   Backend/Custom/IR/Passes/SimplifyCFGPass.h
   Backend/Custom/IR/Passes/SimplifyCFGPass.cpp
+  Backend/Custom/IR/Passes/CriticalEdgeSplittingPass.h
+  Backend/Custom/IR/Passes/CriticalEdgeSplittingPass.cpp
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.h
   Backend/Custom/IR/Passes/DeadCodeEliminationPass.cpp
   Backend/Custom/IR/Passes/GlobalDeadCodeEliminationPass.h

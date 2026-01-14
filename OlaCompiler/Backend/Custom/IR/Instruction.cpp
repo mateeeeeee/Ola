@@ -274,6 +274,18 @@ namespace ola
 		}
 		return case_values[case_idx].GetCaseBlock();
 	}
+	void SwitchInst::SetDefaultCase(BasicBlock* bb)
+	{
+		SetOperand(1, bb);
+	}
+	void SwitchInst::SetCaseBlock(Uint32 case_idx, BasicBlock* bb)
+	{
+		if (case_idx < case_values.size())
+		{
+			case_values[case_idx].SetCaseBlock(bb);
+			SetOperand(case_idx + 2, bb);
+		}
+	}
 
 	CallInst::CallInst(Value* callee, std::span<Value*> args) : Instruction(Opcode::Call, cast<Function>(callee)->GetReturnType(), {})
 	{

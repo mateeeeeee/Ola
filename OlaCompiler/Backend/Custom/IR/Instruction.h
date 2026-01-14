@@ -696,6 +696,7 @@ namespace ola
 		{}
 		Int64 GetCaseValue() const { return case_value; }
 		BasicBlock* GetCaseBlock() const { return case_block; }
+		void SetCaseBlock(BasicBlock* block) { case_block = block; }
 
 	private:
 		Int64 case_value;
@@ -722,7 +723,9 @@ namespace ola
 		ConstCaseRange	  Cases()	  const { return ConstCaseRange(CaseBegin(), CaseEnd()); }
 
 		BasicBlock* GetDefaultCase() const;
+		void SetDefaultCase(BasicBlock* bb);
 		BasicBlock* GetCaseBlock(Uint32 case_idx) const;
+		void SetCaseBlock(Uint32 case_idx, BasicBlock* bb);
 		Int64 GetCaseValue(Uint32 case_idx) const
 		{
 			if (case_idx >= case_values.size()) return INT64_MAX;
