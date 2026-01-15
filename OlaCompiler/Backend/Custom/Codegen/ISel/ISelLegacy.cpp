@@ -210,7 +210,7 @@ namespace ola
 		MachineOperand result = ctx.VirtualReg(GEPI->GetType());
 		IRType* current_type = GEPI->GetType();
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(result)
@@ -248,7 +248,20 @@ namespace ola
 			}
 			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
 			{
-				OLA_ASSERT(false);
+				ConstantInt* field_index = dyn_cast<ConstantInt>(index);
+				OLA_ASSERT(field_index);
+				Uint32 field_offset = struct_type->GetFieldOffset(field_index->GetValue());
+
+				if (field_offset != 0)
+				{
+					MachineOperand new_result = ctx.VirtualReg(GEPI->GetType());
+					ctx.EmitInst(MachineInstruction(InstAdd)
+						.SetOp<0>(new_result)
+						.SetOp<1>(result)
+						.SetOp<2>(MachineOperand::Immediate(field_offset, MachineType::Int64)));
+					result = new_result;
+				}
+				current_type = struct_type->GetMemberType(field_index->GetValue());
 			}
 			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 			{
@@ -286,7 +299,7 @@ namespace ola
 
 		MachineOperand base_op = ctx.GetOperand(base);
 		MachineOperand base_register = ctx.VirtualReg(PAI->GetType());
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsArray())
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(base_register)

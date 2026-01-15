@@ -48,6 +48,7 @@ namespace ola
 		virtual void Visit(Decl const&, Uint32) override;
 		virtual void Visit(FunctionDecl const&, Uint32) override;
 		virtual void Visit(MethodDecl const&, Uint32) override;
+		virtual void Visit(ConstructorDecl const&, Uint32) override;
 		virtual void Visit(ParamVarDecl const&, Uint32) override;
 		virtual void Visit(FieldDecl const&, Uint32) override;
 		virtual void Visit(VarDecl const&, Uint32) override;
@@ -93,6 +94,7 @@ namespace ola
 		virtual void Visit(MethodCallExpr const&, Uint32) override;
 		virtual void Visit(ThisExpr const&, Uint32) override;
 		virtual void Visit(SuperExpr const&, Uint32) override;
+		virtual void Visit(ConstructorExpr const&, Uint32) override;
 
 	private:
 		IRContext& context;

@@ -349,7 +349,12 @@ namespace ola
 			Emit(")");
 		}
 		break;
-		case IRTypeKind::Struct: OLA_ASSERT_MSG(false, "Not implemented yet"); break;
+		case IRTypeKind::Struct:
+		{
+			IRStructType* struct_type = cast<IRStructType>(type);
+			Emit("%{}", struct_type->GetName());
+		}
+		break;
 		}
 	}
 }

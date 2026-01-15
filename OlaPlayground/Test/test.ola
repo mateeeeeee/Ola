@@ -1,22 +1,38 @@
-int compute(int a, int b)
- {
-     int x = a * b + 10;  
-     if (a > 0)
-     {
-         int y = a * b + 10;  
-         return y + x;        
-     }
-     else
-     {
-         // Another basic block
-         int z = a * b + 10;  
-         return z - x;        
-     }
- }
+import std.assert;
 
- public int main()
- {
-     int result1 = compute(5, 3);   
-     int result2 = compute(-1, 4);  
-     return result1 + result2;      
- }
+class B
+{
+	B(int y)
+	{
+		this.y = y;
+	}
+	public int y = 0;
+};
+
+class D : B
+{
+	D(int x)
+	{
+		super(x * 2);
+		this.x = x;
+	}
+	D(int x, int y)
+	{	
+		this(x);
+		this.x *= y;
+	}
+	public int x = 0;
+};
+
+public int main() 
+{
+   D d1(5);
+   Assert(d1.x == 5);
+   Assert(d1.y == 10);
+
+   D d2(2,3);
+   Assert(d2.x == 6);
+   Assert(d2.y == 4);
+
+   return 0;
+}

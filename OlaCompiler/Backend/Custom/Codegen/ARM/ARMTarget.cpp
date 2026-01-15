@@ -265,7 +265,26 @@ namespace ola
 					MachineOperand op1 = MI.GetOperand(1);
 					MachineOperand op2 = MI.GetOperand(2);
 					MachineOperand compare_op = MI.GetOperand(3);
-					//cmp op1, op2
+
+					if (op1.IsMemoryOperand() || op1.IsStackObject())
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(tmp);
+						load_inst.SetOp<1>(op1);
+						instructions.insert(instruction_iter, load_inst);
+						op1 = tmp;
+					}
+					if (op2.IsMemoryOperand() || op2.IsStackObject())
+					{
+						MachineOperand tmp = lowering_ctx.VirtualReg(op2.GetType());
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(tmp);
+						load_inst.SetOp<1>(op2);
+						instructions.insert(instruction_iter, load_inst);
+						op2 = tmp;
+					}
+
 					MI.SetOp<0>(op1);
 					MI.SetOp<1>(op2);
 
@@ -757,6 +776,35 @@ namespace ola
 					instructions.insert(++instruction_iter, store_inst);
 				}
 			}
+			else if (MI.GetOpcode() == InstICmp)
+			{
+				MachineOperand op1 = MI.GetOperand(0);
+				MachineOperand op2 = MI.GetOperand(1);
+
+				Bool op1_is_mem = op1.IsMemoryOperand() || op1.IsStackObject();
+				Bool op2_is_mem = op2.IsMemoryOperand() || op2.IsStackObject();
+				if (op1_is_mem)
+				{
+					auto scratch = GetScratchReg(op1.GetType());
+					MachineInstruction load_inst(InstLoad);
+					load_inst.SetOp<0>(scratch);
+					load_inst.SetOp<1>(op1);
+					instructions.insert(instruction_iter, load_inst);
+					MI.SetOp<0>(scratch);
+				}
+
+				if (op2_is_mem)
+				{
+					MachineOperand scratch = op1_is_mem
+						? MachineOperand::ISAReg(ARM_X17, op2.GetType())
+						: GetScratchReg(op2.GetType());
+					MachineInstruction load_inst(InstLoad);
+					load_inst.SetOp<0>(scratch);
+					load_inst.SetOp<1>(op2);
+					instructions.insert(instruction_iter, load_inst);
+					MI.SetOp<1>(scratch);
+				}
+			}
 		}
 	};
 
@@ -771,8 +819,8 @@ namespace ola
 			gp_regs.reserve(ARM_GPREnd - ARM_GPRBegin + 1);
 			for (Uint32 r = ARM_GPRBegin; r <= ARM_GPREnd; ++r)
 			{
-				// SP, X29 (FP), X30 (LR), X16 (GP scratch)
-				if (r != ARM_SP && r != ARM_X29 && r != ARM_X30 && r != ARM_X16) 
+				// SP, X29 (FP), X30 (LR), X16 (GP scratch), X17 (second GP scratch)
+				if (r != ARM_SP && r != ARM_X29 && r != ARM_X30 && r != ARM_X16 && r != ARM_X17)
 				{
 					gp_regs.push_back(r);
 				}

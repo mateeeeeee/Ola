@@ -170,6 +170,12 @@ namespace ola
 							MachineOperand const& MO = MF.AllocateLocalStack(array_type->GetSize());
 							machine_ctx.MapOperand(AI, MO);
 						}
+						else if (type->IsStruct())
+						{
+							IRStructType const* struct_type = cast<IRStructType>(type);
+							MachineOperand const& MO = MF.AllocateLocalStack(struct_type->GetSize());
+							machine_ctx.MapOperand(AI, MO);
+						}
 						else
 						{
 							MachineOperand const& MO = MF.AllocateLocalStack(GetOperandType(type));

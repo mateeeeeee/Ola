@@ -445,7 +445,7 @@ namespace ola
 	{
 		Value* base_value = I.GetBaseOperand();
 		ISelNodePtr base;
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsArray())
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
@@ -548,7 +548,7 @@ namespace ola
 		Value* base_value = I.GetBase();
 		ISelNodePtr base;
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsArray())
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));

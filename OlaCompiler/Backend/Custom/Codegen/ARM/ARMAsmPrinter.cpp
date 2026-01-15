@@ -194,7 +194,23 @@ namespace ola
 
 							if (src.IsStackObject())
 							{
-								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src));
+								Int32 stack_offset = src.GetStackOffset();
+								if (stack_offset < -256 || stack_offset > 255)
+								{
+									if (stack_offset >= 0)
+									{
+										EmitText("add x16, x29, #{}", stack_offset);
+									}
+									else
+									{
+										EmitText("sub x16, x29, #{}", -stack_offset);
+									}
+									EmitText("{}{} {}, [x16]", opcode_string, opcode_suffix, GetOperandString(dst));
+								}
+								else
+								{
+									EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src));
+								}
 							}
 							else if (src.IsRelocable())
 							{
@@ -228,7 +244,23 @@ namespace ola
 
 							if (dst.IsStackObject())
 							{
-								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
+								Int32 stack_offset = dst.GetStackOffset();
+								if (stack_offset < -256 || stack_offset > 255)
+								{
+									if (stack_offset >= 0)
+									{
+										EmitText("add x16, x29, #{}", stack_offset);
+									}
+									else
+									{
+										EmitText("sub x16, x29, #{}", -stack_offset);
+									}
+									EmitText("{}{} {}, [x16]", opcode_string, opcode_suffix, GetOperandString(src));
+								}
+								else
+								{
+									EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
+								}
 							}
 							else if (dst.IsRelocable())
 							{
@@ -290,7 +322,20 @@ namespace ola
 							{
 								Int32 stack_offset = src.GetStackOffset();
 								std::string dst_str = GetOperandString(dst);
-								if (stack_offset >= 0)
+								Int32 abs_offset = (stack_offset >= 0) ? stack_offset : -stack_offset;
+								if (abs_offset > 4095)
+								{
+									EmitText("mov {}, #{}", dst_str, abs_offset);
+									if (stack_offset >= 0)
+									{
+										EmitText("add {}, x29, {}", dst_str, dst_str);
+									}
+									else
+									{
+										EmitText("sub {}, x29, {}", dst_str, dst_str);
+									}
+								}
+								else if (stack_offset >= 0)
 								{
 									EmitText("add {}, x29, #{}", dst_str, stack_offset);
 								}

@@ -85,9 +85,84 @@ namespace ola
 		VisitFunctionDeclCommon(function_decl, ir_function);
 	}
 
-	void IRVisitor::Visit(MethodDecl const&, Uint32)
+	void IRVisitor::Visit(MethodDecl const& method_decl, Uint32)
 	{
+		ClassDecl const* class_decl = method_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = method_decl.GetFuncType();
+		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
 
+		Linkage linkage = Linkage::External;
+		std::string name(class_decl->GetName()); name += "$"; name += method_decl.GetMangledName();
+		Function* ir_function = new Function(name, ir_func_type, linkage);
+		module.AddGlobal(ir_function);
+
+		Argument* param_arg = ir_function->GetArg(0);
+		Uint32 arg_index = 0;
+		if (isa<ClassType>(func_type->GetReturnType()))
+		{
+			Value* sret_value = param_arg;
+			param_arg = ir_function->GetArg(++arg_index);
+			return_value = sret_value;
+		}
+
+		Value* this_param = param_arg;
+		this_param->SetName("this");
+		this_struct_type = ir_class_type;
+		this_value = this_param;
+
+		param_arg = ir_function->GetArg(++arg_index);
+		for (auto& param : method_decl.GetParamDecls())
+		{
+			Value* ir_param = param_arg;
+			ir_param->SetName(param->GetName());
+			value_map[param.get()] = ir_param;
+			param_arg = ir_function->GetArg(++arg_index);
+		}
+
+		if (method_decl.HasDefinition())
+		{
+			VisitFunctionDeclCommon(method_decl, ir_function);
+		}
+		this_value = nullptr;
+		this_struct_type = nullptr;
+	}
+
+	void IRVisitor::Visit(ConstructorDecl const& ctor_decl, Uint32)
+	{
+		ClassDecl const* class_decl = ctor_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = ctor_decl.GetFuncType();
+		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
+
+		Linkage linkage = Linkage::External;
+		std::string name(class_decl->GetName()); name += "$"; name += ctor_decl.GetMangledName();
+		Function* ir_function = new Function(name, ir_func_type, linkage);
+		module.AddGlobal(ir_function);
+
+		Argument* param_arg = ir_function->GetArg(0);
+		Uint32 arg_index = 0;
+
+		Value* this_param = param_arg;
+		this_param->SetName("this");
+		this_struct_type = ir_class_type;
+		this_value = this_param;
+
+		param_arg = ir_function->GetArg(++arg_index);
+		for (auto& param : ctor_decl.GetParamDecls())
+		{
+			Value* ir_param = param_arg;
+			ir_param->SetName(param->GetName());
+			value_map[param.get()] = ir_param;
+			param_arg = ir_function->GetArg(++arg_index);
+		}
+
+		if (ctor_decl.HasDefinition())
+		{
+			VisitFunctionDeclCommon(ctor_decl, ir_function);
+		}
+		this_value = nullptr;
+		this_struct_type = nullptr;
 	}
 
 	void IRVisitor::Visit(ParamVarDecl const&, Uint32)
@@ -309,7 +384,52 @@ namespace ola
 				}
 				else if (is_class)
 				{
-					
+					ClassType const* class_type = cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type->GetClassDecl();
+
+					Value* struct_alloc = builder->MakeInst<AllocaInst>(ir_type);
+					Value* init_value = value_map[init_expr];
+
+					Bool const is_polymorphic = class_decl->IsPolymorphic();
+					ConstantInt* zero = context.GetInt64(0);
+					if (is_polymorphic)
+					{
+						ConstantInt* index = context.GetInt64(0);
+						std::vector<Value*> indices = { zero, index };
+						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+						Store(vtable_map[class_decl], field_ptr);
+					}
+
+					ClassDecl const* curr_class_decl = class_decl;
+					while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+					{
+						UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
+						for (auto const& base_field : base_fields)
+						{
+							Uint32 field_idx = is_polymorphic + base_field->GetFieldIndex();
+							ConstantInt* index = context.GetInt64(field_idx);
+							std::vector<Value*> indices = { zero, index };
+							Value* dst_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+							Value* src_ptr = builder->MakeInst<GetElementPtrInst>(init_value, indices);
+							IRType* field_type = ConvertToIRType(base_field->GetType());
+							Store(Load(field_type, src_ptr), dst_ptr);
+						}
+						curr_class_decl = base_class_decl;
+					}
+
+					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+					for (auto const& field : fields)
+					{
+						Uint32 field_idx = is_polymorphic + field->GetFieldIndex();
+						ConstantInt* index = context.GetInt64(field_idx);
+						std::vector<Value*> indices = { zero, index };
+						Value* dst_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+						Value* src_ptr = builder->MakeInst<GetElementPtrInst>(init_value, indices);
+						IRType* field_type = ConvertToIRType(field->GetType());
+						Store(Load(field_type, src_ptr), dst_ptr);
+					}
+
+					value_map[&var_decl] = struct_alloc;
 				}
 				else if (is_ref)
 				{
@@ -331,7 +451,69 @@ namespace ola
 			{
 				if (is_class)
 				{
-					
+					ClassType const* class_type = cast<ClassType>(var_type);
+					ClassDecl const* class_decl = class_type->GetClassDecl();
+
+					Value* struct_alloc = builder->MakeInst<AllocaInst>(ir_type);
+					value_map[&var_decl] = struct_alloc;
+
+					Bool const is_polymorphic = class_decl->IsPolymorphic();
+					ConstantInt* zero = context.GetInt64(0);
+					if (is_polymorphic)
+					{
+						ConstantInt* index = context.GetInt64(0);
+						std::vector<Value*> indices = { zero, index };
+						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+						Store(vtable_map[class_decl], field_ptr);
+					}
+
+					ClassDecl const* curr_class_decl = class_decl;
+					while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+					{
+						UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
+						for (auto const& base_field : base_fields)
+						{
+							ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
+							std::vector<Value*> indices = { zero, index };
+							Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+							Store(value_map[base_field.get()], field_ptr);
+						}
+						curr_class_decl = base_class_decl;
+					}
+					UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+					for (auto const& field : fields)
+					{
+						ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
+						std::vector<Value*> indices = { zero, index };
+						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
+						Store(value_map[field.get()], field_ptr);
+					}
+
+					Expr const* init_expr = var_decl.GetInitExpr();
+					if (init_expr && isa<ConstructorExpr>(init_expr))
+					{
+						ConstructorExpr const* ctor_expr = cast<ConstructorExpr>(init_expr);
+						std::string name(class_decl->GetName());
+						name += "$";
+						name += ctor_expr->GetCtorDecl()->GetMangledName();
+						Function* called_ctor = module.GetFunctionByName(name);
+
+						std::vector<Value*> args;
+						Uint32 arg_index = 0;
+						args.push_back(struct_alloc);
+						++arg_index;
+						for (auto const& arg_expr : ctor_expr->GetArgs())
+						{
+							arg_expr->Accept(*this);
+							Value* arg_value = value_map[arg_expr.get()];
+							OLA_ASSERT(arg_value);
+							IRType* arg_type = called_ctor->GetArg(arg_index)->GetType();
+							if (arg_type->IsPointer()) args.push_back(arg_value);
+							else args.push_back(Load(arg_type, arg_value));
+							++arg_index;
+						}
+						builder->MakeInst<CallInst>(called_ctor, args);
+					}
 				}
 				else
 				{
@@ -1211,14 +1393,85 @@ namespace ola
 		}
 	}
 
-	void IRVisitor::Visit(MemberExpr const&, Uint32)
+	void IRVisitor::Visit(MemberExpr const& member_expr, Uint32)
 	{
+		Expr const* class_expr = member_expr.GetClassExpr();
+		Decl const* member_decl = member_expr.GetMemberDecl();
+		class_expr->Accept(*this);
+		Value* struct_value = value_map[class_expr];
 
+		if (isa<FieldDecl>(member_decl))
+		{
+			FieldDecl const* field_decl = cast<FieldDecl>(member_decl);
+			Uint32 field_index = field_decl->GetFieldIndex() + field_decl->GetParentDecl()->IsPolymorphic();
+			ConstantInt* zero = context.GetInt64(0);
+			ConstantInt* index = context.GetInt64(field_index);
+			std::vector<Value*> indices = { zero, index };
+			Value* field_value = builder->MakeInst<GetElementPtrInst>(struct_value, indices);
+			value_map[&member_expr] = field_value;
+		}
+		else if (isa<MethodDecl>(member_decl))
+		{
+			OLA_ASSERT(false);
+		}
+		else OLA_ASSERT(false);
 	}
 
-	void IRVisitor::Visit(MethodCallExpr const&, Uint32)
+	void IRVisitor::Visit(MethodCallExpr const& method_call_expr, Uint32)
 	{
+		Expr const* callee_expr = method_call_expr.GetCallee();
+		OLA_ASSERT(isa<MemberExpr>(callee_expr));
+		MemberExpr const* member_expr = cast<MemberExpr>(callee_expr);
 
+		Decl const* decl = member_expr->GetMemberDecl();
+		OLA_ASSERT(isa<MethodDecl>(decl));
+		MethodDecl const* method_decl = cast<MethodDecl>(decl);
+		ClassDecl const* class_decl = method_decl->GetParentDecl();
+
+		Expr const* class_expr = member_expr->GetClassExpr();
+		class_expr->Accept(*this);
+
+		if (!isa<SuperExpr>(class_expr) && method_decl->IsVirtual())
+		{
+			OLA_ASSERT_MSG(false, "Virtual method calls not yet supported in custom backend");
+		}
+		else
+		{
+			std::string name(class_decl->GetName());
+			name += "$";
+			name += method_call_expr.GetFunctionDecl()->GetMangledName();
+			Function* called_function = module.GetFunctionByName(name);
+			OLA_ASSERT(called_function);
+
+			std::vector<Value*> args;
+			Uint32 arg_index = 0;
+			Bool return_struct = isa<ClassType>(method_call_expr.GetCalleeType()->GetReturnType());
+			Value* return_alloc = nullptr;
+			if (return_struct)
+			{
+				return_alloc = builder->MakeInst<AllocaInst>(called_function->GetArg(arg_index)->GetType());
+				args.push_back(return_alloc);
+				++arg_index;
+			}
+
+			Value* this_ptr = value_map[class_expr];
+			args.push_back(this_ptr);
+			++arg_index;
+
+			for (auto const& arg_expr : method_call_expr.GetArgs())
+			{
+				arg_expr->Accept(*this);
+				Value* arg_value = value_map[arg_expr.get()];
+				OLA_ASSERT(arg_value);
+				IRType* arg_type = called_function->GetArg(arg_index)->GetType();
+				if (arg_type->IsPointer()) args.push_back(arg_value);
+				else args.push_back(Load(arg_type, arg_value));
+				++arg_index;
+			}
+
+			Value* call_result = builder->MakeInst<CallInst>(called_function, args);
+			value_map[&method_call_expr] = return_alloc ? return_alloc : call_result;
+		}
 	}
 
 	void IRVisitor::Visit(ThisExpr const& this_expr, Uint32)
@@ -1229,6 +1482,35 @@ namespace ola
 	void IRVisitor::Visit(SuperExpr const& super_expr, Uint32)
 	{
 		value_map[&super_expr] = this_value;
+	}
+
+	void IRVisitor::Visit(ConstructorExpr const& ctor_expr, Uint32)
+	{
+		ConstructorDecl const* ctor_decl = ctor_expr.GetCtorDecl();
+		ClassDecl const* class_decl = ctor_decl->GetParentDecl();
+
+		std::string name(class_decl->GetName());
+		name += "$";
+		name += ctor_decl->GetMangledName();
+		Function* called_ctor = module.GetFunctionByName(name);
+		OLA_ASSERT(called_ctor);
+
+		std::vector<Value*> args;
+		Uint32 arg_index = 0;
+		args.push_back(this_value);
+		++arg_index;
+
+		for (auto const& arg_expr : ctor_expr.GetArgs())
+		{
+			arg_expr->Accept(*this);
+			Value* arg_value = value_map[arg_expr.get()];
+			OLA_ASSERT(arg_value);
+			IRType* arg_type = called_ctor->GetArg(arg_index)->GetType();
+			if (arg_type->IsPointer()) args.push_back(arg_value);
+			else args.push_back(Load(arg_type, arg_value));
+			++arg_index;
+		}
+		builder->MakeInst<CallInst>(called_ctor, args);
 	}
 
 	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)
@@ -1400,6 +1682,7 @@ namespace ola
 			for (auto const& func_param_type : function_params)
 			{
 				IRType* param_type = ConvertToIRType(func_param_type);
+				OLA_ASSERT_MSG(!param_type->IsStruct(), "Struct pass-by-value not supported in custom backend. Use 'ref' instead.");
 				param_types.push_back(param_type);
 			}
 			return IRFuncType::Get(return_type_struct ? void_type : return_type, param_types);

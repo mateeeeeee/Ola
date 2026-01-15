@@ -12,6 +12,11 @@ namespace ola
 		{
 			return MachineType::Ptr;
 		}
+		if (type->IsStruct())
+		{
+			OLA_ASSERT_MSG(false, "Struct type in GetOperandType - should be passed by ref");
+			return MachineType::Other;
+		}
 		if (type->IsInteger())
 		{
 			switch (cast<IRIntType>(type)->GetWidth())
