@@ -710,6 +710,71 @@ namespace ola
 				}
 			};
 
+			if (MI.GetOpcode() == InstLoad)
+			{
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsStackObject())
+				{
+					Int32 stack_offset = src.GetStackOffset();
+					if (stack_offset < -256 || stack_offset > 255)
+					{
+						MachineOperand x16 = MachineOperand::ISAReg(ARM_X16, MachineType::Ptr);
+						MachineInstruction addr_inst(InstLoadGlobalAddress);
+						addr_inst.SetOp<0>(x16);
+						addr_inst.SetOp<1>(src);
+						instructions.insert(instruction_iter, addr_inst);
+						MI.SetOp<1>(x16);
+					}
+				}
+			}
+			else if (MI.GetOpcode() == InstStore)
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				if (dst.IsStackObject())
+				{
+					Int32 stack_offset = dst.GetStackOffset();
+					if (stack_offset < -256 || stack_offset > 255)
+					{
+						MachineOperand x16 = MachineOperand::ISAReg(ARM_X16, MachineType::Ptr);
+						MachineInstruction addr_inst(InstLoadGlobalAddress);
+						addr_inst.SetOp<0>(x16);
+						addr_inst.SetOp<1>(dst);
+						instructions.insert(instruction_iter, addr_inst);
+						MI.SetOp<0>(x16);
+					}
+				}
+			}
+			else if (MI.GetOpcode() == InstLoadGlobalAddress)
+			{
+				MachineOperand src = MI.GetOperand(1);
+				if (src.IsStackObject())
+				{
+					Int32 stack_offset = src.GetStackOffset();
+					Int32 abs_offset = (stack_offset >= 0) ? stack_offset : -stack_offset;
+					if (abs_offset > 4095)
+					{
+						MachineOperand dst = MI.GetOperand(0);
+						MachineInstruction mov_inst(InstMove);
+						mov_inst.SetOp<0>(dst);
+						mov_inst.SetOp<1>(MachineOperand::Immediate(abs_offset, MachineType::Int64));
+						instructions.insert(instruction_iter, mov_inst);
+
+						MachineOperand x29 = MachineOperand::ISAReg(ARM_X29, MachineType::Ptr);
+						if (stack_offset >= 0)
+						{
+							MI.SetOpcode(InstAdd);
+						}
+						else
+						{
+							MI.SetOpcode(InstSub);
+						}
+						MI.SetOp<0>(dst);
+						MI.SetOp<1>(x29);
+						MI.SetOp<2>(dst);
+					}
+				}
+			}
+
 			if (MI.GetOpcode() >= InstMove && MI.GetOpcode() <= InstStore)
 			{
 				MachineOperand dst = MI.GetOperand(0);
