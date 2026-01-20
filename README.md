@@ -29,8 +29,8 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
   * LLVM backend
   * Custom backend
     - Custom IR
-    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, Constant Propagation, LICM, DCE, Global DCE
-        - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier
+    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, CP and IPCP, LICM, DCE, Global DCE
+        - Analysis passes: CFG, Loop, Dominator Tree, Dominator Frontier, Call Graph
     - Custom MIR
 	  - Instruction Selection: Tree pattern matching ISel (with legacy fallback)
       - Legalization: Automated instruction lowering and legalization
