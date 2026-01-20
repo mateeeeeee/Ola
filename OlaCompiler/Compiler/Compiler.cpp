@@ -13,7 +13,6 @@
 #include "Frontend/Sema.h"
 #include "Backend/Custom/IR/IRGenContext.h"
 #include "Backend/Custom/IR/IRPassManager.h"
-#include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/X86/Microsoft/Microsoft_X86Target.h"
 #include "Backend/Custom/Codegen/X86/SysV/SysV_X86Target.h"
@@ -129,8 +128,7 @@ namespace ola
 				ir_gen_ctx.Generate(ast);
 				IRModule& ir_module = ir_gen_ctx.GetModule();
 
-				FunctionAnalysisManager analysis_manager;
-				IRPassManager ir_pass_manager(ir_module, analysis_manager);
+				IRPassManager ir_pass_manager(ir_module);
 				IRPassOptions pass_opts
 				{
 					.cfg_print = opts.dump_cfg,
@@ -162,7 +160,7 @@ namespace ola
 					break;
 				}
 
-				MachineModule machine_module(ir_module, *target, analysis_manager);
+				MachineModule machine_module(ir_module, *target, ir_pass_manager.GetFAM());
 				if (opts.isel_legacy)
 				{
 					machine_module.SetISelMode(ISelMode::Legacy);

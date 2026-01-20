@@ -197,6 +197,11 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/FunctionInlinerPass.cpp
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.h
   Backend/Custom/IR/Passes/FunctionPassManagerModuleAdaptor.cpp
+  Backend/Custom/IR/Passes/CallGraphAnalysisPass.h
+  Backend/Custom/IR/Passes/IPConstantPropagationPass.h
+  Backend/Custom/IR/Passes/IPConstantPropagationPass.cpp
+  Backend/Custom/IR/CallGraph.h
+  Backend/Custom/IR/CallGraph.cpp
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
   Backend/Custom/Codegen/MachineInstruction.h

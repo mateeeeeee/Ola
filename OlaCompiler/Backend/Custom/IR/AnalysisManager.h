@@ -65,6 +65,25 @@ namespace ola
 		}
 
 		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
+		auto& GetMutableResult(UnitT& U)
+		{
+			using ResultT = typename PassT::Result;
+			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
+			if (!analysis_info.analysis_passes.contains(PassT::ID()))
+			{
+				OLA_ASSERT_MSG(false, "Pass was not registered! Did you forget to call RegisterPass?");
+				OLA_UNREACHABLE();
+			}
+			if (!analysis_info.analysis_results.contains(PassT::ID()))
+			{
+				BasePassT* pass = analysis_info.analysis_passes[PassT::ID()].get();
+				pass->RunOn(U, static_cast<AnalysisManagerT&>(*this));
+				analysis_info.analysis_results[PassT::ID()] = &static_cast<PassT*>(pass)->GetResult();
+			}
+			return *const_cast<ResultT*>(static_cast<ResultT const*>(analysis_info.analysis_results[PassT::ID()]));
+		}
+
+		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
 		void InvalidateCache(UnitT& U) const
 		{
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];

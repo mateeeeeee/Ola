@@ -1,5 +1,6 @@
 #pragma once
 #include "Backend/Custom/IR/IRModulePass.h"
+#include "Backend/Custom/IR/PassRegistry.h"
 
 namespace ola
 {

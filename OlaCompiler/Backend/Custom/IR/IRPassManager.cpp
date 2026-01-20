@@ -19,10 +19,12 @@
 #include "Passes/LoopInvariantCodeMotionPass.h"
 #include "Passes/LoopUnrollPass.h"
 #include "Passes/FunctionInlinerPass.h"
+#include "Passes/IPConstantPropagationPass.h"
+#include "Passes/CallGraphAnalysisPass.h"
 
 namespace ola
 {
-	IRPassManager::IRPassManager(IRModule& M, FunctionAnalysisManager& FAM) : M(M), FAM(FAM)
+	IRPassManager::IRPassManager(IRModule& M) : M(M)
 	{}
 
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
@@ -45,12 +47,21 @@ namespace ola
 			MPM.AddPass(CreateGlobalDCEPass());
 
 			IRModuleAnalysisManager MAM;
+			MAM.RegisterPass<CallGraphAnalysisPass>(M);
 			MPM.Run(M, MAM);
 		}
 	}
 
 	void IRPassManager::RunEarlyOptimizationPipeline()
 	{
+		{
+			IRModulePassManager MPM;
+			MPM.AddPass(CreateIPConstantPropagationPass());
+			IRModuleAnalysisManager MAM;
+			MAM.RegisterPass<CallGraphAnalysisPass>(M);
+			MPM.Run(M, MAM);
+		}
+
 		FunctionPassManager FPM;
 		FPM.AddPass(CreateFunctionInlinerPass());
 		FPM.AddPass(CreateMem2RegPass());
@@ -84,7 +95,6 @@ namespace ola
 
 			IRModuleAnalysisManager MAM;
 			Bool changed = MPM.Run(M, MAM);
-
 			if (!changed)
 			{
 				break;

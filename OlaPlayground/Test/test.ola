@@ -1,38 +1,43 @@
 import std.assert;
 
-class B
+// Internal function called with constant 10 from ALL call sites.
+// IPConstantPropagation should replace 'x' with constant 10 inside the function.
+int Helper(int x, int y)
 {
-	B(int y)
-	{
-		this.y = y;
-	}
-	public int y = 0;
-};
+    return x + y;
+}
 
-class D : B
+// Internal function that is NEVER called.
+// GlobalDeadCodeElimination should remove this.
+int UnusedFunction(int a)
 {
-	D(int x)
-	{
-		super(x * 2);
-		this.x = x;
-	}
-	D(int x, int y)
-	{	
-		this(x);
-		this.x *= y;
-	}
-	public int x = 0;
-};
+    return a * 2;
+}
 
-public int main() 
+// Another unused internal function - should also be eliminated.
+int AnotherUnused()
 {
-   D d1(5);
-   Assert(d1.x == 5);
-   Assert(d1.y == 10);
+    return 42;
+}
 
-   D d2(2,3);
-   Assert(d2.x == 6);
-   Assert(d2.y == 4);
+// Recursive unused function - tests that DCE handles recursive functions
+int UnusedRecursive(int n)
+{
+    if (n <= 0) return 1;
+    return n * UnusedRecursive(n - 1);
+}
 
-   return 0;
+public int main()
+{
+    // All calls to Helper have 10 as first argument
+    // IPCP will see that 'x' is always 10 and replace uses of 'x' with 10
+    int a = Helper(10, 5);   // 10 + 5 = 15
+    int b = Helper(10, 20);  // 10 + 20 = 30
+    int c = Helper(10, 100); // 10 + 100 = 110
+
+    Assert(a == 15);
+    Assert(b == 30);
+    Assert(c == 110);
+
+    return 0;
 }

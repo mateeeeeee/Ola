@@ -6,81 +6,53 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @B$B__I void(ptr %this,i64 %y) {
+define internal @Helper__I__I i64(i64 %x,i64 %y) {
 entry:
-%0 = ptr add ptr %this, 0
-store i64 %y, ptr %0
+%0 = alloca i64
+store 10, ptr %0
+%1 = alloca i64
+store i64 %y, ptr %1
+%2 = alloca i64
+%3 = load i64, ptr %0
+%4 = load i64, ptr %1
+%5 = add i64 %3, %4
+store i64 %5, ptr %2
+br label exit
+return:
 br label exit
 exit:
-ret 
-}
-
-
-define external @D$D__I void(ptr %this,i64 %x) {
-entry:
-%0 = add i64 %x, %x
-br label entry.inlined
-entry.split:
-%1 = ptr add ptr %this, 16
-store i64 %x, ptr %1
-br label exit
-entry.inlined:
-%2 = ptr add ptr %this, 0
-store i64 %0, ptr %2
-br label entry.split
-exit:
-ret 
-}
-
-
-define external @D$D__I__I void(ptr %this,i64 %x,i64 %y) {
-entry:
-call ptr %this, %x, @D$D__I
-%0 = ptr add ptr %this, 16
-%1 = load i64, ptr %0
-%2 = smul i64 %1, %y
-store i64 %2, ptr %0
-br label exit
-exit:
-ret 
+%6 = load i64, ptr %2
+ret i64 %6
 }
 
 
 define external @main i64() {
 entry:
-%0 = alloca %D
-%1 = ptr add ptr %0, 0
-store 0, ptr %1
-%2 = ptr add ptr %0, 16
-store 0, ptr %2
-call ptr %0, 5, @D$D__I
-%3 = load i64, ptr %2
-%4 = icmp eq i64 %3, 5
-call i8 %4, @Assert
-%5 = load i64, ptr %1
-%6 = icmp eq i64 %5, 10
-call i8 %6, @Assert
-%7 = alloca %D
-%8 = ptr add ptr %7, 0
-store 0, ptr %8
-%9 = ptr add ptr %7, 16
-store 0, ptr %9
-br label entry.inlined
-entry.split:
-%10 = load i64, ptr %9
-%11 = icmp eq i64 %10, 6
-call i8 %11, @Assert
-%12 = load i64, ptr %8
-%13 = icmp eq i64 %12, 4
-call i8 %13, @Assert
+%0 = alloca i64
+%1 = call i64 10, 5, @Helper__I__I
+%2 = alloca i64
+store i64 %1, ptr %2
+%3 = call i64 10, 20, @Helper__I__I
+%4 = alloca i64
+store i64 %3, ptr %4
+%5 = call i64 10, 100, @Helper__I__I
+%6 = alloca i64
+store i64 %5, ptr %6
+%7 = load i64, ptr %2
+%8 = icmp eq i64 %7, 15
+call i8 %8, @Assert
+%9 = load i64, ptr %4
+%10 = icmp eq i64 %9, 30
+call i8 %10, @Assert
+%11 = load i64, ptr %6
+%12 = icmp eq i64 %11, 110
+call i8 %12, @Assert
+store 0, ptr %0
 br label exit
-entry.inlined:
-call ptr %7, 2, @D$D__I
-%14 = load i64, ptr %9
-%15 = smul i64 %14, 3
-store i64 %15, ptr %9
-br label entry.split
+return:
+br label exit
 exit:
-ret i64 0
+%13 = load i64, ptr %0
+ret i64 %13
 }
 

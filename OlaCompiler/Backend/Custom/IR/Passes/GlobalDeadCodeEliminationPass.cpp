@@ -1,47 +1,57 @@
 #include <unordered_set>
 #include <functional>
 #include "GlobalDeadCodeEliminationPass.h"
+#include "CallGraphAnalysisPass.h"
+#include "Backend/Custom/IR/CallGraph.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRModule.h"
 
 namespace ola
 {
-	Bool GlobalDeadCodeEliminationPass::RunOn(IRModule& M, IRModuleAnalysisManager& FAM)
+	Bool GlobalDeadCodeEliminationPass::RunOn(IRModule& M, IRModuleAnalysisManager& MAM)
 	{
+		CallGraph& CG = const_cast<CallGraph&>(MAM.GetResult<CallGraphAnalysisPass>(M));
 		std::unordered_set<GlobalValue const*> UsedGlobals;
-		std::function<void(Function const*)> MarkFunctionAsUsed = [&](Function const* F) 
+		std::function<void(Function const*)> MarkFunctionAsUsed = [&](Function const* F)
 		{
-			if (!F || !UsedGlobals.insert(F).second) 
+			if (!F || !UsedGlobals.insert(F).second)
 			{
-				return; 
+				return;
 			}
 
-			for (BasicBlock const& BB : *F) 
+			CallGraphNode* Node = CG.GetNode(F);
+			if (Node)
 			{
-				for (Instruction const& I : BB) 
+				for (CallRecord const& CR : *Node)
 				{
-					if (CallInst const* Call = dyn_cast<CallInst>(&I))
+					if (CR.callee && CR.callee->GetFunction())
 					{
-						if (Function const* Callee = Call->GetCalleeAsFunction())
-						{
-							MarkFunctionAsUsed(Callee);
-						}
+						MarkFunctionAsUsed(CR.callee->GetFunction());
 					}
+				}
+			}
 
-					for (auto const& Op : I.Operands())
+			if (!F->IsDeclaration())
+			{
+				for (BasicBlock const& BB : *F)
+				{
+					for (Instruction const& I : BB)
 					{
-						if (GlobalVariable const* GV = dyn_cast<GlobalVariable>(Op.GetValue()))
+						for (auto const& Op : I.Operands())
 						{
-							UsedGlobals.insert(GV);
+							if (GlobalVariable const* GV = dyn_cast<GlobalVariable>(Op.GetValue()))
+							{
+								UsedGlobals.insert(GV);
+							}
 						}
 					}
 				}
 			}
 		};
 
-		for (auto& G : M.Globals()) 
+		for (auto& G : M.Globals())
 		{
-			if (Function* F = dyn_cast<Function>(G); F && F->GetLinkage() != Linkage::Internal) 
+			if (Function* F = dyn_cast<Function>(G); F && F->GetLinkage() != Linkage::Internal)
 			{
 				MarkFunctionAsUsed(F);
 			}
@@ -59,10 +69,16 @@ namespace ola
 				DeadGlobals.push_back(GV);
 			}
 		}
+
 		for (GlobalValue* DG : DeadGlobals)
 		{
+			if (Function* F = dyn_cast<Function>(DG))
+			{
+				CG.RemoveFunction(F);
+			}
 			M.RemoveGlobal(DG);
 		}
+
 		return !DeadGlobals.empty();
 	}
 }

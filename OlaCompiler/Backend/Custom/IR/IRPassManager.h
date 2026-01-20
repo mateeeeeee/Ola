@@ -1,6 +1,8 @@
 #pragma once
 #include "Compiler/CompilerOptions.h"
-
+#include "AnalysisManager.h"
+#include "FunctionPass.h"
+#include "IRModulePass.h"
 
 namespace ola
 {
@@ -13,20 +15,17 @@ namespace ola
 		Bool domfrontier_print;
 	};
 
-	class Function;
-	template<typename UnitT>
-	class AnalysisManager;
-	using FunctionAnalysisManager = AnalysisManager<Function>;
-
 	class IRPassManager
 	{
 	public:
-		IRPassManager(IRModule& M, FunctionAnalysisManager& FAM);
+		explicit IRPassManager(IRModule& M);
 		void Run(OptimizationLevel level, IRPassOptions const& opts);
+
+		FunctionAnalysisManager& GetFAM() { return FAM; }
 
 	private:
 		IRModule& M;
-		FunctionAnalysisManager& FAM;
+		FunctionAnalysisManager FAM;
 
 	private:
 		void RunEarlyOptimizationPipeline();
