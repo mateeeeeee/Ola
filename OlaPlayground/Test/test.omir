@@ -2,616 +2,109 @@ external Assert
 
 external AssertMsg
 
-internal TestDoWhileLoopInt: 
+internal TestEmptyDoWhileLoop: 
 label0: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 13
-InstStore - i64 stack -32, i64 reg 12
-InstStore - i64 stack -40, i64 reg 7
-InstMove - i64 reg 14, i64 imm 1
-InstMove - i64 reg 13, i64 imm 0
+InstSub - i64 reg 31, i64 reg 31, i64 imm 16
+stp - i64 reg 29, i64 reg 30, ptr stack 0
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 0
 InstJump - label1
 
 label1: 
-X86_Lea - i64 reg 12, i64 reg 13, i64 reg 14, i64 imm 1, i64 imm 0
-InstStore - ptr stack -48, i64 reg 14
-X86_Lea - i64 reg 7, i64 reg 14, , i64 imm 1, i64 imm 1
+InstMove - i8 reg 0, i8 imm 1
+InstCall - 
 InstJump - label2
 
 label2: 
-InstICmp - i64 reg 7, i64 imm 5
-X86_SetLE - i8 reg 6
-InstAnd - i8 reg 6, i8 imm 1
-InstTest - i8 reg 6, i8 reg 6
-InstJNE - label3
-InstJump - label4
-
-label3: 
-InstMove - i64 reg 14, i64 reg 7
-InstMove - i64 reg 13, i64 reg 12
-InstJump - label1
-
-label4: 
-InstICmp - i64 reg 12, i64 imm 15
-X86_SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstJump - label5
-
-label5: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 13, i64 stack -24
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 7, i64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
+ldp - i64 reg 29, i64 reg 30, ptr stack 0
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 16
 InstRet - 
 
-internal TestDoWhileLoopBool: 
+internal getI__I: 
+label3: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 32
+stp - i64 reg 29, i64 reg 30, ptr stack 16
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 16
+InstStore - i64 stack -8, i64 reg 28
+InstMove - i64 reg 28, i64 reg 0
+InstJump - label5
+
+label4: 
+
+label5: 
+InstMove - i64 reg 0, i64 reg 28
+InstLoad - i64 reg 28, i64 stack -8
+ldp - i64 reg 29, i64 reg 30, ptr stack 16
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 32
+InstRet - 
+
+internal TestSimpleLoopUnroll: 
 label6: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 13
-InstStore - i64 stack -32, i64 reg 12
-InstStore - i64 stack -40, i64 reg 7
-InstMove - i64 reg 14, i64 imm 0
-InstMove - i8 reg 13, i8 imm 1
+InstSub - i64 reg 31, i64 reg 31, i64 imm 80
+stp - i64 reg 29, i64 reg 30, ptr stack 64
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
+InstStore - i64 stack -8, i64 reg 22
+InstStore - i64 stack -16, i64 reg 23
+InstStore - i64 stack -24, i64 reg 24
+InstStore - i64 stack -32, i64 reg 25
+InstStore - i64 stack -40, i64 reg 26
+InstStore - i64 stack -48, i64 reg 27
+InstStore - i64 stack -56, i64 reg 28
+InstMove - i64 reg 0, i64 imm 0
+InstCall - 
+InstMove - i64 reg 28, i64 reg 0
+InstMove - i64 reg 0, i64 imm 1
+InstCall - 
+InstMove - i64 reg 27, i64 reg 0
+InstMove - i64 reg 0, i64 imm 2
+InstCall - 
+InstMove - i64 reg 26, i64 reg 0
+InstMove - i64 reg 0, i64 imm 3
+InstCall - 
+InstMove - i64 reg 25, i64 reg 0
+InstMove - i64 reg 0, i64 imm 4
+InstCall - 
+InstMove - i64 reg 24, i64 reg 0
+InstMove - i64 reg 23, i64 imm 0
+InstAdd - i64 reg 22, i64 reg 23, i64 reg 28
+InstAdd - i64 reg 23, i64 reg 22, i64 reg 27
+InstAdd - i64 reg 22, i64 reg 23, i64 reg 26
+InstAdd - i64 reg 23, i64 reg 22, i64 reg 25
+InstAdd - i64 reg 22, i64 reg 23, i64 reg 24
 InstJump - label7
 
 label7: 
-InstStore - ptr stack -48, i64 reg 14
-X86_Lea - i64 reg 12, i64 reg 14, , i64 imm 1, i64 imm 1
-InstICmp - i64 reg 12, i64 imm 3
-X86_SetE - i8 reg 7
-InstAnd - i8 reg 7, i8 imm 1
-InstTest - i8 reg 7, i8 reg 7
-InstJNE - label12
+InstICmp - i64 reg 22, i64 imm 10
+cset - i8 reg 22
+InstMove - i8 reg 0, i8 reg 22
+InstCall - 
 InstJump - label8
 
 label8: 
-InstMove - i8 reg 6, i8 reg 13
-InstJump - label13
-
-label9: 
-InstTest - i8 reg 6, i8 reg 6
-InstJNE - label10
-InstJump - label11
-
-label10: 
-InstMove - i64 reg 14, i64 reg 12
-InstMove - i8 reg 13, i8 reg 6
-InstJump - label7
-
-label11: 
-InstMove - i8 reg 3, i8 reg 7
-InstCall - 
-InstJump - label14
-
-label12: 
-InstMove - i8 reg 6, i8 imm 0
-InstJump - label13
-
-label13: 
-InstJump - label9
-
-label14: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 13, i64 stack -24
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 7, i64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestNestedDoWhileLoops: 
-label15: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 96
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 5
-InstStore - i64 stack -32, i64 reg 13
-InstStore - i64 stack -40, i64 reg 12
-InstStore - i64 stack -48, i64 reg 7
-InstMove - i64 reg 14, i64 imm 0
-InstMove - i64 reg 13, i64 imm 0
-InstJump - label16
-
-label16: 
-InstMove - i64 reg 12, i64 reg 14
-InstJump - label20
-
-label17: 
-InstICmp - i64 reg 7, i64 imm 3
-X86_SetLT - i8 reg 5
-InstAnd - i8 reg 5, i8 imm 1
-InstTest - i8 reg 5, i8 reg 5
-InstJNE - label18
-InstJump - label19
-
-label18: 
-InstMove - i64 reg 14, i64 reg 6
-InstMove - i64 reg 13, i64 reg 7
-InstJump - label16
-
-label19: 
-InstICmp - i64 reg 7, i64 imm 3
-X86_SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstICmp - i64 reg 6, i64 imm 4
-X86_SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstJump - label24
-
-label20: 
-InstStore - ptr stack -56, i64 reg 12
-X86_Lea - i64 reg 6, i64 reg 12, , i64 imm 1, i64 imm 1
-InstJump - label21
-
-label21: 
-InstICmp - i64 reg 6, i64 imm 2
-X86_SetLT - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstTest - i8 reg 14, i8 reg 14
-InstJNE - label22
-InstJump - label23
-
-label22: 
-InstMove - i64 reg 12, i64 reg 6
-InstJump - label20
-
-label23: 
-InstStore - ptr stack -64, i64 reg 13
-X86_Lea - i64 reg 7, i64 reg 13, , i64 imm 1, i64 imm 1
-InstJump - label17
-
-label24: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 5, i64 stack -24
-InstLoad - i64 reg 13, i64 stack -32
-InstLoad - i64 reg 12, i64 stack -40
-InstLoad - i64 reg 7, i64 stack -48
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopWithBreak: 
-label25: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 13
-InstStore - i64 stack -32, i64 reg 12
-InstStore - i64 stack -40, i64 reg 7
-InstMove - i64 reg 14, i64 imm 1
-InstMove - i64 reg 13, i64 imm 0
-InstJump - label26
-
-label26: 
-X86_Lea - i64 reg 12, i64 reg 13, i64 reg 14, i64 imm 1, i64 imm 0
-InstStore - ptr stack -48, i64 reg 14
-X86_Lea - i64 reg 7, i64 reg 14, , i64 imm 1, i64 imm 1
-InstICmp - i64 reg 7, i64 imm 5
-X86_SetGT - i8 reg 6
-InstAnd - i8 reg 6, i8 imm 1
-InstTest - i8 reg 6, i8 reg 6
-InstJNE - label28
-InstJump - label27
-
-label27: 
-InstMove - i64 reg 14, i64 reg 7
-InstMove - i64 reg 13, i64 reg 12
-InstJump - label26
-
-label28: 
-InstICmp - i64 reg 12, i64 imm 15
-X86_SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstJump - label29
-
-label29: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 13, i64 stack -24
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 7, i64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopWithContinue: 
-label30: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 13
-InstStore - i64 stack -32, i64 reg 12
-InstStore - i64 stack -40, i64 reg 7
-InstMove - i64 reg 14, i64 imm 0
-InstMove - i64 reg 13, i64 imm 0
-InstJump - label31
-
-label31: 
-InstStore - ptr stack -48, i64 reg 14
-X86_Lea - i64 reg 12, i64 reg 14, , i64 imm 1, i64 imm 1
-InstMove - i64 reg 0, i64 reg 12
-X86_Cqo - 
-InstMove - i64 reg 7, i64 imm 2
-InstSDiv - i64 reg 7
-InstMove - i64 reg 7, i64 reg 4
-InstICmp - i64 reg 7, i64 imm 0
-X86_SetE - i8 reg 7
-InstAnd - i8 reg 7, i8 imm 1
-InstTest - i8 reg 7, i8 reg 7
-InstJNE - label35
-InstJump - label36
-
-label32: 
-InstICmp - i64 reg 12, i64 imm 5
-X86_SetLT - i8 reg 6
-InstAnd - i8 reg 6, i8 imm 1
-InstTest - i8 reg 6, i8 reg 6
-InstJNE - label33
-InstJump - label34
-
-label33: 
-InstMove - i64 reg 14, i64 reg 12
-InstMove - i64 reg 13, i64 reg 7
-InstJump - label31
-
-label34: 
-InstICmp - i64 reg 7, i64 imm 9
-X86_SetE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstJump - label37
-
-label35: 
-InstMove - i64 reg 7, i64 reg 13
-InstJump - label32
-
-label36: 
-X86_Lea - i64 reg 14, i64 reg 13, i64 reg 12, i64 imm 1, i64 imm 0
-InstMove - i64 reg 7, i64 reg 14
-InstJump - label32
-
-label37: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 13, i64 stack -24
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 7, i64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopBoundary: 
-label38: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 64
-InstStore - i64 stack -8, i64 reg 14
-InstStore - i64 stack -16, i64 reg 13
-InstMove - i64 reg 14, i64 imm 0
-InstJump - label39
-
-label39: 
-InstStore - ptr stack -32, i64 reg 14
-X86_Lea - i64 reg 13, i64 reg 14, , i64 imm 1, i64 imm 1
-InstJump - label40
-
-label40: 
-InstICmp - i64 reg 13, i64 imm 1
-X86_SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstJump - label41
-
-label41: 
-InstLoad - i64 reg 14, i64 stack -8
-InstLoad - i64 reg 13, i64 stack -16
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopWithMultipleVariables: 
-label42: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 14
-InstStore - i64 stack -16, i64 reg 13
-InstStore - i64 stack -24, i64 reg 12
-InstStore - i64 stack -32, i64 imm 1
-InstStore - i64 stack -40, i64 imm 1
-InstJump - label43
-
-label43: 
-InstLoad - i64 reg 14, i64 stack -32
-InstStore - i64 stack -48, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -40
-InstStore - i64 stack -32, i64 reg 14
-InstLoad - i64 reg 14, i64 stack -48
-InstLoad - i64 reg 13, i64 stack -40
-X86_Lea - i64 reg 12, i64 reg 14, i64 reg 13, i64 imm 1, i64 imm 0
-InstStore - i64 stack -40, i64 reg 12
-InstJump - label44
-
-label44: 
-InstLoad - i64 reg 12, i64 stack -40
-InstICmp - i64 reg 12, i64 imm 10
-X86_SetLT - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstTest - i8 reg 12, i8 reg 12
-InstJNE - label43
-InstJump - label45
-
-label45: 
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 13, i64 stack -40
-InstICmp - i64 reg 12, i64 imm 8
-X86_SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstICmp - i64 reg 13, i64 imm 13
-X86_SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 14, i8 reg 12
-InstAnd - i8 reg 14, i8 reg 13
-InstICmp - i8 reg 14, i8 imm 0
-X86_SetNE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstJump - label46
-
-label46: 
-InstLoad - i64 reg 14, i64 stack -8
-InstLoad - i64 reg 13, i64 stack -16
-InstLoad - i64 reg 12, i64 stack -24
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopComplexCondition: 
-label47: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 112
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 5
-InstStore - i64 stack -32, i64 reg 13
-InstStore - i64 stack -40, i64 reg 12
-InstStore - i64 stack -48, i64 reg 7
-InstMove - i64 reg 14, i64 imm 3
-InstMove - i64 reg 13, i64 imm 0
-InstJump - label48
-
-label48: 
-InstStore - ptr stack -64, i64 reg 13
-X86_Lea - i64 reg 12, i64 reg 13, , i64 imm 1, i64 imm 1
-InstStore - ptr stack -72, i64 reg 14
-InstStore - i64 stack -80, i64 reg 14
-InstSub - i64 stack -80, i64 imm 1
-InstJump - label49
-
-label49: 
-InstICmp - i64 reg 12, i64 imm 3
-X86_SetLT - i8 reg 6
-InstAnd - i8 reg 6, i8 imm 1
-InstICmp - i64 stack -80, i64 imm 0
-X86_SetGT - i8 reg 5
-InstAnd - i8 reg 5, i8 imm 1
-InstMove - i8 reg 7, i8 reg 6
-InstAnd - i8 reg 7, i8 reg 5
-InstICmp - i8 reg 7, i8 imm 0
-X86_SetNE - i8 reg 7
-InstAnd - i8 reg 7, i8 imm 1
-InstTest - i8 reg 7, i8 reg 7
-InstJNE - label50
-InstJump - label51
-
-label50: 
-InstLoad - i64 reg 14, i64 stack -80
-InstMove - i64 reg 13, i64 reg 12
-InstJump - label48
-
-label51: 
-InstICmp - i64 reg 12, i64 imm 3
-X86_SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstICmp - i64 stack -80, i64 imm 0
-X86_SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 14, i8 reg 12
-InstAnd - i8 reg 14, i8 reg 13
-InstICmp - i8 reg 14, i8 imm 0
-X86_SetNE - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstMove - i8 reg 3, i8 reg 14
-InstCall - 
-InstJump - label52
-
-label52: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 5, i64 stack -24
-InstLoad - i64 reg 13, i64 stack -32
-InstLoad - i64 reg 12, i64 stack -40
-InstLoad - i64 reg 7, i64 stack -48
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopChangingCondition: 
-label53: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 6
-InstStore - i64 stack -16, i64 reg 14
-InstStore - i64 stack -24, i64 reg 13
-InstStore - i64 stack -32, i64 reg 12
-InstStore - i64 stack -40, i64 reg 7
-InstMove - i64 reg 14, i64 imm 0
-InstMove - i64 reg 13, i64 imm 0
-InstJump - label54
-
-label54: 
-InstStore - ptr stack -48, i64 reg 13
-X86_Lea - i64 reg 12, i64 reg 13, , i64 imm 1, i64 imm 1
-InstICmp - i64 reg 12, i64 imm 3
-X86_SetE - i8 reg 7
-InstAnd - i8 reg 7, i8 imm 1
-InstTest - i8 reg 7, i8 reg 7
-InstJNE - label59
-InstJump - label55
-
-label55: 
-InstMove - i64 reg 7, i64 reg 12
-InstJump - label60
-
-label56: 
-InstICmp - i64 reg 7, i64 imm 5
-X86_SetLT - i8 reg 6
-InstAnd - i8 reg 6, i8 imm 1
-InstTest - i8 reg 6, i8 reg 6
-InstJNE - label57
-InstJump - label58
-
-label57: 
-InstMove - i64 reg 14, i64 reg 12
-InstMove - i64 reg 13, i64 reg 7
-InstJump - label54
-
-label58: 
-InstICmp - i64 reg 12, i64 imm 13
-X86_SetE - i8 reg 13
-InstAnd - i8 reg 13, i8 imm 1
-InstMove - i8 reg 3, i8 reg 13
-InstCall - 
-InstJump - label61
-
-label59: 
-InstMove - i64 reg 7, i64 imm 10
-InstJump - label60
-
-label60: 
-X86_Lea - i64 reg 12, i64 reg 14, i64 reg 7, i64 imm 1, i64 imm 0
-InstJump - label56
-
-label61: 
-InstLoad - i64 reg 6, i64 stack -8
-InstLoad - i64 reg 14, i64 stack -16
-InstLoad - i64 reg 13, i64 stack -24
-InstLoad - i64 reg 12, i64 stack -32
-InstLoad - i64 reg 7, i64 stack -40
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
-InstRet - 
-
-internal TestDoWhileLoopMultipleExits: 
-label62: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 80
-InstStore - i64 stack -8, i64 reg 14
-InstStore - i64 stack -16, i64 reg 13
-InstStore - i64 stack -24, i64 reg 12
-InstStore - i64 stack -32, i64 reg 7
-InstMove - i64 reg 14, i64 imm 0
-InstJump - label63
-
-label63: 
-InstStore - ptr stack -48, i64 reg 14
-X86_Lea - i64 reg 13, i64 reg 14, , i64 imm 1, i64 imm 1
-InstICmp - i64 reg 13, i64 imm 5
-X86_SetE - i8 reg 12
-InstAnd - i8 reg 12, i8 imm 1
-InstTest - i8 reg 12, i8 reg 12
-InstJNE - label66
-InstJump - label67
-
-label64: 
-InstMove - i64 reg 14, i64 reg 13
-InstJump - label63
-
-label65: 
-InstMove - i8 reg 3, i8 reg 12
-InstCall - 
-InstMove - i8 reg 3, i8 reg 7
-InstCall - 
-InstJump - label69
-
-label66: 
-InstMove - i8 reg 7, i8 imm 1
-InstJump - label65
-
-label67: 
-InstICmp - i64 reg 13, i64 imm 10
-X86_SetGT - i8 reg 14
-InstAnd - i8 reg 14, i8 imm 1
-InstTest - i8 reg 14, i8 reg 14
-InstJNE - label68
-InstJump - label64
-
-label68: 
-InstMove - i8 reg 7, i8 imm 0
-InstJump - label65
-
-label69: 
-InstLoad - i64 reg 14, i64 stack -8
-InstLoad - i64 reg 13, i64 stack -16
-InstLoad - i64 reg 12, i64 stack -24
-InstLoad - i64 reg 7, i64 stack -32
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
+InstLoad - i64 reg 22, i64 stack -8
+InstLoad - i64 reg 23, i64 stack -16
+InstLoad - i64 reg 24, i64 stack -24
+InstLoad - i64 reg 25, i64 stack -32
+InstLoad - i64 reg 26, i64 stack -40
+InstLoad - i64 reg 27, i64 stack -48
+InstLoad - i64 reg 28, i64 stack -56
+ldp - i64 reg 29, i64 reg 30, ptr stack 64
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
 InstRet - 
 
 external main: 
-label70: 
-InstPush - i64 reg 2
-InstMove - i64 reg 2, i64 reg 1
-InstSub - i64 reg 1, i64 imm 32
+label9: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 16
+stp - i64 reg 29, i64 reg 30, ptr stack 0
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 0
 InstCall - 
 InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstCall - 
-InstJump - label71
+InstJump - label11
 
-label71: 
+label10: 
+
+label11: 
 InstMove - i64 reg 0, i64 imm 0
-InstMove - i64 reg 1, i64 reg 2
-InstPop - i64 reg 2
+ldp - i64 reg 29, i64 reg 30, ptr stack 0
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 16
 InstRet - 
 

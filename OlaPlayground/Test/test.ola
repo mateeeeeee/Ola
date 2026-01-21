@@ -3,16 +3,33 @@ import std.assert;
 void TestEmptyDoWhileLoop()
 {
     int i = 0;
-    do 
+    do
     {
         // Empty body
     } while (++i < 2);
     Assert(i == 2);
 }
 
+noinline int getI(int i)
+{
+    return i;
+}
+
+
+void TestSimpleLoopUnroll()
+{
+    int sum = 0;
+    for (int i = 0; i < 5; ++i)
+    {
+        sum = sum + getI(i);
+    }
+    // sum = 0 + 1 + 2 + 3 + 4 = 10
+    Assert(sum == 10);
+}
 
 public int main()
 {
     TestEmptyDoWhileLoop();
+    TestSimpleLoopUnroll();
     return 0;
 }

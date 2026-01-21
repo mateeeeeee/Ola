@@ -496,10 +496,19 @@ namespace ola
 						{
 							CurrentValueMap[Phi] = It->second;
 						}
+						else
+						{
+							CurrentValueMap[Phi] = LatchVal;
+						}
 						break;
 					}
 				}
 			}
+		}
+
+		if (Analysis.IV.StepInst)
+		{
+			CurrentValueMap[Analysis.IV.StepInst] = CurrentValueMap[Analysis.IV.Phi];
 		}
 
 		Instruction* PreheaderTerm = Preheader->GetTerminator();
@@ -583,41 +592,58 @@ namespace ola
 			return false;
 		}
 
-		IRContext& Ctx = F.GetContext();
-		IRBuilder Builder(Ctx);
-		Builder.SetCurrentFunction(&F);
-
 		BasicBlock* Header = Analysis.Header;
 		BasicBlock* Latch = Analysis.Latch;
-		BasicBlock* Preheader = Analysis.Preheader;
 
-		std::vector<std::unordered_map<Value*, Value*>> IterationMaps;
-
-		std::unordered_map<Value*, Value*> InitialMap;
-		for (BasicBlock* BB : L->GetBlocks())
+		std::unordered_map<PhiInst*, Value*> PhiLatchValues;
+		for (PhiInst* Phi : Header->PhiInsts())
 		{
-			for (Instruction& I : *BB)
+			for (Uint32 i = 0; i < Phi->GetNumIncomingValues(); ++i)
 			{
-				InitialMap[&I] = &I;
+				BasicBlock* IncomingBB = Phi->GetIncomingBlock(i);
+				if (L->Contains(IncomingBB))
+				{
+					PhiLatchValues[Phi] = Phi->GetIncomingValue(i);
+					break;
+				}
 			}
 		}
-		IterationMaps.push_back(InitialMap);
 
-		for (Uint32 i = 1; i < Factor; ++i)
+		std::unordered_map<Value*, Value*> CurrentMap;
+		for (PhiInst* Phi : Header->PhiInsts())
 		{
-			std::unordered_map<Value*, Value*> PrevMap = IterationMaps.back();
-			std::unordered_map<Value*, Value*> NewMap;
+			CurrentMap[Phi] = Phi;
+		}
 
-			for (BasicBlock* OrigBB : L->GetBlocks())
+		for (Uint32 Iter = 1; Iter < Factor; ++Iter)
+		{
+			for (PhiInst* Phi : Header->PhiInsts())
 			{
-				if (OrigBB == Header)
+				Value* LatchVal = PhiLatchValues[Phi];
+				auto It = CurrentMap.find(LatchVal);
+				if (It != CurrentMap.end())
 				{
-					continue;
+					CurrentMap[Phi] = It->second;
 				}
-
-				for (Instruction& OrigInst : *OrigBB)
+				else
 				{
+					CurrentMap[Phi] = LatchVal;
+				}
+			}
+
+			for (BasicBlock* BB : L->GetBlocks())
+			{
+				for (Instruction& OrigInst : *BB)
+				{
+					if (isa<PhiInst>(&OrigInst))
+					{
+						continue;
+					}
 					if (OrigInst.IsTerminator())
+					{
+						continue;
+					}
+					if (&OrigInst == Analysis.ExitCond.Compare)
 					{
 						continue;
 					}
@@ -631,36 +657,48 @@ namespace ola
 					for (Uint32 j = 0; j < NewInst->GetNumOperands(); ++j)
 					{
 						Value* Op = NewInst->GetOperand(j);
-						auto It = PrevMap.find(Op);
-						if (It != PrevMap.end())
+						auto It = CurrentMap.find(Op);
+						if (It != CurrentMap.end())
 						{
 							NewInst->SetOperand(j, It->second);
 						}
 					}
 
 					NewInst->InsertBefore(Latch, Latch->GetTerminator());
-					NewMap[&OrigInst] = NewInst;
+					CurrentMap[&OrigInst] = NewInst;
 				}
 			}
+		}
 
-			for (PhiInst* Phi : Header->PhiInsts())
+		for (PhiInst* Phi : Header->PhiInsts())
+		{
+			Value* OrigLatchVal = PhiLatchValues[Phi];
+			auto It = CurrentMap.find(OrigLatchVal);
+			Value* FinalVal = (It != CurrentMap.end()) ? It->second : OrigLatchVal;
+
+			for (Uint32 i = 0; i < Phi->GetNumIncomingValues(); ++i)
 			{
-				for (Uint32 j = 0; j < Phi->GetNumIncomingValues(); ++j)
+				BasicBlock* IncomingBB = Phi->GetIncomingBlock(i);
+				if (L->Contains(IncomingBB))
 				{
-					BasicBlock* IncomingBB = Phi->GetIncomingBlock(j);
-					if (L->Contains(IncomingBB))
-					{
-						Value* OldVal = Phi->GetIncomingValue(j);
-						auto It = PrevMap.find(OldVal);
-						if (It != PrevMap.end() && i == Factor - 1)
-						{
-							Phi->SetIncomingValue(j, It->second);
-						}
-					}
+					Phi->SetIncomingValue(i, FinalVal);
+					break;
 				}
 			}
+		}
 
-			IterationMaps.push_back(NewMap);
+		Value* FinalIV = CurrentMap[Analysis.IV.StepInst];
+		if (FinalIV)
+		{
+			for (Uint32 i = 0; i < Analysis.ExitCond.Compare->GetNumOperands(); ++i)
+			{
+				Value* Op = Analysis.ExitCond.Compare->GetOperand(i);
+				if (Op == Analysis.IV.Phi || Op == Analysis.IV.StepInst)
+				{
+					Analysis.ExitCond.Compare->SetOperand(i, FinalIV);
+					break;
+				}
+			}
 		}
 
 		return true;
@@ -709,10 +747,6 @@ namespace ola
 
 	Bool LoopUnrollPass::CanCloneInstruction(Instruction const* I)
 	{
-		if (isa<CallInst>(I))
-		{
-			return false;
-		}
 		if (isa<AllocaInst>(I))
 		{
 			return false;
@@ -722,14 +756,21 @@ namespace ola
 
 	Bool LoopUnrollPass::IsSafeToUnroll(Loop* L) const
 	{
+		BasicBlock* ExitingBlock = L->GetExitingBlock();
 		for (BasicBlock* BB : L->GetBlocks())
 		{
-			for (Instruction& I : *BB)
+			if (BB != ExitingBlock)
 			{
-				if (isa<CallInst>(&I))
+				Instruction* Term = BB->GetTerminator();
+				BranchInst* Branch = dyn_cast<BranchInst>(Term);
+				if (!Branch || Branch->IsConditional())
 				{
 					return false;
 				}
+			}
+
+			for (Instruction& I : *BB)
+			{
 				if (isa<AllocaInst>(&I))
 				{
 					return false;

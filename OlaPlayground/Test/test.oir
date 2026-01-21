@@ -1,0 +1,62 @@
+Module ID : test.ola
+
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @TestEmptyDoWhileLoop void() {
+entry:
+br label dowhile.end
+dowhile.end:
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @getI__I i64(i64 %i) {
+entry:
+br label exit
+return:
+br label exit
+exit:
+ret i64 %i
+}
+
+
+define internal @TestSimpleLoopUnroll void() {
+entry:
+%0 = call i64 0, @getI__I
+%1 = add i64 0, %0
+%2 = call i64 1, @getI__I
+%3 = add i64 %1, %2
+%4 = call i64 2, @getI__I
+%5 = add i64 %3, %4
+%6 = call i64 3, @getI__I
+%7 = add i64 %5, %6
+%8 = call i64 4, @getI__I
+%9 = add i64 %7, %8
+br label for.end
+for.end:
+%10 = icmp eq i64 %9, 10
+call i8 %10, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define external @main i64() {
+entry:
+call ptr @TestEmptyDoWhileLoop
+call ptr @TestSimpleLoopUnroll
+br label exit
+return:
+br label exit
+exit:
+ret i64 0
+}
+
