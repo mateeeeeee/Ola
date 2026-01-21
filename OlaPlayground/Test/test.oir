@@ -6,53 +6,95 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @Helper__I__I i64(i64 %x,i64 %y) {
+define external @TestLICM__I__I__I i64(i64 %a,i64 %b,i64 %n) {
 entry:
-%0 = alloca i64
-store 10, ptr %0
-%1 = alloca i64
-store i64 %y, ptr %1
-%2 = alloca i64
-%3 = load i64, ptr %0
-%4 = load i64, ptr %1
-%5 = add i64 %3, %4
-store i64 %5, ptr %2
-br label exit
-return:
-br label exit
+%0 = smul i64 %a, %b
+br label for.cond
+for.body:
+%1 = add i64 %2, %0
+br label for.iter
+for.cond:
+%2 = phi i64 [ 0, entry ], [ %1, for.iter ]
+%3 = phi i64 [ 0, entry ], [ %4, for.iter ]
+%5 = icmp slt i64 %3, %n
+br i8 %5, label for.body, label exit
+for.iter:
+%6 = alloca ptr
+store i64 %3, ptr %6
+%4 = add i64 %3, 1
+br label for.cond
 exit:
-%6 = load i64, ptr %2
-ret i64 %6
+ret i64 %2
+}
+
+
+define internal @TestNestedLoops__I__I__I i64(i64 %x,i64 %n,i64 %m) {
+entry:
+br label for.cond
+for.body:
+br label for.cond1
+for.cond:
+%0 = phi i64 [ 0, entry ], [ %1, for.iter ]
+%2 = phi i64 [ 0, entry ], [ %3, for.iter ]
+%4 = icmp slt i64 %2, 2
+br i8 %4, label for.body, label exit
+for.iter:
+%5 = alloca ptr
+store i64 %2, ptr %5
+%3 = add i64 %2, 1
+br label for.cond
+for.body1:
+%6 = add i64 %1, 10
+br label for.iter1
+for.cond1:
+%1 = phi i64 [ %0, for.body ], [ %6, for.iter1 ]
+%7 = phi i64 [ 0, for.body ], [ %8, for.iter1 ]
+%9 = icmp slt i64 %7, 3
+br i8 %9, label for.body1, label for.iter
+for.iter1:
+%10 = alloca ptr
+store i64 %7, ptr %10
+%8 = add i64 %7, 1
+br label for.cond1
+exit:
+ret i64 %0
+}
+
+
+define internal @SimpleSum__I i64(i64 %n) {
+entry:
+br label for.cond
+for.body:
+%0 = add i64 %1, %2
+br label for.iter
+for.cond:
+%1 = phi i64 [ 0, entry ], [ %0, for.iter ]
+%2 = phi i64 [ 0, entry ], [ %3, for.iter ]
+%4 = icmp slt i64 %2, 5
+br i8 %4, label for.body, label exit
+for.iter:
+%5 = alloca ptr
+store i64 %2, ptr %5
+%3 = add i64 %2, 1
+br label for.cond
+exit:
+ret i64 %1
 }
 
 
 define external @main i64() {
 entry:
-%0 = alloca i64
-%1 = call i64 10, 5, @Helper__I__I
-%2 = alloca i64
-store i64 %1, ptr %2
-%3 = call i64 10, 20, @Helper__I__I
-%4 = alloca i64
-store i64 %3, ptr %4
-%5 = call i64 10, 100, @Helper__I__I
-%6 = alloca i64
-store i64 %5, ptr %6
-%7 = load i64, ptr %2
-%8 = icmp eq i64 %7, 15
-call i8 %8, @Assert
-%9 = load i64, ptr %4
-%10 = icmp eq i64 %9, 30
-call i8 %10, @Assert
-%11 = load i64, ptr %6
-%12 = icmp eq i64 %11, 110
-call i8 %12, @Assert
-store 0, ptr %0
-br label exit
-return:
+%0 = call i64 3, 4, 5, @TestLICM__I__I__I
+%1 = icmp eq i64 %0, 60
+call i8 %1, @Assert
+%2 = call i64 5, 2, 3, @TestNestedLoops__I__I__I
+%3 = icmp eq i64 %2, 60
+call i8 %3, @Assert
+%4 = call i64 5, @SimpleSum__I
+%5 = icmp eq i64 %4, 10
+call i8 %5, @Assert
 br label exit
 exit:
-%13 = load i64, ptr %0
-ret i64 %13
+ret i64 0
 }
 

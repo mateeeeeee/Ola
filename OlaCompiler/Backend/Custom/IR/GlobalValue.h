@@ -90,11 +90,12 @@ namespace ola
 	class Argument : public Value
 	{
 		friend class Function;
+	public:
+		static Bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
+
 	private:
 		Argument(IRType* type, Uint32 index) : Value(ValueKind::Argument, type), index(index) {}
 		Uint32  GetIndex() const { return index; }
-		static Bool ClassOf(Value* V) { return V->GetKind() == ValueKind::Argument; }
-
 	private:
 		Uint32 index;
 	};

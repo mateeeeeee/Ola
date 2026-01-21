@@ -6,20 +6,37 @@
 
 namespace ola
 {
+	namespace
+	{
+		void CollectLoopsPostOrder(Loop* L, std::vector<Loop*>& LoopsToProcess)
+		{
+			for (Loop* SubLoop : L->GetSubLoops())
+			{
+				CollectLoopsPostOrder(SubLoop, LoopsToProcess);
+			}
+			LoopsToProcess.push_back(L);
+		}
+	}
+
 	Bool LoopInvariantCodeMotionPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		LoopInfo const& LI = FAM.GetResult<LoopAnalysisPass>(F);
-		if (LI.Empty()) 
+		if (LI.Empty())
 		{
 			return false;
 		}
-		Bool Changed = false;
 
-		//#todo this goes only through top level loops
-		for (Loop* L : LI) 
+		std::vector<Loop*> LoopsToProcess;
+		for (Loop* L : LI)
+		{
+			CollectLoopsPostOrder(L, LoopsToProcess);
+		}
+
+		Bool Changed = false;
+		for (Loop* L : LoopsToProcess)
 		{
 			BasicBlock* LoopPreheader = L->GetLoopPreheader();
-			if (!LoopPreheader) 
+			if (!LoopPreheader)
 			{
 				continue;
 			}
@@ -29,7 +46,7 @@ namespace ola
 				LocalChanged = false;
 				for (BasicBlock* BB : L->GetBlocks())
 				{
-					if (BB == L->GetHeader()) 
+					if (LI.GetLoopFor(BB) != L)
 					{
 						continue;
 					}
@@ -39,7 +56,7 @@ namespace ola
 					{
 						if (isa<PhiInst>(&Inst) || Inst.IsTerminator()) continue;
 
-						if (IsLoopInvariant(&Inst, L)) 
+						if (IsLoopInvariant(&Inst, L))
 						{
 							invariant_instructions.push_back(&Inst);
 						}
@@ -60,20 +77,25 @@ namespace ola
 
 	Bool LoopInvariantCodeMotionPass::IsLoopInvariant(Instruction* I, Loop const* L)
 	{
-		if (isa<StoreInst>(I) || isa<LoadInst>(I) || isa<PhiInst>(I) || I->IsTerminator())
+		if (isa<StoreInst>(I) || isa<LoadInst>(I) || isa<PhiInst>(I) ||
+			isa<AllocaInst>(I) || isa<CallInst>(I) || I->IsTerminator())
 		{
 			return false;
 		}
 
-		for (Value* Op : I->Operands()) 
+		for (Value* Op : I->Operands())
 		{
-			if (isa<Constant>(Op)) 
+			if (isa<Constant>(Op))
+			{
+				continue;
+			}
+			if (isa<Argument>(Op))
 			{
 				continue;
 			}
 			if (Instruction* OpInst = dyn_cast<Instruction>(Op))
 			{
-				if (L->Contains(OpInst->GetBasicBlock())) 
+				if (L->Contains(OpInst->GetBasicBlock()))
 				{
 					return false;
 				}

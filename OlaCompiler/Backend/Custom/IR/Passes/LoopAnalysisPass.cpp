@@ -8,17 +8,17 @@ namespace ola
 
 	Bool LoopAnalysisPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		LI.Clear();  // Clear old loop info before recomputing
+		LI.Clear();  
 		DominatorTree const& DT = FAM.GetResult<DominatorTreeAnalysisPass>(F);
-		DT.VisitPostOrder([&](DominatorTreeNode const* DTNode) -> Bool 
+		DT.VisitPostOrder([&](DominatorTreeNode const* DTNode) -> Bool
 		{
 			BasicBlock* Header = DTNode->GetBasicBlock();
 			std::vector<BasicBlock*> BackEdges;
 
-			for (BasicBlock* Pred : Header->GetPredecessors()) 
+			for (BasicBlock* Pred : Header->GetPredecessors())
 			{
 				DominatorTreeNode const* PredNode = DT.GetTreeNode(Pred);
-				if (PredNode && DT.Dominates(DTNode, PredNode)) 
+				if (PredNode && DT.Dominates(DTNode, PredNode))
 				{
 					BackEdges.push_back(Pred);
 				}
@@ -26,15 +26,19 @@ namespace ola
 
 			if (!BackEdges.empty())
 			{
-				Loop* L = new Loop(Header);
-				DiscoverLoop(L, BackEdges, DT, LI);
-				if (!LI.GetLoopFor(Header)) 
+				Loop* ExistingLoop = LI.GetLoopFor(Header);
+				if (ExistingLoop)
 				{
-					LI.AddTopLevelLoop(L);
+					return true;
 				}
+
+				Loop* L = new Loop(Header);
+				LI.ChangeLoopFor(Header, L);  
+				DiscoverLoop(L, BackEdges, DT, LI);
+				LI.AddTopLevelLoop(L);
 			}
 
-			return true;  
+			return true;
 		});
 		return false;
 	}
@@ -46,38 +50,55 @@ namespace ola
 
 		BasicBlock* Header = L->GetHeader();
 
-		for (BasicBlock* BB : BackEdges) 
+		for (BasicBlock* BB : BackEdges)
 		{
 			if (Visited.insert(BB).second) WorkList.push_back(BB);
 		}
 
 		Visited.insert(Header);
-		while (!WorkList.empty()) 
+		while (!WorkList.empty())
 		{
 			BasicBlock* BB = WorkList.back();
 			WorkList.pop_back();
 
 			Loop* ContainingLoop = LI.GetLoopFor(BB);
-			if (ContainingLoop) 
+			if (ContainingLoop)
 			{
-				if (ContainingLoop->GetHeader() != Header) 
+				while (ContainingLoop->GetParentLoop() != nullptr)
 				{
+					ContainingLoop = ContainingLoop->GetParentLoop();
+				}
+
+				if (ContainingLoop != L)
+				{
+					LI.RemoveLoop(ContainingLoop);
+
 					L->AddChildLoop(ContainingLoop);
-					if (ContainingLoop->IsOutermost()) 
+					ContainingLoop->SetParentLoop(L);
+
+					for (BasicBlock* NestedBB : ContainingLoop->GetBlocks())
 					{
-						LI.ChangeTopLevelLoop(ContainingLoop, L);
+						L->AddBlockToLoop(NestedBB);
+					}
+
+					for (BasicBlock* Pred : ContainingLoop->GetHeader()->GetPredecessors())
+					{
+						if (DT.Dominates(Header, Pred) && Visited.insert(Pred).second)
+						{
+							WorkList.push_back(Pred);
+						}
 					}
 				}
 			}
-			else 
+			else
 			{
 				L->AddBlockToLoop(BB);
 				LI.ChangeLoopFor(BB, L);
-			}
 
-			for (BasicBlock* Pred : BB->GetPredecessors())
-			{
-				if (DT.Dominates(Header, Pred) && Visited.insert(Pred).second) WorkList.push_back(Pred);
+				for (BasicBlock* Pred : BB->GetPredecessors())
+				{
+					if (DT.Dominates(Header, Pred) && Visited.insert(Pred).second) WorkList.push_back(Pred);
+				}
 			}
 		}
 	}

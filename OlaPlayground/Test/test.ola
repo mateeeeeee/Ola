@@ -1,43 +1,53 @@
 import std.assert;
 
-// Internal function called with constant 10 from ALL call sites.
-// IPConstantPropagation should replace 'x' with constant 10 inside the function.
-int Helper(int x, int y)
+// Test LICM: 'a * b' is loop-invariant and should be hoisted to preheader
+public int TestLICM(int a, int b, int n)
 {
-    return x + y;
+    int result = 0;
+    for (int i = 0; i < n; i++)
+    {
+        result += a * b;  // a * b is loop-invariant
+    }
+    return result;
 }
 
-// Internal function that is NEVER called.
-// GlobalDeadCodeElimination should remove this.
-int UnusedFunction(int a)
+// Test nested loops: inner computation should be hoisted to inner preheader
+int TestNestedLoops(int x, int n, int m)
 {
-    return a * 2;
+    int sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int outer = x * 2;  // Loop-invariant for inner loop
+        for (int j = 0; j < m; j++)
+        {
+            sum += outer;  // Uses hoisted value
+        }
+    }
+    return sum;
 }
 
-// Another unused internal function - should also be eliminated.
-int AnotherUnused()
+// Simple loop for testing loop analysis
+int SimpleSum(int n)
 {
-    return 42;
-}
-
-// Recursive unused function - tests that DCE handles recursive functions
-int UnusedRecursive(int n)
-{
-    if (n <= 0) return 1;
-    return n * UnusedRecursive(n - 1);
+    int sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += i;
+    }
+    return sum;
 }
 
 public int main()
 {
-    // All calls to Helper have 10 as first argument
-    // IPCP will see that 'x' is always 10 and replace uses of 'x' with 10
-    int a = Helper(10, 5);   // 10 + 5 = 15
-    int b = Helper(10, 20);  // 10 + 20 = 30
-    int c = Helper(10, 100); // 10 + 100 = 110
+    // TestLICM: 3 * 4 = 12, repeated 5 times = 60
+    Assert(TestLICM(3, 4, 5) == 60);
 
-    Assert(a == 15);
-    Assert(b == 30);
-    Assert(c == 110);
+    // TestNestedLoops: x*2 = 10, inner loop runs 3 times per outer iteration
+    // outer loop runs 2 times, so: 2 * 3 * 10 = 60
+    Assert(TestNestedLoops(5, 2, 3) == 60);
+
+    // SimpleSum: 0+1+2+3+4 = 10
+    Assert(SimpleSum(5) == 10);
 
     return 0;
 }
