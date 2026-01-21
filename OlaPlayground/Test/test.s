@@ -1,185 +1,551 @@
+.intel_syntax noprefix
 
 .text
 
-.extern _Assert
-.extern _AssertMsg
-.globl _TestLICM__I__I__I
-_TestLICM__I__I__I:
+.extern Assert
+
+.extern AssertMsg
+
+TestDoWhileLoopInt:
 label0:
-sub sp, sp, #80
-stp x29, x30, [sp, #64]
-add x29, sp, #64
-str x23, [x29, #-8]
-str x24, [x29, #-16]
-str x25, [x29, #-24]
-str x26, [x29, #-32]
-str x27, [x29, #-40]
-str x28, [x29, #-48]
-mov x28, x0
-mov x27, x1
-mov x26, x2
-mul x25, x28, x27
-mov x27, #0
-mov x28, #0
-b label2
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], r13
+mov qword ptr [rbp - 32], r12
+mov qword ptr [rbp - 40], rdi
+mov r14, 1
+mov r13, 0
+jmp label1
 label1:
-add x24, x27, x25
-b label3
+lea r12, [r13 + r14]
+mov qword ptr [rbp - 48], r14
+lea rdi, [r14 + 1]
+jmp label2
 label2:
-cmp x28, x26
-cset w23, lt
-tst w23, w23
-b.ne label1
-b label4
+cmp rdi, 5
+setle sil
+and sil, 1
+test sil, sil
+jne label3
+jmp label4
 label3:
-str x28, [x29, #-56]
-add x23, x28, #1
-mov x27, x24
-mov x28, x23
-b label2
+mov r14, rdi
+mov r13, r12
+jmp label1
 label4:
-mov x0, x27
-ldr x23, [x29, #-8]
-ldr x24, [x29, #-16]
-ldr x25, [x29, #-24]
-ldr x26, [x29, #-32]
-ldr x27, [x29, #-40]
-ldr x28, [x29, #-48]
-ldp x29, x30, [sp, #64]
-add sp, sp, #80
-ret
-_TestNestedLoops__I__I__I:
+cmp r12, 15
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+jmp label5
 label5:
-sub sp, sp, #80
-stp x29, x30, [sp, #64]
-add x29, sp, #64
-str x23, [x29, #-8]
-str x24, [x29, #-16]
-str x25, [x29, #-24]
-str x26, [x29, #-32]
-str x27, [x29, #-40]
-str x28, [x29, #-48]
-mov x28, x0
-mov x28, x1
-mov x28, x2
-mov x28, #0
-mov x27, #0
-b label7
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r13, qword ptr [rbp - 24]
+mov r12, qword ptr [rbp - 32]
+mov rdi, qword ptr [rbp - 40]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopBool:
 label6:
-mov x26, x28
-mov x25, #0
-b label10
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], r13
+mov qword ptr [rbp - 32], r12
+mov qword ptr [rbp - 40], rdi
+mov r14, 0
+mov r13b, 1
+jmp label7
 label7:
-cmp x27, #2
-cset w24, lt
-tst w24, w24
-b.ne label6
-b label12
+mov qword ptr [rbp - 48], r14
+lea r12, [r14 + 1]
+cmp r12, 3
+sete dil
+and dil, 1
+test dil, dil
+jne label12
+jmp label8
 label8:
-str x27, [x29, #-56]
-add x24, x27, #1
-mov x28, x26
-mov x27, x24
-b label7
+mov sil, r13b
+jmp label13
 label9:
-add x24, x26, #10
-b label11
+test sil, sil
+jne label10
+jmp label11
 label10:
-cmp x25, #3
-cset w23, lt
-tst w23, w23
-b.ne label9
-b label8
+mov r14, r12
+mov r13b, sil
+jmp label7
 label11:
-str x25, [x29, #-64]
-add x23, x25, #1
-mov x26, x24
-mov x25, x23
-b label10
+mov cl, dil
+call Assert
+jmp label14
 label12:
-mov x0, x28
-ldr x23, [x29, #-8]
-ldr x24, [x29, #-16]
-ldr x25, [x29, #-24]
-ldr x26, [x29, #-32]
-ldr x27, [x29, #-40]
-ldr x28, [x29, #-48]
-ldp x29, x30, [sp, #64]
-add sp, sp, #80
-ret
-_SimpleSum__I:
+mov sil, 0
+jmp label13
 label13:
-sub sp, sp, #64
-stp x29, x30, [sp, #48]
-add x29, sp, #48
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-mov x28, #0
-mov x27, #0
-b label15
+jmp label9
 label14:
-add x26, x28, x27
-b label16
-label15:
-cmp x27, #5
-cset w25, lt
-tst w25, w25
-b.ne label14
-b label17
-label16:
-str x27, [x29, #-40]
-add x25, x27, #1
-mov x28, x26
-mov x27, x25
-b label15
-label17:
-mov x0, x28
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #48]
-add sp, sp, #64
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r13, qword ptr [rbp - 24]
+mov r12, qword ptr [rbp - 32]
+mov rdi, qword ptr [rbp - 40]
+mov rsp, rbp
+pop rbp
 ret
-.globl _main
-_main:
+TestNestedDoWhileLoops:
+label15:
+push rbp
+mov rbp, rsp
+sub rsp, 96
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], rbx
+mov qword ptr [rbp - 32], r13
+mov qword ptr [rbp - 40], r12
+mov qword ptr [rbp - 48], rdi
+mov r14, 0
+mov r13, 0
+jmp label16
+label16:
+mov r12, r14
+jmp label20
+label17:
+cmp rdi, 3
+setl bl
+and bl, 1
+test bl, bl
+jne label18
+jmp label19
 label18:
-sub sp, sp, #32
-stp x29, x30, [sp, #16]
-add x29, sp, #16
-str x28, [x29, #-8]
-mov x2, #5
-mov x1, #4
-mov x0, #3
-bl _TestLICM__I__I__I
-mov x28, x0
-cmp x28, #60
-cset w28, eq
-mov w0, w28
-bl _Assert
-mov x2, #3
-mov x1, #2
-mov x0, #5
-bl _TestNestedLoops__I__I__I
-mov x28, x0
-cmp x28, #60
-cset w28, eq
-mov w0, w28
-bl _Assert
-mov x0, #5
-bl _SimpleSum__I
-mov x28, x0
-cmp x28, #10
-cset w28, eq
-mov w0, w28
-bl _Assert
-b label19
+mov r14, rsi
+mov r13, rdi
+jmp label16
 label19:
-mov x0, #0
-ldr x28, [x29, #-8]
-ldp x29, x30, [sp, #16]
-add sp, sp, #32
+cmp rdi, 3
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+cmp rsi, 4
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label24
+label20:
+mov qword ptr [rbp - 56], r12
+lea rsi, [r12 + 1]
+jmp label21
+label21:
+cmp rsi, 2
+setl r14b
+and r14b, 1
+test r14b, r14b
+jne label22
+jmp label23
+label22:
+mov r12, rsi
+jmp label20
+label23:
+mov qword ptr [rbp - 64], r13
+lea rdi, [r13 + 1]
+jmp label17
+label24:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov rbx, qword ptr [rbp - 24]
+mov r13, qword ptr [rbp - 32]
+mov r12, qword ptr [rbp - 40]
+mov rdi, qword ptr [rbp - 48]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopWithBreak:
+label25:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], r13
+mov qword ptr [rbp - 32], r12
+mov qword ptr [rbp - 40], rdi
+mov r14, 1
+mov r13, 0
+jmp label26
+label26:
+lea r12, [r13 + r14]
+mov qword ptr [rbp - 48], r14
+lea rdi, [r14 + 1]
+cmp rdi, 5
+setg sil
+and sil, 1
+test sil, sil
+jne label28
+jmp label27
+label27:
+mov r14, rdi
+mov r13, r12
+jmp label26
+label28:
+cmp r12, 15
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+jmp label29
+label29:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r13, qword ptr [rbp - 24]
+mov r12, qword ptr [rbp - 32]
+mov rdi, qword ptr [rbp - 40]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopWithContinue:
+label30:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], r13
+mov qword ptr [rbp - 32], r12
+mov qword ptr [rbp - 40], rdi
+mov r14, 0
+mov r13, 0
+jmp label31
+label31:
+mov qword ptr [rbp - 48], r14
+lea r12, [r14 + 1]
+mov rax, r12
+cqo
+mov rdi, 2
+idiv rdi
+mov rdi, rdx
+cmp rdi, 0
+sete dil
+and dil, 1
+test dil, dil
+jne label35
+jmp label36
+label32:
+cmp r12, 5
+setl sil
+and sil, 1
+test sil, sil
+jne label33
+jmp label34
+label33:
+mov r14, r12
+mov r13, rdi
+jmp label31
+label34:
+cmp rdi, 9
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label37
+label35:
+mov rdi, r13
+jmp label32
+label36:
+lea r14, [r13 + r12]
+mov rdi, r14
+jmp label32
+label37:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r13, qword ptr [rbp - 24]
+mov r12, qword ptr [rbp - 32]
+mov rdi, qword ptr [rbp - 40]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopBoundary:
+label38:
+push rbp
+mov rbp, rsp
+sub rsp, 64
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov r14, 0
+jmp label39
+label39:
+mov qword ptr [rbp - 32], r14
+lea r13, [r14 + 1]
+jmp label40
+label40:
+cmp r13, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+jmp label41
+label41:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopWithMultipleVariables:
+label42:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], 1
+mov qword ptr [rbp - 40], 1
+jmp label43
+label43:
+mov r14, qword ptr [rbp - 32]
+mov qword ptr [rbp - 48], r14
+mov r14, qword ptr [rbp - 40]
+mov qword ptr [rbp - 32], r14
+mov r14, qword ptr [rbp - 48]
+mov r13, qword ptr [rbp - 40]
+lea r12, [r14 + r13]
+mov qword ptr [rbp - 40], r12
+jmp label44
+label44:
+mov r12, qword ptr [rbp - 40]
+cmp r12, 10
+setl r12b
+and r12b, 1
+test r12b, r12b
+jne label43
+jmp label45
+label45:
+mov r12, qword ptr [rbp - 32]
+mov r13, qword ptr [rbp - 40]
+cmp r12, 8
+sete r12b
+and r12b, 1
+cmp r13, 13
+sete r13b
+and r13b, 1
+mov r14b, r12b
+and r14b, r13b
+cmp r14b, 0
+setne r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label46
+label46:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopComplexCondition:
+label47:
+push rbp
+mov rbp, rsp
+sub rsp, 112
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], rbx
+mov qword ptr [rbp - 32], r13
+mov qword ptr [rbp - 40], r12
+mov qword ptr [rbp - 48], rdi
+mov r14, 3
+mov r13, 0
+jmp label48
+label48:
+mov qword ptr [rbp - 64], r13
+lea r12, [r13 + 1]
+mov qword ptr [rbp - 72], r14
+mov qword ptr [rbp - 80], r14
+sub qword ptr [rbp - 80], 1
+jmp label49
+label49:
+cmp r12, 3
+setl sil
+and sil, 1
+cmp qword ptr [rbp - 80], 0
+setg bl
+and bl, 1
+mov dil, sil
+and dil, bl
+cmp dil, 0
+setne dil
+and dil, 1
+test dil, dil
+jne label50
+jmp label51
+label50:
+mov r14, qword ptr [rbp - 80]
+mov r13, r12
+jmp label48
+label51:
+cmp r12, 3
+sete r12b
+and r12b, 1
+cmp qword ptr [rbp - 80], 0
+sete r13b
+and r13b, 1
+mov r14b, r12b
+and r14b, r13b
+cmp r14b, 0
+setne r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label52
+label52:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov rbx, qword ptr [rbp - 24]
+mov r13, qword ptr [rbp - 32]
+mov r12, qword ptr [rbp - 40]
+mov rdi, qword ptr [rbp - 48]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopChangingCondition:
+label53:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], r13
+mov qword ptr [rbp - 32], r12
+mov qword ptr [rbp - 40], rdi
+mov r14, 0
+mov r13, 0
+jmp label54
+label54:
+mov qword ptr [rbp - 48], r13
+lea r12, [r13 + 1]
+cmp r12, 3
+sete dil
+and dil, 1
+test dil, dil
+jne label59
+jmp label55
+label55:
+mov rdi, r12
+jmp label60
+label56:
+cmp rdi, 5
+setl sil
+and sil, 1
+test sil, sil
+jne label57
+jmp label58
+label57:
+mov r14, r12
+mov r13, rdi
+jmp label54
+label58:
+cmp r12, 13
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+jmp label61
+label59:
+mov rdi, 10
+jmp label60
+label60:
+lea r12, [r14 + rdi]
+jmp label56
+label61:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov r13, qword ptr [rbp - 24]
+mov r12, qword ptr [rbp - 32]
+mov rdi, qword ptr [rbp - 40]
+mov rsp, rbp
+pop rbp
+ret
+TestDoWhileLoopMultipleExits:
+label62:
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], rdi
+mov r14, 0
+jmp label63
+label63:
+mov qword ptr [rbp - 48], r14
+lea r13, [r14 + 1]
+cmp r13, 5
+sete r12b
+and r12b, 1
+test r12b, r12b
+jne label66
+jmp label67
+label64:
+mov r14, r13
+jmp label63
+label65:
+mov cl, r12b
+call Assert
+mov cl, dil
+call Assert
+jmp label69
+label66:
+mov dil, 1
+jmp label65
+label67:
+cmp r13, 10
+setg r14b
+and r14b, 1
+test r14b, r14b
+jne label68
+jmp label64
+label68:
+mov dil, 0
+jmp label65
+label69:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rdi, qword ptr [rbp - 32]
+mov rsp, rbp
+pop rbp
+ret
+.globl main
+
+main:
+label70:
+push rbp
+mov rbp, rsp
+sub rsp, 32
+call TestDoWhileLoopInt
+call TestDoWhileLoopBool
+call TestNestedDoWhileLoops
+call TestDoWhileLoopWithBreak
+call TestDoWhileLoopWithContinue
+call TestDoWhileLoopBoundary
+call TestDoWhileLoopWithMultipleVariables
+call TestDoWhileLoopComplexCondition
+call TestDoWhileLoopChangingCondition
+call TestDoWhileLoopMultipleExits
+jmp label71
+label71:
+mov rax, 0
+mov rsp, rbp
+pop rbp
 ret

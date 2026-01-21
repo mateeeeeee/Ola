@@ -85,7 +85,7 @@ namespace ola
 			FPM.AddPass(CreateCSEPass());
 			FPM.AddPass(CreateDCEPass());
 			FPM.AddPass(CreateLICMPass());
-			//FPM.AddPass(CreateLoopUnrollPass());
+			FPM.AddPass(CreateLoopUnrollPass());
 			FPM.AddPass(CreateSimplifyCFGPass());
 			FPM.AddPass(CreateGVNPass());
 			FPM.AddPass(CreateDCEPass());
