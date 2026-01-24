@@ -1,492 +1,701 @@
+.intel_syntax noprefix
 
 .text
 
-.extern _Assert
-.extern _AssertMsg
-.globl _S$Init__I__I
-_S$Init__I__I:
+.extern Assert
+
+.extern AssertMsg
+
+.globl Base$GetX
+
+Base$GetX:
 label0:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-mov x27, x1
-mov x26, x2
-add x25, x28, #0
-str x27, [x25]
-add x25, x28, #8
-str x26, [x25]
-b label1
+push rbp
+mov rbp, rsp
+sub rsp, 32
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov r14, rcx
+lea r13, [r14]
+mov r14, qword ptr [r13]
+mov qword ptr [rbp - 32], r14
+jmp label1
 label1:
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
+mov r14, qword ptr [rbp - 32]
+mov rax, r14
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
 ret
-.globl _S$SetX__I
-_S$SetX__I:
+.globl Base$GetSum
+
+Base$GetSum:
 label2:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x26, [x29, #-8]
-str x27, [x29, #-16]
-str x28, [x29, #-24]
-mov x28, x0
-mov x27, x1
-add x26, x28, #0
-str x27, [x26]
-b label3
+push rbp
+mov rbp, rsp
+sub rsp, 32
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov r14, rcx
+jmp label4
 label3:
-ldr x26, [x29, #-8]
-ldr x27, [x29, #-16]
-ldr x28, [x29, #-24]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-.globl _S$SetY__I
-_S$SetY__I:
+mov r13, qword ptr [rbp - 32]
+jmp label5
 label4:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x26, [x29, #-8]
-str x27, [x29, #-16]
-str x28, [x29, #-24]
-mov x28, x0
-mov x27, x1
-add x26, x28, #8
-str x27, [x26]
-b label5
+lea r12, [r14]
+mov r14, qword ptr [r12]
+mov qword ptr [rbp - 32], r14
+jmp label3
 label5:
-ldr x26, [x29, #-8]
-ldr x27, [x29, #-16]
-ldr x28, [x29, #-24]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
+mov rax, r13
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
 ret
-.globl _S$GetX
-_S$GetX:
+.globl Derived$GetY
+
+Derived$GetY:
 label6:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x27, [x29, #-8]
-str x28, [x29, #-16]
-mov x28, x0
-add x27, x28, #0
-ldr x28, [x27]
-str x28, [x29, #-24]
-b label7
+push rbp
+mov rbp, rsp
+sub rsp, 32
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov r14, rcx
+lea r13, [r14 + 8]
+mov r14, qword ptr [r13]
+mov qword ptr [rbp - 32], r14
+jmp label7
 label7:
-ldr x28, [x29, #-24]
-mov x0, x28
-ldr x27, [x29, #-8]
-ldr x28, [x29, #-16]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
+mov r14, qword ptr [rbp - 32]
+mov rax, r14
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
 ret
-.globl _S$GetY
-_S$GetY:
+.globl Derived$GetSum
+
+Derived$GetSum:
 label8:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x27, [x29, #-8]
-str x28, [x29, #-16]
-mov x28, x0
-add x27, x28, #8
-ldr x28, [x27]
-str x28, [x29, #-24]
-b label9
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], rdi
+mov r14, rcx
+jmp label11
 label9:
-ldr x28, [x29, #-24]
-mov x0, x28
-ldr x27, [x29, #-8]
-ldr x28, [x29, #-16]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-_StructByValue__S:
+mov rcx, r14
+call Base$GetSum
+mov r12, rax
+lea rdi, [r13 + r12]
+jmp label12
 label10:
-sub sp, sp, #96
-stp x29, x30, [sp, #80]
-add x29, sp, #80
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-ldr x27, [x28]
-sub x26, x29, #80
-add x25, x28, #8
-ldr x28, [x25]
-add x25, x26, #8
-str x27, [x26]
-str x28, [x25]
-b label18
+mov r13, qword ptr [rbp - 48]
+jmp label9
 label11:
-cmp x25, #100
-cset w26, eq
-mov w0, w26
-bl _Assert
-b label14
+lea r12, [r14 + 8]
+mov r13, qword ptr [r12]
+mov qword ptr [rbp - 48], r13
+jmp label10
 label12:
-cmp x26, #100
-cset w27, eq
-mov w0, w27
-bl _Assert
-b label19
+mov rax, rdi
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rdi, qword ptr [rbp - 32]
+mov rsp, rbp
+pop rbp
+ret
+.globl ExtendedDerived$GetZ
+
+ExtendedDerived$GetZ:
 label13:
-ldr x26, [x29, #-56]
-b label12
+push rbp
+mov rbp, rsp
+sub rsp, 32
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov r14, rcx
+lea r13, [r14 + 16]
+mov r14, qword ptr [r13]
+mov qword ptr [rbp - 32], r14
+jmp label14
 label14:
-ldr x27, [x28]
-str x27, [x29, #-56]
-b label13
+mov r14, qword ptr [rbp - 32]
+mov rax, r14
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov rsp, rbp
+pop rbp
+ret
+.globl ExtendedDerived$GetSum
+
+ExtendedDerived$GetSum:
 label15:
-ldr x25, [x29, #-64]
-b label11
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], rdi
+mov r14, rcx
+jmp label18
 label16:
-ldr x27, [x26]
-str x27, [x29, #-64]
-b label15
+mov rcx, r14
+call Derived$GetSum
+mov r12, rax
+lea rdi, [r13 + r12]
+jmp label19
 label17:
-sub x27, x29, #48
-add x28, x27, #8
-mov x27, #100
-str x27, [x28]
-b label16
+mov r13, qword ptr [rbp - 48]
+jmp label16
 label18:
-sub x27, x29, #48
-add x26, x27, #0
-mov x27, #100
-str x27, [x26]
-b label17
+lea r12, [r14 + 16]
+mov r13, qword ptr [r12]
+mov qword ptr [rbp - 48], r13
+jmp label17
 label19:
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #80]
-add sp, sp, #96
+mov rax, rdi
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rdi, qword ptr [rbp - 32]
+mov rsp, rbp
+pop rbp
 ret
-_StructByRef__Sref:
+PassBase__Base:
 label20:
-sub sp, sp, #80
-stp x29, x30, [sp, #64]
-add x29, sp, #64
-str x24, [x29, #-8]
-str x25, [x29, #-16]
-str x26, [x29, #-24]
-str x27, [x29, #-32]
-str x28, [x29, #-40]
-mov x28, x0
-b label28
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov r14, rcx
+mov r13, qword ptr [r14]
+lea r14, qword ptr [rbp - 48]
+mov qword ptr [r14], r13
+lea r14, qword ptr [rbp - 48]
+lea r13, qword ptr [rbp - 32]
+mov r12, qword ptr [r14]
+mov qword ptr [r13], r12
+jmp label23
 label21:
-cmp x27, #1000
-cset w25, eq
-mov w0, w25
-bl _Assert
-b label24
+cmp r12, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea rcx, qword ptr [rbp - 32]
+call Base$GetSum
+mov r13, rax
+cmp r13, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+jmp label24
 label22:
-cmp x25, #1000
-cset w24, eq
-mov w0, w24
-bl _Assert
-b label29
+mov r12, qword ptr [rbp - 40]
+jmp label21
 label23:
-ldr x25, [x29, #-56]
-b label22
+lea r13, qword ptr [rbp - 32]
+lea r12, [r13]
+mov r13, qword ptr [r12]
+mov qword ptr [rbp - 40], r13
+jmp label22
 label24:
-ldr x24, [x26]
-str x24, [x29, #-56]
-b label23
-label25:
-ldr x27, [x29, #-64]
-b label21
-label26:
-ldr x24, [x25]
-str x24, [x29, #-64]
-b label25
-label27:
-add x26, x28, #8
-mov x24, #1000
-str x24, [x26]
-b label26
-label28:
-add x25, x28, #0
-mov x26, #1000
-str x26, [x25]
-b label27
-label29:
-ldr x24, [x29, #-8]
-ldr x25, [x29, #-16]
-ldr x26, [x29, #-24]
-ldr x27, [x29, #-32]
-ldr x28, [x29, #-40]
-ldp x29, x30, [sp, #64]
-add sp, sp, #80
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
 ret
-.globl _main
-_main:
+PassBaseRef__Baseref:
+label25:
+push rbp
+mov rbp, rsp
+sub rsp, 64
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov r14, rcx
+jmp label28
+label26:
+cmp r13, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov rcx, r14
+call Base$GetSum
+mov r12, rax
+cmp r12, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+jmp label29
+label27:
+mov r13, qword ptr [rbp - 32]
+jmp label26
+label28:
+lea r12, [r14]
+mov r13, qword ptr [r12]
+mov qword ptr [rbp - 32], r13
+jmp label27
+label29:
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rsp, rbp
+pop rbp
+ret
+PassDerivedRef__Derivedref:
 label30:
-sub sp, sp, #304
-stp x29, x30, [sp, #288]
-add x29, sp, #288
-str x19, [x29, #-8]
-str x20, [x29, #-16]
-str x21, [x29, #-24]
-str x22, [x29, #-32]
-str x23, [x29, #-40]
-str x24, [x29, #-48]
-str x25, [x29, #-56]
-str x26, [x29, #-64]
-str x27, [x29, #-72]
-str x28, [x29, #-80]
-sub x28, x29, #96
-add x16, x28, #0
-str x16, [x29, #-224]
-mov x28, #0
-ldr x16, [x29, #-224]
-str x28, [x16]
-sub x28, x29, #96
-add x16, x28, #8
-str x16, [x29, #-232]
-mov x28, #0
-ldr x16, [x29, #-232]
-str x28, [x16]
-b label68
+push rbp
+mov rbp, rsp
+sub rsp, 80
+mov qword ptr [rbp - 8], r14
+mov qword ptr [rbp - 16], r13
+mov qword ptr [rbp - 24], r12
+mov qword ptr [rbp - 32], rdi
+mov r14, rcx
+jmp label36
 label31:
-sub x28, x29, #96
-sub x25, x29, #216
-ldr x24, [x28]
-add x23, x28, #8
-ldr x28, [x23]
-add x23, x25, #8
-str x24, [x25]
-str x28, [x23]
-mov x0, x25
-bl _StructByValue__S
-b label67
+cmp r13, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+jmp label34
 label32:
-ldr x16, [x29, #-240]
-cmp x16, #10
-cset w23, eq
-mov w0, w23
-bl _Assert
-b label65
+cmp r12, 2
+sete dil
+and dil, 1
+mov cl, dil
+call Assert
+mov rcx, r14
+call Derived$GetSum
+mov rdi, rax
+cmp rdi, 3
+sete dil
+and dil, 1
+mov cl, dil
+call Assert
+jmp label37
 label33:
-ldr x16, [x29, #-248]
-cmp x16, #10
-cset w28, eq
-mov w0, w28
-bl _Assert
-sub x28, x29, #112
-ldr x16, [x29, #-224]
-ldr x24, [x16]
-add x16, x28, #0
-str x16, [x29, #-256]
-ldr x16, [x29, #-256]
-str x24, [x16]
-sub x24, x29, #112
-ldr x16, [x29, #-232]
-ldr x28, [x16]
-add x16, x24, #8
-sub x17, x29, #264
-str x16, [x17]
-sub x16, x29, #264
-ldr x16, [x16]
-str x28, [x16]
-b label63
+mov r12, qword ptr [rbp - 40]
+jmp label32
 label34:
-sub x17, x29, #272
-ldr x16, [x17]
-cmp x16, #10
-cset w24, eq
-mov w0, w24
-bl _Assert
-b label59
+lea rdi, [r14 + 8]
+mov r12, qword ptr [rdi]
+mov qword ptr [rbp - 40], r12
+jmp label33
 label35:
-sub x17, x29, #280
-ldr x16, [x17]
-cmp x16, #10
-cset w20, eq
-mov w0, w20
-bl _Assert
-b label57
+mov r13, qword ptr [rbp - 48]
+jmp label31
 label36:
-cmp x19, #25
-cset w26, eq
-mov w0, w26
-bl _Assert
-b label55
+lea r12, [r14]
+mov r13, qword ptr [r12]
+mov qword ptr [rbp - 48], r13
+jmp label35
 label37:
-cmp x27, #25
-cset w25, eq
-mov w0, w25
-bl _Assert
-sub x0, x29, #96
-bl _StructByRef__Sref
-b label53
+mov r14, qword ptr [rbp - 8]
+mov r13, qword ptr [rbp - 16]
+mov r12, qword ptr [rbp - 24]
+mov rdi, qword ptr [rbp - 32]
+mov rsp, rbp
+pop rbp
+ret
+TestAssignment:
 label38:
-cmp x25, #1000
-cset w23, eq
-mov w0, w23
-bl _Assert
-b label51
+push rbp
+mov rbp, rsp
+sub rsp, 272
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], rbx
+mov qword ptr [rbp - 32], r13
+mov qword ptr [rbp - 40], r12
+mov qword ptr [rbp - 48], rdi
+lea r14, qword ptr [rbp - 72]
+lea r13, [r14]
+mov qword ptr [r13], 1
+lea r14, qword ptr [rbp - 72]
+lea r12, [r14 + 8]
+mov qword ptr [r12], 2
+lea r12, qword ptr [rbp - 80]
+mov r14, qword ptr [r13]
+lea r15, [r12]
+mov qword ptr [rbp - 192], r15
+mov r15, qword ptr [rbp - 192]
+mov qword ptr [r15], r14
+jmp label53
 label39:
-cmp x23, #1000
-cset w21, eq
-mov w0, w21
-bl _Assert
-b label49
+cmp qword ptr [rbp - 200], 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+lea rcx, qword ptr [rbp - 80]
+call Base$GetSum
+mov r12, rax
+cmp r12, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+lea r12, qword ptr [rbp - 80]
+lea rdi, qword ptr [rbp - 176]
+mov rsi, qword ptr [r12]
+mov qword ptr [rdi], rsi
+mov rcx, rdi
+call PassBase__Base
+lea rcx, qword ptr [rbp - 80]
+call PassBaseRef__Baseref
+lea rdi, qword ptr [rbp - 104]
+lea r15, [rdi + 8]
+mov qword ptr [rbp - 208], r15
+mov r15, qword ptr [rbp - 208]
+mov qword ptr [r15], 2
+lea rdi, qword ptr [rbp - 104]
+lea r15, [rdi]
+mov qword ptr [rbp - 216], r15
+mov r15, qword ptr [rbp - 216]
+mov qword ptr [r15], 1
+lea rdi, qword ptr [rbp - 104]
+lea r15, [rdi + 16]
+mov qword ptr [rbp - 224], r15
+mov r15, qword ptr [rbp - 224]
+mov qword ptr [r15], 3
+lea rcx, qword ptr [rbp - 104]
+call ExtendedDerived$GetSum
+mov rdi, rax
+cmp rdi, 6
+sete dil
+and dil, 1
+mov cl, dil
+call Assert
+jmp label51
 label40:
-cmp x21, #1000
-cset w22, eq
-mov w0, w22
-bl _Assert
-b label47
+cmp qword ptr [rbp - 232], 3
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+lea r14, qword ptr [rbp - 112]
+mov r15, qword ptr [rbp - 216]
+mov r15, qword ptr [r15]
+mov qword ptr [rbp - 240], r15
+lea r12, [r14]
+mov r15, qword ptr [rbp - 240]
+mov qword ptr [r12], r15
+jmp label49
 label41:
-cmp x22, #1000
-cset w28, eq
-mov w0, w28
-bl _Assert
-b label45
+cmp r14, 1
+sete sil
+and sil, 1
+mov cl, sil
+call Assert
+lea rcx, qword ptr [rbp - 112]
+call Base$GetSum
+mov rsi, rax
+cmp rsi, 1
+sete sil
+and sil, 1
+mov cl, sil
+call Assert
+lea rsi, qword ptr [rbp - 112]
+lea rdi, qword ptr [rbp - 184]
+mov rbx, qword ptr [rsi]
+mov qword ptr [rdi], rbx
+mov rcx, rdi
+call PassBase__Base
+lea rcx, qword ptr [rbp - 112]
+call PassBaseRef__Baseref
+lea rdi, qword ptr [rbp - 128]
+lea rbx, [rdi]
+mov r15, qword ptr [rbp - 240]
+mov qword ptr [rbx], r15
+lea rbx, qword ptr [rbp - 128]
+mov r15, qword ptr [rbp - 208]
+mov rdi, qword ptr [r15]
+lea rsi, [rbx + 8]
+mov qword ptr [rsi], rdi
+jmp label47
 label42:
-cmp x28, #0
-cset w24, eq
-mov w0, w24
-bl _Assert
-b label69
+cmp rdi, 1
+sete bl
+and bl, 1
+mov cl, bl
+call Assert
+jmp label45
 label43:
-ldr x28, [x29, #-120]
-b label42
+cmp rbx, 2
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea rcx, qword ptr [rbp - 128]
+call Derived$GetSum
+mov r13, rax
+cmp r13, 3
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea rcx, qword ptr [rbp - 128]
+call PassDerivedRef__Derivedref
+jmp label54
 label44:
-ldr x16, [x29, #-224]
-ldr x24, [x16]
-str x24, [x29, #-120]
-b label43
+mov rbx, qword ptr [rbp - 136]
+jmp label43
 label45:
-mov x24, #0
-ldr x16, [x29, #-224]
-str x24, [x16]
-b label44
+mov r13, qword ptr [rsi]
+mov qword ptr [rbp - 136], r13
+jmp label44
 label46:
-ldr x22, [x29, #-128]
-b label41
+mov rdi, qword ptr [rbp - 144]
+jmp label42
 label47:
-str x26, [x29, #-128]
-b label46
+lea r13, qword ptr [rbp - 128]
+lea rdi, [r13]
+mov r13, qword ptr [rdi]
+mov qword ptr [rbp - 144], r13
+jmp label46
 label48:
-ldr x21, [x29, #-136]
-b label40
+mov r14, qword ptr [rbp - 152]
+jmp label41
 label49:
-str x20, [x29, #-136]
-b label48
+mov rsi, qword ptr [r12]
+mov qword ptr [rbp - 152], rsi
+jmp label48
 label50:
-ldr x23, [x29, #-144]
-b label39
+mov r15, qword ptr [rbp - 160]
+mov qword ptr [rbp - 232], r15
+jmp label40
 label51:
-str x26, [x29, #-144]
-b label50
+mov r15, qword ptr [rbp - 224]
+mov rsi, qword ptr [r15]
+mov qword ptr [rbp - 160], rsi
+jmp label50
 label52:
-ldr x25, [x29, #-152]
-b label38
+mov r15, qword ptr [rbp - 168]
+mov qword ptr [rbp - 200], r15
+jmp label39
 label53:
-str x20, [x29, #-152]
-b label52
+mov r15, qword ptr [rbp - 192]
+mov rsi, qword ptr [r15]
+mov qword ptr [rbp - 168], rsi
+jmp label52
 label54:
-ldr x27, [x29, #-160]
-b label37
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov rbx, qword ptr [rbp - 24]
+mov r13, qword ptr [rbp - 32]
+mov r12, qword ptr [rbp - 40]
+mov rdi, qword ptr [rbp - 48]
+mov rsp, rbp
+pop rbp
+ret
+TestReferenceAssignment:
 label55:
-ldr x16, [x29, #-232]
-ldr x26, [x16]
-str x26, [x29, #-160]
-b label54
+push rbp
+mov rbp, rsp
+sub rsp, 256
+mov qword ptr [rbp - 8], rsi
+mov qword ptr [rbp - 16], r14
+mov qword ptr [rbp - 24], rbx
+mov qword ptr [rbp - 32], r13
+mov qword ptr [rbp - 40], r12
+mov qword ptr [rbp - 48], rdi
+lea r14, qword ptr [rbp - 72]
+lea r13, [r14]
+mov qword ptr [r13], 1
+lea r13, qword ptr [rbp - 72]
+lea r14, [r13 + 8]
+mov qword ptr [r14], 2
+lea r14, qword ptr [rbp - 72]
+mov qword ptr [rbp - 80], r14
+mov r15, qword ptr [rbp - 80]
+mov qword ptr [rbp - 184], r15
+jmp label70
 label56:
-ldr x19, [x29, #-168]
-b label36
+cmp qword ptr [rbp - 192], 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+mov rcx, qword ptr [rbp - 184]
+call Base$GetSum
+mov r12, rax
+cmp r12, 1
+sete r12b
+and r12b, 1
+mov cl, r12b
+call Assert
+lea r12, qword ptr [rbp - 104]
+lea rdi, [r12 + 8]
+mov qword ptr [rdi], 2
+lea rdi, qword ptr [rbp - 104]
+lea r12, [rdi]
+mov qword ptr [r12], 1
+lea r12, qword ptr [rbp - 104]
+lea rdi, [r12 + 16]
+mov qword ptr [rdi], 3
+lea rdi, qword ptr [rbp - 104]
+mov qword ptr [rbp - 112], rdi
+mov r15, qword ptr [rbp - 112]
+mov qword ptr [rbp - 200], r15
+jmp label68
 label57:
-ldr x16, [x29, #-224]
-ldr x20, [x16]
-str x20, [x29, #-168]
-b label56
+cmp qword ptr [rbp - 208], 1
+sete sil
+and sil, 1
+mov cl, sil
+call Assert
+mov rcx, qword ptr [rbp - 200]
+call Base$GetSum
+mov rsi, rax
+cmp rsi, 1
+sete sil
+and sil, 1
+mov cl, sil
+call Assert
+lea rsi, qword ptr [rbp - 104]
+mov qword ptr [rbp - 120], rsi
+mov r15, qword ptr [rbp - 120]
+mov qword ptr [rbp - 216], r15
+jmp label66
 label58:
-ldr x16, [x29, #-176]
-sub x17, x29, #280
-str x16, [x17]
-b label35
+cmp qword ptr [rbp - 224], 1
+sete r14b
+and r14b, 1
+mov cl, r14b
+call Assert
+jmp label64
 label59:
-sub x16, x29, #264
-ldr x16, [x16]
-ldr x20, [x16]
-str x20, [x29, #-176]
-b label58
+cmp r14, 2
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+mov rcx, qword ptr [rbp - 216]
+call Derived$GetSum
+mov r13, rax
+cmp r13, 3
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea r13, qword ptr [rbp - 128]
+mov r15, qword ptr [rbp - 216]
+lea rdi, [r15]
+mov r12, qword ptr [rdi]
+lea rdi, [r13]
+mov qword ptr [rdi], r12
+jmp label62
 label60:
-ldr x16, [x29, #-184]
-sub x17, x29, #272
-str x16, [x17]
-b label34
+cmp r12, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea rcx, qword ptr [rbp - 128]
+call Base$GetSum
+mov r13, rax
+cmp r13, 1
+sete r13b
+and r13b, 1
+mov cl, r13b
+call Assert
+lea r13, qword ptr [rbp - 128]
+lea rsi, qword ptr [rbp - 176]
+mov rbx, qword ptr [r13]
+mov qword ptr [rsi], rbx
+mov rcx, rsi
+call PassBase__Base
+lea rcx, qword ptr [rbp - 128]
+call PassBaseRef__Baseref
+jmp label71
 label61:
-ldr x16, [x29, #-256]
-ldr x20, [x16]
-str x20, [x29, #-184]
-b label60
+mov r12, qword ptr [rbp - 136]
+jmp label60
 label62:
-mov x20, #25
-ldr x16, [x29, #-232]
-str x20, [x16]
-b label61
+mov rsi, qword ptr [rdi]
+mov qword ptr [rbp - 136], rsi
+jmp label61
 label63:
-mov x20, #25
-ldr x16, [x29, #-224]
-str x20, [x16]
-b label62
+mov r14, qword ptr [rbp - 144]
+jmp label59
 label64:
-ldr x16, [x29, #-192]
-str x16, [x29, #-248]
-b label33
+mov r15, qword ptr [rbp - 216]
+lea rsi, [r15 + 8]
+mov r14, qword ptr [rsi]
+mov qword ptr [rbp - 144], r14
+jmp label63
 label65:
-ldr x16, [x29, #-232]
-ldr x20, [x16]
-str x20, [x29, #-192]
-b label64
+mov r15, qword ptr [rbp - 152]
+mov qword ptr [rbp - 224], r15
+jmp label58
 label66:
-ldr x16, [x29, #-200]
-str x16, [x29, #-240]
-b label32
+mov r15, qword ptr [rbp - 216]
+lea r14, [r15]
+mov rsi, qword ptr [r14]
+mov qword ptr [rbp - 152], rsi
+jmp label65
 label67:
-ldr x16, [x29, #-224]
-ldr x20, [x16]
-str x20, [x29, #-200]
-b label66
+mov r15, qword ptr [rbp - 160]
+mov qword ptr [rbp - 208], r15
+jmp label57
 label68:
-mov x20, #10
-ldr x16, [x29, #-224]
-str x20, [x16]
-mov x20, #10
-ldr x16, [x29, #-232]
-str x20, [x16]
-b label31
+mov r15, qword ptr [rbp - 200]
+lea rsi, [r15]
+mov r14, qword ptr [rsi]
+mov qword ptr [rbp - 160], r14
+jmp label67
 label69:
-mov x0, #0
-ldr x19, [x29, #-8]
-ldr x20, [x29, #-16]
-ldr x21, [x29, #-24]
-ldr x22, [x29, #-32]
-ldr x23, [x29, #-40]
-ldr x24, [x29, #-48]
-ldr x25, [x29, #-56]
-ldr x26, [x29, #-64]
-ldr x27, [x29, #-72]
-ldr x28, [x29, #-80]
-ldp x29, x30, [sp, #288]
-add sp, sp, #240
+mov r15, qword ptr [rbp - 168]
+mov qword ptr [rbp - 192], r15
+jmp label56
+label70:
+mov r15, qword ptr [rbp - 184]
+lea r14, [r15]
+mov rsi, qword ptr [r14]
+mov qword ptr [rbp - 168], rsi
+jmp label69
+label71:
+mov rsi, qword ptr [rbp - 8]
+mov r14, qword ptr [rbp - 16]
+mov rbx, qword ptr [rbp - 24]
+mov r13, qword ptr [rbp - 32]
+mov r12, qword ptr [rbp - 40]
+mov rdi, qword ptr [rbp - 48]
+mov rsp, rbp
+pop rbp
+ret
+.globl main
+
+main:
+label72:
+push rbp
+mov rbp, rsp
+sub rsp, 32
+call TestAssignment
+call TestReferenceAssignment
+jmp label73
+label73:
+mov rax, 0
+mov rsp, rbp
+pop rbp
 ret

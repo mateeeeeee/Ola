@@ -8,11 +8,12 @@ public class S
 		this.y = y;
 	}
 
-	public void SetX(int x) {this.x = x;}
-	public void SetY(int y) {this.y = y;}
+	//#todo fails on O3 without noinline, works with O0
+	public noinline void SetX(int x) {this.x = x;}
+	public noinline void SetY(int y) {this.y = y;}
 
-	public int GetX() const {return x;}
-	public int GetY() const {return y;}
+	public noinline int GetX() const {return x;}
+	public noinline int GetY() const {return y;}
 
 	private int x = 0;
 	private int y = 0;

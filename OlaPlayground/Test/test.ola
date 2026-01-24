@@ -1,64 +1,105 @@
-import std.assert;
+import std.Assert;
 
-public class S
+class Base
 {
-	public void Init(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-	}
-
-	public void SetX(int x) {this.x = x;}
-	public void SetY(int y) {this.y = y;}
-
-	public int GetX() const {return x;}
-	public int GetY() const {return y;}
-
-	private int x = 0;
-	private int y = 0;
+    int x = 1;
+    public int GetX() const { return x; }
+    public int GetSum() const { return GetX(); }
 };
 
-void StructByValue(S s)
+class Derived : Base
 {
-	s.SetX(100);
-	s.SetY(100);
-	Assert(s.GetX() == 100);
-	Assert(s.GetY() == 100);
+    int y = 2;
+    public int GetY() const { return y; }
+    public int GetSum() const { return GetY() + super.GetSum(); }
+};
+
+class ExtendedDerived : Derived
+{
+    int z = 3;
+    public int GetZ() const { return z; }
+    public int GetSum() const { return GetZ() + super.GetSum(); }
+};
+
+void PassBase(Base b)
+{
+    Assert(b.GetX() == 1);
+    Assert(b.GetSum() == 1);
+}
+void PassBaseRef(ref Base b)
+{
+    Assert(b.GetX() == 1);
+    Assert(b.GetSum() == 1);
 }
 
-void StructByRef(ref S s)
+void PassDerived(Derived d)
 {
-	s.SetX(1000);
-	s.SetY(1000);
-	Assert(s.GetX() == 1000);
-	Assert(s.GetY() == 1000);
+    Assert(d.GetX() == 1);
+    Assert(d.GetY() == 2);
+    Assert(d.GetSum() == 3);
+}
+void PassDerivedRef(ref Derived d)
+{
+    Assert(d.GetX() == 1);
+    Assert(d.GetY() == 2);
+    Assert(d.GetSum() == 3);
+}
+
+void TestAssignment()
+{
+    Derived d;
+    Base b1 = d;
+    Assert(b1.GetX() == 1);
+    Assert(b1.GetSum() == 1);
+    PassBase(b1);
+    PassBaseRef(b1);
+    
+    ExtendedDerived d2;
+    Assert(d2.GetSum() == 6);
+    Assert(d2.GetZ() == 3);
+    
+    Base b2 = d2;
+    Assert(b2.GetX() == 1);
+    Assert(b2.GetSum() == 1);
+    PassBase(b2);
+    PassBaseRef(b2);
+    
+    Derived d3 = d2;
+    Assert(d3.GetX() == 1);
+    Assert(d3.GetY() == 2);
+    Assert(d3.GetSum() == 3);
+    //PassDerived(d3); #todo - fails with O3, works with O0
+    PassDerivedRef(d3);
+}
+
+void TestReferenceAssignment()
+{
+    Derived d;
+    ref Base b1 = d;
+    Assert(b1.GetX() == 1);
+    Assert(b1.GetSum() == 1);
+
+    ExtendedDerived d2;
+
+    ref Base b2 = d2;
+    Assert(b2.GetX() == 1);
+    Assert(b2.GetSum() == 1);
+
+    ref Derived d3 = d2;
+    Assert(d3.GetX() == 1);
+    Assert(d3.GetY() == 2);
+    Assert(d3.GetSum() == 3);
+
+    Base b3 = d3;
+    Assert(b3.GetX() == 1);
+    Assert(b3.GetSum() == 1);
+    PassBase(b3);
+    PassBaseRef(b3);
 }
 
 public int main()
 {
-	S s; s.Init(10, 10);
-	StructByValue(s);
-	Assert(s.GetX() == 10);
-	Assert(s.GetY() == 10);
-
-	S s2 = s; //copy
-	s.SetX(25);
-	s.SetY(25);
-	Assert(s2.GetX() == 10);
-	Assert(s2.GetY() == 10);
-	Assert(s.GetX() == 25);
-	Assert(s.GetY() == 25);
-
-	StructByRef(s);
-	Assert(s.GetX() == 1000);
-	Assert(s.GetY() == 1000);
-
-	ref S s3 = s;
-	Assert(s3.GetX() == 1000);
-	Assert(s3.GetY() == 1000);
-
-	s3.SetX(0);
-	Assert(s.GetX() == 0);
-
-	return 0;
+    TestAssignment();
+    TestReferenceAssignment();
+    return 0;
 }
