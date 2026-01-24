@@ -48,7 +48,7 @@ void TestNestedForLoops()
     Assert(outerCounter == 3);
     Assert(innerCounter == 2);
 }
-noopt void TestNestedForLoopsReset()
+void TestNestedForLoopsReset()
 {
     int outerCounter = 0;
     int totalIterations = 0;
@@ -61,7 +61,7 @@ noopt void TestNestedForLoopsReset()
         }
     }
     Assert(outerCounter == 3);
-    Assert(totalIterations == 6); //todo: fails with optimizations
+    Assert(totalIterations == 6); 
 }
 
 void TestForLoopWithBreak()

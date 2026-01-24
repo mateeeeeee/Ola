@@ -143,7 +143,9 @@ namespace ola
 				}
 				else if (IRArrayType* AT = dyn_cast<IRArrayType>(type))
 				{
-					OLA_ASSERT_MSG(AT->GetElementType() == values[i]->GetType(), "Aggregate member type mismatch!");
+					Bool const types_match = AT->GetElementType() == values[i]->GetType();
+					Bool const both_pointers = AT->GetElementType()->IsPointer() && values[i]->GetType()->IsPointer();
+					OLA_ASSERT_MSG(types_match || both_pointers, "Aggregate member type mismatch!");
 				}
 				aggregate_values[i] = values[i];
 			}

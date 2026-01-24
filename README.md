@@ -39,7 +39,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
       - Microsoft ABI
       - SysV ABI (wip)
     - ARM64 code generation
-    - Class support not complete yet
+    - Class support
 	
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">

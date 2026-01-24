@@ -689,6 +689,120 @@ namespace ola
 				}
 			}
 			break;
+			case InstMemCpy:
+			{
+				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
+				MachineOperand size_op = MI.GetOperand(2);
+
+				OLA_ASSERT(size_op.IsImmediate());
+				Int64 size = size_op.GetImmediate();
+
+				Int64 offset = 0;
+				Bool first = true;
+				while (size >= 8)
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int64);
+					MachineOperand current_src = src;
+					MachineOperand current_dst = dst;
+
+					if (offset > 0)
+					{
+						MachineOperand src_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
+						MachineInstruction add_src(InstAdd);
+						add_src.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+						if (first)
+						{
+							MI.SetOpcode(InstAdd);
+							MI.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+							first = false;
+						}
+						else
+						{
+							instructions.insert(instruction_iter, add_src);
+						}
+						current_src = src_ptr;
+					}
+
+					MachineInstruction load(InstLoad);
+					load.SetOp<0>(tmp).SetOp<1>(current_src);
+					if (first)
+					{
+						MI.SetOpcode(InstLoad);
+						MI.SetOp<0>(tmp).SetOp<1>(current_src).SetOp<2>(MachineOperand::Undefined());
+						first = false;
+					}
+					else
+					{
+						instructions.insert(instruction_iter, load);
+					}
+
+					if (offset > 0)
+					{
+						MachineOperand dst_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
+						MachineInstruction add_dst(InstAdd);
+						add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+						instructions.insert(instruction_iter, add_dst);
+						current_dst = dst_ptr;
+					}
+
+					MachineInstruction store(InstStore);
+					store.SetOp<0>(current_dst).SetOp<1>(tmp);
+
+					++instruction_iter;
+					instruction_iter = instructions.insert(instruction_iter, store);
+
+					offset += 8;
+					size -= 8;
+				}
+
+				while (size > 0)
+				{
+					MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int8);
+					MachineOperand current_src = src;
+					MachineOperand current_dst = dst;
+
+					MachineOperand src_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
+					MachineInstruction add_src(InstAdd);
+					add_src.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+					if (first)
+					{
+						MI.SetOpcode(InstAdd);
+						MI.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+						first = false;
+					}
+					else
+					{
+						instructions.insert(instruction_iter, add_src);
+					}
+					current_src = src_ptr;
+
+					MachineInstruction load(InstLoad);
+					load.SetOp<0>(tmp).SetOp<1>(current_src);
+					instructions.insert(instruction_iter, load);
+
+					MachineOperand dst_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
+					MachineInstruction add_dst(InstAdd);
+					add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+					instructions.insert(instruction_iter, add_dst);
+					current_dst = dst_ptr;
+
+					MachineInstruction store(InstStore);
+					store.SetOp<0>(current_dst).SetOp<1>(tmp);
+
+					++instruction_iter;
+					instruction_iter = instructions.insert(instruction_iter, store);
+
+					offset += 1;
+					size -= 1;
+				}
+
+				if (first)
+				{
+					MI.SetDead();
+				}
+			}
+			break;
 			}
 		}
 

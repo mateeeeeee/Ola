@@ -5,6 +5,8 @@
 
 namespace ola
 {
+	struct MachineSymbolRef { std::string name; };
+
 	class MachineZeroStorage final : public MachineRelocable
 	{
 	public:
@@ -24,7 +26,7 @@ namespace ola
 	class MachineDataStorage final : public MachineRelocable
 	{
 	public:
-		using Storage = std::vector<std::variant<Uint8, Uint16, Uint32, Uint64, std::string>>;
+		using Storage = std::vector<std::variant<Uint8, Uint16, Uint32, Uint64, std::string, MachineSymbolRef>>;
 	public:
 		MachineDataStorage(std::string_view symbol, Bool read_only) : MachineRelocable(symbol), read_only(read_only) {}
 
@@ -54,6 +56,11 @@ namespace ola
 		Uint32 AppendString(std::string_view str)
 		{
 			return Append(std::string(str));
+		}
+
+		Uint32 AppendSymbolRef(std::string_view symbol)
+		{
+			return Append(MachineSymbolRef{std::string(symbol)});
 		}
 
 		virtual RelocableKind GetRelocableKind() const override

@@ -102,6 +102,10 @@ namespace ola
 									}
 								}
 							}
+							else if (GlobalValue* GV = dyn_cast<GlobalValue>(V))
+							{
+								data->AppendSymbolRef(GV->GetName());
+							}
 							else OLA_ASSERT(false);
 						};
 					ExpandValue(ExpandValue, init_value);

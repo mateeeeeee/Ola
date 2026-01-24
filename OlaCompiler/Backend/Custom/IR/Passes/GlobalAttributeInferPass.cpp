@@ -106,6 +106,12 @@ namespace ola
 
 		for (GlobalVariable* GV : Worklist)
 		{
+			// Skip vtables, they contain function pointers that require runtime
+			// relocation on macOS ARM64, so they cannot be in read-only sections
+			if (GV->GetName().starts_with("VTable_")) 
+			{
+				continue;
+			}
 			GV->SetReadOnly();
 		}
 		return !Worklist.empty();

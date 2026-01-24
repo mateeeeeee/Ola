@@ -17,6 +17,7 @@ namespace ola
 		"InstLoad",
 		"InstStore",
 		"InstLoadGlobalAddress",
+		"InstMemCpy",
 		"InstCMoveEQ",
 		"InstCMoveNE",
 

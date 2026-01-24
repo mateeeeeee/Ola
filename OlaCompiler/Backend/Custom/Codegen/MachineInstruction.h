@@ -20,7 +20,8 @@ namespace ola
 		InstLoad,					//reg <- [memory]
 		InstStore,					//[memory] <- reg
 		InstLoadGlobalAddress,		//reg <- memory
-		InstCMoveEQ,			
+		InstMemCpy,					//memcpy: dst, src, size (for struct copies)
+		InstCMoveEQ,
 		InstCMoveNE,
 
 		//Stack

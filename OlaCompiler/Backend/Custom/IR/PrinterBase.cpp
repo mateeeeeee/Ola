@@ -286,6 +286,7 @@ namespace ola
 		ConstantID const_id = C->GetConstantID();
 		switch (const_id)
 		{
+		case ConstantID::Global:	 Emit("@{}", cast<GlobalValue>(C)->GetName());		break;
 		case ConstantID::Float:		 Emit("{}", cast<ConstantFloat>(C)->GetValue());	break;
 		case ConstantID::Integer:	 Emit("{}", cast<ConstantInt>(C)->GetValue());		break;
 		case ConstantID::String:	 Emit("{}", cast<ConstantString>(C)->GetValue());	break;

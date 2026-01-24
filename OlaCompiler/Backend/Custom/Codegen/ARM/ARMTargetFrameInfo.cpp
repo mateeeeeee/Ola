@@ -24,10 +24,8 @@ namespace ola
 
 	void ARMTargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
-		Function* callee = CI->GetCalleeAsFunction();
-		OLA_ASSERT(callee);
-		MachineGlobal const* global = ctx.GetGlobal(callee);
-
+		Bool const is_indirect = CI->IsIndirect();
+		MachineGlobal const* global = is_indirect ? nullptr : ctx.GetGlobal(CI->GetCalleeAsFunction());
 		MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
 		for (Int32 idx = CI->ArgSize() - 1; idx >= 0; --idx)
 		{
@@ -71,7 +69,18 @@ namespace ola
 		}
 
 		MachineInstruction call_inst(InstCall);
-		call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
+		if (is_indirect)
+		{
+			Value* callee_ptr = CI->GetCallee();
+			MachineOperand callee_operand = ctx.GetOperand(callee_ptr);
+			MachineOperand x16 = MachineOperand::ISAReg(ARM_X16, MachineType::Int64);
+			ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(x16).SetOp<1>(callee_operand));
+			call_inst.SetOp<0>(x16);
+		}
+		else
+		{
+			call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
+		}
 		ctx.EmitInst(call_inst);
 
 		IRType const* return_type = CI->GetType();

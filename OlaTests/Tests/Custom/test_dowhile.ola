@@ -108,7 +108,7 @@ void TestDoWhileLoopBoundary()
     } while (i < 5);
     Assert(count == 1);
 }
-noopt void TestDoWhileLoopWithMultipleVariables()
+void TestDoWhileLoopWithMultipleVariables()
 {
     int a = 1, b = 1;
     do 
@@ -117,7 +117,7 @@ noopt void TestDoWhileLoopWithMultipleVariables()
         a = b;
         b = temp + b;
     } while (b < 10);
-    Assert(a == 8 && b == 13); //todo: fails with optimizations
+    Assert(a == 8 && b == 13); 
 }
 void TestDoWhileLoopComplexCondition()
 {

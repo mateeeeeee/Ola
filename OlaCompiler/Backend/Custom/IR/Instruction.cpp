@@ -296,6 +296,15 @@ namespace ola
 		AddOperand(callee);
 	}
 
+	CallInst::CallInst(Value* callee, std::span<Value*> args, IRType* return_type) : Instruction(Opcode::Call, return_type, {})
+	{
+		for (Value* arg : args)
+		{
+			AddOperand(arg);
+		}
+		AddOperand(callee);
+	}
+
 	Function* CallInst::GetCalleeAsFunction() const
 	{
 		if (Function* F = dyn_cast<Function>(GetCallee()))
@@ -307,6 +316,26 @@ namespace ola
 	Function* CallInst::GetCaller() const
 	{
 		return GetBasicBlock()->GetFunction();
+	}
+
+	Instruction* CallInst::Clone() const
+	{
+		Uint32 const OpCount = GetNumOperands();
+		std::vector<Value*> Args; Args.reserve(OpCount - 1);
+		for (Uint32 i = 0; i < OpCount - 1; ++i)
+		{
+			Args.push_back(GetOperand(i));
+		}
+		Value* Callee = GetOperand(OpCount - 1);
+
+		if (!IsIndirect())
+		{
+			return new CallInst(Callee, Args);
+		}
+		else
+		{
+			return new CallInst(Callee, Args, GetType());
+		}
 	}
 
 	AllocaInst::AllocaInst(IRType* type) : Instruction(Opcode::Alloca, IRPtrType::Get(type), {}), allocated_type(type)

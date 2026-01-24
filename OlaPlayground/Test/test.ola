@@ -1,35 +1,52 @@
 import std.assert;
 
-void TestEmptyDoWhileLoop()
+class Base
 {
-    int i = 0;
-    do
-    {
-        // Empty body
-    } while (++i < 2);
-    Assert(i == 2);
+	public int GetValue() const virtual
+	{
+		return 1;
+	}
+	public int GetDoubleValue() const virtual
+	{
+		return GetValue() * 2;
+	}
+};
+
+class Derived : Base
+{
+	public int GetValue() const virtual
+	{
+		return 10;
+	}
+	public int GetDoubleValue() const virtual
+	{
+		return GetValue() * 2;
+	}
+};
+
+void TestVirtualDispatch(ref Base b, int expected)
+{
+	Assert(b.GetValue() == expected);
 }
 
-noinline int getI(int i)
+void TestVirtualDispatchDouble(ref Base b, int expected)
 {
-    return i;
-}
-
-
-void TestSimpleLoopUnroll()
-{
-    int sum = 0;
-    for (int i = 0; i < 5; ++i)
-    {
-        sum = sum + getI(i);
-    }
-    // sum = 0 + 1 + 2 + 3 + 4 = 10
-    Assert(sum == 10);
+	Assert(b.GetDoubleValue() == expected);
 }
 
 public int main()
 {
-    TestEmptyDoWhileLoop();
-    TestSimpleLoopUnroll();
-    return 0;
+	Base b;
+	Assert(b.GetValue() == 1);
+	Assert(b.GetDoubleValue() == 2);
+	TestVirtualDispatch(b, 1);
+	TestVirtualDispatchDouble(b, 2);
+
+	Derived d;
+	Assert(d.GetValue() == 10);
+	Assert(d.GetDoubleValue() == 20);
+	TestVirtualDispatch(d, 10);
+	TestVirtualDispatchDouble(d, 20);
+
+	return 0;
 }

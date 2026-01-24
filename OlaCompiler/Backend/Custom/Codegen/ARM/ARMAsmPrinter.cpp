@@ -143,7 +143,14 @@ namespace ola
 						{
 							MachineOperand const& dst = MI.GetOp<0>();
 							std::string symbol = GetOperandString(dst);
-							EmitText("{} {}", opcode_string, symbol);
+							if (dst.IsReg())
+							{
+								EmitText("blr {}", symbol);
+							}
+							else
+							{
+								EmitText("{} {}", opcode_string, symbol);
+							}
 						}
 						break;
 						case InstRet:
@@ -420,14 +427,15 @@ namespace ola
 						std::visit([&](auto&& arg)
 							{
 								using T = std::decay_t<decltype(arg)>;
-								if constexpr (std::is_same_v<T, Uint8>)				EmitReadOnly(".byte {}", arg);
-								else if constexpr (std::is_same_v<T, Uint16>)		EmitReadOnly(".short {}", arg);
-								else if constexpr (std::is_same_v<T, Uint32>)		EmitReadOnly(".long {}", arg);
-								else if constexpr (std::is_same_v<T, Uint64>)		EmitReadOnly(".quad {}", arg);
-								else if constexpr (std::is_same_v<T, std::string>)	EmitReadOnly(".string \"{}\"", arg);
+								if constexpr (std::is_same_v<T, Uint8>)					EmitReadOnly(".byte {}", arg);
+								else if constexpr (std::is_same_v<T, Uint16>)			EmitReadOnly(".short {}", arg);
+								else if constexpr (std::is_same_v<T, Uint32>)			EmitReadOnly(".long {}", arg);
+								else if constexpr (std::is_same_v<T, Uint64>)			EmitReadOnly(".quad {}", arg);
+								else if constexpr (std::is_same_v<T, std::string>)		EmitReadOnly(".string \"{}\"", arg);
+								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitReadOnly(".quad _{}", arg.name);
 							}, element);
 					}
-					EmitReadOnly(".p2align 3");  
+					EmitReadOnly(".p2align 3");
 					EmitReadOnly("\n");
 				}
 				else
@@ -438,14 +446,15 @@ namespace ola
 						std::visit([&](auto&& arg)
 							{
 								using T = std::decay_t<decltype(arg)>;
-								if constexpr (std::is_same_v<T, Uint8>)				EmitData(".byte {}", arg);
-								else if constexpr (std::is_same_v<T, Uint16>)		EmitData(".short {}", arg);
-								else if constexpr (std::is_same_v<T, Uint32>)		EmitData(".long {}", arg);
-								else if constexpr (std::is_same_v<T, Uint64>)		EmitData(".quad {}", arg);
-								else if constexpr (std::is_same_v<T, std::string>)	EmitData(".string \"{}\"", arg);
+								if constexpr (std::is_same_v<T, Uint8>)					EmitData(".byte {}", arg);
+								else if constexpr (std::is_same_v<T, Uint16>)			EmitData(".short {}", arg);
+								else if constexpr (std::is_same_v<T, Uint32>)			EmitData(".long {}", arg);
+								else if constexpr (std::is_same_v<T, Uint64>)			EmitData(".quad {}", arg);
+								else if constexpr (std::is_same_v<T, std::string>)		EmitData(".string \"{}\"", arg);
+								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitData(".quad _{}", arg.name);
 							}, element);
 					}
-					EmitData(".p2align 3");  
+					EmitData(".p2align 3");
 					EmitData("\n");
 				}
 			}

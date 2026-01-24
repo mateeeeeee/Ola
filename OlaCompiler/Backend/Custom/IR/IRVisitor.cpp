@@ -561,7 +561,7 @@ namespace ola
 		if (class_decl.IsPolymorphic())
 		{
 			std::vector<MethodDecl const*> const& vtable = class_decl.GetVTable();
-			IRArrayType* vtable_type = context.GetArrayType(GetPointerType(void_type), vtable.size()); 
+			IRArrayType* vtable_type = context.GetArrayType(GetPointerType(void_type), vtable.size());
 			std::vector<Constant*> vtable_function_ptrs;
 
 			for (MethodDecl const* method : vtable)
@@ -580,9 +580,11 @@ namespace ola
 
 			std::string vtable_name = "VTable_";
 			vtable_name += class_decl.GetName();
-			GlobalVariable* vtable_var = new GlobalVariable(vtable_name, vtable_type, Linkage::Internal, nullptr); 
-
-			vtable_var->SetReadOnly();
+			ConstantArray* vtable_init = new ConstantArray(vtable_type, vtable_function_ptrs);
+			GlobalVariable* vtable_var = new GlobalVariable(vtable_name, vtable_type, Linkage::Internal, vtable_init);
+			// vtables cannot be read-only on macOS ARM64 because they contain function
+			// pointers that require runtime relocation (illegal text-relocations)
+			// vtable_var->SetReadOnly();
 			module.AddGlobal(vtable_var);
 
 			vtable_map[&class_decl] = vtable_var;
@@ -1433,7 +1435,60 @@ namespace ola
 
 		if (!isa<SuperExpr>(class_expr) && method_decl->IsVirtual())
 		{
-			OLA_ASSERT_MSG(false, "Virtual method calls not yet supported in custom backend");
+			// Virtual dispatch: load function pointer from vtable and call indirectly
+			Value* this_ptr = value_map[class_expr];
+			ConstantInt* zero = context.GetInt64(0);
+
+			// 1. Get pointer to vtable pointer (first field of object, index 0)
+			std::vector<Value*> vtable_ptr_indices = { zero, zero };
+			Value* vtable_ptr_addr = builder->MakeInst<GetElementPtrInst>(this_ptr, vtable_ptr_indices);
+
+			// 2. Load vtable pointer
+			Value* vtable_ptr = Load(GetPointerType(GetPointerType(void_type)), vtable_ptr_addr);
+
+			// 3. Index into vtable to get function pointer address
+			Uint32 vtable_idx = method_decl->GetVTableIndex();
+			std::vector<Value*> func_ptr_indices = { context.GetInt64(vtable_idx) };
+			Value* func_ptr_addr = builder->MakeInst<GetElementPtrInst>(vtable_ptr, func_ptr_indices);
+
+			// 4. Load the function pointer
+			Value* func_ptr = Load(GetPointerType(void_type), func_ptr_addr);
+
+			// 5. Determine return type and build args
+			FuncType const* func_type = method_decl->GetFuncType();
+			IRType* ir_class_type = ConvertClassDecl(class_decl);
+			IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
+			IRType* return_type = ir_func_type->GetReturnType();
+
+			std::vector<Value*> args;
+			Uint32 arg_index = 0;
+			Bool return_struct = isa<ClassType>(method_call_expr.GetCalleeType()->GetReturnType());
+			Value* return_alloc = nullptr;
+			if (return_struct)
+			{
+				IRType* sret_type = ir_func_type->GetParamType(arg_index);
+				return_alloc = builder->MakeInst<AllocaInst>(sret_type);
+				args.push_back(return_alloc);
+				++arg_index;
+			}
+
+			args.push_back(this_ptr);
+			++arg_index;
+
+			for (auto const& arg_expr : method_call_expr.GetArgs())
+			{
+				arg_expr->Accept(*this);
+				Value* arg_value = value_map[arg_expr.get()];
+				OLA_ASSERT(arg_value);
+				IRType* arg_type = ir_func_type->GetParamType(arg_index);
+				if (arg_type->IsPointer()) args.push_back(arg_value);
+				else args.push_back(Load(arg_type, arg_value));
+				++arg_index;
+			}
+
+			// 6. Create indirect call with explicit return type
+			Value* call_result = builder->MakeInst<CallInst>(func_ptr, args, return_type);
+			value_map[&method_call_expr] = return_alloc ? return_alloc : call_result;
 		}
 		else
 		{

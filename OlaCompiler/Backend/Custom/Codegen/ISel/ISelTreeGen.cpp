@@ -7,6 +7,7 @@
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
 #include "Backend/Custom/Codegen/MachineGlobal.h"
 #include "Backend/Custom/Codegen/MachineRelocable.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
@@ -290,6 +291,49 @@ namespace ola
 
 	void ISelTreeGen::ProcessLoadInst(LoadInst& I)
 	{
+		IRType* load_type = I.GetType();
+		if (load_type->IsStruct())
+		{
+			auto captured = CaptureEmittedInstructions([&]()
+			{
+				MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
+				Uint32 struct_size = load_type->GetSize();
+
+				MachineOperand dst_slot = MF->AllocateLocalStack(struct_size);
+				MachineOperand src_addr = ctx.GetOperand(I.GetAddressOp());
+				MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
+				if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
+				{
+					MachineInstruction load_addr(InstLoadGlobalAddress);
+					load_addr.SetOp<0>(src_reg);
+					load_addr.SetOp<1>(src_addr);
+					ctx.EmitInst(load_addr);
+				}
+				else
+				{
+					MachineInstruction move(InstMove);
+					move.SetOp<0>(src_reg);
+					move.SetOp<1>(src_addr);
+					ctx.EmitInst(move);
+				}
+
+				MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
+				MachineInstruction load_dst(InstLoadGlobalAddress);
+				load_dst.SetOp<0>(dst_reg);
+				load_dst.SetOp<1>(dst_slot);
+				ctx.EmitInst(load_dst);
+
+				MachineInstruction memcpy(InstMemCpy);
+				memcpy.SetOp<0>(dst_reg);
+				memcpy.SetOp<1>(src_reg);
+				memcpy.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64));
+				ctx.EmitInst(memcpy);
+				ctx.MapOperand(&I, dst_reg);
+			});
+			AddAsmNode(std::move(captured));
+			return;
+		}
+
 		ISelNodePtr addr = CreateNodeForValue(I.GetAddressOp());
 
 		std::vector<ISelNode*> leaves = { addr.get() };
@@ -310,6 +354,57 @@ namespace ola
 
 	void ISelTreeGen::ProcessStoreInst(StoreInst& I)
 	{
+		IRType* value_type = I.GetValueOp()->GetType();
+
+		if (value_type->IsStruct())
+		{
+			auto captured = CaptureEmittedInstructions([&]()
+			{
+				Uint32 struct_size = value_type->GetSize();
+				MachineOperand src_addr = ctx.GetOperand(I.GetValueOp());
+				MachineOperand dst_addr = ctx.GetOperand(I.GetAddressOp());
+				MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
+				if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
+				{
+					MachineInstruction load_addr(InstLoadGlobalAddress);
+					load_addr.SetOp<0>(src_reg);
+					load_addr.SetOp<1>(src_addr);
+					ctx.EmitInst(load_addr);
+				}
+				else
+				{
+					MachineInstruction move(InstMove);
+					move.SetOp<0>(src_reg);
+					move.SetOp<1>(src_addr);
+					ctx.EmitInst(move);
+				}
+
+				MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
+				if (dst_addr.IsStackObject() || dst_addr.IsMemoryOperand())
+				{
+					MachineInstruction load_addr(InstLoadGlobalAddress);
+					load_addr.SetOp<0>(dst_reg);
+					load_addr.SetOp<1>(dst_addr);
+					ctx.EmitInst(load_addr);
+				}
+				else
+				{
+					MachineInstruction move(InstMove);
+					move.SetOp<0>(dst_reg);
+					move.SetOp<1>(dst_addr);
+					ctx.EmitInst(move);
+				}
+
+				MachineInstruction memcpy(InstMemCpy);
+				memcpy.SetOp<0>(dst_reg);
+				memcpy.SetOp<1>(src_reg);
+				memcpy.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64));
+				ctx.EmitInst(memcpy);
+			});
+			AddAsmNode(std::move(captured));
+			return;
+		}
+
 		ISelNodePtr value = CreateNodeForValue(I.GetValueOp());
 		ISelNodePtr addr = CreateNodeForValue(I.GetAddressOp());
 

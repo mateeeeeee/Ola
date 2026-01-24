@@ -762,6 +762,7 @@ namespace ola
 	{
 	public:
 		CallInst(Value* callee, std::span<Value*> args);
+		CallInst(Value* callee, std::span<Value*> args, IRType* return_type); 
 
 		auto ArgBegin() { return OpBegin(); }
 		auto ArgBegin() const { return OpBegin(); }
@@ -798,20 +799,13 @@ namespace ola
 		Use const& GetCalleeUse() const { return GetOperandUse(GetNumOperands() - 1); }
 		Use& GetCalleeUse() { return GetOperandUse(GetNumOperands() - 1); }
 
+		Bool IsIndirect() const { return GetCalleeAsFunction() == nullptr; }
+
 		Function* GetCalleeAsFunction() const;
 		Function* GetCaller() const;
 
-		OLA_NODISCARD Instruction* Clone() const
-		{
-			Uint32 const OpCount = GetNumOperands();
-			std::vector<Value*> Args; Args.reserve(OpCount - 1);
-			for (Uint32 i = 0; i < OpCount - 1; ++i)
-			{
-				Args.push_back(GetOperand(i));
-			}
-			Value* Callee = GetOperand(OpCount - 1);
-			return new CallInst(Callee, Args);
-		}
+		OLA_NODISCARD Instruction* Clone() const;
+
 		static Bool ClassOf(Instruction const* I)
 		{
 			return I->GetOpcode() == Opcode::Call;
