@@ -53,22 +53,23 @@ void TestAssignment()
     Assert(b1.GetSum() == 1);
     PassBase(b1);
     PassBaseRef(b1);
-    
+
     ExtendedDerived d2;
     Assert(d2.GetSum() == 6);
     Assert(d2.GetZ() == 3);
-    
+
     Base b2 = d2;
     Assert(b2.GetX() == 1);
     Assert(b2.GetSum() == 1);
     PassBase(b2);
     PassBaseRef(b2);
-    
+
     Derived d3 = d2;
     Assert(d3.GetX() == 1);
     Assert(d3.GetY() == 2);
     Assert(d3.GetSum() == 3);
-    //PassDerived(d3); #todo - fails with O3, works with O0
+    //#todo - fails with O3, works with O0
+    //PassDerived(d3); 
     PassDerivedRef(d3);
 }
 

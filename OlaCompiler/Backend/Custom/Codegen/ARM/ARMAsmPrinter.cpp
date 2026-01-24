@@ -306,6 +306,28 @@ namespace ola
 									EmitText("ldr {}, [{}, {}@PAGEOFF]", dst_str, dst_str, pool_label);
 								}
 							}
+							else if (src.IsStackObject())
+							{
+								Int32 offset = src.GetStackOffset();
+								if (offset < -256 || offset > 255)
+								{
+									Bool dst_is_x16 = dst.IsReg() && dst.GetReg().reg == ARM_X16;
+									std::string addr_reg = dst_is_x16 ? "x17" : "x16";
+									if (offset >= 0)
+									{
+										EmitText("add {}, x29, #{}", addr_reg, offset);
+									}
+									else
+									{
+										EmitText("sub {}, x29, #{}", addr_reg, -offset);
+									}
+									EmitText("ldr {}, [{}]", GetOperandString(dst), addr_reg);
+								}
+								else
+								{
+									EmitText("ldr {}, {}", GetOperandString(dst), GetOperandString(src));
+								}
+							}
 							else
 							{
 								EmitText("{} {}, {}", opcode_string, GetOperandString(dst), GetOperandString(src));

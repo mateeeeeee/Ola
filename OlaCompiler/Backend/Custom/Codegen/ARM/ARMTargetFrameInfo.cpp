@@ -330,6 +330,11 @@ namespace ola
 
 	void ARMTargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
+		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
+		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
+		Uint32 const callee_saved_size = (gp_regs.size() + fp_regs.size()) * 8;
+		Uint32 const aligned_callee_saved = OLA_ALIGN_UP(callee_saved_size, STACK_ALIGNMENT);
+
 		std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
 		std::list<MachineInstruction>::iterator insert_point = insert_list.end();
 
@@ -348,10 +353,7 @@ namespace ola
 		{
 			--insert_point;
 		}
-
-		Uint32 callee_saved_size = (MF.GetCalleeSavedArgs().size()) * 8;
-		Uint32 aligned_callee_saved = OLA_ALIGN_UP(callee_saved_size, STACK_ALIGNMENT);
-		if (!MF.GetCalleeSavedArgs().empty())
+		if (aligned_callee_saved > 0)
 		{
 			auto add_sp_it = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
 				{
@@ -360,20 +362,19 @@ namespace ola
 						MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == ARM_SP;
 				});
 
-			if (!missing_epilogue && aligned_callee_saved > 0)
+			Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
+			Uint32 aligned_total = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
+			Uint32 new_total = aligned_total + aligned_callee_saved;
+			Uint32 new_fp_offset = new_total - FP_LR_SAVE_SIZE;
+
+			if (!missing_epilogue)
 			{
-				Uint32 total_stack = MF.GetStackAllocationSize() + FP_LR_SAVE_SIZE;
-				Uint32 aligned_total = OLA_ALIGN_UP(total_stack, STACK_ALIGNMENT);
-				Uint32 new_total = aligned_total + aligned_callee_saved;
-				Uint32 new_fp_offset = new_total - FP_LR_SAVE_SIZE;
 				insert_point->SetOp<2>(MachineOperand::StackObject(new_fp_offset, MachineType::Ptr));
 			}
 
 			if (add_sp_it != insert_list.end())
 			{
-				OLA_ASSERT(add_sp_it->GetOp<2>().IsImmediate());
-				Uint32 current_amount = add_sp_it->GetOp<2>().GetImmediate();
-				add_sp_it->SetOp<2>(MachineOperand::Immediate(current_amount + aligned_callee_saved, MachineType::Int64));
+				add_sp_it->SetOp<2>(MachineOperand::Immediate(new_total, MachineType::Int64));
 			}
 
 			for (auto const& [reg, offset, type] : MF.GetCalleeSavedArgs())
