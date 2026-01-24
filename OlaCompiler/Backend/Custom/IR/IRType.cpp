@@ -55,12 +55,11 @@ namespace ola
 
 	IRStructType::IRStructType(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types) : IRType(ctx, IRTypeKind::Struct, 0, 0), name(name), member_types(member_types)
 	{
-		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		Uint32 offset = 0;
 
 		for (IRType* member_type : this->member_types)
 		{
-			offset = AlignTo(offset, member_type->GetAlign());
+			offset = OLA_ALIGN_UP(offset, member_type->GetAlign());
 			offset += member_type->GetSize();
 			if (GetAlign() < member_type->GetAlign())
 			{
@@ -73,7 +72,7 @@ namespace ola
 		}
 		if (GetAlign())
 		{
-			offset = AlignTo(offset, GetAlign());
+			offset = OLA_ALIGN_UP(offset, GetAlign());
 		}
 		SetSize(offset);
 	}

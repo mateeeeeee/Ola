@@ -611,17 +611,16 @@ namespace ola
 				OLA_ASSERT(field_index_const);
 				Int64 field_index_value = field_index_const->GetValue();
 
-				auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 				for (Int64 i = 0; i < field_index_value; ++i)
 				{
 					IRType* field_type = struct_type->GetMemberType(i);
-					struct_field_offset = AlignTo(struct_field_offset, field_type->GetAlign());
+					struct_field_offset = OLA_ALIGN_UP(struct_field_offset, field_type->GetAlign());
 					struct_field_offset += field_type->GetSize();
 				}
 				if (field_index_value < (Int64)struct_type->GetMemberCount())
 				{
 					IRType* target_field_type = struct_type->GetMemberType(field_index_value);
-					struct_field_offset = AlignTo(struct_field_offset, target_field_type->GetAlign());
+					struct_field_offset = OLA_ALIGN_UP(struct_field_offset, target_field_type->GetAlign());
 					current_type = target_field_type;
 				}
 			}

@@ -201,7 +201,23 @@ namespace ola
 
 							if (src.IsStackObject())
 							{
-								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src));
+								Int32 offset = src.GetStackOffset();
+								if (offset < -256 || offset > 255)
+								{
+									// Large offset: compute address first, then load
+									// Use x17 if dst is x16 to avoid clobbering
+									Bool dst_is_x16 = dst.IsReg() && dst.GetReg().reg == ARM_X16;
+									std::string addr_reg = dst_is_x16 ? "x17" : "x16";
+									if (offset >= 0)
+										EmitText("add {}, x29, #{}", addr_reg, offset);
+									else
+										EmitText("sub {}, x29, #{}", addr_reg, -offset);
+									EmitText("{}{} {}, [{}]", opcode_string, opcode_suffix, GetOperandString(dst), addr_reg);
+								}
+								else
+								{
+									EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(dst), GetOperandString(src));
+								}
 							}
 							else if (src.IsRelocable())
 							{
@@ -235,7 +251,23 @@ namespace ola
 
 							if (dst.IsStackObject())
 							{
-								EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
+								Int32 offset = dst.GetStackOffset();
+								if (offset < -256 || offset > 255)
+								{
+									// Large offset: compute address first, then store
+									// Use x17 if src is x16 to avoid clobbering
+									Bool src_is_x16 = src.IsReg() && src.GetReg().reg == ARM_X16;
+									std::string addr_reg = src_is_x16 ? "x17" : "x16";
+									if (offset >= 0)
+										EmitText("add {}, x29, #{}", addr_reg, offset);
+									else
+										EmitText("sub {}, x29, #{}", addr_reg, -offset);
+									EmitText("{}{} {}, [{}]", opcode_string, opcode_suffix, GetOperandString(src), addr_reg);
+								}
+								else
+								{
+									EmitText("{}{} {}, {}", opcode_string, opcode_suffix, GetOperandString(src), GetOperandString(dst));
+								}
 							}
 							else if (dst.IsRelocable())
 							{

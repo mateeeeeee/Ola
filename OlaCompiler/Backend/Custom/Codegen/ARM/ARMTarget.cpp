@@ -874,17 +874,20 @@ namespace ola
 			else if (MI.GetOpcode() == InstStore)
 			{
 				MachineOperand dst = MI.GetOperand(0);
+				MachineOperand src = MI.GetOperand(1);
 				if (dst.IsStackObject())
 				{
 					Int32 stack_offset = dst.GetStackOffset();
 					if (stack_offset < -256 || stack_offset > 255)
 					{
-						MachineOperand x16 = MachineOperand::ISAReg(ARM_X16, MachineType::Ptr);
+						Bool src_uses_x16 = src.IsReg() && src.GetReg().reg == ARM_X16;
+						Uint32 addr_reg = src_uses_x16 ? ARM_X17 : ARM_X16;
+						MachineOperand addr_operand = MachineOperand::ISAReg(addr_reg, MachineType::Ptr);
 						MachineInstruction addr_inst(InstLoadGlobalAddress);
-						addr_inst.SetOp<0>(x16);
+						addr_inst.SetOp<0>(addr_operand);
 						addr_inst.SetOp<1>(dst);
 						instructions.insert(instruction_iter, addr_inst);
-						MI.SetOp<0>(x16);
+						MI.SetOp<0>(addr_operand);
 					}
 				}
 			}

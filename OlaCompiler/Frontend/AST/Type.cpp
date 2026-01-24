@@ -100,12 +100,17 @@ namespace ola
 
 	ClassType::ClassType(ClassDecl const* class_decl) : Type{ TypeKind::Class, 0, 0 }, class_decl(class_decl)
 	{
-		if (!class_decl) return;
+		if (!class_decl) 
+		{
+			return;
+		}
 
-		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 		Uint32 offset = 0;
 
-		if (class_decl->IsPolymorphic()) offset += 8;
+		if (class_decl->IsPolymorphic()) 
+		{
+			offset += 8;
+		}
 
 		ClassDecl const* curr_base_class_decl = class_decl->GetBaseClass();
 		while (curr_base_class_decl)
@@ -113,21 +118,33 @@ namespace ola
 			for (auto const& field : curr_base_class_decl->GetFields())
 			{
 				QualType const& mem_type = field->GetType();
-				offset = AlignTo(offset, mem_type->GetAlign());
+				offset = OLA_ALIGN_UP(offset, mem_type->GetAlign());
 				offset += mem_type->GetSize();
-				if (GetAlign() < mem_type->GetAlign()) SetAlign(mem_type->GetAlign());
+				if (GetAlign() < mem_type->GetAlign()) 
+				{
+					SetAlign(mem_type->GetAlign());
+				}
 			}
 			curr_base_class_decl = curr_base_class_decl->GetBaseClass();
 		}
 		for (auto const& field : class_decl->GetFields())
 		{
 			QualType const& mem_type = field->GetType();
-			offset = AlignTo(offset, mem_type->GetAlign());
+			offset = OLA_ALIGN_UP(offset, mem_type->GetAlign());
 			offset += mem_type->GetSize();
-			if (GetAlign() < mem_type->GetAlign()) SetAlign(mem_type->GetAlign());
+			if (GetAlign() < mem_type->GetAlign()) 
+			{
+				SetAlign(mem_type->GetAlign());
+			}
 		}
-		if (offset == 0) offset = 1;
-		if (GetAlign()) offset = AlignTo(offset, GetAlign());
+		if (offset == 0) 
+		{
+			offset = 1;
+		}
+		if (GetAlign()) 
+		{
+			offset = OLA_ALIGN_UP(offset, GetAlign());
+		}
 		SetSize(offset);
 	}
 	Bool ClassType::IsAssignableFrom(Type const* other) const

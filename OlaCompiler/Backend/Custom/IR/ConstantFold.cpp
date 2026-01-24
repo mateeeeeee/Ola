@@ -112,14 +112,12 @@ namespace ola
 			constant_indices.push_back(cast<ConstantInt>(idx));
 		}
 
-		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
-
 		Value* base_address = base;
 		Uint32 offset = 0;
 		IRType* current_type = base->GetType();
 		for (ConstantInt* idx : constant_indices)
 		{
-			if (!idx->GetType()->IsInteger()) 
+			if (!idx->GetType()->IsInteger())
 			{
 				return nullptr;
 			}
@@ -141,13 +139,13 @@ namespace ola
 				for (Int64 i = 0; i < index_value; ++i)
 				{
 					IRType* field_type = struct_type->GetMemberType(i);
-					field_offset = AlignTo(field_offset, field_type->GetAlign());
+					field_offset = OLA_ALIGN_UP(field_offset, field_type->GetAlign());
 					field_offset += field_type->GetSize();
 				}
 				if (index_value < (Int64)struct_type->GetMemberCount())
 				{
 					IRType* target_field_type = struct_type->GetMemberType(index_value);
-					field_offset = AlignTo(field_offset, target_field_type->GetAlign());
+					field_offset = OLA_ALIGN_UP(field_offset, target_field_type->GetAlign());
 					current_type = target_field_type;
 				}
 				offset += field_offset;

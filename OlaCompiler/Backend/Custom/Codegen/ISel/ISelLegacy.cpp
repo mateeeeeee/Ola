@@ -329,18 +329,17 @@ namespace ola
 				OLA_ASSERT(field_index_const);
 				Int64 field_index_value = field_index_const->GetValue();
 
-				auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
 				Uint32 field_offset = 0;
 				for (Int64 i = 0; i < field_index_value; ++i)
 				{
 					IRType* field_type = struct_type->GetMemberType(i);
-					field_offset = AlignTo(field_offset, field_type->GetAlign());
+					field_offset = OLA_ALIGN_UP(field_offset, field_type->GetAlign());
 					field_offset += field_type->GetSize();
 				}
 				if (field_index_value < (Int64)struct_type->GetMemberCount())
 				{
 					IRType* target_field_type = struct_type->GetMemberType(field_index_value);
-					field_offset = AlignTo(field_offset, target_field_type->GetAlign());
+					field_offset = OLA_ALIGN_UP(field_offset, target_field_type->GetAlign());
 				}
 
 				if (field_offset != 0)
