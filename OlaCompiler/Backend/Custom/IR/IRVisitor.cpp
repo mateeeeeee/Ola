@@ -1277,8 +1277,7 @@ namespace ola
 			}
 			else if (cast_operand_type->IsStruct())
 			{
-				//Value* bitcast_value = builder.CreateBitCast(cast_operand_value, GetPointerType(cast_type));
-				//value_map[&cast_expr] = builder.CreateStructGEP(cast_type, bitcast_value, 0);
+				value_map[&cast_expr] = cast_operand_value;
 			}
 			else OLA_ASSERT(false);
 		}
@@ -1737,7 +1736,6 @@ namespace ola
 			for (auto const& func_param_type : function_params)
 			{
 				IRType* param_type = ConvertToIRType(func_param_type);
-				OLA_ASSERT_MSG(!param_type->IsStruct(), "Struct pass-by-value not supported in custom backend. Use 'ref' instead.");
 				param_types.push_back(param_type);
 			}
 			return IRFuncType::Get(return_type_struct ? void_type : return_type, param_types);

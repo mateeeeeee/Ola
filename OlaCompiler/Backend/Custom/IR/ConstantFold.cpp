@@ -1,6 +1,7 @@
 #include "ConstantFold.h"
 #include "Constant.h"
 #include "IRContext.h"
+#include "IRType.h"
 #include "BasicBlock.h"
 
 namespace ola
@@ -111,26 +112,50 @@ namespace ola
 			constant_indices.push_back(cast<ConstantInt>(idx));
 		}
 
+		auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
+
 		Value* base_address = base;
 		Uint32 offset = 0;
 		IRType* current_type = base->GetType();
 		for (ConstantInt* idx : constant_indices)
 		{
-			if (idx->GetType()->IsInteger())
+			if (!idx->GetType()->IsInteger()) 
 			{
-				if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
-				{
-					current_type = array_type->GetElementType();
-				}
-				else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
-				{
-					current_type = pointer_type->GetPointeeType();
-				}
+				return nullptr;
 			}
-			else return nullptr;
 
 			Int64 index_value = idx->GetValue();
-			offset += index_value * current_type->GetSize();
+			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
+			{
+				current_type = array_type->GetElementType();
+				offset += index_value * current_type->GetSize();
+			}
+			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
+			{
+				current_type = pointer_type->GetPointeeType();
+				offset += index_value * current_type->GetSize();
+			}
+			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
+			{
+				Uint32 field_offset = 0;
+				for (Int64 i = 0; i < index_value; ++i)
+				{
+					IRType* field_type = struct_type->GetMemberType(i);
+					field_offset = AlignTo(field_offset, field_type->GetAlign());
+					field_offset += field_type->GetSize();
+				}
+				if (index_value < (Int64)struct_type->GetMemberCount())
+				{
+					IRType* target_field_type = struct_type->GetMemberType(index_value);
+					field_offset = AlignTo(field_offset, target_field_type->GetAlign());
+					current_type = target_field_type;
+				}
+				offset += field_offset;
+			}
+			else
+			{
+				return nullptr;
+			}
 		}
 		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
 		return new PtrAddInst(base, ctx.GetInt(int_type, offset), current_type);

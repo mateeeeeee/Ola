@@ -7,6 +7,14 @@
 namespace ola
 {
 	class MachineBasicBlock;
+
+	struct StructArgInfo
+	{
+		Uint32 arg_index;
+		MachineOperand local_slot;
+		Uint32 size;
+	};
+
 	class MachineFunction final : public MachineRelocable
 	{
 	public:
@@ -80,6 +88,12 @@ namespace ola
 			return has_frame;
 		}
 
+		void AddStructArg(Uint32 arg_idx, MachineOperand local_slot, Uint32 size)
+		{
+			struct_args.push_back({ arg_idx, local_slot, size });
+		}
+		auto const& GetStructArgs() const { return struct_args; }
+
 		virtual RelocableKind GetRelocableKind() const override
 		{
 			return RelocableKind::Function;
@@ -97,5 +111,6 @@ namespace ola
 
 		Bool has_call_instructions = false;
 		Uint32 max_call_arg_count = 0;
+		std::vector<StructArgInfo> struct_args;
 	};
 }

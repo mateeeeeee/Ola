@@ -21,6 +21,7 @@ namespace ola
 		}
 		case IRTypeKind::Pointer:
 		{
+			return ctx.GetUndefValue(Ty);
 		}
 		default:
 			OLA_ASSERT(false);

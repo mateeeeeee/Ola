@@ -302,6 +302,9 @@ namespace ola
 			Emit("]");
 		}
 		break;
+		case ConstantID::Undef:
+			Emit("undef");
+		break;
 		default: OLA_ASSERT_MSG(false, "not yet implemented");
 		}
 	}

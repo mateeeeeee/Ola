@@ -106,6 +106,15 @@ namespace ola
 							{
 								data->AppendSymbolRef(GV->GetName());
 							}
+							else if (isa<UndefValue>(V))
+							{
+								// Undef values (e.g., null pointers in vtables) - emit zeros
+								Uint32 size = V->GetType()->GetSize();
+								for (Uint32 i = 0; i < size; ++i)
+								{
+									data->AppendByte(0);
+								}
+							}
 							else OLA_ASSERT(false);
 						};
 					ExpandValue(ExpandValue, init_value);
@@ -203,9 +212,23 @@ namespace ola
 		{
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
-			auto vreg = machine_ctx.VirtualReg(arg_type);
-			machine_ctx.MapOperand(arg, vreg);
-			args.push_back(vreg);
+
+			if (arg_type->IsStruct())
+			{
+				IRStructType const* struct_type = cast<IRStructType>(arg_type);
+				Uint32 struct_size = struct_type->GetSize();
+				MachineOperand const& local_slot = MF.AllocateLocalStack(struct_size);
+				MachineOperand ptr_vreg = machine_ctx.VirtualReg(MachineType::Ptr);
+				machine_ctx.MapOperand(arg, local_slot);
+				args.push_back(ptr_vreg);
+				MF.AddStructArg(arg_idx, local_slot, struct_size);
+			}
+			else
+			{
+				auto vreg = machine_ctx.VirtualReg(arg_type);
+				machine_ctx.MapOperand(arg, vreg);
+				args.push_back(vreg);
+			}
 		}
 
 		machine_ctx.SetCurrentBasicBlock(machine_ctx.GetBlock(&F->GetEntryBlock()));

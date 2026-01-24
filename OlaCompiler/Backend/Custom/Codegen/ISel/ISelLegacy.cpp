@@ -5,6 +5,7 @@
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
 
 namespace ola
 {
@@ -171,6 +172,41 @@ namespace ola
 
 	void ISelLegacy::LowerLoad(LoadInst* LI)
 	{
+		IRType* load_type = LI->GetType();
+		if (load_type->IsStruct())
+		{
+			MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
+			Uint32 struct_size = load_type->GetSize();
+
+			MachineOperand dst_slot = MF->AllocateLocalStack(struct_size);
+			MachineOperand src_addr = ctx.GetOperand(LI->GetAddressOp());
+			MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
+			if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
+			{
+				ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+					.SetOp<0>(src_reg)
+					.SetOp<1>(src_addr));
+			}
+			else
+			{
+				ctx.EmitInst(MachineInstruction(InstMove)
+					.SetOp<0>(src_reg)
+					.SetOp<1>(src_addr));
+			}
+
+			MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
+			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+				.SetOp<0>(dst_reg)
+				.SetOp<1>(dst_slot));
+
+			ctx.EmitInst(MachineInstruction(InstMemCpy)
+				.SetOp<0>(dst_reg)
+				.SetOp<1>(src_reg)
+				.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64)));
+			ctx.MapOperand(LI, dst_reg);
+			return;
+		}
+
 		MachineOperand const& ret = ctx.VirtualReg(LI->GetType());
 		MachineOperand ptr = ctx.GetOperand(LI->GetAddressOp());
 		ptr.SetType(ret.GetType());
@@ -182,6 +218,47 @@ namespace ola
 
 	void ISelLegacy::LowerStore(StoreInst* SI)
 	{
+		IRType* value_type = SI->GetValueOp()->GetType();
+		if (value_type->IsStruct())
+		{
+			Uint32 struct_size = value_type->GetSize();
+			MachineOperand src_addr = ctx.GetOperand(SI->GetValueOp());
+			MachineOperand dst_addr = ctx.GetOperand(SI->GetAddressOp());
+			MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
+			if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
+			{
+				ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+					.SetOp<0>(src_reg)
+					.SetOp<1>(src_addr));
+			}
+			else
+			{
+				ctx.EmitInst(MachineInstruction(InstMove)
+					.SetOp<0>(src_reg)
+					.SetOp<1>(src_addr));
+			}
+
+			MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
+			if (dst_addr.IsStackObject() || dst_addr.IsMemoryOperand())
+			{
+				ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+					.SetOp<0>(dst_reg)
+					.SetOp<1>(dst_addr));
+			}
+			else
+			{
+				ctx.EmitInst(MachineInstruction(InstMove)
+					.SetOp<0>(dst_reg)
+					.SetOp<1>(dst_addr));
+			}
+
+			ctx.EmitInst(MachineInstruction(InstMemCpy)
+				.SetOp<0>(dst_reg)
+				.SetOp<1>(src_reg)
+				.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64)));
+			return;
+		}
+
 		MachineOperand const& ptr = ctx.GetOperand(SI->GetAddressOp());
 		MachineOperand const& val = ctx.GetOperand(SI->GetValueOp());
 		MachineInstruction MI(InstStore);
@@ -248,9 +325,23 @@ namespace ola
 			}
 			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
 			{
-				ConstantInt* field_index = dyn_cast<ConstantInt>(index);
-				OLA_ASSERT(field_index);
-				Uint32 field_offset = struct_type->GetFieldOffset(field_index->GetValue());
+				ConstantInt* field_index_const = dyn_cast<ConstantInt>(index);
+				OLA_ASSERT(field_index_const);
+				Int64 field_index_value = field_index_const->GetValue();
+
+				auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
+				Uint32 field_offset = 0;
+				for (Int64 i = 0; i < field_index_value; ++i)
+				{
+					IRType* field_type = struct_type->GetMemberType(i);
+					field_offset = AlignTo(field_offset, field_type->GetAlign());
+					field_offset += field_type->GetSize();
+				}
+				if (field_index_value < (Int64)struct_type->GetMemberCount())
+				{
+					IRType* target_field_type = struct_type->GetMemberType(field_index_value);
+					field_offset = AlignTo(field_offset, target_field_type->GetAlign());
+				}
 
 				if (field_offset != 0)
 				{
@@ -261,7 +352,7 @@ namespace ola
 						.SetOp<2>(MachineOperand::Immediate(field_offset, MachineType::Int64)));
 					result = new_result;
 				}
-				current_type = struct_type->GetMemberType(field_index->GetValue());
+				current_type = struct_type->GetMemberType(field_index_value);
 			}
 			else if (IRPtrType* pointer_type = dyn_cast<IRPtrType>(current_type))
 			{

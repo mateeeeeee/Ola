@@ -513,23 +513,53 @@ namespace ola
 			OLA_ASSERT(size_op.IsImmediate());
 			Int64 size = size_op.GetImmediate();
 
-			Int64 offset = 0;
+			MachineOperand src_base = src;
+			MachineOperand dst_base = dst;
 			Bool first = true;
+
+			if (src.IsStackObject() || src.IsMemoryOperand())
+			{
+				src_base = lowering_ctx.VirtualReg(MachineType::Ptr);
+				MachineInstruction lea_src(InstLoadGlobalAddress);
+				lea_src.SetOp<0>(src_base).SetOp<1>(src);
+				MI.SetOpcode(InstLoadGlobalAddress);
+				MI.SetOp<0>(src_base).SetOp<1>(src).SetOp<2>(MachineOperand::Undefined());
+				first = false;
+			}
+
+			if (dst.IsStackObject() || dst.IsMemoryOperand())
+			{
+				dst_base = lowering_ctx.VirtualReg(MachineType::Ptr);
+				MachineInstruction lea_dst(InstLoadGlobalAddress);
+				lea_dst.SetOp<0>(dst_base).SetOp<1>(dst);
+				if (first)
+				{
+					MI.SetOpcode(InstLoadGlobalAddress);
+					MI.SetOp<0>(dst_base).SetOp<1>(dst).SetOp<2>(MachineOperand::Undefined());
+					first = false;
+				}
+				else
+				{
+					instructions.insert(instruction_iter, lea_dst);
+				}
+			}
+
+			Int64 offset = 0;
 			while (size >= 8)
 			{
 				MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int64);
-				MachineOperand current_src = src;
-				MachineOperand current_dst = dst;
+				MachineOperand current_src = src_base;
+				MachineOperand current_dst = dst_base;
 
 				if (offset > 0)
 				{
 					MachineOperand src_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
 					MachineInstruction add_src(InstAdd);
-					add_src.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+					add_src.SetOp<0>(src_ptr).SetOp<1>(src_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 					if (first)
 					{
 						MI.SetOpcode(InstAdd);
-						MI.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+						MI.SetOp<0>(src_ptr).SetOp<1>(src_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 						first = false;
 					}
 					else
@@ -556,7 +586,7 @@ namespace ola
 				{
 					MachineOperand dst_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
 					MachineInstruction add_dst(InstAdd);
-					add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+					add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 					instructions.insert(instruction_iter, add_dst);
 					current_dst = dst_ptr;
 				}
@@ -574,16 +604,16 @@ namespace ola
 			while (size > 0)
 			{
 				MachineOperand tmp = lowering_ctx.VirtualReg(MachineType::Int8);
-				MachineOperand current_src = src;
-				MachineOperand current_dst = dst;
+				MachineOperand current_src = src_base;
+				MachineOperand current_dst = dst_base;
 
 				MachineOperand src_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
 				MachineInstruction add_src(InstAdd);
-				add_src.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+				add_src.SetOp<0>(src_ptr).SetOp<1>(src_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 				if (first)
 				{
 					MI.SetOpcode(InstAdd);
-					MI.SetOp<0>(src_ptr).SetOp<1>(src).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+					MI.SetOp<0>(src_ptr).SetOp<1>(src_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 					first = false;
 				}
 				else
@@ -598,7 +628,7 @@ namespace ola
 
 				MachineOperand dst_ptr = lowering_ctx.VirtualReg(MachineType::Ptr);
 				MachineInstruction add_dst(InstAdd);
-				add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
+				add_dst.SetOp<0>(dst_ptr).SetOp<1>(dst_base).SetOp<2>(MachineOperand::Immediate(offset, MachineType::Int64));
 				instructions.insert(instruction_iter, add_dst);
 				current_dst = dst_ptr;
 

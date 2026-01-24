@@ -1,4 +1,64 @@
+import std.assert;
+
+public class S
+{
+	public void Init(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+
+	public void SetX(int x) {this.x = x;}
+	public void SetY(int y) {this.y = y;}
+
+	public int GetX() const {return x;}
+	public int GetY() const {return y;}
+
+	private int x = 0;
+	private int y = 0;
+};
+
+void StructByValue(S s)
+{
+	s.SetX(100);
+	s.SetY(100);
+	Assert(s.GetX() == 100);
+	Assert(s.GetY() == 100);
+}
+
+void StructByRef(ref S s)
+{
+	s.SetX(1000);
+	s.SetY(1000);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
+}
+
 public int main()
 {
-    return 0;
+	S s; s.Init(10, 10);
+	StructByValue(s);
+	Assert(s.GetX() == 10);
+	Assert(s.GetY() == 10);
+
+	S s2 = s; //copy
+	s.SetX(25);
+	s.SetY(25);
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
+	Assert(s.GetX() == 25);
+	Assert(s.GetY() == 25);
+
+	StructByRef(s);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
+
+	ref S s3 = s;
+	Assert(s3.GetX() == 1000);
+	Assert(s3.GetY() == 1000);
+
+	s3.SetX(0);
+	Assert(s.GetX() == 0);
+
+	return 0;
 }

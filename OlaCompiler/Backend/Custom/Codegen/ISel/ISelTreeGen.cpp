@@ -591,8 +591,9 @@ namespace ola
 			ISelNodePtr left = std::make_unique<ISelRegisterNode>(current_reg);
 			ISelNodePtr idx_node = CreateNodeForValue(index);
 
-			// Determine element size for scaling
 			Uint32 element_size = 1;
+			Bool is_struct = false;
+			Uint32 struct_field_offset = 0;
 			if (IRArrayType* array_type = dyn_cast<IRArrayType>(current_type))
 			{
 				element_size = array_type->GetElementType()->GetSize();
@@ -603,37 +604,96 @@ namespace ola
 				element_size = pointer_type->GetPointeeType()->GetSize();
 				current_type = pointer_type->GetPointeeType();
 			}
-
-			ISelNodePtr scale_imm = std::make_unique<ISelImmediateNode>(element_size, MachineType::Int64);
-			auto mul = std::make_unique<ISelBinaryOpNode>(
-				Opcode::SMul,
-				std::move(idx_node),
-				std::move(scale_imm)
-			);
-			MachineOperand scaled_offset_reg = ctx.VirtualReg(MachineType::Int64);
-			auto scaled_reg = std::make_unique<ISelRegisterNode>(scaled_offset_reg, std::move(mul));
-			AddTree(std::move(scaled_reg), {}, false);
-
-			ISelNodePtr scaled_offset_node = std::make_unique<ISelRegisterNode>(scaled_offset_reg);
-			std::vector<ISelNode*> leaves = { left.get(), scaled_offset_node.get() };
-
-			auto add = std::make_unique<ISelBinaryOpNode>(
-				Opcode::Add,
-				std::move(left),
-				std::move(scaled_offset_node)
-			);
-
-			MachineOperand result_reg = ctx.VirtualReg(MachineType::Ptr);
-			auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(add));
-
-			if (idx_num == num_indices - 1)
+			else if (IRStructType* struct_type = dyn_cast<IRStructType>(current_type))
 			{
-				value_map.MapValue(&I, reg.get());
-				ctx.MapOperand(&I, result_reg);
+				is_struct = true;
+				ConstantInt* field_index_const = dyn_cast<ConstantInt>(index);
+				OLA_ASSERT(field_index_const);
+				Int64 field_index_value = field_index_const->GetValue();
+
+				auto AlignTo = []<typename T>(T n, T align) { return (n + align - 1) / align * align; };
+				for (Int64 i = 0; i < field_index_value; ++i)
+				{
+					IRType* field_type = struct_type->GetMemberType(i);
+					struct_field_offset = AlignTo(struct_field_offset, field_type->GetAlign());
+					struct_field_offset += field_type->GetSize();
+				}
+				if (field_index_value < (Int64)struct_type->GetMemberCount())
+				{
+					IRType* target_field_type = struct_type->GetMemberType(field_index_value);
+					struct_field_offset = AlignTo(struct_field_offset, target_field_type->GetAlign());
+					current_type = target_field_type;
+				}
 			}
 
-			AddTree(std::move(reg), leaves, false);
-			current_reg = result_reg;
+			MachineOperand result_reg = ctx.VirtualReg(MachineType::Ptr);
+
+			if (is_struct)
+			{
+				if (struct_field_offset != 0)
+				{
+					ISelNodePtr offset_imm = std::make_unique<ISelImmediateNode>(struct_field_offset, MachineType::Int64);
+					std::vector<ISelNode*> leaves = { left.get(), offset_imm.get() };
+
+					auto add = std::make_unique<ISelBinaryOpNode>(
+						Opcode::Add,
+						std::move(left),
+						std::move(offset_imm)
+					);
+
+					auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(add));
+
+					if (idx_num == num_indices - 1)
+					{
+						value_map.MapValue(&I, reg.get());
+						ctx.MapOperand(&I, result_reg);
+					}
+
+					AddTree(std::move(reg), leaves, false);
+					current_reg = result_reg;
+				}
+				else
+				{
+					if (idx_num == num_indices - 1)
+					{
+						auto reg = std::make_unique<ISelRegisterNode>(current_reg);
+						value_map.MapValue(&I, reg.get());
+						ctx.MapOperand(&I, current_reg);
+					}
+				}
+			}
+			else
+			{
+				ISelNodePtr scale_imm = std::make_unique<ISelImmediateNode>(element_size, MachineType::Int64);
+				auto mul = std::make_unique<ISelBinaryOpNode>(
+					Opcode::SMul,
+					std::move(idx_node),
+					std::move(scale_imm)
+				);
+				MachineOperand scaled_offset_reg = ctx.VirtualReg(MachineType::Int64);
+				auto scaled_reg = std::make_unique<ISelRegisterNode>(scaled_offset_reg, std::move(mul));
+				AddTree(std::move(scaled_reg), {}, false);
+
+				ISelNodePtr scaled_offset_node = std::make_unique<ISelRegisterNode>(scaled_offset_reg);
+				std::vector<ISelNode*> leaves = { left.get(), scaled_offset_node.get() };
+
+				auto add = std::make_unique<ISelBinaryOpNode>(
+					Opcode::Add,
+					std::move(left),
+					std::move(scaled_offset_node)
+				);
+
+				auto reg = std::make_unique<ISelRegisterNode>(result_reg, std::move(add));
+
+				if (idx_num == num_indices - 1)
+				{
+					value_map.MapValue(&I, reg.get());
+					ctx.MapOperand(&I, result_reg);
+				}
+
+				AddTree(std::move(reg), leaves, false);
+				current_reg = result_reg;
+			}
 			++idx_num;
 		}
 	}

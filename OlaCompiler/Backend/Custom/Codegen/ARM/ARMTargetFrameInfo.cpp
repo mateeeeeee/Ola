@@ -31,7 +31,8 @@ namespace ola
 		{
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
-			Uint32 opcode = (arg_operand.IsMemoryOperand() && arg->GetType()->IsPointer()) ? InstLoadGlobalAddress : InstMove;
+			Bool const is_struct_arg = arg->GetType()->IsStruct();
+			Uint32 opcode = (arg_operand.IsMemoryOperand() && (arg->GetType()->IsPointer() || is_struct_arg)) ? InstLoadGlobalAddress : InstMove;
 			if (arg_operand.GetType() != MachineType::Float64)
 			{
 				if (idx >= 8)
@@ -175,6 +176,19 @@ namespace ola
 				}
 			}
 			++arg_idx;
+		}
+
+		for (auto const& struct_arg : MF.GetStructArgs())
+		{
+			MachineOperand ptr_vreg = MF.Args()[struct_arg.arg_index];
+			MachineOperand dst_slot = struct_arg.local_slot;
+			Uint32 size = struct_arg.size;
+
+			MachineInstruction memcpy_inst(InstMemCpy);
+			memcpy_inst.SetOp<0>(dst_slot);
+			memcpy_inst.SetOp<1>(ptr_vreg);
+			memcpy_inst.SetOp<2>(MachineOperand::Immediate(size, Int64));
+			ctx.EmitInst(memcpy_inst);
 		}
 	}
 

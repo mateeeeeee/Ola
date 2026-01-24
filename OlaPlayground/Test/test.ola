@@ -1,52 +1,65 @@
 import std.assert;
 
-class Base
+//alternative way instead of interface
+//class Abstract
+//{
+//	public int GetX() const pure virtual;
+//};
+
+interface Abstract
 {
-	public int GetValue() const virtual
+	public int GetX() const;
+};
+
+class Base : Abstract
+{
+	public int GetX() const virtual
 	{
-		return 1;
+		return x;
 	}
-	public int GetDoubleValue() const virtual
+	public int GetSumX() const virtual
 	{
-		return GetValue() * 2;
+		return GetX();
 	}
+	int x = 1;
 };
 
 class Derived : Base
 {
-	public int GetValue() const virtual
+	public int GetX() const virtual
 	{
-		return 10;
+		return x;
 	}
-	public int GetDoubleValue() const virtual
+	public int GetSumX() const virtual
 	{
-		return GetValue() * 2;
+		return GetX() + super.GetX();
 	}
+
+	int x = 10;
 };
 
-void TestVirtualDispatch(ref Base b, int expected)
+void TestBase(ref Abstract a)
 {
-	Assert(b.GetValue() == expected);
+	Assert(a.GetX() == 1);
 }
 
-void TestVirtualDispatchDouble(ref Base b, int expected)
+void TestDerived(ref Abstract a)
 {
-	Assert(b.GetDoubleValue() == expected);
+	Assert(a.GetX() == 10);
+}
+
+void TestDerived2(ref Base b)
+{
+	Assert(b.GetX() == 10);
+	Assert(b.GetSumX() == 11);
 }
 
 public int main()
 {
 	Base b;
-	Assert(b.GetValue() == 1);
-	Assert(b.GetDoubleValue() == 2);
-	TestVirtualDispatch(b, 1);
-	TestVirtualDispatchDouble(b, 2);
-
+	TestBase(b);
 	Derived d;
-	Assert(d.GetValue() == 10);
-	Assert(d.GetDoubleValue() == 20);
-	TestVirtualDispatch(d, 10);
-	TestVirtualDispatchDouble(d, 20);
-
+	TestDerived(d);
+	TestDerived2(d);
 	return 0;
 }

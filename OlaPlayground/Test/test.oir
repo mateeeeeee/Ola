@@ -6,20 +6,28 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @Base$GetValue i64(ptr %this) {
+declare @Abstract$GetX i64(ptr)
+
+
+define internal @VTable_Abstract ptr [undef,]
+
+
+define external @Base$GetX i64(ptr %this) {
 entry:
 %0 = alloca i64
-store 1, ptr %0
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
 
-define external @Base$GetDoubleValue i64(ptr %this) {
+define external @Base$GetSumX i64(ptr %this) {
 entry:
 %0 = alloca i64
 %1 = ptr add ptr %this, 0
@@ -27,34 +35,35 @@ entry:
 %3 = ptr add ptr %2, 0
 %4 = load ptr, ptr %3
 %5 = call ptr %this, %4
-%6 = smul i64 %5, 2
-store i64 %6, ptr %0
+store i64 %5, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%7 = load i64, ptr %0
-ret i64 %7
+%6 = load i64, ptr %0
+ret i64 %6
 }
 
 
-define internal @VTable_Base ptr [@Base$GetValue,@Base$GetDoubleValue,]
+define internal @VTable_Base ptr [@Base$GetX,@Base$GetSumX,]
 
 
-define external @Derived$GetValue i64(ptr %this) {
+define external @Derived$GetX i64(ptr %this) {
 entry:
 %0 = alloca i64
-store 10, ptr %0
+%1 = ptr add ptr %this, 16
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%1 = load i64, ptr %0
-ret i64 %1
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
 
-define external @Derived$GetDoubleValue i64(ptr %this) {
+define external @Derived$GetSumX i64(ptr %this) {
 entry:
 %0 = alloca i64
 %1 = ptr add ptr %this, 0
@@ -62,56 +71,76 @@ entry:
 %3 = ptr add ptr %2, 0
 %4 = load ptr, ptr %3
 %5 = call ptr %this, %4
-%6 = smul i64 %5, 2
-store i64 %6, ptr %0
+%6 = call ptr %this, @Base$GetX
+%7 = add i64 %5, %6
+store i64 %7, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%7 = load i64, ptr %0
-ret i64 %7
+%8 = load i64, ptr %0
+ret i64 %8
 }
 
 
-define internal @VTable_Derived ptr [@Derived$GetValue,@Derived$GetDoubleValue,]
+define internal @VTable_Derived ptr [@Derived$GetX,@Derived$GetSumX,]
 
 
-define internal @TestVirtualDispatch__Baseref__I void(ptr %b,i64 %expected) {
+define internal @TestBase__Abstractref void(ptr %a) {
 entry:
 %0 = alloca ptr
-store ptr %b, ptr %0
+store ptr %a, ptr %0
 %1 = load ptr, ptr %0
-%2 = alloca i64
-store i64 %expected, ptr %2
-%3 = ptr add ptr %1, 0
-%4 = load ptr, ptr %3
-%5 = ptr add ptr %4, 0
-%6 = load ptr, ptr %5
-%7 = call ptr %1, %6
-%8 = load i64, ptr %2
-%9 = icmp eq i64 %7, %8
-call i8 %9, @Assert
+%2 = ptr add ptr %1, 0
+%3 = load ptr, ptr %2
+%4 = ptr add ptr %3, 0
+%5 = load ptr, ptr %4
+%6 = call ptr %1, %5
+%7 = icmp eq i64 %6, 1
+call i8 %7, @Assert
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestVirtualDispatchDouble__Baseref__I void(ptr %b,i64 %expected) {
+define internal @TestDerived__Abstractref void(ptr %a) {
+entry:
+%0 = alloca ptr
+store ptr %a, ptr %0
+%1 = load ptr, ptr %0
+%2 = ptr add ptr %1, 0
+%3 = load ptr, ptr %2
+%4 = ptr add ptr %3, 0
+%5 = load ptr, ptr %4
+%6 = call ptr %1, %5
+%7 = icmp eq i64 %6, 10
+call i8 %7, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestDerived2__Baseref void(ptr %b) {
 entry:
 %0 = alloca ptr
 store ptr %b, ptr %0
 %1 = load ptr, ptr %0
-%2 = alloca i64
-store i64 %expected, ptr %2
-%3 = ptr add ptr %1, 0
-%4 = load ptr, ptr %3
-%5 = ptr add ptr %4, 8
-%6 = load ptr, ptr %5
-%7 = call ptr %1, %6
-%8 = load i64, ptr %2
-%9 = icmp eq i64 %7, %8
-call i8 %9, @Assert
+%2 = ptr add ptr %1, 0
+%3 = load ptr, ptr %2
+%4 = ptr add ptr %3, 0
+%5 = load ptr, ptr %4
+%6 = call ptr %1, %5
+%7 = icmp eq i64 %6, 10
+call i8 %7, @Assert
+%8 = ptr add ptr %1, 0
+%9 = load ptr, ptr %8
+%10 = ptr add ptr %9, 8
+%11 = load ptr, ptr %10
+%12 = call ptr %1, %11
+%13 = icmp eq i64 %12, 11
+call i8 %13, @Assert
 br label exit
 exit:
 ret 
@@ -124,51 +153,27 @@ entry:
 %1 = alloca %Base
 %2 = ptr add ptr %1, 0
 store ptr @VTable_Base, ptr %2
-%3 = ptr add ptr %1, 0
-%4 = load ptr, ptr %3
-%5 = ptr add ptr %4, 0
-%6 = load ptr, ptr %5
-%7 = call ptr %1, %6
-%8 = icmp eq i64 %7, 1
-call i8 %8, @Assert
-%9 = ptr add ptr %1, 0
-%10 = load ptr, ptr %9
-%11 = ptr add ptr %10, 8
-%12 = load ptr, ptr %11
-%13 = call ptr %1, %12
-%14 = icmp eq i64 %13, 2
-call i8 %14, @Assert
-%15 = load %Base, ptr %1
-call ptr %1, 1, @TestVirtualDispatch__Baseref__I
-%16 = load %Base, ptr %1
-call ptr %1, 2, @TestVirtualDispatchDouble__Baseref__I
-%17 = alloca %Derived
-%18 = ptr add ptr %17, 0
-store ptr @VTable_Derived, ptr %18
-%19 = ptr add ptr %17, 0
-%20 = load ptr, ptr %19
-%21 = ptr add ptr %20, 0
-%22 = load ptr, ptr %21
-%23 = call ptr %17, %22
-%24 = icmp eq i64 %23, 10
-call i8 %24, @Assert
-%25 = ptr add ptr %17, 0
-%26 = load ptr, ptr %25
-%27 = ptr add ptr %26, 8
-%28 = load ptr, ptr %27
-%29 = call ptr %17, %28
-%30 = icmp eq i64 %29, 20
-call i8 %30, @Assert
-%31 = load %Derived, ptr %17
-call ptr %17, 10, @TestVirtualDispatch__Baseref__I
-%32 = load %Derived, ptr %17
-call ptr %17, 20, @TestVirtualDispatchDouble__Baseref__I
+%3 = ptr add ptr %1, 8
+store 1, ptr %3
+%4 = load %Base, ptr %1
+call ptr %1, @TestBase__Abstractref
+%5 = alloca %Derived
+%6 = ptr add ptr %5, 0
+store ptr @VTable_Derived, ptr %6
+%7 = ptr add ptr %5, 8
+store 1, ptr %7
+%8 = ptr add ptr %5, 16
+store 10, ptr %8
+%9 = load %Derived, ptr %5
+call ptr %5, @TestDerived__Abstractref
+%10 = load %Derived, ptr %5
+call ptr %5, @TestDerived2__Baseref
 store 0, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%33 = load i64, ptr %0
-ret i64 %33
+%11 = load i64, ptr %0
+ret i64 %11
 }
 
