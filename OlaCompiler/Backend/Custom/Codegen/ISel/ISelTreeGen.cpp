@@ -11,7 +11,7 @@
 #include "Backend/Custom/Codegen/MachineGlobal.h"
 #include "Backend/Custom/Codegen/MachineRelocable.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
-#include "Backend/Custom/Codegen/Target.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
 #include "Utility/RTTI.h"
 
 namespace ola

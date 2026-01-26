@@ -2,10 +2,10 @@
 #include "LinearScanRegisterAllocator.h"
 #include "RegisterAllocator.h"
 #include "LivenessAnalysis.h"
-#include "MachineModule.h"
-#include "MachineBasicBlock.h"
-#include "MachineFunction.h"
-#include "Target.h"
+#include "Backend/Custom/Codegen/MachineModule.h"
+#include "Backend/Custom/Codegen/MachineBasicBlock.h"
+#include "Backend/Custom/Codegen/MachineFunction.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
 #include "Core/Log.h"
 
 namespace ola

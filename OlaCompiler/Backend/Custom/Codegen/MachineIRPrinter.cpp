@@ -1,6 +1,6 @@
 #include <iostream>
 #include "MachineIRPrinter.h"
-#include "Target.h"
+#include "Targets/Target.h"
 #include "MachineModule.h"
 #include "MachineStorage.h"
 #include "MachineFunction.h"

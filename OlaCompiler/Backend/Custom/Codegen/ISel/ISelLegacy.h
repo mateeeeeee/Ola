@@ -1,5 +1,5 @@
 #pragma once
-#include "Backend/Custom/Codegen/Target.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 
 namespace ola

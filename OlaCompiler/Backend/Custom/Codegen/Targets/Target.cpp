@@ -1,5 +1,5 @@
 #include "Target.h"
-#include "MachineInstruction.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Utility/EnumOperators.h"
 
 namespace ola

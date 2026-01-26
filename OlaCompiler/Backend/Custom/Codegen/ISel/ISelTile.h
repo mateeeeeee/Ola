@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "ISelNode.h"
-#include "Backend/Custom/Codegen/Target.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
 #include "Backend/Custom/Codegen/MachineInstruction.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 #include "Utility/RTTI.h"

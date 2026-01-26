@@ -1,8 +1,8 @@
 #include "ISelDriver.h"
 #include "Tiles/CommonTiles.h"
-#include "Backend/Custom/Codegen/Target.h"
-#include "Backend/Custom/Codegen/X86/ISel/X86Tiles.h"
-#include "Backend/Custom/Codegen/ARM/ISel/ARMTiles.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
+#include "Backend/Custom/Codegen/Targets/X86/ISel/X86Tiles.h"
+#include "Backend/Custom/Codegen/Targets/ARM/ISel/ARMTiles.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
 
