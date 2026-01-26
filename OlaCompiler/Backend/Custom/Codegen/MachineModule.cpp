@@ -7,11 +7,14 @@
 #include "MachineBasicBlock.h"
 #include "MachineIRPrinter.h"
 #include "RA/LinearScanRegisterAllocator.h"
+#include "RA/GraphColoringRegisterAllocator.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/IR/Passes/DominatorTreeAnalysisPass.h"
 #include "Core/Log.h"
+
+#define USE_GRAPH_COLORING_RA 0
 
 namespace ola
 {
@@ -143,7 +146,11 @@ namespace ola
 					MachineFunction& MF = *static_cast<MachineFunction*>(global->GetRelocable());
 					LegalizeInstructions(MF);
 
+#if USE_GRAPH_COLORING_RA
+					GraphColoringRegisterAllocator register_allocator(*this);
+#else
 					LinearScanRegisterAllocator register_allocator(*this);
+#endif
 					register_allocator.AssignRegisters(MF);
 					machine_ctx.SetUsedRegistersInfo(&register_allocator.GetUsedRegistersInfo());
 

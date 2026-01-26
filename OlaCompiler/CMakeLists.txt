@@ -225,6 +225,10 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/RA/RegisterAllocator.h
   Backend/Custom/Codegen/RA/LinearScanRegisterAllocator.h
   Backend/Custom/Codegen/RA/LinearScanRegisterAllocator.cpp
+  Backend/Custom/Codegen/RA/InterferenceGraph.h
+  Backend/Custom/Codegen/RA/InterferenceGraph.cpp
+  Backend/Custom/Codegen/RA/GraphColoringRegisterAllocator.h
+  Backend/Custom/Codegen/RA/GraphColoringRegisterAllocator.cpp
   Backend/Custom/Codegen/Targets/AsmPrinter.h
   Backend/Custom/Codegen/Targets/AsmPrinter.cpp
   Backend/Custom/Codegen/Targets/X86/X86.h

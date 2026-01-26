@@ -34,7 +34,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
     - Custom MIR
 	  - Instruction Selection: Tree pattern matching ISel (with legacy fallback)
       - Legalization: Automated instruction lowering and legalization
-      - Register Allocation: Efficient linear scan algorithm
+      - Register Allocation: linear scan, graph coloring
     - x86-64 code generation
       - Microsoft ABI
       - SysV ABI (wip)

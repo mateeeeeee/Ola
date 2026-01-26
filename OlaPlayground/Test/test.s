@@ -1,676 +1,632 @@
 
+.const
+
+_INT0:
+.quad 4611686018427387904
+
+
+_INT1:
+.quad 4607182418800017408
+
+
+_INT2:
+.quad 4613937818241073152
+
+
+_INT3:
+.quad 4618441417868443648
+
+
+_INT4:
+.quad 4616189618054758400
+
+
+_INT5:
+.quad 4619567317775286272
+
+
 .text
 
 .extern _Assert
 .extern _AssertMsg
-.globl _Base$GetX
-_Base$GetX:
+_Add__I__I:
 label0:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x27, [x29, #-8]
-str x28, [x29, #-16]
-mov x28, x0
-add x27, x28, #0
-ldr x28, [x27]
-str x28, [x29, #-24]
-b label1
-label1:
-ldr x28, [x29, #-24]
-mov x0, x28
-ldr x27, [x29, #-8]
-ldr x28, [x29, #-16]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-.globl _Base$GetSum
-_Base$GetSum:
-label2:
 sub sp, sp, #64
 stp x29, x30, [sp, #48]
 add x29, sp, #48
-str x26, [x29, #-8]
+str x28, [x29, #-8]
 str x27, [x29, #-16]
-str x28, [x29, #-24]
-mov x28, x0
-b label4
-label3:
-ldr x27, [x29, #-40]
-b label5
-label4:
-add x26, x28, #0
-ldr x28, [x26]
+mov x27, x0
+mov x28, x1
+str x27, [x29, #-24]
+str x28, [x29, #-32]
+ldr x27, [x29, #-24]
+ldr x28, [x29, #-32]
+add x28, x27, x28
 str x28, [x29, #-40]
-b label3
-label5:
-mov x0, x27
-ldr x26, [x29, #-8]
+b label2
+label1:
+label2:
+ldr x28, [x29, #-40]
+mov x0, x28
+ldr x28, [x29, #-8]
 ldr x27, [x29, #-16]
-ldr x28, [x29, #-24]
 ldp x29, x30, [sp, #48]
 add sp, sp, #64
 ret
-.globl _Derived$GetY
-_Derived$GetY:
-label6:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x27, [x29, #-8]
-str x28, [x29, #-16]
-mov x28, x0
-add x27, x28, #8
-ldr x28, [x27]
-str x28, [x29, #-24]
-b label7
-label7:
-ldr x28, [x29, #-24]
-mov x0, x28
-ldr x27, [x29, #-8]
-ldr x28, [x29, #-16]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-.globl _Derived$GetSum
-_Derived$GetSum:
-label8:
-sub sp, sp, #64
-stp x29, x30, [sp, #48]
-add x29, sp, #48
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-b label11
-label9:
-mov x0, x28
-bl _Base$GetSum
-mov x26, x0
-add x25, x27, x26
-b label12
-label10:
-ldr x27, [x29, #-40]
-b label9
-label11:
-add x26, x28, #8
-ldr x27, [x26]
-str x27, [x29, #-40]
-b label10
-label12:
-mov x0, x25
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #48]
-add sp, sp, #64
-ret
-.globl _ExtendedDerived$GetZ
-_ExtendedDerived$GetZ:
-label13:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x27, [x29, #-8]
-str x28, [x29, #-16]
-mov x28, x0
-add x27, x28, #16
-ldr x28, [x27]
-str x28, [x29, #-24]
-b label14
-label14:
-ldr x28, [x29, #-24]
-mov x0, x28
-ldr x27, [x29, #-8]
-ldr x28, [x29, #-16]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-.globl _ExtendedDerived$GetSum
-_ExtendedDerived$GetSum:
-label15:
-sub sp, sp, #64
-stp x29, x30, [sp, #48]
-add x29, sp, #48
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-b label18
-label16:
-mov x0, x28
-bl _Derived$GetSum
-mov x26, x0
-add x25, x27, x26
-b label19
-label17:
-ldr x27, [x29, #-40]
-b label16
-label18:
-add x26, x28, #16
-ldr x27, [x26]
-str x27, [x29, #-40]
-b label17
-label19:
-mov x0, x25
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #48]
-add sp, sp, #64
-ret
-_PassBase__Base:
-label20:
+_AddThreeNumbers__I__I__I:
+label3:
 sub sp, sp, #80
 stp x29, x30, [sp, #64]
 add x29, sp, #64
-str x26, [x29, #-8]
+str x28, [x29, #-8]
 str x27, [x29, #-16]
-str x28, [x29, #-24]
-mov x28, x0
-ldr x27, [x28]
-sub x28, x29, #56
-str x27, [x28]
-sub x28, x29, #56
-sub x27, x29, #40
-ldr x26, [x28]
-str x26, [x27]
-b label23
-label21:
-cmp x26, #1
-cset w27, eq
-mov w0, w27
-bl _Assert
-sub x0, x29, #40
-bl _Base$GetSum
-mov x27, x0
-cmp x27, #1
-cset w27, eq
-mov w0, w27
-bl _Assert
-b label24
-label22:
-ldr x26, [x29, #-48]
-b label21
-label23:
-sub x27, x29, #40
-add x26, x27, #0
-ldr x27, [x26]
+str x26, [x29, #-24]
+mov x26, x0
+mov x27, x1
+mov x28, x2
+str x26, [x29, #-40]
 str x27, [x29, #-48]
-b label22
-label24:
-ldr x26, [x29, #-8]
+str x28, [x29, #-56]
+ldr x26, [x29, #-40]
+ldr x28, [x29, #-48]
+ldr x27, [x29, #-56]
+add x28, x26, x28
+add x28, x28, x27
+str x28, [x29, #-64]
+b label5
+label4:
+label5:
+ldr x28, [x29, #-64]
+mov x0, x28
+ldr x28, [x29, #-8]
 ldr x27, [x29, #-16]
-ldr x28, [x29, #-24]
+ldr x26, [x29, #-24]
 ldp x29, x30, [sp, #64]
 add sp, sp, #80
 ret
-_PassBaseRef__Baseref:
-label25:
-sub sp, sp, #64
-stp x29, x30, [sp, #48]
-add x29, sp, #48
-str x26, [x29, #-8]
+_AddFourNumbers__I__I__I__I:
+label6:
+sub sp, sp, #96
+stp x29, x30, [sp, #80]
+add x29, sp, #80
+str x28, [x29, #-8]
 str x27, [x29, #-16]
-str x28, [x29, #-24]
-mov x28, x0
-b label28
-label26:
-cmp x27, #1
-cset w26, eq
-mov w0, w26
-bl _Assert
+str x26, [x29, #-24]
+str x25, [x29, #-32]
+mov x25, x0
+mov x26, x1
+mov x27, x2
+mov x28, x3
+str x25, [x29, #-40]
+str x26, [x29, #-48]
+str x27, [x29, #-56]
+str x28, [x29, #-64]
+ldr x25, [x29, #-40]
+ldr x28, [x29, #-48]
+ldr x26, [x29, #-56]
+ldr x27, [x29, #-64]
+add x28, x25, x28
+add x28, x28, x26
+add x28, x28, x27
+str x28, [x29, #-72]
+b label8
+label7:
+label8:
+ldr x28, [x29, #-72]
 mov x0, x28
-bl _Base$GetSum
-mov x26, x0
-cmp x26, #1
-cset w26, eq
-mov w0, w26
-bl _Assert
-b label29
-label27:
-ldr x27, [x29, #-40]
-b label26
-label28:
-add x26, x28, #0
-ldr x27, [x26]
-str x27, [x29, #-40]
-b label27
-label29:
-ldr x26, [x29, #-8]
+ldr x28, [x29, #-8]
 ldr x27, [x29, #-16]
-ldr x28, [x29, #-24]
-ldp x29, x30, [sp, #48]
-add sp, sp, #64
+ldr x26, [x29, #-24]
+ldr x25, [x29, #-32]
+ldp x29, x30, [sp, #80]
+add sp, sp, #96
 ret
-_PassDerivedRef__Derivedref:
-label30:
+_AddSixNumbers__I__I__I__I__I__I:
+label9:
+sub sp, sp, #128
+stp x29, x30, [sp, #112]
+add x29, sp, #112
+str x28, [x29, #-8]
+str x27, [x29, #-16]
+str x26, [x29, #-24]
+str x25, [x29, #-32]
+str x24, [x29, #-40]
+str x23, [x29, #-48]
+mov x23, x0
+mov x24, x1
+mov x25, x2
+mov x26, x3
+mov x27, x4
+mov x28, x5
+str x23, [x29, #-56]
+str x24, [x29, #-64]
+str x25, [x29, #-72]
+str x26, [x29, #-80]
+str x27, [x29, #-88]
+str x28, [x29, #-96]
+ldr x28, [x29, #-56]
+ldr x25, [x29, #-64]
+ldr x26, [x29, #-72]
+ldr x23, [x29, #-80]
+ldr x24, [x29, #-88]
+ldr x27, [x29, #-96]
+add x28, x28, x25
+add x28, x28, x26
+add x28, x28, x23
+add x28, x28, x24
+add x28, x28, x27
+str x28, [x29, #-104]
+b label11
+label10:
+label11:
+ldr x28, [x29, #-104]
+mov x0, x28
+ldr x28, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x26, [x29, #-24]
+ldr x25, [x29, #-32]
+ldr x24, [x29, #-40]
+ldr x23, [x29, #-48]
+ldp x29, x30, [sp, #112]
+add sp, sp, #128
+ret
+_AddTenNumbers__I__I__I__I__I__I__I__I__I__I:
+label12:
+sub sp, sp, #192
+stp x29, x30, [sp, #176]
+add x29, sp, #176
+str x24, [x29, #-8]
+str x23, [x29, #-16]
+str x22, [x29, #-24]
+str x28, [x29, #-32]
+str x26, [x29, #-40]
+str x21, [x29, #-48]
+str x25, [x29, #-56]
+str x20, [x29, #-64]
+str x27, [x29, #-72]
+str x19, [x29, #-80]
+mov x19, x0
+mov x27, x1
+mov x20, x2
+mov x25, x3
+mov x21, x4
+mov x26, x5
+mov x28, x6
+mov x22, x7
+ldr x23, [x29, #16]
+ldr x24, [x29, #24]
+str x19, [x29, #-88]
+str x27, [x29, #-96]
+str x20, [x29, #-104]
+str x25, [x29, #-112]
+str x21, [x29, #-120]
+str x26, [x29, #-128]
+str x28, [x29, #-136]
+str x22, [x29, #-144]
+str x23, [x29, #-152]
+str x24, [x29, #-160]
+ldr x19, [x29, #-88]
+ldr x28, [x29, #-96]
+ldr x20, [x29, #-104]
+ldr x21, [x29, #-112]
+ldr x22, [x29, #-120]
+ldr x23, [x29, #-128]
+ldr x24, [x29, #-136]
+ldr x25, [x29, #-144]
+ldr x26, [x29, #-152]
+ldr x27, [x29, #-160]
+add x28, x19, x28
+add x28, x28, x20
+add x28, x28, x21
+add x28, x28, x22
+add x28, x28, x23
+add x28, x28, x24
+add x28, x28, x25
+add x28, x28, x26
+add x28, x28, x27
+str x28, [x29, #-168]
+b label14
+label13:
+label14:
+ldr x28, [x29, #-168]
+mov x0, x28
+ldr x24, [x29, #-8]
+ldr x23, [x29, #-16]
+ldr x22, [x29, #-24]
+ldr x28, [x29, #-32]
+ldr x26, [x29, #-40]
+ldr x21, [x29, #-48]
+ldr x25, [x29, #-56]
+ldr x20, [x29, #-64]
+ldr x27, [x29, #-72]
+ldr x19, [x29, #-80]
+ldp x29, x30, [sp, #176]
+add sp, sp, #192
+ret
+_AlternatingSum__I__I__I__I__I__I:
+label15:
+sub sp, sp, #128
+stp x29, x30, [sp, #112]
+add x29, sp, #112
+str x28, [x29, #-8]
+str x27, [x29, #-16]
+str x26, [x29, #-24]
+str x25, [x29, #-32]
+str x24, [x29, #-40]
+str x23, [x29, #-48]
+mov x23, x0
+mov x24, x1
+mov x25, x2
+mov x26, x3
+mov x27, x4
+mov x28, x5
+str x23, [x29, #-56]
+str x24, [x29, #-64]
+str x25, [x29, #-72]
+str x26, [x29, #-80]
+str x27, [x29, #-88]
+str x28, [x29, #-96]
+ldr x28, [x29, #-56]
+ldr x25, [x29, #-64]
+ldr x26, [x29, #-72]
+ldr x23, [x29, #-80]
+ldr x24, [x29, #-88]
+ldr x27, [x29, #-96]
+sub x28, x28, x25
+add x28, x28, x26
+sub x28, x28, x23
+add x28, x28, x24
+sub x28, x28, x27
+str x28, [x29, #-104]
+b label17
+label16:
+label17:
+ldr x28, [x29, #-104]
+mov x0, x28
+ldr x28, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x26, [x29, #-24]
+ldr x25, [x29, #-32]
+ldr x24, [x29, #-40]
+ldr x23, [x29, #-48]
+ldp x29, x30, [sp, #112]
+add sp, sp, #128
+ret
+_AddFloats__F__F:
+label18:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+fmov d29, d0
+fmov d30, d1
+str d29, [x29, #-8]
+str d30, [x29, #-16]
+ldr d29, [x29, #-8]
+ldr d30, [x29, #-16]
+fadd d30, d29, d30
+str d30, [x29, #-24]
+b label20
+label19:
+label20:
+ldr d30, [x29, #-24]
+fmov d0, d30
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+_AddIntAndFloat__I__F__F:
+label21:
 sub sp, sp, #64
 stp x29, x30, [sp, #48]
 add x29, sp, #48
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
+str x28, [x29, #-8]
 mov x28, x0
-b label36
-label31:
-cmp x27, #1
-cset w26, eq
-mov w0, w26
-bl _Assert
-b label34
-label32:
-cmp x26, #2
-cset w25, eq
-mov w0, w25
-bl _Assert
-mov x0, x28
-bl _Derived$GetSum
-mov x25, x0
-cmp x25, #3
-cset w25, eq
-mov w0, w25
-bl _Assert
-b label37
-label33:
-ldr x26, [x29, #-40]
-b label32
-label34:
-add x25, x28, #8
-ldr x26, [x25]
-str x26, [x29, #-40]
-b label33
-label35:
-ldr x27, [x29, #-48]
-b label31
-label36:
-add x26, x28, #0
-ldr x27, [x26]
-str x27, [x29, #-48]
-b label35
-label37:
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
+fmov d29, d1
+fmov d30, d2
+str x28, [x29, #-24]
+str d29, [x29, #-32]
+str d30, [x29, #-40]
+ldr x28, [x29, #-24]
+ldr d28, [x29, #-32]
+ldr d29, [x29, #-40]
+scvtf d30, x28
+fadd d30, d30, d28
+fadd d30, d30, d29
+str d30, [x29, #-48]
+b label23
+label22:
+label23:
+ldr d30, [x29, #-48]
+fmov d0, d30
+ldr x28, [x29, #-8]
 ldp x29, x30, [sp, #48]
 add sp, sp, #64
 ret
-_TestAssignment:
-label38:
-sub sp, sp, #256
-stp x29, x30, [sp, #240]
-add x29, sp, #240
-str x19, [x29, #-8]
-str x20, [x29, #-16]
-str x21, [x29, #-24]
-str x22, [x29, #-32]
-str x23, [x29, #-40]
-str x24, [x29, #-48]
-str x25, [x29, #-56]
-str x26, [x29, #-64]
-str x27, [x29, #-72]
-str x28, [x29, #-80]
-sub x28, x29, #96
-add x27, x28, #0
-mov x28, #1
-str x28, [x27]
-sub x28, x29, #96
-add x26, x28, #8
-mov x28, #2
-str x28, [x26]
-sub x28, x29, #104
-ldr x26, [x27]
-add x16, x28, #0
-str x16, [x29, #-216]
-ldr x16, [x29, #-216]
-str x26, [x16]
-b label53
-label39:
-ldr x16, [x29, #-224]
-cmp x16, #1
-cset w28, eq
-mov w0, w28
-bl _Assert
-sub x0, x29, #104
-bl _Base$GetSum
-mov x28, x0
-cmp x28, #1
-cset w28, eq
-mov w0, w28
-bl _Assert
-sub x28, x29, #104
-sub x25, x29, #200
-ldr x24, [x28]
-str x24, [x25]
-mov x0, x25
-bl _PassBase__Base
-sub x0, x29, #104
-bl _PassBaseRef__Baseref
-sub x25, x29, #128
-add x24, x25, #8
-mov x25, #2
-str x25, [x24]
-sub x25, x29, #128
-add x16, x25, #0
-str x16, [x29, #-232]
-mov x25, #1
-ldr x16, [x29, #-232]
-str x25, [x16]
-sub x25, x29, #128
-add x23, x25, #16
-mov x25, #3
-str x25, [x23]
-sub x0, x29, #128
-bl _ExtendedDerived$GetSum
-mov x25, x0
-cmp x25, #6
-cset w25, eq
-mov w0, w25
-bl _Assert
-b label51
-label40:
-cmp x25, #3
-cset w22, eq
-mov w0, w22
-bl _Assert
-sub x22, x29, #136
-ldr x16, [x29, #-232]
-ldr x21, [x16]
-add x20, x22, #0
-str x21, [x20]
-b label49
-label41:
-cmp x22, #1
-cset w19, eq
-mov w0, w19
-bl _Assert
-sub x0, x29, #136
-bl _Base$GetSum
-mov x19, x0
-cmp x19, #1
-cset w19, eq
-mov w0, w19
-bl _Assert
-sub x19, x29, #136
-sub x26, x29, #208
-ldr x27, [x19]
-str x27, [x26]
-mov x0, x26
-bl _PassBase__Base
-sub x0, x29, #136
-bl _PassBaseRef__Baseref
-sub x26, x29, #152
-add x27, x26, #0
-str x21, [x27]
-sub x27, x29, #152
-ldr x26, [x24]
-add x19, x27, #8
-str x26, [x19]
-b label47
-label42:
-cmp x26, #1
-cset w27, eq
-mov w0, w27
-bl _Assert
-b label45
-label43:
-cmp x27, #2
-cset w28, eq
-mov w0, w28
-bl _Assert
-sub x0, x29, #152
-bl _Derived$GetSum
+_ConditionSum__F__F__F__F__B:
+label24:
+sub sp, sp, #80
+stp x29, x30, [sp, #64]
+add x29, sp, #64
+str x28, [x29, #-8]
+fmov d27, d0
+fmov d28, d1
+fmov d29, d2
+fmov d30, d3
+mov w28, w4
+str d27, [x29, #-24]
+str d28, [x29, #-32]
+str d29, [x29, #-40]
+str d30, [x29, #-48]
+strb w28, [x29, #-49]
+ldrb w28, [x29, #-49]
+ldr d27, [x29, #-24]
+ldr d30, [x29, #-32]
+ldr d28, [x29, #-40]
+ldr d29, [x29, #-48]
+fadd d30, d27, d30
+fadd d29, d28, d29
+tst w28, w28
+fmov d29, d29
+fcsel d29, d30, d29, ne
+str d29, [x29, #-57]
+b label26
+label25:
+label26:
+ldr d30, [x29, #-57]
+fmov d0, d30
+ldr x28, [x29, #-8]
+ldp x29, x30, [sp, #64]
+add sp, sp, #80
+ret
+_AddBooleans__B__B__B__B:
+label27:
+sub sp, sp, #64
+stp x29, x30, [sp, #48]
+add x29, sp, #48
+str x28, [x29, #-8]
+str x27, [x29, #-16]
+str x26, [x29, #-24]
+str x25, [x29, #-32]
+mov w25, w0
+mov w26, w1
+mov w27, w2
+mov w28, w3
+strb w25, [x29, #-33]
+strb w26, [x29, #-34]
+strb w27, [x29, #-35]
+strb w28, [x29, #-36]
+ldrb w25, [x29, #-33]
+ldrb w28, [x29, #-34]
+ldrb w26, [x29, #-35]
+ldrb w27, [x29, #-36]
+add w28, w25, w28
+add w28, w28, w26
+add w28, w28, w27
+uxtb x28, w28
+str x28, [x29, #-44]
+b label29
+label28:
+label29:
+ldr x28, [x29, #-44]
+mov x0, x28
+ldr x28, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x26, [x29, #-24]
+ldr x25, [x29, #-32]
+ldp x29, x30, [sp, #48]
+add sp, sp, #64
+ret
+_TestIntCalls:
+label30:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x1, #2
+mov x0, #1
+bl _Add__I__I
 mov x28, x0
 cmp x28, #3
 cset w28, eq
 mov w0, w28
 bl _Assert
-sub x0, x29, #152
-bl _PassDerivedRef__Derivedref
-b label54
-label44:
-ldr x27, [x29, #-160]
-b label43
-label45:
-ldr x28, [x19]
-str x28, [x29, #-160]
-b label44
-label46:
-ldr x26, [x29, #-168]
-b label42
-label47:
-sub x28, x29, #152
-add x26, x28, #0
-ldr x28, [x26]
-str x28, [x29, #-168]
-b label46
-label48:
-ldr x22, [x29, #-176]
-b label41
-label49:
-ldr x19, [x20]
-str x19, [x29, #-176]
-b label48
-label50:
-ldr x25, [x29, #-184]
-b label40
-label51:
-ldr x21, [x23]
-str x21, [x29, #-184]
-b label50
-label52:
-ldr x16, [x29, #-192]
-str x16, [x29, #-224]
-b label39
-label53:
-ldr x16, [x29, #-216]
-ldr x24, [x16]
-str x24, [x29, #-192]
-b label52
-label54:
-ldr x19, [x29, #-8]
-ldr x20, [x29, #-16]
-ldr x21, [x29, #-24]
-ldr x22, [x29, #-32]
-ldr x23, [x29, #-40]
-ldr x24, [x29, #-48]
-ldr x25, [x29, #-56]
-ldr x26, [x29, #-64]
-ldr x27, [x29, #-72]
-ldr x28, [x29, #-80]
-ldp x29, x30, [sp, #240]
-add sp, sp, #256
+mov x2, #3
+mov x1, #2
+mov x0, #1
+bl _AddThreeNumbers__I__I__I
+mov x28, x0
+cmp x28, #6
+cset w28, eq
+mov w0, w28
+bl _Assert
+mov x3, #4
+mov x2, #3
+mov x1, #2
+mov x0, #1
+bl _AddFourNumbers__I__I__I__I
+mov x28, x0
+cmp x28, #10
+cset w28, eq
+mov w0, w28
+bl _Assert
+mov x5, #6
+mov x4, #5
+mov x3, #4
+mov x2, #3
+mov x1, #2
+mov x0, #1
+bl _AddSixNumbers__I__I__I__I__I__I
+mov x28, x0
+cmp x28, #21
+cset w28, eq
+mov w0, w28
+bl _Assert
+mov x5, #6
+mov x4, #5
+mov x3, #4
+mov x2, #3
+mov x1, #2
+mov x0, #1
+bl _AlternatingSum__I__I__I__I__I__I
+mov x27, x0
+mov x28, #-3
+cmp x27, x28
+cset w28, eq
+mov w0, w28
+bl _Assert
+b label31
+label31:
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
 ret
-_TestReferenceAssignment:
-label55:
-sub sp, sp, #240
-stp x29, x30, [sp, #224]
-add x29, sp, #224
-str x19, [x29, #-8]
-str x20, [x29, #-16]
-str x21, [x29, #-24]
-str x22, [x29, #-32]
-str x23, [x29, #-40]
-str x24, [x29, #-48]
-str x25, [x29, #-56]
-str x26, [x29, #-64]
-str x27, [x29, #-72]
-str x28, [x29, #-80]
-sub x28, x29, #96
-add x27, x28, #0
-mov x28, #1
-str x28, [x27]
-sub x28, x29, #96
-add x27, x28, #8
-mov x28, #2
-str x28, [x27]
-sub x28, x29, #96
-str x28, [x29, #-104]
-ldr x16, [x29, #-104]
-str x16, [x29, #-208]
-b label70
-label56:
-ldr x16, [x29, #-216]
-cmp x16, #1
-cset w26, eq
-mov w0, w26
+_TestFloatCalls:
+label32:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x28, [x29, #-8]
+adrp x28, _INT0@PAGE
+ldr x28, [x28, _INT0@PAGEOFF]
+fmov d1, x28
+adrp x28, _INT1@PAGE
+ldr x28, [x28, _INT1@PAGEOFF]
+fmov d0, x28
+bl _AddFloats__F__F
+fmov d29, d0
+adrp x28, _INT2@PAGE
+ldr x28, [x28, _INT2@PAGEOFF]
+fmov d30, x28
+fcmp d29, d30
+cset w28, eq
+mov w0, w28
 bl _Assert
-ldr x0, [x29, #-208]
-bl _Base$GetSum
-mov x26, x0
-cmp x26, #1
-cset w26, eq
-mov w0, w26
+adrp x28, _INT2@PAGE
+ldr x28, [x28, _INT2@PAGEOFF]
+fmov d2, x28
+adrp x28, _INT0@PAGE
+ldr x28, [x28, _INT0@PAGEOFF]
+fmov d1, x28
+mov x0, #1
+bl _AddIntAndFloat__I__F__F
+fmov d29, d0
+adrp x28, _INT3@PAGE
+ldr x28, [x28, _INT3@PAGEOFF]
+fmov d30, x28
+fcmp d29, d30
+cset w28, eq
+mov w0, w28
 bl _Assert
-sub x26, x29, #128
-add x25, x26, #8
-mov x26, #2
-str x26, [x25]
-sub x26, x29, #128
-add x25, x26, #0
-mov x26, #1
-str x26, [x25]
-sub x26, x29, #128
-add x25, x26, #16
-mov x26, #3
-str x26, [x25]
-sub x26, x29, #128
-str x26, [x29, #-136]
-ldr x26, [x29, #-136]
-b label68
-label57:
-cmp x25, #1
-cset w24, eq
-mov w0, w24
+mov w4, #1
+adrp x28, _INT4@PAGE
+ldr x28, [x28, _INT4@PAGEOFF]
+fmov d3, x28
+adrp x28, _INT2@PAGE
+ldr x28, [x28, _INT2@PAGEOFF]
+fmov d2, x28
+adrp x28, _INT0@PAGE
+ldr x28, [x28, _INT0@PAGEOFF]
+fmov d1, x28
+adrp x28, _INT1@PAGE
+ldr x28, [x28, _INT1@PAGEOFF]
+fmov d0, x28
+bl _ConditionSum__F__F__F__F__B
+fmov d30, d0
+adrp x28, _INT2@PAGE
+ldr x28, [x28, _INT2@PAGEOFF]
+fmov d29, x28
+fcmp d30, d29
+cset w28, eq
+mov w0, w28
 bl _Assert
-mov x0, x26
-bl _Base$GetSum
-mov x24, x0
-cmp x24, #1
-cset w24, eq
-mov w0, w24
+mov w4, #0
+adrp x28, _INT4@PAGE
+ldr x28, [x28, _INT4@PAGEOFF]
+fmov d3, x28
+adrp x28, _INT2@PAGE
+ldr x28, [x28, _INT2@PAGEOFF]
+fmov d2, x28
+adrp x28, _INT0@PAGE
+ldr x28, [x28, _INT0@PAGEOFF]
+fmov d1, x28
+adrp x28, _INT1@PAGE
+ldr x28, [x28, _INT1@PAGEOFF]
+fmov d0, x28
+bl _ConditionSum__F__F__F__F__B
+fmov d29, d0
+adrp x28, _INT5@PAGE
+ldr x28, [x28, _INT5@PAGEOFF]
+fmov d30, x28
+fcmp d29, d30
+cset w28, eq
+mov w0, w28
 bl _Assert
-sub x24, x29, #128
-str x24, [x29, #-144]
-ldr x24, [x29, #-144]
-b label66
-label58:
-cmp x23, #1
-cset w22, eq
-mov w0, w22
+mov x28, #10
+str x28, [x29, #-24]
+mov x28, #9
+str x28, [x29, #-32]
+mov x7, #8
+mov x6, #7
+mov x5, #6
+mov x4, #5
+mov x3, #4
+mov x2, #3
+mov x1, #2
+mov x0, #1
+bl _AddTenNumbers__I__I__I__I__I__I__I__I__I__I
+mov x28, x0
+cmp x28, #55
+cset w28, eq
+mov w0, w28
 bl _Assert
-b label64
-label59:
-cmp x22, #2
-cset w21, eq
-mov w0, w21
+b label33
+label33:
+ldr x28, [x29, #-8]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+_TestBoolCalls:
+label34:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x28, [x29, #-8]
+mov w3, #0
+mov w2, #1
+mov w1, #0
+mov w0, #1
+bl _AddBooleans__B__B__B__B
+mov x28, x0
+cmp x28, #2
+cset w28, eq
+mov w0, w28
 bl _Assert
-mov x0, x24
-bl _Derived$GetSum
-mov x21, x0
-cmp x21, #3
-cset w21, eq
-mov w0, w21
-bl _Assert
-sub x21, x29, #152
-add x20, x24, #0
-ldr x19, [x20]
-add x20, x21, #0
-str x19, [x20]
-b label62
-label60:
-cmp x19, #1
-cset w21, eq
-mov w0, w21
-bl _Assert
-sub x0, x29, #152
-bl _Base$GetSum
-mov x21, x0
-cmp x21, #1
-cset w21, eq
-mov w0, w21
-bl _Assert
-sub x21, x29, #152
-sub x28, x29, #200
-ldr x27, [x21]
-str x27, [x28]
-mov x0, x28
-bl _PassBase__Base
-sub x0, x29, #152
-bl _PassBaseRef__Baseref
-b label71
-label61:
-ldr x19, [x29, #-160]
-b label60
-label62:
-ldr x28, [x20]
-str x28, [x29, #-160]
-b label61
-label63:
-ldr x22, [x29, #-168]
-b label59
-label64:
-add x28, x24, #8
-ldr x22, [x28]
-str x22, [x29, #-168]
-b label63
-label65:
-ldr x23, [x29, #-176]
-b label58
-label66:
-add x22, x24, #0
-ldr x23, [x22]
-str x23, [x29, #-176]
-b label65
-label67:
-ldr x25, [x29, #-184]
-b label57
-label68:
-add x24, x26, #0
-ldr x25, [x24]
-str x25, [x29, #-184]
-b label67
-label69:
-ldr x16, [x29, #-192]
-str x16, [x29, #-216]
-b label56
-label70:
-ldr x16, [x29, #-208]
-add x26, x16, #0
-ldr x25, [x26]
-str x25, [x29, #-192]
-b label69
-label71:
-ldr x19, [x29, #-8]
-ldr x20, [x29, #-16]
-ldr x21, [x29, #-24]
-ldr x22, [x29, #-32]
-ldr x23, [x29, #-40]
-ldr x24, [x29, #-48]
-ldr x25, [x29, #-56]
-ldr x26, [x29, #-64]
-ldr x27, [x29, #-72]
-ldr x28, [x29, #-80]
-ldp x29, x30, [sp, #224]
-add sp, sp, #240
+b label35
+label35:
+ldr x28, [x29, #-8]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
 ret
 .globl _main
 _main:
-label72:
-sub sp, sp, #16
-stp x29, x30, [sp, #0]
-add x29, sp, #0
-bl _TestAssignment
-bl _TestReferenceAssignment
-b label73
-label73:
-mov x0, #0
-ldp x29, x30, [sp, #0]
-add sp, sp, #16
+label36:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x28, [x29, #-8]
+bl _TestIntCalls
+bl _TestFloatCalls
+bl _TestBoolCalls
+mov x28, #0
+str x28, [x29, #-24]
+b label38
+label37:
+label38:
+ldr x28, [x29, #-24]
+mov x0, x28
+ldr x28, [x29, #-8]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
 ret

@@ -1,106 +1,83 @@
-import std.Assert;
+import std.assert;
 
-class Base
-{
-    int x = 1;
-    public int GetX() const { return x; }
-    public int GetSum() const { return GetX(); }
-};
 
-class Derived : Base
+int Add(int a, int b)
 {
-    int y = 2;
-    public int GetY() const { return y; }
-    public int GetSum() const { return GetY() + super.GetSum(); }
-};
-
-class ExtendedDerived : Derived
-{
-    int z = 3;
-    public int GetZ() const { return z; }
-    public int GetSum() const { return GetZ() + super.GetSum(); }
-};
-
-void PassBase(Base b)
-{
-    Assert(b.GetX() == 1);
-    Assert(b.GetSum() == 1);
-}
-void PassBaseRef(ref Base b)
-{
-    Assert(b.GetX() == 1);
-    Assert(b.GetSum() == 1);
+    return a + b;
 }
 
-void PassDerived(Derived d)
+int AddThreeNumbers(int a, int b, int c)
 {
-    Assert(d.GetX() == 1);
-    Assert(d.GetY() == 2);
-    Assert(d.GetSum() == 3);
-}
-void PassDerivedRef(ref Derived d)
-{
-    Assert(d.GetX() == 1);
-    Assert(d.GetY() == 2);
-    Assert(d.GetSum() == 3);
+    return a + b + c;
 }
 
-void TestAssignment()
+int AddFourNumbers(int a, int b, int c, int d)
 {
-    Derived d;
-    Base b1 = d;
-    Assert(b1.GetX() == 1);
-    Assert(b1.GetSum() == 1);
-    PassBase(b1);
-    PassBaseRef(b1);
-
-    ExtendedDerived d2;
-    Assert(d2.GetSum() == 6);
-    Assert(d2.GetZ() == 3);
-
-    Base b2 = d2;
-    Assert(b2.GetX() == 1);
-    Assert(b2.GetSum() == 1);
-    PassBase(b2);
-    PassBaseRef(b2);
-
-    Derived d3 = d2;
-    Assert(d3.GetX() == 1);
-    Assert(d3.GetY() == 2);
-    Assert(d3.GetSum() == 3);
-    //#todo - fails with O3, works with O0
-    //PassDerived(d3); 
-    PassDerivedRef(d3);
+    return a + b + c + d;
 }
 
-void TestReferenceAssignment()
+int AddSixNumbers(int a, int b, int c, int d, int e, int f)
 {
-    Derived d;
-    ref Base b1 = d;
-    Assert(b1.GetX() == 1);
-    Assert(b1.GetSum() == 1);
+    return a + b + c + d + e + f;
+}
 
-    ExtendedDerived d2;
+int AddTenNumbers(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j)
+{
+	return a + b + c + d + e + f + g + h + i + j;
+}
 
-    ref Base b2 = d2;
-    Assert(b2.GetX() == 1);
-    Assert(b2.GetSum() == 1);
+int AlternatingSum(int a, int b, int c, int d, int e, int f)
+{
+    return a - b + c - d + e - f;
+}
 
-    ref Derived d3 = d2;
-    Assert(d3.GetX() == 1);
-    Assert(d3.GetY() == 2);
-    Assert(d3.GetSum() == 3);
+float AddFloats(float a, float b)
+{
+    return a + b;
+}
 
-    Base b3 = d3;
-    Assert(b3.GetX() == 1);
-    Assert(b3.GetSum() == 1);
-    PassBase(b3);
-    PassBaseRef(b3);
+float AddIntAndFloat(int a, float b, float c)
+{
+    return a + b + c;
+}
+
+float ConditionSum(float a, float b, float c, float d, bool e)
+{
+    return e ? a + b : c + d;
+}
+
+int AddBooleans(bool a, bool b, bool c, bool d)
+{
+    return a + b + c + d;  // Implicit conversion (true = 1, false = 0)
+}
+
+
+void TestIntCalls()
+{
+    Assert(Add(1, 2) == 3);
+    Assert(AddThreeNumbers(1,2,3) == 6);
+    Assert(AddFourNumbers(1,2,3,4) == 10);
+    Assert(AddSixNumbers(1,2,3,4,5,6) == 21);
+    Assert(AlternatingSum(1,2,3,4,5,6) == -3);
+}
+void TestFloatCalls()
+{
+    Assert(AddFloats(1.0, 2.0) == 3.0);
+    Assert(AddIntAndFloat(1, 2.0, 3.0) == 6.0);
+    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, true) == 3.0);
+    Assert(ConditionSum(1.0, 2.0, 3.0, 4.0, false) == 7.0);
+    Assert(AddTenNumbers(1,2,3,4,5,6,7,8,9,10) == 55);
+}
+
+void TestBoolCalls()
+{
+    Assert(AddBooleans(true, false, true, false) == 2);
 }
 
 public int main()
 {
-    TestAssignment();
-    TestReferenceAssignment();
+    TestIntCalls();
+    TestFloatCalls();
+    TestBoolCalls();
     return 0;
 }
