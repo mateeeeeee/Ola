@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <limits>
 #include "GraphColoringRegisterAllocator.h"
+#include "CopyCoalescer.h"
 #include "LivenessAnalysis.h"
 #include "Backend/Custom/Codegen/MachineModule.h"
 #include "Backend/Custom/Codegen/MachineBasicBlock.h"
@@ -10,6 +11,9 @@
 
 namespace ola
 {
+	GraphColoringRegisterAllocator::GraphColoringRegisterAllocator(MachineModule& M) : RegisterAllocator(M) {}
+	GraphColoringRegisterAllocator::~GraphColoringRegisterAllocator() = default;
+
 	// GraphColoringRegisterAllocation
 	//     Build interference graph from live intervals
 	//     ComputeSpillCosts for each node
@@ -17,6 +21,10 @@ namespace ola
 	//     while simplify_worklist or spill_worklist not empty do
 	//         if simplify_worklist not empty then
 	//             Simplify()
+	//         else if move_worklist not empty then
+	//             Coalesce()
+	//         else if freeze_worklist not empty then
+	//             Freeze()
 	//         else
 	//             select spill candidate and move to simplify_worklist
 	//     Select: assign colors to nodes on stack
@@ -46,13 +54,32 @@ namespace ola
 		InterferenceGraph IG;
 		Build(MF, liveness, IG);
 		ComputeSpillCosts(MF, IG, liveness);
+
+		if (enable_coalescing)
+		{
+			SetupCoalescer(MF, IG);
+			OLA_ASSERT(coalescer != nullptr);
+		}
 		MakeWorklists(IG);
 
-		while (!simplify_worklist.empty() || !spill_worklist.empty())
+		auto HasCoalesceWork = [&]()
+		{
+			return enable_coalescing && (coalescer->HasWorklistMoves() || coalescer->HasFreezeWorklist());
+		};
+
+		while (!simplify_worklist.empty() || HasCoalesceWork() || !spill_worklist.empty())
 		{
 			if (!simplify_worklist.empty())
 			{
 				Simplify(IG);
+			}
+			else if (enable_coalescing && coalescer->HasWorklistMoves())
+			{
+				coalescer->Coalesce();
+			}
+			else if (enable_coalescing && coalescer->HasFreezeWorklist())
+			{
+				coalescer->Freeze();
 			}
 			else if (!spill_worklist.empty())
 			{
@@ -65,6 +92,30 @@ namespace ola
 		Select(IG, gp_colors, fp_colors);
 		Finalize(MF, IG);
 	}
+
+	void GraphColoringRegisterAllocator::SetupCoalescer(MachineFunction& MF, InterferenceGraph& IG)
+	{
+		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
+
+		coalescer = std::make_unique<CopyCoalescer>(IG, K_gp, K_fp);
+		coalescer->CollectMoves(MF, target_inst_info);
+		coalescer->InitWorklists();
+
+		coalescer->OnAddToSimplifyWorklist = [this](Uint32 vreg) 
+		{
+			spill_worklist.erase(vreg);
+			simplify_worklist.insert(vreg);
+		};
+		coalescer->OnAddToSpillWorklist = [this](Uint32 vreg) 
+		{
+			spill_worklist.insert(vreg);
+		};
+		coalescer->IsInSpillWorklist = [this](Uint32 vreg) 
+		{
+			return spill_worklist.contains(vreg);
+		};
+	}
+
 
 	// Build(liveness)
 	//     for each live interval i do
@@ -119,11 +170,9 @@ namespace ola
 		for (auto& MBB : MF.Blocks())
 		{
 			Float64 block_weight = 1.0;
-
 			for (MachineInstruction& MI : MBB->Instructions())
 			{
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
-
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
@@ -168,6 +217,8 @@ namespace ola
 	//     for each node n in IG do
 	//         if degree[n] >= K then
 	//             add n to spill_worklist
+	//         else if n is move-related then
+	//             add n to freeze_worklist
 	//         else
 	//             add n to simplify_worklist
 	void GraphColoringRegisterAllocator::MakeWorklists(InterferenceGraph& IG)
@@ -178,6 +229,10 @@ namespace ola
 			if (node.degree >= K)
 			{
 				spill_worklist.insert(vreg);
+			}
+			else if (enable_coalescing && coalescer->IsMoveRelated(vreg))
+			{
+				coalescer->AddToFreezeWorklist(vreg);
 			}
 			else
 			{
@@ -192,7 +247,8 @@ namespace ola
 	//     for each neighbor m of n do
 	//         decrement degree[m]
 	//         if degree[m] was K and is now < K then
-	//             move m from spill_worklist to simplify_worklist
+	//             enable moves for m
+	//             move m from spill_worklist to simplify_worklist (or freeze_worklist if move-related)
 	void GraphColoringRegisterAllocator::Simplify(InterferenceGraph& IG)
 	{
 		Uint32 vreg = *simplify_worklist.begin();
@@ -201,7 +257,6 @@ namespace ola
 		select_stack.push(vreg);
 		IGNode* node = IG.GetNode(vreg);
 		node->on_stack = true;
-
 		for (Uint32 neighbor : node->neighbors)
 		{
 			IGNode* neighbor_node = IG.GetNode(neighbor);
@@ -215,8 +270,24 @@ namespace ola
 
 			if (old_degree == K && neighbor_node->degree < K)
 			{
+				if (enable_coalescing)
+				{
+					coalescer->EnableMoves(neighbor);
+					for (Uint32 nn : neighbor_node->neighbors)
+					{
+						coalescer->EnableMoves(nn);
+					}
+				}
+
 				spill_worklist.erase(neighbor);
-				simplify_worklist.insert(neighbor);
+				if (enable_coalescing && coalescer->IsMoveRelated(neighbor))
+				{
+					coalescer->AddToFreezeWorklist(neighbor);
+				}
+				else
+				{
+					simplify_worklist.insert(neighbor);
+				}
 			}
 		}
 	}
@@ -255,7 +326,7 @@ namespace ola
 	// Select(colors)
 	//     while select_stack not empty do
 	//         pop node n from stack
-	//         used_colors ← colors of all colored neighbors
+	//         used_colors ← colors of all colored neighbors (following aliases)
 	//         for each color c in available colors (high-numbered first) do
 	//             if c not in used_colors then
 	//                 color[n] ← c
@@ -274,7 +345,9 @@ namespace ola
 			std::unordered_set<Uint32> used_colors;
 			for (Uint32 neighbor : node->neighbors)
 			{
-				IGNode* neighbor_node = IG.GetNode(neighbor);
+				// follow alias chain for coalesced nodes
+				Uint32 actual_neighbor = enable_coalescing ? coalescer->GetAlias(neighbor) : neighbor;
+				IGNode* neighbor_node = IG.GetNode(actual_neighbor);
 				if (neighbor_node && neighbor_node->color != INVALID_REG)
 				{
 					used_colors.insert(neighbor_node->color);
@@ -311,7 +384,9 @@ namespace ola
 
 	// Finalize()
 	//     for each instruction do
+	//         if instruction is a coalesced move, delete it
 	//         for each vreg operand do
+	//             resolve alias to get canonical vreg
 	//             if vreg has color then
 	//                 replace vreg with physical register
 	//             else
@@ -333,12 +408,28 @@ namespace ola
 			return &new_stack_loc;
 		};
 
+		auto ResolveAlias = [&](Uint32 vreg) -> Uint32
+		{
+			return enable_coalescing ? coalescer->GetAlias(vreg) : vreg;
+		};
+
+		std::unordered_set<MachineInstruction*> const* coalesced_moves =
+			enable_coalescing ? &coalescer->GetCoalescedMoves() : nullptr;
+
 		for (auto& MBB : MF.Blocks())
 		{
 			auto& instructions = MBB->Instructions();
-			for (auto it = instructions.begin(); it != instructions.end(); ++it)
+			for (auto it = instructions.begin(); it != instructions.end(); )
 			{
 				MachineInstruction& MI = *it;
+
+				// Delete coalesced moves
+				if (coalesced_moves && coalesced_moves->contains(&MI))
+				{
+					it = instructions.erase(it);
+					continue;
+				}
+
 				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
 
 				if (MI.GetOpcode() == InstStore)
@@ -346,7 +437,7 @@ namespace ola
 					MachineOperand& addr_op = MI.GetOperand(0);
 					if (IsOperandVReg(addr_op))
 					{
-						Uint32 vreg_id = addr_op.GetReg().reg;
+						Uint32 vreg_id = ResolveAlias(addr_op.GetReg().reg);
 						IGNode* node = IG.GetNode(vreg_id);
 						if (!node || node->color == INVALID_REG)
 						{
@@ -365,7 +456,7 @@ namespace ola
 					MachineOperand& addr_op = MI.GetOperand(1);
 					if (IsOperandVReg(addr_op))
 					{
-						Uint32 vreg_id = addr_op.GetReg().reg;
+						Uint32 vreg_id = ResolveAlias(addr_op.GetReg().reg);
 						IGNode* node = IG.GetNode(vreg_id);
 						if (!node || node->color == INVALID_REG)
 						{
@@ -388,7 +479,7 @@ namespace ola
 						continue;
 					}
 
-					Uint32 vreg_id = MO.GetReg().reg;
+					Uint32 vreg_id = ResolveAlias(MO.GetReg().reg);
 					IGNode* node = IG.GetNode(vreg_id);
 
 					if (node && node->color != INVALID_REG)
@@ -412,6 +503,8 @@ namespace ola
 						MI.SetOperand(idx, *spill_slot);
 					}
 				}
+
+				++it;
 			}
 		}
 	}

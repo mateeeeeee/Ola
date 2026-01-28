@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stack>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include "RegisterAllocator.h"
@@ -11,11 +12,13 @@ namespace ola
 	struct LiveInterval;
 	struct LivenessAnalysisResult;
 	class MachineOperand;
+	class CopyCoalescer;
 
 	class GraphColoringRegisterAllocator : public RegisterAllocator
 	{
 	public:
-		explicit GraphColoringRegisterAllocator(MachineModule& M) : RegisterAllocator(M) {}
+		explicit GraphColoringRegisterAllocator(MachineModule& M);
+		~GraphColoringRegisterAllocator();
 		virtual void AssignRegisters(MachineFunction&) override;
 
 	private:
@@ -27,8 +30,11 @@ namespace ola
 		std::unordered_set<Uint32> spilled_nodes;
 		std::stack<Uint32> select_stack;
 		std::unordered_map<Uint32, MachineOperand*> spill_slots;
+		std::unique_ptr<CopyCoalescer> coalescer;
+		Bool enable_coalescing = true;
 
 	private:
+		void SetupCoalescer(MachineFunction& MF, InterferenceGraph& IG);
 		void Build(MachineFunction& MF, LivenessAnalysisResult& liveness, InterferenceGraph& IG);
 		void ComputeSpillCosts(MachineFunction& MF, InterferenceGraph& IG, LivenessAnalysisResult& liveness);
 		void MakeWorklists(InterferenceGraph& IG);

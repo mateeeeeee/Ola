@@ -227,6 +227,8 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/RA/LinearScanRegisterAllocator.cpp
   Backend/Custom/Codegen/RA/InterferenceGraph.h
   Backend/Custom/Codegen/RA/InterferenceGraph.cpp
+  Backend/Custom/Codegen/RA/CopyCoalescer.h
+  Backend/Custom/Codegen/RA/CopyCoalescer.cpp
   Backend/Custom/Codegen/RA/GraphColoringRegisterAllocator.h
   Backend/Custom/Codegen/RA/GraphColoringRegisterAllocator.cpp
   Backend/Custom/Codegen/Targets/AsmPrinter.h

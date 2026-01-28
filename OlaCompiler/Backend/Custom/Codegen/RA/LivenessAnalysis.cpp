@@ -104,7 +104,6 @@ namespace ola
 	// live_in[B] = use[B] ∪ (live_out[B] - def[B])
 	static Bool ComputeLiveInOut(std::unordered_map<MachineBasicBlock*, BlockLivenessInfo>& block_info)
 	{
-
 		Bool changed = false;
 		for (auto& [MBB, info] : block_info)
 		{
@@ -232,7 +231,6 @@ namespace ola
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float = MO.GetType() == MachineType::Float64;
 					reg_is_float[reg_id] = is_float;
-
 					if (inst_info.HasOpFlag(idx, OperandFlagDef))
 					{
 						if (!live_interval_map.contains(reg_id))
