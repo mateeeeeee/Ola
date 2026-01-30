@@ -28,9 +28,11 @@ namespace ola
 		FunctionAnalysisManager FAM;
 
 	private:
+		void RunEarlyModulePasses();
 		void RunEarlyOptimizationPipeline();
 		void RunMainOptimizationLoop(Uint32 max_iterations);
 		void RunLateOptimizationPipeline();
+		void RunLateModulePasses();
 		void RunDebugPasses(IRPassOptions const& opts);
 		void RegisterAnalysisPasses();
 	};

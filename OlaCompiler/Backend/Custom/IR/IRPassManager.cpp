@@ -21,6 +21,7 @@
 #include "Passes/FunctionInlinerPass.h"
 #include "Passes/IPConstantPropagationPass.h"
 #include "Passes/CallGraphAnalysisPass.h"
+#include "Passes/DevirtualizationPass.h"
 
 namespace ola
 {
@@ -34,34 +35,39 @@ namespace ola
 		if (level >= OptimizationLevel::O1)
 		{
 			Uint32 const max_iterations = level >= OptimizationLevel::O2 ? 5 : 2;
+			RunEarlyModulePasses();
 			RunEarlyOptimizationPipeline();
 			RunMainOptimizationLoop(max_iterations);
 			RunLateOptimizationPipeline();
+			RunLateModulePasses();
 		}
 		RunDebugPasses(opts);
+	}
 
-		if (level >= OptimizationLevel::O1)
-		{
-			IRModulePassManager MPM;
-			MPM.AddPass(CreateGlobalAttributeInferPass());
-			MPM.AddPass(CreateGlobalDCEPass());
+	void IRPassManager::RunEarlyModulePasses()
+	{
+		IRModulePassManager MPM;
+		MPM.AddPass(CreateDevirtualizationPass());
+		MPM.AddPass(CreateIPConstantPropagationPass());
 
-			IRModuleAnalysisManager MAM;
-			MAM.RegisterPass<CallGraphAnalysisPass>(M);
-			MPM.Run(M, MAM);
-		}
+		IRModuleAnalysisManager MAM;
+		MAM.RegisterPass<CallGraphAnalysisPass>(M);
+		MPM.Run(M, MAM);
+	}
+
+	void IRPassManager::RunLateModulePasses()
+	{
+		IRModulePassManager MPM;
+		MPM.AddPass(CreateGlobalAttributeInferPass());
+		MPM.AddPass(CreateGlobalDCEPass());
+
+		IRModuleAnalysisManager MAM;
+		MAM.RegisterPass<CallGraphAnalysisPass>(M);
+		MPM.Run(M, MAM);
 	}
 
 	void IRPassManager::RunEarlyOptimizationPipeline()
 	{
-		{
-			IRModulePassManager MPM;
-			MPM.AddPass(CreateIPConstantPropagationPass());
-			IRModuleAnalysisManager MAM;
-			MAM.RegisterPass<CallGraphAnalysisPass>(M);
-			MPM.Run(M, MAM);
-		}
-
 		FunctionPassManager FPM;
 		FPM.AddPass(CreateFunctionInlinerPass());
 		FPM.AddPass(CreateMem2RegPass());

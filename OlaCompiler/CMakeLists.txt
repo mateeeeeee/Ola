@@ -200,6 +200,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/CallGraphAnalysisPass.h
   Backend/Custom/IR/Passes/IPConstantPropagationPass.h
   Backend/Custom/IR/Passes/IPConstantPropagationPass.cpp
+  Backend/Custom/IR/Passes/DevirtualizationPass.h
+  Backend/Custom/IR/Passes/DevirtualizationPass.cpp
   Backend/Custom/IR/CallGraph.h
   Backend/Custom/IR/CallGraph.cpp
   Backend/Custom/Codegen/MachineOperand.h
