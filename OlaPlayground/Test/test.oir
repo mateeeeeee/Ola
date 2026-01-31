@@ -1,61 +1,14 @@
 Module ID : test.ola
 
-define external @Base$GetValue i64(ptr %this) {
-entry:
-%0 = alloca i64
-store 1, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%1 = load i64, ptr %0
-ret i64 %1
-}
-
-
-define internal @VTable_Base ptr [@Base$GetValue,]
-
-
-define external @Derived$GetValue i64(ptr %this) {
-entry:
-%0 = alloca i64
-store 10, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%1 = load i64, ptr %0
-ret i64 %1
-}
-
-
-define internal @VTable_Derived ptr [@Derived$GetValue,]
-
-
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = alloca %Derived
-%2 = ptr add ptr %1, 0
-store ptr @VTable_Derived, ptr %2
-%3 = ptr add ptr %1, 8
-store 1, ptr %3
-%4 = ptr add ptr %1, 16
-store 10, ptr %4
-%5 = ptr add ptr %1, 0
-%6 = load ptr, ptr %5
-%7 = ptr add ptr %6, 0
-%8 = load ptr, ptr %7
-%9 = call ptr %1, @Derived$GetValue
-%10 = alloca i64
-store i64 %9, ptr %10
-%11 = load i64, ptr %10
-store i64 %11, ptr %0
+%1 = alloca i64
+%2 = alloca i64
 br label exit
 return:
 br label exit
 exit:
-%12 = load i64, ptr %0
-ret i64 %12
+ret i64 30
 }
 

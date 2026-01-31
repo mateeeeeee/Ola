@@ -466,7 +466,7 @@ namespace ola
 				}
 			}
 
-			std::string vtable_name = "VTable_";
+			std::string vtable_name(VTABLE_PREFIX);
 			vtable_name += class_decl.GetName();
 			llvm::GlobalVariable* vtable_var = new llvm::GlobalVariable( 
 				module, vtable_type, true, llvm::GlobalValue::InternalLinkage,

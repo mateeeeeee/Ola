@@ -8,6 +8,8 @@
 
 namespace ola
 {
+	inline constexpr std::string_view VTABLE_PREFIX = "VTable_";
+
 	enum class Linkage : Bool
 	{
 		Internal,

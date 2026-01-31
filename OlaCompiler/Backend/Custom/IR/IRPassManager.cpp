@@ -22,6 +22,7 @@
 #include "Passes/IPConstantPropagationPass.h"
 #include "Passes/CallGraphAnalysisPass.h"
 #include "Passes/DevirtualizationPass.h"
+#include "Passes/SROAPass.h"
 
 namespace ola
 {
@@ -31,6 +32,19 @@ namespace ola
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
 		RegisterAnalysisPasses();
+
+		if(true)
+		{
+			FunctionPassManager FPM;
+			FPM.AddPass(CreateSROAPass());
+			FPM.AddPass(CreateMem2RegPass());
+			FPM.AddPass(CreateConstantPropagationPass());
+
+			IRModulePassManager MPM;
+			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
+			IRModuleAnalysisManager MAM;
+			MPM.Run(M, MAM);
+		}
 
 		if (level >= OptimizationLevel::O1)
 		{
@@ -70,6 +84,7 @@ namespace ola
 	{
 		FunctionPassManager FPM;
 		FPM.AddPass(CreateFunctionInlinerPass());
+		FPM.AddPass(CreateSROAPass());
 		FPM.AddPass(CreateMem2RegPass());
 		FPM.AddPass(CreateDCEPass());
 		FPM.AddPass(CreateSimplifyCFGPass());

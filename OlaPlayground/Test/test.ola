@@ -1,24 +1,14 @@
-class Base
-{
-	public int GetValue() const virtual
-	{
-		return 1;
-	}
-	int x = 1;
-};
 
-class Derived : Base
+class Point
 {
-	public int GetValue() const virtual
-	{
-		return 10;
-	}
-	int y = 10;
+	public int x;
+	public int y;
 };
 
 public int main()
 {
-	Derived d;
-	int result = d.GetValue(); 
-	return result;  
+	Point p;
+	p.x = 10;
+	p.y = 20;
+	return p.x + p.y;  
 }

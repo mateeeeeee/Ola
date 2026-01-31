@@ -578,7 +578,7 @@ namespace ola
 				}
 			}
 
-			std::string vtable_name = "VTable_";
+			std::string vtable_name(VTABLE_PREFIX);
 			vtable_name += class_decl.GetName();
 			ConstantArray* vtable_init = new ConstantArray(vtable_type, vtable_function_ptrs);
 			GlobalVariable* vtable_var = new GlobalVariable(vtable_name, vtable_type, Linkage::Internal, vtable_init);

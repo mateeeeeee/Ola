@@ -35,12 +35,12 @@ namespace ola
 			}
 
 			std::string_view name = G->GetName();
-			if (!name.starts_with("VTable_"))
+			if (!name.starts_with(VTABLE_PREFIX))
 			{
 				continue;
 			}
 
-			std::string class_name(name.substr(7));
+			std::string class_name(name.substr(VTABLE_PREFIX.size()));
 			vtable_to_class[G] = class_name;
 
 			if (ConstantArray* arr = dyn_cast<ConstantArray>(G->GetInitValue()))
@@ -169,7 +169,7 @@ namespace ola
 						}
 
 						GlobalVariable* vtable = dyn_cast<GlobalVariable>(store->GetValueOp());
-						if (!vtable || !vtable->GetName().starts_with("VTable_"))
+						if (!vtable || !vtable->GetName().starts_with(VTABLE_PREFIX))
 						{
 							return nullptr;
 						}
@@ -205,7 +205,7 @@ namespace ola
 					if (StoreInst* store = dyn_cast<StoreInst>(gep_use->GetUser()))
 					{
 						GlobalVariable* vtable = dyn_cast<GlobalVariable>(store->GetValueOp());
-						if (!vtable || !vtable->GetName().starts_with("VTable_"))
+						if (!vtable || !vtable->GetName().starts_with(VTABLE_PREFIX))
 						{
 							return nullptr;
 						}

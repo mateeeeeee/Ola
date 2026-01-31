@@ -1,91 +1,15 @@
-external Base$GetValue: 
+external main: 
 label0: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 48
 stp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 28, i64 imm 1
-InstStore - i64 stack -24, i64 reg 28
 InstJump - label2
 
 label1: 
 
 label2: 
-InstLoad - i64 reg 28, i64 stack -24
-InstMove - i64 reg 0, i64 reg 28
-InstLoad - i64 reg 28, i64 stack -8
+InstMove - i64 reg 0, i64 imm 30
 ldp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-internal data storage VTable_Base
-
-external Derived$GetValue: 
-label3: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 28, i64 imm 10
-InstStore - i64 stack -24, i64 reg 28
-InstJump - label5
-
-label4: 
-
-label5: 
-InstLoad - i64 reg 28, i64 stack -24
-InstMove - i64 reg 0, i64 reg 28
-InstLoad - i64 reg 28, i64 stack -8
-ldp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-internal data storage VTable_Derived
-
-external main: 
-label6: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 96
-stp - i64 reg 29, i64 reg 30, ptr stack 80
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 80
-InstStore - i64 stack -8, i64 reg 26
-InstStore - i64 stack -16, i64 reg 27
-InstStore - i64 stack -24, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -64
-InstLoadGlobalAddress - ptr reg 27, VTable_Derived
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 0
-InstStore - ptr reg 26, ptr reg 27
-InstLoadGlobalAddress - ptr reg 26, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 26, i64 imm 8
-InstMove - i64 reg 26, i64 imm 1
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 26, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 26, i64 imm 16
-InstMove - i64 reg 26, i64 imm 10
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 26, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 26, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 27
-InstAdd - ptr reg 27, ptr reg 26, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 27
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstMove - i64 reg 26, i64 reg 0
-InstStore - i64 stack -72, i64 reg 26
-InstLoad - i64 reg 26, i64 stack -72
-InstStore - i64 stack -40, i64 reg 26
-InstJump - label8
-
-label7: 
-
-label8: 
-InstLoad - i64 reg 26, i64 stack -40
-InstMove - i64 reg 0, i64 reg 26
-InstLoad - i64 reg 26, i64 stack -8
-InstLoad - i64 reg 27, i64 stack -16
-InstLoad - i64 reg 28, i64 stack -24
-ldp - i64 reg 29, i64 reg 30, ptr stack 80
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 96
 InstRet - 
 
