@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide_new2.png"/>
-Ola is a toy compiler with both LLVM backend and a custom backend. 
+Toy compiler with both LLVM backend and a custom backend. 
 
 ## Features
   * classes
@@ -40,6 +40,7 @@ Ola is a toy compiler with both LLVM backend and a custom backend.
       - SysV ABI (wip)
     - ARM64 code generation
     - Class support
+    - Interpreter
 	
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
@@ -62,6 +63,7 @@ The project consists of the following parts:
          - **LLVMIR Pass Manager**: Applies LLVM optimization passes to the IR.
          - Compilation to assembly is done using the `clang -S` command.
        - **Custom Backend**:
+         - **Interpreter**: Executes IR directly without generating machine code
          - **IR Visitor**: Transforms the AST into Ola's custom IR.
          - **IR Pass Manager**: Applies custom optimization passes at the IR level.
          - **MachineModule**: Responsible for lowering IR to MIR and finally to assembly.

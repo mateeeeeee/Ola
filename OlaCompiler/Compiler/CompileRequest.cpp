@@ -34,6 +34,7 @@ namespace ola
 			cli_parser.AddArg(false, "--lib");
 			cli_parser.AddArg(true, "-l");
 			cli_parser.AddArg(false, "--isel-legacy");
+			cli_parser.AddArg(false, "--interpret");
 		}
 		CLIParseResult cli_result = cli_parser.Parse(argc, argv);
 
@@ -67,6 +68,7 @@ namespace ola
 			OLA_INFO("      --lib                Build as static library");
 			OLA_INFO("  -l <libs>                Libraries to link against");
 			OLA_INFO("      --isel-legacy        Use legacy ISel instead of tree pattern ISel");
+			OLA_INFO("      --interpret          Interpret IR instead of generating code");
 			return false;
 		}
 
@@ -120,6 +122,7 @@ namespace ola
 		if (cli_result["-c"])					compiler_flags |= CompilerFlag_NoRun;
 		if (cli_result["--lib"])				compiler_flags |= CompilerFlag_StaticLib;
 		if (cli_result["--isel-legacy"])		compiler_flags |= CompilerFlag_ISelLegacy;
+		if (cli_result["--interpret"])			compiler_flags |= CompilerFlag_Interpret;
 
 		libraries = cli_result["-l"].AsStrings();
 

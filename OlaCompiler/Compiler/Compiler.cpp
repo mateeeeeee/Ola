@@ -17,6 +17,7 @@
 #include "Backend/Custom/Codegen/Targets/X86/Microsoft/Microsoft_X86Target.h"
 #include "Backend/Custom/Codegen/Targets/X86/SysV/SysV_X86Target.h"
 #include "Backend/Custom/Codegen/Targets/ARM/ARMTarget.h"
+#include "Backend/Custom/Interpreter/IRInterpreter.h"
 #include "Utility/DebugVisitor.h"
 #include "Utility/Command.h"
 #include "autogen/OlaConfig.h"
@@ -188,6 +189,7 @@ namespace ola
 		Bool const timeout_detection = compile_request.GetCompilerFlags() & CompilerFlag_TimeoutDetection;
 		Bool const no_run = compile_request.GetCompilerFlags() & CompilerFlag_NoRun;
 		Bool const isel_legacy = compile_request.GetCompilerFlags() & CompilerFlag_ISelLegacy;
+		Bool const interpret = compile_request.GetCompilerFlags() & CompilerFlag_Interpret;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -195,6 +197,62 @@ namespace ola
 		if (!input_directory.empty())
 		{
 			fs::current_path(input_directory);
+		}
+
+		if (interpret)
+		{
+			std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
+			FrontendContext context{};
+
+			for (Uint64 i = 0; i < source_files.size(); ++i)
+			{
+				std::string file_name = fs::path(source_files[i]).stem().string();
+				std::string source_file = source_files[i]; source_file += ".ola";
+
+				Diagnostics diagnostics{};
+				SourceBuffer src(source_file);
+				Lexer lex(diagnostics);
+				lex.Lex(src);
+
+				ImportProcessor import_processor(&context, diagnostics);
+				import_processor.ProcessImports(lex.GetTokens());
+
+				Parser parser(&context, diagnostics);
+				parser.Parse(import_processor.GetProcessedTokens());
+				AST const* ast = parser.GetAST();
+				if (ast_dump)
+				{
+					OLA_MAYBE_UNUSED DebugVisitor debug_ast(ast);
+				}
+
+				IRGenContext ir_gen_ctx(source_file);
+				ir_gen_ctx.Generate(ast);
+				IRModule& ir_module = ir_gen_ctx.GetModule();
+
+				IRPassManager ir_pass_manager(ir_module);
+				IRPassOptions pass_opts
+				{
+					.cfg_print = cfg_dump,
+					.domtree_print = domtree_dump,
+					.domfrontier_print = print_domfrontier
+				};
+				ir_pass_manager.Run(opt_level, pass_opts);
+
+				if (emit_ir)
+				{
+					std::string ir_file = file_name + ".oir";
+					ir_module.Print(ir_file);
+				}
+
+				IRInterpreter interpreter(ir_module);
+				Int exit_code = interpreter.Execute();
+				OLA_INFO("Program exited with code: {}", exit_code);
+
+				fs::current_path(cur_path);
+				return exit_code;
+			}
+			fs::current_path(cur_path);
+			return 0;
 		}
 
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();

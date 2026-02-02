@@ -288,6 +288,16 @@ set(BACKEND_FILES
   Backend/Custom/Codegen/ISel/ISelLegacy.cpp
   Backend/Custom/Codegen/ISel/Tiles/CommonTiles.h
   Backend/Custom/Codegen/ISel/Tiles/CommonTiles.cpp
+  Backend/Custom/Interpreter/InterpreterValue.h
+  Backend/Custom/Interpreter/InterpreterValue.cpp
+  Backend/Custom/Interpreter/InterpreterMemory.h
+  Backend/Custom/Interpreter/InterpreterMemory.cpp
+  Backend/Custom/Interpreter/InterpreterFrame.h
+  Backend/Custom/Interpreter/InterpreterFrame.cpp
+  Backend/Custom/Interpreter/Intrinsics.h
+  Backend/Custom/Interpreter/Intrinsics.cpp
+  Backend/Custom/Interpreter/IRInterpreter.h
+  Backend/Custom/Interpreter/IRInterpreter.cpp
 )
 
 if(LLVM_FOUND)

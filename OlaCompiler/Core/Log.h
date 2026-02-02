@@ -43,4 +43,4 @@ namespace ola
 #define OLA_INFO(fmt, ...)		((void)0)
 #define OLA_WARN(fmt, ...)
 #endif
-#define OLA_ERROR(fmt, ...)		ola::Log(ola::LogLevel::Error, fmt, __VA_ARGS__)
+#define OLA_ERROR(fmt, ...)		ola::Log(ola::LogLevel::Error, fmt, ##__VA_ARGS__)
