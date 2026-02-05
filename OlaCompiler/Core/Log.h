@@ -25,7 +25,6 @@ namespace ola
 		std::string log_entry = std::vformat(fmt, std::make_format_args(args...));
 		std::string full_log_entry = std::format("{} {} {}", GetCurrentTimeString(), GetLogPrefix(level), log_entry);
 		printf("%s\n", full_log_entry.c_str());
-		WriteToLogFile(full_log_entry);
 	}
 	struct LogInitScope
 	{
@@ -42,6 +41,6 @@ namespace ola
 #else
 #define OLA_DEBUG(fmt, ...)		((void)0)
 #define OLA_INFO(fmt, ...)		((void)0)
-#define OLA_WARN(fmt, ...)	
+#define OLA_WARN(fmt, ...)
 #endif
 #define OLA_ERROR(fmt, ...)		ola::Log(ola::LogLevel::Error, fmt, __VA_ARGS__)
