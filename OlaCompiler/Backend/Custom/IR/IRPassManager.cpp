@@ -23,6 +23,7 @@
 #include "Passes/CallGraphAnalysisPass.h"
 #include "Passes/DevirtualizationPass.h"
 #include "Passes/SROAPass.h"
+#include "Passes/AliasAnalysisPass.h"
 
 namespace ola
 {
@@ -164,7 +165,7 @@ namespace ola
 		}
 	}
 
-	void IRPassManager::RegisterAnalysisPasses() 
+	void IRPassManager::RegisterAnalysisPasses()
 	{
 		for (GlobalValue* G : M.Globals())
 		{
@@ -174,6 +175,7 @@ namespace ola
 				FAM.RegisterPass<DominatorTreeAnalysisPass>(*F);
 				FAM.RegisterPass<DominanceFrontierAnalysisPass>(*F);
 				FAM.RegisterPass<LoopAnalysisPass>(*F);
+				FAM.RegisterPass<AliasAnalysisPass>(*F);
 			}
 		}
 	}
