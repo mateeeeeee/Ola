@@ -1,6 +1,7 @@
 #include <unordered_map>
-#include <map>
+#include <unordered_set>
 #include <vector>
+#include <algorithm>
 #include "GlobalValueNumberingPass.h"
 #include "DominatorTreeAnalysisPass.h"
 #include "DominanceFrontierAnalysisPass.h"
@@ -11,10 +12,103 @@
 
 namespace ola
 {
+	namespace
+	{
+		BasicBlock* FindLCA(DominatorTree const& DT, BasicBlock* A, BasicBlock* B)
+		{
+			if (!A) return B;
+			if (!B) return A;
+			if (A == B) return A;
+
+			auto nodeA = DT.GetTreeNode(A);
+			auto nodeB = DT.GetTreeNode(B);
+			if (!nodeA || !nodeB) 
+			{
+				return nullptr;
+			}
+
+			for (auto curr = nodeA; curr; curr = DT.GetImmediateDominator(curr))
+			{
+				if (DT.Dominates(curr, nodeB))
+				{
+					return curr->GetBasicBlock();
+				}
+			}
+			return nullptr;
+		}
+
+		Bool IsPureExpression(Instruction const* I)
+		{
+			if (I->IsTerminator()) return false;
+			if (I->HasSideEffects()) return false;
+			if (isa<LoadInst>(I)) return false;
+			if (isa<PhiInst>(I)) return false;
+			return true;
+		}
+
+		struct ExpressionHasher
+		{
+			std::unordered_map<Value*, Uint64> const& ValueNumbers;
+
+			Uint64 operator()(Instruction const* I) const
+			{
+				HashState hash{};
+				hash.Combine(I->GetOpcode());
+				hash.Combine(reinterpret_cast<Uint64>(I->GetType()));
+				std::vector<Uint64> operand_vns;
+				for (Uint32 i = 0; i < I->GetNumOperands(); ++i)
+				{
+					if (Value* op = I->GetOperand(i))
+					{
+						auto it = ValueNumbers.find(op);
+						if (it != ValueNumbers.end())
+						{
+							operand_vns.push_back(it->second);
+						}
+						else
+						{
+							operand_vns.push_back(reinterpret_cast<Uint64>(op));
+						}
+					}
+				}
+
+				if (I->IsCommutative())
+				{
+					std::sort(operand_vns.begin(), operand_vns.end());
+				}
+				for (Uint64 vn : operand_vns)
+				{
+					hash.Combine(vn);
+				}
+				return hash;
+			}
+		};
+
+		Bool ExpressionsEqual(Instruction const* A, Instruction const* B,
+			std::unordered_map<Value*, Uint64> const& ValueNumbers)
+		{
+			if (A->GetOpcode() != B->GetOpcode()) return false;
+			if (A->GetType() != B->GetType()) return false;
+			if (A->GetNumOperands() != B->GetNumOperands()) return false;
+
+			for (Uint32 i = 0; i < A->GetNumOperands(); ++i)
+			{
+				Value* opA = A->GetOperand(i);
+				Value* opB = B->GetOperand(i);
+				if (opA == opB) continue;
+
+				auto itA = ValueNumbers.find(opA);
+				auto itB = ValueNumbers.find(opB);
+				if (itA == ValueNumbers.end() || itB == ValueNumbers.end()) return false;
+				if (itA->second != itB->second) return false;
+			}
+			return true;
+		}
+	}
+
 	Bool GlobalValueNumberingPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		DominatorTree const& DT = FAM.GetResult<DominatorTreeAnalysisPass>(F);
-		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
 		Bool Changed = false;
 
 		std::vector<BasicBlock*> blocks;
@@ -24,218 +118,160 @@ namespace ola
 				return true;
 			});
 
-		std::unordered_map<Value*, Uint64> ValueNumberMap;
-		std::unordered_map<Uint64, Value*> NumberValueMap;
+		std::unordered_map<Value*, Uint64> ValueNumbers;
 		Uint64 NextVN = 0;
-		std::unordered_map<Uint64, Uint64> ExpressionNumberMap;
-
-		// Track the last store to each pointer
-		std::unordered_map<Value*, Instruction*> LastStoreToMemory;
-
-		auto AssignNewVN = [&](Value* V) -> Uint64
+		auto AssignVN = [&](Value* V) -> Uint64
 			{
-				Uint64 vn = NextVN++;
-				ValueNumberMap[V] = vn;
-				NumberValueMap[vn] = V;
-				return vn;
-			};
-		auto AssignConstantVN = [&](Constant* C) -> Uint64
-			{
-				if (auto it = ValueNumberMap.find(C); it != ValueNumberMap.end())
+				if (auto it = ValueNumbers.find(V); it != ValueNumbers.end())
 				{
 					return it->second;
 				}
-				return AssignNewVN(C);
+				Uint64 vn = NextVN++;
+				ValueNumbers[V] = vn;
+				return vn;
 			};
 
 		for (auto ArgIt = F.ArgBegin(); ArgIt != F.ArgEnd(); ++ArgIt)
 		{
-			AssignNewVN(*ArgIt);
+			AssignVN(*ArgIt);
 		}
 
-		// First pass: assign value numbers to all phi nodes
 		for (BasicBlock* BB : blocks)
 		{
+			AssignVN(BB);
 			for (Instruction& I : *BB)
 			{
-				if (I.GetOpcode() == Opcode::Phi)
+				AssignVN(&I);
+				for (Uint32 i = 0; i < I.GetNumOperands(); ++i)
 				{
-					AssignNewVN(&I);
+					if (Value* op = I.GetOperand(i))
+					{
+						AssignVN(op);
+					}
 				}
 			}
 		}
 
 		std::vector<Instruction*> ToErase;
+		ExpressionHasher hasher{ ValueNumbers };
+		// hash -> list of (vn, set of equivalent instructions)
+		std::unordered_map<Uint64, std::vector<std::pair<Uint64, std::vector<Instruction*>>>> ExprGroups;
+
 		for (BasicBlock* BB : blocks)
 		{
 			for (Instruction& I : *BB)
 			{
-				if (I.GetOpcode() == Opcode::Phi)
+				if (!IsPureExpression(&I)) 
 				{
-					continue; 
-				}
-
-				if (I.GetOpcode() == Opcode::Alloca)
-				{
-					AssignNewVN(&I);
 					continue;
 				}
 
-				for (Uint32 i = 0; i < I.GetNumOperands(); ++i)
+				Uint64 hash = hasher(&I);
+				auto& groups = ExprGroups[hash];
+
+				Bool found = false;
+				for (auto& [vn, insts] : groups)
 				{
-					if (Value* op = I.GetOperand(i))
+					if (!insts.empty() && ExpressionsEqual(&I, insts.front(), ValueNumbers))
 					{
-						if (Constant* C = dyn_cast<Constant>(op); C && !ValueNumberMap.contains(C))
-						{
-							AssignConstantVN(C);
-						}
+						insts.push_back(&I);
+						found = true;
+						break;
 					}
 				}
-
-				if (I.GetOpcode() == Opcode::Store)
+				if (!found)
 				{
-					Value* ptr = I.GetOperand(1);
-					if (ptr)
-					{
-						LastStoreToMemory[ptr] = &I;
-					}
-					AssignNewVN(&I);
-					continue;
-				}
-
-				if (I.IsTerminator() || I.HasSideEffects())
-				{
-					AssignNewVN(&I);
-					continue;
-				}
-
-				std::vector<Uint64> operand_vns;
-				for (Uint32 i = 0; i < I.GetNumOperands(); ++i)
-				{
-					if (Value* op = I.GetOperand(i))
-					{
-						auto it = ValueNumberMap.find(op);
-						OLA_ASSERT(it != ValueNumberMap.end() && "Operand VN not assigned!");
-						operand_vns.push_back(it->second);
-					}
-				}
-
-				HashState hash{};
-				hash.Combine(I.GetOpcode());
-				hash.Combine(reinterpret_cast<Uint64>(I.GetType()));
-				if (I.GetOpcode() == Opcode::Load)
-				{
-					Value* ptr = I.GetOperand(0);
-					if (ptr)
-					{
-						auto store_it = LastStoreToMemory.find(ptr);
-						if (store_it != LastStoreToMemory.end())
-						{
-							auto store_vn_it = ValueNumberMap.find(store_it->second);
-							if (store_vn_it != ValueNumberMap.end())
-							{
-								hash.Combine(store_vn_it->second);
-							}
-						}
-					}
-				}
-
-				if (I.IsCommutative())
-				{
-					std::sort(operand_vns.begin(), operand_vns.end());
-				}
-				for (Uint64 ovn : operand_vns)
-				{
-					hash.Combine(ovn);
-				}
-
-				Uint64 expr_hash = hash;
-
-				auto it = ExpressionNumberMap.find(expr_hash);
-				if (it != ExpressionNumberMap.end())
-				{
-					Uint64 existing_vn = it->second;
-					Value* existing_value = NumberValueMap[existing_vn];
-
-					if (existing_value->GetType() != I.GetType())
-					{
-						Uint64 new_vn = AssignNewVN(&I);
-						ExpressionNumberMap[expr_hash] = new_vn;
-						continue;
-					}
-
-					if (Instruction* existing_inst = dyn_cast<Instruction>(existing_value))
-					{
-						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB) || existing_inst->GetNumOperands() != I.GetNumOperands())
-						{
-							Uint64 new_vn = AssignNewVN(&I);
-							ExpressionNumberMap[expr_hash] = new_vn;
-							continue;
-						}
-
-						Bool operands_match = true;
-						for (Uint32 op_idx = 0; op_idx < I.GetNumOperands(); ++op_idx)
-						{
-							if (I.GetOperand(op_idx) != existing_inst->GetOperand(op_idx))
-							{
-								if (!ValueNumberMap.contains(I.GetOperand(op_idx)) || 
-									!ValueNumberMap.contains(existing_inst->GetOperand(op_idx)))
-								{
-									operands_match = false;
-									break;
-								}
-
-								Uint64 const vn1 = ValueNumberMap[I.GetOperand(op_idx)];
-								Uint64 const vn2 = ValueNumberMap[existing_inst->GetOperand(op_idx)];
-								if (vn1 != vn2)
-								{
-									operands_match = false;
-									break;
-								}
-							}
-						}
-						if (!operands_match)
-						{
-							Uint64 new_vn = AssignNewVN(&I);
-							ExpressionNumberMap[expr_hash] = new_vn;
-							continue;
-						}
-					}
-
-					ValueNumberMap[&I] = existing_vn;
-					I.ReplaceAllUsesWith(existing_value);
-					ToErase.push_back(&I);
-					Changed = true;
-				}
-				else
-				{
-					Uint64 new_vn = AssignNewVN(&I);
-					ExpressionNumberMap[expr_hash] = new_vn;
+					Uint64 vn = AssignVN(&I);
+					groups.push_back({ vn, { &I } });
 				}
 			}
 		}
 
-		for (BasicBlock* BB : blocks)
+		for (auto& [hash, groups] : ExprGroups)
 		{
-			for (Instruction& I : *BB)
+			for (auto& [vn, instructions] : groups)
 			{
-				if (I.GetOpcode() != Opcode::Phi)
+				if (instructions.size() <= 1) 
 				{
 					continue;
 				}
 
-				Instruction* Phi = &I;
-
-				for (Uint32 i = 0; i < Phi->GetNumOperands(); ++i)
+				BasicBlock* lca = nullptr;
+				for (Instruction* I : instructions)
 				{
-					if (Value* op = Phi->GetOperand(i))
+					lca = FindLCA(DT, lca, I->GetBasicBlock());
+				}
+				if (!lca)
+				{
+					continue;
+				}
+
+				// Find representative: pick the earliest instruction in program order
+				// that's in the LCA block (to avoid use-before-def issues)
+				Instruction* representative = nullptr;
+				for (Instruction& LcaInst : *lca)
+				{
+					for (Instruction* I : instructions)
 					{
-						if (Constant* C = dyn_cast<Constant>(op); C && !ValueNumberMap.contains(C))
+						if (I == &LcaInst)
 						{
-							AssignConstantVN(C);
+							representative = I;
+							break;
+						}
+					}
+					if (representative) break;
+				}
+
+				if (!representative)
+				{
+					for (Instruction* I : instructions)
+					{
+						Bool dominates_all = true;
+						for (Instruction* other : instructions)
+						{
+							if (I != other && !DT.Dominates(I->GetBasicBlock(), other->GetBasicBlock()))
+							{
+								dominates_all = false;
+								break;
+							}
+						}
+						if (dominates_all)
+						{
+							representative = I;
+							break;
 						}
 					}
 				}
+
+				if (!representative) 
+				{
+					continue;
+				}
+
+				for (Instruction* I : instructions)
+				{
+					if (I != representative)
+					{
+						I->ReplaceAllUsesWith(representative);
+						ToErase.push_back(I);
+						Changed = true;
+					}
+				}
+			}
+		}
+
+		std::unordered_map<Uint64, Instruction*> PhiExpressions;
+		for (BasicBlock* BB : blocks)
+		{
+			for (Instruction& I : *BB)
+			{
+				if (I.GetOpcode() != Opcode::Phi) 
+				{
+					continue;
+				}
+				if (std::find(ToErase.begin(), ToErase.end(), &I) != ToErase.end()) continue;
+
+				Instruction* Phi = &I;
 
 				std::vector<std::pair<Uint64, Uint64>> operand_block_pairs;
 				for (Uint32 i = 0; i < Phi->GetNumOperands(); i += 2)
@@ -245,21 +281,9 @@ namespace ola
 
 					if (value_op && block_op && isa<BasicBlock>(block_op))
 					{
-						auto val_it = ValueNumberMap.find(value_op);
-						auto block_it = ValueNumberMap.find(block_op);
-
-						if (val_it == ValueNumberMap.end())
-						{
-							AssignNewVN(value_op);
-							val_it = ValueNumberMap.find(value_op);
-						}
-						if (block_it == ValueNumberMap.end())
-						{
-							AssignNewVN(block_op);
-							block_it = ValueNumberMap.find(block_op);
-						}
-
-						operand_block_pairs.push_back({ val_it->second, block_it->second });
+						Uint64 val_vn = AssignVN(value_op);
+						Uint64 block_vn = AssignVN(block_op);
+						operand_block_pairs.push_back({ val_vn, block_vn });
 					}
 				}
 
@@ -274,32 +298,20 @@ namespace ola
 				}
 				Uint64 expr_hash = hash;
 
-				auto it = ExpressionNumberMap.find(expr_hash);
-				if (it != ExpressionNumberMap.end())
+				auto it = PhiExpressions.find(expr_hash);
+				if (it != PhiExpressions.end())
 				{
-					Uint64 existing_vn = it->second;
-					Value* existing_value = NumberValueMap[existing_vn];
-
-					if (Instruction* existing_inst = dyn_cast<Instruction>(existing_value))
+					Instruction* existing = it->second;
+					if (DT.Dominates(existing->GetBasicBlock(), BB))
 					{
-						if (!DT.Dominates(existing_inst->GetBasicBlock(), BB))
-						{
-							Uint64 phi_vn = ValueNumberMap[Phi];
-							ExpressionNumberMap[expr_hash] = phi_vn;
-							continue;
-						}
+						Phi->ReplaceAllUsesWith(existing);
+						ToErase.push_back(Phi);
+						Changed = true;
 					}
-
-					Uint64 phi_vn = ValueNumberMap[Phi];
-					ValueNumberMap[Phi] = existing_vn;
-					Phi->ReplaceAllUsesWith(existing_value);
-					ToErase.push_back(Phi);
-					Changed = true;
 				}
 				else
 				{
-					Uint64 phi_vn = ValueNumberMap[Phi];
-					ExpressionNumberMap[expr_hash] = phi_vn;
+					PhiExpressions[expr_hash] = Phi;
 				}
 			}
 		}
