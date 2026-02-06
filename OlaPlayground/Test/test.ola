@@ -1,33 +1,18 @@
-// Test cross-block GVN
-// Run with --O0 to test GVN in isolation (mem2reg + GVN only)
+import std.assert;
 
-int test(int x, int y)
+void TestDoWhileLoopWithMultipleVariables()
 {
-	// First computation of x + y in entry block
-	int a = x + y;  // Should be kept as representative
-
-	int result = 0;
-
-	if (a > 0)
-	{
-		// Second computation of x + y in a different block
-		// GVN should replace this with 'a'
-		int b = x + y;
-		result = b * 2;
-	}
-	else
-	{
-		// Third computation of x + y in another block
-		// GVN should replace this with 'a' too
-		int c = x + y;
-		result = c * 3;
-	}
-
-	return result;
+    int a = 1, b = 1;
+    do
+    {
+        int temp = a;
+        a = b;
+        b = temp + b;
+    } while (b < 10);
+    Assert(a == 8 && b == 13);
 }
-
 public int main()
 {
-	// test(10, 20) -> a = 30, a > 0 is true, result = 30 * 2 = 60
-	return test(10, 20);
+    TestDoWhileLoopWithMultipleVariables();
+    return 0;
 }

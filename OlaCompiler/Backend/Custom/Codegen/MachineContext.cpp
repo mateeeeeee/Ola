@@ -145,6 +145,16 @@ namespace ola
 				MachineOperand imm = MachineOperand::Immediate(value, MachineType::Float64);
 				return imm;
 			}
+			else if (C->GetConstantID() == ConstantID::Undef)
+			{
+				UndefValue const* UV = cast<UndefValue>(C);
+				MachineType mt = GetOperandType(UV->GetType());
+				if (mt == MachineType::Float64)
+				{
+					return MachineOperand::Immediate(0.0, MachineType::Float64);
+				}
+				return MachineOperand::Immediate(0, mt);
+			}
 			else
 			{
 				OLA_ASSERT(false);

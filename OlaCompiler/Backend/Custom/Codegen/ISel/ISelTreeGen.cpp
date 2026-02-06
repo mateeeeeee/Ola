@@ -441,8 +441,30 @@ namespace ola
 				test.SetOp<1>(cond_op);
 				ctx.EmitInst(test);
 
-				EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
-				EmitJumpWithPhiCopies(InstJump, false_target, src_block);
+				Bool true_has_phi_copies = false;
+				for (auto const& Phi : true_target->PhiInsts())
+				{
+					if (Phi->GetIncomingValueForBlock(src_block))
+					{
+						true_has_phi_copies = true;
+						break;
+					}
+				}
+
+				if (true_has_phi_copies)
+				{
+					OLA_TODO("this assumes false_target has no phis");
+					MachineOperand false_operand = MachineOperand::Relocable(ctx.GetBlock(false_target));
+					MachineInstruction jmp_false(InstJE);
+					jmp_false.SetOp<0>(false_operand);
+					ctx.EmitInst(jmp_false);
+					EmitJumpWithPhiCopies(InstJump, true_target, src_block);
+				}
+				else
+				{
+					EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
+					EmitJumpWithPhiCopies(InstJump, false_target, src_block);
+				}
 			}
 		});
 		AddAsmNode(std::move(captured));
@@ -762,32 +784,33 @@ namespace ola
 
 		if (!src_operands.empty())
 		{
-			std::unordered_set<MachineOperand> needs_staging_set;
 			std::unordered_set<MachineOperand> dst_set(dst_operands.begin(), dst_operands.end());
-
+			std::unordered_set<MachineOperand> needs_staging;
 			for (MachineOperand const& src_op : src_operands)
 			{
-				if (dst_set.contains(src_op)) needs_staging_set.insert(src_op);
+				if (dst_set.contains(src_op)) needs_staging.insert(src_op);
 			}
 
-			std::unordered_map<MachineOperand, MachineOperand> dirty_reg_map;
-			for (Int i = dst_operands.size() - 1; i >= 0; --i)
+			std::unordered_map<MachineOperand, MachineOperand> staged;
+			for (MachineOperand const& op : needs_staging)
 			{
-				MachineOperand src_arg;
-				if (auto iter = dirty_reg_map.find(src_operands[i]); iter != dirty_reg_map.end()) src_arg = iter->second;
-				else src_arg = src_operands[i];
+				MachineOperand temp = ctx.VirtualReg(op.GetType());
+				MachineInstruction stage_copy(InstMove);
+				stage_copy.SetOp<0>(temp).SetOp<1>(op);
+				ctx.EmitInst(stage_copy);
+				staged[op] = temp;
+			}
+
+			for (Uint32 i = 0; i < dst_operands.size(); ++i)
+			{
+				MachineOperand src_arg = src_operands[i];
+				if (auto it = staged.find(src_arg); it != staged.end())
+				{
+					src_arg = it->second;
+				}
 
 				MachineOperand const& dst_arg = dst_operands[i];
 				if (src_arg == dst_arg) continue;
-
-				if (needs_staging_set.count(dst_arg))
-				{
-					MachineOperand intermediate = ctx.VirtualReg(dst_arg.GetType());
-					MachineInstruction tmp_copy(InstMove);
-					tmp_copy.SetOp<0>(intermediate).SetOp<1>(dst_arg);
-					ctx.EmitInst(tmp_copy);
-					dirty_reg_map.emplace(dst_arg, intermediate);
-				}
 
 				MachineInstruction copy(InstMove);
 				copy.SetOp<0>(dst_arg).SetOp<1>(src_arg);

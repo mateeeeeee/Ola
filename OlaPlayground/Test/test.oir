@@ -1,45 +1,46 @@
 Module ID : test.ola
 
-define internal @test__I__I i64(i64 %x,i64 %y) {
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @TestDoWhileLoopWithMultipleVariables void() {
 entry:
 %0 = alloca i64
 %1 = alloca i64
-%2 = alloca i64
-%3 = add i64 %x, %y
-%4 = alloca i64
-%5 = alloca i64
-%6 = icmp sgt i64 %3, 0
-br i8 %6, label if.then, label if.else
-if.then:
-%7 = add i64 %x, %y
-%8 = alloca i64
-%9 = add i64 %7, %7
-br label if.end
-if.else:
-%10 = add i64 %x, %y
-%11 = alloca i64
-%12 = smul i64 %10, 3
-br label if.end
-if.end:
-%13 = phi i64 [ %12, if.else ], [ %9, if.then ]
-%14 = phi i64 [ %10, if.else ]
-%15 = phi i64 [ %7, if.then ]
-br label exit
-return:
+br label dowhile.body
+dowhile.body:
+%2 = phi i64 [ 1, entry ], [ %3, dowhile.cond ]
+%3 = phi i64 [ 1, entry ], [ %4, dowhile.cond ]
+%5 = phi i64 [ %2, dowhile.cond ]
+%6 = alloca i64
+%4 = add i64 %2, %3
+br label dowhile.cond
+dowhile.cond:
+%7 = icmp slt i64 %4, 10
+br i8 %7, label dowhile.body, label dowhile.end
+dowhile.end:
+%8 = icmp eq i64 %3, 8
+%9 = icmp eq i64 %4, 13
+%10 = and i8 %8, %9
+%11 = icmp ne i8 %10, 0
+call i8 %11, @Assert
 br label exit
 exit:
-ret i64 %13
+ret 
 }
 
 
 define external @main i64() {
 entry:
 %0 = alloca i64
-%1 = call i64 10, 20, @test__I__I
+call ptr @TestDoWhileLoopWithMultipleVariables
 br label exit
 return:
 br label exit
 exit:
-ret i64 %1
+ret i64 0
 }
 
