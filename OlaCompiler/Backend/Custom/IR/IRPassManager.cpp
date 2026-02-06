@@ -33,20 +33,6 @@ namespace ola
 	void IRPassManager::Run(OptimizationLevel level, IRPassOptions const& opts)
 	{
 		RegisterAnalysisPasses();
-
-		if(true)
-		{
-			FunctionPassManager FPM;
-			FPM.AddPass(CreateSROAPass());
-			FPM.AddPass(CreateMem2RegPass());
-			FPM.AddPass(CreateConstantPropagationPass());
-
-			IRModulePassManager MPM;
-			MPM.AddPass(CreateFunctionPassManagerModuleAdaptor(FPM, FAM));
-			IRModuleAnalysisManager MAM;
-			MPM.Run(M, MAM);
-		}
-
 		if (level >= OptimizationLevel::O1)
 		{
 			Uint32 const max_iterations = level >= OptimizationLevel::O2 ? 5 : 2;
