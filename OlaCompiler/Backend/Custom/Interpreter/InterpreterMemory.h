@@ -33,7 +33,6 @@ namespace ola
 		Float64 LoadFloat(Uint8* addr);
 		Uint8* LoadPointer(Uint8* addr);
 
-		void InitializeGlobals(IRModule& module);
 		Uint8* GetGlobalAddress(GlobalVariable* gv);
 		Uint8* AllocGlobal(GlobalVariable* gv, Uint32 size, Uint32 alignment);
 		Uint8* AllocString(std::string_view str);

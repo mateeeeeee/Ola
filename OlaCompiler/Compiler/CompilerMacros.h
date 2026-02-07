@@ -15,21 +15,25 @@
 #if !LLVM_BACKEND
 
 #ifdef DEBUG
-#define OLA(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm __VA_ARGS__))
-#define OLA_TEST(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm --interpret --timeout --test __VA_ARGS__))
 #else
-#define OLA(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm __VA_ARGS__))
-#define OLA_TEST(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm --interpret --timeout --test __VA_ARGS__))
 #endif
 
 #else
 
 #ifdef DEBUG
-#define OLA(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 __VA_ARGS__))
-#define OLA_TEST(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --interpret --timeout --test __VA_ARGS__))
 #else
-#define OLA(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 __VA_ARGS__))
-#define OLA_TEST(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --interpret --timeout --test __VA_ARGS__))
 #endif
 
 #endif

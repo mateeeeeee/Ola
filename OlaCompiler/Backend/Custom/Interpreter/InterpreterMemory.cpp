@@ -151,8 +151,4 @@ namespace ola
 		return addr >= heap_base && addr < heap_base + heap.size();
 	}
 
-	void InterpreterMemory::InitializeGlobals(IRModule& module)
-	{
-		OLA_TODO("Add later");
-	}
 }
