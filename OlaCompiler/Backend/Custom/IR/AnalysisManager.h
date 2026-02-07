@@ -46,7 +46,7 @@ namespace ola
 		}
 
 		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
-		auto const& GetResult(UnitT& U)
+		OLA_MAYBE_UNUSED auto const& GetResult(UnitT& U)
 		{
 			using ResultT = typename PassT::Result;
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];
@@ -65,7 +65,7 @@ namespace ola
 		}
 
 		template <typename PassT> requires std::is_base_of_v<Pass, PassT>
-		auto& GetMutableResult(UnitT& U)
+		OLA_MAYBE_UNUSED auto& GetMutableResult(UnitT& U)
 		{
 			using ResultT = typename PassT::Result;
 			UnitAnalysisInfo& analysis_info = unit_analysis_info_map[&U];

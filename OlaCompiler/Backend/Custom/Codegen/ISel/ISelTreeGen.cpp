@@ -441,30 +441,8 @@ namespace ola
 				test.SetOp<1>(cond_op);
 				ctx.EmitInst(test);
 
-				Bool true_has_phi_copies = false;
-				for (auto const& Phi : true_target->PhiInsts())
-				{
-					if (Phi->GetIncomingValueForBlock(src_block))
-					{
-						true_has_phi_copies = true;
-						break;
-					}
-				}
-
-				if (true_has_phi_copies)
-				{
-					OLA_TODO("this assumes false_target has no phis");
-					MachineOperand false_operand = MachineOperand::Relocable(ctx.GetBlock(false_target));
-					MachineInstruction jmp_false(InstJE);
-					jmp_false.SetOp<0>(false_operand);
-					ctx.EmitInst(jmp_false);
-					EmitJumpWithPhiCopies(InstJump, true_target, src_block);
-				}
-				else
-				{
-					EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
-					EmitJumpWithPhiCopies(InstJump, false_target, src_block);
-				}
+				EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
+				EmitJumpWithPhiCopies(InstJump, false_target, src_block);
 			}
 		});
 		AddAsmNode(std::move(captured));
