@@ -1588,10 +1588,6 @@ TEST(Sema, StaticFieldNotInStructLayout_Ok)
 	);
 }
 
-// ===========================================================================
-// Default parameter values
-// ===========================================================================
-
 TEST(Sema, DefaultParam_Ok)
 {
 	EXPECT_SEMA_OK("int foo(int a, int b = 10) { return a + b; }");
