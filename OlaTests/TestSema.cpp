@@ -1587,3 +1587,80 @@ TEST(Sema, StaticFieldNotInStructLayout_Ok)
 		"void foo() { C c; }"
 	);
 }
+
+// ===========================================================================
+// Default parameter values
+// ===========================================================================
+
+TEST(Sema, DefaultParam_Ok)
+{
+	EXPECT_SEMA_OK("int foo(int a, int b = 10) { return a + b; }");
+}
+
+TEST(Sema, DefaultParamMultiple_Ok)
+{
+	EXPECT_SEMA_OK("int foo(int a, int b = 1, int c = 2) { return a + b + c; }");
+}
+
+TEST(Sema, DefaultParamAllDefaults_Ok)
+{
+	EXPECT_SEMA_OK("int foo(int a = 1, int b = 2) { return a + b; }");
+}
+
+TEST(Sema, DefaultParamNotTrailing_Error)
+{
+	EXPECT_SEMA_ERROR("int foo(int a = 1, int b) { return a + b; }");
+}
+
+TEST(Sema, DefaultParamCallFewerArgs_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int foo(int a, int b = 10) { return a + b; }"
+		"void bar() { foo(5); }"
+	);
+}
+
+TEST(Sema, DefaultParamCallAllArgs_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int foo(int a, int b = 10) { return a + b; }"
+		"void bar() { foo(5, 20); }"
+	);
+}
+
+TEST(Sema, DefaultParamCallTooFewArgs_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"int foo(int a, int b = 10) { return a + b; }"
+		"void bar() { foo(); }"
+	);
+}
+
+TEST(Sema, DefaultParamMethod_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  public int Add(int a, int b = 0) { return a + b; }"
+		"};"
+		"void foo() { C c; c.Add(5); }"
+	);
+}
+
+TEST(Sema, DefaultParamConstructor_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  C(int x = 0) { this.val = x; }"
+		"  public int val;"
+		"};"
+		"void foo() { C c1; C c2(42); }"
+	);
+}
+
+TEST(Sema, DefaultParamNotConstexpr_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"int g() { return 5; }"
+		"int foo(int a, int b = g()) { return a + b; }"
+	);
+}
