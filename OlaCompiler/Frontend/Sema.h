@@ -63,7 +63,7 @@ namespace ola
 
 		UniqueVarDeclPtr		ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
 		UniqueFieldDeclPtr		ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility, Bool is_static = false);
-		UniqueParamVarDeclPtr	ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
+		UniqueParamVarDeclPtr	ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& default_expr = nullptr);
 
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
 												UniqueParamVarDeclPtrList&& param_decls, DeclVisibility visibility, FuncAttributes attributes);
@@ -146,6 +146,10 @@ namespace ola
 
 		template<typename DeclT> requires std::is_base_of_v<FunctionDecl, DeclT>
 		std::vector<DeclT const*> ResolveCall(std::vector<DeclT const*> const& candidate_decls, UniqueExprPtrList& args);
+
+		void ValidateDefaultParams(UniqueParamVarDeclPtrList const& param_decls, SourceLocation const& loc);
+		void FillDefaultArgs(FunctionDecl const* decl, UniqueExprPtrList& args, SourceLocation const& loc);
+		static UniqueExprPtr CloneConstExpr(Expr const* expr);
 	};
 
 

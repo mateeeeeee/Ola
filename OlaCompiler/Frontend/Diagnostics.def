@@ -120,4 +120,6 @@ DIAG(super_in_static_method, error, "Cannot use 'super' in a static method")
 DIAG(instance_member_in_static, error, "Cannot access instance member '{}' from a static context")
 DIAG(static_constructor, error, "Constructors cannot be static")
 DIAG(static_outside_class, error, "'static' can only be used on class fields and methods")
+DIAG(default_param_not_trailing, error, "Parameter without default value follows parameter with default value")
+DIAG(default_param_not_constexpr, error, "Default parameter value must be a constant expression")
 #undef DIAG
