@@ -1,0 +1,97 @@
+import std.assert;
+
+int Add(int a, int b = 0)
+{
+    return a + b;
+}
+
+int AddThree(int a, int b = 10, int c = 20)
+{
+    return a + b + c;
+}
+
+int AllDefaults(int a = 1, int b = 2)
+{
+    return a + b;
+}
+
+float FloatDefault(float a, float b = 1.5)
+{
+    return a + b;
+}
+
+bool BoolDefault(bool a, bool b = true)
+{
+    if (a && b) return true;
+    return false;
+}
+
+char CharDefault(char c = 'x')
+{
+    return c;
+}
+
+class Vec
+{
+    Vec(int x = 0, int y = 0)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int GetX() const { return x; }
+    public int GetY() const { return y; }
+
+    public int Add(int a, int b = 0) { return x + y + a + b; }
+
+    int x;
+    int y;
+};
+
+public int main()
+{
+    // Free function with one default, called with and without optional arg
+    Assert(Add(5) == 5);
+    Assert(Add(5, 3) == 8);
+
+    // Multiple defaults, omitting 1, 2, or none
+    Assert(AddThree(1) == 31);
+    Assert(AddThree(1, 2) == 23);
+    Assert(AddThree(1, 2, 3) == 6);
+
+    // All params have defaults
+    Assert(AllDefaults() == 3);
+    Assert(AllDefaults(10) == 12);
+    Assert(AllDefaults(10, 20) == 30);
+
+    // Float default
+    Assert(FloatDefault(2.5) == 4.0);
+    Assert(FloatDefault(2.5, 3.5) == 6.0);
+
+    // Bool default
+    Assert(BoolDefault(true) == true);
+    Assert(BoolDefault(true, false) == false);
+
+    // Char default
+    Assert(CharDefault() == 'x');
+    Assert(CharDefault('a') == 'a');
+
+    // Constructor with defaults
+    Vec v1;
+    Assert(v1.GetX() == 0);
+    Assert(v1.GetY() == 0);
+
+    Vec v2(5);
+    Assert(v2.GetX() == 5);
+    Assert(v2.GetY() == 0);
+
+    Vec v3(5, 10);
+    Assert(v3.GetX() == 5);
+    Assert(v3.GetY() == 10);
+
+    // Method with defaults
+    Assert(v3.Add(1) == 16);
+    Assert(v3.Add(1, 2) == 18);
+
+    return 0;
+}
