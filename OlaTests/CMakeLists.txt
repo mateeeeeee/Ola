@@ -60,6 +60,7 @@ set(OLA_TESTS
 	Tests/test_recursion.ola
 	Tests/test_scope.ola
 	Tests/test_static.ola
+	Tests/test_default_params.ola
 )
 
 add_executable(OlaTests ${SOURCE})
