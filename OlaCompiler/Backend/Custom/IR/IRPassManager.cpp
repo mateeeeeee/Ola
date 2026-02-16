@@ -24,6 +24,7 @@
 #include "Passes/DevirtualizationPass.h"
 #include "Passes/SROAPass.h"
 #include "Passes/AliasAnalysisPass.h"
+#include "Passes/TailRecursionEliminationPass.h"
 
 namespace ola
 {
@@ -113,6 +114,7 @@ namespace ola
 	void IRPassManager::RunLateOptimizationPipeline()
 	{
 		FunctionPassManager FPM;
+		FPM.AddPass(CreateTailRecursionEliminationPass());
 		FPM.AddPass(CreateDCEPass());
 		FPM.AddPass(CreateSimplifyCFGPass());
 		FPM.AddPass(CreateDCEPass());

@@ -206,6 +206,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/SROAPass.cpp
   Backend/Custom/IR/Passes/AliasAnalysisPass.h
   Backend/Custom/IR/Passes/AliasAnalysisPass.cpp
+  Backend/Custom/IR/Passes/TailRecursionEliminationPass.h
+  Backend/Custom/IR/Passes/TailRecursionEliminationPass.cpp
   Backend/Custom/IR/CallGraph.h
   Backend/Custom/IR/CallGraph.cpp
   Backend/Custom/Codegen/MachineOperand.h

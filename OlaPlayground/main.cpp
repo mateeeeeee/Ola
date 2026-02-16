@@ -8,7 +8,7 @@
 using namespace ola;
 
 static constexpr Char const* BACKEND = "--nollvm";
-static constexpr Char const* OPT_LEVEL = "--O0";
+static constexpr Char const* OPT_LEVEL = "--O3";
 static constexpr Char const* TARGET = "arm64";
 static constexpr Char const* INTERPRET = "--interpret";
 
@@ -16,7 +16,7 @@ Int main()
 {
 	OLA_LOG_INIT();
 	CompileRequest compile_request{};
-	Char const* argv[] = { "-i", "test", "--target", TARGET, OPT_LEVEL, BACKEND, INTERPRET, "--emit-asm", "--emit-ir","--emit-mir", "--directory", OLA_PLAYGROUND_PATH"Test"};
+	Char const* argv[] = { "-i", "test", "--target", TARGET, OPT_LEVEL, BACKEND, "--emit-asm", "--emit-ir","--emit-mir", "--directory", OLA_PLAYGROUND_PATH"Test"};
 	if (compile_request.Parse(OLA_ARRAYSIZE(argv), const_cast<Char**>(argv)))
 	{
 		Int compile_result = Compile(compile_request);

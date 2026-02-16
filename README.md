@@ -29,8 +29,8 @@ Toy compiler with both LLVM backend and a custom backend.
   * LLVM backend
   * Custom backend
     - Custom IR
-    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, CP and IPCP, LICM, Loop Unroll, DCE, Global DCE, SROA, Devirtualization
-        - Analysis passes: CFG, Loop, Alias, Dominator Tree, Dominator Frontier, Call Graph
+    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, CP and IPCP, LICM, Loop Unroll, DCE, Global DCE, SROA, Devirtualization, Tail Recursion Elimination
+      - Analysis passes: CFG, Loop, Alias, Dominator Tree, Dominator Frontier, Call Graph
     - Custom MIR
 	  - Instruction Selection: Tree pattern matching ISel (with legacy fallback)
       - Legalization: Automated instruction lowering and legalization

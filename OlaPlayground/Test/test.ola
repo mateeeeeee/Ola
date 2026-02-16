@@ -1,10 +1,19 @@
-import std.assert;
+noinline int factorial_helper(int n, int acc)
+{
+    if(n <= 1)
+    {
+        return acc;
+    }
+    return factorial_helper(n - 1, n * acc);
+}
 
-int c = 10;
+noinline int factorial(int n)
+{
+    return factorial_helper(n, 1);
+}
 
 public int main()
 {
-    int a = 25 + 10;
-    int b = a + 5;
-    return b + c;
+    int result = factorial(5);
+    return result;
 }
