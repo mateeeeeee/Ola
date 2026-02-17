@@ -10,6 +10,8 @@
 
 namespace ola
 {
+	static constexpr std::string_view VTABLE_PREFIX = "VTable_";
+
 	LLVMIRVisitor::LLVMIRVisitor(llvm::LLVMContext& context, llvm::Module& module)
 		: context(context), module(module), builder(context)
 	{
