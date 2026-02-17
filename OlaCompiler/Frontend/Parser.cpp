@@ -123,6 +123,12 @@ namespace ola
 				visibility = DeclVisibility::Private;
 			}
 
+			if (current_token->Is(TokenKind::KW_static))
+			{
+				Diag(static_outside_class);
+				return global_decl_list;
+			}
+
 			if (Consume(TokenKind::KW_class))
 			{
 				UniqueDeclPtr class_decl = ParseClassDeclaration();
@@ -452,6 +458,8 @@ namespace ola
 			visibility = DeclVisibility::Private;
 		}
 
+		Bool is_static = Consume(TokenKind::KW_static);
+
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
 		QualType function_type{};
@@ -503,6 +511,10 @@ namespace ola
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			ParseMethodAttributes(method_attrs);
+			if (is_static)
+			{
+				method_attrs |= MethodAttribute_Static;
+			}
 			if (mode == MethodParseMode::Declarations)
 			{
 				if (!Consume(TokenKind::semicolon))
@@ -523,13 +535,15 @@ namespace ola
 					}
 				}
 			}
-			else 
+			else
 			{
 				if (!Consume(TokenKind::semicolon))
 				{
 					sema->sema_ctx.current_func = &function_type;
 					sema->sema_ctx.is_method_const = HasAttribute(method_attrs, MethodAttribute_Const);
+					sema->sema_ctx.is_static_method = is_static;
 					function_body = ParseCompoundStatement();
+					sema->sema_ctx.is_static_method = false;
 					sema->sema_ctx.is_method_const = false;
 					sema->sema_ctx.current_func = nullptr;
 				}
@@ -718,6 +732,8 @@ namespace ola
 			visibility = DeclVisibility::Private;
 		}
 
+		Bool is_static = Consume(TokenKind::KW_static);
+
 		UniqueFieldDeclPtrList member_var_decl_list;
 		QualType variable_type{};
 		ParseTypeQualifier(variable_type);
@@ -746,8 +762,8 @@ namespace ola
 			}
 			if (first_pass)
 			{
-				UniqueFieldDeclPtr var_decl = sema->ActOnFieldDecl(name, loc, variable_type, std::move(init_expr), visibility);
-				if (var_decl) 
+				UniqueFieldDeclPtr var_decl = sema->ActOnFieldDecl(name, loc, variable_type, std::move(init_expr), visibility, is_static);
+				if (var_decl)
 				{
 					member_var_decl_list.push_back(std::move(var_decl));
 				}
@@ -963,6 +979,8 @@ namespace ola
 
 		UniqueFieldDeclPtrList member_variables;
 		UniqueMethodDeclPtrList member_functions;
+		UniqueFieldDeclPtrList static_member_variables;
+		UniqueMethodDeclPtrList static_member_functions;
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
@@ -977,13 +995,17 @@ namespace ola
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
-							if (current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
+							Bool next_is_static = current_token->Is(TokenKind::KW_static)
+								|| ((current_token->Is(TokenKind::KW_public) || current_token->Is(TokenKind::KW_private))
+									&& (current_token + 1)->Is(TokenKind::KW_static));
+
+							if (!next_is_static && current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
 							{
 								if (mode == MethodParseMode::Declarations)
 								{
 									UniqueConstructorDeclPtr stub = ParseConstructorDefinition(MethodParseMode::Declarations);
 									body_stubs.push_back(stub.get());
-									if (stub) 
+									if (stub)
 									{
 										member_functions.push_back(std::move(stub));
 									}
@@ -1003,9 +1025,16 @@ namespace ola
 								{
 									UniqueMethodDeclPtr stub = ParseMethodDefinition(MethodParseMode::Declarations);
 									body_stubs.push_back(stub.get());
-									if (stub) 
+									if (stub)
 									{
-										member_functions.push_back(std::move(stub));
+										if (stub->IsStatic())
+										{
+											static_member_functions.push_back(std::move(stub));
+										}
+										else
+										{
+											member_functions.push_back(std::move(stub));
+										}
 									}
 								}
 								else
@@ -1023,7 +1052,14 @@ namespace ola
 									{
 										if (var_decl)
 										{
-											member_variables.push_back(std::move(var_decl));
+											if (var_decl->IsStatic())
+											{
+												static_member_variables.push_back(std::move(var_decl));
+											}
+											else
+											{
+												member_variables.push_back(std::move(var_decl));
+											}
 										}
 									}
 								}
@@ -1040,7 +1076,8 @@ namespace ola
 			sema->sema_ctx.current_class_name = "";
 			sema->sema_ctx.current_base_class = nullptr;
 		}
-		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions), final);
+		return sema->ActOnClassDecl(class_name, base_class, loc, std::move(member_variables), std::move(member_functions),
+			std::move(static_member_variables), std::move(static_member_functions), final);
 	}
 
 	UniqueClassDeclPtr Parser::ParseInterfaceDeclaration()
@@ -1089,7 +1126,8 @@ namespace ola
 			sema->sema_ctx.current_class_name = "";
 			sema->sema_ctx.current_base_class = nullptr;
 		}
-		return sema->ActOnClassDecl(class_name, nullptr, loc, std::move(member_variables), std::move(member_functions), false);
+		return sema->ActOnClassDecl(class_name, nullptr, loc, std::move(member_variables), std::move(member_functions),
+			{}, {}, false);
 	}
 
 	ClassDecl* Parser::ParseTemplateInstantiation(TemplateClassDecl* tmpl, SourceLocation const& loc)
@@ -1140,6 +1178,8 @@ namespace ola
 
 		UniqueFieldDeclPtrList member_variables;
 		UniqueMethodDeclPtrList member_functions;
+		UniqueFieldDeclPtrList static_member_variables;
+		UniqueMethodDeclPtrList static_member_functions;
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
@@ -1168,13 +1208,17 @@ namespace ola
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
-							if (current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
+							Bool next_is_static = current_token->Is(TokenKind::KW_static)
+								|| ((current_token->Is(TokenKind::KW_public) || current_token->Is(TokenKind::KW_private))
+									&& (current_token + 1)->Is(TokenKind::KW_static));
+
+							if (!next_is_static && current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
 							{
 								if (mode == MethodParseMode::Declarations)
 								{
 									UniqueConstructorDeclPtr stub = ParseConstructorDefinition(MethodParseMode::Declarations);
 									body_stubs.push_back(stub.get());
-									if (stub) 
+									if (stub)
 									{
 										member_functions.push_back(std::move(stub));
 									}
@@ -1194,9 +1238,16 @@ namespace ola
 								{
 									UniqueMethodDeclPtr stub = ParseMethodDefinition(MethodParseMode::Declarations);
 									body_stubs.push_back(stub.get());
-									if (stub) 
+									if (stub)
 									{
-										member_functions.push_back(std::move(stub));
+										if (stub->IsStatic())
+										{
+											static_member_functions.push_back(std::move(stub));
+										}
+										else
+										{
+											member_functions.push_back(std::move(stub));
+										}
 									}
 								}
 								else
@@ -1214,7 +1265,14 @@ namespace ola
 									{
 										if (var_decl)
 										{
-											member_variables.push_back(std::move(var_decl));
+											if (var_decl->IsStatic())
+											{
+												static_member_variables.push_back(std::move(var_decl));
+											}
+											else
+											{
+												member_variables.push_back(std::move(var_decl));
+											}
 										}
 									}
 								}
@@ -1239,6 +1297,8 @@ namespace ola
 
 		raw_result->SetFields(std::move(member_variables));
 		raw_result->SetMethods(std::move(member_functions));
+		raw_result->SetStaticFields(std::move(static_member_variables));
+		raw_result->SetStaticMethods(std::move(static_member_functions));
 		raw_result->SetFinal(tmpl->IsFinal());
 
 		MethodDecl const* error_decl = nullptr;
@@ -2615,6 +2675,7 @@ namespace ola
 		TokenPtr token = current_token;
 
 		Consume(TokenKind::KW_public, TokenKind::KW_private);
+		Consume(TokenKind::KW_static);
 		if (Consume(TokenKind::KW_inline))
 		{
 			current_token = token;

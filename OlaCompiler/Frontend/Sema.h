@@ -37,6 +37,7 @@ namespace ola
 
 			std::vector<Expr const*> current_class_expr_stack;
 			Bool is_method_const = false;
+			Bool is_static_method = false;
 			Bool is_constructor = false;
 			ClassDecl const* current_base_class = nullptr;
 			std::string current_class_name;
@@ -61,7 +62,7 @@ namespace ola
 	private:
 
 		UniqueVarDeclPtr		ActOnVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
-		UniqueFieldDeclPtr		ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility);
+		UniqueFieldDeclPtr		ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility, Bool is_static = false);
 		UniqueParamVarDeclPtr	ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type);
 
 		UniqueFunctionDeclPtr ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type, 
@@ -82,7 +83,9 @@ namespace ola
 
 		ClassDecl const* ActOnBaseClassSpecifier(std::string_view base_name, SourceLocation const& loc);
 		UniqueClassDeclPtr ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc,
-										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, Bool final);
+										  UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions,
+										  UniqueFieldDeclPtrList&& static_fields, UniqueMethodDeclPtrList&& static_methods,
+										  Bool final);
 		UniqueTemplateClassDeclPtr ActOnTemplateClassDecl(std::string_view name, SourceLocation const& loc,
 			std::vector<std::string>&& type_params, ClassDecl const* base_class, Bool final,
 			Uint64 body_begin, Uint64 body_end);
