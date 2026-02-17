@@ -143,6 +143,9 @@ namespace ola
 		}
 		Uint32 GetFieldIndex() const { return index; }
 
+		void SetStatic(Bool _static) { is_static = _static; }
+		Bool IsStatic() const { return is_static; }
+
 		virtual Bool IsMember() const override { return true; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
@@ -152,6 +155,7 @@ namespace ola
 	private:
 		ClassDecl const* parent = nullptr;
 		Uint32 index = -1;
+		Bool is_static = false;
 	};
 
 	inline Bool HasAttribute(Uint8 attrs, Uint8 attr)
@@ -244,6 +248,7 @@ namespace ola
 		MethodAttribute_Virtual = 0x02,
 		MethodAttribute_Pure = 0x04,
 		MethodAttribute_Final = 0x08,
+		MethodAttribute_Static = 0x10,
 	};
 	using MethodAttributes = Uint8;
 
@@ -270,6 +275,7 @@ namespace ola
 		Bool IsPure() const { return HasMethodAttribute(MethodAttribute_Pure); }
 		Bool IsFinal() const { return HasMethodAttribute(MethodAttribute_Final); }
 		Bool IsConst() const { return HasMethodAttribute(MethodAttribute_Const); }
+		Bool IsStatic() const { return HasMethodAttribute(MethodAttribute_Static); }
 
 		void SetVTableIndex(Uint32 i) const { vtable_index = i; }
 		Uint32 GetVTableIndex() const { return vtable_index; }
@@ -403,6 +409,10 @@ namespace ola
 		UniqueFieldDeclPtrList const& GetFields() const { return fields; }
 		void SetMethods(UniqueMethodDeclPtrList&& _methods);
 		UniqueMethodDeclPtrList const& GetMethods() const { return methods; }
+		void SetStaticFields(UniqueFieldDeclPtrList&& _static_fields);
+		UniqueFieldDeclPtrList const& GetStaticFields() const { return static_fields; }
+		void SetStaticMethods(UniqueMethodDeclPtrList&& _static_methods);
+		UniqueMethodDeclPtrList const& GetStaticMethods() const { return static_methods; }
 		void SetBaseClass(ClassDecl const* _base_class) 
 		{ 
 			base_class  = _base_class;
@@ -412,6 +422,8 @@ namespace ola
 		std::vector<ConstructorDecl const*> FindConstructors() const;
 		std::vector<MethodDecl const*> FindMethodDecls(std::string_view name) const;
 		FieldDecl* FindFieldDecl(std::string_view name) const;
+		FieldDecl* FindStaticFieldDecl(std::string_view name) const;
+		std::vector<MethodDecl const*> FindStaticMethodDecls(std::string_view name) const;
 
 		Uint64 GetFieldCount() const
 		{
@@ -450,6 +462,8 @@ namespace ola
 		ClassDecl const* base_class = nullptr;
 		UniqueFieldDeclPtrList fields;
 		UniqueMethodDeclPtrList methods;
+		UniqueFieldDeclPtrList static_fields;
+		UniqueMethodDeclPtrList static_methods;
 		std::vector<MethodDecl const*> vtable;
 		Bool abstract = false;
 		Bool polymorphic = false;

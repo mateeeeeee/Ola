@@ -113,4 +113,11 @@ DIAG(template_arg_missing, error, "Class template '{}' requires template argumen
 DIAG(non_template_with_args, error, "'{}' is not a class template")
 DIAG(empty_enum_declaration, error, "Enum declaration cannot be empty, at least one enumerator is required")
 DIAG(method_attr_before_return_type, error, "Method attributes (virtual, pure, final, const) must appear after the parameter list, not before the return type")
+DIAG(static_method_cannot_be_virtual, error, "Static method cannot be virtual")
+DIAG(static_method_cannot_be_const, error, "Static method cannot be const")
+DIAG(this_in_static_method, error, "Cannot use 'this' in a static method")
+DIAG(super_in_static_method, error, "Cannot use 'super' in a static method")
+DIAG(instance_member_in_static, error, "Cannot access instance member '{}' from a static context")
+DIAG(static_constructor, error, "Constructors cannot be static")
+DIAG(static_outside_class, error, "'static' can only be used on class fields and methods")
 #undef DIAG
