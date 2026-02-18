@@ -323,6 +323,7 @@ namespace ola
 			case DeclKind::Alias:
 			case DeclKind::Class:
 			case DeclKind::Enum:
+			case DeclKind::TemplateClass:
 				return true;
 			}
 			return false;
