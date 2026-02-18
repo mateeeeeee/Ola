@@ -1,5 +1,5 @@
 #pragma once
-#include "ISelLegacy.h"
+#include "ISelLowering.h"
 #include "ISelTreeGen.h"
 #include "ISelTreeMerge.h"
 #include "ISelTiler.h"
@@ -19,7 +19,7 @@ namespace ola
 	class ISelDriver
 	{
 	public:
-		explicit ISelDriver(MachineContext& ctx, Target const& target, ISelMode mode = ISelMode::TreePattern);
+		ISelDriver(MachineContext& ctx, Target const& target, ISelMode mode = ISelMode::TreePattern);
 
 		void SelectBasicBlock(BasicBlock& BB);
 		ISelMode GetMode() const { return mode; }
@@ -29,7 +29,7 @@ namespace ola
 		Target const& target;
 		ISelMode mode;
 
-		ISelLegacy legacy;
+		ISelLowering lowering;
 		ISelTreeGen tree_gen;
 		ISelTreeMerge tree_merge;
 		ISelTiler tiler;

@@ -12,8 +12,8 @@ namespace ola
 		: ctx(ctx)
 		, target(target)
 		, mode(mode)
-		, legacy(ctx, target)
-		, tree_gen(ctx)
+		, lowering(ctx, target)
+		, tree_gen(ctx, lowering)
 		, tiler(target.GetArch())
 	{
 		RegisterTiles();
@@ -40,7 +40,7 @@ namespace ola
 	{
 		if (mode == ISelMode::Legacy)
 		{
-			legacy.SelectBasicBlock(BB);
+			lowering.SelectBasicBlock(BB);
 			return;
 		}
 

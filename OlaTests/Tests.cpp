@@ -1,8 +1,7 @@
 #include "gtest/gtest.h"
 #define LLVM_BACKEND 0
-#include "Compiler/CompilerMacros.h"
-
 #define USE_INTERPRETER 0
+#include "Compiler/CompilerMacros.h"
 
 #if USE_INTERPRETER
 #define RUN_TEST OLA_TEST_INTERPRET

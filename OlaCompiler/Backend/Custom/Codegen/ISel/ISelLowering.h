@@ -20,10 +20,14 @@ namespace ola
 	class SwitchInst;
 	class SelectInst;
 
-	class ISelLegacy
+	class ISelTreeGen;
+
+	class ISelLowering
 	{
+		friend class ISelTreeGen;
+
 	public:
-		explicit ISelLegacy(MachineContext& ctx, Target const& target);
+		explicit ISelLowering(MachineContext& ctx, Target const& target);
 		void SelectBasicBlock(BasicBlock& BB);
 
 	private:

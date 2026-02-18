@@ -1,5 +1,3 @@
-#include <unordered_set>
-#include <unordered_map>
 #include "ISelTreeGen.h"
 #include "Backend/Custom/IR/BasicBlock.h"
 #include "Backend/Custom/IR/GlobalValue.h"
@@ -16,8 +14,9 @@
 
 namespace ola
 {
-	ISelTreeGen::ISelTreeGen(MachineContext& ctx)
+	ISelTreeGen::ISelTreeGen(MachineContext& ctx, ISelLowering& lowering)
 		: ctx(ctx)
+		, lowering(lowering)
 	{
 	}
 
@@ -294,42 +293,7 @@ namespace ola
 		IRType* load_type = I.GetType();
 		if (load_type->IsStruct())
 		{
-			auto captured = CaptureEmittedInstructions([&]()
-			{
-				MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
-				Uint32 struct_size = load_type->GetSize();
-
-				MachineOperand dst_slot = MF->AllocateLocalStack(struct_size);
-				MachineOperand src_addr = ctx.GetOperand(I.GetAddressOp());
-				MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
-				if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
-				{
-					MachineInstruction load_addr(InstLoadGlobalAddress);
-					load_addr.SetOp<0>(src_reg);
-					load_addr.SetOp<1>(src_addr);
-					ctx.EmitInst(load_addr);
-				}
-				else
-				{
-					MachineInstruction move(InstMove);
-					move.SetOp<0>(src_reg);
-					move.SetOp<1>(src_addr);
-					ctx.EmitInst(move);
-				}
-
-				MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
-				MachineInstruction load_dst(InstLoadGlobalAddress);
-				load_dst.SetOp<0>(dst_reg);
-				load_dst.SetOp<1>(dst_slot);
-				ctx.EmitInst(load_dst);
-
-				MachineInstruction memcpy(InstMemCpy);
-				memcpy.SetOp<0>(dst_reg);
-				memcpy.SetOp<1>(src_reg);
-				memcpy.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64));
-				ctx.EmitInst(memcpy);
-				ctx.MapOperand(&I, dst_reg);
-			});
+			auto captured = CaptureEmittedInstructions([&]() { lowering.LowerLoad(&I); });
 			AddAsmNode(std::move(captured));
 			return;
 		}
@@ -358,49 +322,7 @@ namespace ola
 
 		if (value_type->IsStruct())
 		{
-			auto captured = CaptureEmittedInstructions([&]()
-			{
-				Uint32 struct_size = value_type->GetSize();
-				MachineOperand src_addr = ctx.GetOperand(I.GetValueOp());
-				MachineOperand dst_addr = ctx.GetOperand(I.GetAddressOp());
-				MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
-				if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())
-				{
-					MachineInstruction load_addr(InstLoadGlobalAddress);
-					load_addr.SetOp<0>(src_reg);
-					load_addr.SetOp<1>(src_addr);
-					ctx.EmitInst(load_addr);
-				}
-				else
-				{
-					MachineInstruction move(InstMove);
-					move.SetOp<0>(src_reg);
-					move.SetOp<1>(src_addr);
-					ctx.EmitInst(move);
-				}
-
-				MachineOperand dst_reg = ctx.VirtualReg(MachineType::Ptr);
-				if (dst_addr.IsStackObject() || dst_addr.IsMemoryOperand())
-				{
-					MachineInstruction load_addr(InstLoadGlobalAddress);
-					load_addr.SetOp<0>(dst_reg);
-					load_addr.SetOp<1>(dst_addr);
-					ctx.EmitInst(load_addr);
-				}
-				else
-				{
-					MachineInstruction move(InstMove);
-					move.SetOp<0>(dst_reg);
-					move.SetOp<1>(dst_addr);
-					ctx.EmitInst(move);
-				}
-
-				MachineInstruction memcpy(InstMemCpy);
-				memcpy.SetOp<0>(dst_reg);
-				memcpy.SetOp<1>(src_reg);
-				memcpy.SetOp<2>(MachineOperand::Immediate(struct_size, MachineType::Int64));
-				ctx.EmitInst(memcpy);
-			});
+			auto captured = CaptureEmittedInstructions([&]() { lowering.LowerStore(&I); });
 			AddAsmNode(std::move(captured));
 			return;
 		}
@@ -420,91 +342,26 @@ namespace ola
 
 	void ISelTreeGen::ProcessBranchInst(BranchInst& I)
 	{
-		auto captured = CaptureEmittedInstructions([&]()
-		{
-			BasicBlock* src_block = I.GetBasicBlock();
-
-			if (I.IsUnconditional())
-			{
-				BasicBlock* target = I.GetTrueTarget();
-				EmitJumpWithPhiCopies(InstJump, target, src_block);
-			}
-			else
-			{
-				BasicBlock* true_target = I.GetTrueTarget();
-				BasicBlock* false_target = I.GetFalseTarget();
-
-				MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
-
-				MachineInstruction test(InstTest);
-				test.SetOp<0>(cond_op);
-				test.SetOp<1>(cond_op);
-				ctx.EmitInst(test);
-
-				EmitJumpWithPhiCopies(InstJNE, true_target, src_block);
-				EmitJumpWithPhiCopies(InstJump, false_target, src_block);
-			}
-		});
+		auto captured = CaptureEmittedInstructions([&]() { lowering.LowerBranch(&I); });
 		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessReturnInst(ReturnInst& I)
 	{
-		auto captured = CaptureEmittedInstructions([&]()
-		{
-			Target const& target = ctx.GetModule().GetTarget();
-			target.GetFrameInfo().EmitReturn(&I, ctx);
-		});
+		auto captured = CaptureEmittedInstructions([&]() { lowering.LowerRet(&I); });
 		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessSwitchInst(SwitchInst& I)
 	{
 		if (I.GetNumCases() == 0) return;
-
-		auto captured = CaptureEmittedInstructions([&]()
-		{
-			BasicBlock* src_block = I.GetBasicBlock();
-			MachineOperand cond_op = ctx.GetOperand(I.GetCondition());
-
-			for (auto const& case_val : I.Cases())
-			{
-				BasicBlock* case_block = case_val.GetCaseBlock();
-
-				if (!cond_op.IsImmediate())
-				{
-					MachineInstruction cmp(InstICmp);
-					cmp.SetOp<0>(cond_op);
-					cmp.SetOp<1>(MachineOperand::Immediate(case_val.GetCaseValue(), cond_op.GetType()));
-					ctx.EmitInst(cmp);
-
-					EmitJumpWithPhiCopies(InstJE, case_block, src_block);
-				}
-				else
-				{
-					Int64 imm = cond_op.GetImmediate();
-					if (imm == case_val.GetCaseValue())
-					{
-						EmitJumpWithPhiCopies(InstJump, case_block, src_block);
-					}
-				}
-			}
-
-			if (BasicBlock* default_block = I.GetDefaultCase())
-			{
-				EmitJumpWithPhiCopies(InstJump, default_block, src_block);
-			}
-		});
+		auto captured = CaptureEmittedInstructions([&]() { lowering.LowerSwitch(&I); });
 		AddAsmNode(std::move(captured));
 	}
 
 	void ISelTreeGen::ProcessCallInst(CallInst& I)
 	{
-		auto captured = CaptureEmittedInstructions([&]()
-		{
-			Target const& target = ctx.GetModule().GetTarget();
-			target.GetFrameInfo().EmitCall(&I, ctx);
-		});
+		auto captured = CaptureEmittedInstructions([&]() { lowering.LowerCall(&I); });
 		AddAsmNode(std::move(captured));
 	}
 
@@ -741,65 +598,7 @@ namespace ola
 	void ISelTreeGen::ProcessPhiInst(PhiInst& I)
 	{
 		// PHI operands are pre-mapped before ISel runs in MachineModule::LowerFunction
-		// PHI copies are handled at branches via EmitJumpWithPhiCopies
-	}
-
-	void ISelTreeGen::EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
-	{
-		OLA_ASSERT(jump_opcode >= InstJump && jump_opcode <= InstJNE);
-
-		std::vector<MachineOperand> dst_operands;
-		std::vector<MachineOperand> src_operands;
-		for (auto const& Phi : dst->PhiInsts())
-		{
-			Value* V = Phi->GetIncomingValueForBlock(src);
-			if (V)
-			{
-				src_operands.push_back(ctx.GetOperand(V));
-				dst_operands.push_back(ctx.GetOperand(Phi));
-			}
-		}
-
-		if (!src_operands.empty())
-		{
-			std::unordered_set<MachineOperand> dst_set(dst_operands.begin(), dst_operands.end());
-			std::unordered_set<MachineOperand> needs_staging;
-			for (MachineOperand const& src_op : src_operands)
-			{
-				if (dst_set.contains(src_op)) needs_staging.insert(src_op);
-			}
-
-			std::unordered_map<MachineOperand, MachineOperand> staged;
-			for (MachineOperand const& op : needs_staging)
-			{
-				MachineOperand temp = ctx.VirtualReg(op.GetType());
-				MachineInstruction stage_copy(InstMove);
-				stage_copy.SetOp<0>(temp).SetOp<1>(op);
-				ctx.EmitInst(stage_copy);
-				staged[op] = temp;
-			}
-
-			for (Uint32 i = 0; i < dst_operands.size(); ++i)
-			{
-				MachineOperand src_arg = src_operands[i];
-				if (auto it = staged.find(src_arg); it != staged.end())
-				{
-					src_arg = it->second;
-				}
-
-				MachineOperand const& dst_arg = dst_operands[i];
-				if (src_arg == dst_arg) continue;
-
-				MachineInstruction copy(InstMove);
-				copy.SetOp<0>(dst_arg).SetOp<1>(src_arg);
-				ctx.EmitInst(copy);
-			}
-		}
-
-		MachineOperand dst_operand = MachineOperand::Relocable(ctx.GetBlock(dst));
-		MachineInstruction MI(jump_opcode);
-		MI.SetOp<0>(dst_operand);
-		ctx.EmitInst(MI);
+		// PHI copies are handled at branches via ISelLowering::EmitJump
 	}
 
 	void ISelTreeGen::AddAsmNode(std::vector<MachineInstruction> instructions)

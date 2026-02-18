@@ -1,4 +1,4 @@
-#include "ISelLegacy.h"
+#include "ISelLowering.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/IR/BasicBlock.h"
@@ -9,13 +9,13 @@
 
 namespace ola
 {
-	ISelLegacy::ISelLegacy(MachineContext& ctx, Target const& target)
+	ISelLowering::ISelLowering(MachineContext& ctx, Target const& target)
 		: ctx(ctx)
 		, target(target)
 	{
 	}
 
-	void ISelLegacy::SelectBasicBlock(BasicBlock& BB)
+	void ISelLowering::SelectBasicBlock(BasicBlock& BB)
 	{
 		TargetISelInfo const& isel_info = target.GetISelInfo();
 		for (Instruction& I : BB)
@@ -27,7 +27,7 @@ namespace ola
 		}
 	}
 
-	void ISelLegacy::LowerInstruction(Instruction* I)
+	void ISelLowering::LowerInstruction(Instruction* I)
 	{
 		switch (I->GetOpcode())
 		{
@@ -108,7 +108,7 @@ namespace ola
 		}
 	}
 
-	void ISelLegacy::LowerBinary(BinaryInst* BI)
+	void ISelLowering::LowerBinary(BinaryInst* BI)
 	{
 		MachineOperand ret = ctx.VirtualReg(BI->GetType());
 		MachineInstruction MI(GetMachineOpcode(BI->GetOpcode()));
@@ -117,7 +117,7 @@ namespace ola
 		ctx.MapOperand(BI, ret);
 	}
 
-	void ISelLegacy::LowerCompare(CompareInst* CI)
+	void ISelLowering::LowerCompare(CompareInst* CI)
 	{
 		MachineOperand ret = ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
@@ -130,7 +130,7 @@ namespace ola
 		ctx.MapOperand(CI, ret);
 	}
 
-	void ISelLegacy::LowerUnary(UnaryInst* UI)
+	void ISelLowering::LowerUnary(UnaryInst* UI)
 	{
 		if (UI->GetName() == "nop") return;
 		MachineOperand ret = ctx.VirtualReg(UI->GetType());
@@ -140,12 +140,12 @@ namespace ola
 		ctx.MapOperand(UI, ret);
 	}
 
-	void ISelLegacy::LowerRet(ReturnInst* RI)
+	void ISelLowering::LowerRet(ReturnInst* RI)
 	{
 		target.GetFrameInfo().EmitReturn(RI, ctx);
 	}
 
-	void ISelLegacy::LowerBranch(BranchInst* BI)
+	void ISelLowering::LowerBranch(BranchInst* BI)
 	{
 		BasicBlock* src_block = BI->GetBasicBlock();
 		if (BI->IsUnconditional())
@@ -170,7 +170,7 @@ namespace ola
 		}
 	}
 
-	void ISelLegacy::LowerLoad(LoadInst* LI)
+	void ISelLowering::LowerLoad(LoadInst* LI)
 	{
 		IRType* load_type = LI->GetType();
 		if (load_type->IsStruct())
@@ -216,7 +216,7 @@ namespace ola
 		ctx.MapOperand(LI, ret);
 	}
 
-	void ISelLegacy::LowerStore(StoreInst* SI)
+	void ISelLowering::LowerStore(StoreInst* SI)
 	{
 		IRType* value_type = SI->GetValueOp()->GetType();
 		if (value_type->IsStruct())
@@ -266,12 +266,12 @@ namespace ola
 		ctx.EmitInst(MI);
 	}
 
-	void ISelLegacy::LowerCall(CallInst* CI)
+	void ISelLowering::LowerCall(CallInst* CI)
 	{
 		target.GetFrameInfo().EmitCall(CI, ctx);
 	}
 
-	void ISelLegacy::LowerCast(CastInst* CI)
+	void ISelLowering::LowerCast(CastInst* CI)
 	{
 		MachineOperand ret = ctx.VirtualReg(CI->GetDestType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
@@ -280,7 +280,7 @@ namespace ola
 		ctx.MapOperand(CI, ret);
 	}
 
-	void ISelLegacy::LowerGEP(GetElementPtrInst* GEPI)
+	void ISelLowering::LowerGEP(GetElementPtrInst* GEPI)
 	{
 		Value* base = GEPI->GetBaseOperand();
 		MachineOperand base_op = ctx.GetOperand(base);
@@ -382,7 +382,7 @@ namespace ola
 		ctx.MapOperand(GEPI, result);
 	}
 
-	void ISelLegacy::LowerPtrAdd(PtrAddInst* PAI)
+	void ISelLowering::LowerPtrAdd(PtrAddInst* PAI)
 	{
 		Value* base = PAI->GetBase();
 		ConstantInt* offset = cast<ConstantInt>(PAI->GetOffset());
@@ -418,7 +418,7 @@ namespace ola
 		}
 	}
 
-	void ISelLegacy::LowerSwitch(SwitchInst* SI)
+	void ISelLowering::LowerSwitch(SwitchInst* SI)
 	{
 		if (!SI || SI->GetNumCases() == 0) return;
 		BasicBlock* src_block = SI->GetBasicBlock();
@@ -454,7 +454,7 @@ namespace ola
 		}
 	}
 
-	void ISelLegacy::LowerSelect(SelectInst* SI)
+	void ISelLowering::LowerSelect(SelectInst* SI)
 	{
 		Value* predicate = SI->GetPredicate();
 		Value* true_value = SI->GetTrueValue();
@@ -480,7 +480,7 @@ namespace ola
 		ctx.MapOperand(SI, result_reg);
 	}
 
-	void ISelLegacy::EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
+	void ISelLowering::EmitJump(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src)
 	{
 		OLA_ASSERT(jump_opcode >= InstJump && jump_opcode <= InstJNE);
 

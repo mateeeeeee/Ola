@@ -1,6 +1,7 @@
 #pragma once
 #include "ISelNode.h"
 #include "ISelForest.h"
+#include "ISelLowering.h"
 #include "Backend/Custom/Codegen/MachineContext.h"
 
 namespace ola
@@ -27,7 +28,7 @@ namespace ola
 	class ISelTreeGen
 	{
 	public:
-		explicit ISelTreeGen(MachineContext& ctx);
+		ISelTreeGen(MachineContext& ctx, ISelLowering& lowering);
 
 		ISelForest GenerateTrees(BasicBlock& BB);
 		ISelValueMap const& GetValueMap() const { return value_map; }
@@ -35,6 +36,7 @@ namespace ola
 
 	private:
 		MachineContext& ctx;
+		ISelLowering& lowering;
 		ISelForest forest;
 		ISelValueMap value_map;
 		ISelUseCount use_count;
@@ -60,8 +62,6 @@ namespace ola
 		void ProcessGetElementPtrInst(GetElementPtrInst& I);
 		void ProcessPtrAddInst(PtrAddInst& I);
 		void ProcessPhiInst(PhiInst& I);
-
-		void EmitJumpWithPhiCopies(Uint32 jump_opcode, BasicBlock* dst, BasicBlock* src);
 
 		void AddTree(ISelNodePtr tree, std::vector<ISelNode*> const& leaves, Bool has_memory);
 		void AddAsmNode(std::vector<MachineInstruction> instructions);
