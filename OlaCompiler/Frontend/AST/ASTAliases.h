@@ -28,6 +28,7 @@ namespace ola
 	using UniqueEnumMemberDeclPtr	  = UniquePtr<EnumMemberDecl>;
 	using UniqueAliasDeclPtr		  = UniquePtr<AliasDecl>;
 	using UniqueClassDeclPtr		  = UniquePtr<ClassDecl>;
+	using UniqueTemplateClassDeclPtr  = UniquePtr<TemplateClassDecl>;
 
 	using UniqueStmtPtr				= UniquePtr<Stmt>;
 	using UniqueCompoundStmtPtr		= UniquePtr<CompoundStmt>;

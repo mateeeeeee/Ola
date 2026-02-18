@@ -17,6 +17,7 @@ namespace ola
 	class EnumMemberDecl;
 	class AliasDecl;
 	class ClassDecl;
+	class TemplateClassDecl;
 
 	class Stmt;
 	class CompoundStmt;
