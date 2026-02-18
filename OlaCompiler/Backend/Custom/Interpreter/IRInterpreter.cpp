@@ -115,6 +115,10 @@ namespace ola
 			Uint8* target_addr = memory.GetGlobalAddress(ref_gv);
 			memory.StorePointer(addr, target_addr);
 		}
+		else if (Function* func = dyn_cast<Function>(init_val))
+		{
+			memory.StorePointer(addr, reinterpret_cast<Uint8*>(func));
+		}
 	}
 
 	void IRInterpreter::ExecuteFunction(Function* func, std::vector<InterpreterValue> const& args)
@@ -576,8 +580,9 @@ namespace ola
 		Function* callee = call->GetCalleeAsFunction();
 		if (!callee)
 		{
-			OLA_ASSERT_MSG(false, "Indirect calls not yet supported");
-			return InterpreterValue::MakeVoid();
+			InterpreterValue callee_val = GetOperandValue(call->GetCallee());
+			callee = reinterpret_cast<Function*>(callee_val.AsPointer());
+			OLA_ASSERT_MSG(callee, "Indirect call target is null");
 		}
 
 		if (callee->IsDeclaration())
