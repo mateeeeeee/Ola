@@ -1,38 +1,182 @@
 Module ID : test.ola
 
-define internal @factorial_helper__I__I i64(i64 %n,i64 %acc) {
+declare @Assert void(i8)
+
+
+declare @AssertMsg void(i8,ptr)
+
+
+define internal @GlobalIntA ptr 12
+
+
+define internal @GlobalIntB ptr 7
+
+
+define internal @GlobalFloatC ptr 4.5
+
+
+define internal @GlobalFloatD ptr 9
+
+
+define internal @GlobalCondition ptr 0
+
+
+define internal @TestTernaryOperatorIntegers void() {
 entry:
-br label tailrecurse
-tailrecurse:
-%acc.tr = phi i64 [ %acc, entry ], [ %0, if.end ]
-%n.tr = phi i64 [ %n, entry ], [ %1, if.end ]
-%2 = icmp sle i64 %n.tr, 1
-br i8 %2, label if.then, label if.end
-if.then:
+call i8 1, @Assert
+%0 = load i64, ptr @GlobalIntB
+%1 = icmp sgt i64 5, %0
+%2 = load i64, ptr @GlobalIntB
+%3 = select i8 %1, 5, i64 %2
+%4 = icmp eq i64 %3, 7
+call i8 %4, @Assert
+%5 = load i64, ptr @GlobalIntA
+%6 = load i64, ptr @GlobalIntB
+%7 = icmp sgt i64 %5, %6
+%8 = load i64, ptr @GlobalIntA
+%9 = load i64, ptr @GlobalIntB
+%10 = select i8 %7, i64 %8, i64 %9
+%11 = icmp eq i64 %10, 12
+call i8 %11, @Assert
+%12 = load i64, ptr @GlobalIntA
+%13 = icmp sgt i64 %12, 15
+%14 = load i64, ptr @GlobalIntA
+%15 = select i8 %13, i64 %14, 15
+%16 = icmp eq i64 %15, 15
+call i8 %16, @Assert
+call i8 1, @Assert
 br label exit
-if.end:
-%1 = sub i64 %n.tr, 1
-%0 = smul i64 %n.tr, %acc.tr
-br label tailrecurse
 exit:
-ret i64 %acc.tr
+ret 
 }
 
 
-define internal @factorial__I i64(i64 %n) {
+define internal @TestTernaryOperatorFloats void() {
 entry:
-%0 = call i64 5, 1, @factorial_helper__I__I
+call i8 1, @Assert
+%0 = load f64, ptr @GlobalFloatD
+%1 = fcmp ogt f64 2.5, %0
+%2 = load f64, ptr @GlobalFloatD
+%3 = select i8 %1, 2.5, f64 %2
+%4 = fcmp oeq f64 %3, 9
+call i8 %4, @Assert
+%5 = load f64, ptr @GlobalFloatC
+%6 = load f64, ptr @GlobalFloatD
+%7 = fcmp ogt f64 %5, %6
+%8 = load f64, ptr @GlobalFloatC
+%9 = load f64, ptr @GlobalFloatD
+%10 = select i8 %7, f64 %8, f64 %9
+%11 = fcmp oeq f64 %10, 9
+call i8 %11, @Assert
+%12 = load f64, ptr @GlobalFloatC
+%13 = fcmp ogt f64 %12, 5
+%14 = load f64, ptr @GlobalFloatC
+%15 = select i8 %13, f64 %14, 5
+%16 = fcmp oeq f64 %15, 5
+call i8 %16, @Assert
+call i8 1, @Assert
 br label exit
 exit:
-ret i64 %0
+ret 
+}
+
+
+define internal @TestTernaryOperatorBools void() {
+entry:
+call i8 1, @Assert
+%0 = load i8, ptr @GlobalCondition
+%1 = select i8 %0, 5, 10
+%2 = icmp eq i64 %1, 10
+call i8 %2, @Assert
+%3 = load i8, ptr @GlobalCondition
+%4 = load i64, ptr @GlobalIntA
+%5 = load i64, ptr @GlobalIntB
+%6 = select i8 %3, i64 %4, i64 %5
+%7 = icmp eq i64 %6, 7
+call i8 %7, @Assert
+%8 = load i8, ptr @GlobalCondition
+%9 = select i8 %8, 20, 30
+%10 = icmp eq i64 %9, 30
+call i8 %10, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestTernaryInExpressions void() {
+entry:
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestTernaryConditions void() {
+entry:
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestTernaryArrays void() {
+entry:
+%0 = alloca i64[3]
+%1 = ptr add ptr %0, 0
+store 10, ptr %1
+%2 = ptr add ptr %0, 8
+store 20, ptr %2
+%3 = ptr add ptr %0, 16
+store 30, ptr %3
+%4 = load i64, ptr %1
+%5 = load i64, ptr %2
+%6 = icmp sgt i64 %4, %5
+%7 = load i64, ptr %1
+%8 = load i64, ptr %2
+%9 = select i8 %6, i64 %7, i64 %8
+%10 = icmp eq i64 %9, 20
+call i8 %10, @Assert
+%11 = gep ptr %0, 0, 0
+%12 = load i64, ptr %11
+%13 = icmp eq i64 %12, 10
+call i8 %13, @Assert
+%14 = gep ptr %0, 0, 2
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 30
+call i8 %16, @Assert
+br label exit
+exit:
+ret 
 }
 
 
 define external @main i64() {
 entry:
-%0 = call i64 5, @factorial__I
+call ptr @TestTernaryOperatorIntegers
+call ptr @TestTernaryOperatorFloats
+call ptr @TestTernaryOperatorBools
+call ptr @TestTernaryInExpressions
+call ptr @TestTernaryConditions
+br label entry.inlined
+entry.split:
+call ptr @TestTernaryArrays
 br label exit
+entry.inlined:
+call i8 1, @Assert
+call i8 1, @Assert
+br label entry.split
 exit:
-ret i64 %0
+ret i64 0
 }
 

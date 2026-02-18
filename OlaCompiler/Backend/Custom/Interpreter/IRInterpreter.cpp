@@ -540,7 +540,7 @@ namespace ola
 			}
 			else
 			{
-				offset += idx;
+				offset += idx * current_type->GetSize();
 			}
 		}
 		return InterpreterValue::MakePointer(base_ptr + offset);

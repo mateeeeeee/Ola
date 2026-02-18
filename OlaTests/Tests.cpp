@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #define LLVM_BACKEND 0
-#define USE_INTERPRETER 0
+#define USE_INTERPRETER 1
 #include "Compiler/CompilerMacros.h"
 
 #if USE_INTERPRETER
