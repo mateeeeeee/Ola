@@ -139,7 +139,6 @@ namespace ola
 	void IRInterpreter::ExecuteBasicBlock(BasicBlock* bb)
 	{
 		InterpreterFrame& frame = call_stack.top();
-		frame.SetCurrentBlock(bb);
 
 		std::vector<std::pair<PhiInst*, InterpreterValue>> phi_results;
 		for (Instruction& inst : bb->Instructions())

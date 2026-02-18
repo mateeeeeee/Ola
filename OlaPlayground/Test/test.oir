@@ -6,92 +6,314 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-declare @Abstract$GetX i64(ptr)
+define internal @GlobalInt1 ptr 5
 
 
-define external @Base$GetX i64(ptr %this) {
+define internal @GlobalInt2 ptr 10
+
+
+define internal @TestIntIncrementDecrement void() {
 entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 8
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%0 = alloca ptr
+store 10, ptr %0
+%1 = alloca i64
+%2 = load ptr, ptr %0
+store ptr %2, ptr %1
+%3 = load i64, ptr %1
+%4 = icmp eq i64 %3, 10
+call i8 %4, @Assert
+call i8 1, @Assert
+%5 = alloca ptr
+store 15, ptr %5
+%6 = alloca i64
+%7 = load ptr, ptr %5
+store ptr %7, ptr %6
+%8 = load i64, ptr %6
+%9 = icmp eq i64 %8, 15
+call i8 %9, @Assert
+call i8 1, @Assert
+%10 = load i64, ptr @GlobalInt1
+%11 = add i64 %10, 1
+store i64 %11, ptr @GlobalInt1
+%12 = icmp eq i64 %11, 6
+call i8 %12, @Assert
+%13 = load i64, ptr @GlobalInt1
+%14 = icmp eq i64 %13, 6
+call i8 %14, @Assert
+%15 = load i64, ptr @GlobalInt2
+%16 = sub i64 %15, 1
+store i64 %16, ptr @GlobalInt2
+%17 = icmp eq i64 %16, 9
+call i8 %17, @Assert
+%18 = load i64, ptr @GlobalInt2
+%19 = icmp eq i64 %18, 9
+call i8 %19, @Assert
+%20 = load i64, ptr @GlobalInt1
+%21 = alloca ptr
+store i64 %20, ptr %21
+%22 = add i64 %20, 1
+store i64 %22, ptr @GlobalInt1
+%23 = alloca i64
+%24 = load ptr, ptr %21
+store ptr %24, ptr %23
+%25 = load i64, ptr %23
+%26 = icmp eq i64 %25, 6
+call i8 %26, @Assert
+%27 = load i64, ptr @GlobalInt1
+%28 = icmp eq i64 %27, 7
+call i8 %28, @Assert
+%29 = load i64, ptr @GlobalInt2
+%30 = alloca ptr
+store i64 %29, ptr %30
+%31 = sub i64 %29, 1
+store i64 %31, ptr @GlobalInt2
+%32 = alloca i64
+%33 = load ptr, ptr %30
+store ptr %33, ptr %32
+%34 = load i64, ptr %32
+%35 = icmp eq i64 %34, 9
+call i8 %35, @Assert
+%36 = load i64, ptr @GlobalInt2
+%37 = icmp eq i64 %36, 8
+call i8 %37, @Assert
 br label exit
 exit:
-%3 = load i64, ptr %0
-ret i64 %3
+ret 
 }
 
 
-define external @Base$GetSumX i64(ptr %this) {
+define internal @GlobalFloat1 ptr 3.5
+
+
+define internal @GlobalFloat2 ptr 8.5
+
+
+define internal @TestFloatIncrementDecrement void() {
 entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = ptr add ptr %1, 0
-%3 = load ptr, ptr %2
-%4 = call ptr %this, %3
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%0 = alloca ptr
+store 6.5, ptr %0
+%1 = alloca f64
+%2 = load ptr, ptr %0
+store ptr %2, ptr %1
+%3 = load f64, ptr %1
+%4 = fcmp oeq f64 %3, 6.5
+call i8 %4, @Assert
+call i8 1, @Assert
+%5 = alloca ptr
+store 12.5, ptr %5
+%6 = alloca f64
+%7 = load ptr, ptr %5
+store ptr %7, ptr %6
+%8 = load f64, ptr %6
+%9 = fcmp oeq f64 %8, 12.5
+call i8 %9, @Assert
+call i8 1, @Assert
+%10 = load f64, ptr @GlobalFloat1
+%11 = alloca ptr
+store f64 %10, ptr %11
+%12 = fadd f64 %10, 1
+store f64 %12, ptr @GlobalFloat1
+%13 = alloca f64
+%14 = load ptr, ptr %11
+store ptr %14, ptr %13
+%15 = load f64, ptr %13
+%16 = fcmp oeq f64 %15, 3.5
+call i8 %16, @Assert
+%17 = load f64, ptr @GlobalFloat1
+%18 = fcmp oeq f64 %17, 4.5
+call i8 %18, @Assert
+%19 = load f64, ptr @GlobalFloat2
+%20 = alloca ptr
+store f64 %19, ptr %20
+%21 = fsub f64 %19, 1
+store f64 %21, ptr @GlobalFloat2
+%22 = alloca f64
+%23 = load ptr, ptr %20
+store ptr %23, ptr %22
+%24 = load f64, ptr %22
+%25 = fcmp oeq f64 %24, 8.5
+call i8 %25, @Assert
+%26 = load f64, ptr @GlobalFloat2
+%27 = fcmp oeq f64 %26, 7.5
+call i8 %27, @Assert
 br label exit
 exit:
-ret i64 %4
+ret 
 }
 
 
-define internal @VTable_Base ptr [@Base$GetX,@Base$GetSumX,]
-
-
-define external @Derived$GetX i64(ptr %this) {
+define internal @TestIncrementInLoop void() {
 entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 16
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
+br label for.cond
+for.body:
+%0 = alloca ptr
+store i64 %1, ptr %0
+%2 = add i64 %1, 1
+br label for.iter
+for.cond:
+%1 = phi i64 [ 0, entry ], [ %2, for.iter ]
+%3 = phi i64 [ 0, entry ], [ %4, for.iter ]
+%5 = icmp slt i64 %3, 5
+br i8 %5, label for.body, label for.end
+for.iter:
+%6 = alloca ptr
+store i64 %3, ptr %6
+%4 = add i64 %3, 1
+br label for.cond
+for.end:
+%7 = icmp eq i64 %1, 5
+call i8 %7, @Assert
+br label while.cond
+while.cond:
+%8 = phi i64 [ 0, for.end ], [ %9, while.body ]
+%10 = phi i64 [ 0, for.end ], [ %11, while.body ]
+%12 = icmp slt i64 %10, 5
+br i8 %12, label while.body, label while.end
+while.body:
+%13 = alloca ptr
+store i64 %10, ptr %13
+%11 = add i64 %10, 1
+%14 = load i64, ptr %13
+%9 = add i64 %8, %14
+br label while.cond
+while.end:
+%15 = icmp eq i64 %8, 10
+call i8 %15, @Assert
+%16 = icmp eq i64 %10, 5
+call i8 %16, @Assert
 br label exit
 exit:
-%3 = load i64, ptr %0
-ret i64 %3
+ret 
 }
 
 
-define external @Derived$GetSumX i64(ptr %this) {
+define internal @TestMultipleIncrements void() {
 entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = ptr add ptr %1, 0
-%3 = load ptr, ptr %2
-%4 = call ptr %this, %3
-br label entry.inlined
-entry.split:
-%5 = add i64 %4, %6
+%0 = alloca ptr
+store 0, ptr %0
+%1 = alloca ptr
+store 1, ptr %1
+%2 = alloca ptr
+store 2, ptr %2
+call i8 1, @Assert
+%3 = alloca ptr
+store 10, ptr %3
+%4 = alloca ptr
+store 9, ptr %4
+call i8 1, @Assert
+call i8 1, @Assert
 br label exit
-exit.inlined:
-%6 = load i64, ptr %7
-br label entry.split
-entry.inlined:
-%7 = alloca i64
-%8 = ptr add ptr %this, 8
-%9 = load ptr, ptr %8
-store ptr %9, ptr %7
-br label exit.inlined
 exit:
-ret i64 %5
+ret 
+}
+
+
+define internal @TestIncrementNegative void() {
+entry:
+%0 = alloca ptr
+store -5, ptr %0
+call i8 1, @Assert
+%1 = alloca ptr
+store -1, ptr %1
+call i8 1, @Assert
+%2 = alloca ptr
+store 0, ptr %2
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestIncrementInExpressions void() {
+entry:
+%0 = alloca ptr
+store 5, ptr %0
+%1 = load i64, ptr %0
+%2 = add i64 %1, 10
+%3 = icmp eq i64 %2, 15
+call i8 %3, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+call i8 1, @Assert
+%4 = alloca ptr
+store 10, ptr %4
+%5 = load i64, ptr %4
+%6 = sub i64 %5, 5
+%7 = icmp eq i64 %6, 5
+call i8 %7, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayIncrement void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+%6 = load i64, ptr %1
+%7 = alloca ptr
+store i64 %6, ptr %7
+%8 = add i64 %6, 1
+store i64 %8, ptr %1
+%9 = load i64, ptr %1
+%10 = icmp eq i64 %9, 2
+call i8 %10, @Assert
+%11 = load i64, ptr %2
+%12 = add i64 %11, 1
+store i64 %12, ptr %2
+%13 = load i64, ptr %2
+%14 = icmp eq i64 %13, 3
+call i8 %14, @Assert
+%15 = load i64, ptr %3
+%16 = alloca ptr
+store i64 %15, ptr %16
+%17 = sub i64 %15, 1
+store i64 %17, ptr %3
+%18 = load i64, ptr %3
+%19 = icmp eq i64 %18, 2
+call i8 %19, @Assert
+%20 = load i64, ptr %4
+%21 = sub i64 %20, 1
+store i64 %21, ptr %4
+%22 = load i64, ptr %4
+%23 = icmp eq i64 %22, 3
+call i8 %23, @Assert
+br label exit
+exit:
+ret 
 }
 
 
 define external @main i64() {
 entry:
-%0 = alloca %Base
-%1 = ptr add ptr %0, 0
-store ptr @VTable_Base, ptr %1
-%2 = ptr add ptr %0, 8
-store 1, ptr %2
-br label entry.inlined
-entry.inlined:
-%3 = ptr add ptr %0, 0
-%4 = load ptr, ptr %3
-%5 = ptr add ptr %4, 0
-%6 = load ptr, ptr %5
-%7 = call ptr %0, %6
-%8 = icmp eq i64 %7, 1
-call i8 %8, @Assert
+call ptr @TestIntIncrementDecrement
+call ptr @TestFloatIncrementDecrement
+call ptr @TestIncrementInLoop
+call ptr @TestMultipleIncrements
+call ptr @TestIncrementNegative
+call ptr @TestIncrementInExpressions
+call ptr @TestArrayIncrement
 br label exit
 exit:
 ret i64 0
