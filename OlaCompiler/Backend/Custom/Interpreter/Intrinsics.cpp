@@ -49,6 +49,8 @@ namespace ola
 
 		intrinsics["Assert"] = Intrinsic_Assert;
 		intrinsics["AssertMsg"] = Intrinsic_AssertMsg;
+
+		intrinsics["StringToInt"] = Intrinsic_StringToInt;
 	}
 
 	Bool Intrinsics::IsIntrinsic(std::string_view name) const
@@ -271,5 +273,18 @@ namespace ola
 			std::exit(-252);
 		}
 		return InterpreterValue::MakeVoid();
+	}
+
+	InterpreterValue Intrinsics::Intrinsic_StringToInt(std::vector<InterpreterValue> const& args, InterpreterMemory&)
+	{
+		if (!args.empty())
+		{
+			Char const* str = reinterpret_cast<Char const*>(args[0].AsPointer());
+			if (str)
+			{
+				return InterpreterValue::MakeInt(std::atoll(str));
+			}
+		}
+		return InterpreterValue::MakeInt(0);
 	}
 }

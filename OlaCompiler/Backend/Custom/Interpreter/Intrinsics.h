@@ -63,5 +63,8 @@ namespace ola
 		// std.assert
 		static InterpreterValue Intrinsic_Assert(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
 		static InterpreterValue Intrinsic_AssertMsg(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
+
+		// std.string
+		static InterpreterValue Intrinsic_StringToInt(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
 	};
 }

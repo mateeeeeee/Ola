@@ -6,176 +6,93 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @GlobalIntA ptr 12
+declare @Abstract$GetX i64(ptr)
 
 
-define internal @GlobalIntB ptr 7
-
-
-define internal @GlobalFloatC ptr 4.5
-
-
-define internal @GlobalFloatD ptr 9
-
-
-define internal @GlobalCondition ptr 0
-
-
-define internal @TestTernaryOperatorIntegers void() {
+define external @Base$GetX i64(ptr %this) {
 entry:
-call i8 1, @Assert
-%0 = load i64, ptr @GlobalIntB
-%1 = icmp sgt i64 5, %0
-%2 = load i64, ptr @GlobalIntB
-%3 = select i8 %1, 5, i64 %2
-%4 = icmp eq i64 %3, 7
-call i8 %4, @Assert
-%5 = load i64, ptr @GlobalIntA
-%6 = load i64, ptr @GlobalIntB
-%7 = icmp sgt i64 %5, %6
-%8 = load i64, ptr @GlobalIntA
-%9 = load i64, ptr @GlobalIntB
-%10 = select i8 %7, i64 %8, i64 %9
-%11 = icmp eq i64 %10, 12
-call i8 %11, @Assert
-%12 = load i64, ptr @GlobalIntA
-%13 = icmp sgt i64 %12, 15
-%14 = load i64, ptr @GlobalIntA
-%15 = select i8 %13, i64 %14, 15
-%16 = icmp eq i64 %15, 15
-call i8 %16, @Assert
-call i8 1, @Assert
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 exit:
-ret 
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
 
-define internal @TestTernaryOperatorFloats void() {
+define external @Base$GetSumX i64(ptr %this) {
 entry:
-call i8 1, @Assert
-%0 = load f64, ptr @GlobalFloatD
-%1 = fcmp ogt f64 2.5, %0
-%2 = load f64, ptr @GlobalFloatD
-%3 = select i8 %1, 2.5, f64 %2
-%4 = fcmp oeq f64 %3, 9
-call i8 %4, @Assert
-%5 = load f64, ptr @GlobalFloatC
-%6 = load f64, ptr @GlobalFloatD
-%7 = fcmp ogt f64 %5, %6
-%8 = load f64, ptr @GlobalFloatC
-%9 = load f64, ptr @GlobalFloatD
-%10 = select i8 %7, f64 %8, f64 %9
-%11 = fcmp oeq f64 %10, 9
-call i8 %11, @Assert
-%12 = load f64, ptr @GlobalFloatC
-%13 = fcmp ogt f64 %12, 5
-%14 = load f64, ptr @GlobalFloatC
-%15 = select i8 %13, f64 %14, 5
-%16 = fcmp oeq f64 %15, 5
-call i8 %16, @Assert
-call i8 1, @Assert
+%0 = ptr add ptr %this, 0
+%1 = load ptr, ptr %0
+%2 = ptr add ptr %1, 0
+%3 = load ptr, ptr %2
+%4 = call ptr %this, %3
 br label exit
 exit:
-ret 
+ret i64 %4
 }
 
 
-define internal @TestTernaryOperatorBools void() {
+define internal @VTable_Base ptr [@Base$GetX,@Base$GetSumX,]
+
+
+define external @Derived$GetX i64(ptr %this) {
 entry:
-call i8 1, @Assert
-%0 = load i8, ptr @GlobalCondition
-%1 = select i8 %0, 5, 10
-%2 = icmp eq i64 %1, 10
-call i8 %2, @Assert
-%3 = load i8, ptr @GlobalCondition
-%4 = load i64, ptr @GlobalIntA
-%5 = load i64, ptr @GlobalIntB
-%6 = select i8 %3, i64 %4, i64 %5
-%7 = icmp eq i64 %6, 7
-call i8 %7, @Assert
-%8 = load i8, ptr @GlobalCondition
-%9 = select i8 %8, 20, 30
-%10 = icmp eq i64 %9, 30
-call i8 %10, @Assert
-call i8 1, @Assert
+%0 = alloca i64
+%1 = ptr add ptr %this, 16
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 exit:
-ret 
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
 
-define internal @TestTernaryInExpressions void() {
+define external @Derived$GetSumX i64(ptr %this) {
 entry:
-call i8 1, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
+%0 = ptr add ptr %this, 0
+%1 = load ptr, ptr %0
+%2 = ptr add ptr %1, 0
+%3 = load ptr, ptr %2
+%4 = call ptr %this, %3
+br label entry.inlined
+entry.split:
+%5 = add i64 %4, %6
 br label exit
+exit.inlined:
+%6 = load i64, ptr %7
+br label entry.split
+entry.inlined:
+%7 = alloca i64
+%8 = ptr add ptr %this, 8
+%9 = load ptr, ptr %8
+store ptr %9, ptr %7
+br label exit.inlined
 exit:
-ret 
-}
-
-
-define internal @TestTernaryConditions void() {
-entry:
-call i8 1, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-call i8 1, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestTernaryArrays void() {
-entry:
-%0 = alloca i64[3]
-%1 = ptr add ptr %0, 0
-store 10, ptr %1
-%2 = ptr add ptr %0, 8
-store 20, ptr %2
-%3 = ptr add ptr %0, 16
-store 30, ptr %3
-%4 = load i64, ptr %1
-%5 = load i64, ptr %2
-%6 = icmp sgt i64 %4, %5
-%7 = load i64, ptr %1
-%8 = load i64, ptr %2
-%9 = select i8 %6, i64 %7, i64 %8
-%10 = icmp eq i64 %9, 20
-call i8 %10, @Assert
-%11 = gep ptr %0, 0, 0
-%12 = load i64, ptr %11
-%13 = icmp eq i64 %12, 10
-call i8 %13, @Assert
-%14 = gep ptr %0, 0, 2
-%15 = load i64, ptr %14
-%16 = icmp eq i64 %15, 30
-call i8 %16, @Assert
-br label exit
-exit:
-ret 
+ret i64 %5
 }
 
 
 define external @main i64() {
 entry:
-call ptr @TestTernaryOperatorIntegers
-call ptr @TestTernaryOperatorFloats
-call ptr @TestTernaryOperatorBools
-call ptr @TestTernaryInExpressions
-call ptr @TestTernaryConditions
+%0 = alloca %Base
+%1 = ptr add ptr %0, 0
+store ptr @VTable_Base, ptr %1
+%2 = ptr add ptr %0, 8
+store 1, ptr %2
 br label entry.inlined
-entry.split:
-call ptr @TestTernaryArrays
-br label exit
 entry.inlined:
-call i8 1, @Assert
-call i8 1, @Assert
-br label entry.split
+%3 = ptr add ptr %0, 0
+%4 = load ptr, ptr %3
+%5 = ptr add ptr %4, 0
+%6 = load ptr, ptr %5
+%7 = call ptr %0, %6
+%8 = icmp eq i64 %7, 1
+call i8 %8, @Assert
+br label exit
 exit:
 ret i64 0
 }
