@@ -108,4 +108,7 @@ DIAG(delete_arg_not_pointer, error, "Argument to delete must be a pointer type")
 DIAG(new_invalid_type, error, "Cannot allocate void type")
 DIAG(null_assigned_to_non_pointer, error, "null can only be assigned to a pointer type")
 DIAG(ptr_to_ptr_not_allowed, error, "Pointer to pointer is not allowed")
+DIAG(template_arg_count_mismatch, error, "Template '{}' expects {} type argument(s), but {} were provided")
+DIAG(template_arg_missing, error, "Class template '{}' requires template arguments")
+DIAG(non_template_with_args, error, "'{}' is not a class template")
 #undef DIAG
