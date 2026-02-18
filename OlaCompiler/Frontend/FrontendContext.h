@@ -16,6 +16,14 @@ namespace ola
 	class IntType;
 	class FloatType;
 	class ClassDecl;
+	class TemplateClassDecl;
+
+	struct InstantiationKey
+	{
+		TemplateClassDecl const* tmpl;
+		std::vector<QualType> args;
+		Bool operator==(InstantiationKey const& other) const;
+	};
 
 	class FrontendContext
 	{
@@ -37,6 +45,9 @@ namespace ola
 		FuncType* GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types);
 		ClassType* GetClassType(ClassDecl const* class_decl);
 
+		ClassDecl* GetInstantiation(TemplateClassDecl const* tmpl, std::vector<QualType> const& args);
+		void RegisterInstantiation(TemplateClassDecl const* tmpl, std::vector<QualType> const& args, ClassDecl* decl);
+
 	private:
 		VoidType* void_type;
 		BoolType* bool_type;
@@ -49,5 +60,7 @@ namespace ola
 		std::vector<RefType*>   ref_types;
 		std::vector<PtrType*>   ptr_types;
 		std::vector<FuncType*>  function_types;
+
+		std::vector<std::pair<InstantiationKey, ClassDecl*>> instantiations;
 	};
 }
