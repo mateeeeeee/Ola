@@ -702,6 +702,73 @@ namespace ola
 			}
 		}
 
+		for (auto& static_field : class_decl.GetStaticFields())
+		{
+			QualType const& var_type = static_field->GetType();
+			IRType* ir_type = ConvertToIRType(var_type);
+			Constant* constant_init = nullptr;
+
+			if (Expr const* init_expr = static_field->GetInitExpr())
+			{
+				init_expr->Accept(*this);
+				Value* init_value = value_map[init_expr];
+				constant_init = dyn_cast<Constant>(init_value);
+			}
+			if (!constant_init)
+			{
+				constant_init = Constant::GetNullValue(ir_type);
+			}
+
+			std::string global_name(SanitizeClassName(class_decl.GetName()));
+			global_name += "$";
+			global_name += static_field->GetName();
+			GlobalVariable* global_var = new GlobalVariable(global_name, ir_type, Linkage::Internal, constant_init);
+			if (var_type.IsConst())
+			{
+				global_var->SetReadOnly();
+			}
+			module.AddGlobal(global_var);
+			value_map[static_field.get()] = global_var;
+		}
+
+		for (auto& static_method : class_decl.GetStaticMethods())
+		{
+			FuncType const* func_type = static_method->GetFuncType();
+			IRFuncType* ir_func_type = cast<IRFuncType>(ConvertToIRType(func_type));
+			std::string name(SanitizeClassName(class_decl.GetName()));
+			name += "$";
+			name += static_method->GetMangledName();
+			Function* ir_function = new Function(name, ir_func_type, Linkage::External);
+			module.AddGlobal(ir_function);
+		}
+		for (auto& static_method : class_decl.GetStaticMethods())
+		{
+			FuncType const* func_type = static_method->GetFuncType();
+			std::string name(SanitizeClassName(class_decl.GetName()));
+			name += "$";
+			name += static_method->GetMangledName();
+			Function* ir_function = cast<Function>(module.GetFunctionByName(name));
+
+			Uint32 arg_index = 0;
+			Argument* param_arg = ir_function->GetArg(arg_index);
+			if (isa<ClassType>(func_type->GetReturnType()))
+			{
+				return_value = param_arg;
+				param_arg = ir_function->GetArg(++arg_index);
+			}
+			for (auto& param : static_method->GetParamDecls())
+			{
+				Value* ir_param = param_arg;
+				ir_param->SetName(param->GetName());
+				value_map[param.get()] = ir_param;
+				param_arg = ir_function->GetArg(++arg_index);
+			}
+			if (static_method->HasDefinition())
+			{
+				VisitFunctionDeclCommon(*static_method, ir_function);
+			}
+		}
+
 		if (class_decl.IsPolymorphic())
 		{
 			std::vector<MethodDecl const*> const& vtable = class_decl.GetVTable();
@@ -1568,6 +1635,13 @@ namespace ola
 	{
 		Expr const* class_expr = member_expr.GetClassExpr();
 		Decl const* member_decl = member_expr.GetMemberDecl();
+
+		if (isa<FieldDecl>(member_decl) && cast<FieldDecl>(member_decl)->IsStatic())
+		{
+			value_map[&member_expr] = value_map[member_decl];
+			return;
+		}
+
 		class_expr->Accept(*this);
 		Value* struct_value = value_map[class_expr];
 
@@ -1598,6 +1672,47 @@ namespace ola
 		OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
+
+		if (method_decl->IsStatic())
+		{
+			std::string name(SanitizeClassName(class_decl->GetName()));
+			name += "$";
+			name += method_decl->GetMangledName();
+			Function* called_function = module.GetFunctionByName(name);
+			OLA_ASSERT(called_function);
+
+			std::vector<Value*> args;
+			Uint32 arg_index = 0;
+			Bool return_struct = isa<ClassType>(method_call_expr.GetCalleeType()->GetReturnType());
+			Value* return_alloc = nullptr;
+			if (return_struct)
+			{
+				return_alloc = builder->MakeInst<AllocaInst>(called_function->GetArg(arg_index)->GetType());
+				args.push_back(return_alloc);
+				++arg_index;
+			}
+
+			for (auto const& arg_expr : method_call_expr.GetArgs())
+			{
+				arg_expr->Accept(*this);
+				Value* arg_value = value_map[arg_expr.get()];
+				OLA_ASSERT(arg_value);
+				IRType* arg_type = called_function->GetArg(arg_index)->GetType();
+				if (arg_type->IsPointer())
+				{
+					args.push_back(arg_value);
+				}
+				else
+				{
+					args.push_back(Load(arg_type, arg_value));
+				}
+				++arg_index;
+			}
+
+			Value* call_result = builder->MakeInst<CallInst>(called_function, args);
+			value_map[&method_call_expr] = return_alloc ? return_alloc : call_result;
+			return;
+		}
 
 		Expr const* class_expr = member_expr->GetClassExpr();
 		class_expr->Accept(*this);

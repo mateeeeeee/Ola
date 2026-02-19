@@ -1195,6 +1195,7 @@ namespace ola
 			QualType const* saved_current_func = sema->sema_ctx.current_func;
 			Bool saved_return_stmt = sema->sema_ctx.return_stmt_encountered;
 			Bool saved_is_method_const = sema->sema_ctx.is_method_const;
+			Bool saved_is_static_method = sema->sema_ctx.is_static_method;
 			Bool saved_is_constructor = sema->sema_ctx.is_constructor;
 			sema->sema_ctx.current_class_name = std::string(tmpl->GetName());
 			sema->sema_ctx.current_base_class = tmpl->GetBaseClass();
@@ -1292,6 +1293,7 @@ namespace ola
 			sema->sema_ctx.current_func = saved_current_func;
 			sema->sema_ctx.return_stmt_encountered = saved_return_stmt;
 			sema->sema_ctx.is_method_const = saved_is_method_const;
+			sema->sema_ctx.is_static_method = saved_is_static_method;
 			sema->sema_ctx.is_constructor = saved_is_constructor;
 		}
 
