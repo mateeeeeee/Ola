@@ -65,8 +65,9 @@ namespace ola
 		OLA_NODISCARD UniqueDeclPtrList ParseExternVariableDeclaration();
 		OLA_NODISCARD UniqueEnumDeclPtr ParseEnumDeclaration();
 		OLA_NODISCARD UniqueAliasDeclPtr ParseAliasDeclaration();
-		OLA_NODISCARD UniqueClassDeclPtr ParseClassDeclaration();
+		OLA_NODISCARD UniqueDeclPtr ParseClassDeclaration();
 		OLA_NODISCARD UniqueClassDeclPtr ParseInterfaceDeclaration();
+		OLA_NODISCARD ClassDecl* ParseTemplateInstantiation(TemplateClassDecl* tmpl, SourceLocation const& loc);
 
 		OLA_NODISCARD UniqueStmtPtr ParseStatement();
 		OLA_NODISCARD UniqueCompoundStmtPtr ParseCompoundStatement();
