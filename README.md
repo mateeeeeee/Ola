@@ -1,5 +1,5 @@
 <img align="center" padding="2" src="OlaDocs/olalogo_wide_new2.png"/>
-Toy compiler with both LLVM backend and a custom backend. 
+Optimizing C-like compiler with both LLVM backend and fully custom backend targeting x86-64 and ARM64. 
 
 ## Features
   * classes
