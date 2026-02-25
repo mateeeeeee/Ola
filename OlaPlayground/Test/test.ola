@@ -1,101 +1,64 @@
 import std.assert;
 
-void TestPtrBasic()
+public class S
 {
-	int* p = alloc(int, 1);
-	p[0] = 42;
-	Assert(p[0] == 42);
-	free(p);
-}
-
-void TestPtrNull()
-{
-	int* p = null;
-	Assert(p == null);
-
-	p = alloc(int, 1);
-	Assert(p != null);
-	p[0] = 10;
-	Assert(p[0] == 10);
-	free(p);
-}
-
-void TestPtrArray()
-{
-	int* arr = alloc(int, 5);
-	int i = 0;
-	for(; i < 5; ++i)
+	public void Init(int x, int y)
 	{
-		arr[i] = i * i;
+		this.x = x;
+		this.y = y;
 	}
-	Assert(arr[0] == 0);
-	Assert(arr[1] == 1);
-	Assert(arr[2] == 4);
-	Assert(arr[3] == 9);
-	Assert(arr[4] == 16);
-	free(arr);
+
+	public void SetX(int x) {this.x = x;}
+	public void SetY(int y) {this.y = y;}
+	
+	public int GetX() const {return x;}
+	public int GetY() const {return y;}
+
+	private int x = 0;
+	private int y = 0;
+};
+
+void StructByValue(S s)
+{
+	s.SetX(100);
+	s.SetY(100);
+	Assert(s.GetX() == 100);
+	Assert(s.GetY() == 100);
 }
 
-void SetValue(int* p, int val)
+void StructByRef(ref S s)
 {
-	p[0] = val;
-}
-
-int GetValue(int* p)
-{
-	return p[0];
-}
-
-void TestPtrPassToFunction()
-{
-	int* p = alloc(int, 1);
-	SetValue(p, 99);
-	Assert(GetValue(p) == 99);
-	free(p);
-}
-
-int* AllocAndInit(int count, int val)
-{
-	int* p = alloc(int, count);
-	int i = 0;
-	for(; i < count; ++i)
-	{
-		p[i] = val;
-	}
-	return p;
-}
-
-void TestPtrReturn()
-{
-	int* p = AllocAndInit(3, 7);
-	Assert(p[0] == 7);
-	Assert(p[1] == 7);
-	Assert(p[2] == 7);
-	free(p);
-}
-
-void TestPtrCompare()
-{
-	int* a = alloc(int, 1);
-	int* b = alloc(int, 1);
-	int* c = a;
-
-	Assert(a == c);
-	Assert(a != b);
-	Assert(a != null);
-	Assert(null == null);
-
-	free(a);
-	free(b);
+	s.SetX(1000);
+	s.SetY(1000);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
 }
 
 public int main()
 {
-	TestPtrBasic();
-	TestPtrNull();
-	TestPtrArray();
-	TestPtrPassToFunction();
-	TestPtrReturn();
-	TestPtrCompare();
+	S s; s.Init(10, 10);
+	StructByValue(s);
+	Assert(s.GetX() == 10);
+	Assert(s.GetY() == 10);
+
+	S s2 = s; //copy
+	s.SetX(25);
+	s.SetY(25);
+	Assert(s2.GetX() == 10);
+	Assert(s2.GetY() == 10);
+	Assert(s.GetX() == 25);
+	Assert(s.GetY() == 25);
+
+	StructByRef(s);
+	Assert(s.GetX() == 1000);
+	Assert(s.GetY() == 1000);
+
+	ref S s3 = s;
+	Assert(s3.GetX() == 1000);
+	Assert(s3.GetY() == 1000);
+
+	s3.SetX(0);
+	Assert(s.GetX() == 0);
+
 	return 0;
 }
