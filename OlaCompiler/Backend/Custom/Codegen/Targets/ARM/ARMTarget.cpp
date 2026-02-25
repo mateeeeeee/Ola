@@ -288,9 +288,17 @@ namespace ola
 					MI.SetOp<0>(op1);
 					MI.SetOp<1>(op2);
 
-					if (op1.IsImmediate())
+					if (op1.IsImmediate() && op2.IsImmediate())
 					{
-						OLA_ASSERT(!op2.IsImmediate());
+						MachineOperand tmp = lowering_ctx.VirtualReg(op1.GetType());
+						MachineInstruction mov_inst(InstMove);
+						mov_inst.SetOp<0>(tmp);
+						mov_inst.SetOp<1>(op1);
+						instructions.insert(instruction_iter, mov_inst);
+						MI.SetOp<0>(tmp);
+					}
+					else if (op1.IsImmediate())
+					{
 						MI.SetOp<0>(op2);
 						MI.SetOp<1>(op1);
 

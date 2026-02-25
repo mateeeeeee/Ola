@@ -183,15 +183,14 @@ mov x0, x28
 bl ___ola_free
 b label12
 label9:
-ldr x27, [x29, #-48]
+ldr x27, [x29, #-40]
 b label8
 label10:
 ldr x26, [x25]
-str x26, [x29, #-48]
+str x26, [x29, #-40]
 b label9
 label11:
-ldr x26, [x29, #-40]
-add x25, x26, #0
+add x25, x28, #0
 mov x26, #99
 str x26, [x25]
 b label10
@@ -283,9 +282,52 @@ ldr x28, [x29, #-24]
 ldp x29, x30, [sp, #32]
 add sp, sp, #48
 ret
+_TestPtrCompare:
+label17:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x0, #8
+bl ___ola_alloc
+mov x28, x0
+mov x0, #8
+bl ___ola_alloc
+mov x27, x0
+cmp x28, x28
+cset w26, eq
+mov w0, w26
+bl _Assert
+cmp x28, x27
+cset w26, ne
+mov w0, w26
+bl _Assert
+cmp x28, #0
+cset w26, ne
+mov w0, w26
+bl _Assert
+mov x26, #0
+cmp x26, #0
+cset w26, eq
+mov w0, w26
+bl _Assert
+mov x0, x28
+bl ___ola_free
+mov x0, x27
+bl ___ola_free
+b label18
+label18:
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
 .globl _main
 _main:
-label17:
+label19:
 sub sp, sp, #16
 stp x29, x30, [sp, #0]
 add x29, sp, #0
@@ -294,8 +336,9 @@ bl _TestPtrNull
 bl _TestPtrArray
 bl _TestPtrPassToFunction
 bl _TestPtrReturn
-b label18
-label18:
+bl _TestPtrCompare
+b label20
+label20:
 mov x0, #0
 ldp x29, x30, [sp, #0]
 add sp, sp, #16

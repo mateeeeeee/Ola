@@ -96,6 +96,6 @@ public int main()
 	TestPtrArray();
 	TestPtrPassToFunction();
 	TestPtrReturn();
-	//TestPtrCompare();
+	TestPtrCompare();
 	return 0;
 }

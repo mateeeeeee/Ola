@@ -275,7 +275,6 @@ namespace ola
 			ISelNodePtr src = CreateNodeForValue(I.GetSrc());
 			if (auto* reg = dyn_cast<ISelRegisterNode>(src.get()))
 			{
-				value_map.MapValue(&I, reg);
 				ctx.MapOperand(&I, reg->GetRegister());
 			}
 			return;

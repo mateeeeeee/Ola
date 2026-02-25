@@ -1309,7 +1309,7 @@ namespace ola
 			Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
 			IRType* arg_type = called_function->GetArg(arg_index)->GetType();
-			if (arg_type->IsPointer()) args.push_back(arg_value);
+			if (arg_type->IsPointer() && !isa<PtrType>(arg_expr->GetType())) args.push_back(arg_value);
 			else args.push_back(Load(arg_type, arg_value));
 
 			arg_index++;
