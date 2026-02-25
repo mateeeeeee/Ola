@@ -194,6 +194,12 @@ namespace ola
 			type_mangled_name += GetTypeMangledName(ref_type->GetReferredType());
 			type_mangled_name += "ref";
 		}
+		else if (isa<PtrType>(type))
+		{
+			PtrType const* ptr_type = cast<PtrType>(type);
+			type_mangled_name += GetTypeMangledName(ptr_type->GetPointeeType());
+			type_mangled_name += "ptr";
+		}
 		else if (isa<ClassType>(type))
 		{
 			ClassType const* class_type = cast<ClassType>(type);

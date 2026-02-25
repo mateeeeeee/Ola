@@ -100,9 +100,21 @@ namespace ola
 			LowerSelect(cast<SelectInst>(I));
 			break;
 		case Opcode::Phi:
-		case Opcode::Bitcast:
 		case Opcode::Alloca:
 			break;
+		case Opcode::Bitcast:
+		{
+			CastInst* CI = cast<CastInst>(I);
+			if (CI->GetSrcType()->IsPointer() && CI->GetDestType()->IsPointer())
+			{
+				ctx.MapOperand(CI, ctx.GetOperand(CI->GetSrc()));
+			}
+			else
+			{
+				LowerCast(CI);
+			}
+			break;
+		}
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
 		}

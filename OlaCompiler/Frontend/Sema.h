@@ -118,6 +118,9 @@ namespace ola
 		UniqueThisExprPtr ActOnThisExpr(SourceLocation const& loc, Bool implicit);
 		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, Bool implicit);
 		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
+		UniqueExprPtr ActOnNullLiteral(SourceLocation const& loc);
+		UniqueExprPtr ActOnAllocExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr);
+		UniqueExprPtr ActOnFreeExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr);
 
 	private:
 		FrontendContext* ctx;

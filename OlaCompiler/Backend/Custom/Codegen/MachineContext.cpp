@@ -155,6 +155,10 @@ namespace ola
 				}
 				return MachineOperand::Immediate(0, mt);
 			}
+			else if (C->GetConstantID() == ConstantID::NullPtr)
+			{
+				return MachineOperand::Immediate(0, MachineType::Int64);
+			}
 			else
 			{
 				OLA_ASSERT(false);

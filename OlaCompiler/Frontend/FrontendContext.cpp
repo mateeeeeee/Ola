@@ -26,6 +26,10 @@ namespace ola
 		{
 			delete ref_type;
 		}
+		for (PtrType* ptr_type : ptr_types)
+		{
+			delete ptr_type;
+		}
 		for (FuncType* function_type : function_types)
 		{
 			delete function_type;
@@ -63,6 +67,19 @@ namespace ola
 		}
 		ref_types.push_back(new(this) RefType(type));
 		return ref_types.back();
+	}
+
+	PtrType* FrontendContext::GetPtrType(QualType const& type)
+	{
+		for (auto const& ptr_type : ptr_types)
+		{
+			if (ptr_type->GetPointeeType() == type)
+			{
+				return ptr_type;
+			}
+		}
+		ptr_types.push_back(new(this) PtrType(type));
+		return ptr_types.back();
 	}
 
 	FuncType* FrontendContext::GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types)

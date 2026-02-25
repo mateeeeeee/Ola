@@ -66,6 +66,9 @@ namespace ola
 	using UniqueThisExprPtr			= UniquePtr<ThisExpr>;
 	using UniqueSuperExprPtr		= UniquePtr<SuperExpr>;
 	using UniqueConstructorExprPtr	= UniquePtr<ConstructorExpr>;
+	using UniqueNullLiteralPtr		= UniquePtr<NullLiteral>;
+	using UniqueAllocExprPtr		= UniquePtr<AllocExpr>;
+	using UniqueFreeExprPtr			= UniquePtr<FreeExpr>;
 
 	using UniqueEnumMemberDeclPtrList	  = std::vector<UniqueEnumMemberDeclPtr>;
 	using UniqueVarDeclPtrList			  = std::vector<UniqueVarDeclPtr>;

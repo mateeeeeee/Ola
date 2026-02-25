@@ -18,6 +18,27 @@ namespace ola
 		return ctx->GetRefType(type);
 	}
 
+	Bool PtrType::IsAssignableFrom(Type const* other) const
+	{
+		if (this == other) 
+		{
+			return true;
+		}
+		if (PtrType const* other_ptr = dyn_cast<PtrType>(other))
+		{
+			if (isa<VoidType>(other_ptr->pointee_type.GetTypePtr())) 
+			{
+				return true;
+			}
+			return pointee_type.GetTypePtr() == other_ptr->pointee_type.GetTypePtr();
+		}
+		return false;
+	}
+	PtrType* PtrType::Get(FrontendContext* ctx, QualType const& type)
+	{
+		return ctx->GetPtrType(type);
+	}
+
 	Bool VoidType::IsAssignableFrom(Type const* other) const
 	{
 		return isa<VoidType>(other); 

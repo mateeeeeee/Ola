@@ -64,6 +64,7 @@ namespace ola
 		Invalid,
 		Void,
 		Ref,
+		Ptr,
 		Bool,
 		Char,
 		Int,
@@ -113,6 +114,23 @@ namespace ola
 
 	private:
 		explicit RefType(QualType const& type) :Type(TypeKind::Ref, 8, 8), type(type) {}
+	};
+
+	class PtrType : public Type
+	{
+		friend class FrontendContext;
+	public:
+		QualType const& GetPointeeType() const { return pointee_type; }
+
+		virtual Bool IsAssignableFrom(Type const*) const override;
+
+		static Bool ClassOf(Type const* T) { return T->GetKind() == TypeKind::Ptr; }
+		static PtrType* Get(FrontendContext* ctx, QualType const& type);
+	private:
+		QualType pointee_type;
+
+	private:
+		explicit PtrType(QualType const& type) : Type(TypeKind::Ptr, 8, 8), pointee_type(type) {}
 	};
 
 	class VoidType : public Type

@@ -37,6 +37,9 @@ namespace ola
 		Uint8* AllocGlobal(GlobalVariable* gv, Uint32 size, Uint32 alignment);
 		Uint8* AllocString(std::string_view str);
 
+		Uint8* HeapAlloc(Uint32 size);
+		void HeapFree(Uint8* ptr);
+
 		Bool IsValidStackAddress(Uint8* addr) const;
 		Bool IsValidHeapAddress(Uint8* addr) const;
 

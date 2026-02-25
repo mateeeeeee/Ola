@@ -1166,7 +1166,7 @@ namespace ola
 			llvm::Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
 			llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
-			if (arg_type->isPointerTy())
+			if (arg_type->isPointerTy() && !isa<PtrType>(arg_expr->GetType()))
 			{
 				args.push_back(arg_value);
 			}
@@ -1174,7 +1174,7 @@ namespace ola
 			{
 				args.push_back(Load(arg_type, arg_value));
 			}
-			
+
 			arg_index++;
 		}
 
@@ -1239,7 +1239,14 @@ namespace ola
 			}
 			else if (alloc_type->isPointerTy())
 			{
-				llvm::Value* ptr = builder.CreateInBoundsGEP(alloc_type, Load(alloc_type, alloc), index_value);
+				llvm::Value* loaded_ptr = Load(alloc_type, alloc);
+				Type const* expr_type = array_expr->GetType();
+				llvm::Type* element_type = int_type;
+				if (PtrType const* ptr_type = dyn_cast<PtrType>(expr_type))
+				{
+					element_type = ConvertToIRType(ptr_type->GetPointeeType());
+				}
+				llvm::Value* ptr = builder.CreateInBoundsGEP(element_type, loaded_ptr, index_value);
 				value_map[&array_access_expr] = ptr;
 			}
 			else OLA_ASSERT(false);
@@ -1251,18 +1258,28 @@ namespace ola
 			llvm::Value* ptr = builder.CreateGEP(global_type, global_var, { zero, index_value });
 			value_map[&array_access_expr] = ptr;
 		}
-		else 
+		else
 		{
 			Type const* array_expr_type = array_expr->GetType();
-			OLA_ASSERT(isa<ArrayType>(array_expr_type));
-			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
-			if (isa<ArrayType>(array_type->GetElementType()))
+			if (isa<PtrType>(array_expr_type))
 			{
-				Uint32 array_size = array_type->GetArraySize();
-				index_value = builder.CreateMul(index_value, builder.getInt64(array_size));
+				PtrType const* ptr_type = cast<PtrType>(array_expr_type);
+				llvm::Type* element_type = ConvertToIRType(ptr_type->GetPointeeType());
+				llvm::Value* ptr = builder.CreateInBoundsGEP(element_type, array_value, index_value);
+				value_map[&array_access_expr] = ptr;
 			}
-			llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
-			value_map[&array_access_expr] = ptr;
+			else
+			{
+				OLA_ASSERT(isa<ArrayType>(array_expr_type));
+				ArrayType const* array_type = cast<ArrayType>(array_expr_type);
+				if (isa<ArrayType>(array_type->GetElementType()))
+				{
+					Uint32 array_size = array_type->GetArraySize();
+					index_value = builder.CreateMul(index_value, builder.getInt64(array_size));
+				}
+				llvm::Value* ptr = builder.CreateInBoundsGEP(array_value->getType(), array_value, index_value);
+				value_map[&array_access_expr] = ptr;
+			}
 		}
 	}
 
@@ -1378,6 +1395,52 @@ namespace ola
 	void LLVMIRVisitor::Visit(SuperExpr const& super_expr, Uint32)
 	{
 		value_map[&super_expr] = this_value;
+	}
+
+	void LLVMIRVisitor::Visit(NullLiteral const& null_literal, Uint32)
+	{
+		llvm::Type* ptr_type = ConvertToIRType(null_literal.GetType());
+		value_map[&null_literal] = llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(ptr_type));
+	}
+
+	void LLVMIRVisitor::Visit(AllocExpr const& alloc_expr, Uint32)
+	{
+		llvm::Function* alloc_fn = module.getFunction("__ola_alloc");
+		if (!alloc_fn)
+		{
+			llvm::FunctionType* alloc_type = llvm::FunctionType::get(GetPointerType(char_type), { int_type }, false);
+			alloc_fn = llvm::Function::Create(alloc_type, llvm::Function::ExternalLinkage, "__ola_alloc", module);
+		}
+
+		alloc_expr.GetCountExpr()->Accept(*this);
+		llvm::Value* count_value = value_map[alloc_expr.GetCountExpr()];
+		count_value = Load(int_type, count_value);
+
+		Type const* element_type = alloc_expr.GetAllocType().GetTypePtr();
+		Uint64 element_size = element_type->GetSize();
+		llvm::Value* size = builder.CreateMul(count_value, builder.getInt64(element_size));
+
+		llvm::Value* raw_ptr = builder.CreateCall(alloc_fn, { size });
+		llvm::Type* result_ptr_type = ConvertToIRType(alloc_expr.GetType());
+		llvm::Value* typed_ptr = builder.CreateBitCast(raw_ptr, result_ptr_type);
+		value_map[&alloc_expr] = typed_ptr;
+	}
+
+	void LLVMIRVisitor::Visit(FreeExpr const& free_expr, Uint32)
+	{
+		llvm::Function* free_fn = module.getFunction("__ola_free");
+		if (!free_fn)
+		{
+			llvm::FunctionType* free_type = llvm::FunctionType::get(void_type, { GetPointerType(char_type) }, false);
+			free_fn = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "__ola_free", module);
+		}
+
+		free_expr.GetPtrExpr()->Accept(*this);
+		llvm::Value* ptr_value = value_map[free_expr.GetPtrExpr()];
+		ptr_value = Load(free_expr.GetPtrExpr()->GetType(), ptr_value);
+		llvm::Value* raw_ptr = builder.CreateBitCast(ptr_value, GetPointerType(char_type));
+		builder.CreateCall(free_fn, { raw_ptr });
+		value_map[&free_expr] = llvm::UndefValue::get(void_type);
 	}
 
 	void LLVMIRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
@@ -1569,6 +1632,11 @@ namespace ola
 			RefType const* ref_type = cast<RefType>(type);
 			return llvm::PointerType::get(ConvertToIRType(ref_type->GetReferredType()), 0);
 		}
+		case TypeKind::Ptr:
+		{
+			PtrType const* ptr_type = cast<PtrType>(type);
+			return llvm::PointerType::get(ConvertToIRType(ptr_type->GetPointeeType()), 0);
+		}
 		default:
 			OLA_UNREACHABLE();
 		}
@@ -1665,6 +1733,15 @@ namespace ola
 		{
 			llvm_type = ConvertToIRType(ref_type->GetReferredType());
 		}
+		else if (isa<PtrType>(type))
+		{
+			llvm_type = ConvertToIRType(type);
+			if (IsPointer(ptr->getType()) && (llvm::isa<llvm::AllocaInst>(ptr) || llvm::isa<llvm::GlobalVariable>(ptr)))
+			{
+				return builder.CreateLoad(llvm_type, ptr);
+			}
+			return ptr;
+		}
 		else
 		{
 			llvm_type = ConvertToIRType(type);
@@ -1680,6 +1757,10 @@ namespace ola
 			{
 				return ptr;
 			}
+			if (llvm::isa<llvm::ConstantPointerNull>(ptr))
+			{
+				return ptr;
+			}
 			return builder.CreateLoad(llvm_type, ptr);
 		}
 		return ptr;
@@ -1688,11 +1769,19 @@ namespace ola
 	llvm::Value* LLVMIRVisitor::Store(llvm::Value* value, llvm::Value* ptr)
 	{
 		if (!IsPointer(value->getType())) return builder.CreateStore(value, ptr);
-		
+
 		llvm::Value* load = nullptr;
 		if (llvm::AllocaInst* AI = dyn_cast<llvm::AllocaInst>(value))
 		{
 			load = Load(AI->getAllocatedType(), AI);
+		}
+		else if (llvm::isa<llvm::ConstantPointerNull>(value))
+		{
+			load = value;
+		}
+		else if (!llvm::isa<llvm::AllocaInst>(value) && !llvm::isa<llvm::GlobalVariable>(value))
+		{
+			load = value;
 		}
 		else
 		{

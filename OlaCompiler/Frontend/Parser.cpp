@@ -1354,6 +1354,9 @@ namespace ola
 		case TokenKind::KW_false: return ParseConstantBool();
 		case TokenKind::KW_this:  return ParseThisExpression();
 		case TokenKind::KW_super:  return ParseSuperExpression();
+		case TokenKind::KW_null:  return ParseNullExpression();
+		case TokenKind::KW_alloc: return ParseAllocExpression();
+		case TokenKind::KW_free:  return ParseFreeExpression();
 		default:
 			Diag(unexpected_token);
 		}
@@ -1481,6 +1484,43 @@ namespace ola
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
 		return sema->ActOnSuperExpr(loc, false);
+	}
+
+	UniqueExprPtr Parser::ParseNullExpression()
+	{
+		OLA_ASSERT(current_token->Is(TokenKind::KW_null));
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		return sema->ActOnNullLiteral(loc);
+	}
+
+	UniqueExprPtr Parser::ParseAllocExpression()
+	{
+		OLA_ASSERT(current_token->Is(TokenKind::KW_alloc));
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		Expect(TokenKind::left_round);
+
+		QualType alloc_type{};
+		ParseTypeQualifier(alloc_type);
+		ParseTypeSpecifier(alloc_type);
+		Expect(TokenKind::comma);
+		UniqueExprPtr count_expr = ParseAssignmentExpression();
+		Expect(TokenKind::right_round);
+
+		return sema->ActOnAllocExpr(loc, alloc_type, std::move(count_expr));
+	}
+
+	UniqueExprPtr Parser::ParseFreeExpression()
+	{
+		OLA_ASSERT(current_token->Is(TokenKind::KW_free));
+		SourceLocation loc = current_token->GetLocation();
+		++current_token;
+		Expect(TokenKind::left_round);
+		UniqueExprPtr ptr_expr = ParseAssignmentExpression();
+		Expect(TokenKind::right_round);
+
+		return sema->ActOnFreeExpr(loc, std::move(ptr_expr));
 	}
 
 	UniqueIdentifierExprPtr Parser::ParseMemberIdentifier()
@@ -1725,6 +1765,16 @@ namespace ola
 					type.RemoveConst();
 				}
 			}
+		}
+
+		if (Consume(TokenKind::star))
+		{
+			if (isa<VoidType>(type))
+			{
+				Diag(invalid_type_specifier);
+				return;
+			}
+			type.SetType(PtrType::Get(context, type));
 		}
 
 		if (is_ref)
