@@ -44,6 +44,11 @@ namespace ola
 				diagnostics.Report(loc, arrays_cannot_be_refs);
 				return nullptr;
 			}
+			if (isa<PtrType>(ref_type->GetReferredType()))
+			{
+				diagnostics.Report(loc, pointers_cannot_be_refs);
+				return nullptr;
+			}
 		}
 		if (isa<ClassType>(type))
 		{
