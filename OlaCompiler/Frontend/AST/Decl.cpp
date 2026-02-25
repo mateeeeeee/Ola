@@ -204,7 +204,12 @@ namespace ola
 		{
 			ClassType const* class_type = cast<ClassType>(type);
 			type_mangled_name += "__";
-			type_mangled_name += class_type->GetClassDecl()->GetName();
+			std::string class_name(class_type->GetClassDecl()->GetName());
+			for (char& c : class_name)
+			{
+				if (c == '<' || c == '>' || c == ',') c = '.';
+			}
+			type_mangled_name += class_name;
 		}
 		else OLA_ASSERT(false);
 
