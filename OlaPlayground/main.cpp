@@ -7,7 +7,7 @@
 
 using namespace ola;
 
-static constexpr Char const* BACKEND = "--llvm";
+static constexpr Char const* BACKEND = "--nollvm";
 static constexpr Char const* OPT_LEVEL = "--O0";
 static constexpr Char const* TARGET = "arm64";
 static constexpr Char const* INTERPRET = "--interpret";
