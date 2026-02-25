@@ -1733,15 +1733,6 @@ namespace ola
 		{
 			llvm_type = ConvertToIRType(ref_type->GetReferredType());
 		}
-		else if (isa<PtrType>(type))
-		{
-			llvm_type = ConvertToIRType(type);
-			if (IsPointer(ptr->getType()) && (llvm::isa<llvm::AllocaInst>(ptr) || llvm::isa<llvm::GlobalVariable>(ptr)))
-			{
-				return builder.CreateLoad(llvm_type, ptr);
-			}
-			return ptr;
-		}
 		else
 		{
 			llvm_type = ConvertToIRType(type);
