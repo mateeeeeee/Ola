@@ -66,6 +66,7 @@ set(OLA_CUSTOM_TESTS
 	Tests/Custom/test_constructors.ola
 	Tests/Custom/test_returns.ola
 	Tests/Custom/test_literals.ola
+	Tests/Custom/test_ptr.ola
 )
 
 add_executable(OlaTests ${SOURCE} ${OLA_LLVM_TESTS} ${OLA_CUSTOM_TESTS})

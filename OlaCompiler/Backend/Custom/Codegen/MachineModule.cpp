@@ -109,9 +109,9 @@ namespace ola
 							{
 								data->AppendSymbolRef(GV->GetName());
 							}
-							else if (isa<UndefValue>(V))
+							else if (isa<UndefValue>(V) || isa<ConstantNullPtr>(V))
 							{
-								// Undef values (e.g., null pointers in vtables) - emit zeros
+								// Undef/null values - emit zeros
 								Uint32 size = V->GetType()->GetSize();
 								for (Uint32 i = 0; i < size; ++i)
 								{

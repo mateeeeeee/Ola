@@ -44,6 +44,11 @@ namespace ola
 				diagnostics.Report(loc, arrays_cannot_be_refs);
 				return nullptr;
 			}
+			if (isa<PtrType>(ref_type->GetReferredType()))
+			{
+				diagnostics.Report(loc, pointers_cannot_be_refs);
+				return nullptr;
+			}
 		}
 		if (isa<ClassType>(type))
 		{
@@ -702,8 +707,8 @@ namespace ola
 		case BinaryExprKind::Multiply:
 		case BinaryExprKind::Divide:
 		{
-			if (isoneof<VoidType, ArrayType, FuncType>(lhs_type) ||
-				isoneof<VoidType, ArrayType, FuncType>(rhs_type))
+			if (isoneof<VoidType, ArrayType, FuncType, PtrType>(lhs_type) ||
+				isoneof<VoidType, ArrayType, FuncType, PtrType>(rhs_type))
 			{
 				diagnostics.Report(loc, invalid_operands);
 				return nullptr;
@@ -800,13 +805,33 @@ namespace ola
 		break;
 		case BinaryExprKind::Equal:
 		case BinaryExprKind::NotEqual:
+		{
+			Bool lhs_is_ptr = isa<PtrType>(lhs_type);
+			Bool rhs_is_ptr = isa<PtrType>(rhs_type);
+			if (lhs_is_ptr || rhs_is_ptr)
+			{
+				if (!lhs_is_ptr || !rhs_is_ptr)
+				{
+					diagnostics.Report(loc, invalid_operands);
+					return nullptr;
+				}
+				if (!lhs_type->IsAssignableFrom(rhs_type) && !rhs_type->IsAssignableFrom(lhs_type))
+				{
+					diagnostics.Report(loc, invalid_operands);
+					return nullptr;
+				}
+				type = BoolType::Get(ctx);
+				break;
+			}
+		}
+		[[fallthrough]];
 		case BinaryExprKind::Less:
 		case BinaryExprKind::Greater:
 		case BinaryExprKind::LessEqual:
 		case BinaryExprKind::GreaterEqual:
 		{
-			if (isoneof<VoidType, ArrayType, FuncType>(lhs_type) ||
-				isoneof<VoidType, ArrayType, FuncType>(rhs_type))
+			if (isoneof<VoidType, ArrayType, FuncType, PtrType>(lhs_type) ||
+				isoneof<VoidType, ArrayType, FuncType, PtrType>(rhs_type))
 			{
 				diagnostics.Report(loc, invalid_operands);
 				return nullptr;
@@ -1295,7 +1320,7 @@ namespace ola
 
 	UniqueArrayAccessExprPtr Sema::ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr)
 	{
-		if (!isa<ArrayType>(array_expr->GetType()))
+		if (!isa<ArrayType>(array_expr->GetType()) && !isa<PtrType>(array_expr->GetType()))
 		{
 			diagnostics.Report(loc, subscripted_value_not_array);
 			return nullptr;
@@ -1306,21 +1331,31 @@ namespace ola
 			return nullptr;
 		}
 
-		ArrayType const* array_type = cast<ArrayType>(array_expr->GetType());
-		if (index_expr->IsConstexpr())
+		QualType element_type;
+		if (isa<ArrayType>(array_expr->GetType()))
 		{
-			Int64 bracket_value = index_expr->EvaluateConstexpr();
-			if (array_type->GetArraySize() > 0 && (bracket_value < 0 || bracket_value >= array_type->GetArraySize()))
+			ArrayType const* array_type = cast<ArrayType>(array_expr->GetType());
+			if (index_expr->IsConstexpr())
 			{
-				diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);
-				return nullptr;
+				Int64 bracket_value = index_expr->EvaluateConstexpr();
+				if (array_type->GetArraySize() > 0 && (bracket_value < 0 || bracket_value >= array_type->GetArraySize()))
+				{
+					diagnostics.Report(loc, array_index_outside_of_bounds, bracket_value);
+					return nullptr;
+				}
 			}
+			element_type = array_type->GetElementType();
+		}
+		else
+		{
+			PtrType const* ptr_type = cast<PtrType>(array_expr->GetType());
+			element_type = ptr_type->GetPointeeType();
 		}
 
 		UniqueArrayAccessExprPtr array_access_expr = MakeUnique<ArrayAccessExpr>(loc);
 		array_access_expr->SetArrayExpr(std::move(array_expr));
 		array_access_expr->SetIndexExpr(std::move(index_expr));
-		array_access_expr->SetType(array_type->GetElementType());
+		array_access_expr->SetType(element_type);
 		return array_access_expr;
 	}
 
@@ -1513,6 +1548,56 @@ namespace ola
 		ctor_expr->SetType(type);
 		ctor_expr->SetArgs(std::move(args));
 		return ctor_expr;
+	}
+
+	UniqueExprPtr Sema::ActOnNullLiteral(SourceLocation const& loc)
+	{
+		UniqueExprPtr null_expr = MakeUnique<NullLiteral>(loc);
+		null_expr->SetType(PtrType::Get(ctx, VoidType::Get(ctx)));
+		return null_expr;
+	}
+
+	UniqueExprPtr Sema::ActOnAllocExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr)
+	{
+		if (isa<VoidType>(type))
+		{
+			diagnostics.Report(loc, alloc_invalid_type);
+			return nullptr;
+		}
+		if (isa<PtrType>(type))
+		{
+			diagnostics.Report(loc, ptr_to_ptr_not_allowed);
+			return nullptr;
+		}
+		if (!isa<IntType>(count_expr->GetType()))
+		{
+			if (IntType::Get(ctx)->IsAssignableFrom(count_expr->GetType()))
+			{
+				count_expr = ActOnImplicitCastExpr(loc, IntType::Get(ctx), std::move(count_expr));
+			}
+			else
+			{
+				diagnostics.Report(loc, invalid_operands);
+				return nullptr;
+			}
+		}
+
+		QualType ptr_type(PtrType::Get(ctx, type));
+		UniqueExprPtr alloc_expr = MakeUnique<AllocExpr>(loc, type, std::move(count_expr));
+		alloc_expr->SetType(ptr_type);
+		return alloc_expr;
+	}
+
+	UniqueExprPtr Sema::ActOnFreeExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr)
+	{
+		if (!isa<PtrType>(ptr_expr->GetType()))
+		{
+			diagnostics.Report(loc, free_arg_not_pointer);
+			return nullptr;
+		}
+		UniqueExprPtr free_expr = MakeUnique<FreeExpr>(loc, std::move(ptr_expr));
+		free_expr->SetType(VoidType::Get(ctx));
+		return free_expr;
 	}
 
 	UniqueExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)

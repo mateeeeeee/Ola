@@ -18,6 +18,7 @@ namespace ola
 		StringLiteral,
 		BoolLiteral,
 		CharLiteral,
+		NullLiteral,
 		Identifier,
 		DeclRef,
 		ImplicitCast,
@@ -27,7 +28,9 @@ namespace ola
 		Member,
 		MethodCall,
 		This,
-		Super
+		Super,
+		Alloc,
+		Free
 	};
 	enum class UnaryExprKind : Uint8
 	{
@@ -534,5 +537,62 @@ namespace ola
 	private:
 		ConstructorDecl const* ctor_decl;
 		UniqueExprPtrList ctor_args;
+	};
+
+	class NullLiteral final : public Expr
+	{
+	public:
+		explicit NullLiteral(SourceLocation const& loc) : Expr(ExprKind::NullLiteral, loc)
+		{
+			SetValueCategory(ExprValueCategory::RValue);
+		}
+
+		virtual Bool IsConstexpr() const override { return true; }
+		virtual Int64 EvaluateConstexpr() const override { return 0; }
+
+		virtual void Accept(ASTVisitor&, Uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static Bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::NullLiteral; }
+	};
+
+	class AllocExpr final : public Expr
+	{
+	public:
+		AllocExpr(SourceLocation const& loc, QualType const& alloc_type, UniqueExprPtr&& count)
+			: Expr(ExprKind::Alloc, loc), alloc_type(alloc_type), count_expr(std::move(count))
+		{
+			SetValueCategory(ExprValueCategory::RValue);
+		}
+
+		QualType const& GetAllocType() const { return alloc_type; }
+		Expr const* GetCountExpr() const { return count_expr.get(); }
+
+		virtual void Accept(ASTVisitor&, Uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static Bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Alloc; }
+	private:
+		QualType alloc_type;
+		UniqueExprPtr count_expr;
+	};
+
+	class FreeExpr final : public Expr
+	{
+	public:
+		FreeExpr(SourceLocation const& loc, UniqueExprPtr&& ptr)
+			: Expr(ExprKind::Free, loc), ptr_expr(std::move(ptr))
+		{
+			SetValueCategory(ExprValueCategory::RValue);
+		}
+
+		Expr const* GetPtrExpr() const { return ptr_expr.get(); }
+
+		virtual void Accept(ASTVisitor&, Uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+
+		static Bool ClassOf(Expr const* expr) { return expr->GetExprKind() == ExprKind::Free; }
+	private:
+		UniqueExprPtr ptr_expr;
 	};
 }

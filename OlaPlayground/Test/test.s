@@ -1,75 +1,114 @@
-
-.text
-
-_factorial_helper__I__I:
-label0:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
-str x25, [x29, #-8]
-str x26, [x29, #-16]
-str x27, [x29, #-24]
-str x28, [x29, #-32]
-mov x28, x0
-mov x27, x1
-mov x26, x28
-mov x28, x27
-b label1
-label1:
-cmp x26, #1
-cset w27, le
-tst w27, w27
-b.ne label2
-b label3
-label2:
-b label4
-label3:
-sub x27, x26, #1
-mul x25, x26, x28
-mov x26, x27
-mov x28, x25
-b label1
-label4:
-mov x0, x28
-ldr x25, [x29, #-8]
-ldr x26, [x29, #-16]
-ldr x27, [x29, #-24]
-ldr x28, [x29, #-32]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
-ret
-_factorial__I:
-label5:
-sub sp, sp, #32
-stp x29, x30, [sp, #16]
-add x29, sp, #16
-str x28, [x29, #-8]
-mov x28, x0
-mov x1, #1
-mov x0, #5
-bl _factorial_helper__I__I
-mov x28, x0
-b label6
-label6:
-mov x0, x28
-ldr x28, [x29, #-8]
-ldp x29, x30, [sp, #16]
-add sp, sp, #32
-ret
-.globl _main
-_main:
-label7:
-sub sp, sp, #32
-stp x29, x30, [sp, #16]
-add x29, sp, #16
-str x28, [x29, #-8]
-mov x0, #5
-bl _factorial__I
-mov x28, x0
-b label8
-label8:
-mov x0, x28
-ldr x28, [x29, #-8]
-ldp x29, x30, [sp, #16]
-add sp, sp, #32
-ret
+	.text
+	.def	@feat.00;
+	.scl	3;
+	.type	0;
+	.endef
+	.globl	@feat.00
+.set @feat.00, 0
+	.intel_syntax noprefix
+	.file	"test.ola"
+	.def	S$Init__I__I;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	S$Init__I__I                    # -- Begin function S$Init__I__I
+	.p2align	4, 0x90
+S$Init__I__I:                           # @"S$Init__I__I"
+# %bb.0:                                # %entry
+	mov	qword ptr [rcx], rdx
+	mov	qword ptr [rcx + 8], r8
+	ret
+                                        # -- End function
+	.def	S$SetX__I;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	S$SetX__I                       # -- Begin function S$SetX__I
+	.p2align	4, 0x90
+S$SetX__I:                              # @"S$SetX__I"
+# %bb.0:                                # %entry
+	mov	qword ptr [rcx], rdx
+	ret
+                                        # -- End function
+	.def	S$SetY__I;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	S$SetY__I                       # -- Begin function S$SetY__I
+	.p2align	4, 0x90
+S$SetY__I:                              # @"S$SetY__I"
+# %bb.0:                                # %entry
+	mov	qword ptr [rcx + 8], rdx
+	ret
+                                        # -- End function
+	.def	S$GetX;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	S$GetX                          # -- Begin function S$GetX
+	.p2align	4, 0x90
+S$GetX:                                 # @"S$GetX"
+# %bb.0:                                # %entry
+	mov	rax, qword ptr [rcx]
+	ret
+                                        # -- End function
+	.def	S$GetY;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	S$GetY                          # -- Begin function S$GetY
+	.p2align	4, 0x90
+S$GetY:                                 # @"S$GetY"
+# %bb.0:                                # %entry
+	mov	rax, qword ptr [rcx + 8]
+	ret
+                                        # -- End function
+	.def	main;
+	.scl	2;
+	.type	32;
+	.endef
+	.globl	main                            # -- Begin function main
+	.p2align	4, 0x90
+main:                                   # @main
+.seh_proc main
+# %bb.0:                                # %entry
+	sub	rsp, 40
+	.seh_stackalloc 40
+	.seh_endprologue
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	mov	ecx, 1
+	call	Assert
+	xor	eax, eax
+                                        # kill: def $rax killed $eax
+	add	rsp, 40
+	ret
+	.seh_endproc
+                                        # -- End function
+	.addrsig

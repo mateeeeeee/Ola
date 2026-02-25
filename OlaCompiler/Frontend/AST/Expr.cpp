@@ -122,6 +122,20 @@ namespace ola
 		visitor.Visit(*this, depth);
 		for (auto const& arg : ctor_args) arg->Accept(visitor, depth + 1);
 	}
+	void NullLiteral::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
+	void AllocExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		count_expr->Accept(visitor, depth + 1);
+	}
+	void FreeExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+		ptr_expr->Accept(visitor, depth + 1);
+	}
 
 	void Expr::Accept(ASTVisitor& visitor) const
 	{
@@ -205,6 +219,18 @@ namespace ola
 		visitor.Visit(*this, 0);
 	}
 	void ConstructorExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void NullLiteral::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void AllocExpr::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void FreeExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

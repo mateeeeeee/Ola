@@ -1309,7 +1309,7 @@ namespace ola
 			Value* arg_value = value_map[arg_expr.get()];
 			OLA_ASSERT(arg_value);
 			IRType* arg_type = called_function->GetArg(arg_index)->GetType();
-			if (arg_type->IsPointer()) args.push_back(arg_value);
+			if (arg_type->IsPointer() && !isa<PtrType>(arg_expr->GetType())) args.push_back(arg_value);
 			else args.push_back(Load(arg_type, arg_value));
 
 			arg_index++;
@@ -1381,16 +1381,27 @@ namespace ola
 		else
 		{
 			Type const* array_expr_type = array_expr->GetType();
-			OLA_ASSERT(isa<ArrayType>(array_expr_type));
-			ArrayType const* array_type = cast<ArrayType>(array_expr_type);
-			if (isa<ArrayType>(array_type->GetElementType()))
+			if (isa<PtrType>(array_expr_type))
 			{
-				Uint32 array_size = array_type->GetArraySize();
-				index_value = builder->MakeInst<BinaryInst>(Opcode::SMul, index_value, context.GetInt64(array_size));
+				IRType* ptr_ir_type = ConvertToIRType(array_expr_type);
+				Value* loaded_ptr = Load(ptr_ir_type, array_value);
+				std::vector<Value*> indices = { index_value };
+				Value* ptr = builder->MakeInst<GetElementPtrInst>(loaded_ptr, indices);
+				value_map[&array_access] = ptr;
 			}
-			std::vector<Value*> indices = { zero, index_value };
-			Value* ptr = builder->MakeInst<GetElementPtrInst>(array_value, indices);
-			value_map[&array_access] = ptr;
+			else
+			{
+				OLA_ASSERT(isa<ArrayType>(array_expr_type));
+				ArrayType const* array_type = cast<ArrayType>(array_expr_type);
+				if (isa<ArrayType>(array_type->GetElementType()))
+				{
+					Uint32 array_size = array_type->GetArraySize();
+					index_value = builder->MakeInst<BinaryInst>(Opcode::SMul, index_value, context.GetInt64(array_size));
+				}
+				std::vector<Value*> indices = { zero, index_value };
+				Value* ptr = builder->MakeInst<GetElementPtrInst>(array_value, indices);
+				value_map[&array_access] = ptr;
+			}
 		}
 	}
 
@@ -1565,6 +1576,61 @@ namespace ola
 			++arg_index;
 		}
 		builder->MakeInst<CallInst>(called_ctor, args);
+	}
+
+	void IRVisitor::Visit(NullLiteral const& null_expr, Uint32)
+	{
+		IRType* ir_type = ConvertToIRType(null_expr.GetType());
+		IRPtrType* ptr_type = cast<IRPtrType>(ir_type);
+		value_map[&null_expr] = new ConstantNullPtr(ptr_type);
+	}
+
+	void IRVisitor::Visit(AllocExpr const& alloc_expr, Uint32)
+	{
+		alloc_expr.GetCountExpr()->Accept(*this);
+		Value* count_value = value_map[alloc_expr.GetCountExpr()];
+		count_value = Load(int_type, count_value);
+
+		IRType* element_ir_type = ConvertToIRType(alloc_expr.GetAllocType());
+		Uint64 element_size = element_ir_type->GetSize();
+		Value* size_value = builder->MakeInst<BinaryInst>(Opcode::SMul, count_value, context.GetInt64(element_size));
+
+		Function* alloc_fn = module.GetFunctionByName("__ola_alloc");
+		if (!alloc_fn)
+		{
+			IRPtrType* ptr_void = GetPointerType(void_type);
+			IRFuncType* alloc_func_type = IRFuncType::Get(ptr_void, { int_type });
+			alloc_fn = new Function("__ola_alloc", alloc_func_type, Linkage::External);
+			module.AddGlobal(alloc_fn);
+		}
+
+		std::vector<Value*> alloc_args = { size_value };
+		Value* raw_ptr = builder->MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(alloc_args));
+		IRType* result_type = ConvertToIRType(alloc_expr.GetType());
+		Value* typed_ptr = builder->MakeInst<CastInst>(Opcode::Bitcast, result_type, raw_ptr);
+		value_map[&alloc_expr] = typed_ptr;
+	}
+
+	void IRVisitor::Visit(FreeExpr const& free_expr, Uint32)
+	{
+		free_expr.GetPtrExpr()->Accept(*this);
+		Value* ptr_value = value_map[free_expr.GetPtrExpr()];
+		ptr_value = Load(ConvertToIRType(free_expr.GetPtrExpr()->GetType()), ptr_value);
+
+		Function* free_fn = module.GetFunctionByName("__ola_free");
+		if (!free_fn)
+		{
+			IRPtrType* ptr_void = GetPointerType(void_type);
+			IRFuncType* free_func_type = IRFuncType::Get(void_type, { ptr_void });
+			free_fn = new Function("__ola_free", free_func_type, Linkage::External);
+			module.AddGlobal(free_fn);
+		}
+
+		IRPtrType* ptr_void = GetPointerType(void_type);
+		Value* void_ptr = builder->MakeInst<CastInst>(Opcode::Bitcast, ptr_void, ptr_value);
+		std::vector<Value*> free_args = { void_ptr };
+		builder->MakeInst<CallInst>(static_cast<Value*>(free_fn), std::span<Value*>(free_args));
+		value_map[&free_expr] = nullptr;
 	}
 
 	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)
@@ -1750,6 +1816,11 @@ namespace ola
 			RefType const* ref_type = cast<RefType>(type);
 			return GetPointerType(ConvertToIRType(ref_type->GetReferredType()));
 		}
+		case TypeKind::Ptr:
+		{
+			PtrType const* ptr_type = cast<PtrType>(type);
+			return GetPointerType(ConvertToIRType(ptr_type->GetPointeeType()));
+		}
 		default:
 			OLA_UNREACHABLE();
 		}
@@ -1849,6 +1920,10 @@ namespace ola
 
 	Value* IRVisitor::Load(IRType* ir_type, Value* ptr)
 	{
+		if (isa<ConstantNullPtr>(ptr))
+		{
+			return ptr;
+		}
 		if (ptr->GetType()->IsPointer())
 		{
 			if (ir_type->IsPointer() && isa<GlobalVariable>(ptr))
@@ -1863,6 +1938,10 @@ namespace ola
 	Value* IRVisitor::Store(Value* value, Value* ptr)
 	{
 		if (!value->GetType()->IsPointer())
+		{
+			return builder->MakeInst<StoreInst>(value, ptr);
+		}
+		if (isa<Constant>(value) || isa<CallInst>(value) || isa<CastInst>(value))
 		{
 			return builder->MakeInst<StoreInst>(value, ptr);
 		}

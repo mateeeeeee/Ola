@@ -8,6 +8,7 @@ namespace ola
 	class ArrayType;
 	class ClassType;
 	class RefType;
+	class PtrType;
 	class FuncType;
 	class VoidType;
 	class BoolType;
@@ -32,6 +33,7 @@ namespace ola
 
 		ArrayType* GetArrayType(QualType const& type, Uint32 array_size);
 		RefType* GetRefType(QualType const& type);
+		PtrType* GetPtrType(QualType const& type);
 		FuncType* GetFuncType(QualType const& return_type, std::vector<QualType> const& param_types);
 		ClassType* GetClassType(ClassDecl const* class_decl);
 
@@ -45,6 +47,7 @@ namespace ola
 		std::vector<ArrayType*> array_types;
 		std::vector<ClassType*> class_types;
 		std::vector<RefType*>   ref_types;
+		std::vector<PtrType*>   ptr_types;
 		std::vector<FuncType*>  function_types;
 	};
 }

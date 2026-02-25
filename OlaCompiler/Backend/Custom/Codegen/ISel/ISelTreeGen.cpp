@@ -270,10 +270,18 @@ namespace ola
 
 	void ISelTreeGen::ProcessCastInst(CastInst& I)
 	{
+		if (I.GetOpcode() == Opcode::Bitcast && I.GetSrcType()->IsPointer() && I.GetDestType()->IsPointer())
+		{
+			ISelNodePtr src = CreateNodeForValue(I.GetSrc());
+			if (auto* reg = dyn_cast<ISelRegisterNode>(src.get()))
+			{
+				ctx.MapOperand(&I, reg->GetRegister());
+			}
+			return;
+		}
+
 		ISelNodePtr src = CreateNodeForValue(I.GetSrc());
-
 		std::vector<ISelNode*> leaves = { src.get() };
-
 		auto cast_op = std::make_unique<ISelUnaryOpNode>(
 			I.GetOpcode(),
 			std::move(src)

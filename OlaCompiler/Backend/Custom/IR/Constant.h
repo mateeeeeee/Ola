@@ -8,8 +8,8 @@
 namespace ola
 {
 	enum class ConstantID : Uint8
-	{ 
-		Global, Integer, Float, String, Offset, Array, Struct, Undef
+	{
+		Global, Integer, Float, String, Offset, Array, Struct, NullPtr, Undef
 	};
 
 	class Constant : public TrackableValue
@@ -215,6 +215,21 @@ namespace ola
 		static Bool ClassOf(Constant const* C)
 		{
 			return C->GetConstantID() == ConstantID::Undef;
+		}
+	};
+
+	class ConstantNullPtr final : public Constant
+	{
+	public:
+		explicit ConstantNullPtr(IRPtrType* type) : Constant(ConstantID::NullPtr, type) {}
+
+		static Bool ClassOf(Value const* V)
+		{
+			return isa<Constant>(V) && ClassOf(cast<Constant>(V));
+		}
+		static Bool ClassOf(Constant const* C)
+		{
+			return C->GetConstantID() == ConstantID::NullPtr;
 		}
 	};
 }

@@ -660,6 +660,11 @@ namespace ola
 			return InterpreterValue::MakeInt(0);
 		}
 
+		if (isa<ConstantNullPtr>(v))
+		{
+			return InterpreterValue::MakePointer(nullptr);
+		}
+
 		if (ConstantString* cs = dyn_cast<ConstantString>(v))
 		{
 			Uint8* addr = memory.AllocString(cs->GetValue());

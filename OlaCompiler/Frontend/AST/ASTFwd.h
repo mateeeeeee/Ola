@@ -55,6 +55,9 @@ namespace ola
 	class ThisExpr;
 	class SuperExpr;
 	class ConstructorExpr;
+	class NullLiteral;
+	class AllocExpr;
+	class FreeExpr;
 
 	struct AST;
 }

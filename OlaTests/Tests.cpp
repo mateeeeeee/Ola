@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #define LLVM_BACKEND 0
-#define USE_INTERPRETER 1
+#define USE_INTERPRETER 0
 #include "Compiler/CompilerMacros.h"
 
 #if USE_INTERPRETER
@@ -113,6 +113,11 @@ TEST(Declarations, Class)
 TEST(Declarations, Ref)
 {
 	EXPECT_EQ(RUN_TEST(-i test_ref), 0);
+}
+
+TEST(Declarations, Ptr)
+{
+	EXPECT_EQ(RUN_TEST(-i test_ptr), 0);
 }
 
 TEST(Declarations, Array)

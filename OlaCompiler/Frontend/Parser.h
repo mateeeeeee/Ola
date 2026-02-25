@@ -113,6 +113,9 @@ namespace ola
 		OLA_NODISCARD UniqueExprPtr ParseIdentifier();
 		OLA_NODISCARD UniqueThisExprPtr ParseThisExpression();
 		OLA_NODISCARD UniqueSuperExprPtr ParseSuperExpression();
+		OLA_NODISCARD UniqueExprPtr ParseNullExpression();
+		OLA_NODISCARD UniqueExprPtr ParseAllocExpression();
+		OLA_NODISCARD UniqueExprPtr ParseFreeExpression();
 		OLA_NODISCARD UniqueIdentifierExprPtr ParseMemberIdentifier();
 		OLA_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
