@@ -17,7 +17,7 @@ Toy compiler with both LLVM backend and a custom backend.
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
-  * reference type: `ref`
+  * reference type and pointers: `ref`, `T*`
   * automatic type deduction: `auto`
   * enums
   * functions 
