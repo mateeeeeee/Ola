@@ -1766,11 +1766,7 @@ namespace ola
 		{
 			load = Load(AI->getAllocatedType(), AI);
 		}
-		else if (llvm::isa<llvm::ConstantPointerNull>(value))
-		{
-			load = value;
-		}
-		else if (!llvm::isa<llvm::AllocaInst>(value) && !llvm::isa<llvm::GlobalVariable>(value))
+		else if (llvm::isa<llvm::ConstantPointerNull>(value) || llvm::isa<llvm::BitCastInst>(value) || llvm::isa<llvm::CallInst>(value))
 		{
 			load = value;
 		}
