@@ -1,0 +1,41 @@
+import std.assert;
+
+class Box<T>
+{
+	Box(T v)
+	{
+		this.value = v;
+	}
+	public T GetValue() const
+	{
+		return this.value;
+	}
+	public void SetValue(T v)
+	{
+		this.value = v;
+	}
+	private T value;
+};
+
+public int main()
+{
+	Box<int> bi(42);
+	Assert(bi.GetValue() == 42);
+	bi.SetValue(100);
+	Assert(bi.GetValue() == 100);
+
+	Box<float> bf(3.14);
+	Assert(bf.GetValue() == 3.14);
+	bf.SetValue(2.71);
+	Assert(bf.GetValue() == 2.71);
+
+	Box<bool> bb(true);
+	Assert(bb.GetValue() == true);
+	bb.SetValue(false);
+	Assert(bb.GetValue() == false);
+
+	Box<int> bi2(10);
+	Assert(bi2.GetValue() == 10);
+
+	return 0;
+}
