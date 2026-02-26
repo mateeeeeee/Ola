@@ -90,8 +90,8 @@ namespace ola
 		virtual void Visit(ThisExpr const&, Uint32) override;
 		virtual void Visit(SuperExpr const&, Uint32) override;
 		virtual void Visit(NullLiteral const&, Uint32) override;
-		virtual void Visit(AllocExpr const&, Uint32) override;
-		virtual void Visit(FreeExpr const&, Uint32) override;
+		virtual void Visit(NewExpr const&, Uint32) override;
+		virtual void Visit(DeleteExpr const&, Uint32) override;
 
 	private:
 		llvm::LLVMContext& context;

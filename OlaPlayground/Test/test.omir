@@ -33,9 +33,9 @@ InstMove - i64 reg 1, i64 reg 2
 InstPop - i64 reg 2
 InstRet - 
 
-external __ola_alloc
+external __ola_new
 
-external __ola_free
+external __ola_delete
 
 internal TestPtrNull: 
 label2: 

@@ -1403,44 +1403,44 @@ namespace ola
 		value_map[&null_literal] = llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(ptr_type));
 	}
 
-	void LLVMIRVisitor::Visit(AllocExpr const& alloc_expr, Uint32)
+	void LLVMIRVisitor::Visit(NewExpr const& new_expr, Uint32)
 	{
-		llvm::Function* alloc_fn = module.getFunction("__ola_alloc");
+		llvm::Function* alloc_fn = module.getFunction("__ola_new");
 		if (!alloc_fn)
 		{
 			llvm::FunctionType* alloc_type = llvm::FunctionType::get(GetPointerType(char_type), { int_type }, false);
-			alloc_fn = llvm::Function::Create(alloc_type, llvm::Function::ExternalLinkage, "__ola_alloc", module);
+			alloc_fn = llvm::Function::Create(alloc_type, llvm::Function::ExternalLinkage, "__ola_new", module);
 		}
 
-		alloc_expr.GetCountExpr()->Accept(*this);
-		llvm::Value* count_value = value_map[alloc_expr.GetCountExpr()];
+		new_expr.GetCountExpr()->Accept(*this);
+		llvm::Value* count_value = value_map[new_expr.GetCountExpr()];
 		count_value = Load(int_type, count_value);
 
-		Type const* element_type = alloc_expr.GetAllocType().GetTypePtr();
+		Type const* element_type = new_expr.GetAllocType().GetTypePtr();
 		Uint64 element_size = element_type->GetSize();
 		llvm::Value* size = builder.CreateMul(count_value, builder.getInt64(element_size));
 
 		llvm::Value* raw_ptr = builder.CreateCall(alloc_fn, { size });
-		llvm::Type* result_ptr_type = ConvertToIRType(alloc_expr.GetType());
+		llvm::Type* result_ptr_type = ConvertToIRType(new_expr.GetType());
 		llvm::Value* typed_ptr = builder.CreateBitCast(raw_ptr, result_ptr_type);
-		value_map[&alloc_expr] = typed_ptr;
+		value_map[&new_expr] = typed_ptr;
 	}
 
-	void LLVMIRVisitor::Visit(FreeExpr const& free_expr, Uint32)
+	void LLVMIRVisitor::Visit(DeleteExpr const& delete_expr, Uint32)
 	{
-		llvm::Function* free_fn = module.getFunction("__ola_free");
+		llvm::Function* free_fn = module.getFunction("__ola_delete");
 		if (!free_fn)
 		{
 			llvm::FunctionType* free_type = llvm::FunctionType::get(void_type, { GetPointerType(char_type) }, false);
-			free_fn = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "__ola_free", module);
+			free_fn = llvm::Function::Create(free_type, llvm::Function::ExternalLinkage, "__ola_delete", module);
 		}
 
-		free_expr.GetPtrExpr()->Accept(*this);
-		llvm::Value* ptr_value = value_map[free_expr.GetPtrExpr()];
-		ptr_value = Load(free_expr.GetPtrExpr()->GetType(), ptr_value);
+		delete_expr.GetPtrExpr()->Accept(*this);
+		llvm::Value* ptr_value = value_map[delete_expr.GetPtrExpr()];
+		ptr_value = Load(delete_expr.GetPtrExpr()->GetType(), ptr_value);
 		llvm::Value* raw_ptr = builder.CreateBitCast(ptr_value, GetPointerType(char_type));
 		builder.CreateCall(free_fn, { raw_ptr });
-		value_map[&free_expr] = llvm::UndefValue::get(void_type);
+		value_map[&delete_expr] = llvm::UndefValue::get(void_type);
 	}
 
 	void LLVMIRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, llvm::Function* func)
