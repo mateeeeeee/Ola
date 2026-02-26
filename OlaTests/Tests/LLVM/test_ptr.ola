@@ -2,10 +2,10 @@ import std.assert;
 
 void TestPtrBasic()
 {
-	int* p = alloc(int, 1);
+	int* p = new int;
 	p[0] = 42;
 	Assert(p[0] == 42);
-	free(p);
+	delete p;
 }
 
 void TestPtrNull()
@@ -13,16 +13,16 @@ void TestPtrNull()
 	int* p = null;
 	Assert(p == null);
 
-	p = alloc(int, 1);
+	p = new int;
 	Assert(p != null);
 	p[0] = 10;
 	Assert(p[0] == 10);
-	free(p);
+	delete p;
 }
 
 void TestPtrArray()
 {
-	int* arr = alloc(int, 5);
+	int* arr = new int[5];
 	int i = 0;
 	for(; i < 5; ++i)
 	{
@@ -33,7 +33,7 @@ void TestPtrArray()
 	Assert(arr[2] == 4);
 	Assert(arr[3] == 9);
 	Assert(arr[4] == 16);
-	free(arr);
+	delete arr;
 }
 
 void SetValue(int* p, int val)
@@ -48,15 +48,15 @@ int GetValue(int* p)
 
 void TestPtrPassToFunction()
 {
-	int* p = alloc(int, 1);
+	int* p = new int;
 	SetValue(p, 99);
 	Assert(GetValue(p) == 99);
-	free(p);
+	delete p;
 }
 
 int* AllocAndInit(int count, int val)
 {
-	int* p = alloc(int, count);
+	int* p = new int[count];
 	int i = 0;
 	for(; i < count; ++i)
 	{
@@ -71,13 +71,13 @@ void TestPtrReturn()
 	Assert(p[0] == 7);
 	Assert(p[1] == 7);
 	Assert(p[2] == 7);
-	free(p);
+	delete p;
 }
 
 void TestPtrCompare()
 {
-	int* a = alloc(int, 1);
-	int* b = alloc(int, 1);
+	int* a = new int;
+	int* b = new int;
 	int* c = a;
 
 	Assert(a == c);
@@ -85,8 +85,8 @@ void TestPtrCompare()
 	Assert(a != null);
 	Assert(null == null);
 
-	free(a);
-	free(b);
+	delete a;
+	delete b;
 }
 
 public int main()

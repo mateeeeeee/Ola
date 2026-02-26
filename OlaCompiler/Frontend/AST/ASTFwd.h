@@ -56,8 +56,8 @@ namespace ola
 	class SuperExpr;
 	class ConstructorExpr;
 	class NullLiteral;
-	class AllocExpr;
-	class FreeExpr;
+	class NewExpr;
+	class DeleteExpr;
 
 	struct AST;
 }

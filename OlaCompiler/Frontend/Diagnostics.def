@@ -104,8 +104,8 @@ DIAG(non_pure_method_needs_definition, error, "Non-pure method needs definition"
 DIAG(function_decl_needs_to_be_extern, error, "function declaration needs to be declared as extern!")
 DIAG(function_def_cannot_be_extern, error, "function definition cannot be declared as extern! Use either public or private!")
 DIAG(calling_deprecated_function, warning, "Function {} is deprecated")
-DIAG(free_arg_not_pointer, error, "Argument to free must be a pointer type")
-DIAG(alloc_invalid_type, error, "Cannot allocate void type")
+DIAG(delete_arg_not_pointer, error, "Argument to delete must be a pointer type")
+DIAG(new_invalid_type, error, "Cannot allocate void type")
 DIAG(null_assigned_to_non_pointer, error, "null can only be assigned to a pointer type")
 DIAG(ptr_to_ptr_not_allowed, error, "Pointer to pointer is not allowed")
 #undef DIAG

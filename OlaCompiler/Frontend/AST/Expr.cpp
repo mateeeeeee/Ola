@@ -126,12 +126,12 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
-	void AllocExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
+	void NewExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		count_expr->Accept(visitor, depth + 1);
 	}
-	void FreeExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
+	void DeleteExpr::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{
 		visitor.Visit(*this, depth);
 		ptr_expr->Accept(visitor, depth + 1);
@@ -226,11 +226,11 @@ namespace ola
 	{
 		visitor.Visit(*this, 0);
 	}
-	void AllocExpr::Accept(ASTVisitor& visitor) const
+	void NewExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}
-	void FreeExpr::Accept(ASTVisitor& visitor) const
+	void DeleteExpr::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

@@ -1355,8 +1355,8 @@ namespace ola
 		case TokenKind::KW_this:  return ParseThisExpression();
 		case TokenKind::KW_super:  return ParseSuperExpression();
 		case TokenKind::KW_null:  return ParseNullExpression();
-		case TokenKind::KW_alloc: return ParseAllocExpression();
-		case TokenKind::KW_free:  return ParseFreeExpression();
+		case TokenKind::KW_new:    return ParseNewExpression();
+		case TokenKind::KW_delete: return ParseDeleteExpression();
 		default:
 			Diag(unexpected_token);
 		}
@@ -1494,33 +1494,37 @@ namespace ola
 		return sema->ActOnNullLiteral(loc);
 	}
 
-	UniqueExprPtr Parser::ParseAllocExpression()
+	UniqueExprPtr Parser::ParseNewExpression()
 	{
-		OLA_ASSERT(current_token->Is(TokenKind::KW_alloc));
+		OLA_ASSERT(current_token->Is(TokenKind::KW_new));
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		Expect(TokenKind::left_round);
 
 		QualType alloc_type{};
-		ParseTypeQualifier(alloc_type);
-		ParseTypeSpecifier(alloc_type);
-		Expect(TokenKind::comma);
-		UniqueExprPtr count_expr = ParseAssignmentExpression();
-		Expect(TokenKind::right_round);
+		ParseBaseType(alloc_type);
 
-		return sema->ActOnAllocExpr(loc, alloc_type, std::move(count_expr));
+		UniqueExprPtr count_expr;
+		if (Consume(TokenKind::left_square))
+		{
+			count_expr = ParseAssignmentExpression();
+			Expect(TokenKind::right_square);
+		}
+		else
+		{
+			count_expr = sema->ActOnIntLiteral(1, loc);
+		}
+
+		return sema->ActOnNewExpr(loc, alloc_type, std::move(count_expr));
 	}
 
-	UniqueExprPtr Parser::ParseFreeExpression()
+	UniqueExprPtr Parser::ParseDeleteExpression()
 	{
-		OLA_ASSERT(current_token->Is(TokenKind::KW_free));
+		OLA_ASSERT(current_token->Is(TokenKind::KW_delete));
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
-		Expect(TokenKind::left_round);
-		UniqueExprPtr ptr_expr = ParseAssignmentExpression();
-		Expect(TokenKind::right_round);
+		UniqueExprPtr ptr_expr = ParseUnaryExpression();
 
-		return sema->ActOnFreeExpr(loc, std::move(ptr_expr));
+		return sema->ActOnDeleteExpr(loc, std::move(ptr_expr));
 	}
 
 	UniqueIdentifierExprPtr Parser::ParseMemberIdentifier()
@@ -1783,6 +1787,39 @@ namespace ola
 			type.RemoveConst();
 			type = QualType(RefType::Get(context, type), is_const ? Qualifier_Const : Qualifier_None);
 		}
+	}
+
+	void Parser::ParseBaseType(QualType& type)
+	{
+		switch (current_token->GetKind())
+		{
+		case TokenKind::KW_bool:  type.SetType(BoolType::Get(context));  break;
+		case TokenKind::KW_char:  type.SetType(CharType::Get(context));  break;
+		case TokenKind::KW_int:   type.SetType(IntType::Get(context));   break;
+		case TokenKind::KW_float: type.SetType(FloatType::Get(context)); break;
+		case TokenKind::identifier:
+		{
+			std::string_view identifier = current_token->GetData();
+			TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.LookUp(identifier);
+			if (tag_decl && isa<AliasDecl>(tag_decl))
+			{
+				type = tag_decl->GetType();
+			}
+			else if (tag_decl && isa<ClassDecl>(tag_decl))
+			{
+				type.SetType(ClassType::Get(context, cast<ClassDecl>(tag_decl)));
+			}
+			else
+			{
+				Diag(invalid_type_specifier);
+			}
+		}
+		break;
+		default:
+			Diag(invalid_type_specifier);
+			return;
+		}
+		++current_token;
 	}
 
 	Bool Parser::IsFunctionDeclaration()

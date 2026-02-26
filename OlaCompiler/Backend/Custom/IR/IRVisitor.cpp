@@ -1585,44 +1585,44 @@ namespace ola
 		value_map[&null_expr] = new ConstantNullPtr(ptr_type);
 	}
 
-	void IRVisitor::Visit(AllocExpr const& alloc_expr, Uint32)
+	void IRVisitor::Visit(NewExpr const& new_expr, Uint32)
 	{
-		alloc_expr.GetCountExpr()->Accept(*this);
-		Value* count_value = value_map[alloc_expr.GetCountExpr()];
+		new_expr.GetCountExpr()->Accept(*this);
+		Value* count_value = value_map[new_expr.GetCountExpr()];
 		count_value = Load(int_type, count_value);
 
-		IRType* element_ir_type = ConvertToIRType(alloc_expr.GetAllocType());
+		IRType* element_ir_type = ConvertToIRType(new_expr.GetAllocType());
 		Uint64 element_size = element_ir_type->GetSize();
 		Value* size_value = builder->MakeInst<BinaryInst>(Opcode::SMul, count_value, context.GetInt64(element_size));
 
-		Function* alloc_fn = module.GetFunctionByName("__ola_alloc");
+		Function* alloc_fn = module.GetFunctionByName("__ola_new");
 		if (!alloc_fn)
 		{
 			IRPtrType* ptr_void = GetPointerType(void_type);
 			IRFuncType* alloc_func_type = IRFuncType::Get(ptr_void, { int_type });
-			alloc_fn = new Function("__ola_alloc", alloc_func_type, Linkage::External);
+			alloc_fn = new Function("__ola_new", alloc_func_type, Linkage::External);
 			module.AddGlobal(alloc_fn);
 		}
 
 		std::vector<Value*> alloc_args = { size_value };
 		Value* raw_ptr = builder->MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(alloc_args));
-		IRType* result_type = ConvertToIRType(alloc_expr.GetType());
+		IRType* result_type = ConvertToIRType(new_expr.GetType());
 		Value* typed_ptr = builder->MakeInst<CastInst>(Opcode::Bitcast, result_type, raw_ptr);
-		value_map[&alloc_expr] = typed_ptr;
+		value_map[&new_expr] = typed_ptr;
 	}
 
-	void IRVisitor::Visit(FreeExpr const& free_expr, Uint32)
+	void IRVisitor::Visit(DeleteExpr const& delete_expr, Uint32)
 	{
-		free_expr.GetPtrExpr()->Accept(*this);
-		Value* ptr_value = value_map[free_expr.GetPtrExpr()];
-		ptr_value = Load(ConvertToIRType(free_expr.GetPtrExpr()->GetType()), ptr_value);
+		delete_expr.GetPtrExpr()->Accept(*this);
+		Value* ptr_value = value_map[delete_expr.GetPtrExpr()];
+		ptr_value = Load(ConvertToIRType(delete_expr.GetPtrExpr()->GetType()), ptr_value);
 
-		Function* free_fn = module.GetFunctionByName("__ola_free");
+		Function* free_fn = module.GetFunctionByName("__ola_delete");
 		if (!free_fn)
 		{
 			IRPtrType* ptr_void = GetPointerType(void_type);
 			IRFuncType* free_func_type = IRFuncType::Get(void_type, { ptr_void });
-			free_fn = new Function("__ola_free", free_func_type, Linkage::External);
+			free_fn = new Function("__ola_delete", free_func_type, Linkage::External);
 			module.AddGlobal(free_fn);
 		}
 
@@ -1630,7 +1630,7 @@ namespace ola
 		Value* void_ptr = builder->MakeInst<CastInst>(Opcode::Bitcast, ptr_void, ptr_value);
 		std::vector<Value*> free_args = { void_ptr };
 		builder->MakeInst<CallInst>(static_cast<Value*>(free_fn), std::span<Value*>(free_args));
-		value_map[&free_expr] = nullptr;
+		value_map[&delete_expr] = nullptr;
 	}
 
 	void IRVisitor::VisitFunctionDeclCommon(FunctionDecl const& func_decl, Function* func)

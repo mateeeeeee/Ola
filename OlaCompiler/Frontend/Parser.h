@@ -114,8 +114,8 @@ namespace ola
 		OLA_NODISCARD UniqueThisExprPtr ParseThisExpression();
 		OLA_NODISCARD UniqueSuperExprPtr ParseSuperExpression();
 		OLA_NODISCARD UniqueExprPtr ParseNullExpression();
-		OLA_NODISCARD UniqueExprPtr ParseAllocExpression();
-		OLA_NODISCARD UniqueExprPtr ParseFreeExpression();
+		OLA_NODISCARD UniqueExprPtr ParseNewExpression();
+		OLA_NODISCARD UniqueExprPtr ParseDeleteExpression();
 		OLA_NODISCARD UniqueIdentifierExprPtr ParseMemberIdentifier();
 		OLA_NODISCARD UniqueInitializerListExprPtr ParseInitializerListExpression();
 
@@ -123,6 +123,7 @@ namespace ola
 		void ParseMethodAttributes(Uint8& attrs);
 		void ParseTypeQualifier(QualType& type);
 		void ParseTypeSpecifier(QualType& type, Bool array_size_forbidden = false, Bool allow_ref = true);
+		void ParseBaseType(QualType& type);
 
 		Bool IsFunctionDeclaration();
 		Bool IsCurrentTokenTypename();

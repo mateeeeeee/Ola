@@ -115,8 +115,8 @@ KEYWORD(super)
 KEYWORD(virtual)
 KEYWORD(pure)
 KEYWORD(final)
-KEYWORD(alloc)
-KEYWORD(free)
+KEYWORD(new)
+KEYWORD(delete)
 KEYWORD(null)
 
 #undef KEYWORD

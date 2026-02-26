@@ -68,7 +68,7 @@ namespace ola
 		static InterpreterValue Intrinsic_StringToInt(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
 
 		// memory
-		static InterpreterValue Intrinsic_OlaAlloc(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
-		static InterpreterValue Intrinsic_OlaFree(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
+		static InterpreterValue Intrinsic_OlaNew(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
+		static InterpreterValue Intrinsic_OlaDelete(std::vector<InterpreterValue> const& args, InterpreterMemory& mem);
 	};
 }

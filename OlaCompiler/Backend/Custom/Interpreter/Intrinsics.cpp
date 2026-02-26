@@ -52,8 +52,8 @@ namespace ola
 
 		intrinsics["StringToInt"] = Intrinsic_StringToInt;
 
-		intrinsics["__ola_alloc"] = Intrinsic_OlaAlloc;
-		intrinsics["__ola_free"] = Intrinsic_OlaFree;
+		intrinsics["__ola_new"] = Intrinsic_OlaNew;
+		intrinsics["__ola_delete"] = Intrinsic_OlaDelete;
 	}
 
 	Bool Intrinsics::IsIntrinsic(std::string_view name) const
@@ -291,7 +291,7 @@ namespace ola
 		return InterpreterValue::MakeInt(0);
 	}
 
-	InterpreterValue Intrinsics::Intrinsic_OlaAlloc(std::vector<InterpreterValue> const& args, InterpreterMemory& mem)
+	InterpreterValue Intrinsics::Intrinsic_OlaNew(std::vector<InterpreterValue> const& args, InterpreterMemory& mem)
 	{
 		OLA_ASSERT(args.size() == 1);
 		Uint32 size = static_cast<Uint32>(args[0].AsInt());
@@ -299,7 +299,7 @@ namespace ola
 		return InterpreterValue::MakePointer(ptr);
 	}
 
-	InterpreterValue Intrinsics::Intrinsic_OlaFree(std::vector<InterpreterValue> const& args, InterpreterMemory& mem)
+	InterpreterValue Intrinsics::Intrinsic_OlaDelete(std::vector<InterpreterValue> const& args, InterpreterMemory& mem)
 	{
 		OLA_ASSERT(args.size() == 1);
 		Uint8* ptr = args[0].AsPointer();

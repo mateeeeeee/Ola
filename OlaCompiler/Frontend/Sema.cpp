@@ -1557,11 +1557,11 @@ namespace ola
 		return null_expr;
 	}
 
-	UniqueExprPtr Sema::ActOnAllocExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr)
+	UniqueExprPtr Sema::ActOnNewExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr)
 	{
 		if (isa<VoidType>(type))
 		{
-			diagnostics.Report(loc, alloc_invalid_type);
+			diagnostics.Report(loc, new_invalid_type);
 			return nullptr;
 		}
 		if (isa<PtrType>(type))
@@ -1583,21 +1583,21 @@ namespace ola
 		}
 
 		QualType ptr_type(PtrType::Get(ctx, type));
-		UniqueExprPtr alloc_expr = MakeUnique<AllocExpr>(loc, type, std::move(count_expr));
-		alloc_expr->SetType(ptr_type);
-		return alloc_expr;
+		UniqueExprPtr new_expr = MakeUnique<NewExpr>(loc, type, std::move(count_expr));
+		new_expr->SetType(ptr_type);
+		return new_expr;
 	}
 
-	UniqueExprPtr Sema::ActOnFreeExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr)
+	UniqueExprPtr Sema::ActOnDeleteExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr)
 	{
 		if (!isa<PtrType>(ptr_expr->GetType()))
 		{
-			diagnostics.Report(loc, free_arg_not_pointer);
+			diagnostics.Report(loc, delete_arg_not_pointer);
 			return nullptr;
 		}
-		UniqueExprPtr free_expr = MakeUnique<FreeExpr>(loc, std::move(ptr_expr));
-		free_expr->SetType(VoidType::Get(ctx));
-		return free_expr;
+		UniqueExprPtr delete_expr = MakeUnique<DeleteExpr>(loc, std::move(ptr_expr));
+		delete_expr->SetType(VoidType::Get(ctx));
+		return delete_expr;
 	}
 
 	UniqueExprPtr Sema::ActOnImplicitCastExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& expr)

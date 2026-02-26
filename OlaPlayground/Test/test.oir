@@ -8,7 +8,7 @@ declare @AssertMsg void(i8,ptr)
 
 define internal @TestPtrBasic void() {
 entry:
-%0 = call i64 8, @__ola_alloc
+%0 = call i64 8, @__ola_new
 %1 = bitcast ptr %0
 %2 = ptr add ptr %1, 0
 store 42, ptr %2
@@ -16,17 +16,17 @@ store 42, ptr %2
 %4 = icmp eq i64 %3, 42
 call i8 %4, @Assert
 %5 = bitcast ptr %1
-call ptr %5, @__ola_free
+call ptr %5, @__ola_delete
 br label exit
 exit:
 ret 
 }
 
 
-declare @__ola_alloc ptr(i64)
+declare @__ola_new ptr(i64)
 
 
-declare @__ola_free void(ptr)
+declare @__ola_delete void(ptr)
 
 
 define internal @TestPtrNull void() {
@@ -36,7 +36,7 @@ store null, ptr %0
 %1 = load ptr, ptr %0
 %2 = icmp eq ptr %1, null
 call i8 %2, @Assert
-%3 = call i64 8, @__ola_alloc
+%3 = call i64 8, @__ola_new
 %4 = bitcast ptr %3
 store ptr %4, ptr %0
 %5 = load ptr, ptr %0
@@ -52,7 +52,7 @@ store 10, ptr %8
 call i8 %12, @Assert
 %13 = load ptr, ptr %0
 %14 = bitcast ptr %13
-call ptr %14, @__ola_free
+call ptr %14, @__ola_delete
 br label exit
 exit:
 ret 
@@ -61,7 +61,7 @@ ret
 
 define internal @TestPtrArray void() {
 entry:
-%0 = call i64 40, @__ola_alloc
+%0 = call i64 40, @__ola_new
 %1 = bitcast ptr %0
 %2 = gep ptr %1, 0
 store 0, ptr %2
@@ -96,7 +96,7 @@ call i8 %18, @Assert
 %21 = icmp eq i64 %20, 16
 call i8 %21, @Assert
 %22 = bitcast ptr %1
-call ptr %22, @__ola_free
+call ptr %22, @__ola_delete
 br label exit
 exit:
 ret 
@@ -105,14 +105,14 @@ ret
 
 define internal @TestPtrPassToFunction void() {
 entry:
-%0 = call i64 8, @__ola_alloc
+%0 = call i64 8, @__ola_new
 %1 = bitcast ptr %0
 br label entry.inlined
 entry.split.split:
 %2 = icmp eq i64 %3, 99
 call i8 %2, @Assert
 %4 = bitcast ptr %1
-call ptr %4, @__ola_free
+call ptr %4, @__ola_delete
 br label exit
 exit.inlined:
 %3 = load i64, ptr %5
@@ -133,7 +133,7 @@ ret
 
 define internal @AllocAndInit__I__I ptr(i64 %count,i64 %val) {
 entry:
-%0 = call i64 24, @__ola_alloc
+%0 = call i64 24, @__ola_new
 %1 = bitcast ptr %0
 %2 = gep ptr %1, 0
 store 7, ptr %2
@@ -163,7 +163,7 @@ call i8 %6, @Assert
 %9 = icmp eq i64 %8, 7
 call i8 %9, @Assert
 %10 = bitcast ptr %0
-call ptr %10, @__ola_free
+call ptr %10, @__ola_delete
 br label exit
 exit:
 ret 
@@ -172,9 +172,9 @@ ret
 
 define internal @TestPtrCompare void() {
 entry:
-%0 = call i64 8, @__ola_alloc
+%0 = call i64 8, @__ola_new
 %1 = bitcast ptr %0
-%2 = call i64 8, @__ola_alloc
+%2 = call i64 8, @__ola_new
 %3 = bitcast ptr %2
 %4 = icmp eq ptr %1, %1
 call i8 %4, @Assert
@@ -185,9 +185,9 @@ call i8 %6, @Assert
 %7 = icmp eq ptr null, null
 call i8 %7, @Assert
 %8 = bitcast ptr %1
-call ptr %8, @__ola_free
+call ptr %8, @__ola_delete
 %9 = bitcast ptr %3
-call ptr %9, @__ola_free
+call ptr %9, @__ola_delete
 br label exit
 exit:
 ret 

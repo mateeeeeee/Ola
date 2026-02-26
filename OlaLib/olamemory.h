@@ -3,13 +3,13 @@
 
 extern "C"
 {
-	void* __ola_alloc(long long size)
+	void* __ola_new(long long size)
 	{
 		void* ptr = malloc((size_t)size);
 		if (ptr) memset(ptr, 0, (size_t)size);
 		return ptr;
 	}
-	void __ola_free(void* ptr)
+	void __ola_delete(void* ptr)
 	{
 		free(ptr);
 	}
