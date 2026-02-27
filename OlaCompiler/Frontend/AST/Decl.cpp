@@ -285,6 +285,10 @@ namespace ola
 	{
 		visitor.Visit(*this, depth);
 	}
+	void TemplateFunctionDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 	void Decl::Accept(ASTVisitor& visitor) const
 	{
@@ -327,6 +331,10 @@ namespace ola
 		visitor.Visit(*this, 0);
 	}
 	void TemplateClassDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void TemplateFunctionDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

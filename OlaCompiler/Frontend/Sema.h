@@ -86,6 +86,9 @@ namespace ola
 		UniqueTemplateClassDeclPtr ActOnTemplateClassDecl(std::string_view name, SourceLocation const& loc,
 			std::vector<std::string>&& type_params, ClassDecl const* base_class, Bool final,
 			Uint64 body_begin, Uint64 body_end);
+		UniqueTemplateFunctionDeclPtr ActOnTemplateFunctionDecl(std::string_view name, SourceLocation const& loc,
+			std::vector<std::string>&& type_params, FuncAttributes attributes, DeclVisibility visibility,
+			Uint64 body_begin, Uint64 body_end);
 
 		UniqueCompoundStmtPtr ActOnCompoundStmt(UniqueStmtPtrList&& stmts);
 		UniqueExprStmtPtr ActOnExprStmt(UniqueExprPtr&& expr);

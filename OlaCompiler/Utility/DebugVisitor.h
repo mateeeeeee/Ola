@@ -24,6 +24,7 @@ namespace ola
 		virtual void Visit(AliasDecl const&, Uint32) override;
 		virtual void Visit(ClassDecl const&, Uint32) override;
 		virtual void Visit(TemplateClassDecl const&, Uint32) override;
+		virtual void Visit(TemplateFunctionDecl const&, Uint32) override;
 
 		virtual void Visit(Stmt const&, Uint32) override;
 		virtual void Visit(CompoundStmt const&, Uint32) override;

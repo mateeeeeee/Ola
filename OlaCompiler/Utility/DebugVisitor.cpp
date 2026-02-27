@@ -175,6 +175,11 @@ namespace ola
 		OLA_DEBUG("{}TemplateClassDecl <{}>\n", GetIndentation(depth), tmpl_decl.GetName());
 	}
 
+	void DebugVisitor::Visit(TemplateFunctionDecl const& tmpl_decl, Uint32 depth)
+	{
+		OLA_DEBUG("{}TemplateFunctionDecl <{}>\n", GetIndentation(depth), tmpl_decl.GetName());
+	}
+
 	void DebugVisitor::Visit(Stmt const&, Uint32 depth)
 	{
 		OLA_DEBUG("{}Stmt\n", GetIndentation(depth));
