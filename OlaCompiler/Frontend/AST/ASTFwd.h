@@ -18,6 +18,7 @@ namespace ola
 	class AliasDecl;
 	class ClassDecl;
 	class TemplateClassDecl;
+	class TemplateFunctionDecl;
 
 	class Stmt;
 	class CompoundStmt;

@@ -20,7 +20,8 @@ namespace ola
 		EnumMember,
 		Alias,
 		Class,
-		TemplateClass
+		TemplateClass,
+		TemplateFunction
 	};
 	enum class DeclVisibility : Uint8
 	{
@@ -488,6 +489,35 @@ namespace ola
 		Uint64 body_token_end;
 		ClassDecl const* base_class = nullptr;
 		Bool final = false;
+	};
+
+	class TemplateFunctionDecl final : public Decl
+	{
+	public:
+		TemplateFunctionDecl(std::string_view name, SourceLocation const& loc,
+			std::vector<std::string>&& type_params,
+			Uint64 body_token_begin, Uint64 body_token_end)
+			: Decl(DeclKind::TemplateFunction, name, loc),
+			type_params(std::move(type_params)),
+			body_token_begin(body_token_begin),
+			body_token_end(body_token_end) {}
+
+		std::vector<std::string> const& GetTypeParams() const { return type_params; }
+		Uint64 GetBodyTokenBegin() const { return body_token_begin; }
+		Uint64 GetBodyTokenEnd() const { return body_token_end; }
+
+		void SetFuncAttributes(FuncAttributes attrs) { func_attributes = attrs; }
+		FuncAttributes GetFuncAttributes() const { return func_attributes; }
+
+		virtual void Accept(ASTVisitor&, Uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+		static Bool ClassOf(Decl const* d) { return d->GetDeclKind() == DeclKind::TemplateFunction; }
+
+	private:
+		std::vector<std::string> type_params;
+		Uint64 body_token_begin;
+		Uint64 body_token_end;
+		FuncAttributes func_attributes = FuncAttribute_None;
 	};
 }
 
