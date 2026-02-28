@@ -382,7 +382,7 @@ namespace ola
 		}
 	}
 
-	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 1), {lhs, rhs})
+	CompareInst::CompareInst(Opcode id, Value* lhs, Value* rhs) : Instruction(id, IRIntType::Get(lhs->GetContext(), 8), {lhs, rhs})
 	{
 		Uint32 id_int = (Uint32)id;
 		OLA_ASSERT(id_int >= (Uint32)Opcode::CompareOpBegin && id_int <= (Uint32)Opcode::CompareOpEnd);

@@ -17,6 +17,7 @@ namespace ola
 		ast = MakeUnique<AST>();
 		AddBuiltinDecls(ast->translation_unit);
 		ParseTranslationUnit();
+		if (diagnostics.HasErrors()) ast.reset();
 	}
 
 	void Parser::ParseImported(std::vector<Token> const& _tokens)
@@ -26,11 +27,12 @@ namespace ola
 		sema = MakeUnique<Sema>(context, diagnostics);
 		ast = MakeUnique<AST>();
 		ParseTranslationUnit();
+		if (diagnostics.HasErrors()) ast.reset();
 	}
 
 	void Parser::ParseTranslationUnit()
 	{
-		while (current_token->IsNot(TokenKind::eof))
+		while (current_token->IsNot(TokenKind::eof) && !diagnostics.HasErrors())
 		{
 			UniqueDeclPtrList decls = ParseGlobalDeclaration();
 			for(auto&& decl : decls) ast->translation_unit->AddDecl(std::move(decl));
@@ -457,7 +459,7 @@ namespace ola
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
 			var_decl_list.push_back(std::move(var_decl));
 
-		} while (!Consume(TokenKind::semicolon));
+		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
 
 		return var_decl_list;
 	}
@@ -501,7 +503,7 @@ namespace ola
 				UniqueFieldDeclPtr var_decl = sema->ActOnFieldDecl(name, loc, variable_type, std::move(init_expr), visibility);
 				member_var_decl_list.push_back(std::move(var_decl));
 			}
-		} while (!Consume(TokenKind::semicolon));
+		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
 
 		return member_var_decl_list;
 	}
@@ -528,7 +530,7 @@ namespace ola
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::Extern);
 			var_decl_list.push_back(std::move(var_decl));
 
-		} while (!Consume(TokenKind::semicolon));
+		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
 
 		return var_decl_list;
 	}
@@ -763,7 +765,7 @@ namespace ola
 		SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
 		Expect(TokenKind::left_brace);
 		UniqueStmtPtrList stmts;
-		while (current_token->IsNot(TokenKind::right_brace))
+		while (current_token->IsNot(TokenKind::right_brace) && !diagnostics.HasErrors())
 		{
 			if (IsCurrentTokenTypename())
 			{
@@ -1033,6 +1035,10 @@ namespace ola
 	{
 		TokenPtr current_token_copy = current_token;
 		UniqueExprPtr lhs = ParseConditionalExpression();
+		if (diagnostics.HasErrors())
+		{
+			return nullptr;
+		}
 		BinaryExprKind arith_op_kind = BinaryExprKind::Assign;
 		SourceLocation loc = current_token->GetLocation();
 		switch (current_token->GetKind())
@@ -1359,6 +1365,7 @@ namespace ola
 		case TokenKind::KW_delete: return ParseDeleteExpression();
 		default:
 			Diag(unexpected_token);
+			return nullptr;
 		}
 		OLA_ASSERT(false);
 		return nullptr;

@@ -8,13 +8,13 @@ namespace ola
 	IRContext::IRContext()
 	{
 		void_type = new(this) IRVoidType(*this);
-		int1_type = new(this) IRIntType(*this, 1);
 		int8_type = new(this) IRIntType(*this, 8);
+		int64_type = new(this) IRIntType(*this, 64);
 		float_type = new(this) IRFloatType(*this);
 		label_type = new(this) IRLabelType(*this);
 
-		true_value = new ConstantInt(int1_type, 1);
-		false_value = new ConstantInt(int1_type, 0);
+		true_value = new ConstantInt(int8_type, 1);
+		false_value = new ConstantInt(int8_type, 0);
 		zero_float = new ConstantFloat(float_type, 0.0);
 	}
 
@@ -36,8 +36,8 @@ namespace ola
 
 		delete label_type;
 		delete float_type;
-		delete int1_type;
 		delete int8_type;
+		delete int64_type;
 		delete void_type;
 	}
 
@@ -45,8 +45,8 @@ namespace ola
 	{
 		switch (width)
 		{
-		case 1: return int1_type;
-		case 8: return int8_type;
+		case 8:  return int8_type;
+		case 64: return int64_type;
 		default:
 			OLA_ASSERT_MSG(false, "Invalid integer type width!");
 		}
@@ -162,7 +162,7 @@ namespace ola
 		{
 			return constant_ints64[value];
 		}
-		constant_ints64[value] = new ConstantInt(int8_type, value);
+		constant_ints64[value] = new ConstantInt(int64_type, value);
 		return constant_ints64[value];
 	}
 
@@ -172,7 +172,7 @@ namespace ola
 		{
 			return constant_ints8[value];
 		}
-		constant_ints8[value] = new ConstantInt(int1_type, value);
+		constant_ints8[value] = new ConstantInt(int8_type, value);
 		return constant_ints8[value];
 	}
 
@@ -181,7 +181,7 @@ namespace ola
 	{
 		OLA_ASSERT(type->IsInteger());
 		IRIntType* int_type = cast<IRIntType>(type);
-		return (int_type->GetWidth() == 8) ? GetInt64(value) : GetInt8(value);
+		return (int_type->GetWidth() == 64) ? GetInt64(value) : GetInt8(value);
 	}
 
 	ConstantFloat* IRContext::GetFloat(Float64 value)

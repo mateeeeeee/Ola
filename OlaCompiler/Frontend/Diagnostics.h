@@ -43,16 +43,23 @@ namespace ola
 			output += "\n";
 
 			PrintMessage(diag_kind, output);
-            if (exit_on_error && diag_kind == DiagKind::error)
-            {
-                std::exit(OLA_INVALID_SOURCE_CODE);
-            }
+			if (diag_kind == DiagKind::error)
+			{
+				error_reported = true;
+				if (exit_on_error) 
+				{
+					std::exit(OLA_INVALID_SOURCE_CODE);
+				}
+			}
 		}
+
+		Bool HasErrors() const { return error_reported; }
+		void ResetErrors() { error_reported = false; }
 
 	private:
 		Bool warnings_as_errors = false;
 		Bool exit_on_error = false;
 		SourceLocation loc;
-		OLA_MAYBE_UNUSED Bool error_reported = false;
+		Bool error_reported = false;
 	};
 }

@@ -65,7 +65,7 @@ namespace ola
 	Value* TryConstantFold_CompareInst(Opcode opcode, Value* lhs, Value* rhs)
 	{
 		IRContext& ctx = lhs->GetContext();
-		IRType* bool_type = IRIntType::Get(ctx, 1);
+		IRType* bool_type = IRIntType::Get(ctx, 8);
 
 		ConstantInt* CI1 = dyn_cast<ConstantInt>(lhs);
 		ConstantInt* CI2 = dyn_cast<ConstantInt>(rhs);
@@ -155,7 +155,7 @@ namespace ola
 				return nullptr;
 			}
 		}
-		IRType* int_type = IRIntType::Get(base->GetContext(), 8);
+		IRType* int_type = IRIntType::Get(base->GetContext(), 64);
 		return new PtrAddInst(base, ctx.GetInt(int_type, offset), current_type);
 	}
 

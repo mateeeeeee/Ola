@@ -10,7 +10,7 @@ namespace ola
 		switch (Ty->GetKind())
 		{
 		case IRTypeKind::Integer:
-			return cast<IRIntType>(Ty)->GetWidth() == 1 ? ctx.GetInt8(0) : ctx.GetInt64(0);
+			return cast<IRIntType>(Ty)->GetWidth() == 8 ? ctx.GetInt8(0) : ctx.GetInt64(0);
 		case IRTypeKind::Float:
 			return ctx.GetZeroFloat();
 		case IRTypeKind::Struct:

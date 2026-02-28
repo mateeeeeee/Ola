@@ -20,9 +20,9 @@ namespace ola
 		builder = std::make_unique<IRBuilder>(context);
 
 		void_type = IRVoidType::Get(context);
-		bool_type = IRIntType::Get(context, 1);
-		char_type = IRIntType::Get(context, 1);
-		int_type = IRIntType::Get(context, 8);
+		bool_type = IRIntType::Get(context, 8);
+		char_type = IRIntType::Get(context, 8);
+		int_type = IRIntType::Get(context, 64);
 		float_type = IRFloatType::Get(context);
 	}
 
@@ -921,8 +921,8 @@ namespace ola
 		}
 		else
 		{
-			zero = cast<IRIntType>(operand->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
-			one  = cast<IRIntType>(operand->GetType())->GetWidth() == 1 ? context.GetInt8(1) : context.GetInt64(1);
+			zero = cast<IRIntType>(operand->GetType())->GetWidth() == 8 ? context.GetInt8(0) : context.GetInt64(0);
+			one  = cast<IRIntType>(operand->GetType())->GetWidth() == 8 ? context.GetInt8(1) : context.GetInt64(1);
 		}
 
 		switch (unary_expr.GetUnaryKind())
@@ -1073,14 +1073,14 @@ namespace ola
 		case BinaryExprKind::LogicalAnd:
 		{
 			Value* tmp = builder->MakeInst<BinaryInst>(Opcode::And, lhs, rhs);
-			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
+			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 8 ? context.GetInt8(0) : context.GetInt64(0);
 			result = builder->MakeInst<CompareInst>(Opcode::ICmpNE, tmp, zero);
 		}
 		break;
 		case BinaryExprKind::LogicalOr:
 		{
 			Value* tmp = builder->MakeInst<BinaryInst>(Opcode::Or, lhs, rhs);
-			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 1 ? context.GetInt8(0) : context.GetInt64(0);
+			Constant* zero = cast<IRIntType>(tmp->GetType())->GetWidth() == 8 ? context.GetInt8(0) : context.GetInt64(0);
 			result = builder->MakeInst<CompareInst>(Opcode::ICmpNE, tmp, zero);
 		}
 		break;
@@ -1154,7 +1154,7 @@ namespace ola
 		OLA_ASSERT(false_value);
 		false_value = Load(false_expr->GetType(), false_value);
 
-		OLA_ASSERT(condition_value->GetType() == context.GetIntegerType(1));
+		OLA_ASSERT(condition_value->GetType() == context.GetIntegerType(8));
 		value_map[&ternary_expr] = builder->MakeInst<SelectInst>(condition_value, true_value, false_value);
 	}
 
@@ -1748,7 +1748,7 @@ namespace ola
 		if (condition_value->GetType()->IsInteger())
 		{
 			IRIntType* int_type = cast<IRIntType>(condition_value->GetType());
-			if (int_type->GetWidth() == 1)
+			if (int_type->GetWidth() == 8)
 			{
 				builder->MakeInst<BranchInst>(condition_value, true_block, false_block);
 			}

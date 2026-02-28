@@ -37,11 +37,11 @@ namespace ola
 	class ConstantInt final : public Constant
 	{
 	public:
-		ConstantInt(IRType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth() * 8)
+		ConstantInt(IRType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(GetIntegerType()->GetWidth())
 		{
 			OLA_ASSERT(isa<IRIntType>(type));
 		}
-		ConstantInt(IRIntType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth() * 8) {}
+		ConstantInt(IRIntType* type, Int64 V) : Constant(ConstantID::Integer, type), value(V), bitwidth(type->GetWidth()) {}
 
 		IRIntType* GetIntegerType() const
 		{
@@ -91,7 +91,7 @@ namespace ola
 	class ConstantString final : public Constant
 	{
 	public:
-		ConstantString(IRContext& C, std::string_view str) : Constant(ConstantID::String, IRArrayType::Get(IRIntType::Get(C, 1), str.size() + 1)), value(str) {}
+		ConstantString(IRContext& C, std::string_view str) : Constant(ConstantID::String, IRArrayType::Get(IRIntType::Get(C, 8), str.size() + 1)), value(str) {}
 
 		std::string_view GetValue() const { return value; }
 		

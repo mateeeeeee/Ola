@@ -326,8 +326,8 @@ namespace ola
 			IRIntType* int_type = cast<IRIntType>(type);
 			switch (int_type->GetWidth())
 			{
-			case 1: Emit("i8");  break;
-			case 8: Emit("i64"); break;
+			case 8:  Emit("i8");  break;
+			case 64: Emit("i64"); break;
 			}
 		}
 		break;

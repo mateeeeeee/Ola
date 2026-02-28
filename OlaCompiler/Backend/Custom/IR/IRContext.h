@@ -55,8 +55,8 @@ namespace ola
 
 	private:
 		IRVoidType*		void_type;
-		IRIntType*		int1_type;
 		IRIntType*		int8_type;
+		IRIntType*		int64_type;
 		IRFloatType*	float_type;
 		IRLabelType*	label_type;
 

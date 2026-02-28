@@ -394,7 +394,7 @@ namespace ola
 			IRIntType* src_int_type = dyn_cast<IRIntType>(cast_inst->GetSrcType());
 			if (src_int_type)
 			{
-				Uint32 src_bits = src_int_type->GetWidth() * 8;
+				Uint32 src_bits = src_int_type->GetWidth();
 				if (src_bits < 64)
 				{
 					Uint64 mask = (1ULL << src_bits) - 1;

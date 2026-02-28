@@ -21,9 +21,9 @@ namespace ola
 		{
 			switch (cast<IRIntType>(type)->GetWidth())
 			{
-			case 1:
-				return MachineType::Int8;
 			case 8:
+				return MachineType::Int8;
+			case 64:
 				return MachineType::Int64;
 			default:
 				OLA_ASSERT(false);

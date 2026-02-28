@@ -1,87 +1,100 @@
 set(SOURCE
-  Tests.cpp
+  TestLexer.cpp
+  TestParser.cpp
+  TestIR.cpp
+  TestInterpreter.cpp
 )
 
-set(OLA_LLVM_TESTS
-	Tests/LLVM/test_ternary.ola
-	Tests/LLVM/test_while.ola
-	Tests/LLVM/test_additive.ola
-	Tests/LLVM/test_alias.ola
-	Tests/LLVM/test_array.ola
-	Tests/LLVM/test_bit.ola
-	Tests/LLVM/test_dowhile.ola
-	Tests/LLVM/test_enum.ola
-	Tests/LLVM/test_for.ola
-	Tests/LLVM/test_functioncalls.ola
-	Tests/LLVM/test_goto.ola
-	Tests/LLVM/test_ifelse.ola
-	Tests/LLVM/test_increment.ola
-	Tests/LLVM/test_logical.ola
-	Tests/LLVM/test_multiplicative.ola
-	Tests/LLVM/test_plusminus.ola
-	Tests/LLVM/test_relational.ola
-	Tests/LLVM/test_shift.ola
-	Tests/LLVM/test_sizeof.ola
-	Tests/LLVM/test_switch.ola
-	Tests/LLVM/test_string.ola
-	Tests/LLVM/test_implicitcasts.ola
-	Tests/LLVM/test_class.ola
-	Tests/LLVM/test_ref.ola
-	Tests/LLVM/test_inheritance.ola
-	Tests/LLVM/test_polymorphism.ola
-	Tests/LLVM/test_overloading.ola
-	Tests/LLVM/test_constructors.ola
-	Tests/LLVM/test_returns.ola
-	Tests/LLVM/test_literals.ola
+set(SOURCE_E2E
+  TestE2E.cpp
 )
 
-set(OLA_CUSTOM_TESTS
-	Tests/Custom/test_ternary.ola
-	Tests/Custom/test_while.ola
-	Tests/Custom/test_additive.ola
-	Tests/Custom/test_alias.ola
-	Tests/Custom/test_array.ola
-	Tests/Custom/test_bit.ola
-	Tests/Custom/test_dowhile.ola
-	Tests/Custom/test_enum.ola
-	Tests/Custom/test_for.ola
-	Tests/Custom/test_functioncalls.ola
-	Tests/Custom/test_goto.ola
-	Tests/Custom/test_ifelse.ola
-	Tests/Custom/test_increment.ola
-	Tests/Custom/test_logical.ola
-	Tests/Custom/test_multiplicative.ola
-	Tests/Custom/test_plusminus.ola
-	Tests/Custom/test_relational.ola
-	Tests/Custom/test_shift.ola
-	Tests/Custom/test_sizeof.ola
-	Tests/Custom/test_switch.ola
-	Tests/Custom/test_string.ola
-	Tests/Custom/test_implicitcasts.ola
-	Tests/Custom/test_class.ola
-	Tests/Custom/test_ref.ola
-	Tests/Custom/test_inheritance.ola
-	Tests/Custom/test_polymorphism.ola
-	Tests/Custom/test_overloading.ola
-	Tests/Custom/test_constructors.ola
-	Tests/Custom/test_returns.ola
-	Tests/Custom/test_literals.ola
-	Tests/Custom/test_ptr.ola
+set(SOURCE_INTERPRETER
+  TestE2EInterpreter.cpp
 )
 
-add_executable(OlaTests ${SOURCE} ${OLA_LLVM_TESTS} ${OLA_CUSTOM_TESTS})
+set(OLA_TESTS
+	Tests/test_additive.ola
+	Tests/test_alias.ola
+	Tests/test_array.ola
+	Tests/test_bit.ola
+	Tests/test_class.ola
+	Tests/test_const.ola
+	Tests/test_constructors.ola
+	Tests/test_dowhile.ola
+	Tests/test_enum.ola
+	Tests/test_floats.ola
+	Tests/test_for.ola
+	Tests/test_functioncalls.ola
+	Tests/test_goto.ola
+	Tests/test_ifelse.ola
+	Tests/test_implicitcasts.ola
+	Tests/test_increment.ola
+	Tests/test_inheritance.ola
+	Tests/test_literals.ola
+	Tests/test_logical.ola
+	Tests/test_multiplicative.ola
+	Tests/test_overloading.ola
+	Tests/test_plusminus.ola
+	Tests/test_polymorphism.ola
+	Tests/test_ptr.ola
+	Tests/test_ref.ola
+	Tests/test_relational.ola
+	Tests/test_returns.ola
+	Tests/test_shift.ola
+	Tests/test_sizeof.ola
+	Tests/test_string.ola
+	Tests/test_switch.ola
+	Tests/test_ternary.ola
+	Tests/test_while.ola
+)
+
+add_executable(OlaTests ${SOURCE})
+add_executable(OlaTestsE2E ${SOURCE_E2E} ${OLA_TESTS})
+add_executable(OlaTestsInterpreter ${SOURCE_INTERPRETER} ${OLA_TESTS})
 
 source_group(" " FILES ${SOURCE})
-source_group("Tests/LLVM" FILES ${OLA_LLVM_TESTS})
-source_group("Tests/Custom" FILES ${OLA_CUSTOM_TESTS})
+source_group("Tests" FILES ${OLA_TESTS})
 
 set(GOOGLETEST_PATH ${CMAKE_CURRENT_SOURCE_DIR}/googletest)
 add_subdirectory(${GOOGLETEST_PATH} ${CMAKE_BINARY_DIR}/googletest)
 
-target_link_libraries(OlaTests PRIVATE gtest_main)
+target_link_libraries(OlaTests PRIVATE gtest_main OlaCompiler)
+target_link_libraries(OlaTestsE2E PRIVATE gtest_main OlaCompiler)
+target_link_libraries(OlaTestsInterpreter PRIVATE gtest_main OlaCompiler)
 
 target_include_directories(OlaTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(OlaTests PRIVATE ${CMAKE_SOURCE_DIR}/OlaCompiler/)
+target_include_directories(OlaTestsE2E PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(OlaTestsInterpreter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Force-include core type headers so compiler types (Bool, Int, etc.) are available in test files
+if(MSVC)
+    target_compile_options(OlaTests PRIVATE
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+    target_compile_options(OlaTestsE2E PRIVATE
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+    target_compile_options(OlaTestsInterpreter PRIVATE
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(OlaTests PRIVATE
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+    target_compile_options(OlaTestsE2E PRIVATE
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+    target_compile_options(OlaTestsInterpreter PRIVATE
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+        "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+    )
+endif()
 
 # Configure the path to Ola executable for tests
 if(CMAKE_CONFIGURATION_TYPES)
@@ -95,4 +108,33 @@ target_compile_definitions(OlaTests PRIVATE
     OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
 )
 
+target_compile_definitions(OlaTestsE2E PRIVATE
+    OLA_EXE_PATH="${OLA_EXE_PATH}"
+    OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+)
 
+target_compile_definitions(OlaTestsInterpreter PRIVATE
+    OLA_EXE_PATH="${OLA_EXE_PATH}"
+    OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+)
+
+if(LLVM_FOUND)
+    add_executable(OlaTestsLLVM TestE2ELLVM.cpp ${OLA_TESTS})
+    target_link_libraries(OlaTestsLLVM PRIVATE gtest_main OlaCompiler)
+    target_include_directories(OlaTestsLLVM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    if(MSVC)
+        target_compile_options(OlaTestsLLVM PRIVATE
+            /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+            /FI"${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+        )
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(OlaTestsLLVM PRIVATE
+            "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+            "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+        )
+    endif()
+    target_compile_definitions(OlaTestsLLVM PRIVATE
+        OLA_EXE_PATH="${OLA_EXE_PATH}"
+        OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+    )
+endif()

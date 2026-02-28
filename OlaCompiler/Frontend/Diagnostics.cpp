@@ -62,9 +62,13 @@ namespace ola
 		std::string output = std::format("[Diagnostics][{}]: {} in file {} at line: {}, col: {}\n",
 			ToString(diag_kind), diag_msgs[code], loc.filename, loc.line, loc.column);
 		PrintMessage(diag_kind, output);
-		if (exit_on_error && diag_kind == DiagKind::error)
+		if (diag_kind == DiagKind::error)
 		{
-			std::exit(OLA_INVALID_SOURCE_CODE);
+			error_reported = true;
+			if (exit_on_error) 
+			{
+				std::exit(OLA_INVALID_SOURCE_CODE);
+			}
 		}
 	}
 }

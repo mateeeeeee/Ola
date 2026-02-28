@@ -83,14 +83,7 @@ namespace ola
 				{
 					output_file = input_files[0];
 				}
-				if (cli_result["--nollvm"])
-				{
-					input_directory = OLA_TESTS_PATH"Tests/Custom";
-				}
-				else
-				{
-					input_directory = OLA_TESTS_PATH"Tests/LLVM";
-				}
+				input_directory = OLA_TESTS_PATH"Tests";
 			}
 			else
 			{

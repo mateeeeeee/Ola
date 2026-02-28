@@ -105,7 +105,7 @@ namespace ola
 		Uint32 width; 
 
 	private:
-		explicit IRIntType(IRContext& ctx, Uint32 width) : IRType(ctx, IRTypeKind::Integer, width, width), width(width) {}
+		explicit IRIntType(IRContext& ctx, Uint32 width) : IRType(ctx, IRTypeKind::Integer, width / 8, width / 8), width(width) {}
 	};
 
 	class IRFloatType : public IRType

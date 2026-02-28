@@ -68,7 +68,7 @@ namespace ola
 		Constant* TryConstantFold_CompareInst(CompareInst* CI)
 		{
 			IRContext& ctx = CI->GetContext();
-			IRType* bool_type = IRIntType::Get(ctx, 1);
+			IRType* bool_type = IRIntType::Get(ctx, 8);
 
 			ConstantInt* CI1 = dyn_cast<ConstantInt>(CI->GetLHS());
 			ConstantInt* CI2 = dyn_cast<ConstantInt>(CI->GetRHS());
