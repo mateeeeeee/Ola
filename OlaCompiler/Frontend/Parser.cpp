@@ -251,7 +251,22 @@ namespace ola
 			ParseFunctionAttributes(attrs);
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
-			ParseTypeSpecifier(return_type);
+
+			// Check for template function with unknown return type: identifier identifier <
+			Bool is_template_with_unknown_return = false;
+			if (current_token->Is(TokenKind::identifier) &&
+				(current_token + 1)->Is(TokenKind::identifier) &&
+				(current_token + 2)->Is(TokenKind::less) &&
+				!sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()))
+			{
+				is_template_with_unknown_return = true;
+				++current_token; // skip the unknown return type identifier
+			}
+			else
+			{
+				ParseTypeSpecifier(return_type);
+			}
+
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
@@ -2616,6 +2631,16 @@ namespace ola
 
 		QualType tmp{};
 		ParseTypeQualifier(tmp);
+
+		// Check for template function with unknown return type: identifier identifier <
+		if (current_token->Is(TokenKind::identifier) &&
+			(current_token + 1)->Is(TokenKind::identifier) &&
+			(current_token + 2)->Is(TokenKind::less))
+		{
+			current_token = token;
+			return true;
+		}
+
 		ParseTypeSpecifier(tmp);
 		Expect(TokenKind::identifier);
 

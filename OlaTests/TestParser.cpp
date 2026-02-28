@@ -1188,3 +1188,28 @@ TEST(Parser, ConstArrayParam)
 	ParseHelper h("void foo(const int[] arr) {}");
 	ASSERT_FALSE(h.HasErrors());
 }
+
+TEST(Parser, TemplateFunctionDeclaration)
+{
+	ParseHelper h(
+		"T Identity<T>(T x) { return x; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, TemplateFunctionMultipleParams)
+{
+	ParseHelper h(
+		"A First<A, B>(A a, B b) { return a; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, TemplateFunctionInstantiation)
+{
+	ParseHelper h(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int y = Identity<int>(42); }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}

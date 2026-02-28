@@ -1387,3 +1387,35 @@ TEST(Sema, AssignClassToDifferentType_Error)
 		"void foo() { A a; B b; a = b; }"
 	);
 }
+
+TEST(Sema, TemplateFunctionBasic_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int y = Identity<int>(42); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionMultipleParams_Ok)
+{
+	EXPECT_SEMA_OK(
+		"A First<A, B>(A a, B b) { return a; }"
+		"void foo() { int y = First<int, float>(1, 2.0); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionMultipleInstantiations_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int a = Identity<int>(1); float b = Identity<float>(2.0); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionArgCountMismatch_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int y = Identity<int, float>(42); }"
+	);
+}
