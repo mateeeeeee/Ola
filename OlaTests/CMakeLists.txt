@@ -50,8 +50,8 @@ set(OLA_TESTS
 )
 
 add_executable(OlaTests ${SOURCE})
-add_executable(OlaTestsE2E ${SOURCE_E2E} ${OLA_TESTS})
-add_executable(OlaTestsInterpreter ${SOURCE_INTERPRETER} ${OLA_TESTS})
+add_executable(OlaTestsE2E ${SOURCE_E2E})
+add_executable(OlaTestsInterpreter ${SOURCE_INTERPRETER})
 
 source_group(" " FILES ${SOURCE})
 source_group("Tests" FILES ${OLA_TESTS})
@@ -119,7 +119,7 @@ target_compile_definitions(OlaTestsInterpreter PRIVATE
 )
 
 if(LLVM_FOUND)
-    add_executable(OlaTestsLLVM TestE2ELLVM.cpp ${OLA_TESTS})
+    add_executable(OlaTestsLLVM TestE2ELLVM.cpp)
     target_link_libraries(OlaTestsLLVM PRIVATE gtest_main OlaCompiler)
     target_include_directories(OlaTestsLLVM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     if(MSVC)

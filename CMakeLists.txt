@@ -68,6 +68,22 @@ add_compile_definitions(
 
 # Add subdirectories
 add_subdirectory(OlaLib)
+
+# LLVM detection (must be before subdirectories so LLVM_FOUND is visible to all)
+if(ENABLE_LLVM)
+    message(STATUS "LLVM backend is enabled, searching for LLVM...")
+    find_package(LLVM 17 QUIET CONFIG)
+    if(LLVM_FOUND)
+        message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+        message(STATUS "LLVM include dirs: ${LLVM_INCLUDE_DIRS}")
+        message(STATUS "LLVM library dirs: ${LLVM_LIBRARY_DIRS}")
+    else()
+        message(WARNING "LLVM backend was enabled, but LLVM 17 was not found! Disabling LLVM backend...")
+    endif()
+else()
+    message(STATUS "LLVM backend is disabled.")
+endif()
+
 add_subdirectory(OlaCompiler)
 
 if(BUILD_TESTS)
@@ -84,6 +100,11 @@ add_dependencies(OlaDriver OlaCompiler)
 
 if(BUILD_TESTS)
 	add_dependencies(OlaTests OlaDriver)
+	add_dependencies(OlaTestsE2E OlaDriver)
+	add_dependencies(OlaTestsInterpreter OlaDriver)
+	if(LLVM_FOUND)
+		add_dependencies(OlaTestsLLVM OlaDriver)
+	endif()
 endif()
 
 if(BUILD_PLAYGROUND)

@@ -1,22 +1,6 @@
 # OlaCompiler/CMakeLists.txt
 cmake_minimum_required(VERSION 3.20)
 
-# LLVM backend detection
-if(ENABLE_LLVM)
-    message(STATUS "LLVM backend is enabled, searching for LLVM...")
-    find_package(LLVM 17 QUIET CONFIG)
-
-    if(LLVM_FOUND)
-        message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-        message(STATUS "LLVM include dirs: ${LLVM_INCLUDE_DIRS}")
-        message(STATUS "LLVM library dirs: ${LLVM_LIBRARY_DIRS}")
-    else()
-        message(WARNING "LLVM backend was enabled, but LLVM 17 was not found! Disabling LLVM backend...")
-    endif()
-else()
-    message(STATUS "LLVM backend is disabled.")
-endif()
-
 configure_file(${CMAKE_SOURCE_DIR}/ola_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/autogen/OlaConfig.h)
 
 # Set up compiler-specific flags
