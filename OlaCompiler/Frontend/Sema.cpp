@@ -432,6 +432,17 @@ namespace ola
 		return tmpl;
 	}
 
+	UniqueTemplateFunctionDeclPtr Sema::ActOnTemplateFunctionDecl(std::string_view name, SourceLocation const& loc,
+		std::vector<std::string>&& type_params, FuncAttributes attributes, DeclVisibility visibility,
+		Uint64 body_begin, Uint64 body_end)
+	{
+		auto tmpl = MakeUnique<TemplateFunctionDecl>(name, loc, std::move(type_params), body_begin, body_end);
+		tmpl->SetFuncAttributes(attributes);
+		tmpl->SetVisibility(visibility);
+		sema_ctx.decl_sym_table.Insert_Overload(tmpl.get());
+		return tmpl;
+	}
+
 	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
 		return MakeUnique<CompoundStmt>(std::move(stmts));

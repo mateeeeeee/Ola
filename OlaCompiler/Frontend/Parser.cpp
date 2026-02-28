@@ -159,7 +159,7 @@ namespace ola
 			{
 				if (IsFunctionDeclaration())
 				{
-					UniqueFunctionDeclPtr function_decl = ParseFunctionDefinition(visibility);
+					UniqueDeclPtr function_decl = ParseFunctionDefinition(visibility);
 					if(function_decl)
 					{
 						global_decl_list.push_back(std::move(function_decl));
@@ -236,8 +236,9 @@ namespace ola
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), DeclVisibility::Extern, attrs);
 	}
 
-	UniqueFunctionDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
+	UniqueDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
 	{
+		Uint64 start_token_pos = current_token - tokens.begin();
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
 		QualType function_type{};
@@ -259,6 +260,51 @@ namespace ola
 
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
+
+			std::vector<std::string> type_params;
+			if (Consume(TokenKind::less))
+			{
+				do
+				{
+					if (current_token->IsNot(TokenKind::identifier))
+					{
+						Diag(expected_identifier);
+						return nullptr;
+					}
+					type_params.push_back(std::string(current_token->GetData()));
+					++current_token;
+				} while (Consume(TokenKind::comma));
+				Expect(TokenKind::greater);
+			}
+
+			if (!type_params.empty())
+			{
+				Uint64 body_token_begin = start_token_pos;
+				Expect(TokenKind::left_round);
+				Int32 paren_count = 1;
+				while (paren_count != 0)
+				{
+					if (current_token->Is(TokenKind::left_round)) ++paren_count;
+					else if (current_token->Is(TokenKind::right_round)) --paren_count;
+					if (paren_count != 0) ++current_token;
+				}
+				Expect(TokenKind::right_round);
+
+				Expect(TokenKind::left_brace);
+				Int32 brace_count = 1;
+				while (brace_count != 0)
+				{
+					if (current_token->Is(TokenKind::left_brace)) ++brace_count;
+					else if (current_token->Is(TokenKind::right_brace)) --brace_count;
+					if (brace_count != 0) ++current_token;
+				}
+				++current_token;
+				Uint64 body_token_end = current_token - tokens.begin();
+
+				auto tmpl = sema->ActOnTemplateFunctionDecl(name, loc, std::move(type_params), attrs, visibility, body_token_begin, body_token_end);
+				return tmpl;
+			}
+
 			Expect(TokenKind::left_round);
 
 			std::vector<QualType> param_types{};
@@ -2486,7 +2532,7 @@ namespace ola
 		ParseTypeSpecifier(tmp);
 		Expect(TokenKind::identifier);
 
-		Bool is_function = Consume(TokenKind::left_round);
+		Bool is_function = Consume(TokenKind::left_round) || Consume(TokenKind::less);
 		current_token = token;
 		return is_function;
 	}

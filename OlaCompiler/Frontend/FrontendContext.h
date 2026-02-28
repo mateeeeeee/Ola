@@ -17,8 +17,15 @@ namespace ola
 	class FloatType;
 	class ClassDecl;
 	class TemplateClassDecl;
+	class FunctionDecl;
+	class TemplateFunctionDecl;
 
-	struct InstantiationKey
+	struct FuncInstantiationKey
+	{
+		TemplateFunctionDecl const* tmpl;
+		std::vector<QualType> args;
+		Bool operator==(FuncInstantiationKey const& other) const;
+	};
 	{
 		TemplateClassDecl const* tmpl;
 		std::vector<QualType> args;
