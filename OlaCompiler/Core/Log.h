@@ -17,7 +17,6 @@ namespace ola
 
 	void LogInit();
 	void LogDestroy();
-	void WriteToLogFile(std::string const&);
 
 	template<typename... Args>
 	void Log(LogLevel level, char const* fmt, Args&&... args)

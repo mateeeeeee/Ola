@@ -76,11 +76,12 @@ The project consists of the following parts:
    - A separate **executable** that links to the `OlaCompiler` static library. It provides a development environment for experimenting with the compiler and Ola code, without directly invoking the `OlaDriver`.
 
 5. **Ola Tests**:
-   - A set of unit tests built with GoogleTest, covering Ola language features. These tests are organized into two main folders:
-     - **LLVM Tests**: Unit tests that use the LLVM backend of the compiler.
-     - **Custom Backend Tests**: Unit tests that use the custom backend.
-     - The tests rely on the `Assert` function from the `std.assert` import.
-     - **OlaDriver** executable is used in the tests via system calls.
+   - A set of tests built with GoogleTest, organized into four targets:
+     - **OlaTests**: Unit tests for the Lexer, Parser, IR, and Interpreter — no system calls.
+     - **OlaTestsE2E**: End-to-end tests using the custom backend. Invokes **OlaDriver** via system calls.
+     - **OlaTestsInterpreter**: End-to-end tests using the interpreter backend. Invokes **OlaDriver** via system calls.
+     - **OlaTestsLLVM**: End-to-end tests using the LLVM backend. Only built when LLVM is detected. Invokes **OlaDriver** via system calls.
+     - E2E tests rely on the `Assert` function from the `std.assert` import.
 
 ## Dependencies
 * [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)

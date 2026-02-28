@@ -1,11 +1,8 @@
 #include <chrono>
-#include <iostream>
 #include "Log.h"
 
 namespace ola
 {
-	static FILE* gLogFile = nullptr;
-
 	std::string GetLogPrefix(LogLevel level)
 	{
 		switch (level)
@@ -43,29 +40,10 @@ namespace ola
 
 	void LogInit()
 	{
-		if (!gLogFile)
-		{
-			static Char const* gLogFileName = "olalog.txt";
-			gLogFile = fopen(gLogFileName, "w+");
-			setbuf(gLogFile, nullptr);
-		}
 		setbuf(stdout, nullptr);
 	}
 
 	void LogDestroy()
 	{
-		if (gLogFile)
-		{
-			fclose(gLogFile);
-		}
 	}
-
-	void WriteToLogFile(std::string const& log_entry)
-	{
-		if (gLogFile)
-		{
-			fprintf(gLogFile, "%s\n", log_entry.c_str());
-		}
-	}
-
 }
