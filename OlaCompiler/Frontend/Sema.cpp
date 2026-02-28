@@ -982,7 +982,45 @@ namespace ola
 
 	UniqueCallExprPtr Sema::ActOnCallExpr(SourceLocation const& loc, UniqueExprPtr&& func_expr, UniqueExprPtrList&& args)
 	{
-		if (isa<IdentifierExpr>(func_expr.get()))
+		if (isa<DeclRefExpr>(func_expr.get()))
+		{
+			DeclRefExpr const* decl_ref = cast<DeclRefExpr>(func_expr.get());
+			Decl const* decl = decl_ref->GetDecl();
+			if (!isa<FunctionDecl>(decl))
+			{
+				diagnostics.Report(loc, matching_function_not_found);
+				return nullptr;
+			}
+			FunctionDecl const* match_decl = cast<FunctionDecl>(decl);
+			FuncType const* match_func_type = match_decl->GetFuncType();
+
+			std::span<QualType const> param_types = match_func_type->GetParams();
+			if (args.size() != param_types.size())
+			{
+				diagnostics.Report(loc, matching_function_not_found);
+				return nullptr;
+			}
+			for (Uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = args[i];
+				QualType const& func_param_type = param_types[i];
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+				}
+			}
+
+			UniqueCallExprPtr func_call_expr = MakeUnique<CallExpr>(loc, match_decl);
+			func_call_expr->SetType(match_func_type->GetReturnType());
+			func_call_expr->SetArgs(std::move(args));
+			func_call_expr->SetCallee(MakeUnique<DeclRefExpr>(match_decl, loc));
+			if (isa<RefType>(func_call_expr->GetType()))
+			{
+				func_call_expr->SetLValue();
+			}
+			return func_call_expr;
+		}
+		else if (isa<IdentifierExpr>(func_expr.get()))
 		{
 			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
 			std::vector<Decl*>& found_decls = sema_ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());

@@ -170,5 +170,32 @@ namespace ola
 		instantiations.emplace_back(InstantiationKey{ tmpl, args }, decl);
 	}
 
+	Bool FuncInstantiationKey::operator==(FuncInstantiationKey const& other) const
+	{
+		if (tmpl != other.tmpl) return false;
+		if (args.size() != other.args.size()) return false;
+		for (Uint64 i = 0; i < args.size(); ++i)
+		{
+			if (args[i].GetTypePtr() != other.args[i].GetTypePtr()) return false;
+			if (args[i].IsConst() != other.args[i].IsConst()) return false;
+		}
+		return true;
+	}
+
+	FunctionDecl* FrontendContext::GetFuncInstantiation(TemplateFunctionDecl const* tmpl, std::vector<QualType> const& args)
+	{
+		FuncInstantiationKey key{ tmpl, args };
+		for (auto const& [k, v] : func_instantiations)
+		{
+			if (k == key) return v;
+		}
+		return nullptr;
+	}
+
+	void FrontendContext::RegisterFuncInstantiation(TemplateFunctionDecl const* tmpl, std::vector<QualType> const& args, FunctionDecl* decl)
+	{
+		func_instantiations.emplace_back(FuncInstantiationKey{ tmpl, args }, decl);
+	}
+
 }
 

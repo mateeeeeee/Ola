@@ -1231,6 +1231,73 @@ namespace ola
 		return raw_result;
 	}
 
+	FunctionDecl* Parser::ParseTemplateFunctionInstantiation(TemplateFunctionDecl* tmpl, SourceLocation const& loc)
+	{
+		Expect(TokenKind::less);
+		std::vector<QualType> args;
+		do
+		{
+			QualType arg{};
+			ParseTypeQualifier(arg);
+			ParseTypeSpecifier(arg);
+			args.push_back(arg);
+		} while (Consume(TokenKind::comma));
+		Expect(TokenKind::greater);
+
+		auto const& type_params = tmpl->GetTypeParams();
+		if (args.size() != type_params.size())
+		{
+			diagnostics.Report(loc, template_arg_count_mismatch, tmpl->GetName(), type_params.size(), args.size());
+			return nullptr;
+		}
+
+		if (FunctionDecl* cached = context->GetFuncInstantiation(tmpl, args))
+		{
+			return cached;
+		}
+
+		TokenPtr saved_token = current_token;
+
+		Uint64 body_begin = tmpl->GetBodyTokenBegin();
+		current_token = tokens.begin() + body_begin;
+
+		UniqueDeclPtr instantiated;
+		{
+			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
+
+			std::vector<UniqueAliasDeclPtr> type_aliases;
+			for (Uint64 i = 0; i < type_params.size(); ++i)
+			{
+				type_aliases.push_back(sema->ActOnAliasDecl(type_params[i], loc, args[i]));
+			}
+
+			instantiated = ParseFunctionDefinition(tmpl->IsPublic() ? DeclVisibility::Public : DeclVisibility::Private);
+		}
+
+		current_token = saved_token;
+
+		if (!instantiated || !isa<FunctionDecl>(instantiated.get()))
+		{
+			return nullptr;
+		}
+
+		FunctionDecl* raw_func = cast<FunctionDecl>(instantiated.get());
+
+		std::string specialized_name(tmpl->GetName());
+		specialized_name += '<';
+		for (Uint64 i = 0; i < args.size(); ++i)
+		{
+			if (i > 0) specialized_name += ',';
+			specialized_name += GetTypeNameForTemplate(args[i]);
+		}
+		specialized_name += '>';
+
+		context->RegisterFuncInstantiation(tmpl, args, raw_func);
+		ast->translation_unit->AddDecl(std::move(instantiated));
+
+		return raw_func;
+	}
+
 	UniqueStmtPtr Parser::ParseStatement()
 	{
 		switch (current_token->GetKind())
@@ -2021,6 +2088,26 @@ namespace ola
 		std::string_view name = current_token->GetData();
 		SourceLocation loc = current_token->GetLocation();
 		++current_token;
+
+		if (current_token->Is(TokenKind::less))
+		{
+			std::vector<Decl*>& overloads = sema->sema_ctx.decl_sym_table.LookUp_Overload(name);
+			TemplateFunctionDecl* tmpl = nullptr;
+			for (Decl* d : overloads)
+			{
+				if (isa<TemplateFunctionDecl>(d)) { tmpl = cast<TemplateFunctionDecl>(d); break; }
+			}
+			if (tmpl)
+			{
+				FunctionDecl* instantiated = ParseTemplateFunctionInstantiation(tmpl, loc);
+				if (instantiated)
+				{
+					return MakeUnique<DeclRefExpr>(instantiated, loc);
+				}
+				return nullptr;
+			}
+		}
+
 		return sema->ActOnIdentifier(name, loc, current_token->Is(TokenKind::left_round));
 	}
 
