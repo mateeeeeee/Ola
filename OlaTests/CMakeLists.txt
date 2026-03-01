@@ -3,6 +3,7 @@ set(SOURCE
   TestParser.cpp
   TestIR.cpp
   TestInterpreter.cpp
+  TestIRPasses.cpp
 )
 
 set(SOURCE_E2E
