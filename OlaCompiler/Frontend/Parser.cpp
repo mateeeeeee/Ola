@@ -17,7 +17,10 @@ namespace ola
 		ast = MakeUnique<AST>();
 		AddBuiltinDecls(ast->translation_unit);
 		ParseTranslationUnit();
-		if (diagnostics.HasErrors()) ast.reset();
+		if (diagnostics.HasErrors()) 
+		{
+			ast.reset();
+		}
 	}
 
 	void Parser::ParseImported(std::vector<Token> const& _tokens)
@@ -27,7 +30,10 @@ namespace ola
 		sema = MakeUnique<Sema>(context, diagnostics);
 		ast = MakeUnique<AST>();
 		ParseTranslationUnit();
-		if (diagnostics.HasErrors()) ast.reset();
+		if (diagnostics.HasErrors()) 
+		{
+			ast.reset();
+		}
 	}
 
 	void Parser::ParseTranslationUnit()
@@ -35,25 +41,39 @@ namespace ola
 		while (current_token->IsNot(TokenKind::eof) && !diagnostics.HasErrors())
 		{
 			UniqueDeclPtrList decls = ParseGlobalDeclaration();
-			for(auto&& decl : decls) ast->translation_unit->AddDecl(std::move(decl));
+			for(auto&& decl : decls) 
+			{
+				ast->translation_unit->AddDecl(std::move(decl));
+			}
 		}
 	}
 
 	void Parser::AddBuiltinDecls(UniqueTranslationUnitPtr& TU)
 	{
 		UniqueAliasDeclPtr string_alias = sema->ActOnAliasDecl("string", SourceLocation{}, ArrayType::Get(context, CharType::Get(context), 0));
-		TU->AddDecl(std::move(string_alias));
+		if (string_alias)
+		{
+			TU->AddDecl(std::move(string_alias));
+		}
 	}
 
 	UniqueDeclPtrList Parser::ParseGlobalDeclaration()
 	{
+		while (Consume(TokenKind::semicolon)) 
+		{
+			Diag(empty_statement);
+		}
+
 		UniqueDeclPtrList global_decl_list;
-		while (Consume(TokenKind::semicolon)) Diag(empty_statement);
 		if (Consume(TokenKind::KW_extern))
 		{
 			if (IsFunctionDeclaration())
 			{
-				global_decl_list.push_back(ParseFunctionDeclaration());
+				UniqueFunctionDeclPtr function_decl = ParseFunctionDeclaration();
+				if(function_decl)
+				{
+					global_decl_list.push_back(std::move(function_decl));
+				}
 			}
 			else
 			{
@@ -74,36 +94,63 @@ namespace ola
 
 			if (Consume(TokenKind::KW_class))
 			{
-				global_decl_list.push_back(ParseClassDeclaration());
+				UniqueClassDeclPtr class_decl = ParseClassDeclaration();
+				if (class_decl)
+				{
+					global_decl_list.push_back(std::move(class_decl));
+				}
 			}
 			else if (Consume(TokenKind::KW_interface))
 			{
-				global_decl_list.push_back(ParseInterfaceDeclaration());
+				UniqueClassDeclPtr interface_decl = ParseInterfaceDeclaration();
+				if (interface_decl)
+				{
+					global_decl_list.push_back(std::move(interface_decl));
+				}
 			}
 			else if (Consume(TokenKind::KW_enum))
 			{
-				global_decl_list.push_back(ParseEnumDeclaration());
+				UniqueEnumDeclPtr enum_decl = ParseEnumDeclaration();
+				if (enum_decl)
+				{
+					global_decl_list.push_back(std::move(enum_decl));
+				}
 			}
 			else if (Consume(TokenKind::KW_alias))
 			{
-				global_decl_list.push_back(ParseAliasDeclaration());
+				UniqueAliasDeclPtr alias_decl = ParseAliasDeclaration();
+				if (alias_decl)
+				{
+					global_decl_list.push_back(std::move(alias_decl));
+				}
 			}
 			else
 			{
 				if (IsFunctionDeclaration())
 				{
-					global_decl_list.push_back(ParseFunctionDefinition(visibility));
+					UniqueFunctionDeclPtr function_decl = ParseFunctionDefinition(visibility);
+					if(function_decl)
+					{
+						global_decl_list.push_back(std::move(function_decl));
+					}
 				}
 				else
 				{
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(visibility);
 					for (auto& variable_decl : variable_decls)
 					{
-						global_decl_list.push_back(std::move(variable_decl));
+						if(variable_decl)
+						{
+							global_decl_list.push_back(std::move(variable_decl));
+						}
 					}
 				}
 			}
-			global_decl_list.back()->SetVisibility(visibility);
+
+			if (!global_decl_list.empty()) 
+			{
+				global_decl_list.back()->SetVisibility(visibility);
+			}
 		}
 		return global_decl_list;
 	}
@@ -343,7 +390,10 @@ namespace ola
 		UniqueCompoundStmtPtr constructor_body;
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
-			if (current_token->IsNot(TokenKind::identifier)) Diag(expected_identifier);
+			if (current_token->IsNot(TokenKind::identifier)) 
+			{
+				Diag(expected_identifier);
+			}
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
 			Expect(TokenKind::left_round);
@@ -356,8 +406,11 @@ namespace ola
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
-				param_types.emplace_back(param_decl->GetType());
-				param_decls.push_back(std::move(param_decl));
+				if(param_decl)
+				{
+					param_types.emplace_back(param_decl->GetType());
+					param_decls.push_back(std::move(param_decl));
+				}
 			}
 			function_type.SetType(FuncType::Get(context, VoidType::Get(context), param_types));
 			if (first_pass)
@@ -437,6 +490,10 @@ namespace ola
 			if (Consume(TokenKind::equal))
 			{
 				init_expr = (current_token->Is(TokenKind::left_brace)) ? ParseInitializerListExpression() : ParseAssignmentExpression();
+				if(!init_expr)
+				{
+					break;
+				}
 			}
 			else if (Consume(TokenKind::left_round))
 			{
@@ -457,10 +514,12 @@ namespace ola
 				init_expr = sema->ActOnConstructorExpr(loc, variable_type, std::move(args));
 			}
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, std::move(init_expr), visibility);
-			var_decl_list.push_back(std::move(var_decl));
+			if (var_decl) 
+			{
+				var_decl_list.push_back(std::move(var_decl));
+			}
 
 		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
-
 		return var_decl_list;
 	}
 
@@ -497,14 +556,20 @@ namespace ola
 			if (Consume(TokenKind::equal))
 			{
 				init_expr = current_token->Is(TokenKind::left_brace) ? ParseInitializerListExpression() : ParseAssignmentExpression();
+				if(!init_expr)
+				{
+					break;
+				}
 			}
 			if (first_pass)
 			{
 				UniqueFieldDeclPtr var_decl = sema->ActOnFieldDecl(name, loc, variable_type, std::move(init_expr), visibility);
-				member_var_decl_list.push_back(std::move(var_decl));
+				if (var_decl) 
+				{
+					member_var_decl_list.push_back(std::move(var_decl));
+				}
 			}
 		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
-
 		return member_var_decl_list;
 	}
 
@@ -528,10 +593,11 @@ namespace ola
 			std::string_view name = current_token->GetData(); ++current_token;
 
 			UniqueVarDeclPtr var_decl = sema->ActOnVariableDecl(name, loc, variable_type, nullptr, DeclVisibility::Extern);
-			var_decl_list.push_back(std::move(var_decl));
-
+			if (var_decl) 
+			{
+				var_decl_list.push_back(std::move(var_decl));
+			}
 		} while (!Consume(TokenKind::semicolon) && !diagnostics.HasErrors());
-
 		return var_decl_list;
 	}
 
@@ -560,14 +626,21 @@ namespace ola
 			if (Consume(TokenKind::equal))
 			{
 				UniqueExprPtr enum_value_expr = ParseAssignmentExpression();
-				enum_members.push_back(sema->ActOnEnumMemberDecl(enum_value_name, loc, std::move(enum_value_expr)));
-				val = enum_members.back()->GetValue() + 1;
+				UniqueEnumMemberDeclPtr enum_member = sema->ActOnEnumMemberDecl(enum_value_name, loc, std::move(enum_value_expr));
+				if (enum_member) 
+				{ 
+					val = enum_member->GetValue() + 1; 
+					enum_members.push_back(std::move(enum_member)); 
+				}
 			}
 			else
 			{
-				enum_members.push_back(sema->ActOnEnumMemberDecl(enum_value_name, loc, val++));
+				UniqueEnumMemberDeclPtr enum_member = sema->ActOnEnumMemberDecl(enum_value_name, loc, val++);
+				if (enum_member) 
+				{
+					enum_members.push_back(std::move(enum_member));
+				}
 			}
-
 			if (Consume(TokenKind::right_brace))
 			{
 				break;
@@ -677,7 +750,10 @@ namespace ola
 								{
 									for (auto& var_decl : var_decls)
 									{
-										member_variables.push_back(std::move(var_decl));
+										if (var_decl) 
+										{
+											member_variables.push_back(std::move(var_decl));
+										}
 									}
 								}
 							}
@@ -784,14 +860,17 @@ namespace ola
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
 					for (auto& variable_decl : variable_decls)
 					{
-						stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
+						if (variable_decl) 
+						{
+							stmts.push_back(sema->ActOnDeclStmt(std::move(variable_decl)));
+						}
 					}
 				}
 			}
 			else
 			{
 				UniqueStmtPtr stmt = ParseStatement();
-				stmts.push_back(std::move(stmt));
+				if (stmt) stmts.push_back(std::move(stmt));
 			}
 		}
 		Expect(TokenKind::right_brace);

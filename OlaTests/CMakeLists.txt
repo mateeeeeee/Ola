@@ -1,6 +1,7 @@
 set(SOURCE
   TestLexer.cpp
   TestParser.cpp
+  TestSema.cpp
   TestIR.cpp
   TestInterpreter.cpp
   TestIRPasses.cpp

@@ -41,7 +41,7 @@
             "preLaunchTask": "Build Ola (Release)"
         },
         // ----------------------------------------------------------------
-        // OlaTests — unit tests (Lexer, Parser, IR)
+        // OlaTests — unit tests (Lexer, Parser, Sema, IR, IR Passes)
         // ----------------------------------------------------------------
         {
             "name": "Tests: Unit (Debug)",
@@ -85,6 +85,24 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/debug/bin/OlaTests",
             "args": ["--gtest_filter=Interpreter.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Tests: Sema",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": ["--gtest_filter=Sema.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Tests: IR Passes",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": ["--gtest_filter=DCE.*:ConstantPropagation.*:ArithmeticReduction.*:SimplifyCFG.*:Mem2Reg.*:TailRecursionElimination.*:GlobalDCE.*"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Debug)"
         },
