@@ -5,6 +5,8 @@ set(SOURCE
   TestIR.cpp
   TestInterpreter.cpp
   TestIRPasses.cpp
+  TestMachineIR.cpp
+  TestRegisterAlloc.cpp
 )
 
 set(SOURCE_E2E

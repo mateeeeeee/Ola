@@ -41,7 +41,9 @@
             "preLaunchTask": "Build Ola (Release)"
         },
         // ----------------------------------------------------------------
-        // OlaTests — unit tests (Lexer, Parser, Sema, IR, IR Passes)
+        // OlaTests — unit tests
+        //   Lexer, Parser, Sema, IR, IR Passes,
+        //   Machine IR, Register Allocation
         // ----------------------------------------------------------------
         {
             "name": "Tests: Unit (Debug)",
@@ -102,7 +104,25 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/debug/bin/OlaTests",
-            "args": ["--gtest_filter=DCE.*:ConstantPropagation.*:ArithmeticReduction.*:SimplifyCFG.*:Mem2Reg.*:TailRecursionElimination.*:GlobalDCE.*"],
+            "args": ["--gtest_filter=DCE.*:ConstantPropagation.*:ArithmeticReduction.*:SimplifyCFG.*:Mem2Reg.*:TailRecursionElimination.*:GlobalDCE.*:CSE.*:GVN.*:FunctionInliner.*:LICM.*:SROA.*:CriticalEdgeSplitting.*:IPCP.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Tests: Machine IR",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": ["--gtest_filter=MachineOperand.*:MachineInstruction.*:MachineBasicBlock.*:MachineFunction.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Tests: Register Allocation",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": ["--gtest_filter=InterferenceGraph.*:LiveInterval.*"],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Debug)"
         },
