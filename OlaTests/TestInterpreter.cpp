@@ -282,9 +282,332 @@ TEST(Interpreter, FunctionCall)
 	EXPECT_EQ(RunMain(module), 42);
 }
 
-// ---------------------------------------------------------------------------
-// Global variable
-// ---------------------------------------------------------------------------
+TEST(Interpreter, BitwiseAnd)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 5 & 3 == 1
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::And, ctx.GetInt64(5), ctx.GetInt64(3));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 1);
+}
+
+TEST(Interpreter, BitwiseOr)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 5 | 2 == 7
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Or, ctx.GetInt64(5), ctx.GetInt64(2));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 7);
+}
+
+TEST(Interpreter, BitwiseXor)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 5 ^ 3 == 6
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Xor, ctx.GetInt64(5), ctx.GetInt64(3));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 6);
+}
+
+TEST(Interpreter, ShiftLeft)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 1 << 3 == 8
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Shl, ctx.GetInt64(1), ctx.GetInt64(3));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 8);
+}
+
+TEST(Interpreter, LogicalShiftRight)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 16 >> 2 == 4
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::LShr, ctx.GetInt64(16), ctx.GetInt64(2));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 4);
+}
+
+TEST(Interpreter, SignedRemainder)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// 10 % 3 == 1
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::SRem, ctx.GetInt64(10), ctx.GetInt64(3));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 1);
+}
+
+TEST(Interpreter, ZeroExtend)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ZExt i8(100) to i64 == 100
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* narrow = ctx.GetInt8(100);
+	Value* result = builder.MakeInst<CastInst>(Opcode::ZExt, ctx.GetIntegerType(64), narrow);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 100);
+}
+
+TEST(Interpreter, SignExtendNegative)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// SExt i8(-10) to i64; add 52 to keep return value positive: -10 + 52 == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* narrow = ctx.GetInt8(-10);
+	Value* extended = builder.MakeInst<CastInst>(Opcode::ZExt, ctx.GetIntegerType(64), narrow);
+	// ZExt of -10 (0xF6 in 8 bits) gives 246; then 246 - 204 = 42.
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Sub, extended, ctx.GetInt64(204));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, SwitchHitsNamedCase)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// switch (2) { case 1: ret 1; case 2: ret 42; default: ret 0; }
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+
+	BasicBlock* entry    = builder.AddBlock("entry");
+	BasicBlock* case1_bb = builder.AddBlock("case1");
+	BasicBlock* case2_bb = builder.AddBlock("case2");
+	BasicBlock* def_bb   = builder.AddBlock("default");
+
+	builder.SetCurrentBlock(case1_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(1));
+
+	builder.SetCurrentBlock(case2_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	builder.SetCurrentBlock(def_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	builder.SetCurrentBlock(entry);
+	SwitchInst* sw = new SwitchInst(ctx.GetInt64(2), def_bb);
+	sw->AddCase(1, case1_bb);
+	sw->AddCase(2, case2_bb);
+	sw->InsertBefore(entry, entry->end());
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, SwitchHitsDefault)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// switch (99) { case 1: ret 1; case 2: ret 2; default: ret 42; }
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+
+	BasicBlock* entry    = builder.AddBlock("entry");
+	BasicBlock* case1_bb = builder.AddBlock("case1");
+	BasicBlock* case2_bb = builder.AddBlock("case2");
+	BasicBlock* def_bb   = builder.AddBlock("default");
+
+	builder.SetCurrentBlock(case1_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(1));
+
+	builder.SetCurrentBlock(case2_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(2));
+
+	builder.SetCurrentBlock(def_bb);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	builder.SetCurrentBlock(entry);
+	SwitchInst* sw = new SwitchInst(ctx.GetInt64(99), def_bb);
+	sw->AddCase(1, case1_bb);
+	sw->AddCase(2, case2_bb);
+	sw->InsertBefore(entry, entry->end());
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, LoopWithPhiAccumulatesSum)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Equivalent to:
+	//   int sum = 0, i = 0;
+	//   while (i < 5) { i++; sum += i; }
+	//   return sum;   // 1+2+3+4+5 == 15
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+	builder.SetCurrentFunction(fn);
+
+	BasicBlock* preheader = builder.AddBlock("preheader");
+	BasicBlock* header    = builder.AddBlock("header");
+	BasicBlock* latch     = builder.AddBlock("latch");
+	BasicBlock* exit_b    = builder.AddBlock("exit");
+
+	// preheader → header
+	builder.SetCurrentBlock(preheader);
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	// header: phi nodes + condition
+	PhiInst* i_phi   = new PhiInst(ctx.GetIntegerType(64));
+	PhiInst* sum_phi = new PhiInst(ctx.GetIntegerType(64));
+	header->AddPhiInst(i_phi);
+	header->AddPhiInst(sum_phi);
+	builder.SetCurrentBlock(header);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSLT, i_phi, ctx.GetInt64(5));
+	builder.MakeInst<BranchInst>(cond, latch, exit_b);
+
+	// latch: increment i, accumulate sum
+	builder.SetCurrentBlock(latch);
+	Value* i_next   = builder.MakeInst<BinaryInst>(Opcode::Add, i_phi, ctx.GetInt64(1));
+	Value* sum_next = builder.MakeInst<BinaryInst>(Opcode::Add, sum_phi, i_next);
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	// exit: return accumulated sum
+	builder.SetCurrentBlock(exit_b);
+	builder.MakeInst<ReturnInst>(sum_phi);
+
+	// Patch phi incoming values.
+	i_phi->AddIncoming(ctx.GetInt64(0), preheader);
+	i_phi->AddIncoming(i_next, latch);
+	sum_phi->AddIncoming(ctx.GetInt64(0), preheader);
+	sum_phi->AddIncoming(sum_next, latch);
+
+	EXPECT_EQ(RunMain(module), 15);
+}
+
+TEST(Interpreter, RecursiveFactorial)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// int fact(int n) { if (n <= 1) return 1; return n * fact(n-1); }
+	// int main() { return fact(5); }  // 120
+	std::vector<IRType*> params = { ctx.GetIntegerType(64) };
+	IRFuncType* fact_ft = ctx.GetFunctionType(ctx.GetIntegerType(64), params);
+	Function* fact_fn = new Function("fact", fact_ft, Linkage::Internal);
+	module.AddGlobal(fact_fn);
+
+	builder.SetCurrentFunction(fact_fn);
+	BasicBlock* fact_entry   = builder.AddBlock("entry");
+	BasicBlock* fact_base    = builder.AddBlock("base");
+	BasicBlock* fact_recurse = builder.AddBlock("recurse");
+
+	Value* n = fact_fn->GetArg(0);
+
+	builder.SetCurrentBlock(fact_entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSLE, n, ctx.GetInt64(1));
+	builder.MakeInst<BranchInst>(cond, fact_base, fact_recurse);
+
+	builder.SetCurrentBlock(fact_base);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(1));
+
+	builder.SetCurrentBlock(fact_recurse);
+	Value* n_minus_1 = builder.MakeInst<BinaryInst>(Opcode::Sub, n, ctx.GetInt64(1));
+	std::vector<Value*> rec_args = { n_minus_1 };
+	Value* rec = builder.MakeInst<CallInst>(fact_fn, std::span<Value*>(rec_args));
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::SMul, n, rec);
+	builder.MakeInst<ReturnInst>(result);
+
+	// main calls fact(5)
+	IRFuncType* main_ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* main_fn = new Function("main", main_ft, Linkage::External);
+	module.AddGlobal(main_fn);
+
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* main_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(main_entry);
+	std::vector<Value*> main_args = { ctx.GetInt64(5) };
+	Value* r = builder.MakeInst<CallInst>(fact_fn, std::span<Value*>(main_args));
+	builder.MakeInst<ReturnInst>(r);
+
+	EXPECT_EQ(RunMain(module), 120);
+}
 
 TEST(Interpreter, GlobalVariable)
 {
