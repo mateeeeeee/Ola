@@ -1412,11 +1412,52 @@ TEST(Sema, TemplateFunctionMultipleInstantiations_Ok)
 	);
 }
 
-TEST(Sema, TemplateFunctionDifferentInstantiations_Ok)
+TEST(Sema, TemplateFunctionCacheDeduplication_Ok)
 {
 	EXPECT_SEMA_OK(
 		"T Identity<T>(T x) { return x; }"
-		"void foo() { int a = Identity<int>(1); float b = Identity<float>(2.0); }"
+		"void foo() { int a = Identity<int>(1); int b = Identity<int>(2); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionKnownReturnType_Ok)
+{
+	EXPECT_SEMA_OK(
+		"bool IsPositive<T>(T x) { return x > 0; }"
+		"void foo() { bool a = IsPositive<int>(5); bool b = IsPositive<float>(3.14); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionMultiBody_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Add<T>(T a, T b) { T result = a + b; return result; }"
+		"void foo() { int x = Add<int>(1, 2); float y = Add<float>(1.0, 2.0); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionThreeInstantiations_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int a = Identity<int>(1); float b = Identity<float>(2.0); bool c = Identity<bool>(true); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionAsExpressionStmt_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { Identity<int>(42); }"
+	);
+}
+
+TEST(Sema, TemplateFunctionWithRegularFunction_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"int Double(int x) { return x + x; }"
+		"void foo() { int a = Identity<int>(1); int b = Double(a); }"
 	);
 }
 

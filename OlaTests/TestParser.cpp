@@ -1213,3 +1213,20 @@ TEST(Parser, TemplateFunctionInstantiation)
 	);
 	ASSERT_FALSE(h.HasErrors());
 }
+
+TEST(Parser, TemplateFunctionKnownReturnType)
+{
+	ParseHelper h(
+		"int Max<T>(T a, T b) { if (a > b) return a; return b; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, TemplateFunctionMultipleCallsInBody)
+{
+	ParseHelper h(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { Identity<int>(1); Identity<float>(2.0); Identity<bool>(true); }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
