@@ -439,7 +439,7 @@ namespace ola
 		auto tmpl = MakeUnique<TemplateFunctionDecl>(name, loc, std::move(type_params), body_begin, body_end);
 		tmpl->SetFuncAttributes(attributes);
 		tmpl->SetVisibility(visibility);
-		sema_ctx.decl_sym_table.Insert_Overload(tmpl.get());
+		sema_ctx.decl_sym_table.InsertGlobal_Overload(tmpl.get());
 		return tmpl;
 	}
 

@@ -57,7 +57,7 @@ namespace ola
 
 		OLA_NODISCARD UniqueDeclPtrList ParseGlobalDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
-		OLA_NODISCARD UniqueDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
+		OLA_NODISCARD UniqueDeclPtr ParseFunctionDefinition(DeclVisibility visibility, Bool is_template_instantiation = false);
 		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDeclaration();
 		UniqueMethodDeclPtr ParseMethodDefinition(MethodParseMode mode, MethodDecl* existing_stub = nullptr);
 		UniqueConstructorDeclPtr ParseConstructorDefinition(MethodParseMode mode, MethodDecl* existing_stub = nullptr);

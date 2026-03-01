@@ -92,6 +92,10 @@ namespace ola
 		{
 			return scopes.back().Insert_Overload(symbol);
 		}
+		Bool InsertGlobal_Overload(SymType* symbol)
+		{
+			return scopes.front().Insert_Overload(symbol);
+		}
 
 		SymType* LookUp(std::string const& sym_name)
 		{

@@ -1412,6 +1412,14 @@ TEST(Sema, TemplateFunctionMultipleInstantiations_Ok)
 	);
 }
 
+TEST(Sema, TemplateFunctionDifferentInstantiations_Ok)
+{
+	EXPECT_SEMA_OK(
+		"T Identity<T>(T x) { return x; }"
+		"void foo() { int a = Identity<int>(1); float b = Identity<float>(2.0); }"
+	);
+}
+
 TEST(Sema, TemplateFunctionArgCountMismatch_Error)
 {
 	EXPECT_SEMA_ERROR(

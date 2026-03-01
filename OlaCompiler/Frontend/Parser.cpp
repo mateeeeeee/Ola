@@ -236,7 +236,7 @@ namespace ola
 		return sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), DeclVisibility::Extern, attrs);
 	}
 
-	UniqueDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility)
+	UniqueDeclPtr Parser::ParseFunctionDefinition(DeclVisibility visibility, Bool is_template_instantiation)
 	{
 		Uint64 start_token_pos = current_token - tokens.begin();
 		SourceLocation const& loc = current_token->GetLocation();
@@ -253,14 +253,13 @@ namespace ola
 			ParseTypeQualifier(return_type);
 
 			// Check for template function with unknown return type: identifier identifier <
-			Bool is_template_with_unknown_return = false;
-			if (current_token->Is(TokenKind::identifier) &&
+			if (!is_template_instantiation &&
+				current_token->Is(TokenKind::identifier) &&
 				(current_token + 1)->Is(TokenKind::identifier) &&
 				(current_token + 2)->Is(TokenKind::less) &&
 				!sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()))
 			{
-				is_template_with_unknown_return = true;
-				++current_token; // skip the unknown return type identifier
+				++current_token; 
 			}
 			else
 			{
@@ -276,8 +275,19 @@ namespace ola
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
 
+			if (is_template_instantiation && Consume(TokenKind::less))
+			{
+				Int32 angle_count = 1;
+				while (angle_count != 0)
+				{
+					if (current_token->Is(TokenKind::less)) ++angle_count;
+					else if (current_token->Is(TokenKind::greater)) --angle_count;
+					++current_token;
+				}
+			}
+
 			std::vector<std::string> type_params;
-			if (Consume(TokenKind::less))
+			if (!is_template_instantiation && Consume(TokenKind::less))
 			{
 				do
 				{
@@ -316,8 +326,7 @@ namespace ola
 				++current_token;
 				Uint64 body_token_end = current_token - tokens.begin();
 
-				auto tmpl = sema->ActOnTemplateFunctionDecl(name, loc, std::move(type_params), attrs, visibility, body_token_begin, body_token_end);
-				return tmpl;
+				return sema->ActOnTemplateFunctionDecl(name, loc, std::move(type_params), attrs, visibility, body_token_begin, body_token_end);
 			}
 
 			Expect(TokenKind::left_round);
@@ -1276,8 +1285,11 @@ namespace ola
 		Uint64 body_begin = tmpl->GetBodyTokenBegin();
 		current_token = tokens.begin() + body_begin;
 
+		QualType const* saved_current_func = sema->sema_ctx.current_func;
+		Bool saved_return_stmt = sema->sema_ctx.return_stmt_encountered;
 		UniqueDeclPtr instantiated;
 		{
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
 
 			std::vector<UniqueAliasDeclPtr> type_aliases;
@@ -1285,12 +1297,12 @@ namespace ola
 			{
 				type_aliases.push_back(sema->ActOnAliasDecl(type_params[i], loc, args[i]));
 			}
-
-			instantiated = ParseFunctionDefinition(tmpl->IsPublic() ? DeclVisibility::Public : DeclVisibility::Private);
+			instantiated = ParseFunctionDefinition(tmpl->IsPublic() ? DeclVisibility::Public : DeclVisibility::Private, true);
 		}
 
 		current_token = saved_token;
-
+		sema->sema_ctx.current_func = saved_current_func;
+		sema->sema_ctx.return_stmt_encountered = saved_return_stmt;
 		if (!instantiated || !isa<FunctionDecl>(instantiated.get()))
 		{
 			return nullptr;
