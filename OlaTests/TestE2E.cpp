@@ -46,3 +46,4 @@ TEST(Classes, Inheritance)  { EXPECT_EQ(RUN_TEST(-i test_inheritance),  0); }
 TEST(Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphism), 0); }
 TEST(Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
 TEST(Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
+TEST(Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }

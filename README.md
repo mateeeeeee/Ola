@@ -3,10 +3,11 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
 
 ## Features
   * classes
-	- access modifiers: `public`, `private`
 	- constructors
+  - templates: `class Box<T>`
 	- single inheritance: `:`
 	- polymorphism using vtables: `virtual`, `pure`, `final`
+	- access modifiers: `public`, `private`
 	- `interface`, `this` and `super` keywords
   * operators:
     - additive: `+`, `-`, `+=`, `-=`, `++`, `--`
@@ -42,7 +43,65 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
     - ARM64 code generation
     - Class support
     - Interpreter
-	
+
+## Example
+```cpp
+class Pair<A, B>
+{
+    Pair(A a, B b)
+    {
+        this.first = a;
+        this.second = b;
+    }
+    public A First() const { return this.first; }
+    public B Second() const { return this.second; }
+    private A first;
+    private B second;
+};
+
+class Shape
+{
+    Shape(int x, int y) { this.x = x; this.y = y; }
+    public int GetX() const { return this.x; }
+    public int GetY() const { return this.y; }
+    public int Area() const virtual { return 0; }
+    private int x;
+    private int y;
+};
+
+class Rectangle : Shape
+{
+    Rectangle(int x, int y, int w, int h)
+    {
+        super(x, y);
+        this.w = w;
+        this.h = h;
+    }
+    public int Area() const virtual { return this.w * this.h; }
+    private int w;
+    private int h;
+};
+
+int AreaAt(ref Pair<int,int> origin, int w, int h)
+{
+    return w * h;
+}
+
+public int main()
+{
+    Pair<int, float> p(10, 3.14);
+
+    Rectangle r(0, 0, p.First(), 5);
+    ref Shape s = r;
+    int area = s.Area();
+
+    Pair<int, int> origin(0, 0);
+    int area2 = AreaAt(origin, 3, 4);
+
+    return area + area2; // 62
+}
+```
+
 ## Architecture
 <img src="OlaDocs/olaarch.svg" alt="Ola compiler architecture">
 
