@@ -15,7 +15,7 @@ namespace ola
 	static std::string SanitizeClassName(std::string_view name)
 	{
 		std::string result(name);
-		for (char& c : result)
+		for (Char& c : result)
 		{
 			if (c == '<' || c == '>' || c == ',') c = '.';
 		}
