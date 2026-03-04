@@ -4,7 +4,7 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
 ## Features
   * classes
 	- constructors
-  - templates: `class Box<T>`
+  	- templates: `class Box<T>`
 	- single inheritance: `:`
 	- polymorphism using vtables: `virtual`, `pure`, `final`
 	- access modifiers: `public`, `private`
