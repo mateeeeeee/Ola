@@ -6,204 +6,526 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @TestPtrBasic void() {
+define external @Box.int.$Box__I void(ptr %this,i64 %v) {
 entry:
-%0 = call i64 8, @__ola_new
-%1 = bitcast ptr %0
-%2 = ptr add ptr %1, 0
-store 42, ptr %2
-%3 = load i64, ptr %2
-%4 = icmp eq i64 %3, 42
-call i8 %4, @Assert
-%5 = bitcast ptr %1
-call ptr %5, @__ola_delete
+%0 = alloca i64
+store i64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i64, ptr %0
+store i64 %2, ptr %1
 br label exit
 exit:
 ret 
 }
 
 
-declare @__ola_new ptr(i64)
-
-
-declare @__ola_delete void(ptr)
-
-
-define internal @TestPtrNull void() {
+define external @Box.int.$GetValue i64(ptr %this) {
 entry:
-%0 = alloca ptr
-store null, ptr %0
-%1 = load ptr, ptr %0
-%2 = icmp eq ptr %1, null
-call i8 %2, @Assert
-%3 = call i64 8, @__ola_new
-%4 = bitcast ptr %3
-store ptr %4, ptr %0
-%5 = load ptr, ptr %0
-%6 = icmp ne ptr %5, null
-call i8 %6, @Assert
-%7 = load ptr, ptr %0
-%8 = ptr add ptr %7, 0
-store 10, ptr %8
-%9 = load ptr, ptr %0
-%10 = ptr add ptr %9, 0
-%11 = load i64, ptr %10
-%12 = icmp eq i64 %11, 10
-call i8 %12, @Assert
-%13 = load ptr, ptr %0
-%14 = bitcast ptr %13
-call ptr %14, @__ola_delete
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Box.int.$SetValue__I void(ptr %this,i64 %v) {
+entry:
+%0 = alloca i64
+store i64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i64, ptr %0
+store i64 %2, ptr %1
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestPtrArray void() {
+define external @Box.float.$Box__F void(ptr %this,f64 %v) {
 entry:
-%0 = call i64 40, @__ola_new
-%1 = bitcast ptr %0
-%2 = gep ptr %1, 0
-store 0, ptr %2
-%3 = gep ptr %1, 1
-store 1, ptr %3
-%4 = gep ptr %1, 2
-store 4, ptr %4
-%5 = gep ptr %1, 3
-store 9, ptr %5
-%6 = gep ptr %1, 4
-store 16, ptr %6
-br label for.end
-for.end:
-%7 = ptr add ptr %1, 0
-%8 = load i64, ptr %7
-%9 = icmp eq i64 %8, 0
-call i8 %9, @Assert
-%10 = ptr add ptr %1, 8
-%11 = load i64, ptr %10
-%12 = icmp eq i64 %11, 1
-call i8 %12, @Assert
-%13 = ptr add ptr %1, 16
-%14 = load i64, ptr %13
-%15 = icmp eq i64 %14, 4
-call i8 %15, @Assert
-%16 = ptr add ptr %1, 24
-%17 = load i64, ptr %16
-%18 = icmp eq i64 %17, 9
-call i8 %18, @Assert
-%19 = ptr add ptr %1, 32
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 16
-call i8 %21, @Assert
-%22 = bitcast ptr %1
-call ptr %22, @__ola_delete
+%0 = alloca f64
+store f64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load f64, ptr %0
+store f64 %2, ptr %1
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestPtrPassToFunction void() {
+define external @Box.float.$GetValue f64(ptr %this) {
 entry:
-%0 = call i64 8, @__ola_new
-%1 = bitcast ptr %0
-br label entry.inlined
-entry.split.split:
-%2 = icmp eq i64 %3, 99
-call i8 %2, @Assert
-%4 = bitcast ptr %1
-call ptr %4, @__ola_delete
+%0 = alloca f64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
-exit.inlined:
-%3 = load i64, ptr %5
-br label entry.split.split
-entry.inlined1:
-%5 = alloca i64
-%6 = load ptr, ptr %7
-store ptr %6, ptr %5
-br label exit.inlined
-entry.inlined:
-%7 = ptr add ptr %1, 0
-store 99, ptr %7
-br label entry.inlined1
+return:
+br label exit
+exit:
+%3 = load f64, ptr %0
+ret f64 %3
+}
+
+
+define external @Box.float.$SetValue__F void(ptr %this,f64 %v) {
+entry:
+%0 = alloca f64
+store f64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load f64, ptr %0
+store f64 %2, ptr %1
+br label exit
 exit:
 ret 
 }
 
 
-define internal @AllocAndInit__I__I ptr(i64 %count,i64 %val) {
+define external @Box.bool.$Box__B void(ptr %this,i8 %v) {
 entry:
-%0 = call i64 24, @__ola_new
-%1 = bitcast ptr %0
-%2 = gep ptr %1, 0
-store 7, ptr %2
-%3 = gep ptr %1, 1
-store 7, ptr %3
-%4 = gep ptr %1, 2
-store 7, ptr %4
+%0 = alloca i8
+store i8 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i8, ptr %0
+store i8 %2, ptr %1
 br label exit
 exit:
-ret ptr %1
+ret 
 }
 
 
-define internal @TestPtrReturn void() {
+define external @Box.bool.$GetValue i8(ptr %this) {
 entry:
-%0 = call i64 3, 7, @AllocAndInit__I__I
-%1 = ptr add ptr %0, 0
-%2 = load i64, ptr %1
-%3 = icmp eq i64 %2, 7
-call i8 %3, @Assert
-%4 = ptr add ptr %0, 8
+%0 = alloca i8
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i8, ptr %0
+ret i8 %3
+}
+
+
+define external @Box.bool.$SetValue__B void(ptr %this,i8 %v) {
+entry:
+%0 = alloca i8
+store i8 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i8, ptr %0
+store i8 %2, ptr %1
+br label exit
+exit:
+ret 
+}
+
+
+define external @Pair.int.float.$Pair__I__F void(ptr %this,i64 %a,f64 %b) {
+entry:
+%0 = alloca i64
+store i64 %a, ptr %0
+%1 = alloca f64
+store f64 %b, ptr %1
+%2 = ptr add ptr %this, 0
+%3 = load i64, ptr %0
+store i64 %3, ptr %2
+%4 = ptr add ptr %this, 8
+%5 = load f64, ptr %1
+store f64 %5, ptr %4
+br label exit
+exit:
+ret 
+}
+
+
+define external @Pair.int.float.$GetFirst i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Pair.int.float.$GetSecond f64(ptr %this) {
+entry:
+%0 = alloca f64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load f64, ptr %0
+ret f64 %3
+}
+
+
+define external @Pair.bool.int.$Pair__B__I void(ptr %this,i8 %a,i64 %b) {
+entry:
+%0 = alloca i8
+store i8 %a, ptr %0
+%1 = alloca i64
+store i64 %b, ptr %1
+%2 = ptr add ptr %this, 0
+%3 = load i8, ptr %0
+store i8 %3, ptr %2
+%4 = ptr add ptr %this, 8
+%5 = load i64, ptr %1
+store i64 %5, ptr %4
+br label exit
+exit:
+ret 
+}
+
+
+define external @Pair.bool.int.$GetFirst i8(ptr %this) {
+entry:
+%0 = alloca i8
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i8, ptr %0
+ret i8 %3
+}
+
+
+define external @Pair.bool.int.$GetSecond i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Pair.int.int.$Pair__I__I void(ptr %this,i64 %a,i64 %b) {
+entry:
+%0 = alloca i64
+store i64 %a, ptr %0
+%1 = alloca i64
+store i64 %b, ptr %1
+%2 = ptr add ptr %this, 0
+%3 = load i64, ptr %0
+store i64 %3, ptr %2
+%4 = ptr add ptr %this, 8
+%5 = load i64, ptr %1
+store i64 %5, ptr %4
+br label exit
+exit:
+ret 
+}
+
+
+define external @Pair.int.int.$GetFirst i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Pair.int.int.$GetSecond i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Counter.int.$Counter__I void(ptr %this,i64 %initial) {
+entry:
+%0 = alloca i64
+store i64 %initial, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i64, ptr %0
+store i64 %2, ptr %1
+%3 = ptr add ptr %this, 8
+store 0, ptr %3
+br label exit
+exit:
+ret 
+}
+
+
+define external @Counter.int.$Set__I void(ptr %this,i64 %v) {
+entry:
+%0 = alloca i64
+store i64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load i64, ptr %0
+store i64 %2, ptr %1
+%3 = ptr add ptr %this, 8
+%4 = ptr add ptr %this, 8
 %5 = load i64, ptr %4
-%6 = icmp eq i64 %5, 7
-call i8 %6, @Assert
-%7 = ptr add ptr %0, 16
-%8 = load i64, ptr %7
-%9 = icmp eq i64 %8, 7
-call i8 %9, @Assert
-%10 = bitcast ptr %0
-call ptr %10, @__ola_delete
+%6 = add i64 %5, 1
+store i64 %6, ptr %3
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestPtrCompare void() {
+define external @Counter.int.$Get i64(ptr %this) {
 entry:
-%0 = call i64 8, @__ola_new
-%1 = bitcast ptr %0
-%2 = call i64 8, @__ola_new
-%3 = bitcast ptr %2
-%4 = icmp eq ptr %1, %1
-call i8 %4, @Assert
-%5 = icmp ne ptr %1, %3
-call i8 %5, @Assert
-%6 = icmp ne ptr %1, null
-call i8 %6, @Assert
-%7 = icmp eq ptr null, null
-call i8 %7, @Assert
-%8 = bitcast ptr %1
-call ptr %8, @__ola_delete
-%9 = bitcast ptr %3
-call ptr %9, @__ola_delete
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Counter.int.$GetCount i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Counter.float.$Counter__F void(ptr %this,f64 %initial) {
+entry:
+%0 = alloca f64
+store f64 %initial, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load f64, ptr %0
+store f64 %2, ptr %1
+%3 = ptr add ptr %this, 8
+store 0, ptr %3
 br label exit
 exit:
 ret 
+}
+
+
+define external @Counter.float.$Set__F void(ptr %this,f64 %v) {
+entry:
+%0 = alloca f64
+store f64 %v, ptr %0
+%1 = ptr add ptr %this, 0
+%2 = load f64, ptr %0
+store f64 %2, ptr %1
+%3 = ptr add ptr %this, 8
+%4 = ptr add ptr %this, 8
+%5 = load i64, ptr %4
+%6 = add i64 %5, 1
+store i64 %6, ptr %3
+br label exit
+exit:
+ret 
+}
+
+
+define external @Counter.float.$Get f64(ptr %this) {
+entry:
+%0 = alloca f64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load f64, ptr %0
+ret f64 %3
+}
+
+
+define external @Counter.float.$GetCount i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
 }
 
 
 define external @main i64() {
 entry:
-call ptr @TestPtrBasic
-call ptr @TestPtrNull
-call ptr @TestPtrArray
-call ptr @TestPtrPassToFunction
-call ptr @TestPtrReturn
-call ptr @TestPtrCompare
+%0 = alloca i64
+%1 = alloca %Box.int.
+%2 = ptr add ptr %1, 0
+store 0, ptr %2
+call ptr %1, 42, @Box.int.$Box__I
+%3 = call ptr %1, @Box.int.$GetValue
+%4 = icmp eq i64 %3, 42
+call i8 %4, @Assert
+call ptr %1, 100, @Box.int.$SetValue__I
+%5 = call ptr %1, @Box.int.$GetValue
+%6 = icmp eq i64 %5, 100
+call i8 %6, @Assert
+%7 = alloca %Box.float.
+%8 = ptr add ptr %7, 0
+store 0, ptr %8
+call ptr %7, 3.14, @Box.float.$Box__F
+%9 = call ptr %7, @Box.float.$GetValue
+%10 = fcmp oeq f64 %9, 3.14
+call i8 %10, @Assert
+call ptr %7, 2.71, @Box.float.$SetValue__F
+%11 = call ptr %7, @Box.float.$GetValue
+%12 = fcmp oeq f64 %11, 2.71
+call i8 %12, @Assert
+%13 = alloca %Box.bool.
+%14 = ptr add ptr %13, 0
+store 0, ptr %14
+call ptr %13, 1, @Box.bool.$Box__B
+%15 = call ptr %13, @Box.bool.$GetValue
+%16 = icmp eq i8 %15, 1
+call i8 %16, @Assert
+call ptr %13, 0, @Box.bool.$SetValue__B
+%17 = call ptr %13, @Box.bool.$GetValue
+%18 = icmp eq i8 %17, 0
+call i8 %18, @Assert
+%19 = alloca %Box.int.
+%20 = ptr add ptr %19, 0
+store 0, ptr %20
+call ptr %19, 10, @Box.int.$Box__I
+%21 = call ptr %19, @Box.int.$GetValue
+%22 = icmp eq i64 %21, 10
+call i8 %22, @Assert
+%23 = alloca %Pair.int.float.
+%24 = ptr add ptr %23, 0
+store 0, ptr %24
+%25 = ptr add ptr %23, 8
+store 0, ptr %25
+call ptr %23, 10, 3.14, @Pair.int.float.$Pair__I__F
+%26 = call ptr %23, @Pair.int.float.$GetFirst
+%27 = icmp eq i64 %26, 10
+call i8 %27, @Assert
+%28 = call ptr %23, @Pair.int.float.$GetSecond
+%29 = fcmp oeq f64 %28, 3.14
+call i8 %29, @Assert
+%30 = alloca %Pair.bool.int.
+%31 = ptr add ptr %30, 0
+store 0, ptr %31
+%32 = ptr add ptr %30, 8
+store 0, ptr %32
+call ptr %30, 1, 99, @Pair.bool.int.$Pair__B__I
+%33 = call ptr %30, @Pair.bool.int.$GetFirst
+%34 = icmp eq i8 %33, 1
+call i8 %34, @Assert
+%35 = call ptr %30, @Pair.bool.int.$GetSecond
+%36 = icmp eq i64 %35, 99
+call i8 %36, @Assert
+%37 = alloca %Pair.int.int.
+%38 = ptr add ptr %37, 0
+store 0, ptr %38
+%39 = ptr add ptr %37, 8
+store 0, ptr %39
+call ptr %37, 1, 2, @Pair.int.int.$Pair__I__I
+%40 = call ptr %37, @Pair.int.int.$GetFirst
+%41 = icmp eq i64 %40, 1
+call i8 %41, @Assert
+%42 = call ptr %37, @Pair.int.int.$GetSecond
+%43 = icmp eq i64 %42, 2
+call i8 %43, @Assert
+%44 = alloca %Counter.int.
+%45 = ptr add ptr %44, 0
+store 0, ptr %45
+%46 = ptr add ptr %44, 8
+store 0, ptr %46
+call ptr %44, 0, @Counter.int.$Counter__I
+%47 = call ptr %44, @Counter.int.$Get
+%48 = icmp eq i64 %47, 0
+call i8 %48, @Assert
+%49 = call ptr %44, @Counter.int.$GetCount
+%50 = icmp eq i64 %49, 0
+call i8 %50, @Assert
+call ptr %44, 5, @Counter.int.$Set__I
+%51 = call ptr %44, @Counter.int.$Get
+%52 = icmp eq i64 %51, 5
+call i8 %52, @Assert
+%53 = call ptr %44, @Counter.int.$GetCount
+%54 = icmp eq i64 %53, 1
+call i8 %54, @Assert
+call ptr %44, 10, @Counter.int.$Set__I
+%55 = call ptr %44, @Counter.int.$Get
+%56 = icmp eq i64 %55, 10
+call i8 %56, @Assert
+%57 = call ptr %44, @Counter.int.$GetCount
+%58 = icmp eq i64 %57, 2
+call i8 %58, @Assert
+%59 = alloca %Counter.float.
+%60 = ptr add ptr %59, 0
+store 0, ptr %60
+%61 = ptr add ptr %59, 8
+store 0, ptr %61
+call ptr %59, 1, @Counter.float.$Counter__F
+%62 = call ptr %59, @Counter.float.$Get
+%63 = fcmp oeq f64 %62, 1
+call i8 %63, @Assert
+call ptr %59, 2.5, @Counter.float.$Set__F
+%64 = call ptr %59, @Counter.float.$Get
+%65 = fcmp oeq f64 %64, 2.5
+call i8 %65, @Assert
+%66 = call ptr %59, @Counter.float.$GetCount
+%67 = icmp eq i64 %66, 1
+call i8 %67, @Assert
+store 0, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 0
+%68 = load i64, ptr %0
+ret i64 %68
 }
 

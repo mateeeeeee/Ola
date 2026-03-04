@@ -399,11 +399,27 @@ namespace ola
 								Int32 offset = addr.GetStackOffset();
 								if (offset >= 0)
 								{
-									addr_str = std::format("[sp, #{}]", offset);
+									if (offset > 504)
+									{
+										EmitText("add x16, sp, #{}", offset);
+										addr_str = "[x16]";
+									}
+									else
+									{
+										addr_str = std::format("[sp, #{}]", offset);
+									}
 								}
 								else
 								{
-									addr_str = GetOperandString(addr);
+									if (offset < -512)
+									{
+										EmitText("sub x16, x29, #{}", -offset);
+										addr_str = "[x16]";
+									}
+									else
+									{
+										addr_str = GetOperandString(addr);
+									}
 								}
 							}
 							else

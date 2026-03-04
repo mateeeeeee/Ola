@@ -29,7 +29,7 @@ namespace ola
 		std::unordered_set<Uint32> spill_worklist;
 		std::unordered_set<Uint32> spilled_nodes;
 		std::stack<Uint32> select_stack;
-		std::unordered_map<Uint32, MachineOperand*> spill_slots;
+		std::unordered_map<Uint32, MachineOperand> spill_slots;
 		std::unique_ptr<CopyCoalescer> coalescer;
 		Bool enable_coalescing = true;
 

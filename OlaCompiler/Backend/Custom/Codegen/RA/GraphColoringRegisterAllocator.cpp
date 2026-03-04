@@ -395,8 +395,7 @@ namespace ola
 	{
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
 		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
-
-		auto GetSpillSlot = [&](Uint32 vreg_id, MachineType type) -> MachineOperand*
+		auto GetSpillSlot = [&](Uint32 vreg_id, MachineType type) -> MachineOperand
 		{
 			auto it = spill_slots.find(vreg_id);
 			if (it != spill_slots.end())
@@ -404,13 +403,20 @@ namespace ola
 				return it->second;
 			}
 			MachineOperand& new_stack_loc = MF.AllocateLocalStack(type);
-			spill_slots[vreg_id] = &new_stack_loc;
-			return &new_stack_loc;
+			MachineOperand copy = new_stack_loc;
+			spill_slots[vreg_id] = copy;
+			return copy;
 		};
-
 		auto ResolveAlias = [&](Uint32 vreg) -> Uint32
 		{
 			return enable_coalescing ? coalescer->GetAlias(vreg) : vreg;
+		};
+		auto IsSpilledVReg = [&](MachineOperand const& MO) -> Bool
+		{
+			if (!IsOperandVReg(MO)) return false;
+			Uint32 vreg_id = ResolveAlias(MO.GetReg().reg);
+			IGNode* node = IG.GetNode(vreg_id);
+			return !node || node->color == INVALID_REG;
 		};
 
 		std::unordered_set<MachineInstruction*> const* coalesced_moves =
@@ -435,39 +441,67 @@ namespace ola
 				if (MI.GetOpcode() == InstStore)
 				{
 					MachineOperand& addr_op = MI.GetOperand(0);
-					if (IsOperandVReg(addr_op))
+					if (IsSpilledVReg(addr_op))
 					{
 						Uint32 vreg_id = ResolveAlias(addr_op.GetReg().reg);
-						IGNode* node = IG.GetNode(vreg_id);
-						if (!node || node->color == INVALID_REG)
-						{
-							MachineOperand* spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
-							Uint32 scratch = target_reg_info.GetGPScratchRegister();
-							MachineInstruction load_inst(InstLoad);
-							load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
-							load_inst.SetOp<1>(*spill_slot);
-							instructions.insert(it, load_inst);
-							MI.SetOperand(0, MachineOperand::ISAReg(scratch, addr_op.GetType()));
-						}
+						MachineOperand spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
+						Uint32 scratch = target_reg_info.GetGPScratchRegister();
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
+						load_inst.SetOp<1>(spill_slot);
+						instructions.insert(it, load_inst);
+						MI.SetOperand(0, MachineOperand::ISAReg(scratch, addr_op.GetType()));
+					}
+					MachineOperand& val_op = MI.GetOperand(1);
+					if (IsSpilledVReg(val_op))
+					{
+						Uint32 vreg_id = ResolveAlias(val_op.GetReg().reg);
+						MachineOperand spill_slot = GetSpillSlot(vreg_id, val_op.GetType());
+						Bool is_float = (val_op.GetType() == MachineType::Float64);
+						Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, val_op.GetType()));
+						load_inst.SetOp<1>(spill_slot);
+						instructions.insert(it, load_inst);
+						MI.SetOperand(1, MachineOperand::ISAReg(scratch, val_op.GetType()));
 					}
 				}
 				else if (MI.GetOpcode() == InstLoad)
 				{
+					MachineOperand& dst_op = MI.GetOperand(0);
+					Bool dst_spilled = IsSpilledVReg(dst_op);
+					MachineOperand dst_spill_slot;
+					Uint32 dst_scratch = 0;
+					if (dst_spilled)
+					{
+						Uint32 vreg_id = ResolveAlias(dst_op.GetReg().reg);
+						dst_spill_slot = GetSpillSlot(vreg_id, dst_op.GetType());
+
+						Bool is_float = (dst_op.GetType() == MachineType::Float64);
+						dst_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+						MI.SetOperand(0, MachineOperand::ISAReg(dst_scratch, dst_op.GetType()));
+					}
+
 					MachineOperand& addr_op = MI.GetOperand(1);
-					if (IsOperandVReg(addr_op))
+					if (IsSpilledVReg(addr_op))
 					{
 						Uint32 vreg_id = ResolveAlias(addr_op.GetReg().reg);
-						IGNode* node = IG.GetNode(vreg_id);
-						if (!node || node->color == INVALID_REG)
-						{
-							MachineOperand* spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
-							Uint32 scratch = target_reg_info.GetGPScratchRegister();
-							MachineInstruction load_ptr_inst(InstLoad);
-							load_ptr_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
-							load_ptr_inst.SetOp<1>(*spill_slot);
-							instructions.insert(it, load_ptr_inst);
-							MI.SetOperand(1, MachineOperand::ISAReg(scratch, addr_op.GetType()));
-						}
+						MachineOperand spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
+						Uint32 scratch = target_reg_info.GetGPScratchRegister();
+						MachineInstruction load_ptr_inst(InstLoad);
+						load_ptr_inst.SetOp<0>(MachineOperand::ISAReg(scratch, addr_op.GetType()));
+						load_ptr_inst.SetOp<1>(spill_slot);
+						instructions.insert(it, load_ptr_inst);
+						MI.SetOperand(1, MachineOperand::ISAReg(scratch, addr_op.GetType()));
+					}
+
+					if (dst_spilled)
+					{
+						auto next_it = std::next(it);
+						MachineInstruction store_inst(InstStore);
+						store_inst.SetOp<0>(dst_spill_slot);
+						store_inst.SetOp<1>(MachineOperand::ISAReg(dst_scratch, dst_spill_slot.GetType()));
+						instructions.insert(next_it, store_inst);
 					}
 				}
 
@@ -499,8 +533,30 @@ namespace ola
 					}
 					else
 					{
-						MachineOperand* spill_slot = GetSpillSlot(vreg_id, MO.GetType());
-						MI.SetOperand(idx, *spill_slot);
+						MachineOperand spill_slot = GetSpillSlot(vreg_id, MO.GetType());
+						if (inst_info.HasOpFlag(idx, OperandFlagDef))
+						{
+							Bool is_float = (MO.GetType() == MachineType::Float64);
+							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
+
+							auto next_it = std::next(it);
+							MachineInstruction store_inst(InstStore);
+							store_inst.SetOp<0>(spill_slot);
+							store_inst.SetOp<1>(MachineOperand::ISAReg(scratch, MO.GetType()));
+							instructions.insert(next_it, store_inst);
+						}
+						else
+						{
+							Bool is_float = (MO.GetType() == MachineType::Float64);
+							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+
+							MachineInstruction load_inst(InstLoad);
+							load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, MO.GetType()));
+							load_inst.SetOp<1>(spill_slot);
+							instructions.insert(it, load_inst);
+							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
+						}
 					}
 				}
 
