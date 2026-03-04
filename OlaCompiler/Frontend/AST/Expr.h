@@ -37,7 +37,8 @@ namespace ola
 		PreIncrement, PreDecrement,
 		PostIncrement, PostDecrement,
 		Plus, Minus, BitNot,
-		LogicalNot
+		LogicalNot,
+		Dereference
 	};
 	enum class BinaryExprKind : Uint8
 	{
@@ -560,13 +561,20 @@ namespace ola
 	{
 	public:
 		NewExpr(SourceLocation const& loc, QualType const& alloc_type, UniqueExprPtr&& count)
-			: Expr(ExprKind::New, loc), alloc_type(alloc_type), count_expr(std::move(count))
+			: Expr(ExprKind::New, loc), alloc_type(alloc_type), count_expr(std::move(count)), ctor_decl(nullptr)
 		{
 			SetValueCategory(ExprValueCategory::RValue);
 		}
 
 		QualType const& GetAllocType() const { return alloc_type; }
 		Expr const* GetCountExpr() const { return count_expr.get(); }
+
+		void SetCtorDecl(ConstructorDecl const* decl) { ctor_decl = decl; }
+		void SetCtorArgs(UniqueExprPtrList&& args) { ctor_args = std::move(args); }
+		ConstructorDecl const* GetCtorDecl() const { return ctor_decl; }
+		UniqueExprPtrList const& GetCtorArgs() const { return ctor_args; }
+		Bool HasConstructor() const { return ctor_decl != nullptr; }
+		Bool HasInitArgs() const { return !ctor_args.empty(); }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;
 		virtual void Accept(ASTVisitor&) const override;
@@ -575,6 +583,8 @@ namespace ola
 	private:
 		QualType alloc_type;
 		UniqueExprPtr count_expr;
+		ConstructorDecl const* ctor_decl;
+		UniqueExprPtrList ctor_args;
 	};
 
 	class DeleteExpr final : public Expr

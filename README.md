@@ -18,7 +18,7 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
     - logic: `&&`, `||`, `!`
   * control statements: `if` `else`, `switch`, `goto`, `?:`
   * loop statements: `for`,`foreach`, `while`, `do` `while`, `break`, `continue`
-  * pointers and heap allocation: `T*`, `new T[]`, `delete`
+  * pointers, dereference and heap allocation: `T*`, `new T[]`, `delete`, `->`, `*ptr`
   * reference type: `ref`
   * automatic type deduction: `auto`
   * enums

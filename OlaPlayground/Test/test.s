@@ -1,518 +1,266 @@
-.intel_syntax noprefix
-
-.section .rodata
-
-_FP0:
-.quad 0
-
-
-_FP1:
-.quad 4614253070214989087
-
 
 .data
 
-VTable_Shape:
-.quad Shape$Area
+_VTable_Animal:
+.quad _Animal$Speak
+.p2align 3
 
 
-VTable_Rectangle:
-.quad Rectangle$Area
+_VTable_Dog:
+.quad _Dog$Speak
+.p2align 3
 
 
 .text
 
-.extern Assert
-
-.extern AssertMsg
-
-.globl Shape$Shape__I__I
-
-Shape$Shape__I__I:
+.extern _Assert
+.extern _AssertMsg
+.globl _Animal$Animal
+_Animal$Animal:
 label0:
-push rbp
-mov rbp, rsp
-sub rsp, 48
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, rcx
-mov r13, rdx
-mov r12, r8
-mov qword ptr [rbp - 40], r13
-mov qword ptr [rbp - 48], r12
-mov r12, qword ptr [rbp - 40]
-lea r13, [r14 + 8]
-mov qword ptr [r13], r12
-mov r13, qword ptr [rbp - 48]
-lea r12, [r14 + 16]
-mov qword ptr [r12], r13
-jmp label1
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+add x27, x28, #8
+mov x28, #0
+str x28, [x27]
+b label1
 label1:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
 ret
-.globl Shape$GetX
-
-Shape$GetX:
+.globl _Animal$Animal__I
+_Animal$Animal__I:
 label2:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, rcx
-lea r13, [r14 + 8]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label4
+sub sp, sp, #64
+stp x29, x30, [sp, #48]
+add x29, sp, #48
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x28, x0
+mov x27, x1
+str x27, [x29, #-40]
+ldr x27, [x29, #-40]
+add x26, x28, #8
+str x27, [x26]
+b label3
 label3:
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #48]
+add sp, sp, #64
+ret
+.globl _Animal$GetLegs
+_Animal$GetLegs:
 label4:
-mov r14, qword ptr [rbp - 32]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-.globl Shape$GetY
-
-Shape$GetY:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+add x27, x28, #8
+ldr x28, [x27]
+str x28, [x29, #-24]
+b label6
 label5:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, rcx
-lea r13, [r14 + 16]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label7
 label6:
+ldr x28, [x29, #-24]
+mov x0, x28
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _Animal$Speak
+_Animal$Speak:
 label7:
-mov r14, qword ptr [rbp - 32]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-.globl Shape$Area
-
-Shape$Area:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x28, [x29, #-8]
+mov x28, x0
+mov x28, #0
+str x28, [x29, #-24]
+b label9
 label8:
-push rbp
-mov rbp, rsp
-sub rsp, 16
-mov qword ptr [rbp - 8], r14
-mov r14, rcx
-mov qword ptr [rbp - 16], 0
-jmp label10
 label9:
+ldr x28, [x29, #-24]
+mov x0, x28
+ldr x28, [x29, #-8]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _Dog$Dog
+_Dog$Dog:
 label10:
-mov r14, qword ptr [rbp - 16]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov rsp, rbp
-pop rbp
-ret
-.globl Rectangle$Rectangle__I__I__I__I
-
-Rectangle$Rectangle__I__I__I__I:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+mov x0, x28
+bl _Animal$Animal
+add x27, x28, #16
+mov x28, #0
+str x28, [x27]
+b label11
 label11:
-push rbp
-mov rbp, rsp
-sub rsp, 112
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], r13
-mov qword ptr [rbp - 32], r12
-mov qword ptr [rbp - 40], rdi
-mov r14, rcx
-mov r13, rdx
-mov r12, r8
-mov rdi, r9
-mov rsi, qword ptr [rbp + 48]
-mov qword ptr [rbp - 56], r13
-mov qword ptr [rbp - 64], r12
-mov qword ptr [rbp - 72], rdi
-mov qword ptr [rbp - 80], rsi
-mov rsi, qword ptr [rbp - 56]
-mov rdi, qword ptr [rbp - 64]
-mov r8, rdi
-mov rdx, rsi
-mov rcx, r14
-call Shape$Shape__I__I
-mov rsi, qword ptr [rbp - 72]
-lea rdi, [r14 + 24]
-mov qword ptr [rdi], rsi
-mov rdi, qword ptr [rbp - 80]
-lea rsi, [r14 + 32]
-mov qword ptr [rsi], rdi
-jmp label12
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+.globl _Dog$Dog__I__I
+_Dog$Dog__I__I:
 label12:
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov r13, qword ptr [rbp - 24]
-mov r12, qword ptr [rbp - 32]
-mov rdi, qword ptr [rbp - 40]
-mov rsp, rbp
-pop rbp
-ret
-.globl Rectangle$Area
-
-Rectangle$Area:
+sub sp, sp, #64
+stp x29, x30, [sp, #48]
+add x29, sp, #48
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x28, x0
+mov x27, x1
+mov x26, x2
+str x27, [x29, #-40]
+str x26, [x29, #-48]
+ldr x26, [x29, #-40]
+mov x1, x26
+mov x0, x28
+bl _Animal$Animal__I
+ldr x26, [x29, #-48]
+add x27, x28, #16
+str x26, [x27]
+b label13
 label13:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, rcx
-lea r13, [r14 + 24]
-mov r12, qword ptr [r13]
-lea r13, [r14 + 32]
-mov r14, qword ptr [r13]
-mov r13, r12
-imul r13, r14
-mov qword ptr [rbp - 32], r13
-jmp label15
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #48]
+add sp, sp, #64
+ret
+.globl _Dog$Speak
+_Dog$Speak:
 label14:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+add x27, x28, #16
+ldr x28, [x27]
+str x28, [x29, #-24]
+b label16
 label15:
-mov r13, qword ptr [rbp - 32]
-mov rax, r13
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
-ret
-.globl Pair.int.int.$Pair__I__I
-
-Pair.int.int.$Pair__I__I:
 label16:
-push rbp
-mov rbp, rsp
-sub rsp, 48
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, rcx
-mov r13, rdx
-mov r12, r8
-mov qword ptr [rbp - 40], r13
-mov qword ptr [rbp - 48], r12
-mov r12, qword ptr [rbp - 40]
-lea r13, [r14]
-mov qword ptr [r13], r12
-mov r13, qword ptr [rbp - 48]
-lea r12, [r14 + 8]
-mov qword ptr [r12], r13
-jmp label17
+ldr x28, [x29, #-24]
+mov x0, x28
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _main
+_main:
 label17:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
-ret
-.globl Pair.int.int.$First
-
-Pair.int.int.$First:
+sub sp, sp, #80
+stp x29, x30, [sp, #64]
+add x29, sp, #64
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x0, #24
+bl ___ola_new
+mov x28, x0
+adrp x27, _VTable_Dog@PAGE
+add x27, x27, _VTable_Dog@PAGEOFF
+add x26, x28, #0
+str x27, [x26]
+add x26, x28, #8
+mov x27, #0
+str x27, [x26]
+add x27, x28, #16
+mov x26, #0
+str x26, [x27]
+mov x2, #10
+mov x1, #4
+mov x0, x28
+bl _Dog$Dog__I__I
+str x28, [x29, #-48]
+ldr x28, [x29, #-48]
+ldr x28, [x29, #-48]
+str x28, [x29, #-56]
+ldr x28, [x29, #-56]
+add x26, x28, #0
+mov x0, x26
+bl _Animal$GetLegs
+mov x26, x0
+cmp x26, #4
+cset w26, eq
+mov w0, w26
+bl _Assert
+ldr x26, [x29, #-56]
+add x28, x26, #0
+add x26, x28, #0
+ldr x27, [x26]
+add x26, x27, #0
+ldr x27, [x26]
+mov x0, x28
+mov x16, x27
+blr x16
+mov x27, x0
+cmp x27, #10
+cset w27, eq
+mov w0, w27
+bl _Assert
+ldr x27, [x29, #-56]
+add x28, x27, #0
+mov x0, x28
+bl _Animal$GetLegs
+mov x28, x0
+cmp x28, #4
+cset w28, eq
+mov w0, w28
+bl _Assert
+ldr x28, [x29, #-48]
+add x27, x28, #0
+add x28, x27, #0
+ldr x26, [x28]
+add x28, x26, #0
+ldr x26, [x28]
+mov x0, x27
+mov x16, x26
+blr x16
+mov x26, x0
+cmp x26, #10
+cset w26, eq
+mov w0, w26
+bl _Assert
+ldr x26, [x29, #-48]
+mov x0, x26
+bl ___ola_delete
+mov x26, #0
+str x26, [x29, #-40]
+b label19
 label18:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, rcx
-lea r13, [r14]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label20
 label19:
-label20:
-mov r14, qword ptr [rbp - 32]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
+ldr x26, [x29, #-40]
+mov x0, x26
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #64]
+add sp, sp, #80
 ret
-.globl Pair.int.int.$Second
-
-Pair.int.int.$Second:
-label21:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, rcx
-lea r13, [r14 + 8]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label23
-label22:
-label23:
-mov r14, qword ptr [rbp - 32]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-AreaAt__Pair.int.int.ref__I__I:
-label24:
-push rbp
-mov rbp, rsp
-sub rsp, 64
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-mov r14, rcx
-mov r13, rdx
-mov r12, r8
-mov qword ptr [rbp - 40], r14
-mov r14, qword ptr [rbp - 40]
-mov qword ptr [rbp - 48], r13
-mov qword ptr [rbp - 56], r12
-mov r12, qword ptr [rbp - 48]
-mov r13, qword ptr [rbp - 56]
-mov r14, r12
-imul r14, r13
-mov qword ptr [rbp - 64], r14
-jmp label26
-label25:
-label26:
-mov r14, qword ptr [rbp - 64]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
-ret
-.globl Pair.int.float.$Pair__I__F
-
-Pair.int.float.$Pair__I__F:
-label27:
-push rbp
-mov rbp, rsp
-sub rsp, 48
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov qword ptr [rbp - 24], r12
-movsd qword ptr [rbp - 32], xmm14
-mov r14, rcx
-mov r13, rdx
-movsd xmm14, xmm2
-mov qword ptr [rbp - 40], r13
-movsd qword ptr [rbp - 48], xmm14
-mov r13, qword ptr [rbp - 40]
-lea r12, [r14]
-mov qword ptr [r12], r13
-movsd xmm14, qword ptr [rbp - 48]
-lea r12, [r14 + 8]
-movsd qword ptr [r12], xmm14
-jmp label28
-label28:
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov r12, qword ptr [rbp - 24]
-movsd xmm14, qword ptr [rbp - 32]
-mov rsp, rbp
-pop rbp
-ret
-.globl Pair.int.float.$First
-
-Pair.int.float.$First:
-label29:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-mov r14, rcx
-lea r13, [r14]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label31
-label30:
-label31:
-mov r14, qword ptr [rbp - 32]
-mov rax, r14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-mov rsp, rbp
-pop rbp
-ret
-.globl Pair.int.float.$Second
-
-Pair.int.float.$Second:
-label32:
-push rbp
-mov rbp, rsp
-sub rsp, 32
-mov qword ptr [rbp - 8], r14
-mov qword ptr [rbp - 16], r13
-movsd qword ptr [rbp - 24], xmm14
-mov r14, rcx
-lea r13, [r14 + 8]
-mov r14, qword ptr [r13]
-mov qword ptr [rbp - 32], r14
-jmp label34
-label33:
-label34:
-movsd xmm14, qword ptr [rbp - 32]
-movsd xmm0, xmm14
-mov r14, qword ptr [rbp - 8]
-mov r13, qword ptr [rbp - 16]
-movsd xmm14, qword ptr [rbp - 24]
-mov rsp, rbp
-pop rbp
-ret
-.globl main
-
-main:
-label35:
-push rbp
-mov rbp, rsp
-sub rsp, 256
-mov qword ptr [rbp - 8], rsi
-mov qword ptr [rbp - 16], r14
-mov qword ptr [rbp - 24], rbx
-mov qword ptr [rbp - 32], r13
-mov qword ptr [rbp - 40], r12
-mov qword ptr [rbp - 48], rdi
-movsd qword ptr [rbp - 56], xmm14
-lea r14, qword ptr [rbp - 80]
-lea r13, [r14]
-mov qword ptr [r13], 0
-lea r13, qword ptr [rbp - 80]
-lea r14, [r13 + 8]
-movsd xmm14, qword ptr [rip + _FP0]
-movsd qword ptr [r14], xmm14
-movsd xmm2, qword ptr [rip + _FP1]
-mov rdx, 10
-lea rcx, qword ptr [rbp - 80]
-call Pair.int.float.$Pair__I__F
-lea r14, qword ptr [rbp - 120]
-lea r13, [rip + VTable_Rectangle]
-lea r12, [r14]
-mov qword ptr [r12], r13
-lea r12, qword ptr [rbp - 120]
-lea r13, [r12 + 8]
-mov qword ptr [r13], 0
-lea r13, qword ptr [rbp - 120]
-lea r12, [r13 + 16]
-mov qword ptr [r12], 0
-lea r12, qword ptr [rbp - 120]
-lea r13, [r12 + 24]
-mov qword ptr [r13], 0
-lea r13, qword ptr [rbp - 120]
-lea r12, [r13 + 32]
-mov qword ptr [r12], 0
-lea rcx, qword ptr [rbp - 80]
-call Pair.int.float.$First
-mov r12, rax
-mov qword ptr [rbp - 168], 5
-mov r9, r12
-mov r8, 0
-mov rdx, 0
-lea rcx, qword ptr [rbp - 120]
-call Rectangle$Rectangle__I__I__I__I
-lea r12, qword ptr [rbp - 120]
-lea r13, qword ptr [rbp - 200]
-mov r14, qword ptr [r12]
-mov rdi, r12
-add rdi, 8
-mov rsi, qword ptr [rdi]
-mov rdi, r13
-add rdi, 8
-mov qword ptr [r13], r14
-mov r14, r12
-add r14, 16
-mov rbx, qword ptr [r14]
-mov r14, r13
-add r14, 16
-mov qword ptr [rdi], rsi
-mov rdi, r12
-add rdi, 24
-mov rsi, qword ptr [rdi]
-mov rdi, r13
-add rdi, 24
-mov qword ptr [r14], rbx
-mov r14, r12
-add r14, 32
-mov r12, qword ptr [r14]
-mov r14, r13
-add r14, 32
-mov qword ptr [rdi], rsi
-mov qword ptr [r14], r12
-lea r14, qword ptr [rbp - 120]
-mov qword ptr [rbp - 128], r14
-mov r14, qword ptr [rbp - 128]
-lea r12, [r14]
-mov rdi, qword ptr [r12]
-lea r12, [rdi]
-mov rdi, qword ptr [r12]
-mov rcx, r14
-mov rax, rdi
-call rax
-mov rdi, rax
-mov qword ptr [rbp - 136], rdi
-lea rdi, qword ptr [rbp - 152]
-lea r14, [rdi]
-mov qword ptr [r14], 0
-lea r14, qword ptr [rbp - 152]
-lea rdi, [r14 + 8]
-mov qword ptr [rdi], 0
-mov r8, 0
-mov rdx, 0
-lea rcx, qword ptr [rbp - 152]
-call Pair.int.int.$Pair__I__I
-lea rdi, qword ptr [rbp - 152]
-lea r14, qword ptr [rbp - 216]
-mov r12, qword ptr [rdi]
-mov rsi, rdi
-add rsi, 8
-mov rdi, qword ptr [rsi]
-mov rsi, r14
-add rsi, 8
-mov qword ptr [r14], r12
-mov qword ptr [rsi], rdi
-mov r8, 4
-mov rdx, 3
-lea rcx, qword ptr [rbp - 152]
-call AreaAt__Pair.int.int.ref__I__I
-mov rsi, rax
-mov qword ptr [rbp - 160], rsi
-mov rsi, qword ptr [rbp - 160]
-cmp rsi, 12
-sete sil
-and sil, 1
-mov cl, sil
-call Assert
-mov rsi, qword ptr [rbp - 136]
-mov qword ptr [rbp - 64], rsi
-jmp label37
-label36:
-label37:
-mov rsi, qword ptr [rbp - 64]
-mov rax, rsi
-mov rsi, qword ptr [rbp - 8]
-mov r14, qword ptr [rbp - 16]
-mov rbx, qword ptr [rbp - 24]
-mov r13, qword ptr [rbp - 32]
-mov r12, qword ptr [rbp - 40]
-mov rdi, qword ptr [rbp - 48]
-movsd xmm14, qword ptr [rbp - 56]
-mov rsp, rbp
-pop rbp
-ret
+.extern ___ola_new
+.extern ___ola_delete

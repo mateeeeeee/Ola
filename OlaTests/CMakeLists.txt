@@ -51,6 +51,8 @@ set(OLA_TESTS
 	Tests/test_switch.ola
 	Tests/test_ternary.ola
 	Tests/test_while.ola
+	Tests/test_dereference.ola
+	Tests/test_new.ola
 )
 
 add_executable(OlaTests ${SOURCE})

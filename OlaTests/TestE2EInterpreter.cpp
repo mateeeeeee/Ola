@@ -45,3 +45,6 @@ TEST(Interpreter_Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphis
 TEST(Interpreter_Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
 TEST(Interpreter_Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
 TEST(Interpreter_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }
+
+TEST(Interpreter_Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_dereference),   0); }
+TEST(Interpreter_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }

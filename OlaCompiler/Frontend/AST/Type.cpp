@@ -30,7 +30,7 @@ namespace ola
 			{
 				return true;
 			}
-			return pointee_type.GetTypePtr() == other_ptr->pointee_type.GetTypePtr();
+			return pointee_type.GetTypePtr()->IsAssignableFrom(other_ptr->pointee_type.GetTypePtr());
 		}
 		return false;
 	}

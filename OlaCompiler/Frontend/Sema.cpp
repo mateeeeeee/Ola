@@ -673,6 +673,20 @@ namespace ola
 				operand = ActOnImplicitCastExpr(loc, BoolType::Get(ctx), std::move(operand));
 			}
 			break;
+		case UnaryExprKind::Dereference:
+		{
+			if (!isa<PtrType>(operand->GetType()))
+			{
+				diagnostics.Report(loc, invalid_operands);
+				return nullptr;
+			}
+			PtrType const* ptr_type = cast<PtrType>(operand->GetType());
+			UniqueUnaryExprPtr deref_expr = MakeUnique<UnaryExpr>(op, loc);
+			deref_expr->SetType(ptr_type->GetPointeeType());
+			deref_expr->SetLValue(true);
+			deref_expr->SetOperand(std::move(operand));
+			return deref_expr;
+		}
 		default:
 			break;
 		}
@@ -1573,7 +1587,7 @@ namespace ola
 		return null_expr;
 	}
 
-	UniqueExprPtr Sema::ActOnNewExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr)
+	UniqueExprPtr Sema::ActOnNewExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr, Bool has_ctor_args, UniqueExprPtrList&& ctor_args)
 	{
 		if (isa<VoidType>(type))
 		{
@@ -1598,10 +1612,69 @@ namespace ola
 			}
 		}
 
+		ConstructorDecl const* matched_ctor = nullptr;
+		if (has_ctor_args && isa<ClassType>(type))
+		{
+			ClassDecl const* class_decl = cast<ClassType>(type)->GetClassDecl();
+			std::vector<ConstructorDecl const*> candidate_ctors = class_decl->FindConstructors();
+			std::vector<ConstructorDecl const*> match_ctors = ResolveCall(candidate_ctors, ctor_args);
+			if (match_ctors.empty())
+			{
+				diagnostics.Report(loc, matching_ctor_not_found);
+				return nullptr;
+			}
+			if (match_ctors.size() > 1)
+			{
+				diagnostics.Report(loc, matching_ctor_ambiguous);
+				return nullptr;
+			}
+			matched_ctor = match_ctors[0];
+			std::span<QualType const> param_types = matched_ctor->GetFuncType()->GetParams();
+			for (Uint64 i = 0; i < param_types.size(); ++i)
+			{
+				UniqueExprPtr& arg = ctor_args[i];
+				QualType const& func_param_type = param_types[i];
+				if (func_param_type.GetTypePtr() != arg->GetType().GetTypePtr())
+				{
+					arg = ActOnImplicitCastExpr(loc, func_param_type, std::move(arg));
+				}
+			}
+		}
+		else if (has_ctor_args && !isa<ClassType>(type))
+		{
+			if (ctor_args.size() != 1)
+			{
+				diagnostics.Report(loc, invalid_operands);
+				return nullptr;
+			}
+			UniqueExprPtr& arg = ctor_args[0];
+			if (type.GetTypePtr() != arg->GetType().GetTypePtr())
+			{
+				if (type->IsAssignableFrom(arg->GetType()))
+				{
+					arg = ActOnImplicitCastExpr(loc, type, std::move(arg));
+				}
+				else
+				{
+					diagnostics.Report(loc, invalid_operands);
+					return nullptr;
+				}
+			}
+		}
+
 		QualType ptr_type(PtrType::Get(ctx, type));
-		UniqueExprPtr new_expr = MakeUnique<NewExpr>(loc, type, std::move(count_expr));
-		new_expr->SetType(ptr_type);
-		return new_expr;
+		UniqueNewExprPtr new_expr_ptr = MakeUnique<NewExpr>(loc, type, std::move(count_expr));
+		if (matched_ctor)
+		{
+			new_expr_ptr->SetCtorDecl(matched_ctor);
+			new_expr_ptr->SetCtorArgs(std::move(ctor_args));
+		}
+		else if (has_ctor_args && !ctor_args.empty())
+		{
+			new_expr_ptr->SetCtorArgs(std::move(ctor_args));
+		}
+		new_expr_ptr->SetType(ptr_type);
+		return new_expr_ptr;
 	}
 
 	UniqueExprPtr Sema::ActOnDeleteExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr)

@@ -1,0 +1,93 @@
+import std.assert;
+
+void TestDerefBasic()
+{
+	int* p = new int;
+	p[0] = 42;
+	Assert(*p == 42);
+	*p = 99;
+	Assert(*p == 99);
+	Assert(p[0] == 99);
+	delete p;
+}
+
+class Vec2
+{
+	Vec2() { this.x = 0; this.y = 0; }
+	Vec2(int x, int y) { this.x = x; this.y = y; }
+	public int GetX() const { return this.x; }
+	public int GetY() const { return this.y; }
+	public int x;
+	public int y;
+};
+
+void TestDerefClass()
+{
+	Vec2* v = new Vec2(3, 4);
+	Assert((*v).x == 3);
+	Assert((*v).y == 4);
+	Assert((*v).GetX() == 3);
+	Assert((*v).GetY() == 4);
+	delete v;
+}
+
+void TestArrowField()
+{
+	Vec2* v = new Vec2(10, 20);
+	Assert(v->x == 10);
+	Assert(v->y == 20);
+	v->x = 50;
+	v->y = 60;
+	Assert(v->x == 50);
+	Assert(v->y == 60);
+	delete v;
+}
+
+void TestArrowMethod()
+{
+	Vec2* v = new Vec2(7, 8);
+	Assert(v->GetX() == 7);
+	Assert(v->GetY() == 8);
+	delete v;
+}
+
+class Animal
+{
+	Animal() { this.legs = 0; }
+	Animal(int l) { this.legs = l; }
+	public int GetLegs() const { return this.legs; }
+	public int Speak() const virtual { return 0; }
+	public int legs;
+};
+
+class Dog : Animal
+{
+	Dog(int l, int bv)
+	{
+		super(l);
+		this.barkVolume = bv;
+	}
+	public int Speak() const virtual { return this.barkVolume; }
+	public int barkVolume;
+};
+
+void TestArrowPolymorphic()
+{
+	Dog* d = new Dog(4, 10);
+	Animal* a = d;
+	Assert(a->GetLegs() == 4);
+	Assert(a->Speak() == 10);
+	Assert((*a).GetLegs() == 4);
+	Assert((*d).Speak() == 10);
+	delete d;
+}
+
+public int main()
+{
+	TestDerefBasic();
+	TestDerefClass();
+	TestArrowField();
+	TestArrowMethod();
+	TestArrowPolymorphic();
+	return 0;
+}

@@ -1,0 +1,142 @@
+import std.assert;
+
+class Simple
+{
+	Simple() { this.val = 0; }
+	Simple(int v) { this.val = v; }
+	public int val;
+};
+
+void TestNewNoArgs()
+{
+	Simple* s = new Simple;
+	Assert(s->val == 0);
+	delete s;
+}
+
+void TestNewWithArgs()
+{
+	Simple* s = new Simple(42);
+	Assert(s->val == 42);
+	delete s;
+}
+
+class Base
+{
+	Base() { this.x = 0; }
+	Base(int x) { this.x = x; }
+	public int GetX() const virtual { return this.x; }
+	public int x;
+};
+
+class Derived : Base
+{
+	Derived(int x, int y)
+	{
+		super(x);
+		this.y = y;
+	}
+	public int GetY() const { return this.y; }
+	public int y;
+};
+
+void TestNewInheritance()
+{
+	Derived* d = new Derived(10, 20);
+	Assert(d->GetY() == 20);
+	Assert(d->y == 20);
+	delete d;
+}
+
+void TestNewPolymorphic()
+{
+	Derived* d = new Derived(5, 15);
+	Base* b = d;
+	Assert(b->GetX() == 5);
+	delete d;
+}
+
+class Multi
+{
+	Multi(int a, int b, int c)
+	{
+		this.sum = a + b + c;
+	}
+	public int sum;
+};
+
+void TestNewMultipleArgs()
+{
+	Multi* m = new Multi(1, 2, 3);
+	Assert(m->sum == 6);
+	delete m;
+}
+
+void TestNewArray()
+{
+	int* arr = new int[3];
+	arr[0] = 10;
+	arr[1] = 20;
+	arr[2] = 30;
+	Assert(arr[0] == 10);
+	Assert(arr[1] == 20);
+	Assert(arr[2] == 30);
+	delete arr;
+}
+
+void TestNewScalarInit()
+{
+	int* p = new int(42);
+	Assert(*p == 42);
+	delete p;
+}
+
+void TestNewArrayInit()
+{
+	int* a = new int[5](7);
+	Assert(a[0] == 7);
+	Assert(a[1] == 7);
+	Assert(a[2] == 7);
+	Assert(a[3] == 7);
+	Assert(a[4] == 7);
+	delete a;
+}
+
+class Dog
+{
+	Dog(int legs, int sound)
+	{
+		this.legs = legs;
+		this.sound = sound;
+	}
+	public int GetLegs() const { return this.legs; }
+	public int Speak() const { return this.sound; }
+	public int legs;
+	public int sound;
+};
+
+void TestNewClassArrayInit()
+{
+	Dog* ds = new Dog[3](4, 10);
+	Assert(ds[0].Speak() == 10);
+	Assert(ds[0].GetLegs() == 4);
+	Assert(ds[1].Speak() == 10);
+	Assert(ds[1].GetLegs() == 4);
+	Assert(ds[2].Speak() == 10);
+	Assert(ds[2].GetLegs() == 4);
+	delete ds;
+}
+
+public int main()
+{
+	TestNewNoArgs();
+	TestNewWithArgs();
+	TestNewInheritance();
+	TestNewPolymorphic();
+	TestNewMultipleArgs();
+	TestNewArray();
+	TestNewScalarInit();
+	TestNewArrayInit();
+	TestNewClassArrayInit();
+	return 0;
+}

@@ -122,7 +122,7 @@ namespace ola
 		UniqueSuperExprPtr ActOnSuperExpr(SourceLocation const& loc, Bool implicit);
 		UniqueConstructorExprPtr ActOnConstructorExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtrList&& args);
 		UniqueExprPtr ActOnNullLiteral(SourceLocation const& loc);
-		UniqueExprPtr ActOnNewExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr);
+		UniqueExprPtr ActOnNewExpr(SourceLocation const& loc, QualType const& type, UniqueExprPtr&& count_expr, Bool has_ctor_args = false, UniqueExprPtrList&& ctor_args = {});
 		UniqueExprPtr ActOnDeleteExpr(SourceLocation const& loc, UniqueExprPtr&& ptr_expr);
 
 	private:

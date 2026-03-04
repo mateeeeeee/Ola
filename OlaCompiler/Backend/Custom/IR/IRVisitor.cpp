@@ -918,6 +918,17 @@ namespace ola
 		operand_expr->Accept(*this);
 		Value* operand_value = value_map[operand_expr];
 		OLA_ASSERT(operand_value);
+
+		if (unary_expr.GetUnaryKind() == UnaryExprKind::Dereference)
+		{
+			IRType* ptr_ir_type = ConvertToIRType(operand_expr->GetType());
+			Value* loaded_ptr = Load(ptr_ir_type, operand_value);
+			std::vector<Value*> indices = { context.GetInt64(0) };
+			Value* element_ptr = builder->MakeInst<GetElementPtrInst>(loaded_ptr, indices);
+			value_map[&unary_expr] = element_ptr;
+			return;
+		}
+
 		Value* operand = Load(operand_expr->GetType(), operand_value);
 
 		Bool const is_float_expr = isa<FloatType>(operand_expr->GetType());
@@ -1618,6 +1629,205 @@ namespace ola
 		Value* raw_ptr = builder->MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(alloc_args));
 		IRType* result_type = ConvertToIRType(new_expr.GetType());
 		Value* typed_ptr = builder->MakeInst<CastInst>(Opcode::Bitcast, result_type, raw_ptr);
+
+		Expr const* count_expr_ast = new_expr.GetCountExpr();
+		Bool is_single = isa<IntLiteral>(count_expr_ast) && cast<IntLiteral>(count_expr_ast)->GetValue() == 1;
+		if (isa<ClassType>(new_expr.GetAllocType()))
+		{
+			ClassType const* class_type = cast<ClassType>(new_expr.GetAllocType());
+			ClassDecl const* class_decl = class_type->GetClassDecl();
+			Bool const is_polymorphic = class_decl->IsPolymorphic();
+
+			if (is_single)
+			{
+				ConstantInt* zero = context.GetInt64(0);
+
+				if (is_polymorphic)
+				{
+					ConstantInt* index = context.GetInt64(0);
+					std::vector<Value*> indices = { zero, index };
+					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, indices);
+					Store(vtable_map[class_decl], field_ptr);
+				}
+
+				ClassDecl const* curr_class_decl = class_decl;
+				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+				{
+					UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
+					for (auto const& base_field : base_fields)
+					{
+						ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
+						std::vector<Value*> indices = { zero, index };
+						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, indices);
+						Store(value_map[base_field.get()], field_ptr);
+					}
+					curr_class_decl = base_class_decl;
+				}
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				for (auto const& field : fields)
+				{
+					ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
+					std::vector<Value*> indices = { zero, index };
+					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, indices);
+					Store(value_map[field.get()], field_ptr);
+				}
+
+				if (new_expr.HasConstructor())
+				{
+					std::string name(SanitizeClassName(class_decl->GetName()));
+					name += "$";
+					name += new_expr.GetCtorDecl()->GetMangledName();
+					Function* called_ctor = module.GetFunctionByName(name);
+
+					std::vector<Value*> ctor_call_args;
+					Uint32 arg_index = 0;
+					ctor_call_args.push_back(typed_ptr);
+					++arg_index;
+					for (auto const& arg_expr : new_expr.GetCtorArgs())
+					{
+						arg_expr->Accept(*this);
+						Value* arg_value = value_map[arg_expr.get()];
+						OLA_ASSERT(arg_value);
+						IRType* arg_type = called_ctor->GetArg(arg_index)->GetType();
+						if (arg_type->IsPointer()) ctor_call_args.push_back(arg_value);
+						else ctor_call_args.push_back(Load(arg_type, arg_value));
+						++arg_index;
+					}
+					builder->MakeInst<CallInst>(called_ctor, ctor_call_args);
+				}
+			}
+			else
+			{
+				std::string ctor_name;
+				Function* called_ctor = nullptr;
+				std::vector<Value*> ctor_arg_values;
+				if (new_expr.HasConstructor())
+				{
+					ctor_name = SanitizeClassName(class_decl->GetName());
+					ctor_name += "$";
+					ctor_name += new_expr.GetCtorDecl()->GetMangledName();
+					called_ctor = module.GetFunctionByName(ctor_name);
+
+					Uint32 arg_index = 1;
+					for (auto const& arg_expr : new_expr.GetCtorArgs())
+					{
+						arg_expr->Accept(*this);
+						Value* arg_value = value_map[arg_expr.get()];
+						OLA_ASSERT(arg_value);
+						IRType* arg_type = called_ctor->GetArg(arg_index)->GetType();
+						if (arg_type->IsPointer()) ctor_arg_values.push_back(arg_value);
+						else ctor_arg_values.push_back(Load(arg_type, arg_value));
+						++arg_index;
+					}
+				}
+
+				Function* function = builder->GetCurrentFunction();
+				BasicBlock* cond_block = builder->AddBlock(function, exit_block, "newinit.cond");
+				BasicBlock* body_block = builder->AddBlock(function, exit_block, "newinit.body");
+				BasicBlock* end_block  = builder->AddBlock(function, exit_block, "newinit.end");
+
+				Value* i_alloc = builder->MakeInst<AllocaInst>(int_type);
+				Store(context.GetInt64(0), i_alloc);
+				builder->MakeInst<BranchInst>(context, cond_block);
+
+				builder->SetCurrentBlock(cond_block);
+				Value* i_val = Load(int_type, i_alloc);
+				Value* cmp = builder->MakeInst<CompareInst>(Opcode::ICmpSLT, i_val, count_value);
+				builder->MakeInst<BranchInst>(cmp, body_block, end_block);
+
+				builder->SetCurrentBlock(body_block);
+				Value* i_body = Load(int_type, i_alloc);
+				std::vector<Value*> elem_indices = { i_body };
+				Value* elem_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, elem_indices);
+
+				ConstantInt* zero = context.GetInt64(0);
+				if (is_polymorphic)
+				{
+					ConstantInt* index = context.GetInt64(0);
+					std::vector<Value*> indices = { zero, index };
+					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(elem_ptr, indices);
+					Store(vtable_map[class_decl], field_ptr);
+				}
+
+				ClassDecl const* curr_class_decl = class_decl;
+				while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+				{
+					UniqueFieldDeclPtrList const& base_fields = base_class_decl->GetFields();
+					for (auto const& base_field : base_fields)
+					{
+						ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
+						std::vector<Value*> indices = { zero, index };
+						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(elem_ptr, indices);
+						Store(value_map[base_field.get()], field_ptr);
+					}
+					curr_class_decl = base_class_decl;
+				}
+				UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
+				for (auto const& field : fields)
+				{
+					ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
+					std::vector<Value*> indices = { zero, index };
+					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(elem_ptr, indices);
+					Store(value_map[field.get()], field_ptr);
+				}
+
+				if (called_ctor)
+				{
+					std::vector<Value*> ctor_call_args;
+					ctor_call_args.push_back(elem_ptr);
+					for (auto const& av : ctor_arg_values) ctor_call_args.push_back(av);
+					builder->MakeInst<CallInst>(called_ctor, ctor_call_args);
+				}
+
+				Value* i_inc = builder->MakeInst<BinaryInst>(Opcode::Add, i_body, context.GetInt64(1));
+				Store(i_inc, i_alloc);
+				builder->MakeInst<BranchInst>(context, cond_block);
+
+				builder->SetCurrentBlock(end_block);
+			}
+		}
+		else if (new_expr.HasInitArgs())
+		{
+			Expr const* init_expr = new_expr.GetCtorArgs()[0].get();
+			init_expr->Accept(*this);
+			Value* init_value = value_map[init_expr];
+			IRType* init_ir_type = ConvertToIRType(new_expr.GetAllocType());
+			init_value = Load(init_ir_type, init_value);
+
+			if (is_single)
+			{
+				Store(init_value, typed_ptr);
+			}
+			else
+			{
+				Function* function = builder->GetCurrentFunction();
+				BasicBlock* cond_block = builder->AddBlock(function, exit_block, "newinit.cond");
+				BasicBlock* body_block = builder->AddBlock(function, exit_block, "newinit.body");
+				BasicBlock* end_block  = builder->AddBlock(function, exit_block, "newinit.end");
+
+				Value* i_alloc = builder->MakeInst<AllocaInst>(int_type);
+				Store(context.GetInt64(0), i_alloc);
+				builder->MakeInst<BranchInst>(context, cond_block);
+
+				builder->SetCurrentBlock(cond_block);
+				Value* i_val = Load(int_type, i_alloc);
+				Value* cmp = builder->MakeInst<CompareInst>(Opcode::ICmpSLT, i_val, count_value);
+				builder->MakeInst<BranchInst>(cmp, body_block, end_block);
+
+				builder->SetCurrentBlock(body_block);
+				Value* i_body = Load(int_type, i_alloc);
+				std::vector<Value*> elem_indices = { i_body };
+				Value* elem_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, elem_indices);
+				Store(init_value, elem_ptr);
+
+				Value* i_inc = builder->MakeInst<BinaryInst>(Opcode::Add, i_body, context.GetInt64(1));
+				Store(i_inc, i_alloc);
+				builder->MakeInst<BranchInst>(context, cond_block);
+
+				builder->SetCurrentBlock(end_block);
+			}
+		}
+
 		value_map[&new_expr] = typed_ptr;
 	}
 

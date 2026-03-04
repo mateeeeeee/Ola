@@ -1552,6 +1552,9 @@ namespace ola
 		case TokenKind::exclaim:
 			unary_kind = UnaryExprKind::LogicalNot;
 			break;
+		case TokenKind::star:
+			unary_kind = UnaryExprKind::Dereference;
+			break;
 		case TokenKind::KW_sizeof: return ParseSizeofExpression();
 		case TokenKind::KW_length: return ParseLengthExpression();
 		default:
@@ -1614,6 +1617,39 @@ namespace ola
 			case TokenKind::period:
 			{
 				++current_token;
+				sema->sema_ctx.current_class_expr_stack.push_back(expr.get());
+				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();
+				sema->sema_ctx.current_class_expr_stack.pop_back();
+				if (current_token->Is(TokenKind::left_round))
+				{
+					++current_token;
+					UniqueExprPtrList args;
+					if (!Consume(TokenKind::right_round))
+					{
+						while (true)
+						{
+							UniqueExprPtr arg_expr = ParseAssignmentExpression();
+							args.push_back(std::move(arg_expr));
+							if (Consume(TokenKind::right_round))
+							{
+								break;
+							}
+							Expect(TokenKind::comma);
+						}
+					}
+					expr = sema->ActOnMethodCall(loc, std::move(expr), std::move(member_identifier), std::move(args));
+				}
+				else
+				{
+					expr = sema->ActOnFieldAccess(loc, std::move(expr), std::move(member_identifier));
+				}
+			}
+			break;
+			case TokenKind::arrow:
+			{
+				++current_token;
+				UniqueExprPtr zero_index = sema->ActOnIntLiteral(0, loc);
+				expr = sema->ActOnArrayAccessExpr(loc, std::move(expr), std::move(zero_index));
 				sema->sema_ctx.current_class_expr_stack.push_back(expr.get());
 				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();
 				sema->sema_ctx.current_class_expr_stack.pop_back();
@@ -1815,17 +1851,56 @@ namespace ola
 		ParseBaseType(alloc_type);
 
 		UniqueExprPtr count_expr;
+		UniqueExprPtrList ctor_args;
+		Bool has_ctor_args = false;
 		if (Consume(TokenKind::left_square))
 		{
 			count_expr = ParseAssignmentExpression();
 			Expect(TokenKind::right_square);
+			if (current_token->Is(TokenKind::left_round))
+			{
+				++current_token;
+				has_ctor_args = true;
+				if (!Consume(TokenKind::right_round))
+				{
+					while (true)
+					{
+						UniqueExprPtr arg_expr = ParseAssignmentExpression();
+						ctor_args.push_back(std::move(arg_expr));
+						if (Consume(TokenKind::right_round))
+						{
+							break;
+						}
+						Expect(TokenKind::comma);
+					}
+				}
+			}
+		}
+		else if (current_token->Is(TokenKind::left_round))
+		{
+			++current_token;
+			has_ctor_args = true;
+			if (!Consume(TokenKind::right_round))
+			{
+				while (true)
+				{
+					UniqueExprPtr arg_expr = ParseAssignmentExpression();
+					ctor_args.push_back(std::move(arg_expr));
+					if (Consume(TokenKind::right_round))
+					{
+						break;
+					}
+					Expect(TokenKind::comma);
+				}
+			}
+			count_expr = sema->ActOnIntLiteral(1, loc);
 		}
 		else
 		{
 			count_expr = sema->ActOnIntLiteral(1, loc);
 		}
 
-		return sema->ActOnNewExpr(loc, alloc_type, std::move(count_expr));
+		return sema->ActOnNewExpr(loc, alloc_type, std::move(count_expr), has_ctor_args, std::move(ctor_args));
 	}
 
 	UniqueExprPtr Parser::ParseDeleteExpression()

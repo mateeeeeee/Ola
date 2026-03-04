@@ -308,3 +308,52 @@ TEST(Sema, AccessPublicMember_Ok)
 		"void bar() { Foo f; int v = f.x; }"
 	);
 }
+
+TEST(Sema, DerefNonPointer_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = 5; int y = *x; }");
+}
+
+TEST(Sema, DerefPointer_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = new int; *p = 10; delete p; }");
+}
+
+TEST(Sema, PtrSubclassAssignment_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Base { public int x; };"
+		"class Derived : Base { public int y; };"
+		"void foo() { Derived* d = new Derived; Base* b = d; delete d; }"
+	);
+}
+
+TEST(Sema, PtrUnrelatedAssignment_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class A { public int x; };"
+		"class B { public int y; };"
+		"void foo() { A* a = new A; B* b = a; delete a; }"
+	);
+}
+
+TEST(Sema, NewCtorArgs_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo { Foo(int x) { this.val = x; } public int val; };"
+		"void bar() { Foo* f = new Foo(42); delete f; }"
+	);
+}
+
+TEST(Sema, NewCtorArgsMismatch_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { Foo(int x) { this.val = x; } public int val; };"
+		"void bar() { Foo* f = new Foo(1, 2, 3); delete f; }"
+	);
+}
+
+TEST(Sema, NewCtorOnNonClass_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int* p = new int(42); }");
+}

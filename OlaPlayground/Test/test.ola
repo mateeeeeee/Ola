@@ -1,58 +1,38 @@
 import std.assert;
 
-class Pair<A, B>
+class Animal
 {
-    Pair(A a, B b)
+    Animal() { this.legs = 0; }
+    Animal(int l) { this.legs = l; }
+    public int GetLegs() const { return this.legs; }
+    public int Speak() const virtual { return 0; }
+    public int legs;
+};
+
+class Dog : Animal
+{
+    Dog()
     {
-        this.first = a;
-        this.second = b;
+        super();
+        this.barkVolume = 0;
     }
-    public A First() const { return this.first; }
-    public B Second() const { return this.second; }
-    private A first;
-    private B second;
-};
-
-class Shape
-{
-    Shape(int x, int y) { this.x = x; this.y = y; }
-    public int GetX() const { return this.x; }
-    public int GetY() const { return this.y; }
-    public int Area() const virtual { return 0; }
-    private int x;
-    private int y;
-};
-
-class Rectangle : Shape
-{
-    Rectangle(int x, int y, int w, int h)
+    Dog(int l, int bv)
     {
-        super(x, y);
-        this.w = w;
-        this.h = h;
+        super(l);
+        this.barkVolume = bv;
     }
-    public int Area() const virtual { return this.w * this.h; }
-    private int w;
-    private int h;
+    public int Speak() const virtual { return this.barkVolume; }
+    public int barkVolume;
 };
-
-int AreaAt(ref Pair<int,int> origin, int w, int h)
-{
-    return w * h;
-}
 
 public int main()
 {
-    Pair<int, float> p(10, 3.14);
-
-    Rectangle r(0, 0, p.First(), 5);
-    ref Shape s = r;
-    int area = s.Area();
-    //Assert(area == 50);
-
-    Pair<int, int> origin(0, 0);
-    int area2 = AreaAt(origin, 3, 4);
-    Assert(area2 == 12);
-
-    return area;
+    Dog* d = new Dog(4, 10);
+    Animal* a = d;
+    Assert(a->GetLegs() == 4);
+    Assert(a->Speak() == 10);
+    Assert((*a).GetLegs() == 4);
+    Assert((*d).Speak() == 10);
+    delete d;
+    return 0;
 }
