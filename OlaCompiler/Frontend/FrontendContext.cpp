@@ -1,8 +1,32 @@
 #include "FrontendContext.h"
 #include "Frontend/AST/Type.h"
+#include "Frontend/AST/Decl.h"
 
 namespace ola
 {
+	Bool InstantiationKey::operator==(InstantiationKey const& other) const
+	{
+		if (tmpl != other.tmpl) 
+		{
+			return false;
+		}
+		if (args.size() != other.args.size()) 
+		{
+			return false;
+		}
+		for (Uint64 i = 0; i < args.size(); ++i)
+		{
+			if (args[i].GetTypePtr() != other.args[i].GetTypePtr()) 
+			{
+				return false;
+			}
+			if (args[i].IsConst() != other.args[i].IsConst()) 
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	FrontendContext::FrontendContext()
 	{
 		void_type	= new(this) VoidType();
@@ -126,6 +150,24 @@ namespace ola
 		}
 		class_types.push_back(new(this) ClassType(class_decl));
 		return class_types.back();
+	}
+
+	ClassDecl* FrontendContext::GetInstantiation(TemplateClassDecl const* tmpl, std::vector<QualType> const& args)
+	{
+		InstantiationKey key{ tmpl, args };
+		for (auto const& [k, v] : instantiations)
+		{
+			if (k == key) 
+			{
+				return v;
+			}
+		}
+		return nullptr;
+	}
+
+	void FrontendContext::RegisterInstantiation(TemplateClassDecl const* tmpl, std::vector<QualType> const& args, ClassDecl* decl)
+	{
+		instantiations.emplace_back(InstantiationKey{ tmpl, args }, decl);
 	}
 
 }

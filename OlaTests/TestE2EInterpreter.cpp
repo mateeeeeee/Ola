@@ -43,3 +43,5 @@ TEST(Interpreter_Misc, Floats)        { EXPECT_EQ(RUN_TEST(-i test_floats),     
 TEST(Interpreter_Classes, Inheritance)  { EXPECT_EQ(RUN_TEST(-i test_inheritance),  0); }
 TEST(Interpreter_Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphism), 0); }
 TEST(Interpreter_Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
+TEST(Interpreter_Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
+TEST(Interpreter_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }

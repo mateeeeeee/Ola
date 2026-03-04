@@ -12,6 +12,16 @@ namespace ola
 {
 	static constexpr std::string_view VTABLE_PREFIX = "VTable_";
 
+	static std::string SanitizeClassName(std::string_view name)
+	{
+		std::string result(name);
+		for (Char& c : result)
+		{
+			if (c == '<' || c == '>' || c == ',') c = '.';
+		}
+		return result;
+	}
+
 	LLVMIRVisitor::LLVMIRVisitor(llvm::LLVMContext& context, llvm::Module& module)
 		: context(context), module(module), builder(context)
 	{
@@ -81,7 +91,7 @@ namespace ola
 		llvm::FunctionType* llvm_function_type = ConvertMethodType(function_type, llvm_class_type);
 
 		llvm::Function::LinkageTypes linkage = llvm::Function::ExternalLinkage;
-		std::string name(class_decl->GetName()); name += "$"; name += method_decl.GetMangledName();
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += method_decl.GetMangledName();
 		llvm::Function* llvm_function = llvm::Function::Create(llvm_function_type, linkage, name, module);
 
 		llvm::Argument* param_arg = llvm_function->arg_begin();
@@ -365,7 +375,7 @@ namespace ola
 					if (init_expr && isa<ConstructorExpr>(init_expr))
 					{
 						ConstructorExpr const* ctor_expr = cast<ConstructorExpr>(init_expr);
-						std::string name(class_decl->GetName());
+						std::string name(SanitizeClassName(class_decl->GetName()));
 						name += "$";
 						name += ctor_expr->GetCtorDecl()->GetMangledName();
 						llvm::Function* called_ctor = module.getFunction(name);
@@ -469,7 +479,7 @@ namespace ola
 			}
 
 			std::string vtable_name(VTABLE_PREFIX);
-			vtable_name += class_decl.GetName();
+			vtable_name += SanitizeClassName(class_decl.GetName());
 			llvm::GlobalVariable* vtable_var = new llvm::GlobalVariable( 
 				module, vtable_type, true, llvm::GlobalValue::InternalLinkage,
 				llvm::ConstantArray::get(vtable_type, vtable_function_ptrs), vtable_name.c_str());
@@ -1355,7 +1365,7 @@ namespace ola
 		}
 		else
 		{
-			std::string name(class_decl->GetName());
+			std::string name(SanitizeClassName(class_decl->GetName()));
 			name += "$";
 			name += member_call_expr.GetFunctionDecl()->GetMangledName();
 			llvm::Function* called_function = module.getFunction(name);
@@ -1653,7 +1663,7 @@ namespace ola
 			return struct_type_map[class_decl];
 		}
 
-		llvm::StructType* llvm_class_type = llvm::StructType::create(context, class_decl->GetName());
+		llvm::StructType* llvm_class_type = llvm::StructType::create(context, SanitizeClassName(class_decl->GetName()));
 		UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
 		std::vector<llvm::Type*> llvm_member_types;
 		if (class_decl->IsPolymorphic())

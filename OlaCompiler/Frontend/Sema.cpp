@@ -381,6 +381,22 @@ namespace ola
 		return class_decl;
 	}
 
+	UniqueTemplateClassDeclPtr Sema::ActOnTemplateClassDecl(std::string_view name, SourceLocation const& loc,
+		std::vector<std::string>&& type_params, ClassDecl const* base_class, Bool final,
+		Uint64 body_begin, Uint64 body_end)
+	{
+		if (sema_ctx.tag_sym_table.LookUpCurrentScope(name))
+		{
+			diagnostics.Report(loc, redefinition_of_identifier, name);
+			return nullptr;
+		}
+		auto tmpl = MakeUnique<TemplateClassDecl>(name, loc, std::move(type_params), body_begin, body_end);
+		tmpl->SetBaseClass(base_class);
+		tmpl->SetFinal(final);
+		sema_ctx.tag_sym_table.Insert(tmpl.get());
+		return tmpl;
+	}
+
 	UniqueCompoundStmtPtr Sema::ActOnCompoundStmt(UniqueStmtPtrList&& stmts)
 	{
 		return MakeUnique<CompoundStmt>(std::move(stmts));

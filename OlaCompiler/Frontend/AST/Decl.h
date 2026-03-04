@@ -19,7 +19,8 @@ namespace ola
 		Enum,
 		EnumMember,
 		Alias,
-		Class
+		Class,
+		TemplateClass
 	};
 	enum class DeclVisibility : Uint8
 	{
@@ -322,6 +323,7 @@ namespace ola
 			case DeclKind::Alias:
 			case DeclKind::Class:
 			case DeclKind::Enum:
+			case DeclKind::TemplateClass:
 				return true;
 			}
 			return false;
@@ -454,6 +456,38 @@ namespace ola
 
 	private:
 		Bool IsPolymorphicImpl() const;
+	};
+
+	class TemplateClassDecl final : public TagDecl
+	{
+	public:
+		TemplateClassDecl(std::string_view name, SourceLocation const& loc,
+			std::vector<std::string>&& type_params,
+			Uint64 body_token_begin, Uint64 body_token_end)
+			: TagDecl(DeclKind::TemplateClass, name, loc),
+			type_params(std::move(type_params)),
+			body_token_begin(body_token_begin),
+			body_token_end(body_token_end) {}
+
+		std::vector<std::string> const& GetTypeParams() const { return type_params; }
+		Uint64 GetBodyTokenBegin() const { return body_token_begin; }
+		Uint64 GetBodyTokenEnd() const { return body_token_end; }
+
+		ClassDecl const* GetBaseClass() const { return base_class; }
+		void SetBaseClass(ClassDecl const* bc) { base_class = bc; }
+		Bool IsFinal() const { return final; }
+		void SetFinal(Bool f) { final = f; }
+
+		virtual void Accept(ASTVisitor&, Uint32) const override;
+		virtual void Accept(ASTVisitor&) const override;
+		static Bool ClassOf(Decl const* d) { return d->GetDeclKind() == DeclKind::TemplateClass; }
+
+	private:
+		std::vector<std::string> type_params;
+		Uint64 body_token_begin;
+		Uint64 body_token_end;
+		ClassDecl const* base_class = nullptr;
+		Bool final = false;
 	};
 }
 

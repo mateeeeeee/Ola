@@ -204,7 +204,12 @@ namespace ola
 		{
 			ClassType const* class_type = cast<ClassType>(type);
 			type_mangled_name += "__";
-			type_mangled_name += class_type->GetClassDecl()->GetName();
+			std::string class_name(class_type->GetClassDecl()->GetName());
+			for (Char& c : class_name)
+			{
+				if (c == '<' || c == '>' || c == ',') c = '.';
+			}
+			type_mangled_name += class_name;
 		}
 		else OLA_ASSERT(false);
 
@@ -276,6 +281,10 @@ namespace ola
 		for (auto&& param : param_decls) param->Accept(visitor, depth + 1);
 		if (body_stmt) body_stmt->Accept(visitor, depth + 1);
 	}
+	void TemplateClassDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
+	{
+		visitor.Visit(*this, depth);
+	}
 
 	void Decl::Accept(ASTVisitor& visitor) const
 	{
@@ -314,6 +323,10 @@ namespace ola
 		visitor.Visit(*this, 0);
 	}
 	void ClassDecl::Accept(ASTVisitor& visitor) const
+	{
+		visitor.Visit(*this, 0);
+	}
+	void TemplateClassDecl::Accept(ASTVisitor& visitor) const
 	{
 		visitor.Visit(*this, 0);
 	}

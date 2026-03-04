@@ -15,6 +15,16 @@
 namespace ola
 {
 
+	static std::string SanitizeClassName(std::string_view name)
+	{
+		std::string result(name);
+		for (char& c : result)
+		{
+			if (c == '<' || c == '>' || c == ',') c = '.';
+		}
+		return result;
+	}
+
 	IRVisitor::IRVisitor(IRContext& context, IRModule& module) : context(context), module(module)
 	{
 		builder = std::make_unique<IRBuilder>(context);
@@ -93,7 +103,7 @@ namespace ola
 		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
 
 		Linkage linkage = Linkage::External;
-		std::string name(class_decl->GetName()); name += "$"; name += method_decl.GetMangledName();
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += method_decl.GetMangledName();
 		Function* ir_function = new Function(name, ir_func_type, linkage);
 		module.AddGlobal(ir_function);
 
@@ -136,7 +146,7 @@ namespace ola
 		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
 
 		Linkage linkage = Linkage::External;
-		std::string name(class_decl->GetName()); name += "$"; name += ctor_decl.GetMangledName();
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += ctor_decl.GetMangledName();
 		Function* ir_function = new Function(name, ir_func_type, linkage);
 		module.AddGlobal(ir_function);
 
@@ -493,7 +503,7 @@ namespace ola
 					if (init_expr && isa<ConstructorExpr>(init_expr))
 					{
 						ConstructorExpr const* ctor_expr = cast<ConstructorExpr>(init_expr);
-						std::string name(class_decl->GetName());
+						std::string name(SanitizeClassName(class_decl->GetName()));
 						name += "$";
 						name += ctor_expr->GetCtorDecl()->GetMangledName();
 						Function* called_ctor = module.GetFunctionByName(name);
@@ -579,7 +589,7 @@ namespace ola
 			}
 
 			std::string vtable_name(VTABLE_PREFIX);
-			vtable_name += class_decl.GetName();
+			vtable_name += SanitizeClassName(class_decl.GetName());
 			ConstantArray* vtable_init = new ConstantArray(vtable_type, vtable_function_ptrs);
 			GlobalVariable* vtable_var = new GlobalVariable(vtable_name, vtable_type, Linkage::Internal, vtable_init);
 			// vtables cannot be read-only on macOS ARM64 because they contain function
@@ -1502,7 +1512,7 @@ namespace ola
 		}
 		else
 		{
-			std::string name(class_decl->GetName());
+			std::string name(SanitizeClassName(class_decl->GetName()));
 			name += "$";
 			name += method_call_expr.GetFunctionDecl()->GetMangledName();
 			Function* called_function = module.GetFunctionByName(name);
@@ -1554,7 +1564,7 @@ namespace ola
 		ConstructorDecl const* ctor_decl = ctor_expr.GetCtorDecl();
 		ClassDecl const* class_decl = ctor_decl->GetParentDecl();
 
-		std::string name(class_decl->GetName());
+		std::string name(SanitizeClassName(class_decl->GetName()));
 		name += "$";
 		name += ctor_decl->GetMangledName();
 		Function* called_ctor = module.GetFunctionByName(name);
@@ -1854,7 +1864,7 @@ namespace ola
 			llvm_member_types.push_back(ConvertToIRType(field->GetType()));
 		}
 
-		IRStructType* class_type = context.GetStructType(class_decl->GetName(), llvm_member_types);
+		IRStructType* class_type = context.GetStructType(SanitizeClassName(class_decl->GetName()), llvm_member_types);
 		struct_type_map[class_decl] = class_type;
 		return class_type;
 	}

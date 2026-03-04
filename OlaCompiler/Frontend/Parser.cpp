@@ -1,10 +1,41 @@
 #include "Parser.h"
 #include "Diagnostics.h"
+#include "FrontendContext.h"
 #include "AST/AST.h"
+#include "AST/Type.h"
 #include "Sema.h"
 
 namespace ola
 {
+	namespace
+	{
+		std::string GetTypeNameForTemplate(QualType const& type)
+		{
+			Type const* t = type.GetTypePtr();
+			if (!t) return "?";
+			if (isa<IntType>(t)) 	return "int";
+			if (isa<FloatType>(t)) 	return "float";
+			if (isa<BoolType>(t)) 	return "bool";
+			if (isa<CharType>(t)) 	return "char";
+			if (isa<VoidType>(t)) 	return "void";
+			if (isa<ClassType>(t))
+			{
+				ClassDecl const* cd = cast<ClassType>(t)->GetClassDecl();
+				return std::string(cd->GetName());
+			}
+			if (isa<ArrayType>(t))
+			{
+				ArrayType const* arr = cast<ArrayType>(t);
+				return GetTypeNameForTemplate(arr->GetElementType()) + "[]";
+			}
+			if (isa<PtrType>(t))
+			{
+				PtrType const* ptr = cast<PtrType>(t);
+				return GetTypeNameForTemplate(ptr->GetPointeeType()) + "*";
+			}
+			return "?";
+		}
+	}
 
 	Parser::Parser(FrontendContext* context, Diagnostics& diagnostics) : context(context), diagnostics(diagnostics) {}
 	Parser::~Parser() = default;
@@ -94,7 +125,7 @@ namespace ola
 
 			if (Consume(TokenKind::KW_class))
 			{
-				UniqueClassDeclPtr class_decl = ParseClassDeclaration();
+				UniqueDeclPtr class_decl = ParseClassDeclaration();
 				if (class_decl)
 				{
 					global_decl_list.push_back(std::move(class_decl));
@@ -673,7 +704,7 @@ namespace ola
 		return sema->ActOnAliasDecl(alias_name, loc, aliased_type);
 	}
 
-	UniqueClassDeclPtr Parser::ParseClassDeclaration()
+	UniqueDeclPtr Parser::ParseClassDeclaration()
 	{
 		std::string class_name = "";
 		SourceLocation loc = current_token->GetLocation();
@@ -686,7 +717,69 @@ namespace ola
 		{
 			Expect(TokenKind::identifier);
 		}
-		
+
+		std::vector<std::string> type_params;
+		if (Consume(TokenKind::less))
+		{
+			do
+			{
+				if (current_token->IsNot(TokenKind::identifier))
+				{
+					Diag(expected_identifier);
+					return nullptr;
+				}
+				type_params.push_back(std::string(current_token->GetData()));
+				++current_token;
+			} while (Consume(TokenKind::comma));
+			Expect(TokenKind::greater);
+		}
+
+		if (!type_params.empty())
+		{
+			Bool const final = Consume(TokenKind::KW_final);
+			ClassDecl const* base_class = nullptr;
+			if (Consume(TokenKind::colon))
+			{
+				std::string base_class_name = "";
+				if (current_token->Is(TokenKind::identifier))
+				{
+					base_class_name = current_token->GetData();
+					if (base_class_name.empty())
+					{
+						Diag(expected_base_class_name);
+						return nullptr;
+					}
+					++current_token;
+				}
+				else
+				{
+					Diag(expected_base_class_name);
+					return nullptr;
+				}
+				base_class = sema->ActOnBaseClassSpecifier(base_class_name, current_token->GetLocation());
+			}
+
+			Uint64 body_token_begin = current_token - tokens.begin();
+			Int32 brace_count = 0;
+			Expect(TokenKind::left_brace); ++brace_count;
+			while (brace_count != 0)
+			{
+				if (Consume(TokenKind::left_brace))
+				{
+					++brace_count;
+				}
+				else if (Consume(TokenKind::right_brace))
+				{
+					--brace_count;
+				}
+				else ++current_token;
+			}
+			Expect(TokenKind::semicolon);
+			Uint64 body_token_end = current_token - tokens.begin();
+
+			return sema->ActOnTemplateClassDecl(class_name, loc, std::move(type_params), base_class, final, body_token_begin, body_token_end);
+		}
+
 		Bool const final = Consume(TokenKind::KW_final);
 		ClassDecl const* base_class = nullptr;
 		if (Consume(TokenKind::colon))
@@ -804,6 +897,138 @@ namespace ola
 			sema->sema_ctx.current_base_class = nullptr;
 		}
 		return sema->ActOnClassDecl(class_name, nullptr, loc, std::move(member_variables), std::move(member_functions), false);
+	}
+
+	ClassDecl* Parser::ParseTemplateInstantiation(TemplateClassDecl* tmpl, SourceLocation const& loc)
+	{
+		Expect(TokenKind::less);
+		std::vector<QualType> args;
+		do
+		{
+			QualType arg{};
+			ParseTypeQualifier(arg);
+			ParseTypeSpecifier(arg);
+			args.push_back(arg);
+		} while (Consume(TokenKind::comma));
+		Expect(TokenKind::greater);
+
+		auto const& type_params = tmpl->GetTypeParams();
+		if (args.size() != type_params.size())
+		{
+			diagnostics.Report(loc, template_arg_count_mismatch, tmpl->GetName(), type_params.size(), args.size());
+			return nullptr;
+		}
+
+		if (ClassDecl* cached = context->GetInstantiation(tmpl, args))
+		{
+			return cached;
+		}
+
+		std::string specialized_name(tmpl->GetName());
+		specialized_name += '<';
+		for (Uint64 i = 0; i < args.size(); ++i)
+		{
+			if (i > 0) specialized_name += ',';
+			specialized_name += GetTypeNameForTemplate(args[i]);
+		}
+		specialized_name += '>';
+
+		TokenPtr saved_token = current_token;
+
+		Uint64 body_begin = tmpl->GetBodyTokenBegin();
+		Uint64 body_end = tmpl->GetBodyTokenEnd();
+		current_token = tokens.begin() + body_begin;
+
+		UniqueFieldDeclPtrList member_variables;
+		UniqueMethodDeclPtrList member_functions;
+		{
+			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
+			SYM_TABLE_GUARD(sema->sema_ctx.tag_sym_table);
+
+			std::vector<UniqueAliasDeclPtr> type_aliases;
+			for (Uint64 i = 0; i < type_params.size(); ++i)
+			{
+				type_aliases.push_back(sema->ActOnAliasDecl(type_params[i], loc, args[i]));
+			}
+
+			std::string saved_class_name = sema->sema_ctx.current_class_name;
+			ClassDecl const* saved_base_class = sema->sema_ctx.current_base_class;
+			QualType const* saved_current_func = sema->sema_ctx.current_func;
+			Bool saved_return_stmt = sema->sema_ctx.return_stmt_encountered;
+			Bool saved_is_method_const = sema->sema_ctx.is_method_const;
+			Bool saved_is_constructor = sema->sema_ctx.is_constructor;
+			sema->sema_ctx.current_class_name = std::string(tmpl->GetName());
+			sema->sema_ctx.current_base_class = tmpl->GetBaseClass();
+			sema->sema_ctx.current_func = nullptr;
+
+			{
+				auto ParseClassMembers = [&](Bool first_pass)
+					{
+						Expect(TokenKind::left_brace);
+						while (!Consume(TokenKind::right_brace))
+						{
+							if (current_token->Is(TokenKind::identifier))
+							{
+								UniqueConstructorDeclPtr constructor = ParseConstructorDefinition(first_pass);
+								if (!first_pass)
+								{
+									member_functions.push_back(std::move(constructor));
+								}
+								continue;
+							}
+
+							Bool is_function_declaration = IsFunctionDeclaration();
+							if (is_function_declaration)
+							{
+								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
+								if (!first_pass)
+								{
+									member_functions.push_back(std::move(member_function));
+								}
+							}
+							else
+							{
+								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
+								if (first_pass)
+								{
+									for (auto& var_decl : var_decls)
+									{
+										if (var_decl)
+										{
+											member_variables.push_back(std::move(var_decl));
+										}
+									}
+								}
+							}
+						}
+						Expect(TokenKind::semicolon);
+					};
+
+				TokenPtr start_token = current_token;
+				ParseClassMembers(true);
+				current_token = start_token;
+				ParseClassMembers(false);
+			}
+
+			sema->sema_ctx.current_class_name = saved_class_name;
+			sema->sema_ctx.current_base_class = saved_base_class;
+			sema->sema_ctx.current_func = saved_current_func;
+			sema->sema_ctx.return_stmt_encountered = saved_return_stmt;
+			sema->sema_ctx.is_method_const = saved_is_method_const;
+			sema->sema_ctx.is_constructor = saved_is_constructor;
+		}
+
+		UniqueClassDeclPtr result = sema->ActOnClassDecl(specialized_name, tmpl->GetBaseClass(), loc, std::move(member_variables), std::move(member_functions), tmpl->IsFinal());
+		ClassDecl* raw_result = nullptr;
+		if (result)
+		{
+			raw_result = result.get();
+			context->RegisterInstantiation(tmpl, args, raw_result);
+			ast->translation_unit->AddDecl(std::move(result));
+		}
+
+		current_token = saved_token;
+		return raw_result;
 	}
 
 	UniqueStmtPtr Parser::ParseStatement()
@@ -1798,6 +2023,76 @@ namespace ola
 					ClassDecl* class_decl = cast<ClassDecl>(tag_decl);
 					type.SetType(ClassType::Get(context, class_decl));
 				}
+				else if (isa<TemplateClassDecl>(tag_decl))
+				{
+					TemplateClassDecl* tmpl = cast<TemplateClassDecl>(tag_decl);
+					++current_token;
+					ClassDecl* specialized = ParseTemplateInstantiation(tmpl, current_token->GetLocation());
+					if (specialized)
+					{
+						type.SetType(ClassType::Get(context, specialized));
+					}
+
+					while (Consume(TokenKind::left_square))
+					{
+						if (isa<VoidType>(type))
+						{
+							Diag(invalid_type_specifier);
+							return;
+						}
+
+						if (array_size_forbidden)
+						{
+							Expect(TokenKind::right_square);
+							type.SetType(ArrayType::Get(context, type));
+							type.RemoveConst();
+						}
+						else
+						{
+							if (Consume(TokenKind::right_square))
+							{
+								type.SetType(ArrayType::Get(context, type));
+								type.RemoveConst();
+							}
+							else
+							{
+								UniqueExprPtr array_size_expr = ParseConditionalExpression();
+								if (!array_size_expr->IsConstexpr())
+								{
+									Diag(array_size_not_constexpr);
+									return;
+								}
+								Int64 array_size = array_size_expr->EvaluateConstexpr();
+								if (array_size <= 0)
+								{
+									Diag(array_size_not_positive);
+									return;
+								}
+								Expect(TokenKind::right_square);
+								type.SetType(ArrayType::Get(context, type, array_size));
+								type.RemoveConst();
+							}
+						}
+					}
+
+					if (Consume(TokenKind::star))
+					{
+						if (isa<VoidType>(type))
+						{
+							Diag(invalid_type_specifier);
+							return;
+						}
+						type.SetType(PtrType::Get(context, type));
+					}
+
+					if (is_ref)
+					{
+						Bool is_const = type.IsConst();
+						type.RemoveConst();
+						type = QualType(RefType::Get(context, type), is_const ? Qualifier_Const : Qualifier_None);
+					}
+					return;
+				}
 				else
 				{
 					Diag(invalid_type_specifier);
@@ -1894,6 +2189,17 @@ namespace ola
 			else if (tag_decl && isa<ClassDecl>(tag_decl))
 			{
 				type.SetType(ClassType::Get(context, cast<ClassDecl>(tag_decl)));
+			}
+			else if (tag_decl && isa<TemplateClassDecl>(tag_decl))
+			{
+				TemplateClassDecl* tmpl = cast<TemplateClassDecl>(tag_decl);
+				++current_token;
+				ClassDecl* specialized = ParseTemplateInstantiation(tmpl, current_token->GetLocation());
+				if (specialized)
+				{
+					type.SetType(ClassType::Get(context, specialized));
+				}
+				return;
 			}
 			else
 			{
