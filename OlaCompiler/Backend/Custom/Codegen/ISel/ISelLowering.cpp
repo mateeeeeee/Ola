@@ -190,7 +190,8 @@ namespace ola
 			MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
 			Uint32 struct_size = load_type->GetSize();
 
-			MachineOperand dst_slot = MF->AllocateLocalStack(struct_size);
+			MachineOperand const* pre_alloc = MF->GetPreAllocatedStructLoad(LI);
+			MachineOperand dst_slot = pre_alloc ? *pre_alloc : MF->AllocateLocalStack(struct_size);
 			MachineOperand src_addr = ctx.GetOperand(LI->GetAddressOp());
 			MachineOperand src_reg = ctx.VirtualReg(MachineType::Ptr);
 			if (src_addr.IsStackObject() || src_addr.IsMemoryOperand())

@@ -202,6 +202,13 @@ namespace ola
 							machine_ctx.MapOperand(AI, MO);
 						}
 					}
+					else if (LoadInst* LI = dyn_cast<LoadInst>(&I))
+					{
+						if (LI->GetType()->IsStruct())
+						{
+							MF.PreAllocateStructLoad(LI, LI->GetType()->GetSize());
+						}
+					}
 					if (isa<PhiInst>(&I))
 					{
 						MachineOperand const& MO = machine_ctx.VirtualReg(I.GetType());

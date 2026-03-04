@@ -1,6 +1,7 @@
 #include <vector>
 #include <list>
 #include <memory>
+#include <unordered_map>
 #include "MachineOperand.h"
 #include "MachineRelocable.h"
 
@@ -94,6 +95,18 @@ namespace ola
 		}
 		auto const& GetStructArgs() const { return struct_args; }
 
+		MachineOperand& PreAllocateStructLoad(void const* inst, Uint32 size)
+		{
+			MachineOperand& slot = AllocateLocalStack(size);
+			pre_allocated_struct_loads[inst] = slot;
+			return slot;
+		}
+		MachineOperand const* GetPreAllocatedStructLoad(void const* inst) const
+		{
+			auto it = pre_allocated_struct_loads.find(inst);
+			return it != pre_allocated_struct_loads.end() ? &it->second : nullptr;
+		}
+
 		virtual RelocableKind GetRelocableKind() const override
 		{
 			return RelocableKind::Function;
@@ -112,5 +125,6 @@ namespace ola
 		Bool has_call_instructions = false;
 		Uint32 max_call_arg_count = 0;
 		std::vector<StructArgInfo> struct_args;
+		std::unordered_map<void const*, MachineOperand> pre_allocated_struct_loads;
 	};
 }
