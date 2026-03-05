@@ -1,0 +1,53 @@
+import std.assert;
+import std.pair;
+
+void TestDefaultPair()
+{
+	Pair<int, int> p;
+	p.SetFirst(10);
+	p.SetSecond(20);
+	Assert(p.First() == 10);
+	Assert(p.Second() == 20);
+}
+
+void TestConstructorPair()
+{
+	Pair<int, float> p(42, 3.14);
+	Assert(p.First() == 42);
+	Assert(p.Second() == 3.14);
+}
+
+void TestSetFirst()
+{
+	Pair<int, int> p(1, 2);
+	Assert(p.First() == 1);
+	p.SetFirst(100);
+	Assert(p.First() == 100);
+	Assert(p.Second() == 2);
+}
+
+void TestSetSecond()
+{
+	Pair<int, int> p(1, 2);
+	Assert(p.Second() == 2);
+	p.SetSecond(200);
+	Assert(p.First() == 1);
+	Assert(p.Second() == 200);
+}
+
+void TestFloatPair()
+{
+	Pair<float, float> p(1.5, 2.5);
+	Assert(p.First() == 1.5);
+	Assert(p.Second() == 2.5);
+}
+
+public int main()
+{
+	TestDefaultPair();
+	TestConstructorPair();
+	TestSetFirst();
+	TestSetSecond();
+	TestFloatPair();
+	return 0;
+}

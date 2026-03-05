@@ -50,3 +50,4 @@ TEST(Interpreter_Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_derefere
 TEST(Interpreter_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }
 
 TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
+TEST(Interpreter_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }

@@ -1,0 +1,26 @@
+class Pair<T1, T2>
+{
+	Pair()
+	{
+	}
+	Pair(T1 f, T2 s)
+	{
+		this.first = f;
+		this.second = s;
+	}
+
+	public T1 First() const { return this.first; }
+	public T2 Second() const { return this.second; }
+
+	public void SetFirst(T1 value)
+	{
+		this.first = value;
+	}
+	public void SetSecond(T2 value)
+	{
+		this.second = value;
+	}
+
+	private T1 first;
+	private T2 second;
+};

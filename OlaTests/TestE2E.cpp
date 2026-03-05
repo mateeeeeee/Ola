@@ -52,3 +52,4 @@ TEST(Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_dereference),   0); 
 TEST(Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }
 
 TEST(Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
+TEST(Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
