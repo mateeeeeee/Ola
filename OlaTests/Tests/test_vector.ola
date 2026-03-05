@@ -1,0 +1,154 @@
+import std.assert;
+import std.vector;
+
+void TestEmptyVector()
+{
+	Vector<int> v;
+	Assert(v.Size() == 0);
+	Assert(v.Capacity() == 0);
+	Assert(v.Empty() == true);
+	v.Destroy();
+}
+
+void TestPushBackAndGet()
+{
+	Vector<int> v;
+	v.PushBack(10);
+	v.PushBack(20);
+	v.PushBack(30);
+	Assert(v.Size() == 3);
+	Assert(v.Empty() == false);
+	Assert(v.Get(0) == 10);
+	Assert(v.Get(1) == 20);
+	Assert(v.Get(2) == 30);
+	v.Destroy();
+}
+
+void TestGrow()
+{
+	Vector<int> v;
+	v.PushBack(1);
+	v.PushBack(2);
+	v.PushBack(3);
+	v.PushBack(4);
+	Assert(v.Capacity() == 4);
+	v.PushBack(5);
+	Assert(v.Capacity() == 8);
+	Assert(v.Size() == 5);
+	Assert(v.Get(0) == 1);
+	Assert(v.Get(1) == 2);
+	Assert(v.Get(2) == 3);
+	Assert(v.Get(3) == 4);
+	Assert(v.Get(4) == 5);
+	v.Destroy();
+}
+
+void TestSetGet()
+{
+	Vector<int> v;
+	v.PushBack(0);
+	v.PushBack(0);
+	v.PushBack(0);
+	v.Set(0, 100);
+	v.Set(1, 200);
+	v.Set(2, 300);
+	Assert(v.Get(0) == 100);
+	Assert(v.Get(1) == 200);
+	Assert(v.Get(2) == 300);
+	v.Destroy();
+}
+
+void TestFrontBack()
+{
+	Vector<int> v;
+	v.PushBack(11);
+	v.PushBack(22);
+	v.PushBack(33);
+	Assert(v.Front() == 11);
+	Assert(v.Back() == 33);
+	v.Destroy();
+}
+
+void TestPopBack()
+{
+	Vector<int> v;
+	v.PushBack(1);
+	v.PushBack(2);
+	v.PushBack(3);
+	Assert(v.Size() == 3);
+	v.PopBack();
+	Assert(v.Size() == 2);
+	Assert(v.Back() == 2);
+	v.PopBack();
+	Assert(v.Size() == 1);
+	Assert(v.Back() == 1);
+	v.Destroy();
+}
+
+void TestClear()
+{
+	Vector<int> v;
+	v.PushBack(1);
+	v.PushBack(2);
+	v.PushBack(3);
+	Assert(v.Size() == 3);
+	v.Clear();
+	Assert(v.Size() == 0);
+	Assert(v.Empty() == true);
+	Assert(v.Capacity() == 4);
+	v.Destroy();
+}
+
+void TestDestroy()
+{
+	Vector<int> v;
+	v.PushBack(1);
+	v.PushBack(2);
+	v.Destroy();
+	Assert(v.Size() == 0);
+	Assert(v.Capacity() == 0);
+	Assert(v.Empty() == true);
+}
+
+void TestPreallocated()
+{
+	Vector<int> v(8);
+	Assert(v.Size() == 0);
+	Assert(v.Capacity() == 8);
+	Assert(v.Empty() == true);
+	v.PushBack(42);
+	Assert(v.Size() == 1);
+	Assert(v.Capacity() == 8);
+	Assert(v.Get(0) == 42);
+	v.Destroy();
+}
+
+void TestFloatVector()
+{
+	Vector<float> v;
+	v.PushBack(1.5);
+	v.PushBack(2.5);
+	v.PushBack(3.5);
+	Assert(v.Size() == 3);
+	Assert(v.Get(0) == 1.5);
+	Assert(v.Get(1) == 2.5);
+	Assert(v.Get(2) == 3.5);
+	Assert(v.Front() == 1.5);
+	Assert(v.Back() == 3.5);
+	v.Destroy();
+}
+
+public int main()
+{
+	TestEmptyVector();
+	TestPushBackAndGet();
+	TestGrow();
+	TestSetGet();
+	TestFrontBack();
+	TestPopBack();
+	TestClear();
+	TestDestroy();
+	TestPreallocated();
+	TestFloatVector();
+	return 0;
+}

@@ -53,6 +53,7 @@ set(OLA_TESTS
 	Tests/test_while.ola
 	Tests/test_dereference.ola
 	Tests/test_new.ola
+	Tests/test_vector.ola
 )
 
 add_executable(OlaTests ${SOURCE})

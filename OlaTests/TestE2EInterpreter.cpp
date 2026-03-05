@@ -48,3 +48,5 @@ TEST(Interpreter_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_exam
 
 TEST(Interpreter_Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_dereference),   0); }
 TEST(Interpreter_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }
+
+TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }

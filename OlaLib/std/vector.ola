@@ -1,0 +1,81 @@
+class Vector<T>
+{
+	Vector()
+	{
+		this.data = null;
+		this.size = 0;
+		this.capacity = 0;
+	}
+	Vector(int cap)
+	{
+		this.data = new T[cap];
+		this.size = 0;
+		this.capacity = cap;
+	}
+
+	public int Size() const { return this.size; }
+	public int Capacity() const { return this.capacity; }
+	public bool Empty() const { return this.size == 0; }
+
+	public T Get(int index) const
+	{
+		return this.data[index];
+	}
+	public void Set(int index, T value)
+	{
+		this.data[index] = value;
+	}
+
+	public T Front() const { return this.data[0]; }
+	public T Back() const { return this.data[this.size - 1]; }
+
+	public void PushBack(T value)
+	{
+		if(this.size < this.capacity)
+		{
+			this.data[this.size] = value;
+			this.size = this.size + 1;
+			return;
+		}
+		int new_cap = this.capacity > 0 ? this.capacity * 2 : 4;
+		T* new_data = new T[new_cap];
+		int i = 0;
+		for(; i < this.size; ++i)
+		{
+			new_data[i] = this.data[i];
+		}
+		new_data[this.size] = value;
+		if(this.data != null)
+		{
+			delete this.data;
+		}
+		this.data = new_data;
+		this.capacity = new_cap;
+		this.size = this.size + 1;
+	}
+
+	public void PopBack()
+	{
+		this.size = this.size - 1;
+	}
+
+	public void Clear()
+	{
+		this.size = 0;
+	}
+
+	public void Destroy()
+	{
+		if(this.data != null)
+		{
+			delete this.data;
+		}
+		this.data = null;
+		this.size = 0;
+		this.capacity = 0;
+	}
+
+	private T* data;
+	private int size;
+	private int capacity;
+};
