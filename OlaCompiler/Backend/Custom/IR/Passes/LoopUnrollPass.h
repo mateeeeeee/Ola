@@ -1,5 +1,7 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
+#include <queue>
 #include "Backend/Custom/IR/FunctionPass.h"
 #include "Backend/Custom/IR/PassRegistry.h"
 
@@ -34,7 +36,7 @@ namespace ola
 		Uint32 UnrollFactor = 4;
 		Uint32 FullUnrollThreshold = 32;
 		Uint32 MaxUnrolledSize = 256;
-		Bool AllowPartialUnroll = true;
+		Bool AllowPartialUnroll = false;
 	};
 
 	struct LoopUnrollAnalysis
@@ -79,6 +81,7 @@ namespace ola
 			Function& F);
 
 		static Bool CanCloneInstruction(Instruction const* I);
+		static std::vector<BasicBlock*> GetBlocksInExecutionOrder(Loop* L);
 		Bool IsSafeToUnroll(Loop* L) const;
 		Uint32 EstimateLoopSize(Loop* L) const;
 	};

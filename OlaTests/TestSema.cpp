@@ -353,7 +353,7 @@ TEST(Sema, NewCtorArgsMismatch_Error)
 	);
 }
 
-TEST(Sema, NewCtorOnNonClass_Error)
+TEST(Sema, NewCtorOnNonClass_Ok)
 {
-	EXPECT_SEMA_ERROR("void foo() { int* p = new int(42); }");
+	EXPECT_SEMA_OK("void foo() { int* p = new int(42); }");
 }

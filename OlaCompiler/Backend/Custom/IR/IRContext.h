@@ -21,6 +21,7 @@ namespace ola
 	class ConstantInt;
 	class ConstantFloat;
 	class ConstantArray;
+	class ConstantNullPtr;
 	class UndefValue;
 
 	class IRContext
@@ -50,6 +51,7 @@ namespace ola
 		ConstantFloat* GetFloat(Float64 val);
 
 		ConstantArray* GetNullArray(IRArrayType* array_type);
+		ConstantNullPtr* GetNullPtr(IRPtrType* ptr_type);
 		Constant* GetNullValue(IRType* type);
 		UndefValue* GetUndefValue(IRType* type);
 
@@ -73,6 +75,7 @@ namespace ola
 		std::unordered_map<Int8, ConstantInt*> constant_ints8;
 		std::unordered_map<Float64, ConstantFloat*> constant_floats;
 		std::unordered_map<IRArrayType*, ConstantArray*> constant_null_arrays;
+		std::unordered_map<IRPtrType*, ConstantNullPtr*> constant_null_ptrs;
 		std::unordered_map<IRType*, UndefValue*> undef_values;
 	};
 }

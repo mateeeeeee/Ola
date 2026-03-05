@@ -421,10 +421,10 @@ namespace ola
 		}
 
 		std::vector<Instruction*> AllNewInstructions;
-
+		std::vector<BasicBlock*> OrderedBlocks = GetBlocksInExecutionOrder(L);
 		for (Int64 Iter = 0; Iter < Analysis.TripCount; ++Iter)
 		{
-			for (BasicBlock* BB : L->GetBlocks())
+			for (BasicBlock* BB : OrderedBlocks)
 			{
 				for (Instruction& OrigInst : *BB)
 				{
@@ -436,6 +436,7 @@ namespace ola
 					{
 						continue;
 					}
+
 					// Skip loop control instructions - they're not needed after unrolling
 					if (&OrigInst == Analysis.ExitCond.Compare)
 					{
@@ -615,6 +616,8 @@ namespace ola
 			CurrentMap[Phi] = Phi;
 		}
 
+		std::vector<BasicBlock*> OrderedBlocks = GetBlocksInExecutionOrder(L);
+
 		for (Uint32 Iter = 1; Iter < Factor; ++Iter)
 		{
 			for (PhiInst* Phi : Header->PhiInsts())
@@ -631,24 +634,20 @@ namespace ola
 				}
 			}
 
-			for (BasicBlock* BB : L->GetBlocks())
+			for (BasicBlock* BB : OrderedBlocks)
 			{
+				std::vector<Instruction*> InstsToClone;
 				for (Instruction& OrigInst : *BB)
 				{
-					if (isa<PhiInst>(&OrigInst))
-					{
-						continue;
-					}
-					if (OrigInst.IsTerminator())
-					{
-						continue;
-					}
-					if (&OrigInst == Analysis.ExitCond.Compare)
-					{
-						continue;
-					}
+					if (isa<PhiInst>(&OrigInst))			continue;
+					if (OrigInst.IsTerminator())			continue;
+					if (&OrigInst == Analysis.ExitCond.Compare)	continue;
+					InstsToClone.push_back(&OrigInst);
+				}
 
-					Instruction* NewInst = OrigInst.Clone();
+				for (Instruction* OrigInst : InstsToClone)
+				{
+					Instruction* NewInst = OrigInst->Clone();
 					if (!NewInst)
 					{
 						continue;
@@ -665,7 +664,7 @@ namespace ola
 					}
 
 					NewInst->InsertBefore(Latch, Latch->GetTerminator());
-					CurrentMap[&OrigInst] = NewInst;
+					CurrentMap[OrigInst] = NewInst;
 				}
 			}
 		}
@@ -687,20 +686,6 @@ namespace ola
 			}
 		}
 
-		Value* FinalIV = CurrentMap[Analysis.IV.StepInst];
-		if (FinalIV)
-		{
-			for (Uint32 i = 0; i < Analysis.ExitCond.Compare->GetNumOperands(); ++i)
-			{
-				Value* Op = Analysis.ExitCond.Compare->GetOperand(i);
-				if (Op == Analysis.IV.Phi || Op == Analysis.IV.StepInst)
-				{
-					Analysis.ExitCond.Compare->SetOperand(i, FinalIV);
-					break;
-				}
-			}
-		}
-
 		return true;
 	}
 
@@ -712,7 +697,8 @@ namespace ola
 	{
 		std::unordered_map<Value*, Value*> NewValueMap = ValueMap;
 
-		for (BasicBlock* BB : L->GetBlocks())
+		std::vector<BasicBlock*> OrderedBlocks = GetBlocksInExecutionOrder(L);
+		for (BasicBlock* BB : OrderedBlocks)
 		{
 			for (Instruction& OrigInst : *BB)
 			{
@@ -784,6 +770,33 @@ namespace ola
 		}
 
 		return true;
+	}
+
+	std::vector<BasicBlock*> LoopUnrollPass::GetBlocksInExecutionOrder(Loop* L)
+	{
+		std::vector<BasicBlock*> Ordered;
+		std::unordered_set<BasicBlock*> Visited;
+		std::queue<BasicBlock*> Worklist;
+
+		BasicBlock* Header = L->GetHeader();
+		Worklist.push(Header);
+		Visited.insert(Header);
+		while (!Worklist.empty())
+		{
+			BasicBlock* BB = Worklist.front();
+			Worklist.pop();
+			Ordered.push_back(BB);
+
+			for (BasicBlock* Succ : BB->GetSuccessors())
+			{
+				if (L->Contains(Succ) && !Visited.count(Succ))
+				{
+					Visited.insert(Succ);
+					Worklist.push(Succ);
+				}
+			}
+		}
+		return Ordered;
 	}
 
 	Uint32 LoopUnrollPass::EstimateLoopSize(Loop* L) const

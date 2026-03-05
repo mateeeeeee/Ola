@@ -26,6 +26,7 @@ namespace ola
 		for (IRFuncType* function_type : function_types)	delete function_type;
 
 		for (auto& [_, v] : undef_values) delete v;
+		for (auto& [_, v] : constant_null_ptrs) delete v;
 		for (auto& [_, v] : constant_strings) delete v;
 		for (auto& [_, v] : constant_ints64) delete v;
 		for (auto& [_, v] : constant_ints8) delete v;
@@ -209,6 +210,15 @@ namespace ola
 		return constant_null_arrays[array_type];
 	}
 
+	ConstantNullPtr* IRContext::GetNullPtr(IRPtrType* ptr_type)
+	{
+		if (!constant_null_ptrs.contains(ptr_type))
+		{
+			constant_null_ptrs[ptr_type] = new ConstantNullPtr(ptr_type);
+		}
+		return constant_null_ptrs[ptr_type];
+	}
+
 	Constant* IRContext::GetNullValue(IRType* type)
 	{
 		if (isa<IRIntType>(type))
@@ -222,6 +232,10 @@ namespace ola
 		else if (isa<IRArrayType>(type))
 		{
 			return GetNullArray(cast<IRArrayType>(type));
+		}
+		else if (isa<IRPtrType>(type))
+		{
+			return GetNullPtr(cast<IRPtrType>(type));
 		}
 		return nullptr;
 	}

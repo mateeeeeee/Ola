@@ -6,125 +6,288 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @Dog$Dog__I__I void(ptr %this,i64 %legs,i64 %sound) {
+define external @Vector.int.$Vector void(ptr %this) {
 entry:
-%0 = alloca i64
-store i64 %legs, ptr %0
-%1 = alloca i64
-store i64 %sound, ptr %1
-%2 = ptr add ptr %this, 0
-%3 = load i64, ptr %0
-store i64 %3, ptr %2
-%4 = ptr add ptr %this, 8
-%5 = load i64, ptr %1
-store i64 %5, ptr %4
+%0 = ptr add ptr %this, 0
+store null, ptr %0
+%1 = ptr add ptr %this, 8
+store 0, ptr %1
+%2 = ptr add ptr %this, 16
+store 0, ptr %2
 br label exit
 exit:
 ret 
 }
 
 
-define external @Dog$GetLegs i64(ptr %this) {
+define external @Vector.int.$Vector__I void(ptr %this,i64 %cap) {
 entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 0
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
-br label exit
-return:
+%0 = ptr add ptr %this, 0
+%1 = shl i64 %cap, 3
+%2 = call i64 %1, @__ola_new
+%3 = bitcast ptr %2
+store ptr %3, ptr %0
+%4 = ptr add ptr %this, 8
+store 0, ptr %4
+%5 = ptr add ptr %this, 16
+store i64 %cap, ptr %5
 br label exit
 exit:
-%3 = load i64, ptr %0
-ret i64 %3
-}
-
-
-define external @Dog$Speak i64(ptr %this) {
-entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 8
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%3 = load i64, ptr %0
-ret i64 %3
-}
-
-
-define external @main i64() {
-entry:
-%0 = alloca i64
-%1 = call i64 48, @__ola_new
-%2 = bitcast ptr %1
-%3 = alloca i64
-store 0, ptr %3
-br label newinit.cond
-newinit.cond:
-%4 = load i64, ptr %3
-%5 = icmp slt i64 %4, 3
-br i8 %5, label newinit.body, label newinit.end
-newinit.body:
-%6 = load i64, ptr %3
-%7 = gep ptr %2, %6
-%8 = ptr add ptr %7, 0
-store 0, ptr %8
-%9 = ptr add ptr %7, 8
-store 0, ptr %9
-call ptr %7, 4, 10, @Dog$Dog__I__I
-%10 = add i64 %6, 1
-store i64 %10, ptr %3
-br label newinit.cond
-newinit.end:
-%11 = alloca ptr
-store ptr %2, ptr %11
-%12 = load ptr, ptr %11
-%13 = ptr add ptr %12, 0
-%14 = call ptr %13, @Dog$Speak
-%15 = icmp eq i64 %14, 10
-call i8 %15, @Assert
-%16 = load ptr, ptr %11
-%17 = ptr add ptr %16, 0
-%18 = call ptr %17, @Dog$GetLegs
-%19 = icmp eq i64 %18, 4
-call i8 %19, @Assert
-%20 = load ptr, ptr %11
-%21 = ptr add ptr %20, 16
-%22 = call ptr %21, @Dog$Speak
-%23 = icmp eq i64 %22, 10
-call i8 %23, @Assert
-%24 = load ptr, ptr %11
-%25 = ptr add ptr %24, 16
-%26 = call ptr %25, @Dog$GetLegs
-%27 = icmp eq i64 %26, 4
-call i8 %27, @Assert
-%28 = load ptr, ptr %11
-%29 = ptr add ptr %28, 32
-%30 = call ptr %29, @Dog$Speak
-%31 = icmp eq i64 %30, 10
-call i8 %31, @Assert
-%32 = load ptr, ptr %11
-%33 = ptr add ptr %32, 32
-%34 = call ptr %33, @Dog$GetLegs
-%35 = icmp eq i64 %34, 4
-call i8 %35, @Assert
-%36 = load ptr, ptr %11
-%37 = bitcast ptr %36
-call ptr %37, @__ola_delete
-store 0, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%38 = load i64, ptr %0
-ret i64 %38
+ret 
 }
 
 
 declare @__ola_new ptr(i64)
 
 
+define external @Vector.int.$Size i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Vector.int.$Capacity i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 16
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
+br label exit
+exit:
+%3 = load i64, ptr %0
+ret i64 %3
+}
+
+
+define external @Vector.int.$Empty i8(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 8
+%1 = load i64, ptr %0
+%2 = icmp eq i64 %1, 0
+br label exit
+exit:
+ret i8 %2
+}
+
+
+define external @Vector.int.$Get__I i64(ptr %this,i64 %index) {
+entry:
+%0 = ptr add ptr %this, 0
+%1 = load ptr, ptr %0
+%2 = gep ptr %1, %index
+%3 = load i64, ptr %2
+br label exit
+exit:
+ret i64 %3
+}
+
+
+define external @Vector.int.$Set__I__I void(ptr %this,i64 %index,i64 %value) {
+entry:
+%0 = ptr add ptr %this, 0
+%1 = load ptr, ptr %0
+%2 = gep ptr %1, %index
+store i64 %value, ptr %2
+br label exit
+exit:
+ret 
+}
+
+
+define external @Vector.int.$Front i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = load ptr, ptr %1
+%3 = ptr add ptr %2, 0
+%4 = load ptr, ptr %3
+store ptr %4, ptr %0
+br label exit
+exit:
+%5 = load i64, ptr %0
+ret i64 %5
+}
+
+
+define external @Vector.int.$Back i64(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 0
+%1 = ptr add ptr %this, 8
+%2 = load i64, ptr %1
+%3 = sub i64 %2, 1
+%4 = load ptr, ptr %0
+%5 = gep ptr %4, %3
+%6 = load i64, ptr %5
+br label exit
+exit:
+ret i64 %6
+}
+
+
+define external @Vector.int.$PushBack__I void(ptr %this,i64 %value) {
+entry:
+%0 = ptr add ptr %this, 8
+%1 = ptr add ptr %this, 16
+%2 = load i64, ptr %0
+%3 = load i64, ptr %1
+%4 = icmp slt i64 %2, %3
+br i8 %4, label if.then, label if.end
+if.then:
+%5 = ptr add ptr %this, 0
+%6 = load i64, ptr %0
+%7 = load ptr, ptr %5
+%8 = gep ptr %7, %6
+store i64 %value, ptr %8
+%9 = load i64, ptr %0
+%10 = add i64 %9, 1
+store i64 %10, ptr %0
+br label exit
+if.end:
+%11 = load i64, ptr %1
+%12 = icmp sgt i64 %11, 0
+%13 = load i64, ptr %1
+%14 = add i64 %13, %13
+%15 = select i8 %12, i64 %14, 4
+%16 = shl i64 %15, 3
+%17 = call i64 %16, @__ola_new
+%18 = bitcast ptr %17
+%19 = ptr add ptr %this, 0
+br label for.cond
+for.body:
+%20 = gep ptr %18, %21
+%22 = load ptr, ptr %19
+%23 = gep ptr %22, %21
+%24 = load i64, ptr %23
+store i64 %24, ptr %20
+br label for.iter
+for.cond:
+%21 = phi i64 [ 0, if.end ], [ %25, for.iter ]
+%26 = load i64, ptr %0
+%27 = icmp slt i64 %21, %26
+br i8 %27, label for.body, label for.end
+for.iter:
+%25 = add i64 %21, 1
+br label for.cond
+for.end:
+%28 = load i64, ptr %0
+%29 = gep ptr %18, %28
+store i64 %value, ptr %29
+%30 = ptr add ptr %this, 0
+%31 = load ptr, ptr %30
+%32 = icmp ne ptr %31, null
+br i8 %32, label if.then1, label edge.0
+edge.0:
+br label if.end1
+if.then1:
+%33 = ptr add ptr %this, 0
+%34 = load ptr, ptr %33
+%35 = bitcast ptr %34
+call ptr %35, @__ola_delete
+br label if.end1
+if.end1:
+%36 = ptr add ptr %this, 0
+store ptr %18, ptr %36
+store i64 %15, ptr %1
+%37 = load i64, ptr %0
+%38 = add i64 %37, 1
+store i64 %38, ptr %0
+br label exit
+exit:
+ret 
+}
+
+
 declare @__ola_delete void(ptr)
+
+
+define external @Vector.int.$PopBack void(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 8
+%1 = load i64, ptr %0
+%2 = sub i64 %1, 1
+store i64 %2, ptr %0
+br label exit
+exit:
+ret 
+}
+
+
+define external @Vector.int.$Clear void(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 8
+store 0, ptr %0
+br label exit
+exit:
+ret 
+}
+
+
+define external @Vector.int.$Destroy void(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 0
+%1 = load ptr, ptr %0
+%2 = icmp ne ptr %1, null
+br i8 %2, label if.then, label edge.0
+edge.0:
+br label if.end
+if.then:
+%3 = load ptr, ptr %0
+%4 = bitcast ptr %3
+call ptr %4, @__ola_delete
+br label if.end
+if.end:
+store null, ptr %0
+%5 = ptr add ptr %this, 8
+store 0, ptr %5
+%6 = ptr add ptr %this, 16
+store 0, ptr %6
+br label exit
+exit:
+ret 
+}
+
+
+define external @main i64() {
+entry:
+%0 = alloca %Vector.int.
+%1 = ptr add ptr %0, 0
+store null, ptr %1
+%2 = ptr add ptr %0, 8
+store 0, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+call ptr %0, 10, @Vector.int.$PushBack__I
+br label entry.inlined
+entry.split:
+%4 = icmp eq i64 %5, 1
+call i8 %4, @Assert
+br label entry.inlined1
+entry.split.split:
+%6 = icmp eq i64 %7, 10
+call i8 %6, @Assert
+call ptr %0, @Vector.int.$Destroy
+br label exit
+entry.inlined1:
+%8 = load ptr, ptr %1
+%9 = gep ptr %8, 0
+%7 = load i64, ptr %9
+br label entry.split.split
+exit.inlined:
+%5 = load i64, ptr %10
+br label entry.split
+entry.inlined:
+%10 = alloca i64
+%11 = load ptr, ptr %2
+store ptr %11, ptr %10
+br label exit.inlined
+exit:
+ret i64 0
+}
 
