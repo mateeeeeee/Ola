@@ -518,7 +518,11 @@ namespace ola
 		{
 			InterpreterValue idx_val = GetOperandValue(gep->GetIndex(i));
 			Int64 idx = idx_val.AsInt();
-			if (IRArrayType* arr_type = dyn_cast<IRArrayType>(current_type))
+			if (i == 0)
+			{
+				offset += idx * current_type->GetSize();
+			}
+			else if (IRArrayType* arr_type = dyn_cast<IRArrayType>(current_type))
 			{
 				IRType* elem_type = arr_type->GetElementType();
 				offset += idx * elem_type->GetSize();
