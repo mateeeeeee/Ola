@@ -1,0 +1,112 @@
+class ListNode<T>
+{
+	ListNode(T val)
+	{
+		this.data = val;
+		this.prev = null;
+		this.next = null;
+	}
+	public T data;
+	public ListNode<T>* prev;
+	public ListNode<T>* next;
+};
+
+class List<T>
+{
+	List()
+	{
+		this.head = null;
+		this.tail = null;
+		this.size = 0;
+	}
+
+	public int Size() const { return this.size; }
+	public bool Empty() const { return this.size == 0; }
+
+	public T Front() const { return this.head->data; }
+	public T Back() const { return this.tail->data; }
+
+	public void PushBack(T value)
+	{
+		ListNode<T>* node = new ListNode<T>(value);
+		if(this.tail == null)
+		{
+			this.head = node;
+			this.tail = node;
+		}
+		else
+		{
+			node->prev = this.tail;
+			this.tail->next = node;
+			this.tail = node;
+		}
+		this.size = this.size + 1;
+	}
+
+	public void PushFront(T value)
+	{
+		ListNode<T>* node = new ListNode<T>(value);
+		if(this.head == null)
+		{
+			this.head = node;
+			this.tail = node;
+		}
+		else
+		{
+			node->next = this.head;
+			this.head->prev = node;
+			this.head = node;
+		}
+		this.size = this.size + 1;
+	}
+
+	public void PopBack()
+	{
+		ListNode<T>* node = this.tail;
+		if(this.tail->prev != null)
+		{
+			this.tail = this.tail->prev;
+			this.tail->next = null;
+		}
+		else
+		{
+			this.head = null;
+			this.tail = null;
+		}
+		delete node;
+		this.size = this.size - 1;
+	}
+
+	public void PopFront()
+	{
+		ListNode<T>* node = this.head;
+		if(this.head->next != null)
+		{
+			this.head = this.head->next;
+			this.head->prev = null;
+		}
+		else
+		{
+			this.head = null;
+			this.tail = null;
+		}
+		delete node;
+		this.size = this.size - 1;
+	}
+
+	public void Clear()
+	{
+		while(this.head != null)
+		{
+			ListNode<T>* next = this.head->next;
+			delete this.head;
+			this.head = next;
+		}
+		this.tail = null;
+		this.size = 0;
+	}
+
+	private ListNode<T>* head;
+	private ListNode<T>* tail;
+	private int size;
+};

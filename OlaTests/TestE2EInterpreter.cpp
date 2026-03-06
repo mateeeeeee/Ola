@@ -52,3 +52,4 @@ TEST(Interpreter_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),   
 TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
 TEST(Interpreter_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
 TEST(Interpreter_Containers, Optional)     { EXPECT_EQ(RUN_TEST(-i test_optional),      0); }
+TEST(Interpreter_Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),          0); }

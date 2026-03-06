@@ -1,0 +1,87 @@
+import std.assert;
+import std.list;
+
+void TestPushBack()
+{
+	List<int> l;
+	Assert(l.Empty() == true);
+	l.PushBack(10);
+	l.PushBack(20);
+	l.PushBack(30);
+	Assert(l.Size() == 3);
+	Assert(l.Front() == 10);
+	Assert(l.Back() == 30);
+	l.Clear();
+}
+
+void TestPushFront()
+{
+	List<int> l;
+	l.PushFront(10);
+	l.PushFront(20);
+	l.PushFront(30);
+	Assert(l.Size() == 3);
+	Assert(l.Front() == 30);
+	Assert(l.Back() == 10);
+	l.Clear();
+}
+
+void TestPopBack()
+{
+	List<int> l;
+	l.PushBack(1);
+	l.PushBack(2);
+	l.PushBack(3);
+	l.PopBack();
+	Assert(l.Size() == 2);
+	Assert(l.Back() == 2);
+	l.PopBack();
+	Assert(l.Size() == 1);
+	Assert(l.Front() == 1);
+	Assert(l.Back() == 1);
+	l.PopBack();
+	Assert(l.Empty() == true);
+}
+
+void TestPopFront()
+{
+	List<int> l;
+	l.PushBack(1);
+	l.PushBack(2);
+	l.PushBack(3);
+	l.PopFront();
+	Assert(l.Size() == 2);
+	Assert(l.Front() == 2);
+	l.PopFront();
+	Assert(l.Size() == 1);
+	Assert(l.Front() == 3);
+	Assert(l.Back() == 3);
+	l.PopFront();
+	Assert(l.Empty() == true);
+}
+
+void TestMixed()
+{
+	List<float> l;
+	l.PushBack(1.0);
+	l.PushFront(0.5);
+	l.PushBack(2.0);
+	Assert(l.Size() == 3);
+	Assert(l.Front() == 0.5);
+	Assert(l.Back() == 2.0);
+	l.PopFront();
+	l.PopBack();
+	Assert(l.Size() == 1);
+	Assert(l.Front() == 1.0);
+	l.Clear();
+}
+
+public int main()
+{
+	TestPushBack();
+	TestPushFront();
+	TestPopBack();
+	TestPopFront();
+	TestMixed();
+	return 0;
+}
