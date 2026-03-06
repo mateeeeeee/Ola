@@ -1,0 +1,42 @@
+import std.assert;
+import std.optional;
+
+void TestEmptyOptional()
+{
+	Optional<int> o;
+	Assert(o.HasValue() == false);
+}
+
+void TestValueOptional()
+{
+	Optional<int> o(42);
+	Assert(o.HasValue() == true);
+	Assert(o.Value() == 42);
+}
+
+void TestSetAndReset()
+{
+	Optional<int> o;
+	Assert(o.HasValue() == false);
+	o.Set(10);
+	Assert(o.HasValue() == true);
+	Assert(o.Value() == 10);
+	o.Reset();
+	Assert(o.HasValue() == false);
+}
+
+void TestFloatOptional()
+{
+	Optional<float> o(3.14);
+	Assert(o.HasValue() == true);
+	Assert(o.Value() == 3.14);
+}
+
+public int main()
+{
+	TestEmptyOptional();
+	TestValueOptional();
+	TestSetAndReset();
+	TestFloatOptional();
+	return 0;
+}

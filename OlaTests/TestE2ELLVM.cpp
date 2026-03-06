@@ -49,3 +49,7 @@ TEST(LLVM_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0
 
 TEST(LLVM_Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_dereference),   0); }
 TEST(LLVM_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }
+
+TEST(LLVM_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
+TEST(LLVM_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
+TEST(LLVM_Containers, Optional)     { EXPECT_EQ(RUN_TEST(-i test_optional),      0); }

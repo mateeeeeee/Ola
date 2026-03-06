@@ -1953,15 +1953,27 @@ namespace ola
 	{
 		if (condition_value->GetType()->IsPointer())
 		{
-			if (isa<AllocaInst>(condition_value))
+			IRType* load_type = nullptr;
+			if (AllocaInst* AI = dyn_cast<AllocaInst>(condition_value))
 			{
-				AllocaInst* alloca_inst = cast<AllocaInst>(condition_value);
-				condition_value = builder->MakeInst<LoadInst>(condition_value, alloca_inst->GetAllocatedType());
+				load_type = AI->GetAllocatedType();
 			}
-			else if (isa<GlobalVariable>(condition_value))
+			else if (GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(condition_value))
 			{
-				GlobalVariable* global_var_alloc = cast<GlobalVariable>(condition_value);
-				condition_value = builder->MakeInst<LoadInst>(condition_value, global_var_alloc->GetValueType());
+				load_type = GEPI->GetResultElementType();
+			}
+			else if (PtrAddInst* PA = dyn_cast<PtrAddInst>(condition_value))
+			{
+				load_type = PA->GetResultElementType();
+			}
+			else if (GlobalVariable* GV = dyn_cast<GlobalVariable>(condition_value))
+			{
+				load_type = GV->GetValueType();
+			}
+			
+			if (load_type) 
+			{
+				condition_value = builder->MakeInst<LoadInst>(condition_value, load_type);
 			}
 		}
 

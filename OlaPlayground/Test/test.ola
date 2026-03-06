@@ -1,12 +1,42 @@
 import std.assert;
-import std.vector;
+
+class Optional<T>
+{
+	Optional()
+	{
+		this.has_val = false;
+	}
+	Optional(T v)
+	{
+		this.val = v;
+		this.has_val = true;
+	}
+	public bool HasValue() const { return this.has_val; }
+	public T Value() const { return this.val; }
+
+	public void Test()
+	{
+		if(this.has_val)
+		{
+			Assert(this.val == 42);
+		}
+	}
+
+	private T val;
+	private bool has_val;
+};
 
 public int main()
 {
-	Vector<int> v;
-	v.PushBack(10);
-	Assert(v.Size() == 1);
-	Assert(v.Get(0) == 10);
-	v.Destroy();
+	Optional<int> empty;
+	Optional<int> full(42);
+
+	Assert(empty.HasValue() == false);
+	Assert(full.HasValue() == true);
+	Assert(full.Value() == 42);
+
+	full.Test();
+	empty.Test();
+
 	return 0;
 }

@@ -1,0 +1,28 @@
+class Optional<T>
+{
+	Optional()
+	{
+		this.has_val = false;
+	}
+	Optional(T v)
+	{
+		this.val = v;
+		this.has_val = true;
+	}
+
+	public bool HasValue() const { return this.has_val; }
+	public T Value() const { return this.val; }
+
+	public void Set(T v)
+	{
+		this.val = v;
+		this.has_val = true;
+	}
+	public void Reset()
+	{
+		this.has_val = false;
+	}
+
+	private T val;
+	private bool has_val;
+};
