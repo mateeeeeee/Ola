@@ -933,6 +933,12 @@ namespace ola
 		}
 		specialized_name += '>';
 
+		UniqueClassDeclPtr result = MakeUnique<ClassDecl>(specialized_name, loc);
+		ClassDecl* raw_result = result.get();
+		result->SetType(ClassType::Get(context, raw_result));
+		result->SetBaseClass(tmpl->GetBaseClass());
+		context->RegisterInstantiation(tmpl, args, raw_result);
+
 		TokenPtr saved_token = current_token;
 
 		Uint64 body_begin = tmpl->GetBodyTokenBegin();
@@ -1018,14 +1024,19 @@ namespace ola
 			sema->sema_ctx.is_constructor = saved_is_constructor;
 		}
 
-		UniqueClassDeclPtr result = sema->ActOnClassDecl(specialized_name, tmpl->GetBaseClass(), loc, std::move(member_variables), std::move(member_functions), tmpl->IsFinal());
-		ClassDecl* raw_result = nullptr;
-		if (result)
+		raw_result->SetFields(std::move(member_variables));
+		raw_result->SetMethods(std::move(member_functions));
+		raw_result->SetFinal(tmpl->IsFinal());
+
+		MethodDecl const* error_decl = nullptr;
+		BuildVTableResult build_result = raw_result->BuildVTable(error_decl);
+		if (build_result == BuildVTableResult::Error_OverrideFinal)
 		{
-			raw_result = result.get();
-			context->RegisterInstantiation(tmpl, args, raw_result);
-			ast->translation_unit->AddDecl(std::move(result));
+			diagnostics.Report(error_decl->GetLocation(), cannot_override_final_function, error_decl->GetName());
 		}
+
+		sema->sema_ctx.tag_sym_table.Insert(raw_result);
+		ast->translation_unit->AddDecl(std::move(result));
 
 		current_token = saved_token;
 		return raw_result;

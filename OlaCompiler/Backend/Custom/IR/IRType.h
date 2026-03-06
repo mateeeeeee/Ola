@@ -171,12 +171,13 @@ namespace ola
 		std::vector<IRType*> const& GetMemberTypes() const { return member_types; }
 		Uint64 GetMemberCount() const { return member_types.size(); }
 		IRType* GetMemberType(Uint32 i) const { return member_types[i]; }
-
 		Uint32 GetFieldOffset(Uint32 i) const
 		{
 			OLA_ASSERT(false);
 			return 0; 
 		}
+
+		void SetBody(std::vector<IRType*> const& member_types);
 
 		static Bool ClassOf(IRType const* T) { return T->GetKind() == IRTypeKind::Struct; }
 		static IRStructType* Get(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types);
@@ -184,6 +185,7 @@ namespace ola
 	private:
 		std::string name;
 		std::vector<IRType*> member_types;
+
 	private:
 		IRStructType(IRContext& ctx, std::string_view name, std::vector<IRType*> const& member_types);
 	};

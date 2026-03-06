@@ -2052,30 +2052,35 @@ namespace ola
 		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, IRStructType*>;
 		static LLVMStructTypeMap struct_type_map;
 
-		if (struct_type_map.contains(class_decl)) return struct_type_map[class_decl];
+		if (struct_type_map.contains(class_decl)) 
+		{
+			return struct_type_map[class_decl];
+		}
+
+		IRStructType* class_type = context.GetStructType(SanitizeClassName(class_decl->GetName()), {});
+		struct_type_map[class_decl] = class_type;
 
 		UniqueFieldDeclPtrList const& fields = class_decl->GetFields();
-		std::vector<IRType*> llvm_member_types;
+		std::vector<IRType*> member_types;
 		if (class_decl->IsPolymorphic())
 		{
-			llvm_member_types.push_back(GetPointerType(GetPointerType(void_type)));
+			member_types.push_back(GetPointerType(GetPointerType(void_type)));
 		}
 		ClassDecl const* curr_class_decl = class_decl;
 		while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
 		{
 			for (auto const& field : base_class_decl->GetFields())
 			{
-				llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+				member_types.push_back(ConvertToIRType(field->GetType()));
 			}
 			curr_class_decl = base_class_decl;
 		}
 		for (auto const& field : fields)
 		{
-			llvm_member_types.push_back(ConvertToIRType(field->GetType()));
+			member_types.push_back(ConvertToIRType(field->GetType()));
 		}
 
-		IRStructType* class_type = context.GetStructType(SanitizeClassName(class_decl->GetName()), llvm_member_types);
-		struct_type_map[class_decl] = class_type;
+		class_type->SetBody(member_types);
 		return class_type;
 	}
 

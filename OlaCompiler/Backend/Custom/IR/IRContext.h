@@ -40,6 +40,7 @@ namespace ola
 		IRArrayType*		GetArrayType(IRType* base_type, Uint32 array_size);
 		IRFuncType*   GetFunctionType(IRType* ret_type, std::vector<IRType*> const& param_types);
 		IRStructType*     GetStructType(std::string_view name, std::vector<IRType*> const& member_types);
+		IRStructType*     CreateOpaqueStructType(std::string_view name);
 
 		ConstantString* GetString(std::string_view str);
 		ConstantInt* GetInt64(Int64 value);

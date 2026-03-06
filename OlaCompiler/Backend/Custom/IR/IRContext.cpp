@@ -147,6 +147,12 @@ namespace ola
 		return struct_types.back();
 	}
 
+	IRStructType* IRContext::CreateOpaqueStructType(std::string_view name)
+	{
+		struct_types.push_back(new(this) IRStructType(*this, name, {}));
+		return struct_types.back();
+	}
+
 	ConstantString* IRContext::GetString(std::string_view str)
 	{
 		if (constant_strings.contains(str))

@@ -51,6 +51,8 @@ OlaPlayground/Test/test2.*
 
 /.vs
 build/
+build_debug/
+build_release/
 bin/
 *.sln
 *.vcxproj

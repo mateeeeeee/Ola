@@ -48,6 +48,19 @@ class Counter<T>
 	private int count;
 };
 
+class Node<T>
+{
+	Node(T val) { this.data = val; this.next = null; }
+	public T data;
+	public Node<T>* next;
+};
+
+class List<T>
+{
+	List() { this.head = null; }
+	public Node<T>* head;
+};
+
 public int main()
 {
 	Box<int> bi(42);
@@ -95,6 +108,27 @@ public int main()
 	cf.Set(2.5);
 	Assert(cf.Get() == 2.5);
 	Assert(cf.GetCount() == 1);
+
+	Node<int>* na = new Node<int>(10);
+	Node<int>* nb = new Node<int>(20);
+	Node<int>* nc = new Node<int>(30);
+	na->next = nb;
+	nb->next = nc;
+	Assert(na->data == 10);
+	Assert(na->next->data == 20);
+	Assert(na->next->next->data == 30);
+	Assert(na->next->next->next == null);
+
+	List<int> list;
+	Assert(list.head == null);
+	list.head = na;
+	Assert(list.head->data == 10);
+	Assert(list.head->next->data == 20);
+	Assert(list.head->next->next->data == 30);
+
+	delete nc;
+	delete nb;
+	delete na;
 
 	return 0;
 }

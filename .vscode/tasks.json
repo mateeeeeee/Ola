@@ -17,9 +17,6 @@
             },
             "problemMatcher": [
                 "$gcc"
-            ],
-            "dependsOn": [
-                "Configure CMake (Debug)"
             ]
         },
         {
@@ -35,9 +32,6 @@
             "group": "build",
             "problemMatcher": [
                 "$gcc"
-            ],
-            "dependsOn": [
-                "Configure CMake (Release)"
             ]
         },
         {
@@ -95,6 +89,7 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Build (Debug)",
+                "Configure CMake (Debug)",
                 "Build Ola (Debug)"
             ],
             "problemMatcher": []
@@ -104,6 +99,7 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Build (Release)",
+                "Configure CMake (Release)",
                 "Build Ola (Release)"
             ],
             "problemMatcher": []
