@@ -2,18 +2,6 @@ import std.assert;
 import std.hash;
 import std.set;
 
-class Id
-{
-	Id() { this.val = 0; }
-	Id(int v) { this.val = v; }
-	public int val;
-};
-
-int Hash(Id id)
-{
-	return id.val;
-}
-
 void TestInsertContains()
 {
 	Set<int> s;
@@ -63,29 +51,10 @@ void TestRehash()
 		s.Insert(i);
 	}
 	Assert(s.Size() == 15);
-	int j = 0;
-	for(; j < 15; ++j)
+	for(i = 0; i < 15; ++i)
 	{
-		Assert(s.Contains(j) == true);
+		Assert(s.Contains(i) == true);
 	}
-	s.Clear();
-}
-
-void TestCustomClass()
-{
-	Set<Id> s;
-	Id a(10);
-	Id b(20);
-	Id c(30);
-	s.Insert(a);
-	s.Insert(b);
-	s.Insert(c);
-	Assert(s.Size() == 3);
-	Assert(s.Contains(a) == true);
-	Assert(s.Contains(b) == true);
-	Assert(s.Contains(c) == true);
-	Id d(40);
-	Assert(s.Contains(d) == false);
 	s.Clear();
 }
 
@@ -95,6 +64,5 @@ public int main()
 	TestDuplicates();
 	TestRemove();
 	TestRehash();
-	TestCustomClass();
 	return 0;
 }

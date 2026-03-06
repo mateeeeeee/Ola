@@ -1,0 +1,18 @@
+int Hash(int value)
+{
+	if(value < 0) return -value;
+	return value;
+}
+
+int Hash(float value)
+{
+	int h = value * 2654435;
+	if(h < 0) h = -h;
+	return h;
+}
+
+int Hash(bool value)
+{
+	if(value) return 1;
+	return 0;
+}

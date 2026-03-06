@@ -54,3 +54,4 @@ TEST(LLVM_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),       
 TEST(LLVM_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
 TEST(LLVM_Containers, Optional)     { EXPECT_EQ(RUN_TEST(-i test_optional),      0); }
 TEST(LLVM_Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),          0); }
+TEST(LLVM_Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); }

@@ -1,0 +1,122 @@
+class Set<T>
+{
+	Set()
+	{
+		this.num_buckets = 16;
+		this.keys = new T[16];
+		this.states = new int[16];
+		this.size = 0;
+		int i = 0;
+		for(; i < this.num_buckets; ++i)
+		{
+			this.states[i] = 0;
+		}
+	}
+
+	public int Size() const { return this.size; }
+	public bool Empty() const { return this.size == 0; }
+
+	public bool Contains(T value) const
+	{
+		int hash = Hash(value);
+		if(hash < 0) hash = -hash;
+		int idx = hash % this.num_buckets;
+		int start = idx;
+		do
+		{
+			if(this.states[idx] == 0) return false;
+			if(this.states[idx] == 1 && this.keys[idx] == value) return true;
+			idx = (idx + 1) % this.num_buckets;
+		} while(idx != start);
+		return false;
+	}
+
+	public bool Insert(T value)
+	{
+		if(this.Contains(value)) return false;
+		if(this.size * 10 > this.num_buckets * 7)
+		{
+			int old_buckets = this.num_buckets;
+			T* old_keys = this.keys;
+			int* old_states = this.states;
+
+			this.num_buckets = old_buckets * 2;
+			this.keys = new T[this.num_buckets];
+			this.states = new int[this.num_buckets];
+			this.size = 0;
+
+			int i = 0;
+			for(; i < this.num_buckets; ++i)
+			{
+				this.states[i] = 0;
+			}
+
+			int j = 0;
+			for(; j < old_buckets; ++j)
+			{
+				if(old_states[j] == 1)
+				{
+					int h = Hash(old_keys[j]);
+					if(h < 0) h = -h;
+					int slot = h % this.num_buckets;
+					while(this.states[slot] == 1)
+					{
+						slot = (slot + 1) % this.num_buckets;
+					}
+					this.keys[slot] = old_keys[j];
+					this.states[slot] = 1;
+					this.size = this.size + 1;
+				}
+			}
+
+			delete old_keys;
+			delete old_states;
+		}
+		int hash = Hash(value);
+		if(hash < 0) hash = -hash;
+		int idx = hash % this.num_buckets;
+		while(this.states[idx] == 1)
+		{
+			idx = (idx + 1) % this.num_buckets;
+		}
+		this.keys[idx] = value;
+		this.states[idx] = 1;
+		this.size = this.size + 1;
+		return true;
+	}
+
+	public bool Remove(T value)
+	{
+		int hash = Hash(value);
+		if(hash < 0) hash = -hash;
+		int idx = hash % this.num_buckets;
+		int start = idx;
+		do
+		{
+			if(this.states[idx] == 0) return false;
+			if(this.states[idx] == 1 && this.keys[idx] == value)
+			{
+				this.states[idx] = 2;
+				this.size = this.size - 1;
+				return true;
+			}
+			idx = (idx + 1) % this.num_buckets;
+		} while(idx != start);
+		return false;
+	}
+
+	public void Clear()
+	{
+		int i = 0;
+		for(; i < this.num_buckets; ++i)
+		{
+			this.states[i] = 0;
+		}
+		this.size = 0;
+	}
+
+	private T* keys;
+	private int* states;
+	private int num_buckets;
+	private int size;
+};

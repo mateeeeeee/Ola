@@ -1459,9 +1459,24 @@ namespace ola
 		{
 			class_decl = cast<ClassType>(class_expr_type)->GetClassDecl();
 		}
-		OLA_ASSERT(class_decl);
+		OLA_ASSERT(class_decl || isa<ThisExpr>(class_expr.get()));
 
-		std::vector<MethodDecl const*> candidate_decls = class_decl->FindMethodDecls(member_identifier->GetName());
+		std::vector<MethodDecl const*> candidate_decls;
+		if (class_decl)
+		{
+			candidate_decls = class_decl->FindMethodDecls(member_identifier->GetName());
+		}
+		else
+		{
+			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(member_identifier->GetName());
+			for (Decl* decl : decls)
+			{
+				if (isa<MethodDecl>(decl))
+				{
+					candidate_decls.push_back(cast<MethodDecl>(decl));
+				}
+			}
+		}
 		std::vector<MethodDecl const*> match_decls = ResolveCall(candidate_decls, args);
 		if (match_decls.empty())
 		{

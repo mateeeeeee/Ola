@@ -524,6 +524,27 @@ namespace ola
 						}
 						builder->MakeInst<CallInst>(called_ctor, args);
 					}
+					else
+					{
+						std::vector<ConstructorDecl const*> ctors = class_decl->FindConstructors();
+						for (ConstructorDecl const* ctor : ctors)
+						{
+							if (ctor->GetParamDecls().empty())
+							{
+								std::string name(SanitizeClassName(class_decl->GetName()));
+								name += "$";
+								name += ctor->GetMangledName();
+								Function* called_ctor = module.GetFunctionByName(name);
+								if (called_ctor)
+								{
+									std::vector<Value*> args;
+									args.push_back(struct_alloc);
+									builder->MakeInst<CallInst>(called_ctor, args);
+								}
+								break;
+							}
+						}
+					}
 				}
 				else
 				{
@@ -671,7 +692,7 @@ namespace ola
 
 		end_blocks.push_back(end_block);
 		then_stmt->Accept(*this);
-		if (!then_block->GetTerminator())
+		if (!builder->GetCurrentBlock()->GetTerminator())
 		{
 			builder->MakeInst<BranchInst>(context, end_block);
 		}
@@ -679,7 +700,7 @@ namespace ola
 		{
 			builder->SetCurrentBlock(else_block);
 			else_stmt->Accept(*this);
-			if (!else_block->GetTerminator())
+			if (!builder->GetCurrentBlock()->GetTerminator())
 			{
 				builder->MakeInst<BranchInst>(context, end_block);
 			}

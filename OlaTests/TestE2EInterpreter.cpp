@@ -53,3 +53,4 @@ TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),
 TEST(Interpreter_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
 TEST(Interpreter_Containers, Optional)     { EXPECT_EQ(RUN_TEST(-i test_optional),      0); }
 TEST(Interpreter_Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),          0); }
+TEST(Interpreter_Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); }
