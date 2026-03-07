@@ -2,2483 +2,531 @@ external Assert
 
 external AssertMsg
 
-internal Hash__I: 
+external Stack.int.$Stack: 
 label0: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 48
+stp - i64 reg 29, i64 reg 30, ptr stack 32
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
+InstStore - i64 stack -8, i64 reg 26
+InstStore - i64 stack -16, i64 reg 27
+InstStore - i64 stack -24, i64 reg 28
+InstMove - ptr reg 28, ptr reg 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
+InstMove - i64 reg 26, i64 imm 0
+InstStore - ptr reg 27, i64 reg 26
+InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
+InstMove - i64 reg 27, i64 imm 0
+InstStore - ptr reg 26, i64 reg 27
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
+InstMove - i64 reg 28, i64 imm 0
+InstStore - ptr reg 27, i64 reg 28
+InstJump - label1
+
+label1: 
+InstLoad - i64 reg 26, i64 stack -8
+InstLoad - i64 reg 27, i64 stack -16
+InstLoad - i64 reg 28, i64 stack -24
+ldp - i64 reg 29, i64 reg 30, ptr stack 32
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
+InstRet - 
+
+external Stack.int.$Size: 
+label2: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 48
 stp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
-InstMove - i64 reg 28, i64 reg 0
-InstStore - i64 stack -24, i64 reg 28
-InstLoad - i64 reg 28, i64 stack -24
-InstICmp - i64 reg 28, i64 imm 0
-cset - i8 reg 28
-InstTest - i8 reg 28, i8 reg 28
-InstJNE - label1
+InstMove - ptr reg 28, ptr reg 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - ptr reg 28, ptr reg 27
+InstStore - i64 stack -24, ptr reg 28
 InstJump - label4
-
-label1: 
-InstLoad - i64 reg 28, i64 stack -24
-InstNeg - i64 reg 27, i64 reg 28
-InstStore - i64 stack -32, i64 reg 27
-InstJump - label6
-
-label2: 
 
 label3: 
 
 label4: 
-InstLoad - i64 reg 27, i64 stack -24
-InstStore - i64 stack -32, i64 reg 27
-InstJump - label6
-
-label5: 
-
-label6: 
-InstLoad - i64 reg 27, i64 stack -32
-InstMove - i64 reg 0, i64 reg 27
+InstLoad - i64 reg 28, i64 stack -24
+InstMove - i64 reg 0, i64 reg 28
 InstLoad - i64 reg 27, i64 stack -8
 InstLoad - i64 reg 28, i64 stack -16
 ldp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
 InstRet - 
 
-internal Hash__F: 
-label7: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 96
-stp - i64 reg 29, i64 reg 30, ptr stack 80
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 80
+external Stack.int.$Empty: 
+label5: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 48
+stp - i64 reg 29, i64 reg 30, ptr stack 32
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
-InstStore - f64 stack -24, f64 reg 60
-InstStore - f64 stack -32, f64 reg 61
-InstStore - f64 stack -40, f64 reg 62
-fmov - f64 reg 62, f64 reg 32
-InstStore - f64 stack -56, f64 reg 62
-InstLoad - f64 reg 62, f64 stack -56
-InstMove - i64 reg 28, i64 imm 2654435
-InstS2F - f64 reg 61, i64 reg 28
-InstFMul - f64 reg 60, f64 reg 62, f64 reg 61
-InstF2S - i64 reg 28, f64 reg 60
-InstStore - i64 stack -72, i64 reg 28
-InstLoad - i64 reg 28, i64 stack -72
+InstMove - ptr reg 28, ptr reg 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 28, ptr reg 27
 InstICmp - i64 reg 28, i64 imm 0
 cset - i8 reg 28
-InstTest - i8 reg 28, i8 reg 28
-InstJNE - label8
-InstJump - label10
+InstStore - i8 stack -17, i8 reg 28
+InstJump - label7
 
+label6: 
+
+label7: 
+InstLoad - i8 reg 28, i8 stack -17
+InstMove - i8 reg 0, i8 reg 28
+InstLoad - i64 reg 27, i64 stack -8
+InstLoad - i64 reg 28, i64 stack -16
+ldp - i64 reg 29, i64 reg 30, ptr stack 32
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
+InstRet - 
+
+external Stack.int.$Top: 
 label8: 
-InstLoad - i64 reg 28, i64 stack -72
-InstNeg - i64 reg 27, i64 reg 28
-InstStore - i64 stack -72, i64 reg 27
+InstSub - i64 reg 31, i64 reg 31, i64 imm 64
+stp - i64 reg 29, i64 reg 30, ptr stack 48
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
+InstStore - i64 stack -8, i64 reg 25
+InstStore - i64 stack -16, i64 reg 26
+InstStore - i64 stack -24, i64 reg 27
+InstStore - i64 stack -32, i64 reg 28
+InstMove - ptr reg 28, ptr reg 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 27
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
+InstLoad - ptr reg 28, ptr reg 27
+InstSub - i64 reg 27, i64 reg 26, i64 imm 1
+InstMove - i64 reg 26, i64 imm 8
+InstSMul - i64 reg 25, i64 reg 27, i64 reg 26
+InstAdd - ptr reg 26, ptr reg 28, i64 reg 25
+InstLoad - i64 reg 25, ptr reg 26
+InstStore - i64 stack -40, i64 reg 25
 InstJump - label10
 
 label9: 
 
 label10: 
-InstLoad - i64 reg 27, i64 stack -72
-InstStore - i64 stack -64, i64 reg 27
-InstJump - label12
-
-label11: 
-
-label12: 
-InstLoad - i64 reg 27, i64 stack -64
-InstMove - i64 reg 0, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-InstLoad - f64 reg 60, f64 stack -24
-InstLoad - f64 reg 61, f64 stack -32
-InstLoad - f64 reg 62, f64 stack -40
-ldp - i64 reg 29, i64 reg 30, ptr stack 80
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 96
+InstLoad - i64 reg 25, i64 stack -40
+InstMove - i64 reg 0, i64 reg 25
+InstLoad - i64 reg 25, i64 stack -8
+InstLoad - i64 reg 26, i64 stack -16
+InstLoad - i64 reg 27, i64 stack -24
+InstLoad - i64 reg 28, i64 stack -32
+ldp - i64 reg 29, i64 reg 30, ptr stack 48
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
 InstRet - 
 
-internal Hash__B: 
+external Stack.int.$Push__I: 
+label11: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 112
+stp - i64 reg 29, i64 reg 30, ptr stack 96
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 96
+InstStore - i64 stack -8, i64 reg 22
+InstStore - i64 stack -16, i64 reg 23
+InstStore - i64 stack -24, i64 reg 24
+InstStore - i64 stack -32, i64 reg 25
+InstStore - i64 stack -40, i64 reg 26
+InstStore - i64 stack -48, i64 reg 27
+InstStore - i64 stack -56, i64 reg 28
+InstMove - ptr reg 28, ptr reg 0
+InstMove - i64 reg 27, i64 reg 1
+InstStore - i64 stack -72, i64 reg 27
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 27
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
+InstLoad - i64 reg 25, ptr reg 27
+InstICmp - i64 reg 26, i64 reg 25
+cset - i8 reg 25
+InstTest - i8 reg 25, i8 reg 25
+InstJNE - label12
+InstJump - label15
+
+label12: 
+InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 25
+InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
+InstLoad - ptr reg 27, ptr reg 25
+InstLoad - i64 reg 25, i64 stack -72
+InstMove - i64 reg 24, i64 imm 8
+InstSMul - i64 reg 23, i64 reg 26, i64 reg 24
+InstAdd - ptr reg 24, ptr reg 27, i64 reg 23
+InstStore - ptr reg 24, i64 reg 25
+InstAdd - ptr reg 24, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 25, ptr reg 24
+InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
+InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
+InstStore - ptr reg 25, i64 reg 24
+InstJump - label23
+
 label13: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 28
-InstMove - i8 reg 28, i8 reg 0
-InstStore - i8 stack -17, i8 reg 28
-InstLoad - i8 reg 28, i8 stack -17
-InstTest - i8 reg 28, i8 reg 28
-InstJNE - label14
-InstJump - label17
 
 label14: 
-InstMove - i64 reg 28, i64 imm 1
-InstStore - i64 stack -25, i64 reg 28
-InstJump - label19
 
 label15: 
+InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
+InstLoad - i64 reg 24, ptr reg 25
+InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
+InstLoad - i64 reg 23, ptr reg 25
+InstICmp - i64 reg 24, i64 imm 0
+cset - i8 reg 24
+InstMove - i64 reg 25, i64 imm 2
+InstSMul - i64 reg 27, i64 reg 23, i64 reg 25
+InstTest - i8 reg 24, i8 reg 24
+InstMove - i64 reg 24, i64 imm 4
+InstCMoveNE - i64 reg 24, i64 reg 27
+InstStore - i64 stack -80, i64 reg 24
+InstLoad - i64 reg 24, i64 stack -80
+InstMove - i64 reg 27, i64 imm 8
+InstSMul - i64 reg 25, i64 reg 24, i64 reg 27
+InstMove - i64 reg 0, i64 reg 25
+InstCall - 
+InstMove - ptr reg 25, ptr reg 0
+InstStore - ptr stack -88, ptr reg 25
+InstMove - i64 reg 25, i64 imm 0
+InstStore - i64 stack -96, i64 reg 25
+InstJump - label17
 
 label16: 
+InstLoad - i64 reg 25, i64 stack -96
+InstLoad - ptr reg 27, ptr stack -88
+InstLoad - i64 reg 24, i64 stack -96
+InstAdd - ptr reg 23, ptr reg 28, i64 imm 0
+InstLoad - ptr reg 26, ptr reg 23
+InstMove - i64 reg 23, i64 imm 8
+InstSMul - i64 reg 22, i64 reg 24, i64 reg 23
+InstAdd - ptr reg 23, ptr reg 26, i64 reg 22
+InstLoad - i64 reg 22, ptr reg 23
+InstMove - i64 reg 23, i64 imm 8
+InstSMul - i64 reg 26, i64 reg 25, i64 reg 23
+InstAdd - ptr reg 23, ptr reg 27, i64 reg 26
+InstStore - ptr reg 23, i64 reg 22
+InstJump - label18
 
 label17: 
-InstMove - i64 reg 28, i64 imm 0
-InstStore - i64 stack -25, i64 reg 28
+InstLoad - i64 reg 23, i64 stack -96
+InstAdd - ptr reg 22, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 22
+InstICmp - i64 reg 23, i64 reg 26
+cset - i8 reg 26
+InstTest - i8 reg 26, i8 reg 26
+InstJNE - label16
 InstJump - label19
 
 label18: 
+InstLoad - i64 reg 26, i64 stack -96
+InstAdd - i64 reg 23, i64 reg 26, i64 imm 1
+InstStore - i64 stack -96, i64 reg 23
+InstJump - label17
 
 label19: 
-InstLoad - i64 reg 28, i64 stack -25
-InstMove - i64 reg 0, i64 reg 28
-InstLoad - i64 reg 28, i64 stack -8
+InstAdd - ptr reg 23, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 23
+InstLoad - ptr reg 23, ptr stack -88
+InstLoad - i64 reg 22, i64 stack -72
+InstMove - i64 reg 27, i64 imm 8
+InstSMul - i64 reg 25, i64 reg 26, i64 reg 27
+InstAdd - ptr reg 27, ptr reg 23, i64 reg 25
+InstStore - ptr reg 27, i64 reg 22
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
+InstLoad - ptr reg 22, ptr reg 27
+InstICmp - ptr reg 22, i64 imm 0
+cset - i8 reg 22
+InstTest - i8 reg 22, i8 reg 22
+InstJNE - label20
+InstJump - label22
+
+label20: 
+InstAdd - ptr reg 22, ptr reg 28, i64 imm 0
+InstLoad - ptr reg 27, ptr reg 22
+InstMove - ptr reg 0, ptr reg 27
+InstCall - 
+InstJump - label22
+
+label21: 
+
+label22: 
+InstLoad - ptr reg 27, ptr stack -88
+InstAdd - ptr reg 22, ptr reg 28, i64 imm 0
+InstStore - ptr reg 22, ptr reg 27
+InstLoad - i64 reg 22, i64 stack -80
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
+InstStore - ptr reg 27, i64 reg 22
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 22, ptr reg 27
+InstAdd - i64 reg 27, i64 reg 22, i64 imm 1
+InstAdd - ptr reg 22, ptr reg 28, i64 imm 8
+InstStore - ptr reg 22, i64 reg 27
+InstJump - label23
+
+label23: 
+InstLoad - i64 reg 22, i64 stack -8
+InstLoad - i64 reg 23, i64 stack -16
+InstLoad - i64 reg 24, i64 stack -24
+InstLoad - i64 reg 25, i64 stack -32
+InstLoad - i64 reg 26, i64 stack -40
+InstLoad - i64 reg 27, i64 stack -48
+InstLoad - i64 reg 28, i64 stack -56
+ldp - i64 reg 29, i64 reg 30, ptr stack 96
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 112
+InstRet - 
+
+external __ola_new
+
+external __ola_delete
+
+external Stack.int.$Pop: 
+label24: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 48
+stp - i64 reg 29, i64 reg 30, ptr stack 32
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
+InstStore - i64 stack -8, i64 reg 26
+InstStore - i64 stack -16, i64 reg 27
+InstStore - i64 stack -24, i64 reg 28
+InstMove - ptr reg 28, ptr reg 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
+InstLoad - i64 reg 26, ptr reg 27
+InstSub - i64 reg 27, i64 reg 26, i64 imm 1
+InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
+InstStore - ptr reg 26, i64 reg 27
+InstJump - label25
+
+label25: 
+InstLoad - i64 reg 26, i64 stack -8
+InstLoad - i64 reg 27, i64 stack -16
+InstLoad - i64 reg 28, i64 stack -24
 ldp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
 InstRet - 
 
-external Id$Id: 
-label20: 
+external Stack.int.$Clear: 
+label26: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 32
 stp - i64 reg 29, i64 reg 30, ptr stack 16
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 16
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
 InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
+InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstJump - label21
+InstJump - label27
 
-label21: 
+label27: 
 InstLoad - i64 reg 27, i64 stack -8
 InstLoad - i64 reg 28, i64 stack -16
 ldp - i64 reg 29, i64 reg 30, ptr stack 16
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 32
 InstRet - 
 
-external Id$Id__I: 
-label22: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 64
-stp - i64 reg 29, i64 reg 30, ptr stack 48
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
-InstStore - i64 stack -8, i64 reg 26
-InstStore - i64 stack -16, i64 reg 27
-InstStore - i64 stack -24, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 reg 1
-InstStore - i64 stack -40, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -40
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 0
-InstStore - ptr reg 26, i64 reg 27
-InstJump - label23
-
-label23: 
-InstLoad - i64 reg 26, i64 stack -8
-InstLoad - i64 reg 27, i64 stack -16
-InstLoad - i64 reg 28, i64 stack -24
-ldp - i64 reg 29, i64 reg 30, ptr stack 48
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
-InstRet - 
-
-internal Hash__Id: 
-label24: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
-InstStore - i64 stack -8, i64 reg 26
-InstStore - i64 stack -16, i64 reg 27
-InstStore - i64 stack -24, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstLoad - i64 reg 27, ptr reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -56
-InstStore - ptr reg 28, i64 reg 27
-InstLoadGlobalAddress - ptr reg 28, ptr stack -56
-InstLoadGlobalAddress - ptr reg 27, ptr stack -40
-InstLoad - i64 reg 26, ptr reg 28
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 26, ptr stack -40
-InstAdd - ptr reg 27, ptr reg 26, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 27
-InstStore - i64 stack -48, ptr reg 26
-InstJump - label26
-
-label25: 
-
-label26: 
-InstLoad - i64 reg 26, i64 stack -48
-InstMove - i64 reg 0, i64 reg 26
-InstLoad - i64 reg 26, i64 stack -8
-InstLoad - i64 reg 27, i64 stack -16
-InstLoad - i64 reg 28, i64 stack -24
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-external Set.int.$Set: 
-label27: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
-InstStore - i64 stack -8, i64 reg 24
-InstStore - i64 stack -16, i64 reg 25
-InstStore - i64 stack -24, i64 reg 26
-InstStore - i64 stack -32, i64 reg 27
-InstStore - i64 stack -40, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstMove - i64 reg 26, i64 imm 16
-InstStore - ptr reg 27, i64 reg 26
-InstMove - i64 reg 0, i64 imm 128
-InstCall - 
-InstMove - ptr reg 26, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstStore - ptr reg 27, ptr reg 26
-InstMove - i64 reg 0, i64 imm 128
-InstCall - 
-InstMove - ptr reg 27, ptr reg 0
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstStore - ptr reg 26, ptr reg 27
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 24
-InstMove - i64 reg 27, i64 imm 0
-InstStore - ptr reg 26, i64 reg 27
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -56, i64 reg 27
-InstJump - label29
-
+internal TestPushTop: 
 label28: 
-InstLoad - i64 reg 27, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 24
-InstMove - i64 reg 24, i64 imm 0
-InstStore - ptr reg 26, i64 reg 24
-InstJump - label30
-
-label29: 
-InstLoad - i64 reg 24, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstICmp - i64 reg 24, i64 reg 25
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label28
-InstJump - label31
-
-label30: 
-InstLoad - i64 reg 25, i64 stack -56
-InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
-InstStore - i64 stack -56, i64 reg 24
-InstJump - label29
-
-label31: 
-InstJump - label32
-
-label32: 
-InstLoad - i64 reg 24, i64 stack -8
-InstLoad - i64 reg 25, i64 stack -16
-InstLoad - i64 reg 26, i64 stack -24
-InstLoad - i64 reg 27, i64 stack -32
-InstLoad - i64 reg 28, i64 stack -40
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-external __ola_new
-
-external Set.int.$Size: 
-label33: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 27
-InstStore - i64 stack -16, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - ptr reg 28, ptr reg 27
-InstStore - i64 stack -24, ptr reg 28
-InstJump - label35
-
-label34: 
-
-label35: 
-InstLoad - i64 reg 28, i64 stack -24
-InstMove - i64 reg 0, i64 reg 28
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-external Set.int.$Empty: 
-label36: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 27
-InstStore - i64 stack -16, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 28, ptr reg 27
-InstICmp - i64 reg 28, i64 imm 0
-cset - i8 reg 28
-InstStore - i8 stack -17, i8 reg 28
-InstJump - label38
-
-label37: 
-
-label38: 
-InstLoad - i8 reg 28, i8 stack -17
-InstMove - i8 reg 0, i8 reg 28
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-external Set.int.$Contains__I: 
-label39: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 112
-stp - i64 reg 29, i64 reg 30, ptr stack 96
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 96
-InstStore - i64 stack -8, i64 reg 23
-InstStore - i64 stack -16, i64 reg 24
-InstStore - i64 stack -24, i64 reg 25
-InstStore - i64 stack -32, i64 reg 26
-InstStore - i64 stack -40, i64 reg 27
-InstStore - i64 stack -48, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 reg 1
-InstStore - i64 stack -56, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -56
-InstMove - i64 reg 0, i64 reg 27
-InstCall - 
-InstMove - i64 reg 27, i64 reg 0
-InstStore - i64 stack -65, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -65
-InstICmp - i64 reg 27, i64 imm 0
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label40
-InstJump - label42
-
-label40: 
-InstLoad - i64 reg 27, i64 stack -65
-InstNeg - i64 reg 26, i64 reg 27
-InstStore - i64 stack -65, i64 reg 26
-InstJump - label42
-
-label41: 
-
-label42: 
-InstLoad - i64 reg 26, i64 stack -65
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 27
-InstSDiv - i64 reg 27, i64 reg 26, i64 reg 25
-msub - i64 reg 24, i64 reg 27, i64 reg 25, i64 reg 26
-InstStore - i64 stack -73, i64 reg 24
-InstLoad - i64 reg 24, i64 stack -73
-InstStore - i64 stack -81, i64 reg 24
-InstJump - label43
-
-label43: 
-InstLoad - i64 reg 24, i64 stack -73
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 26, i64 reg 24, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 25, i64 reg 26
-InstLoad - i64 reg 26, ptr reg 27
-InstICmp - i64 reg 26, i64 imm 0
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label47
-InstJump - label50
-
-label44: 
-InstLoad - i64 reg 26, i64 stack -73
-InstLoad - i64 reg 27, i64 stack -81
-InstICmp - i64 reg 26, i64 reg 27
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label43
-InstJump - label45
-
-label45: 
-InstMove - i8 reg 27, i8 imm 0
-InstStore - i8 stack -57, i8 reg 27
-InstJump - label55
-
-label46: 
-
-label47: 
-InstMove - i8 reg 27, i8 imm 0
-InstStore - i8 stack -57, i8 reg 27
-InstJump - label55
-
-label48: 
-
-label49: 
-
-label50: 
-InstLoad - i64 reg 27, i64 stack -73
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 24
-InstLoad - i64 reg 24, ptr reg 26
-InstLoad - i64 reg 26, i64 stack -73
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 27, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 26, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 27, i64 reg 23
-InstLoad - i64 reg 23, ptr reg 25
-InstLoad - i64 reg 25, i64 stack -56
-InstICmp - i64 reg 24, i64 imm 1
-cset - i8 reg 24
-InstICmp - i64 reg 23, i64 reg 25
-cset - i8 reg 25
-InstAnd - i8 reg 23, i8 reg 24, i8 reg 25
-InstICmp - i8 reg 23, i8 imm 0
-cset - i8 reg 23
-InstTest - i8 reg 23, i8 reg 23
-InstJNE - label51
-InstJump - label54
-
-label51: 
-InstMove - i8 reg 23, i8 imm 1
-InstStore - i8 stack -57, i8 reg 23
-InstJump - label55
-
-label52: 
-
-label53: 
-
-label54: 
-InstLoad - i64 reg 23, i64 stack -73
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 25
-InstAdd - i64 reg 25, i64 reg 23, i64 imm 1
-InstSDiv - i64 reg 23, i64 reg 25, i64 reg 24
-msub - i64 reg 27, i64 reg 23, i64 reg 24, i64 reg 25
-InstStore - i64 stack -73, i64 reg 27
-InstJump - label44
-
-label55: 
-InstLoad - i8 reg 27, i8 stack -57
-InstMove - i8 reg 0, i8 reg 27
-InstLoad - i64 reg 23, i64 stack -8
-InstLoad - i64 reg 24, i64 stack -16
-InstLoad - i64 reg 25, i64 stack -24
-InstLoad - i64 reg 26, i64 stack -32
-InstLoad - i64 reg 27, i64 stack -40
-InstLoad - i64 reg 28, i64 stack -48
-ldp - i64 reg 29, i64 reg 30, ptr stack 96
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 112
-InstRet - 
-
-external Set.int.$Insert__I: 
-label56: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 176
-stp - i64 reg 29, i64 reg 30, ptr stack 160
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 160
-InstStore - i64 stack -8, i64 reg 22
-InstStore - i64 stack -16, i64 reg 23
-InstStore - i64 stack -24, i64 reg 24
-InstStore - i64 stack -32, i64 reg 25
-InstStore - i64 stack -40, i64 reg 26
-InstStore - i64 stack -48, i64 reg 27
-InstStore - i64 stack -56, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 reg 1
-InstStore - i64 stack -72, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -72
-InstMove - i64 reg 1, i64 reg 27
-InstMove - ptr reg 0, ptr reg 28
-InstCall - 
-InstMove - i8 reg 27, i8 reg 0
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label57
-InstJump - label60
-
-label57: 
-InstMove - i8 reg 27, i8 imm 0
-InstStore - i8 stack -73, i8 reg 27
-InstJump - label88
-
-label58: 
-
-label59: 
-
-label60: 
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 26, ptr reg 27
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 10
-InstSMul - i64 reg 24, i64 reg 26, i64 reg 27
-InstMove - i64 reg 27, i64 imm 7
-InstSMul - i64 reg 26, i64 reg 25, i64 reg 27
-InstICmp - i64 reg 24, i64 reg 26
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label61
-InstJump - label63
-
-label61: 
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - ptr reg 24, ptr reg 26
-InstStore - i64 stack -81, ptr reg 24
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 24
-InstStore - ptr stack -89, ptr reg 26
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 26
-InstStore - ptr stack -97, ptr reg 24
-InstLoad - i64 reg 24, i64 stack -81
-InstMove - i64 reg 26, i64 imm 2
-InstSMul - i64 reg 27, i64 reg 24, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstStore - ptr reg 26, i64 reg 27
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 27, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstMove - i64 reg 0, i64 reg 24
-InstCall - 
-InstMove - ptr reg 24, ptr reg 0
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 0
-InstStore - ptr reg 26, ptr reg 24
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 24, i64 reg 26
-InstMove - i64 reg 0, i64 reg 27
-InstCall - 
-InstMove - ptr reg 27, ptr reg 0
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstStore - ptr reg 26, ptr reg 27
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 24
-InstMove - i64 reg 27, i64 imm 0
-InstStore - ptr reg 26, i64 reg 27
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -105, i64 reg 27
-InstJump - label65
-
-label62: 
-
-label63: 
-InstLoad - i64 reg 27, i64 stack -72
-InstMove - i64 reg 0, i64 reg 27
-InstCall - 
-InstMove - i64 reg 27, i64 reg 0
-InstStore - i64 stack -113, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -113
-InstICmp - i64 reg 27, i64 imm 0
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label81
-InstJump - label83
-
-label64: 
-InstLoad - i64 reg 27, i64 stack -105
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 24, i64 reg 25
-InstMove - i64 reg 25, i64 imm 0
-InstStore - ptr reg 26, i64 reg 25
-InstJump - label66
-
-label65: 
-InstLoad - i64 reg 25, i64 stack -105
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 26
-InstICmp - i64 reg 25, i64 reg 24
-cset - i8 reg 24
-InstTest - i8 reg 24, i8 reg 24
-InstJNE - label64
-InstJump - label67
-
-label66: 
-InstLoad - i64 reg 24, i64 stack -105
-InstAdd - i64 reg 25, i64 reg 24, i64 imm 1
-InstStore - i64 stack -105, i64 reg 25
-InstJump - label65
-
-label67: 
-InstMove - i64 reg 25, i64 imm 0
-InstStore - i64 stack -121, i64 reg 25
-InstJump - label69
-
-label68: 
-InstLoad - i64 reg 25, i64 stack -121
-InstLoad - ptr reg 24, ptr stack -97
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 25, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 24, i64 reg 27
-InstLoad - i64 reg 27, ptr reg 26
-InstICmp - i64 reg 27, i64 imm 1
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label72
-InstJump - label74
-
-label69: 
-InstLoad - i64 reg 27, i64 stack -121
-InstLoad - i64 reg 26, i64 stack -81
-InstICmp - i64 reg 27, i64 reg 26
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label68
-InstJump - label71
-
-label70: 
-InstLoad - i64 reg 26, i64 stack -121
-InstAdd - i64 reg 27, i64 reg 26, i64 imm 1
-InstStore - i64 stack -121, i64 reg 27
-InstJump - label69
-
-label71: 
-InstLoad - ptr reg 27, ptr stack -89
-InstMove - ptr reg 0, ptr reg 27
-InstCall - 
-InstLoad - ptr reg 27, ptr stack -97
-InstMove - ptr reg 0, ptr reg 27
-InstCall - 
-InstJump - label63
-
-label72: 
-InstLoad - i64 reg 27, i64 stack -121
-InstLoad - ptr reg 26, ptr stack -89
-InstMove - i64 reg 24, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 27, i64 reg 24
-InstAdd - ptr reg 24, ptr reg 26, i64 reg 25
-InstLoad - i64 reg 25, ptr reg 24
-InstMove - i64 reg 0, i64 reg 25
-InstCall - 
-InstMove - i64 reg 25, i64 reg 0
-InstStore - i64 stack -129, i64 reg 25
-InstLoad - i64 reg 25, i64 stack -129
-InstICmp - i64 reg 25, i64 imm 0
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label75
-InstJump - label77
-
-label73: 
-
-label74: 
-InstJump - label70
-
-label75: 
-InstLoad - i64 reg 25, i64 stack -129
-InstNeg - i64 reg 24, i64 reg 25
-InstStore - i64 stack -129, i64 reg 24
-InstJump - label77
-
-label76: 
-
-label77: 
-InstLoad - i64 reg 24, i64 stack -129
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 26, ptr reg 25
-InstSDiv - i64 reg 25, i64 reg 24, i64 reg 26
-msub - i64 reg 27, i64 reg 25, i64 reg 26, i64 reg 24
-InstStore - i64 stack -137, i64 reg 27
-InstJump - label78
-
-label78: 
-InstLoad - i64 reg 27, i64 stack -137
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 26, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 26, i64 reg 24
-InstLoad - i64 reg 24, ptr reg 25
-InstICmp - i64 reg 24, i64 imm 1
-cset - i8 reg 24
-InstTest - i8 reg 24, i8 reg 24
-InstJNE - label79
-InstJump - label80
-
-label79: 
-InstLoad - i64 reg 24, i64 stack -137
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 26, ptr reg 25
-InstAdd - i64 reg 25, i64 reg 24, i64 imm 1
-InstSDiv - i64 reg 24, i64 reg 25, i64 reg 26
-msub - i64 reg 27, i64 reg 24, i64 reg 26, i64 reg 25
-InstStore - i64 stack -137, i64 reg 27
-InstJump - label78
-
-label80: 
-InstLoad - i64 reg 27, i64 stack -137
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 25, ptr reg 24
-InstLoad - i64 reg 24, i64 stack -121
-InstLoad - ptr reg 26, ptr stack -89
-InstMove - i64 reg 23, i64 imm 8
-InstSMul - i64 reg 22, i64 reg 24, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 26, i64 reg 22
-InstLoad - i64 reg 22, ptr reg 23
-InstMove - i64 reg 23, i64 imm 8
-InstSMul - i64 reg 26, i64 reg 27, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 25, i64 reg 26
-InstStore - ptr reg 23, i64 reg 22
-InstLoad - i64 reg 23, i64 stack -137
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 26, ptr reg 22
-InstMove - i64 reg 22, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 23, i64 reg 22
-InstAdd - ptr reg 22, ptr reg 26, i64 reg 25
-InstMove - i64 reg 25, i64 imm 1
-InstStore - ptr reg 22, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 22, ptr reg 25
-InstAdd - i64 reg 25, i64 reg 22, i64 imm 1
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 24
-InstStore - ptr reg 22, i64 reg 25
-InstJump - label74
-
-label81: 
-InstLoad - i64 reg 22, i64 stack -113
-InstNeg - i64 reg 25, i64 reg 22
-InstStore - i64 stack -113, i64 reg 25
-InstJump - label83
-
-label82: 
-
-label83: 
-InstLoad - i64 reg 25, i64 stack -113
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 26, ptr reg 22
-InstSDiv - i64 reg 22, i64 reg 25, i64 reg 26
-msub - i64 reg 23, i64 reg 22, i64 reg 26, i64 reg 25
-InstStore - i64 stack -145, i64 reg 23
-InstJump - label84
-
-label84: 
-InstLoad - i64 reg 23, i64 stack -145
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 26, ptr reg 22
-InstMove - i64 reg 22, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 23, i64 reg 22
-InstAdd - ptr reg 22, ptr reg 26, i64 reg 25
-InstLoad - i64 reg 25, ptr reg 22
-InstICmp - i64 reg 25, i64 imm 1
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label85
-InstJump - label86
-
-label85: 
-InstLoad - i64 reg 25, i64 stack -145
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 26, ptr reg 22
-InstAdd - i64 reg 22, i64 reg 25, i64 imm 1
-InstSDiv - i64 reg 25, i64 reg 22, i64 reg 26
-msub - i64 reg 23, i64 reg 25, i64 reg 26, i64 reg 22
-InstStore - i64 stack -145, i64 reg 23
-InstJump - label84
-
-label86: 
-InstLoad - i64 reg 23, i64 stack -145
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 22, ptr reg 25
-InstLoad - i64 reg 25, i64 stack -72
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 23, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 22, i64 reg 27
-InstStore - ptr reg 26, i64 reg 25
-InstLoad - i64 reg 26, i64 stack -145
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 27, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 22, i64 reg 26, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 27, i64 reg 22
-InstMove - i64 reg 22, i64 imm 1
-InstStore - ptr reg 25, i64 reg 22
-InstAdd - ptr reg 22, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 25, ptr reg 22
-InstAdd - i64 reg 22, i64 reg 25, i64 imm 1
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 24
-InstStore - ptr reg 25, i64 reg 22
-InstMove - i8 reg 25, i8 imm 1
-InstStore - i8 stack -73, i8 reg 25
-InstJump - label88
-
-label87: 
-
-label88: 
-InstLoad - i8 reg 25, i8 stack -73
-InstMove - i8 reg 0, i8 reg 25
-InstLoad - i64 reg 22, i64 stack -8
-InstLoad - i64 reg 23, i64 stack -16
-InstLoad - i64 reg 24, i64 stack -24
-InstLoad - i64 reg 25, i64 stack -32
-InstLoad - i64 reg 26, i64 stack -40
-InstLoad - i64 reg 27, i64 stack -48
-InstLoad - i64 reg 28, i64 stack -56
-ldp - i64 reg 29, i64 reg 30, ptr stack 160
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 176
-InstRet - 
-
-external __ola_delete
-
-external Set.int.$Remove__I: 
-label89: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 112
-stp - i64 reg 29, i64 reg 30, ptr stack 96
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 96
-InstStore - i64 stack -8, i64 reg 23
-InstStore - i64 stack -16, i64 reg 24
-InstStore - i64 stack -24, i64 reg 25
-InstStore - i64 stack -32, i64 reg 26
-InstStore - i64 stack -40, i64 reg 27
-InstStore - i64 stack -48, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 reg 1
-InstStore - i64 stack -56, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -56
-InstMove - i64 reg 0, i64 reg 27
-InstCall - 
-InstMove - i64 reg 27, i64 reg 0
-InstStore - i64 stack -65, i64 reg 27
-InstLoad - i64 reg 27, i64 stack -65
-InstICmp - i64 reg 27, i64 imm 0
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label90
-InstJump - label92
-
-label90: 
-InstLoad - i64 reg 27, i64 stack -65
-InstNeg - i64 reg 26, i64 reg 27
-InstStore - i64 stack -65, i64 reg 26
-InstJump - label92
-
-label91: 
-
-label92: 
-InstLoad - i64 reg 26, i64 stack -65
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 27
-InstSDiv - i64 reg 27, i64 reg 26, i64 reg 25
-msub - i64 reg 24, i64 reg 27, i64 reg 25, i64 reg 26
-InstStore - i64 stack -73, i64 reg 24
-InstLoad - i64 reg 24, i64 stack -73
-InstStore - i64 stack -81, i64 reg 24
-InstJump - label93
-
-label93: 
-InstLoad - i64 reg 24, i64 stack -73
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 26, i64 reg 24, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 25, i64 reg 26
-InstLoad - i64 reg 26, ptr reg 27
-InstICmp - i64 reg 26, i64 imm 0
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label97
-InstJump - label100
-
-label94: 
-InstLoad - i64 reg 26, i64 stack -73
-InstLoad - i64 reg 27, i64 stack -81
-InstICmp - i64 reg 26, i64 reg 27
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label93
-InstJump - label95
-
-label95: 
-InstMove - i8 reg 27, i8 imm 0
-InstStore - i8 stack -57, i8 reg 27
-InstJump - label105
-
-label96: 
-
-label97: 
-InstMove - i8 reg 27, i8 imm 0
-InstStore - i8 stack -57, i8 reg 27
-InstJump - label105
-
-label98: 
-
-label99: 
-
-label100: 
-InstLoad - i64 reg 27, i64 stack -73
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 24
-InstLoad - i64 reg 24, ptr reg 26
-InstLoad - i64 reg 26, i64 stack -73
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 27, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 26, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 27, i64 reg 23
-InstLoad - i64 reg 23, ptr reg 25
-InstLoad - i64 reg 25, i64 stack -56
-InstICmp - i64 reg 24, i64 imm 1
-cset - i8 reg 24
-InstICmp - i64 reg 23, i64 reg 25
-cset - i8 reg 25
-InstAnd - i8 reg 23, i8 reg 24, i8 reg 25
-InstICmp - i8 reg 23, i8 imm 0
-cset - i8 reg 23
-InstTest - i8 reg 23, i8 reg 23
-InstJNE - label101
-InstJump - label104
-
-label101: 
-InstLoad - i64 reg 23, i64 stack -73
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 23, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 24, i64 reg 27
-InstMove - i64 reg 27, i64 imm 2
-InstStore - ptr reg 25, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 25, ptr reg 27
-InstSub - i64 reg 27, i64 reg 25, i64 imm 1
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 24
-InstStore - ptr reg 25, i64 reg 27
-InstMove - i8 reg 25, i8 imm 1
-InstStore - i8 stack -57, i8 reg 25
-InstJump - label105
-
-label102: 
-
-label103: 
-
-label104: 
-InstLoad - i64 reg 25, i64 stack -73
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 27
-InstAdd - i64 reg 27, i64 reg 25, i64 imm 1
-InstSDiv - i64 reg 25, i64 reg 27, i64 reg 24
-msub - i64 reg 23, i64 reg 25, i64 reg 24, i64 reg 27
-InstStore - i64 stack -73, i64 reg 23
-InstJump - label94
-
-label105: 
-InstLoad - i8 reg 23, i8 stack -57
-InstMove - i8 reg 0, i8 reg 23
-InstLoad - i64 reg 23, i64 stack -8
-InstLoad - i64 reg 24, i64 stack -16
-InstLoad - i64 reg 25, i64 stack -24
-InstLoad - i64 reg 26, i64 stack -32
-InstLoad - i64 reg 27, i64 stack -40
-InstLoad - i64 reg 28, i64 stack -48
-ldp - i64 reg 29, i64 reg 30, ptr stack 96
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 112
-InstRet - 
-
-external Set.int.$Clear: 
-label106: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
-InstStore - i64 stack -8, i64 reg 24
-InstStore - i64 stack -16, i64 reg 25
-InstStore - i64 stack -24, i64 reg 26
-InstStore - i64 stack -32, i64 reg 27
-InstStore - i64 stack -40, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -56, i64 reg 27
-InstJump - label108
-
-label107: 
-InstLoad - i64 reg 27, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 24
-InstMove - i64 reg 24, i64 imm 0
-InstStore - ptr reg 26, i64 reg 24
-InstJump - label109
-
-label108: 
-InstLoad - i64 reg 24, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstICmp - i64 reg 24, i64 reg 25
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label107
-InstJump - label110
-
-label109: 
-InstLoad - i64 reg 25, i64 stack -56
-InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
-InstStore - i64 stack -56, i64 reg 24
-InstJump - label108
-
-label110: 
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 24, i64 reg 28
-InstJump - label111
-
-label111: 
-InstLoad - i64 reg 24, i64 stack -8
-InstLoad - i64 reg 25, i64 stack -16
-InstLoad - i64 reg 26, i64 stack -24
-InstLoad - i64 reg 27, i64 stack -32
-InstLoad - i64 reg 28, i64 stack -40
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-internal TestInsertContains: 
-label112: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 64
 stp - i64 reg 29, i64 reg 30, ptr stack 48
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i8 reg 28, i8 reg 0
 InstICmp - i8 reg 28, i8 imm 1
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i64 reg 28, i64 reg 0
-InstICmp - i64 reg 28, i64 imm 0
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
 InstMove - i64 reg 1, i64 imm 10
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
 InstMove - i64 reg 1, i64 imm 20
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
 InstMove - i64 reg 1, i64 imm 30
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i64 reg 28, i64 reg 0
 InstICmp - i64 reg 28, i64 imm 3
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstMove - i64 reg 1, i64 imm 10
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstMove - i64 reg 1, i64 imm 20
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstMove - i64 reg 1, i64 imm 30
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstMove - i64 reg 1, i64 imm 40
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 0
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstJump - label113
-
-label113: 
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 48
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
-InstRet - 
-
-internal TestDuplicates: 
-label114: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 64
-stp - i64 reg 29, i64 reg 30, ptr stack 48
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
-InstStore - i64 stack -8, i64 reg 27
-InstStore - i64 stack -16, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i64 reg 1, i64 imm 5
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstMove - i64 reg 1, i64 imm 5
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 0
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i64 reg 28, i64 reg 0
-InstICmp - i64 reg 28, i64 imm 1
+InstICmp - i64 reg 28, i64 imm 30
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstJump - label115
+InstJump - label29
 
-label115: 
+label29: 
 InstLoad - i64 reg 27, i64 stack -8
 InstLoad - i64 reg 28, i64 stack -16
 ldp - i64 reg 29, i64 reg 30, ptr stack 48
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
 InstRet - 
 
-internal TestRemove: 
-label116: 
+internal TestPop: 
+label30: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 64
 stp - i64 reg 29, i64 reg 30, ptr stack 48
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i64 reg 1, i64 imm 1
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
 InstMove - i64 reg 1, i64 imm 2
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
 InstMove - i64 reg 1, i64 imm 3
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstMove - i64 reg 1, i64 imm 2
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i64 reg 28, i64 reg 0
 InstICmp - i64 reg 28, i64 imm 2
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstMove - i64 reg 1, i64 imm 2
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 0
+InstMove - i64 reg 28, i64 reg 0
+InstICmp - i64 reg 28, i64 imm 2
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstMove - i64 reg 1, i64 imm 1
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
+InstCall - 
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
+InstCall - 
+InstMove - i64 reg 28, i64 reg 0
+InstICmp - i64 reg 28, i64 imm 1
+cset - i8 reg 28
+InstMove - i8 reg 0, i8 reg 28
+InstCall - 
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
+InstCall - 
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i8 reg 28, i8 reg 0
 InstICmp - i8 reg 28, i8 imm 1
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstMove - i64 reg 1, i64 imm 3
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 1
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstMove - i64 reg 1, i64 imm 2
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstICmp - i8 reg 28, i8 imm 0
-cset - i8 reg 28
-InstMove - i8 reg 0, i8 reg 28
-InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstJump - label117
+InstJump - label31
 
-label117: 
+label31: 
 InstLoad - i64 reg 27, i64 stack -8
 InstLoad - i64 reg 28, i64 stack -16
 ldp - i64 reg 29, i64 reg 30, ptr stack 48
 InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
 InstRet - 
 
-internal TestRehash: 
-label118: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
+internal TestLIFO: 
+label32: 
+InstSub - i64 reg 31, i64 reg 31, i64 imm 64
+stp - i64 reg 29, i64 reg 30, ptr stack 48
+InstAdd - i64 reg 29, i64 reg 31, i64 imm 48
 InstStore - i64 stack -8, i64 reg 27
 InstStore - i64 stack -16, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
+InstLoadGlobalAddress - ptr reg 28, ptr stack -40
 InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
 InstMove - i64 reg 28, i64 imm 0
 InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -48
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i64 reg 28, i64 imm 0
-InstStore - i64 stack -56, i64 reg 28
-InstJump - label120
-
-label119: 
-InstLoad - i64 reg 28, i64 stack -56
-InstMove - i64 reg 1, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstMove - i64 reg 1, i64 imm 100
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstJump - label121
-
-label120: 
-InstLoad - i64 reg 28, i64 stack -56
-InstICmp - i64 reg 28, i64 imm 15
-cset - i8 reg 28
-InstTest - i8 reg 28, i8 reg 28
-InstJNE - label119
-InstJump - label122
-
-label121: 
-InstLoad - i64 reg 28, i64 stack -56
-InstAdd - i64 reg 27, i64 reg 28, i64 imm 1
-InstStore - i64 stack -56, i64 reg 27
-InstJump - label120
-
-label122: 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
+InstMove - i64 reg 1, i64 imm 200
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i64 reg 27, i64 reg 0
-InstICmp - i64 reg 27, i64 imm 15
-cset - i8 reg 27
-InstMove - i8 reg 0, i8 reg 27
+InstMove - i64 reg 1, i64 imm 300
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -64, i64 reg 27
-InstJump - label124
-
-label123: 
-InstLoad - i64 reg 27, i64 stack -64
-InstMove - i64 reg 1, i64 reg 27
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstMove - i8 reg 27, i8 reg 0
-InstICmp - i8 reg 27, i8 imm 1
-cset - i8 reg 27
-InstMove - i8 reg 0, i8 reg 27
-InstCall - 
-InstJump - label125
-
-label124: 
-InstLoad - i64 reg 27, i64 stack -64
-InstICmp - i64 reg 27, i64 imm 15
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label123
-InstJump - label126
-
-label125: 
-InstLoad - i64 reg 27, i64 stack -64
-InstAdd - i64 reg 28, i64 reg 27, i64 imm 1
-InstStore - i64 stack -64, i64 reg 28
-InstJump - label124
-
-label126: 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -48
-InstCall - 
-InstJump - label127
-
-label127: 
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-external Set.Id.$Set: 
-label128: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
-InstStore - i64 stack -8, i64 reg 23
-InstStore - i64 stack -16, i64 reg 24
-InstStore - i64 stack -24, i64 reg 25
-InstStore - i64 stack -32, i64 reg 26
-InstStore - i64 stack -40, i64 reg 27
-InstStore - i64 stack -48, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstMove - i64 reg 26, i64 imm 16
-InstStore - ptr reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 0
-InstMove - i64 reg 0, i64 imm 128
-InstCall - 
-InstMove - ptr reg 27, ptr reg 0
-InstMove - i64 reg 25, i64 imm 0
-InstStore - i64 stack -56, i64 reg 25
-InstJump - label129
-
-label129: 
-InstLoad - i64 reg 25, i64 stack -56
-InstICmp - i64 reg 25, i64 imm 16
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label130
-InstJump - label131
-
-label130: 
-InstLoad - i64 reg 25, i64 stack -56
-InstMove - i64 reg 24, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 25, i64 reg 24
-InstAdd - ptr reg 24, ptr reg 27, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 24, i64 imm 0
-InstMove - i64 reg 24, i64 imm 0
-InstStore - ptr reg 23, i64 reg 24
-InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
-InstStore - i64 stack -56, i64 reg 24
-InstJump - label129
-
-label131: 
-InstStore - ptr reg 26, ptr reg 27
-InstMove - i64 reg 0, i64 imm 128
-InstCall - 
-InstMove - ptr reg 27, ptr reg 0
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstStore - ptr reg 26, ptr reg 27
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 24
-InstMove - i64 reg 27, i64 imm 0
-InstStore - ptr reg 26, i64 reg 27
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -64, i64 reg 27
-InstJump - label133
-
-label132: 
-InstLoad - i64 reg 27, i64 stack -64
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 24, i64 reg 25
-InstMove - i64 reg 25, i64 imm 0
-InstStore - ptr reg 26, i64 reg 25
-InstJump - label134
-
-label133: 
-InstLoad - i64 reg 25, i64 stack -64
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 26
-InstICmp - i64 reg 25, i64 reg 24
-cset - i8 reg 24
-InstTest - i8 reg 24, i8 reg 24
-InstJNE - label132
-InstJump - label135
-
-label134: 
-InstLoad - i64 reg 24, i64 stack -64
-InstAdd - i64 reg 25, i64 reg 24, i64 imm 1
-InstStore - i64 stack -64, i64 reg 25
-InstJump - label133
-
-label135: 
-InstJump - label136
-
-label136: 
-InstLoad - i64 reg 23, i64 stack -8
-InstLoad - i64 reg 24, i64 stack -16
-InstLoad - i64 reg 25, i64 stack -24
-InstLoad - i64 reg 26, i64 stack -32
-InstLoad - i64 reg 27, i64 stack -40
-InstLoad - i64 reg 28, i64 stack -48
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-external Set.Id.$Size: 
-label137: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 27
-InstStore - i64 stack -16, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - ptr reg 28, ptr reg 27
-InstStore - i64 stack -24, ptr reg 28
-InstJump - label139
-
-label138: 
-
-label139: 
-InstLoad - i64 reg 28, i64 stack -24
-InstMove - i64 reg 0, i64 reg 28
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-external Set.Id.$Empty: 
-label140: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 48
-stp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
-InstStore - i64 stack -8, i64 reg 27
-InstStore - i64 stack -16, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 28, ptr reg 27
-InstICmp - i64 reg 28, i64 imm 0
-cset - i8 reg 28
-InstStore - i8 stack -17, i8 reg 28
-InstJump - label142
-
-label141: 
-
-label142: 
-InstLoad - i8 reg 28, i8 stack -17
-InstMove - i8 reg 0, i8 reg 28
-InstLoad - i64 reg 27, i64 stack -8
-InstLoad - i64 reg 28, i64 stack -16
-ldp - i64 reg 29, i64 reg 30, ptr stack 32
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 48
-InstRet - 
-
-external Set.Id.$Contains__Id: 
-label143: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 144
-stp - i64 reg 29, i64 reg 30, ptr stack 128
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 128
-InstStore - i64 stack -8, i64 reg 23
-InstStore - i64 stack -16, i64 reg 24
-InstStore - i64 stack -24, i64 reg 25
-InstStore - i64 stack -32, i64 reg 26
-InstStore - i64 stack -40, i64 reg 27
-InstStore - i64 stack -48, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - ptr reg 27, ptr reg 1
-InstLoad - i64 reg 26, ptr reg 27
-InstLoadGlobalAddress - ptr reg 27, ptr stack -120
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 27, ptr stack -120
-InstLoadGlobalAddress - ptr reg 26, ptr stack -56
-InstLoad - i64 reg 25, ptr reg 27
-InstStore - ptr reg 26, i64 reg 25
-InstLoadGlobalAddress - ptr reg 25, ptr stack -56
-InstLoadGlobalAddress - ptr reg 26, ptr stack -72
-InstLoad - i64 reg 27, ptr reg 25
-InstStore - ptr reg 26, i64 reg 27
-InstMove - ptr reg 0, ptr reg 26
-InstCall - 
-InstMove - i64 reg 26, i64 reg 0
-InstStore - i64 stack -80, i64 reg 26
-InstLoad - i64 reg 26, i64 stack -80
-InstICmp - i64 reg 26, i64 imm 0
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label144
-InstJump - label146
-
-label144: 
-InstLoad - i64 reg 26, i64 stack -80
-InstNeg - i64 reg 27, i64 reg 26
-InstStore - i64 stack -80, i64 reg 27
-InstJump - label146
-
-label145: 
-
-label146: 
-InstLoad - i64 reg 27, i64 stack -80
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstSDiv - i64 reg 26, i64 reg 27, i64 reg 25
-msub - i64 reg 24, i64 reg 26, i64 reg 25, i64 reg 27
-InstStore - i64 stack -88, i64 reg 24
-InstLoad - i64 reg 24, i64 stack -88
-InstStore - i64 stack -96, i64 reg 24
-InstJump - label147
-
-label147: 
-InstLoad - i64 reg 24, i64 stack -88
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 24, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 27
-InstLoad - i64 reg 27, ptr reg 26
-InstICmp - i64 reg 27, i64 imm 0
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label151
-InstJump - label154
-
-label148: 
-InstLoad - i64 reg 27, i64 stack -88
-InstLoad - i64 reg 26, i64 stack -96
-InstICmp - i64 reg 27, i64 reg 26
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label147
-InstJump - label149
-
-label149: 
-InstMove - i8 reg 26, i8 imm 0
-InstStore - i8 stack -57, i8 reg 26
-InstJump - label159
-
-label150: 
-
-label151: 
-InstMove - i8 reg 26, i8 imm 0
-InstStore - i8 stack -57, i8 reg 26
-InstJump - label159
-
-label152: 
-
-label153: 
-
-label154: 
-InstLoad - i64 reg 26, i64 stack -88
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 26, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 25, i64 reg 24
-InstLoad - i64 reg 24, ptr reg 27
-InstLoad - i64 reg 27, i64 stack -88
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 27, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 26, i64 reg 23
-InstMove - ptr reg 23, ptr reg 25
-InstLoadGlobalAddress - ptr reg 25, ptr stack -104
-InstLoad - i64 reg 26, ptr reg 23
-InstStore - ptr reg 25, i64 reg 26
-InstLoadGlobalAddress - ptr reg 26, ptr stack -56
-InstLoadGlobalAddress - ptr reg 23, ptr stack -112
-InstLoad - i64 reg 27, ptr reg 26
-InstStore - ptr reg 23, i64 reg 27
-InstICmp - i64 reg 24, i64 imm 1
-cset - i8 reg 24
-InstICmp - ptr reg 25, ptr reg 23
-cset - i8 reg 23
-InstAnd - i8 reg 25, i8 reg 24, i8 reg 23
-InstICmp - i8 reg 25, i8 imm 0
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label155
-InstJump - label158
-
-label155: 
-InstMove - i8 reg 25, i8 imm 1
-InstStore - i8 stack -57, i8 reg 25
-InstJump - label159
-
-label156: 
-
-label157: 
-
-label158: 
-InstLoad - i64 reg 25, i64 stack -88
-InstAdd - ptr reg 23, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 23
-InstAdd - i64 reg 23, i64 reg 25, i64 imm 1
-InstSDiv - i64 reg 25, i64 reg 23, i64 reg 24
-msub - i64 reg 27, i64 reg 25, i64 reg 24, i64 reg 23
-InstStore - i64 stack -88, i64 reg 27
-InstJump - label148
-
-label159: 
-InstLoad - i8 reg 27, i8 stack -57
-InstMove - i8 reg 0, i8 reg 27
-InstLoad - i64 reg 23, i64 stack -8
-InstLoad - i64 reg 24, i64 stack -16
-InstLoad - i64 reg 25, i64 stack -24
-InstLoad - i64 reg 26, i64 stack -32
-InstLoad - i64 reg 27, i64 stack -40
-InstLoad - i64 reg 28, i64 stack -48
-ldp - i64 reg 29, i64 reg 30, ptr stack 128
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 144
-InstRet - 
-
-external Set.Id.$Insert__Id: 
-label160: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 224
-stp - i64 reg 29, i64 reg 30, ptr stack 208
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 208
-InstStore - i64 stack -8, i64 reg 22
-InstStore - i64 stack -16, i64 reg 23
-InstStore - i64 stack -24, i64 reg 24
-InstStore - i64 stack -32, i64 reg 25
-InstStore - i64 stack -40, i64 reg 26
-InstStore - i64 stack -48, i64 reg 27
-InstStore - i64 stack -56, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - ptr reg 27, ptr reg 1
-InstLoad - i64 reg 26, ptr reg 27
-InstLoadGlobalAddress - ptr reg 27, ptr stack -208
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 27, ptr stack -208
-InstLoadGlobalAddress - ptr reg 26, ptr stack -72
-InstLoad - i64 reg 25, ptr reg 27
-InstStore - ptr reg 26, i64 reg 25
-InstLoadGlobalAddress - ptr reg 25, ptr stack -72
-InstLoadGlobalAddress - ptr reg 26, ptr stack -88
-InstLoad - i64 reg 27, ptr reg 25
-InstStore - ptr reg 26, i64 reg 27
-InstMove - ptr reg 1, ptr reg 26
-InstMove - ptr reg 0, ptr reg 28
-InstCall - 
-InstMove - i8 reg 26, i8 reg 0
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label161
-InstJump - label164
-
-label161: 
-InstMove - i8 reg 26, i8 imm 0
-InstStore - i8 stack -73, i8 reg 26
-InstJump - label195
-
-label162: 
-
-label163: 
-
-label164: 
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 27, ptr reg 26
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 10
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstMove - i64 reg 26, i64 imm 7
-InstSMul - i64 reg 27, i64 reg 25, i64 reg 26
-InstICmp - i64 reg 24, i64 reg 27
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label165
-InstJump - label167
-
-label165: 
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - ptr reg 24, ptr reg 27
-InstStore - i64 stack -96, ptr reg 24
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 27, ptr reg 24
-InstStore - ptr stack -104, ptr reg 27
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 27
-InstStore - ptr stack -112, ptr reg 24
-InstLoad - i64 reg 24, i64 stack -96
-InstMove - i64 reg 27, i64 imm 2
-InstSMul - i64 reg 26, i64 reg 24, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstStore - ptr reg 27, i64 reg 26
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 24, i64 reg 26
-InstMove - i64 reg 0, i64 reg 25
-InstCall - 
-InstMove - ptr reg 25, ptr reg 0
-InstMove - i64 reg 26, i64 imm 0
-InstStore - i64 stack -120, i64 reg 26
-InstJump - label168
-
-label166: 
-
-label167: 
-InstLoadGlobalAddress - ptr reg 26, ptr stack -72
-InstLoadGlobalAddress - ptr reg 23, ptr stack -128
-InstLoad - i64 reg 22, ptr reg 26
-InstStore - ptr reg 23, i64 reg 22
-InstMove - ptr reg 0, ptr reg 23
-InstCall - 
-InstMove - i64 reg 23, i64 reg 0
-InstStore - i64 stack -136, i64 reg 23
-InstLoad - i64 reg 23, i64 stack -136
-InstICmp - i64 reg 23, i64 imm 0
-cset - i8 reg 23
-InstTest - i8 reg 23, i8 reg 23
-InstJNE - label188
-InstJump - label190
-
-label168: 
-InstLoad - i64 reg 23, i64 stack -120
-InstICmp - i64 reg 23, i64 reg 24
-cset - i8 reg 23
-InstTest - i8 reg 23, i8 reg 23
-InstJNE - label169
-InstJump - label170
-
-label169: 
-InstLoad - i64 reg 23, i64 stack -120
-InstMove - i64 reg 22, i64 imm 8
-InstSMul - i64 reg 26, i64 reg 23, i64 reg 22
-InstAdd - ptr reg 22, ptr reg 25, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 22, i64 imm 0
-InstMove - i64 reg 22, i64 imm 0
-InstStore - ptr reg 26, i64 reg 22
-InstAdd - i64 reg 22, i64 reg 23, i64 imm 1
-InstStore - i64 stack -120, i64 reg 22
-InstJump - label168
-
-label170: 
-InstStore - ptr reg 27, ptr reg 25
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 24, i64 reg 25
-InstMove - i64 reg 0, i64 reg 27
-InstCall - 
-InstMove - ptr reg 27, ptr reg 0
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
-InstStore - ptr reg 25, ptr reg 27
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 24
-InstMove - i64 reg 27, i64 imm 0
-InstStore - ptr reg 25, i64 reg 27
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -144, i64 reg 27
-InstJump - label172
-
-label171: 
-InstLoad - i64 reg 27, i64 stack -144
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 22, i64 reg 27, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 24, i64 reg 22
-InstMove - i64 reg 22, i64 imm 0
-InstStore - ptr reg 25, i64 reg 22
-InstJump - label173
-
-label172: 
-InstLoad - i64 reg 22, i64 stack -144
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 25
-InstICmp - i64 reg 22, i64 reg 24
-cset - i8 reg 24
-InstTest - i8 reg 24, i8 reg 24
-InstJNE - label171
-InstJump - label174
-
-label173: 
-InstLoad - i64 reg 24, i64 stack -144
-InstAdd - i64 reg 22, i64 reg 24, i64 imm 1
-InstStore - i64 stack -144, i64 reg 22
-InstJump - label172
-
-label174: 
-InstMove - i64 reg 22, i64 imm 0
-InstStore - i64 stack -152, i64 reg 22
-InstJump - label176
-
-label175: 
-InstLoad - i64 reg 22, i64 stack -152
-InstLoad - ptr reg 24, ptr stack -112
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 22, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 24, i64 reg 27
-InstLoad - i64 reg 27, ptr reg 25
-InstICmp - i64 reg 27, i64 imm 1
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label179
-InstJump - label181
-
-label176: 
-InstLoad - i64 reg 27, i64 stack -152
-InstLoad - i64 reg 25, i64 stack -96
-InstICmp - i64 reg 27, i64 reg 25
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label175
-InstJump - label178
-
-label177: 
-InstLoad - i64 reg 25, i64 stack -152
-InstAdd - i64 reg 27, i64 reg 25, i64 imm 1
-InstStore - i64 stack -152, i64 reg 27
-InstJump - label176
-
-label178: 
-InstLoad - ptr reg 27, ptr stack -104
-InstMove - ptr reg 0, ptr reg 27
-InstCall - 
-InstLoad - ptr reg 27, ptr stack -112
-InstMove - ptr reg 0, ptr reg 27
-InstCall - 
-InstJump - label167
-
-label179: 
-InstLoad - i64 reg 27, i64 stack -152
-InstLoad - ptr reg 25, ptr stack -104
-InstMove - i64 reg 24, i64 imm 8
-InstSMul - i64 reg 22, i64 reg 27, i64 reg 24
-InstAdd - ptr reg 24, ptr reg 25, i64 reg 22
-InstMove - ptr reg 22, ptr reg 24
-InstLoadGlobalAddress - ptr reg 24, ptr stack -160
-InstLoad - i64 reg 25, ptr reg 22
-InstStore - ptr reg 24, i64 reg 25
-InstMove - ptr reg 0, ptr reg 24
-InstCall - 
-InstMove - i64 reg 24, i64 reg 0
-InstStore - i64 stack -168, i64 reg 24
-InstLoad - i64 reg 24, i64 stack -168
-InstICmp - i64 reg 24, i64 imm 0
-cset - i8 reg 24
-InstTest - i8 reg 24, i8 reg 24
-InstJNE - label182
-InstJump - label184
-
-label180: 
-
-label181: 
-InstJump - label177
-
-label182: 
-InstLoad - i64 reg 24, i64 stack -168
-InstNeg - i64 reg 25, i64 reg 24
-InstStore - i64 stack -168, i64 reg 25
-InstJump - label184
-
-label183: 
-
-label184: 
-InstLoad - i64 reg 25, i64 stack -168
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 22, ptr reg 24
-InstSDiv - i64 reg 24, i64 reg 25, i64 reg 22
-msub - i64 reg 27, i64 reg 24, i64 reg 22, i64 reg 25
-InstStore - i64 stack -176, i64 reg 27
-InstJump - label185
-
-label185: 
-InstLoad - i64 reg 27, i64 stack -176
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 22, ptr reg 24
-InstMove - i64 reg 24, i64 imm 8
-InstSMul - i64 reg 25, i64 reg 27, i64 reg 24
-InstAdd - ptr reg 24, ptr reg 22, i64 reg 25
-InstLoad - i64 reg 25, ptr reg 24
-InstICmp - i64 reg 25, i64 imm 1
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label186
-InstJump - label187
-
-label186: 
-InstLoad - i64 reg 25, i64 stack -176
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 22, ptr reg 24
-InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
-InstSDiv - i64 reg 25, i64 reg 24, i64 reg 22
-msub - i64 reg 27, i64 reg 25, i64 reg 22, i64 reg 24
-InstStore - i64 stack -176, i64 reg 27
-InstJump - label185
-
-label187: 
-InstLoad - i64 reg 27, i64 stack -176
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 24, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 22, i64 reg 27, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 24, i64 reg 22
-InstLoad - i64 reg 22, i64 stack -152
-InstLoad - ptr reg 24, ptr stack -104
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 22, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 24, i64 reg 23
-InstMove - ptr reg 23, ptr reg 27
-InstLoadGlobalAddress - ptr reg 27, ptr stack -184
-InstLoad - i64 reg 24, ptr reg 23
-InstStore - ptr reg 27, i64 reg 24
-InstMove - ptr reg 24, ptr reg 27
-InstMove - ptr reg 27, ptr reg 25
-InstLoad - i64 reg 25, ptr reg 24
-InstStore - ptr reg 27, i64 reg 25
-InstLoad - i64 reg 25, i64 stack -176
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 25, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 24, i64 reg 23
-InstMove - i64 reg 23, i64 imm 1
-InstStore - ptr reg 27, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 27, ptr reg 23
-InstAdd - i64 reg 23, i64 reg 27, i64 imm 1
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstStore - ptr reg 27, i64 reg 23
-InstJump - label181
-
-label188: 
-InstLoad - i64 reg 27, i64 stack -136
-InstNeg - i64 reg 23, i64 reg 27
-InstStore - i64 stack -136, i64 reg 23
-InstJump - label190
-
-label189: 
-
-label190: 
-InstLoad - i64 reg 23, i64 stack -136
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 27
-InstSDiv - i64 reg 27, i64 reg 23, i64 reg 24
-msub - i64 reg 25, i64 reg 27, i64 reg 24, i64 reg 23
-InstStore - i64 stack -192, i64 reg 25
-InstJump - label191
-
-label191: 
-InstLoad - i64 reg 25, i64 stack -192
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 25, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 24, i64 reg 23
-InstLoad - i64 reg 23, ptr reg 27
-InstICmp - i64 reg 23, i64 imm 1
-cset - i8 reg 23
-InstTest - i8 reg 23, i8 reg 23
-InstJNE - label192
-InstJump - label193
-
-label192: 
-InstLoad - i64 reg 23, i64 stack -192
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 27
-InstAdd - i64 reg 27, i64 reg 23, i64 imm 1
-InstSDiv - i64 reg 23, i64 reg 27, i64 reg 24
-msub - i64 reg 25, i64 reg 23, i64 reg 24, i64 reg 27
-InstStore - i64 stack -192, i64 reg 25
-InstJump - label191
-
-label193: 
-InstLoad - i64 reg 25, i64 stack -192
-InstAdd - ptr reg 23, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 27, ptr reg 23
-InstMove - i64 reg 23, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 25, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 27, i64 reg 24
-InstLoadGlobalAddress - ptr reg 24, ptr stack -72
-InstLoadGlobalAddress - ptr reg 27, ptr stack -200
-InstLoad - i64 reg 25, ptr reg 24
-InstStore - ptr reg 27, i64 reg 25
-InstMove - ptr reg 25, ptr reg 27
-InstMove - ptr reg 27, ptr reg 23
-InstLoad - i64 reg 23, ptr reg 25
-InstStore - ptr reg 27, i64 reg 23
-InstLoad - i64 reg 23, i64 stack -192
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 23, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 25, i64 reg 24
-InstMove - i64 reg 24, i64 imm 1
-InstStore - ptr reg 27, i64 reg 24
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 27, ptr reg 24
-InstAdd - i64 reg 24, i64 reg 27, i64 imm 1
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstStore - ptr reg 27, i64 reg 24
-InstMove - i8 reg 27, i8 imm 1
-InstStore - i8 stack -73, i8 reg 27
-InstJump - label195
-
-label194: 
-
-label195: 
-InstLoad - i8 reg 27, i8 stack -73
-InstMove - i8 reg 0, i8 reg 27
-InstLoad - i64 reg 22, i64 stack -8
-InstLoad - i64 reg 23, i64 stack -16
-InstLoad - i64 reg 24, i64 stack -24
-InstLoad - i64 reg 25, i64 stack -32
-InstLoad - i64 reg 26, i64 stack -40
-InstLoad - i64 reg 27, i64 stack -48
-InstLoad - i64 reg 28, i64 stack -56
-ldp - i64 reg 29, i64 reg 30, ptr stack 208
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 224
-InstRet - 
-
-external Set.Id.$Remove__Id: 
-label196: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 144
-stp - i64 reg 29, i64 reg 30, ptr stack 128
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 128
-InstStore - i64 stack -8, i64 reg 23
-InstStore - i64 stack -16, i64 reg 24
-InstStore - i64 stack -24, i64 reg 25
-InstStore - i64 stack -32, i64 reg 26
-InstStore - i64 stack -40, i64 reg 27
-InstStore - i64 stack -48, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - ptr reg 27, ptr reg 1
-InstLoad - i64 reg 26, ptr reg 27
-InstLoadGlobalAddress - ptr reg 27, ptr stack -120
-InstStore - ptr reg 27, i64 reg 26
-InstLoadGlobalAddress - ptr reg 27, ptr stack -120
-InstLoadGlobalAddress - ptr reg 26, ptr stack -56
-InstLoad - i64 reg 25, ptr reg 27
-InstStore - ptr reg 26, i64 reg 25
-InstLoadGlobalAddress - ptr reg 25, ptr stack -56
-InstLoadGlobalAddress - ptr reg 26, ptr stack -72
-InstLoad - i64 reg 27, ptr reg 25
-InstStore - ptr reg 26, i64 reg 27
-InstMove - ptr reg 0, ptr reg 26
-InstCall - 
-InstMove - i64 reg 26, i64 reg 0
-InstStore - i64 stack -80, i64 reg 26
-InstLoad - i64 reg 26, i64 stack -80
-InstICmp - i64 reg 26, i64 imm 0
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label197
-InstJump - label199
-
-label197: 
-InstLoad - i64 reg 26, i64 stack -80
-InstNeg - i64 reg 27, i64 reg 26
-InstStore - i64 stack -80, i64 reg 27
-InstJump - label199
-
-label198: 
-
-label199: 
-InstLoad - i64 reg 27, i64 stack -80
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstSDiv - i64 reg 26, i64 reg 27, i64 reg 25
-msub - i64 reg 24, i64 reg 26, i64 reg 25, i64 reg 27
-InstStore - i64 stack -88, i64 reg 24
-InstLoad - i64 reg 24, i64 stack -88
-InstStore - i64 stack -96, i64 reg 24
-InstJump - label200
-
-label200: 
-InstLoad - i64 reg 24, i64 stack -88
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 24, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 27
-InstLoad - i64 reg 27, ptr reg 26
-InstICmp - i64 reg 27, i64 imm 0
-cset - i8 reg 27
-InstTest - i8 reg 27, i8 reg 27
-InstJNE - label204
-InstJump - label207
-
-label201: 
-InstLoad - i64 reg 27, i64 stack -88
-InstLoad - i64 reg 26, i64 stack -96
-InstICmp - i64 reg 27, i64 reg 26
-cset - i8 reg 26
-InstTest - i8 reg 26, i8 reg 26
-InstJNE - label200
-InstJump - label202
-
-label202: 
-InstMove - i8 reg 26, i8 imm 0
-InstStore - i8 stack -57, i8 reg 26
-InstJump - label212
-
-label203: 
-
-label204: 
-InstMove - i8 reg 26, i8 imm 0
-InstStore - i8 stack -57, i8 reg 26
-InstJump - label212
-
-label205: 
-
-label206: 
-
-label207: 
-InstLoad - i64 reg 26, i64 stack -88
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 27
-InstMove - i64 reg 27, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 26, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 25, i64 reg 24
-InstLoad - i64 reg 24, ptr reg 27
-InstLoad - i64 reg 27, i64 stack -88
-InstAdd - ptr reg 25, ptr reg 28, i64 imm 0
-InstLoad - ptr reg 26, ptr reg 25
-InstMove - i64 reg 25, i64 imm 8
-InstSMul - i64 reg 23, i64 reg 27, i64 reg 25
-InstAdd - ptr reg 25, ptr reg 26, i64 reg 23
-InstMove - ptr reg 23, ptr reg 25
-InstLoadGlobalAddress - ptr reg 25, ptr stack -104
-InstLoad - i64 reg 26, ptr reg 23
-InstStore - ptr reg 25, i64 reg 26
-InstLoadGlobalAddress - ptr reg 26, ptr stack -56
-InstLoadGlobalAddress - ptr reg 23, ptr stack -112
-InstLoad - i64 reg 27, ptr reg 26
-InstStore - ptr reg 23, i64 reg 27
-InstICmp - i64 reg 24, i64 imm 1
-cset - i8 reg 24
-InstICmp - ptr reg 25, ptr reg 23
-cset - i8 reg 23
-InstAnd - i8 reg 25, i8 reg 24, i8 reg 23
-InstICmp - i8 reg 25, i8 imm 0
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label208
-InstJump - label211
-
-label208: 
-InstLoad - i64 reg 25, i64 stack -88
-InstAdd - ptr reg 23, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 24, ptr reg 23
-InstMove - i64 reg 23, i64 imm 8
-InstSMul - i64 reg 27, i64 reg 25, i64 reg 23
-InstAdd - ptr reg 23, ptr reg 24, i64 reg 27
-InstMove - i64 reg 27, i64 imm 2
-InstStore - ptr reg 23, i64 reg 27
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstLoad - i64 reg 23, ptr reg 27
-InstSub - i64 reg 27, i64 reg 23, i64 imm 1
-InstAdd - ptr reg 23, ptr reg 28, i64 imm 24
-InstStore - ptr reg 23, i64 reg 27
-InstMove - i8 reg 23, i8 imm 1
-InstStore - i8 stack -57, i8 reg 23
-InstJump - label212
-
-label209: 
-
-label210: 
-
-label211: 
-InstLoad - i64 reg 23, i64 stack -88
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 24, ptr reg 27
-InstAdd - i64 reg 27, i64 reg 23, i64 imm 1
-InstSDiv - i64 reg 23, i64 reg 27, i64 reg 24
-msub - i64 reg 25, i64 reg 23, i64 reg 24, i64 reg 27
-InstStore - i64 stack -88, i64 reg 25
-InstJump - label201
-
-label212: 
-InstLoad - i8 reg 25, i8 stack -57
-InstMove - i8 reg 0, i8 reg 25
-InstLoad - i64 reg 23, i64 stack -8
-InstLoad - i64 reg 24, i64 stack -16
-InstLoad - i64 reg 25, i64 stack -24
-InstLoad - i64 reg 26, i64 stack -32
-InstLoad - i64 reg 27, i64 stack -40
-InstLoad - i64 reg 28, i64 stack -48
-ldp - i64 reg 29, i64 reg 30, ptr stack 128
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 144
-InstRet - 
-
-external Set.Id.$Clear: 
-label213: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 80
-stp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 64
-InstStore - i64 stack -8, i64 reg 24
-InstStore - i64 stack -16, i64 reg 25
-InstStore - i64 stack -24, i64 reg 26
-InstStore - i64 stack -32, i64 reg 27
-InstStore - i64 stack -40, i64 reg 28
-InstMove - ptr reg 28, ptr reg 0
-InstMove - i64 reg 27, i64 imm 0
-InstStore - i64 stack -56, i64 reg 27
-InstJump - label215
-
-label214: 
-InstLoad - i64 reg 27, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 8
-InstLoad - ptr reg 25, ptr reg 26
-InstMove - i64 reg 26, i64 imm 8
-InstSMul - i64 reg 24, i64 reg 27, i64 reg 26
-InstAdd - ptr reg 26, ptr reg 25, i64 reg 24
-InstMove - i64 reg 24, i64 imm 0
-InstStore - ptr reg 26, i64 reg 24
-InstJump - label216
-
-label215: 
-InstLoad - i64 reg 24, i64 stack -56
-InstAdd - ptr reg 26, ptr reg 28, i64 imm 16
-InstLoad - i64 reg 25, ptr reg 26
-InstICmp - i64 reg 24, i64 reg 25
-cset - i8 reg 25
-InstTest - i8 reg 25, i8 reg 25
-InstJNE - label214
-InstJump - label217
-
-label216: 
-InstLoad - i64 reg 25, i64 stack -56
-InstAdd - i64 reg 24, i64 reg 25, i64 imm 1
-InstStore - i64 stack -56, i64 reg 24
-InstJump - label215
-
-label217: 
-InstAdd - ptr reg 24, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 24, i64 reg 28
-InstJump - label218
-
-label218: 
-InstLoad - i64 reg 24, i64 stack -8
-InstLoad - i64 reg 25, i64 stack -16
-InstLoad - i64 reg 26, i64 stack -24
-InstLoad - i64 reg 27, i64 stack -32
-InstLoad - i64 reg 28, i64 stack -40
-ldp - i64 reg 29, i64 reg 30, ptr stack 64
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 80
-InstRet - 
-
-internal TestCustomClass: 
-label219: 
-InstSub - i64 reg 31, i64 reg 31, i64 imm 176
-stp - i64 reg 29, i64 reg 30, ptr stack 160
-InstAdd - i64 reg 29, i64 reg 31, i64 imm 160
-InstStore - i64 stack -8, i64 reg 26
-InstStore - i64 stack -16, i64 reg 27
-InstStore - i64 stack -24, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 8
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 16
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 28, ptr stack -64
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 24
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -72
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstMove - i64 reg 1, i64 imm 10
-InstLoadGlobalAddress - ptr reg 0, ptr stack -72
-InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -80
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstMove - i64 reg 1, i64 imm 20
-InstLoadGlobalAddress - ptr reg 0, ptr stack -80
-InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -88
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstMove - i64 reg 1, i64 imm 30
-InstLoadGlobalAddress - ptr reg 0, ptr stack -88
-InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -72
-InstLoadGlobalAddress - ptr reg 27, ptr stack -96
-InstLoad - i64 reg 26, ptr reg 28
-InstStore - ptr reg 27, i64 reg 26
-InstMove - ptr reg 1, ptr reg 27
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstMove - i8 reg 27, i8 reg 0
-InstLoadGlobalAddress - ptr reg 27, ptr stack -80
-InstLoadGlobalAddress - ptr reg 26, ptr stack -104
-InstLoad - i64 reg 28, ptr reg 27
-InstStore - ptr reg 26, i64 reg 28
-InstMove - ptr reg 1, ptr reg 26
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstMove - i8 reg 26, i8 reg 0
-InstLoadGlobalAddress - ptr reg 26, ptr stack -88
-InstLoadGlobalAddress - ptr reg 28, ptr stack -112
-InstLoad - i64 reg 27, ptr reg 26
-InstStore - ptr reg 28, i64 reg 27
-InstMove - ptr reg 1, ptr reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstMove - i8 reg 28, i8 reg 0
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i64 reg 28, i64 reg 0
-InstICmp - i64 reg 28, i64 imm 3
+InstICmp - i64 reg 28, i64 imm 300
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -72
-InstLoadGlobalAddress - ptr reg 27, ptr stack -120
-InstLoad - i64 reg 26, ptr reg 28
-InstStore - ptr reg 27, i64 reg 26
-InstMove - ptr reg 1, ptr reg 27
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstMove - i8 reg 27, i8 reg 0
-InstICmp - i8 reg 27, i8 imm 1
-cset - i8 reg 27
-InstMove - i8 reg 0, i8 reg 27
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstLoadGlobalAddress - ptr reg 27, ptr stack -80
-InstLoadGlobalAddress - ptr reg 26, ptr stack -128
-InstLoad - i64 reg 28, ptr reg 27
-InstStore - ptr reg 26, i64 reg 28
-InstMove - ptr reg 1, ptr reg 26
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
+InstMove - i64 reg 28, i64 reg 0
+InstICmp - i64 reg 28, i64 imm 200
+cset - i8 reg 28
+InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstMove - i8 reg 26, i8 reg 0
-InstICmp - i8 reg 26, i8 imm 1
-cset - i8 reg 26
-InstMove - i8 reg 0, i8 reg 26
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
-InstLoadGlobalAddress - ptr reg 26, ptr stack -88
-InstLoadGlobalAddress - ptr reg 28, ptr stack -136
-InstLoad - i64 reg 27, ptr reg 26
-InstStore - ptr reg 28, i64 reg 27
-InstMove - ptr reg 1, ptr reg 28
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
+InstCall - 
+InstMove - i64 reg 28, i64 reg 0
+InstICmp - i64 reg 28, i64 imm 100
+cset - i8 reg 28
+InstMove - i8 reg 0, i8 reg 28
+InstCall - 
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
+InstCall - 
+InstLoadGlobalAddress - ptr reg 0, ptr stack -40
 InstCall - 
 InstMove - i8 reg 28, i8 reg 0
 InstICmp - i8 reg 28, i8 imm 1
 cset - i8 reg 28
 InstMove - i8 reg 0, i8 reg 28
 InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -144
-InstAdd - ptr reg 27, ptr reg 28, i64 imm 0
-InstMove - i64 reg 28, i64 imm 0
-InstStore - ptr reg 27, i64 reg 28
-InstMove - i64 reg 1, i64 imm 40
-InstLoadGlobalAddress - ptr reg 0, ptr stack -144
-InstCall - 
-InstLoadGlobalAddress - ptr reg 28, ptr stack -144
-InstLoadGlobalAddress - ptr reg 27, ptr stack -152
-InstLoad - i64 reg 26, ptr reg 28
-InstStore - ptr reg 27, i64 reg 26
-InstMove - ptr reg 1, ptr reg 27
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstMove - i8 reg 27, i8 reg 0
-InstICmp - i8 reg 27, i8 imm 0
-cset - i8 reg 27
-InstMove - i8 reg 0, i8 reg 27
-InstCall - 
-InstLoadGlobalAddress - ptr reg 0, ptr stack -64
-InstCall - 
-InstJump - label220
+InstJump - label33
 
-label220: 
-InstLoad - i64 reg 26, i64 stack -8
-InstLoad - i64 reg 27, i64 stack -16
-InstLoad - i64 reg 28, i64 stack -24
-ldp - i64 reg 29, i64 reg 30, ptr stack 160
-InstAdd - i64 reg 31, i64 reg 31, i64 imm 176
+label33: 
+InstLoad - i64 reg 27, i64 stack -8
+InstLoad - i64 reg 28, i64 stack -16
+ldp - i64 reg 29, i64 reg 30, ptr stack 48
+InstAdd - i64 reg 31, i64 reg 31, i64 imm 64
 InstRet - 
 
 external main: 
-label221: 
+label34: 
 InstSub - i64 reg 31, i64 reg 31, i64 imm 48
 stp - i64 reg 29, i64 reg 30, ptr stack 32
 InstAdd - i64 reg 29, i64 reg 31, i64 imm 32
@@ -2486,15 +534,13 @@ InstStore - i64 stack -8, i64 reg 28
 InstCall - 
 InstCall - 
 InstCall - 
-InstCall - 
-InstCall - 
 InstMove - i64 reg 28, i64 imm 0
 InstStore - i64 stack -24, i64 reg 28
-InstJump - label223
+InstJump - label36
 
-label222: 
+label35: 
 
-label223: 
+label36: 
 InstLoad - i64 reg 28, i64 stack -24
 InstMove - i64 reg 0, i64 reg 28
 InstLoad - i64 reg 28, i64 stack -8

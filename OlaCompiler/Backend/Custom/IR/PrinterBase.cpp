@@ -302,6 +302,18 @@ namespace ola
 			Emit("]");
 		}
 		break;
+		case ConstantID::Struct:
+		{
+			ConstantStruct const* CS = cast<ConstantStruct>(C);
+			Emit("{{");
+			for (Constant* E : CS->Values())
+			{
+				PrintConstant(E);
+				Emit(",");
+			}
+			Emit("}}");
+		}
+		break;
 		case ConstantID::Undef:
 			Emit("undef");
 		break;

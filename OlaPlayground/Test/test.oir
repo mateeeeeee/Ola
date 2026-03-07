@@ -6,169 +6,171 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @Hash__I i64(i64 %value) {
+define external @Stack.int.$Stack void(ptr %this) {
+entry:
+%0 = ptr add ptr %this, 0
+store null, ptr %0
+%1 = ptr add ptr %this, 8
+store 0, ptr %1
+%2 = ptr add ptr %this, 16
+store 0, ptr %2
+br label exit
+exit:
+ret 
+}
+
+
+define external @Stack.int.$Size i64(ptr %this) {
 entry:
 %0 = alloca i64
-store i64 %value, ptr %0
-%1 = alloca i64
-%2 = load i64, ptr %0
-%3 = icmp slt i64 %2, 0
-br i8 %3, label if.then, label if.end
-if.then:
-%4 = load i64, ptr %0
-%5 = neg i64 %4
-store i64 %5, ptr %1
-br label exit
-return:
-br label if.end
-if.else:
-br label exit
-if.end:
-%6 = load i64, ptr %0
-store i64 %6, ptr %1
-br label exit
-return1:
-br label exit
-exit:
-%7 = load i64, ptr %1
-ret i64 %7
-}
-
-
-define internal @Hash__F i64(f64 %value) {
-entry:
-%0 = alloca f64
-store f64 %value, ptr %0
-%1 = alloca i64
-%2 = s2f i64 2654435
-%3 = load f64, ptr %0
-%4 = fmul f64 %3, %2
-%5 = f2s f64 %4
-%6 = alloca i64
-store i64 %5, ptr %6
-%7 = load i64, ptr %6
-%8 = icmp slt i64 %7, 0
-br i8 %8, label if.then, label if.end
-if.then:
-%9 = load i64, ptr %6
-%10 = neg i64 %9
-store i64 %10, ptr %6
-br label if.end
-if.else:
-br label exit
-if.end:
-%11 = load i64, ptr %6
-store i64 %11, ptr %1
+%1 = ptr add ptr %this, 8
+%2 = load ptr, ptr %1
+store ptr %2, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%12 = load i64, ptr %1
-ret i64 %12
-}
-
-
-define internal @Hash__B i64(i8 %value) {
-entry:
-%0 = alloca i8
-store i8 %value, ptr %0
-%1 = alloca i64
-%2 = load i8, ptr %0
-br i8 %2, label if.then, label if.end
-if.then:
-store 1, ptr %1
-br label exit
-return:
-br label if.end
-if.else:
-br label exit
-if.end:
-store 0, ptr %1
-br label exit
-return1:
-br label exit
-exit:
-%3 = load i64, ptr %1
+%3 = load i64, ptr %0
 ret i64 %3
 }
 
 
-define external @Id$Id void(ptr %this) {
+define external @Stack.int.$Empty i8(ptr %this) {
 entry:
-%0 = ptr add ptr %this, 0
-store 0, ptr %0
-br label exit
-exit:
-ret 
-}
-
-
-define external @Id$Id__I void(ptr %this,i64 %v) {
-entry:
-%0 = alloca i64
-store i64 %v, ptr %0
-%1 = ptr add ptr %this, 0
-%2 = load i64, ptr %0
-store i64 %2, ptr %1
-br label exit
-exit:
-ret 
-}
-
-
-define internal @Hash__Id i64(%Id %id) {
-entry:
-%0 = alloca %Id
-store %Id %id, ptr %0
-%1 = alloca i64
-%2 = ptr add ptr %0, 0
-%3 = load ptr, ptr %2
-store ptr %3, ptr %1
+%0 = alloca i8
+%1 = ptr add ptr %this, 8
+%2 = load i64, ptr %1
+%3 = icmp eq i64 %2, 0
+store i8 %3, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%4 = load i64, ptr %1
-ret i64 %4
+%4 = load i8, ptr %0
+ret i8 %4
 }
 
 
-define external @Set.int.$Set void(ptr %this) {
+define external @Stack.int.$Top i64(ptr %this) {
 entry:
-%0 = ptr add ptr %this, 16
-store 16, ptr %0
+%0 = alloca i64
 %1 = ptr add ptr %this, 0
-%2 = call i64 128, @__ola_new
-%3 = bitcast ptr %2
-store ptr %3, ptr %1
-%4 = ptr add ptr %this, 8
-%5 = call i64 128, @__ola_new
-%6 = bitcast ptr %5
-store ptr %6, ptr %4
-%7 = ptr add ptr %this, 24
-store 0, ptr %7
-%8 = alloca i64
-store 0, ptr %8
+%2 = ptr add ptr %this, 8
+%3 = load i64, ptr %2
+%4 = sub i64 %3, 1
+%5 = load ptr, ptr %1
+%6 = gep ptr %5, %4
+%7 = load i64, ptr %6
+store i64 %7, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%8 = load i64, ptr %0
+ret i64 %8
+}
+
+
+define external @Stack.int.$Push__I void(ptr %this,i64 %value) {
+entry:
+%0 = alloca i64
+store i64 %value, ptr %0
+%1 = ptr add ptr %this, 8
+%2 = ptr add ptr %this, 16
+%3 = load i64, ptr %1
+%4 = load i64, ptr %2
+%5 = icmp slt i64 %3, %4
+br i8 %5, label if.then, label if.end
+if.then:
+%6 = ptr add ptr %this, 0
+%7 = ptr add ptr %this, 8
+%8 = load i64, ptr %7
+%9 = load ptr, ptr %6
+%10 = gep ptr %9, %8
+%11 = load i64, ptr %0
+store i64 %11, ptr %10
+%12 = ptr add ptr %this, 8
+%13 = ptr add ptr %this, 8
+%14 = load i64, ptr %13
+%15 = add i64 %14, 1
+store i64 %15, ptr %12
+br label exit
+return:
+br label if.end
+if.else:
+br label exit
+if.end:
+%16 = ptr add ptr %this, 16
+%17 = load i64, ptr %16
+%18 = icmp sgt i64 %17, 0
+%19 = ptr add ptr %this, 16
+%20 = load i64, ptr %19
+%21 = smul i64 %20, 2
+%22 = select i8 %18, i64 %21, 4
+%23 = alloca i64
+store i64 %22, ptr %23
+%24 = load i64, ptr %23
+%25 = smul i64 %24, 8
+%26 = call i64 %25, @__ola_new
+%27 = bitcast ptr %26
+%28 = alloca ptr
+store ptr %27, ptr %28
+%29 = alloca i64
+store 0, ptr %29
 br label for.cond
 for.body:
-%9 = ptr add ptr %this, 8
-%10 = load i64, ptr %8
-%11 = load ptr, ptr %9
-%12 = gep ptr %11, %10
-store 0, ptr %12
+%30 = load i64, ptr %29
+%31 = load ptr, ptr %28
+%32 = gep ptr %31, %30
+%33 = ptr add ptr %this, 0
+%34 = load i64, ptr %29
+%35 = load ptr, ptr %33
+%36 = gep ptr %35, %34
+%37 = load i64, ptr %36
+store i64 %37, ptr %32
 br label for.iter
 for.cond:
-%13 = ptr add ptr %this, 16
-%14 = load i64, ptr %8
-%15 = load i64, ptr %13
-%16 = icmp slt i64 %14, %15
-br i8 %16, label for.body, label for.end
+%38 = ptr add ptr %this, 8
+%39 = load i64, ptr %29
+%40 = load i64, ptr %38
+%41 = icmp slt i64 %39, %40
+br i8 %41, label for.body, label for.end
 for.iter:
-%17 = load i64, ptr %8
-%18 = add i64 %17, 1
-store i64 %18, ptr %8
+%42 = load i64, ptr %29
+%43 = add i64 %42, 1
+store i64 %43, ptr %29
 br label for.cond
 for.end:
+%44 = ptr add ptr %this, 8
+%45 = load i64, ptr %44
+%46 = load ptr, ptr %28
+%47 = gep ptr %46, %45
+%48 = load i64, ptr %0
+store i64 %48, ptr %47
+%49 = ptr add ptr %this, 0
+%50 = load ptr, ptr %49
+%51 = icmp ne ptr %50, null
+br i8 %51, label if.then1, label if.end1
+if.then1:
+%52 = ptr add ptr %this, 0
+%53 = load ptr, ptr %52
+%54 = bitcast ptr %53
+call ptr %54, @__ola_delete
+br label if.end1
+if.else1:
+br label exit
+if.end1:
+%55 = ptr add ptr %this, 0
+%56 = load ptr, ptr %28
+store ptr %56, ptr %55
+%57 = ptr add ptr %this, 16
+%58 = load i64, ptr %23
+store i64 %58, ptr %57
+%59 = ptr add ptr %this, 8
+%60 = ptr add ptr %this, 8
+%61 = load i64, ptr %60
+%62 = add i64 %61, 1
+store i64 %62, ptr %59
 br label exit
 exit:
 ret 
@@ -178,1308 +180,123 @@ ret
 declare @__ola_new ptr(i64)
 
 
-define external @Set.int.$Size i64(ptr %this) {
-entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 24
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%3 = load i64, ptr %0
-ret i64 %3
-}
-
-
-define external @Set.int.$Empty i8(ptr %this) {
-entry:
-%0 = alloca i8
-%1 = ptr add ptr %this, 24
-%2 = load i64, ptr %1
-%3 = icmp eq i64 %2, 0
-store i8 %3, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%4 = load i8, ptr %0
-ret i8 %4
-}
-
-
-define external @Set.int.$Contains__I i8(ptr %this,i64 %value) {
-entry:
-%0 = alloca i64
-store i64 %value, ptr %0
-%1 = alloca i8
-%2 = load i64, ptr %0
-%3 = call i64 %2, @Hash__I
-%4 = alloca i64
-store i64 %3, ptr %4
-%5 = load i64, ptr %4
-%6 = icmp slt i64 %5, 0
-br i8 %6, label if.then, label if.end
-if.then:
-%7 = load i64, ptr %4
-%8 = neg i64 %7
-store i64 %8, ptr %4
-br label if.end
-if.else:
-br label exit
-if.end:
-%9 = ptr add ptr %this, 16
-%10 = load i64, ptr %4
-%11 = load i64, ptr %9
-%12 = srem i64 %10, %11
-%13 = alloca i64
-store i64 %12, ptr %13
-%14 = alloca i64
-%15 = load i64, ptr %13
-store i64 %15, ptr %14
-br label dowhile.body
-dowhile.body:
-%16 = ptr add ptr %this, 8
-%17 = load i64, ptr %13
-%18 = load ptr, ptr %16
-%19 = gep ptr %18, %17
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 0
-br i8 %21, label if.then1, label if.end1
-dowhile.cond:
-%22 = load i64, ptr %13
-%23 = load i64, ptr %14
-%24 = icmp ne i64 %22, %23
-br i8 %24, label dowhile.body, label dowhile.end
-dowhile.end:
-store 0, ptr %1
-br label exit
-return:
-br label exit
-if.then1:
-store 0, ptr %1
-br label exit
-return1:
-br label if.end1
-if.else1:
-br label exit
-if.end1:
-%25 = ptr add ptr %this, 8
-%26 = load i64, ptr %13
-%27 = load ptr, ptr %25
-%28 = gep ptr %27, %26
-%29 = load i64, ptr %28
-%30 = icmp eq i64 %29, 1
-%31 = ptr add ptr %this, 0
-%32 = load i64, ptr %13
-%33 = load ptr, ptr %31
-%34 = gep ptr %33, %32
-%35 = load i64, ptr %34
-%36 = load i64, ptr %0
-%37 = icmp eq i64 %35, %36
-%38 = and i8 %30, %37
-%39 = icmp ne i8 %38, 0
-br i8 %39, label if.then2, label if.end2
-if.then2:
-store 1, ptr %1
-br label exit
-return2:
-br label if.end2
-if.else2:
-br label exit
-if.end2:
-%40 = load i64, ptr %13
-%41 = add i64 %40, 1
-%42 = ptr add ptr %this, 16
-%43 = load i64, ptr %42
-%44 = srem i64 %41, %43
-store i64 %44, ptr %13
-br label dowhile.cond
-exit:
-%45 = load i8, ptr %1
-ret i8 %45
-}
-
-
-define external @Set.int.$Insert__I i8(ptr %this,i64 %value) {
-entry:
-%0 = alloca i64
-store i64 %value, ptr %0
-%1 = alloca i8
-%2 = load i64, ptr %0
-%3 = call ptr %this, %2, @Set.int.$Contains__I
-br i8 %3, label if.then, label if.end
-if.then:
-store 0, ptr %1
-br label exit
-return:
-br label if.end
-if.else:
-br label exit
-if.end:
-%4 = ptr add ptr %this, 24
-%5 = load i64, ptr %4
-%6 = smul i64 %5, 10
-%7 = ptr add ptr %this, 16
-%8 = load i64, ptr %7
-%9 = smul i64 %8, 7
-%10 = icmp sgt i64 %6, %9
-br i8 %10, label if.then1, label if.end1
-if.then1:
-%11 = ptr add ptr %this, 16
-%12 = alloca i64
-%13 = load ptr, ptr %11
-store ptr %13, ptr %12
-%14 = ptr add ptr %this, 0
-%15 = alloca ptr
-%16 = load ptr, ptr %14
-store ptr %16, ptr %15
-%17 = ptr add ptr %this, 8
-%18 = alloca ptr
-%19 = load ptr, ptr %17
-store ptr %19, ptr %18
-%20 = ptr add ptr %this, 16
-%21 = load i64, ptr %12
-%22 = smul i64 %21, 2
-store i64 %22, ptr %20
-%23 = ptr add ptr %this, 0
-%24 = ptr add ptr %this, 16
-%25 = load i64, ptr %24
-%26 = smul i64 %25, 8
-%27 = call i64 %26, @__ola_new
-%28 = bitcast ptr %27
-store ptr %28, ptr %23
-%29 = ptr add ptr %this, 8
-%30 = ptr add ptr %this, 16
-%31 = load i64, ptr %30
-%32 = smul i64 %31, 8
-%33 = call i64 %32, @__ola_new
-%34 = bitcast ptr %33
-store ptr %34, ptr %29
-%35 = ptr add ptr %this, 24
-store 0, ptr %35
-%36 = alloca i64
-store 0, ptr %36
-br label for.cond
-if.else1:
-br label exit
-if.end1:
-%37 = load i64, ptr %0
-%38 = call i64 %37, @Hash__I
-%39 = alloca i64
-store i64 %38, ptr %39
-%40 = load i64, ptr %39
-%41 = icmp slt i64 %40, 0
-br i8 %41, label if.then2, label if.end2
-for.body:
-%42 = ptr add ptr %this, 8
-%43 = load i64, ptr %36
-%44 = load ptr, ptr %42
-%45 = gep ptr %44, %43
-store 0, ptr %45
-br label for.iter
-for.cond:
-%46 = ptr add ptr %this, 16
-%47 = load i64, ptr %36
-%48 = load i64, ptr %46
-%49 = icmp slt i64 %47, %48
-br i8 %49, label for.body, label for.end
-for.iter:
-%50 = load i64, ptr %36
-%51 = add i64 %50, 1
-store i64 %51, ptr %36
-br label for.cond
-for.end:
-%52 = alloca i64
-store 0, ptr %52
-br label for.cond1
-for.body1:
-%53 = load i64, ptr %52
-%54 = load ptr, ptr %18
-%55 = gep ptr %54, %53
-%56 = load i64, ptr %55
-%57 = icmp eq i64 %56, 1
-br i8 %57, label if.then3, label if.end3
-for.cond1:
-%58 = load i64, ptr %52
-%59 = load i64, ptr %12
-%60 = icmp slt i64 %58, %59
-br i8 %60, label for.body1, label for.end1
-for.iter1:
-%61 = load i64, ptr %52
-%62 = add i64 %61, 1
-store i64 %62, ptr %52
-br label for.cond1
-for.end1:
-%63 = load ptr, ptr %15
-%64 = bitcast ptr %63
-call ptr %64, @__ola_delete
-%65 = load ptr, ptr %18
-%66 = bitcast ptr %65
-call ptr %66, @__ola_delete
-br label if.end1
-if.then3:
-%67 = load i64, ptr %52
-%68 = load ptr, ptr %15
-%69 = gep ptr %68, %67
-%70 = load i64, ptr %69
-%71 = call i64 %70, @Hash__I
-%72 = alloca i64
-store i64 %71, ptr %72
-%73 = load i64, ptr %72
-%74 = icmp slt i64 %73, 0
-br i8 %74, label if.then4, label if.end4
-if.else2:
-br label exit
-if.end3:
-br label for.iter1
-if.then4:
-%75 = load i64, ptr %72
-%76 = neg i64 %75
-store i64 %76, ptr %72
-br label if.end4
-if.else3:
-br label exit
-if.end4:
-%77 = ptr add ptr %this, 16
-%78 = load i64, ptr %72
-%79 = load i64, ptr %77
-%80 = srem i64 %78, %79
-%81 = alloca i64
-store i64 %80, ptr %81
-br label while.cond
-while.cond:
-%82 = ptr add ptr %this, 8
-%83 = load i64, ptr %81
-%84 = load ptr, ptr %82
-%85 = gep ptr %84, %83
-%86 = load i64, ptr %85
-%87 = icmp eq i64 %86, 1
-br i8 %87, label while.body, label while.end
-while.body:
-%88 = load i64, ptr %81
-%89 = add i64 %88, 1
-%90 = ptr add ptr %this, 16
-%91 = load i64, ptr %90
-%92 = srem i64 %89, %91
-store i64 %92, ptr %81
-br label while.cond
-while.end:
-%93 = ptr add ptr %this, 0
-%94 = load i64, ptr %81
-%95 = load ptr, ptr %93
-%96 = gep ptr %95, %94
-%97 = load i64, ptr %52
-%98 = load ptr, ptr %15
-%99 = gep ptr %98, %97
-%100 = load i64, ptr %99
-store i64 %100, ptr %96
-%101 = ptr add ptr %this, 8
-%102 = load i64, ptr %81
-%103 = load ptr, ptr %101
-%104 = gep ptr %103, %102
-store 1, ptr %104
-%105 = ptr add ptr %this, 24
-%106 = ptr add ptr %this, 24
-%107 = load i64, ptr %106
-%108 = add i64 %107, 1
-store i64 %108, ptr %105
-br label if.end3
-if.then2:
-%109 = load i64, ptr %39
-%110 = neg i64 %109
-store i64 %110, ptr %39
-br label if.end2
-if.else4:
-br label exit
-if.end2:
-%111 = ptr add ptr %this, 16
-%112 = load i64, ptr %39
-%113 = load i64, ptr %111
-%114 = srem i64 %112, %113
-%115 = alloca i64
-store i64 %114, ptr %115
-br label while.cond1
-while.cond1:
-%116 = ptr add ptr %this, 8
-%117 = load i64, ptr %115
-%118 = load ptr, ptr %116
-%119 = gep ptr %118, %117
-%120 = load i64, ptr %119
-%121 = icmp eq i64 %120, 1
-br i8 %121, label while.body1, label while.end1
-while.body1:
-%122 = load i64, ptr %115
-%123 = add i64 %122, 1
-%124 = ptr add ptr %this, 16
-%125 = load i64, ptr %124
-%126 = srem i64 %123, %125
-store i64 %126, ptr %115
-br label while.cond1
-while.end1:
-%127 = ptr add ptr %this, 0
-%128 = load i64, ptr %115
-%129 = load ptr, ptr %127
-%130 = gep ptr %129, %128
-%131 = load i64, ptr %0
-store i64 %131, ptr %130
-%132 = ptr add ptr %this, 8
-%133 = load i64, ptr %115
-%134 = load ptr, ptr %132
-%135 = gep ptr %134, %133
-store 1, ptr %135
-%136 = ptr add ptr %this, 24
-%137 = ptr add ptr %this, 24
-%138 = load i64, ptr %137
-%139 = add i64 %138, 1
-store i64 %139, ptr %136
-store 1, ptr %1
-br label exit
-return1:
-br label exit
-exit:
-%140 = load i8, ptr %1
-ret i8 %140
-}
-
-
 declare @__ola_delete void(ptr)
 
 
-define external @Set.int.$Remove__I i8(ptr %this,i64 %value) {
+define external @Stack.int.$Pop void(ptr %this) {
 entry:
-%0 = alloca i64
-store i64 %value, ptr %0
-%1 = alloca i8
-%2 = load i64, ptr %0
-%3 = call i64 %2, @Hash__I
-%4 = alloca i64
-store i64 %3, ptr %4
-%5 = load i64, ptr %4
-%6 = icmp slt i64 %5, 0
-br i8 %6, label if.then, label if.end
-if.then:
-%7 = load i64, ptr %4
-%8 = neg i64 %7
-store i64 %8, ptr %4
-br label if.end
-if.else:
-br label exit
-if.end:
-%9 = ptr add ptr %this, 16
-%10 = load i64, ptr %4
-%11 = load i64, ptr %9
-%12 = srem i64 %10, %11
-%13 = alloca i64
-store i64 %12, ptr %13
-%14 = alloca i64
-%15 = load i64, ptr %13
-store i64 %15, ptr %14
-br label dowhile.body
-dowhile.body:
-%16 = ptr add ptr %this, 8
-%17 = load i64, ptr %13
-%18 = load ptr, ptr %16
-%19 = gep ptr %18, %17
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 0
-br i8 %21, label if.then1, label if.end1
-dowhile.cond:
-%22 = load i64, ptr %13
-%23 = load i64, ptr %14
-%24 = icmp ne i64 %22, %23
-br i8 %24, label dowhile.body, label dowhile.end
-dowhile.end:
-store 0, ptr %1
-br label exit
-return:
-br label exit
-if.then1:
-store 0, ptr %1
-br label exit
-return1:
-br label if.end1
-if.else1:
-br label exit
-if.end1:
-%25 = ptr add ptr %this, 8
-%26 = load i64, ptr %13
-%27 = load ptr, ptr %25
-%28 = gep ptr %27, %26
-%29 = load i64, ptr %28
-%30 = icmp eq i64 %29, 1
-%31 = ptr add ptr %this, 0
-%32 = load i64, ptr %13
-%33 = load ptr, ptr %31
-%34 = gep ptr %33, %32
-%35 = load i64, ptr %34
-%36 = load i64, ptr %0
-%37 = icmp eq i64 %35, %36
-%38 = and i8 %30, %37
-%39 = icmp ne i8 %38, 0
-br i8 %39, label if.then2, label if.end2
-if.then2:
-%40 = ptr add ptr %this, 8
-%41 = load i64, ptr %13
-%42 = load ptr, ptr %40
-%43 = gep ptr %42, %41
-store 2, ptr %43
-%44 = ptr add ptr %this, 24
-%45 = ptr add ptr %this, 24
-%46 = load i64, ptr %45
-%47 = sub i64 %46, 1
-store i64 %47, ptr %44
-store 1, ptr %1
-br label exit
-return2:
-br label if.end2
-if.else2:
-br label exit
-if.end2:
-%48 = load i64, ptr %13
-%49 = add i64 %48, 1
-%50 = ptr add ptr %this, 16
-%51 = load i64, ptr %50
-%52 = srem i64 %49, %51
-store i64 %52, ptr %13
-br label dowhile.cond
-exit:
-%53 = load i8, ptr %1
-ret i8 %53
-}
-
-
-define external @Set.int.$Clear void(ptr %this) {
-entry:
-%0 = alloca i64
-store 0, ptr %0
-br label for.cond
-for.body:
+%0 = ptr add ptr %this, 8
 %1 = ptr add ptr %this, 8
-%2 = load i64, ptr %0
-%3 = load ptr, ptr %1
-%4 = gep ptr %3, %2
-store 0, ptr %4
-br label for.iter
-for.cond:
-%5 = ptr add ptr %this, 16
-%6 = load i64, ptr %0
-%7 = load i64, ptr %5
-%8 = icmp slt i64 %6, %7
-br i8 %8, label for.body, label for.end
-for.iter:
-%9 = load i64, ptr %0
-%10 = add i64 %9, 1
-store i64 %10, ptr %0
-br label for.cond
-for.end:
-%11 = ptr add ptr %this, 24
-store 0, ptr %11
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestInsertContains void() {
-entry:
-%0 = alloca %Set.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store null, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-%4 = ptr add ptr %0, 24
-store 0, ptr %4
-call ptr %0, @Set.int.$Set
-%5 = call ptr %0, @Set.int.$Empty
-%6 = icmp eq i8 %5, 1
-call i8 %6, @Assert
-%7 = call ptr %0, @Set.int.$Size
-%8 = icmp eq i64 %7, 0
-call i8 %8, @Assert
-%9 = call ptr %0, 10, @Set.int.$Insert__I
-%10 = call ptr %0, 20, @Set.int.$Insert__I
-%11 = call ptr %0, 30, @Set.int.$Insert__I
-%12 = call ptr %0, @Set.int.$Size
-%13 = icmp eq i64 %12, 3
-call i8 %13, @Assert
-%14 = call ptr %0, 10, @Set.int.$Contains__I
-%15 = icmp eq i8 %14, 1
-call i8 %15, @Assert
-%16 = call ptr %0, 20, @Set.int.$Contains__I
-%17 = icmp eq i8 %16, 1
-call i8 %17, @Assert
-%18 = call ptr %0, 30, @Set.int.$Contains__I
-%19 = icmp eq i8 %18, 1
-call i8 %19, @Assert
-%20 = call ptr %0, 40, @Set.int.$Contains__I
-%21 = icmp eq i8 %20, 0
-call i8 %21, @Assert
-call ptr %0, @Set.int.$Clear
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestDuplicates void() {
-entry:
-%0 = alloca %Set.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store null, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-%4 = ptr add ptr %0, 24
-store 0, ptr %4
-call ptr %0, @Set.int.$Set
-%5 = call ptr %0, 5, @Set.int.$Insert__I
-%6 = icmp eq i8 %5, 1
-call i8 %6, @Assert
-%7 = call ptr %0, 5, @Set.int.$Insert__I
-%8 = icmp eq i8 %7, 0
-call i8 %8, @Assert
-%9 = call ptr %0, @Set.int.$Size
-%10 = icmp eq i64 %9, 1
-call i8 %10, @Assert
-call ptr %0, @Set.int.$Clear
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestRemove void() {
-entry:
-%0 = alloca %Set.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store null, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-%4 = ptr add ptr %0, 24
-store 0, ptr %4
-call ptr %0, @Set.int.$Set
-%5 = call ptr %0, 1, @Set.int.$Insert__I
-%6 = call ptr %0, 2, @Set.int.$Insert__I
-%7 = call ptr %0, 3, @Set.int.$Insert__I
-%8 = call ptr %0, 2, @Set.int.$Remove__I
-%9 = icmp eq i8 %8, 1
-call i8 %9, @Assert
-%10 = call ptr %0, @Set.int.$Size
-%11 = icmp eq i64 %10, 2
-call i8 %11, @Assert
-%12 = call ptr %0, 2, @Set.int.$Contains__I
-%13 = icmp eq i8 %12, 0
-call i8 %13, @Assert
-%14 = call ptr %0, 1, @Set.int.$Contains__I
-%15 = icmp eq i8 %14, 1
-call i8 %15, @Assert
-%16 = call ptr %0, 3, @Set.int.$Contains__I
-%17 = icmp eq i8 %16, 1
-call i8 %17, @Assert
-%18 = call ptr %0, 2, @Set.int.$Remove__I
-%19 = icmp eq i8 %18, 0
-call i8 %19, @Assert
-call ptr %0, @Set.int.$Clear
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestRehash void() {
-entry:
-%0 = alloca %Set.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store null, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-%4 = ptr add ptr %0, 24
-store 0, ptr %4
-call ptr %0, @Set.int.$Set
-%5 = alloca i64
-store 0, ptr %5
-br label for.cond
-for.body:
-%6 = load i64, ptr %5
-%7 = call ptr %0, %6, @Set.int.$Insert__I
-br label for.iter
-for.cond:
-%8 = load i64, ptr %5
-%9 = icmp slt i64 %8, 15
-br i8 %9, label for.body, label for.end
-for.iter:
-%10 = load i64, ptr %5
-%11 = add i64 %10, 1
-store i64 %11, ptr %5
-br label for.cond
-for.end:
-%12 = call ptr %0, @Set.int.$Size
-%13 = icmp eq i64 %12, 15
-call i8 %13, @Assert
-%14 = alloca i64
-store 0, ptr %14
-br label for.cond1
-for.body1:
-%15 = load i64, ptr %14
-%16 = call ptr %0, %15, @Set.int.$Contains__I
-%17 = icmp eq i8 %16, 1
-call i8 %17, @Assert
-br label for.iter1
-for.cond1:
-%18 = load i64, ptr %14
-%19 = icmp slt i64 %18, 15
-br i8 %19, label for.body1, label for.end1
-for.iter1:
-%20 = load i64, ptr %14
-%21 = add i64 %20, 1
-store i64 %21, ptr %14
-br label for.cond1
-for.end1:
-call ptr %0, @Set.int.$Clear
-br label exit
-exit:
-ret 
-}
-
-
-define external @Set.Id.$Set void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 16
-store 16, ptr %0
-%1 = ptr add ptr %this, 0
-%2 = call i64 128, @__ola_new
-%3 = bitcast ptr %2
-%4 = alloca i64
-store 0, ptr %4
-br label newinit.cond
-newinit.cond:
-%5 = load i64, ptr %4
-%6 = icmp slt i64 %5, 16
-br i8 %6, label newinit.body, label newinit.end
-newinit.body:
-%7 = load i64, ptr %4
-%8 = gep ptr %3, %7
-%9 = ptr add ptr %8, 0
-store 0, ptr %9
-%10 = add i64 %7, 1
-store i64 %10, ptr %4
-br label newinit.cond
-newinit.end:
-store ptr %3, ptr %1
-%11 = ptr add ptr %this, 8
-%12 = call i64 128, @__ola_new
-%13 = bitcast ptr %12
-store ptr %13, ptr %11
-%14 = ptr add ptr %this, 24
-store 0, ptr %14
-%15 = alloca i64
-store 0, ptr %15
-br label for.cond
-for.body:
-%16 = ptr add ptr %this, 8
-%17 = load i64, ptr %15
-%18 = load ptr, ptr %16
-%19 = gep ptr %18, %17
-store 0, ptr %19
-br label for.iter
-for.cond:
-%20 = ptr add ptr %this, 16
-%21 = load i64, ptr %15
-%22 = load i64, ptr %20
-%23 = icmp slt i64 %21, %22
-br i8 %23, label for.body, label for.end
-for.iter:
-%24 = load i64, ptr %15
-%25 = add i64 %24, 1
-store i64 %25, ptr %15
-br label for.cond
-for.end:
-br label exit
-exit:
-ret 
-}
-
-
-define external @Set.Id.$Size i64(ptr %this) {
-entry:
-%0 = alloca i64
-%1 = ptr add ptr %this, 24
-%2 = load ptr, ptr %1
-store ptr %2, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%3 = load i64, ptr %0
-ret i64 %3
-}
-
-
-define external @Set.Id.$Empty i8(ptr %this) {
-entry:
-%0 = alloca i8
-%1 = ptr add ptr %this, 24
 %2 = load i64, ptr %1
-%3 = icmp eq i64 %2, 0
-store i8 %3, ptr %0
-br label exit
-return:
-br label exit
-exit:
-%4 = load i8, ptr %0
-ret i8 %4
-}
-
-
-define external @Set.Id.$Contains__Id i8(ptr %this,%Id %value) {
-entry:
-%0 = alloca %Id
-store %Id %value, ptr %0
-%1 = alloca i8
-%2 = load %Id, ptr %0
-%3 = call %Id %2, @Hash__Id
-%4 = alloca i64
-store i64 %3, ptr %4
-%5 = load i64, ptr %4
-%6 = icmp slt i64 %5, 0
-br i8 %6, label if.then, label if.end
-if.then:
-%7 = load i64, ptr %4
-%8 = neg i64 %7
-store i64 %8, ptr %4
-br label if.end
-if.else:
-br label exit
-if.end:
-%9 = ptr add ptr %this, 16
-%10 = load i64, ptr %4
-%11 = load i64, ptr %9
-%12 = srem i64 %10, %11
-%13 = alloca i64
-store i64 %12, ptr %13
-%14 = alloca i64
-%15 = load i64, ptr %13
-store i64 %15, ptr %14
-br label dowhile.body
-dowhile.body:
-%16 = ptr add ptr %this, 8
-%17 = load i64, ptr %13
-%18 = load ptr, ptr %16
-%19 = gep ptr %18, %17
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 0
-br i8 %21, label if.then1, label if.end1
-dowhile.cond:
-%22 = load i64, ptr %13
-%23 = load i64, ptr %14
-%24 = icmp ne i64 %22, %23
-br i8 %24, label dowhile.body, label dowhile.end
-dowhile.end:
-store 0, ptr %1
-br label exit
-return:
-br label exit
-if.then1:
-store 0, ptr %1
-br label exit
-return1:
-br label if.end1
-if.else1:
-br label exit
-if.end1:
-%25 = ptr add ptr %this, 8
-%26 = load i64, ptr %13
-%27 = load ptr, ptr %25
-%28 = gep ptr %27, %26
-%29 = load i64, ptr %28
-%30 = icmp eq i64 %29, 1
-%31 = ptr add ptr %this, 0
-%32 = load i64, ptr %13
-%33 = load ptr, ptr %31
-%34 = gep ptr %33, %32
-%35 = load %Id, ptr %34
-%36 = load %Id, ptr %0
-%37 = icmp eq %Id %35, %36
-%38 = and i8 %30, %37
-%39 = icmp ne i8 %38, 0
-br i8 %39, label if.then2, label if.end2
-if.then2:
-store 1, ptr %1
-br label exit
-return2:
-br label if.end2
-if.else2:
-br label exit
-if.end2:
-%40 = load i64, ptr %13
-%41 = add i64 %40, 1
-%42 = ptr add ptr %this, 16
-%43 = load i64, ptr %42
-%44 = srem i64 %41, %43
-store i64 %44, ptr %13
-br label dowhile.cond
-exit:
-%45 = load i8, ptr %1
-ret i8 %45
-}
-
-
-define external @Set.Id.$Insert__Id i8(ptr %this,%Id %value) {
-entry:
-%0 = alloca %Id
-store %Id %value, ptr %0
-%1 = alloca i8
-%2 = load %Id, ptr %0
-%3 = call ptr %this, %2, @Set.Id.$Contains__Id
-br i8 %3, label if.then, label if.end
-if.then:
-store 0, ptr %1
-br label exit
-return:
-br label if.end
-if.else:
-br label exit
-if.end:
-%4 = ptr add ptr %this, 24
-%5 = load i64, ptr %4
-%6 = smul i64 %5, 10
-%7 = ptr add ptr %this, 16
-%8 = load i64, ptr %7
-%9 = smul i64 %8, 7
-%10 = icmp sgt i64 %6, %9
-br i8 %10, label if.then1, label if.end1
-if.then1:
-%11 = ptr add ptr %this, 16
-%12 = alloca i64
-%13 = load ptr, ptr %11
-store ptr %13, ptr %12
-%14 = ptr add ptr %this, 0
-%15 = alloca ptr
-%16 = load ptr, ptr %14
-store ptr %16, ptr %15
-%17 = ptr add ptr %this, 8
-%18 = alloca ptr
-%19 = load ptr, ptr %17
-store ptr %19, ptr %18
-%20 = ptr add ptr %this, 16
-%21 = load i64, ptr %12
-%22 = smul i64 %21, 2
-store i64 %22, ptr %20
-%23 = ptr add ptr %this, 0
-%24 = ptr add ptr %this, 16
-%25 = load i64, ptr %24
-%26 = smul i64 %25, 8
-%27 = call i64 %26, @__ola_new
-%28 = bitcast ptr %27
-%29 = alloca i64
-store 0, ptr %29
-br label newinit.cond
-if.else1:
-br label exit
-if.end1:
-%30 = load %Id, ptr %0
-%31 = call %Id %30, @Hash__Id
-%32 = alloca i64
-store i64 %31, ptr %32
-%33 = load i64, ptr %32
-%34 = icmp slt i64 %33, 0
-br i8 %34, label if.then2, label if.end2
-newinit.cond:
-%35 = load i64, ptr %29
-%36 = icmp slt i64 %35, %25
-br i8 %36, label newinit.body, label newinit.end
-newinit.body:
-%37 = load i64, ptr %29
-%38 = gep ptr %28, %37
-%39 = ptr add ptr %38, 0
-store 0, ptr %39
-%40 = add i64 %37, 1
-store i64 %40, ptr %29
-br label newinit.cond
-newinit.end:
-store ptr %28, ptr %23
-%41 = ptr add ptr %this, 8
-%42 = ptr add ptr %this, 16
-%43 = load i64, ptr %42
-%44 = smul i64 %43, 8
-%45 = call i64 %44, @__ola_new
-%46 = bitcast ptr %45
-store ptr %46, ptr %41
-%47 = ptr add ptr %this, 24
-store 0, ptr %47
-%48 = alloca i64
-store 0, ptr %48
-br label for.cond
-for.body:
-%49 = ptr add ptr %this, 8
-%50 = load i64, ptr %48
-%51 = load ptr, ptr %49
-%52 = gep ptr %51, %50
-store 0, ptr %52
-br label for.iter
-for.cond:
-%53 = ptr add ptr %this, 16
-%54 = load i64, ptr %48
-%55 = load i64, ptr %53
-%56 = icmp slt i64 %54, %55
-br i8 %56, label for.body, label for.end
-for.iter:
-%57 = load i64, ptr %48
-%58 = add i64 %57, 1
-store i64 %58, ptr %48
-br label for.cond
-for.end:
-%59 = alloca i64
-store 0, ptr %59
-br label for.cond1
-for.body1:
-%60 = load i64, ptr %59
-%61 = load ptr, ptr %18
-%62 = gep ptr %61, %60
-%63 = load i64, ptr %62
-%64 = icmp eq i64 %63, 1
-br i8 %64, label if.then3, label if.end3
-for.cond1:
-%65 = load i64, ptr %59
-%66 = load i64, ptr %12
-%67 = icmp slt i64 %65, %66
-br i8 %67, label for.body1, label for.end1
-for.iter1:
-%68 = load i64, ptr %59
-%69 = add i64 %68, 1
-store i64 %69, ptr %59
-br label for.cond1
-for.end1:
-%70 = load ptr, ptr %15
-%71 = bitcast ptr %70
-call ptr %71, @__ola_delete
-%72 = load ptr, ptr %18
-%73 = bitcast ptr %72
-call ptr %73, @__ola_delete
-br label if.end1
-if.then3:
-%74 = load i64, ptr %59
-%75 = load ptr, ptr %15
-%76 = gep ptr %75, %74
-%77 = load %Id, ptr %76
-%78 = call %Id %77, @Hash__Id
-%79 = alloca i64
-store i64 %78, ptr %79
-%80 = load i64, ptr %79
-%81 = icmp slt i64 %80, 0
-br i8 %81, label if.then4, label if.end4
-if.else2:
-br label exit
-if.end3:
-br label for.iter1
-if.then4:
-%82 = load i64, ptr %79
-%83 = neg i64 %82
-store i64 %83, ptr %79
-br label if.end4
-if.else3:
-br label exit
-if.end4:
-%84 = ptr add ptr %this, 16
-%85 = load i64, ptr %79
-%86 = load i64, ptr %84
-%87 = srem i64 %85, %86
-%88 = alloca i64
-store i64 %87, ptr %88
-br label while.cond
-while.cond:
-%89 = ptr add ptr %this, 8
-%90 = load i64, ptr %88
-%91 = load ptr, ptr %89
-%92 = gep ptr %91, %90
-%93 = load i64, ptr %92
-%94 = icmp eq i64 %93, 1
-br i8 %94, label while.body, label while.end
-while.body:
-%95 = load i64, ptr %88
-%96 = add i64 %95, 1
-%97 = ptr add ptr %this, 16
-%98 = load i64, ptr %97
-%99 = srem i64 %96, %98
-store i64 %99, ptr %88
-br label while.cond
-while.end:
-%100 = ptr add ptr %this, 0
-%101 = load i64, ptr %88
-%102 = load ptr, ptr %100
-%103 = gep ptr %102, %101
-%104 = load i64, ptr %59
-%105 = load ptr, ptr %15
-%106 = gep ptr %105, %104
-%107 = load %Id, ptr %106
-store %Id %107, ptr %103
-%108 = ptr add ptr %this, 8
-%109 = load i64, ptr %88
-%110 = load ptr, ptr %108
-%111 = gep ptr %110, %109
-store 1, ptr %111
-%112 = ptr add ptr %this, 24
-%113 = ptr add ptr %this, 24
-%114 = load i64, ptr %113
-%115 = add i64 %114, 1
-store i64 %115, ptr %112
-br label if.end3
-if.then2:
-%116 = load i64, ptr %32
-%117 = neg i64 %116
-store i64 %117, ptr %32
-br label if.end2
-if.else4:
-br label exit
-if.end2:
-%118 = ptr add ptr %this, 16
-%119 = load i64, ptr %32
-%120 = load i64, ptr %118
-%121 = srem i64 %119, %120
-%122 = alloca i64
-store i64 %121, ptr %122
-br label while.cond1
-while.cond1:
-%123 = ptr add ptr %this, 8
-%124 = load i64, ptr %122
-%125 = load ptr, ptr %123
-%126 = gep ptr %125, %124
-%127 = load i64, ptr %126
-%128 = icmp eq i64 %127, 1
-br i8 %128, label while.body1, label while.end1
-while.body1:
-%129 = load i64, ptr %122
-%130 = add i64 %129, 1
-%131 = ptr add ptr %this, 16
-%132 = load i64, ptr %131
-%133 = srem i64 %130, %132
-store i64 %133, ptr %122
-br label while.cond1
-while.end1:
-%134 = ptr add ptr %this, 0
-%135 = load i64, ptr %122
-%136 = load ptr, ptr %134
-%137 = gep ptr %136, %135
-%138 = load %Id, ptr %0
-store %Id %138, ptr %137
-%139 = ptr add ptr %this, 8
-%140 = load i64, ptr %122
-%141 = load ptr, ptr %139
-%142 = gep ptr %141, %140
-store 1, ptr %142
-%143 = ptr add ptr %this, 24
-%144 = ptr add ptr %this, 24
-%145 = load i64, ptr %144
-%146 = add i64 %145, 1
-store i64 %146, ptr %143
-store 1, ptr %1
-br label exit
-return1:
-br label exit
-exit:
-%147 = load i8, ptr %1
-ret i8 %147
-}
-
-
-define external @Set.Id.$Remove__Id i8(ptr %this,%Id %value) {
-entry:
-%0 = alloca %Id
-store %Id %value, ptr %0
-%1 = alloca i8
-%2 = load %Id, ptr %0
-%3 = call %Id %2, @Hash__Id
-%4 = alloca i64
-store i64 %3, ptr %4
-%5 = load i64, ptr %4
-%6 = icmp slt i64 %5, 0
-br i8 %6, label if.then, label if.end
-if.then:
-%7 = load i64, ptr %4
-%8 = neg i64 %7
-store i64 %8, ptr %4
-br label if.end
-if.else:
-br label exit
-if.end:
-%9 = ptr add ptr %this, 16
-%10 = load i64, ptr %4
-%11 = load i64, ptr %9
-%12 = srem i64 %10, %11
-%13 = alloca i64
-store i64 %12, ptr %13
-%14 = alloca i64
-%15 = load i64, ptr %13
-store i64 %15, ptr %14
-br label dowhile.body
-dowhile.body:
-%16 = ptr add ptr %this, 8
-%17 = load i64, ptr %13
-%18 = load ptr, ptr %16
-%19 = gep ptr %18, %17
-%20 = load i64, ptr %19
-%21 = icmp eq i64 %20, 0
-br i8 %21, label if.then1, label if.end1
-dowhile.cond:
-%22 = load i64, ptr %13
-%23 = load i64, ptr %14
-%24 = icmp ne i64 %22, %23
-br i8 %24, label dowhile.body, label dowhile.end
-dowhile.end:
-store 0, ptr %1
-br label exit
-return:
-br label exit
-if.then1:
-store 0, ptr %1
-br label exit
-return1:
-br label if.end1
-if.else1:
-br label exit
-if.end1:
-%25 = ptr add ptr %this, 8
-%26 = load i64, ptr %13
-%27 = load ptr, ptr %25
-%28 = gep ptr %27, %26
-%29 = load i64, ptr %28
-%30 = icmp eq i64 %29, 1
-%31 = ptr add ptr %this, 0
-%32 = load i64, ptr %13
-%33 = load ptr, ptr %31
-%34 = gep ptr %33, %32
-%35 = load %Id, ptr %34
-%36 = load %Id, ptr %0
-%37 = icmp eq %Id %35, %36
-%38 = and i8 %30, %37
-%39 = icmp ne i8 %38, 0
-br i8 %39, label if.then2, label if.end2
-if.then2:
-%40 = ptr add ptr %this, 8
-%41 = load i64, ptr %13
-%42 = load ptr, ptr %40
-%43 = gep ptr %42, %41
-store 2, ptr %43
-%44 = ptr add ptr %this, 24
-%45 = ptr add ptr %this, 24
-%46 = load i64, ptr %45
-%47 = sub i64 %46, 1
-store i64 %47, ptr %44
-store 1, ptr %1
-br label exit
-return2:
-br label if.end2
-if.else2:
-br label exit
-if.end2:
-%48 = load i64, ptr %13
-%49 = add i64 %48, 1
-%50 = ptr add ptr %this, 16
-%51 = load i64, ptr %50
-%52 = srem i64 %49, %51
-store i64 %52, ptr %13
-br label dowhile.cond
-exit:
-%53 = load i8, ptr %1
-ret i8 %53
-}
-
-
-define external @Set.Id.$Clear void(ptr %this) {
-entry:
-%0 = alloca i64
-store 0, ptr %0
-br label for.cond
-for.body:
-%1 = ptr add ptr %this, 8
-%2 = load i64, ptr %0
-%3 = load ptr, ptr %1
-%4 = gep ptr %3, %2
-store 0, ptr %4
-br label for.iter
-for.cond:
-%5 = ptr add ptr %this, 16
-%6 = load i64, ptr %0
-%7 = load i64, ptr %5
-%8 = icmp slt i64 %6, %7
-br i8 %8, label for.body, label for.end
-for.iter:
-%9 = load i64, ptr %0
-%10 = add i64 %9, 1
-store i64 %10, ptr %0
-br label for.cond
-for.end:
-%11 = ptr add ptr %this, 24
-store 0, ptr %11
+%3 = sub i64 %2, 1
+store i64 %3, ptr %0
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestCustomClass void() {
+define external @Stack.int.$Clear void(ptr %this) {
 entry:
-%0 = alloca %Set.Id.
+%0 = ptr add ptr %this, 8
+store 0, ptr %0
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestPushTop void() {
+entry:
+%0 = alloca %Stack.int.
 %1 = ptr add ptr %0, 0
 store null, ptr %1
 %2 = ptr add ptr %0, 8
-store null, ptr %2
+store 0, ptr %2
 %3 = ptr add ptr %0, 16
 store 0, ptr %3
-%4 = ptr add ptr %0, 24
-store 0, ptr %4
-call ptr %0, @Set.Id.$Set
-%5 = alloca %Id
-%6 = ptr add ptr %5, 0
-store 0, ptr %6
-call ptr %5, 10, @Id$Id__I
-%7 = alloca %Id
-%8 = ptr add ptr %7, 0
-store 0, ptr %8
-call ptr %7, 20, @Id$Id__I
-%9 = alloca %Id
-%10 = ptr add ptr %9, 0
-store 0, ptr %10
-call ptr %9, 30, @Id$Id__I
-%11 = load %Id, ptr %5
-%12 = call ptr %0, %11, @Set.Id.$Insert__Id
-%13 = load %Id, ptr %7
-%14 = call ptr %0, %13, @Set.Id.$Insert__Id
-%15 = load %Id, ptr %9
-%16 = call ptr %0, %15, @Set.Id.$Insert__Id
-%17 = call ptr %0, @Set.Id.$Size
-%18 = icmp eq i64 %17, 3
-call i8 %18, @Assert
-%19 = load %Id, ptr %5
-%20 = call ptr %0, %19, @Set.Id.$Contains__Id
-%21 = icmp eq i8 %20, 1
-call i8 %21, @Assert
-%22 = load %Id, ptr %7
-%23 = call ptr %0, %22, @Set.Id.$Contains__Id
-%24 = icmp eq i8 %23, 1
-call i8 %24, @Assert
-%25 = load %Id, ptr %9
-%26 = call ptr %0, %25, @Set.Id.$Contains__Id
-%27 = icmp eq i8 %26, 1
-call i8 %27, @Assert
-%28 = alloca %Id
-%29 = ptr add ptr %28, 0
-store 0, ptr %29
-call ptr %28, 40, @Id$Id__I
-%30 = load %Id, ptr %28
-%31 = call ptr %0, %30, @Set.Id.$Contains__Id
-%32 = icmp eq i8 %31, 0
-call i8 %32, @Assert
-call ptr %0, @Set.Id.$Clear
+call ptr %0, @Stack.int.$Stack
+%4 = call ptr %0, @Stack.int.$Empty
+%5 = icmp eq i8 %4, 1
+call i8 %5, @Assert
+call ptr %0, 10, @Stack.int.$Push__I
+call ptr %0, 20, @Stack.int.$Push__I
+call ptr %0, 30, @Stack.int.$Push__I
+%6 = call ptr %0, @Stack.int.$Size
+%7 = icmp eq i64 %6, 3
+call i8 %7, @Assert
+%8 = call ptr %0, @Stack.int.$Top
+%9 = icmp eq i64 %8, 30
+call i8 %9, @Assert
+call ptr %0, @Stack.int.$Clear
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestPop void() {
+entry:
+%0 = alloca %Stack.int.
+%1 = ptr add ptr %0, 0
+store null, ptr %1
+%2 = ptr add ptr %0, 8
+store 0, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+call ptr %0, @Stack.int.$Stack
+call ptr %0, 1, @Stack.int.$Push__I
+call ptr %0, 2, @Stack.int.$Push__I
+call ptr %0, 3, @Stack.int.$Push__I
+call ptr %0, @Stack.int.$Pop
+%4 = call ptr %0, @Stack.int.$Size
+%5 = icmp eq i64 %4, 2
+call i8 %5, @Assert
+%6 = call ptr %0, @Stack.int.$Top
+%7 = icmp eq i64 %6, 2
+call i8 %7, @Assert
+call ptr %0, @Stack.int.$Pop
+%8 = call ptr %0, @Stack.int.$Top
+%9 = icmp eq i64 %8, 1
+call i8 %9, @Assert
+call ptr %0, @Stack.int.$Pop
+%10 = call ptr %0, @Stack.int.$Empty
+%11 = icmp eq i8 %10, 1
+call i8 %11, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestLIFO void() {
+entry:
+%0 = alloca %Stack.int.
+%1 = ptr add ptr %0, 0
+store null, ptr %1
+%2 = ptr add ptr %0, 8
+store 0, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+call ptr %0, @Stack.int.$Stack
+call ptr %0, 100, @Stack.int.$Push__I
+call ptr %0, 200, @Stack.int.$Push__I
+call ptr %0, 300, @Stack.int.$Push__I
+%4 = call ptr %0, @Stack.int.$Top
+%5 = icmp eq i64 %4, 300
+call i8 %5, @Assert
+call ptr %0, @Stack.int.$Pop
+%6 = call ptr %0, @Stack.int.$Top
+%7 = icmp eq i64 %6, 200
+call i8 %7, @Assert
+call ptr %0, @Stack.int.$Pop
+%8 = call ptr %0, @Stack.int.$Top
+%9 = icmp eq i64 %8, 100
+call i8 %9, @Assert
+call ptr %0, @Stack.int.$Pop
+%10 = call ptr %0, @Stack.int.$Empty
+%11 = icmp eq i8 %10, 1
+call i8 %11, @Assert
 br label exit
 exit:
 ret 
@@ -1489,11 +306,9 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestInsertContains
-call ptr @TestDuplicates
-call ptr @TestRemove
-call ptr @TestRehash
-call ptr @TestCustomClass
+call ptr @TestPushTop
+call ptr @TestPop
+call ptr @TestLIFO
 store 0, ptr %0
 br label exit
 return:

@@ -1,0 +1,52 @@
+class Stack<T>
+{
+	Stack()
+	{
+		this.data = null;
+		this.size = 0;
+		this.capacity = 0;
+	}
+
+	public int Size() const { return this.size; }
+	public bool Empty() const { return this.size == 0; }
+	public T Top() const { return this.data[this.size - 1]; }
+
+	public void Push(T value)
+	{
+		if(this.size < this.capacity)
+		{
+			this.data[this.size] = value;
+			this.size = this.size + 1;
+			return;
+		}
+		int new_cap = this.capacity > 0 ? this.capacity * 2 : 4;
+		T* new_data = new T[new_cap];
+		int i = 0;
+		for(; i < this.size; ++i)
+		{
+			new_data[i] = this.data[i];
+		}
+		new_data[this.size] = value;
+		if(this.data != null)
+		{
+			delete this.data;
+		}
+		this.data = new_data;
+		this.capacity = new_cap;
+		this.size = this.size + 1;
+	}
+
+	public void Pop()
+	{
+		this.size = this.size - 1;
+	}
+
+	public void Clear()
+	{
+		this.size = 0;
+	}
+
+	private T* data;
+	private int size;
+	private int capacity;
+};

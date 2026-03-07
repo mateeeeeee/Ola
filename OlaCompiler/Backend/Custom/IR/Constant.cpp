@@ -14,6 +14,15 @@ namespace ola
 		case IRTypeKind::Float:
 			return ctx.GetZeroFloat();
 		case IRTypeKind::Struct:
+		{
+			IRStructType* struct_type = cast<IRStructType>(Ty);
+			std::vector<Constant*> null_members;
+			for (Uint64 i = 0; i < struct_type->GetMemberCount(); ++i)
+			{
+				null_members.push_back(GetNullValue(struct_type->GetMemberType(i)));
+			}
+			return new ConstantStruct(struct_type, null_members);
+		}
 		case IRTypeKind::Array:
 		{
 			IRArrayType* array_type = cast<IRArrayType>(Ty);
