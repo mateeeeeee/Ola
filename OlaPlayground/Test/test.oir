@@ -6,7 +6,7 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @Stack.int.$Stack void(ptr %this) {
+define external @Queue.int.$Queue void(ptr %this) {
 entry:
 %0 = ptr add ptr %this, 0
 store null, ptr %0
@@ -14,13 +14,15 @@ store null, ptr %0
 store 0, ptr %1
 %2 = ptr add ptr %this, 16
 store 0, ptr %2
+%3 = ptr add ptr %this, 24
+store 0, ptr %3
 br label exit
 exit:
 ret 
 }
 
 
-define external @Stack.int.$Size i64(ptr %this) {
+define external @Queue.int.$Size i64(ptr %this) {
 entry:
 %0 = alloca i64
 %1 = ptr add ptr %this, 8
@@ -35,7 +37,7 @@ ret i64 %3
 }
 
 
-define external @Stack.int.$Empty i8(ptr %this) {
+define external @Queue.int.$Empty i8(ptr %this) {
 entry:
 %0 = alloca i8
 %1 = ptr add ptr %this, 8
@@ -51,27 +53,52 @@ ret i8 %4
 }
 
 
-define external @Stack.int.$Top i64(ptr %this) {
+define external @Queue.int.$Front i64(ptr %this) {
 entry:
 %0 = alloca i64
 %1 = ptr add ptr %this, 0
-%2 = ptr add ptr %this, 8
+%2 = ptr add ptr %this, 24
 %3 = load i64, ptr %2
-%4 = sub i64 %3, 1
-%5 = load ptr, ptr %1
-%6 = gep ptr %5, %4
-%7 = load i64, ptr %6
-store i64 %7, ptr %0
+%4 = load ptr, ptr %1
+%5 = gep ptr %4, %3
+%6 = load i64, ptr %5
+store i64 %6, ptr %0
 br label exit
 return:
 br label exit
 exit:
-%8 = load i64, ptr %0
-ret i64 %8
+%7 = load i64, ptr %0
+ret i64 %7
 }
 
 
-define external @Stack.int.$Push__I void(ptr %this,i64 %value) {
+define external @Queue.int.$Back i64(ptr %this) {
+entry:
+%0 = alloca i64
+%1 = ptr add ptr %this, 0
+%2 = ptr add ptr %this, 24
+%3 = ptr add ptr %this, 8
+%4 = load i64, ptr %2
+%5 = load i64, ptr %3
+%6 = add i64 %4, %5
+%7 = sub i64 %6, 1
+%8 = ptr add ptr %this, 16
+%9 = load i64, ptr %8
+%10 = srem i64 %7, %9
+%11 = load ptr, ptr %1
+%12 = gep ptr %11, %10
+%13 = load i64, ptr %12
+store i64 %13, ptr %0
+br label exit
+return:
+br label exit
+exit:
+%14 = load i64, ptr %0
+ret i64 %14
+}
+
+
+define external @Queue.int.$Push__I void(ptr %this,i64 %value) {
 entry:
 %0 = alloca i64
 store i64 %value, ptr %0
@@ -79,99 +106,103 @@ store i64 %value, ptr %0
 %2 = ptr add ptr %this, 16
 %3 = load i64, ptr %1
 %4 = load i64, ptr %2
-%5 = icmp slt i64 %3, %4
+%5 = icmp eq i64 %3, %4
 br i8 %5, label if.then, label if.end
 if.then:
-%6 = ptr add ptr %this, 0
-%7 = ptr add ptr %this, 8
-%8 = load i64, ptr %7
-%9 = load ptr, ptr %6
-%10 = gep ptr %9, %8
-%11 = load i64, ptr %0
-store i64 %11, ptr %10
-%12 = ptr add ptr %this, 8
-%13 = ptr add ptr %this, 8
+%6 = ptr add ptr %this, 16
+%7 = load i64, ptr %6
+%8 = icmp sgt i64 %7, 0
+%9 = ptr add ptr %this, 16
+%10 = load i64, ptr %9
+%11 = smul i64 %10, 2
+%12 = select i8 %8, i64 %11, 4
+%13 = alloca i64
+store i64 %12, ptr %13
 %14 = load i64, ptr %13
-%15 = add i64 %14, 1
-store i64 %15, ptr %12
-br label exit
-return:
-br label if.end
+%15 = smul i64 %14, 8
+%16 = call i64 %15, @__ola_new
+%17 = bitcast ptr %16
+%18 = alloca ptr
+store ptr %17, ptr %18
+%19 = alloca i64
+store 0, ptr %19
+br label for.cond
 if.else:
 br label exit
 if.end:
-%16 = ptr add ptr %this, 16
-%17 = load i64, ptr %16
-%18 = icmp sgt i64 %17, 0
-%19 = ptr add ptr %this, 16
-%20 = load i64, ptr %19
-%21 = smul i64 %20, 2
-%22 = select i8 %18, i64 %21, 4
-%23 = alloca i64
-store i64 %22, ptr %23
-%24 = load i64, ptr %23
-%25 = smul i64 %24, 8
-%26 = call i64 %25, @__ola_new
-%27 = bitcast ptr %26
-%28 = alloca ptr
-store ptr %27, ptr %28
-%29 = alloca i64
-store 0, ptr %29
-br label for.cond
-for.body:
-%30 = load i64, ptr %29
-%31 = load ptr, ptr %28
+%20 = ptr add ptr %this, 24
+%21 = ptr add ptr %this, 8
+%22 = load i64, ptr %20
+%23 = load i64, ptr %21
+%24 = add i64 %22, %23
+%25 = ptr add ptr %this, 16
+%26 = load i64, ptr %25
+%27 = srem i64 %24, %26
+%28 = alloca i64
+store i64 %27, ptr %28
+%29 = ptr add ptr %this, 0
+%30 = load i64, ptr %28
+%31 = load ptr, ptr %29
 %32 = gep ptr %31, %30
-%33 = ptr add ptr %this, 0
-%34 = load i64, ptr %29
-%35 = load ptr, ptr %33
-%36 = gep ptr %35, %34
-%37 = load i64, ptr %36
-store i64 %37, ptr %32
+%33 = load i64, ptr %0
+store i64 %33, ptr %32
+%34 = ptr add ptr %this, 8
+%35 = ptr add ptr %this, 8
+%36 = load i64, ptr %35
+%37 = add i64 %36, 1
+store i64 %37, ptr %34
+br label exit
+for.body:
+%38 = load i64, ptr %19
+%39 = load ptr, ptr %18
+%40 = gep ptr %39, %38
+%41 = ptr add ptr %this, 0
+%42 = ptr add ptr %this, 24
+%43 = load i64, ptr %42
+%44 = load i64, ptr %19
+%45 = add i64 %43, %44
+%46 = ptr add ptr %this, 16
+%47 = load i64, ptr %46
+%48 = srem i64 %45, %47
+%49 = load ptr, ptr %41
+%50 = gep ptr %49, %48
+%51 = load i64, ptr %50
+store i64 %51, ptr %40
 br label for.iter
 for.cond:
-%38 = ptr add ptr %this, 8
-%39 = load i64, ptr %29
-%40 = load i64, ptr %38
-%41 = icmp slt i64 %39, %40
-br i8 %41, label for.body, label for.end
+%52 = ptr add ptr %this, 8
+%53 = load i64, ptr %19
+%54 = load i64, ptr %52
+%55 = icmp slt i64 %53, %54
+br i8 %55, label for.body, label for.end
 for.iter:
-%42 = load i64, ptr %29
-%43 = add i64 %42, 1
-store i64 %43, ptr %29
+%56 = load i64, ptr %19
+%57 = add i64 %56, 1
+store i64 %57, ptr %19
 br label for.cond
 for.end:
-%44 = ptr add ptr %this, 8
-%45 = load i64, ptr %44
-%46 = load ptr, ptr %28
-%47 = gep ptr %46, %45
-%48 = load i64, ptr %0
-store i64 %48, ptr %47
-%49 = ptr add ptr %this, 0
-%50 = load ptr, ptr %49
-%51 = icmp ne ptr %50, null
-br i8 %51, label if.then1, label if.end1
+%58 = ptr add ptr %this, 0
+%59 = load ptr, ptr %58
+%60 = icmp ne ptr %59, null
+br i8 %60, label if.then1, label if.end1
 if.then1:
-%52 = ptr add ptr %this, 0
-%53 = load ptr, ptr %52
-%54 = bitcast ptr %53
-call ptr %54, @__ola_delete
+%61 = ptr add ptr %this, 0
+%62 = load ptr, ptr %61
+%63 = bitcast ptr %62
+call ptr %63, @__ola_delete
 br label if.end1
 if.else1:
 br label exit
 if.end1:
-%55 = ptr add ptr %this, 0
-%56 = load ptr, ptr %28
-store ptr %56, ptr %55
-%57 = ptr add ptr %this, 16
-%58 = load i64, ptr %23
-store i64 %58, ptr %57
-%59 = ptr add ptr %this, 8
-%60 = ptr add ptr %this, 8
-%61 = load i64, ptr %60
-%62 = add i64 %61, 1
-store i64 %62, ptr %59
-br label exit
+%64 = ptr add ptr %this, 0
+%65 = load ptr, ptr %18
+store ptr %65, ptr %64
+%66 = ptr add ptr %this, 16
+%67 = load i64, ptr %13
+store i64 %67, ptr %66
+%68 = ptr add ptr %this, 24
+store 0, ptr %68
+br label if.end
 exit:
 ret 
 }
@@ -183,52 +214,67 @@ declare @__ola_new ptr(i64)
 declare @__ola_delete void(ptr)
 
 
-define external @Stack.int.$Pop void(ptr %this) {
+define external @Queue.int.$Pop void(ptr %this) {
 entry:
-%0 = ptr add ptr %this, 8
-%1 = ptr add ptr %this, 8
+%0 = ptr add ptr %this, 24
+%1 = ptr add ptr %this, 24
 %2 = load i64, ptr %1
-%3 = sub i64 %2, 1
-store i64 %3, ptr %0
+%3 = add i64 %2, 1
+%4 = ptr add ptr %this, 16
+%5 = load i64, ptr %4
+%6 = srem i64 %3, %5
+store i64 %6, ptr %0
+%7 = ptr add ptr %this, 8
+%8 = ptr add ptr %this, 8
+%9 = load i64, ptr %8
+%10 = sub i64 %9, 1
+store i64 %10, ptr %7
 br label exit
 exit:
 ret 
 }
 
 
-define external @Stack.int.$Clear void(ptr %this) {
+define external @Queue.int.$Clear void(ptr %this) {
 entry:
 %0 = ptr add ptr %this, 8
 store 0, ptr %0
+%1 = ptr add ptr %this, 24
+store 0, ptr %1
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestPushTop void() {
+define internal @TestPushFront void() {
 entry:
-%0 = alloca %Stack.int.
+%0 = alloca %Queue.int.
 %1 = ptr add ptr %0, 0
 store null, ptr %1
 %2 = ptr add ptr %0, 8
 store 0, ptr %2
 %3 = ptr add ptr %0, 16
 store 0, ptr %3
-call ptr %0, @Stack.int.$Stack
-%4 = call ptr %0, @Stack.int.$Empty
-%5 = icmp eq i8 %4, 1
-call i8 %5, @Assert
-call ptr %0, 10, @Stack.int.$Push__I
-call ptr %0, 20, @Stack.int.$Push__I
-call ptr %0, 30, @Stack.int.$Push__I
-%6 = call ptr %0, @Stack.int.$Size
-%7 = icmp eq i64 %6, 3
-call i8 %7, @Assert
-%8 = call ptr %0, @Stack.int.$Top
-%9 = icmp eq i64 %8, 30
-call i8 %9, @Assert
-call ptr %0, @Stack.int.$Clear
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+call ptr %0, @Queue.int.$Queue
+%5 = call ptr %0, @Queue.int.$Empty
+%6 = icmp eq i8 %5, 1
+call i8 %6, @Assert
+call ptr %0, 10, @Queue.int.$Push__I
+call ptr %0, 20, @Queue.int.$Push__I
+call ptr %0, 30, @Queue.int.$Push__I
+%7 = call ptr %0, @Queue.int.$Size
+%8 = icmp eq i64 %7, 3
+call i8 %8, @Assert
+%9 = call ptr %0, @Queue.int.$Front
+%10 = icmp eq i64 %9, 10
+call i8 %10, @Assert
+%11 = call ptr %0, @Queue.int.$Back
+%12 = icmp eq i64 %11, 30
+call i8 %12, @Assert
+call ptr %0, @Queue.int.$Clear
 br label exit
 exit:
 ret 
@@ -237,66 +283,106 @@ ret
 
 define internal @TestPop void() {
 entry:
-%0 = alloca %Stack.int.
+%0 = alloca %Queue.int.
 %1 = ptr add ptr %0, 0
 store null, ptr %1
 %2 = ptr add ptr %0, 8
 store 0, ptr %2
 %3 = ptr add ptr %0, 16
 store 0, ptr %3
-call ptr %0, @Stack.int.$Stack
-call ptr %0, 1, @Stack.int.$Push__I
-call ptr %0, 2, @Stack.int.$Push__I
-call ptr %0, 3, @Stack.int.$Push__I
-call ptr %0, @Stack.int.$Pop
-%4 = call ptr %0, @Stack.int.$Size
-%5 = icmp eq i64 %4, 2
-call i8 %5, @Assert
-%6 = call ptr %0, @Stack.int.$Top
-%7 = icmp eq i64 %6, 2
-call i8 %7, @Assert
-call ptr %0, @Stack.int.$Pop
-%8 = call ptr %0, @Stack.int.$Top
-%9 = icmp eq i64 %8, 1
-call i8 %9, @Assert
-call ptr %0, @Stack.int.$Pop
-%10 = call ptr %0, @Stack.int.$Empty
-%11 = icmp eq i8 %10, 1
-call i8 %11, @Assert
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+call ptr %0, @Queue.int.$Queue
+call ptr %0, 1, @Queue.int.$Push__I
+call ptr %0, 2, @Queue.int.$Push__I
+call ptr %0, 3, @Queue.int.$Push__I
+call ptr %0, @Queue.int.$Pop
+%5 = call ptr %0, @Queue.int.$Size
+%6 = icmp eq i64 %5, 2
+call i8 %6, @Assert
+%7 = call ptr %0, @Queue.int.$Front
+%8 = icmp eq i64 %7, 2
+call i8 %8, @Assert
+call ptr %0, @Queue.int.$Pop
+%9 = call ptr %0, @Queue.int.$Front
+%10 = icmp eq i64 %9, 3
+call i8 %10, @Assert
+call ptr %0, @Queue.int.$Pop
+%11 = call ptr %0, @Queue.int.$Empty
+%12 = icmp eq i8 %11, 1
+call i8 %12, @Assert
 br label exit
 exit:
 ret 
 }
 
 
-define internal @TestLIFO void() {
+define internal @TestFIFO void() {
 entry:
-%0 = alloca %Stack.int.
+%0 = alloca %Queue.int.
 %1 = ptr add ptr %0, 0
 store null, ptr %1
 %2 = ptr add ptr %0, 8
 store 0, ptr %2
 %3 = ptr add ptr %0, 16
 store 0, ptr %3
-call ptr %0, @Stack.int.$Stack
-call ptr %0, 100, @Stack.int.$Push__I
-call ptr %0, 200, @Stack.int.$Push__I
-call ptr %0, 300, @Stack.int.$Push__I
-%4 = call ptr %0, @Stack.int.$Top
-%5 = icmp eq i64 %4, 300
-call i8 %5, @Assert
-call ptr %0, @Stack.int.$Pop
-%6 = call ptr %0, @Stack.int.$Top
-%7 = icmp eq i64 %6, 200
-call i8 %7, @Assert
-call ptr %0, @Stack.int.$Pop
-%8 = call ptr %0, @Stack.int.$Top
-%9 = icmp eq i64 %8, 100
-call i8 %9, @Assert
-call ptr %0, @Stack.int.$Pop
-%10 = call ptr %0, @Stack.int.$Empty
-%11 = icmp eq i8 %10, 1
-call i8 %11, @Assert
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+call ptr %0, @Queue.int.$Queue
+call ptr %0, 100, @Queue.int.$Push__I
+call ptr %0, 200, @Queue.int.$Push__I
+call ptr %0, 300, @Queue.int.$Push__I
+%5 = call ptr %0, @Queue.int.$Front
+%6 = icmp eq i64 %5, 100
+call i8 %6, @Assert
+call ptr %0, @Queue.int.$Pop
+%7 = call ptr %0, @Queue.int.$Front
+%8 = icmp eq i64 %7, 200
+call i8 %8, @Assert
+call ptr %0, @Queue.int.$Pop
+%9 = call ptr %0, @Queue.int.$Front
+%10 = icmp eq i64 %9, 300
+call i8 %10, @Assert
+call ptr %0, @Queue.int.$Pop
+%11 = call ptr %0, @Queue.int.$Empty
+%12 = icmp eq i8 %11, 1
+call i8 %12, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestWrapAround void() {
+entry:
+%0 = alloca %Queue.int.
+%1 = ptr add ptr %0, 0
+store null, ptr %1
+%2 = ptr add ptr %0, 8
+store 0, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+call ptr %0, @Queue.int.$Queue
+call ptr %0, 1, @Queue.int.$Push__I
+call ptr %0, 2, @Queue.int.$Push__I
+call ptr %0, 3, @Queue.int.$Push__I
+call ptr %0, 4, @Queue.int.$Push__I
+call ptr %0, @Queue.int.$Pop
+call ptr %0, @Queue.int.$Pop
+call ptr %0, 5, @Queue.int.$Push__I
+call ptr %0, 6, @Queue.int.$Push__I
+%5 = call ptr %0, @Queue.int.$Size
+%6 = icmp eq i64 %5, 4
+call i8 %6, @Assert
+%7 = call ptr %0, @Queue.int.$Front
+%8 = icmp eq i64 %7, 3
+call i8 %8, @Assert
+%9 = call ptr %0, @Queue.int.$Back
+%10 = icmp eq i64 %9, 6
+call i8 %10, @Assert
+call ptr %0, @Queue.int.$Clear
 br label exit
 exit:
 ret 
@@ -306,9 +392,10 @@ ret
 define external @main i64() {
 entry:
 %0 = alloca i64
-call ptr @TestPushTop
+call ptr @TestPushFront
 call ptr @TestPop
-call ptr @TestLIFO
+call ptr @TestFIFO
+call ptr @TestWrapAround
 store 0, ptr %0
 br label exit
 return:

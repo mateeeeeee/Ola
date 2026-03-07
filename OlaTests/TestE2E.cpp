@@ -57,3 +57,4 @@ TEST(Containers, Optional)     { EXPECT_EQ(RUN_TEST(-i test_optional),      0); 
 TEST(Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),          0); }
 TEST(Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); }
 TEST(Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack),         0); }
+TEST(Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
