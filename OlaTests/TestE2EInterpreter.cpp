@@ -56,3 +56,4 @@ TEST(Interpreter_Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),  
 TEST(Interpreter_Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); }
 TEST(Interpreter_Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack),         0); }
 TEST(Interpreter_Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
+TEST(Interpreter_Containers, Map)          { EXPECT_EQ(RUN_TEST(-i test_map),           0); }

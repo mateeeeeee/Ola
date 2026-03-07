@@ -57,3 +57,4 @@ TEST(LLVM_Containers, List)         { EXPECT_EQ(RUN_TEST(-i test_list),         
 TEST(LLVM_Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); }
 TEST(LLVM_Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack),         0); }
 TEST(LLVM_Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
+TEST(LLVM_Containers, Map)          { EXPECT_EQ(RUN_TEST(-i test_map),           0); }
