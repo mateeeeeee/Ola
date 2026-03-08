@@ -575,7 +575,10 @@ namespace ola
 							ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
 							std::vector<Value*> indices = { zero, index };
 							Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
-							Store(value_map[base_field.get()], field_ptr);
+							if (!isa<ClassType>(base_field->GetType())) 
+							{
+								Store(value_map[base_field.get()], field_ptr);
+							}
 						}
 						curr_class_decl = base_class_decl;
 					}
@@ -585,7 +588,10 @@ namespace ola
 						ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
 						std::vector<Value*> indices = { zero, index };
 						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(struct_alloc, indices);
-						Store(value_map[field.get()], field_ptr);
+						if (!isa<ClassType>(field->GetType())) 
+						{
+							Store(value_map[field.get()], field_ptr);
+						}
 					}
 
 					Expr const* init_expr = var_decl.GetInitExpr();
@@ -1709,11 +1715,42 @@ namespace ola
 		Function* called_ctor = module.GetFunctionByName(name);
 		OLA_ASSERT(called_ctor);
 
+		IRType* class_ir_type = ConvertClassDecl(class_decl);
+		Value* temp_alloc = builder->MakeInst<AllocaInst>(class_ir_type);
+
+		Bool const is_polymorphic = class_decl->IsPolymorphic();
+		ConstantInt* zero = context.GetInt64(0);
+		if (is_polymorphic)
+		{
+			ConstantInt* index = context.GetInt64(0);
+			std::vector<Value*> indices = { zero, index };
+			Value* field_ptr = builder->MakeInst<GetElementPtrInst>(temp_alloc, indices);
+			Store(vtable_map[class_decl], field_ptr);
+		}
+		ClassDecl const* curr_class_decl = class_decl;
+		while (ClassDecl const* base_class_decl = curr_class_decl->GetBaseClass())
+		{
+			for (auto const& base_field : base_class_decl->GetFields())
+			{
+				ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
+				std::vector<Value*> indices = { zero, index };
+				Value* field_ptr = builder->MakeInst<GetElementPtrInst>(temp_alloc, indices);
+				Store(value_map[base_field.get()], field_ptr);
+			}
+			curr_class_decl = base_class_decl;
+		}
+		for (auto const& field : class_decl->GetFields())
+		{
+			ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
+			std::vector<Value*> indices = { zero, index };
+			Value* field_ptr = builder->MakeInst<GetElementPtrInst>(temp_alloc, indices);
+			Store(value_map[field.get()], field_ptr);
+		}
+
 		std::vector<Value*> args;
 		Uint32 arg_index = 0;
-		args.push_back(this_value);
+		args.push_back(temp_alloc);
 		++arg_index;
-
 		for (auto const& arg_expr : ctor_expr.GetArgs())
 		{
 			arg_expr->Accept(*this);
@@ -1725,6 +1762,7 @@ namespace ola
 			++arg_index;
 		}
 		builder->MakeInst<CallInst>(called_ctor, args);
+		value_map[&ctor_expr] = temp_alloc;
 	}
 
 	void IRVisitor::Visit(NullLiteral const& null_expr, Uint32)
@@ -1787,7 +1825,7 @@ namespace ola
 						ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
 						std::vector<Value*> indices = { zero, index };
 						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, indices);
-						Store(value_map[base_field.get()], field_ptr);
+						if (!isa<ClassType>(base_field->GetType())) Store(value_map[base_field.get()], field_ptr);
 					}
 					curr_class_decl = base_class_decl;
 				}
@@ -1797,7 +1835,10 @@ namespace ola
 					ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
 					std::vector<Value*> indices = { zero, index };
 					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(typed_ptr, indices);
-					Store(value_map[field.get()], field_ptr);
+					if (!isa<ClassType>(field->GetType())) 
+					{
+						Store(value_map[field.get()], field_ptr);
+					}
 				}
 
 				if (new_expr.HasConstructor())
@@ -1886,7 +1927,10 @@ namespace ola
 						ConstantInt* index = context.GetInt64(is_polymorphic + base_field->GetFieldIndex());
 						std::vector<Value*> indices = { zero, index };
 						Value* field_ptr = builder->MakeInst<GetElementPtrInst>(elem_ptr, indices);
-						Store(value_map[base_field.get()], field_ptr);
+						if (!isa<ClassType>(base_field->GetType())) 
+						{
+							Store(value_map[base_field.get()], field_ptr);
+						}
 					}
 					curr_class_decl = base_class_decl;
 				}
@@ -1896,7 +1940,10 @@ namespace ola
 					ConstantInt* index = context.GetInt64(is_polymorphic + field->GetFieldIndex());
 					std::vector<Value*> indices = { zero, index };
 					Value* field_ptr = builder->MakeInst<GetElementPtrInst>(elem_ptr, indices);
-					Store(value_map[field.get()], field_ptr);
+					if (!isa<ClassType>(field->GetType())) 
+					{
+						Store(value_map[field.get()], field_ptr);
+					}
 				}
 
 				if (called_ctor)
@@ -2319,6 +2366,10 @@ namespace ola
 		else if (GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(value))
 		{
 			load = Load(GEPI->GetResultElementType(), GEPI);
+		}
+		else if (PtrAddInst* PA = dyn_cast<PtrAddInst>(value))
+		{
+			load = Load(PA->GetResultElementType(), PA);
 		}
 		else
 		{

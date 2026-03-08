@@ -1249,6 +1249,16 @@ namespace ola
 					return MakeUnique<IdentifierExpr>(name, loc);
 				}
 			}
+
+			if (TagDecl* tag_decl = sema_ctx.tag_sym_table.LookUp(name))
+			{
+				if (isa<ClassDecl>(tag_decl))
+				{
+					UniqueIdentifierExprPtr ctor_expr = MakeUnique<IdentifierExpr>(name, loc);
+					ctor_expr->SetType(ClassType::Get(ctx, cast<ClassDecl>(tag_decl)));
+					return ctor_expr;
+				}
+			}
 		}
 		else
 		{

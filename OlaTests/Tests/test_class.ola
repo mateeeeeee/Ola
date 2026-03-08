@@ -35,6 +35,32 @@ void StructByRef(ref S s)
 	Assert(s.GetY() == 1000);
 }
 
+class Inner
+{
+	Inner(int v)
+	{
+		value = v;
+	}
+
+	public int Get() const { return value; }
+	public void Set(int v) { value = v; }
+
+	int value;
+};
+
+class Outer
+{
+	Inner inner;
+
+	Outer(int v)
+	{
+		inner = Inner(v);
+	}
+
+	public int GetInner() const { return inner.Get(); }
+	public void SetInner(int v) { inner.Set(v); }
+};
+
 public int main()
 {
 	S s; s.Init(10, 10);
@@ -61,5 +87,12 @@ public int main()
 	s3.SetX(0);
 	Assert(s.GetX() == 0);
 
+	// Class-by-value field tests
+	Outer o(10);
+	Assert(o.GetInner() == 10);
+	o.SetInner(42);
+	Assert(o.GetInner() == 42);
+
 	return 0;
 }
+

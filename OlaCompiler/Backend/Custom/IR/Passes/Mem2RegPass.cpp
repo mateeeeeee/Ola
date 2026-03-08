@@ -53,11 +53,15 @@ namespace ola
 							}
 						}
 					}
-					else if (const GetElementPtrInst* GEPI = dyn_cast<GetElementPtrInst>(U->GetUser()))
+					else if (isa<GetElementPtrInst>(U->GetUser()))
 					{
 						return false;
 					}
-					else if (CallInst* CI = dyn_cast<CallInst>(U->GetUser()))
+					else if (isa<PtrAddInst>(U->GetUser()))
+					{
+						return false;
+					}
+					else if (isa<CallInst>(U->GetUser()))
 					{
 						return false;
 					}

@@ -837,7 +837,7 @@ namespace ola
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
-							if (current_token->Is(TokenKind::identifier))
+							if (current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
 							{
 								if (mode == MethodParseMode::Declarations)
 								{
@@ -1013,7 +1013,7 @@ namespace ola
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
-							if (current_token->Is(TokenKind::identifier))
+							if (current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::left_round))
 							{
 								if (mode == MethodParseMode::Declarations)
 								{
@@ -1643,7 +1643,7 @@ namespace ola
 		{
 			switch (current_token->GetKind())
 			{
-			case TokenKind::left_round: 
+			case TokenKind::left_round:
 			{
 				++current_token;
 				UniqueExprPtrList args;
@@ -1660,7 +1660,14 @@ namespace ola
 						Expect(TokenKind::comma);
 					}
 				}
-				expr = sema->ActOnCallExpr(loc, std::move(expr), std::move(args));
+				if (expr && isa<IdentifierExpr>(expr.get()) && isa<ClassType>(expr->GetType()))
+				{
+					expr = sema->ActOnConstructorExpr(loc, expr->GetType(), std::move(args));
+				}
+				else
+				{
+					expr = sema->ActOnCallExpr(loc, std::move(expr), std::move(args));
+				}
 			}
 			break;
 			case TokenKind::plus_plus:

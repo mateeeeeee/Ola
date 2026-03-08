@@ -401,3 +401,40 @@ TEST(Sema, TemplateClassMethodForwardReference_Ok)
 		"void foo() { Box<int> b; b.Double(3); }"
 	);
 }
+
+
+TEST(Sema, ClassByValueField_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Inner { public int x; };"
+		"class Outer { Inner inner; };"
+	);
+}
+
+TEST(Sema, ClassConstructorExprAsRValue_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Vec { Vec(int x) { this.x = x; } public int x; };"
+		"class Wrapper {"
+		"  Vec v;"
+		"  Wrapper(int n) { v = Vec(n); }"
+		"};"
+	);
+}
+
+TEST(Sema, MethodReturningClassByValue_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Point { Point(int x) { this.x = x; } public int x; };"
+		"class Factory {"
+		"  public Point Make(int n) { return Point(n); }"
+		"};"
+	);
+}
+
+TEST(Sema, UndeclaredClassField_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Outer { Undeclared inner; };"
+	);
+}

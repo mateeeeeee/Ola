@@ -6,139 +6,362 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @MathHelper.int.$Double__I i64(ptr %this,i64 %x) {
+define external @Base$GetX i64(ptr %this) {
 entry:
-%0 = alloca i64
-store i64 %x, ptr %0
-%1 = alloca i64
-%2 = load i64, ptr %0
-%3 = call ptr %this, %2, 2, @MathHelper.int.$Multiply__I__I
-store i64 %3, ptr %1
-br label exit
-return:
+%0 = ptr add ptr %this, 0
+%1 = load i64, ptr %0
 br label exit
 exit:
-%4 = load i64, ptr %1
-ret i64 %4
+ret i64 %1
 }
 
 
-define external @MathHelper.int.$Triple__I i64(ptr %this,i64 %x) {
+define external @Base$GetSum i64(ptr %this) {
 entry:
-%0 = alloca i64
-store i64 %x, ptr %0
-%1 = alloca i64
-%2 = load i64, ptr %0
-%3 = call ptr %this, %2, 3, @MathHelper.int.$Multiply__I__I
-store i64 %3, ptr %1
-br label exit
-return:
+br label entry.inlined
+entry.inlined:
+%0 = ptr add ptr %this, 0
+%1 = load i64, ptr %0
 br label exit
 exit:
-%4 = load i64, ptr %1
-ret i64 %4
+ret i64 %1
 }
 
 
-define external @MathHelper.int.$Multiply__I__I i64(ptr %this,i64 %a,i64 %b) {
+define external @Derived$GetY i64(ptr %this) {
 entry:
-%0 = alloca i64
-store i64 %a, ptr %0
-%1 = alloca i64
-store i64 %b, ptr %1
-%2 = alloca i64
-%3 = load i64, ptr %0
-%4 = load i64, ptr %1
-%5 = smul i64 %3, %4
-store i64 %5, ptr %2
-br label exit
-return:
+%0 = ptr add ptr %this, 8
+%1 = load i64, ptr %0
 br label exit
 exit:
-%6 = load i64, ptr %2
-ret i64 %6
+ret i64 %1
 }
 
 
-define external @MathHelper.float.$Double__F f64(ptr %this,f64 %x) {
+define external @Derived$GetSum i64(ptr %this) {
 entry:
-%0 = alloca f64
-store f64 %x, ptr %0
-%1 = alloca f64
-%2 = load f64, ptr %0
-%3 = s2f i64 2
-%4 = call ptr %this, %2, %3, @MathHelper.float.$Multiply__F__F
-store f64 %4, ptr %1
+br label entry.inlined
+entry.split.split:
+%0 = add i64 %1, %2
 br label exit
-return:
-br label exit
+entry.inlined.inlined:
+%3 = ptr add ptr %this, 0
+%2 = load i64, ptr %3
+br label entry.split.split
+entry.inlined:
+%4 = ptr add ptr %this, 8
+%1 = load i64, ptr %4
+br label entry.inlined.inlined
 exit:
-%5 = load f64, ptr %1
-ret f64 %5
+ret i64 %0
 }
 
 
-define external @MathHelper.float.$Triple__F f64(ptr %this,f64 %x) {
+define external @ExtendedDerived$GetZ i64(ptr %this) {
 entry:
-%0 = alloca f64
-store f64 %x, ptr %0
-%1 = alloca f64
-%2 = load f64, ptr %0
-%3 = s2f i64 3
-%4 = call ptr %this, %2, %3, @MathHelper.float.$Multiply__F__F
-store f64 %4, ptr %1
-br label exit
-return:
+%0 = ptr add ptr %this, 16
+%1 = load i64, ptr %0
 br label exit
 exit:
-%5 = load f64, ptr %1
-ret f64 %5
+ret i64 %1
 }
 
 
-define external @MathHelper.float.$Multiply__F__F f64(ptr %this,f64 %a,f64 %b) {
+define external @ExtendedDerived$GetSum i64(ptr %this) {
 entry:
-%0 = alloca f64
-store f64 %a, ptr %0
-%1 = alloca f64
-store f64 %b, ptr %1
-%2 = alloca f64
-%3 = load f64, ptr %0
-%4 = load f64, ptr %1
-%5 = fmul f64 %3, %4
-store f64 %5, ptr %2
+br label entry.inlined
+entry.split:
+%0 = call ptr %this, @Derived$GetSum
+%1 = add i64 %2, %0
 br label exit
-return:
-br label exit
+entry.inlined:
+%3 = ptr add ptr %this, 16
+%2 = load i64, ptr %3
+br label entry.split
 exit:
-%6 = load f64, ptr %2
-ret f64 %6
+ret i64 %1
+}
+
+
+define internal @PassBase__Base void(%Base %b) {
+entry:
+%0 = alloca %Base
+store %Base %b, ptr %0
+br label entry.inlined
+entry.split:
+%1 = icmp eq i64 %2, 1
+call i8 %1, @Assert
+br label entry.inlined.inlined
+entry.split.split:
+%3 = icmp eq i64 %4, 1
+call i8 %3, @Assert
+br label exit
+entry.inlined.inlined:
+%4 = load i64, ptr %5
+br label entry.split.split
+entry.inlined:
+%5 = ptr add ptr %0, 0
+%2 = load i64, ptr %5
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @PassBaseRef__Baseref void(ptr %b) {
+entry:
+br label entry.inlined
+entry.split:
+%0 = icmp eq i64 %1, 1
+call i8 %0, @Assert
+br label entry.inlined.inlined
+entry.split.split:
+%2 = icmp eq i64 %3, 1
+call i8 %2, @Assert
+br label exit
+entry.inlined.inlined:
+%3 = load i64, ptr %4
+br label entry.split.split
+entry.inlined:
+%4 = ptr add ptr %b, 0
+%1 = load i64, ptr %4
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @PassDerivedRef__Derivedref void(ptr %d) {
+entry:
+br label entry.inlined
+entry.split:
+%0 = icmp eq i64 %1, 1
+call i8 %0, @Assert
+br label entry.inlined1
+entry.split.split:
+%2 = icmp eq i64 %3, 2
+call i8 %2, @Assert
+%4 = call ptr %d, @Derived$GetSum
+%5 = icmp eq i64 %4, 3
+call i8 %5, @Assert
+br label exit
+entry.inlined1:
+%6 = ptr add ptr %d, 8
+%3 = load i64, ptr %6
+br label entry.split.split
+entry.inlined:
+%7 = ptr add ptr %d, 0
+%1 = load i64, ptr %7
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @TestAssignment void() {
+entry:
+%0 = alloca %Derived
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = alloca %Base
+%4 = ptr add ptr %3, 0
+%5 = load i64, ptr %1
+store i64 %5, ptr %4
+br label entry.inlined
+entry.split:
+%6 = icmp eq i64 %7, 1
+call i8 %6, @Assert
+br label entry.inlined.inlined
+entry.split.split:
+%8 = icmp eq i64 %9, 1
+call i8 %8, @Assert
+%10 = load %Base, ptr %3
+call %Base %10, @PassBase__Base
+call ptr %3, @PassBaseRef__Baseref
+%11 = alloca %ExtendedDerived
+%12 = ptr add ptr %11, 8
+store 2, ptr %12
+%13 = ptr add ptr %11, 0
+store 1, ptr %13
+%14 = ptr add ptr %11, 16
+store 3, ptr %14
+%15 = call ptr %11, @ExtendedDerived$GetSum
+%16 = icmp eq i64 %15, 6
+call i8 %16, @Assert
+br label entry.inlined1
+entry.split.split.split:
+%17 = icmp eq i64 %18, 3
+call i8 %17, @Assert
+%19 = alloca %Base
+%20 = ptr add ptr %19, 0
+%21 = load i64, ptr %13
+store i64 %21, ptr %20
+br label entry.inlined2
+entry.split.split.split.split:
+%22 = icmp eq i64 %23, 1
+call i8 %22, @Assert
+br label entry.inlined.inlined1
+entry.split.split.split.split.split:
+%24 = icmp eq i64 %25, 1
+call i8 %24, @Assert
+%26 = load %Base, ptr %19
+call %Base %26, @PassBase__Base
+call ptr %19, @PassBaseRef__Baseref
+%27 = alloca %Derived
+%28 = ptr add ptr %27, 0
+%29 = load i64, ptr %13
+store i64 %29, ptr %28
+%30 = ptr add ptr %27, 8
+%31 = load i64, ptr %12
+store i64 %31, ptr %30
+br label entry.inlined3
+entry.split.split.split.split.split.split:
+%32 = icmp eq i64 %33, 1
+call i8 %32, @Assert
+br label entry.inlined4
+entry.split.split.split.split.split.split.split:
+%34 = icmp eq i64 %35, 2
+call i8 %34, @Assert
+%36 = call ptr %27, @Derived$GetSum
+%37 = icmp eq i64 %36, 3
+call i8 %37, @Assert
+call ptr %27, @PassDerivedRef__Derivedref
+br label exit
+entry.inlined4:
+%35 = load i64, ptr %30
+br label entry.split.split.split.split.split.split.split
+entry.inlined3:
+%38 = ptr add ptr %27, 0
+%33 = load i64, ptr %38
+br label entry.split.split.split.split.split.split
+entry.inlined.inlined1:
+%25 = load i64, ptr %20
+br label entry.split.split.split.split.split
+entry.inlined2:
+%23 = load i64, ptr %20
+br label entry.split.split.split.split
+entry.inlined1:
+%18 = load i64, ptr %14
+br label entry.split.split.split
+entry.inlined.inlined:
+%9 = load i64, ptr %4
+br label entry.split.split
+entry.inlined:
+%7 = load i64, ptr %4
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @TestReferenceAssignment void() {
+entry:
+%0 = alloca %Derived
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = alloca ptr
+store ptr %0, ptr %3
+%4 = load ptr, ptr %3
+br label entry.inlined
+entry.split:
+%5 = icmp eq i64 %6, 1
+call i8 %5, @Assert
+br label entry.inlined.inlined
+entry.split.split:
+%7 = icmp eq i64 %8, 1
+call i8 %7, @Assert
+%9 = alloca %ExtendedDerived
+%10 = ptr add ptr %9, 8
+store 2, ptr %10
+%11 = ptr add ptr %9, 0
+store 1, ptr %11
+%12 = ptr add ptr %9, 16
+store 3, ptr %12
+%13 = alloca ptr
+store ptr %9, ptr %13
+%14 = load ptr, ptr %13
+br label entry.inlined1
+entry.split.split.split:
+%15 = icmp eq i64 %16, 1
+call i8 %15, @Assert
+br label entry.inlined.inlined1
+entry.split.split.split.split:
+%17 = icmp eq i64 %18, 1
+call i8 %17, @Assert
+%19 = alloca ptr
+store ptr %9, ptr %19
+%20 = load ptr, ptr %19
+br label entry.inlined2
+entry.split.split.split.split.split:
+%21 = icmp eq i64 %22, 1
+call i8 %21, @Assert
+br label entry.inlined3
+entry.split.split.split.split.split.split:
+%23 = icmp eq i64 %24, 2
+call i8 %23, @Assert
+%25 = call ptr %20, @Derived$GetSum
+%26 = icmp eq i64 %25, 3
+call i8 %26, @Assert
+%27 = alloca %Base
+%28 = ptr add ptr %27, 0
+%29 = ptr add ptr %20, 0
+%30 = load i64, ptr %29
+store i64 %30, ptr %28
+br label entry.inlined4
+entry.split.split.split.split.split.split.split:
+%31 = icmp eq i64 %32, 1
+call i8 %31, @Assert
+br label entry.inlined.inlined2
+entry.split.split.split.split.split.split.split.split:
+%33 = icmp eq i64 %34, 1
+call i8 %33, @Assert
+%35 = load %Base, ptr %27
+call %Base %35, @PassBase__Base
+call ptr %27, @PassBaseRef__Baseref
+br label exit
+entry.inlined.inlined2:
+%34 = load i64, ptr %28
+br label entry.split.split.split.split.split.split.split.split
+entry.inlined4:
+%32 = load i64, ptr %28
+br label entry.split.split.split.split.split.split.split
+entry.inlined3:
+%36 = ptr add ptr %20, 8
+%24 = load i64, ptr %36
+br label entry.split.split.split.split.split.split
+entry.inlined2:
+%37 = ptr add ptr %20, 0
+%22 = load i64, ptr %37
+br label entry.split.split.split.split.split
+entry.inlined.inlined1:
+%18 = load i64, ptr %38
+br label entry.split.split.split.split
+entry.inlined1:
+%38 = ptr add ptr %14, 0
+%16 = load i64, ptr %38
+br label entry.split.split.split
+entry.inlined.inlined:
+%8 = load i64, ptr %39
+br label entry.split.split
+entry.inlined:
+%39 = ptr add ptr %4, 0
+%6 = load i64, ptr %39
+br label entry.split
+exit:
+ret 
 }
 
 
 define external @main i64() {
 entry:
-%0 = alloca i64
-%1 = alloca %MathHelper.int.
-%2 = call ptr %1, 5, @MathHelper.int.$Double__I
-%3 = icmp eq i64 %2, 10
-call i8 %3, @Assert
-%4 = call ptr %1, 4, @MathHelper.int.$Triple__I
-%5 = icmp eq i64 %4, 12
-call i8 %5, @Assert
-%6 = call ptr %1, 3, 7, @MathHelper.int.$Multiply__I__I
-%7 = icmp eq i64 %6, 21
-call i8 %7, @Assert
-%8 = alloca %MathHelper.float.
-%9 = call ptr %8, 2.5, @MathHelper.float.$Double__F
-%10 = fcmp oeq f64 %9, 5
-call i8 %10, @Assert
-store 0, ptr %0
-br label exit
-return:
+call ptr @TestAssignment
+call ptr @TestReferenceAssignment
 br label exit
 exit:
-%11 = load i64, ptr %0
-ret i64 %11
+ret i64 0
 }
 

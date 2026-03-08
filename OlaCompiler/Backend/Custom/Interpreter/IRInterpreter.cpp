@@ -447,6 +447,13 @@ namespace ola
 				Uint8* ptr = memory.LoadPointer(addr);
 				return InterpreterValue::MakePointer(ptr);
 			}
+			else if (load_type->IsStruct())
+			{
+				Uint32 size = load_type->GetSize();
+				Uint8* copy = memory.StackAlloc(size, 8);
+				memory.Store(copy, addr, size);
+				return InterpreterValue::MakePointer(copy);
+			}
 			break;
 		}
 
@@ -468,6 +475,10 @@ namespace ola
 			else if (store_type->IsPointer())
 			{
 				memory.StorePointer(addr, val.AsPointer());
+			}
+			else if (store_type->IsStruct())
+			{
+				memory.Store(addr, val.AsPointer(), store_type->GetSize());
 			}
 			return InterpreterValue::MakeVoid();
 		}
