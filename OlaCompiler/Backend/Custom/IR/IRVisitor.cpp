@@ -179,6 +179,95 @@ namespace ola
 	{
 	}
 
+	void IRVisitor::DeclareMethodDeclIR(MethodDecl const& method_decl)
+	{
+		ClassDecl const* class_decl = method_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = method_decl.GetFuncType();
+		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += method_decl.GetMangledName();
+		Function* ir_function = new Function(name, ir_func_type, Linkage::External);
+		module.AddGlobal(ir_function);
+	}
+
+	void IRVisitor::DefineMethodDeclIR(MethodDecl const& method_decl)
+	{
+		ClassDecl const* class_decl = method_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = method_decl.GetFuncType();
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += method_decl.GetMangledName();
+		Function* ir_function = cast<Function>(module.GetFunctionByName(name));
+
+		Argument* param_arg = ir_function->GetArg(0);
+		Uint32 arg_index = 0;
+		if (isa<ClassType>(func_type->GetReturnType()))
+		{
+			Value* sret_value = param_arg;
+			param_arg = ir_function->GetArg(++arg_index);
+			return_value = sret_value;
+		}
+		Value* this_param = param_arg;
+		this_param->SetName("this");
+		this_struct_type = ir_class_type;
+		this_value = this_param;
+		param_arg = ir_function->GetArg(++arg_index);
+		for (auto& param : method_decl.GetParamDecls())
+		{
+			Value* ir_param = param_arg;
+			ir_param->SetName(param->GetName());
+			value_map[param.get()] = ir_param;
+			param_arg = ir_function->GetArg(++arg_index);
+		}
+		if (method_decl.HasDefinition())
+		{
+			VisitFunctionDeclCommon(method_decl, ir_function);
+		}
+		this_value = nullptr;
+		this_struct_type = nullptr;
+	}
+
+	void IRVisitor::DeclareConstructorDeclIR(ConstructorDecl const& ctor_decl)
+	{
+		ClassDecl const* class_decl = ctor_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = ctor_decl.GetFuncType();
+		IRFuncType* ir_func_type = ConvertMethodType(func_type, ir_class_type);
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += ctor_decl.GetMangledName();
+		Function* ir_function = new Function(name, ir_func_type, Linkage::External);
+		module.AddGlobal(ir_function);
+	}
+
+	void IRVisitor::DefineConstructorDeclIR(ConstructorDecl const& ctor_decl)
+	{
+		ClassDecl const* class_decl = ctor_decl.GetParentDecl();
+		IRType* ir_class_type = ConvertClassDecl(class_decl);
+		FuncType const* func_type = ctor_decl.GetFuncType();
+		std::string name(SanitizeClassName(class_decl->GetName())); name += "$"; name += ctor_decl.GetMangledName();
+		Function* ir_function = cast<Function>(module.GetFunctionByName(name));
+
+		Argument* param_arg = ir_function->GetArg(0);
+		Uint32 arg_index = 0;
+		Value* this_param = param_arg;
+		this_param->SetName("this");
+		this_struct_type = ir_class_type;
+		this_value = this_param;
+		param_arg = ir_function->GetArg(++arg_index);
+		for (auto& param : ctor_decl.GetParamDecls())
+		{
+			Value* ir_param = param_arg;
+			ir_param->SetName(param->GetName());
+			value_map[param.get()] = ir_param;
+			param_arg = ir_function->GetArg(++arg_index);
+		}
+		if (ctor_decl.HasDefinition())
+		{
+			VisitFunctionDeclCommon(ctor_decl, ir_function);
+		}
+		this_value = nullptr;
+		this_struct_type = nullptr;
+	}
+
+
 	void IRVisitor::Visit(FieldDecl const& field_decl, Uint32)
 	{
 		QualType const& var_type = field_decl.GetType();
@@ -586,7 +675,25 @@ namespace ola
 		}
 		for (auto& method : class_decl.GetMethods())
 		{
-			method->Accept(*this);
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DeclareConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DeclareMethodDeclIR(*method);
+			}
+		}
+		for (auto& method : class_decl.GetMethods())
+		{
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DefineConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DefineMethodDeclIR(*method);
+			}
 		}
 
 		if (class_decl.IsPolymorphic())

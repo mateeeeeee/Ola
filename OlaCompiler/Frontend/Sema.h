@@ -70,9 +70,11 @@ namespace ola
 
 		UniqueMethodDeclPtr ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 												UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-												DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs);
+												DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs,
+												Bool pre_registration = false);
 		UniqueConstructorDeclPtr ActOnConstructorDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 													  UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt);
+		void ActOnAttachMethodBody(MethodDecl* method, UniqueParamVarDeclPtrList&& new_params, UniqueCompoundStmtPtr&& body_stmt);
 		UniqueEnumDeclPtr ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, UniqueExprPtr&& enum_value_expr);
 		UniqueEnumMemberDeclPtr ActOnEnumMemberDecl(std::string_view name, SourceLocation const& loc, Int64 enum_value);

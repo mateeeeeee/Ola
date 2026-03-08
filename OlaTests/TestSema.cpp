@@ -357,3 +357,47 @@ TEST(Sema, NewCtorOnNonClass_Ok)
 {
 	EXPECT_SEMA_OK("void foo() { int* p = new int(42); }");
 }
+
+// A method defined earlier calling one defined later, previously would fail
+// with "undeclared identifier" during the second parse pass
+TEST(Sema, ClassMethodForwardReference_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo {"
+		"  public int Bar() { return Baz(); }"
+		"  public int Baz() { return 42; }"
+		"};"
+	);
+}
+
+TEST(Sema, ClassMethodReverseOrder_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo {"
+		"  public int Baz() { return 42; }"
+		"  public int Bar() { return Baz(); }"
+		"};"
+	);
+}
+
+TEST(Sema, ClassMethodChainedForwardReference_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo {"
+		"  public int A() { return B(); }"
+		"  public int B() { return C(); }"
+		"  public int C() { return 1; }"
+		"};"
+	);
+}
+
+TEST(Sema, TemplateClassMethodForwardReference_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Box<T> {"
+		"  public T Double(T x) { return Mul(x, 2); }"
+		"  public T Mul(T a, T b) { return a * b; }"
+		"};"
+		"void foo() { Box<int> b; b.Double(3); }"
+	);
+}

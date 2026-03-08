@@ -328,7 +328,7 @@ namespace ola
 		return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), nullptr, visibility, func_attrs, method_attrs);
 	}
 
-	UniqueMethodDeclPtr Parser::ParseMethodDefinition(Bool first_pass)
+	UniqueMethodDeclPtr Parser::ParseMethodDefinition(MethodParseMode mode, MethodDecl* existing_stub)
 	{
 		DeclVisibility visibility = DeclVisibility::Private;
 		if (Consume(TokenKind::KW_public))
@@ -375,29 +375,27 @@ namespace ola
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			ParseMethodAttributes(method_attrs);
-			if (first_pass)
+			if (mode == MethodParseMode::Declarations)
 			{
-				if (Consume(TokenKind::semicolon))
+				if (!Consume(TokenKind::semicolon))
 				{
-					return nullptr;
-				}
-
-				Int32 brace_count = 0;
-				Expect(TokenKind::left_brace); ++brace_count;
-				while (brace_count != 0)
-				{
-					if (Consume(TokenKind::left_brace))
+					Int32 brace_count = 0;
+					Expect(TokenKind::left_brace); ++brace_count;
+					while (brace_count != 0)
 					{
-						++brace_count;
+						if (Consume(TokenKind::left_brace))
+						{
+							++brace_count;
+						}
+						else if (Consume(TokenKind::right_brace))
+						{
+							--brace_count;
+						}
+						else current_token++;
 					}
-					else if (Consume(TokenKind::right_brace))
-					{
-						--brace_count;
-					}
-					else current_token++;
 				}
 			}
-			else
+			else 
 			{
 				if (!Consume(TokenKind::semicolon))
 				{
@@ -409,10 +407,21 @@ namespace ola
 				}
 			}
 		}
-		return first_pass ? nullptr : sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), std::move(function_body), visibility, func_attrs, method_attrs);
+		if (mode == MethodParseMode::Declarations)
+		{
+			return sema->ActOnMethodDecl(name, loc, function_type, std::move(param_decls), nullptr, visibility, func_attrs, method_attrs, /*pre_registration=*/true);
+		}
+		else 
+		{
+			if (existing_stub)
+			{
+				sema->ActOnAttachMethodBody(existing_stub, std::move(param_decls), std::move(function_body));
+			}
+			return nullptr;
+		}
 	}
 
-	UniqueConstructorDeclPtr Parser::ParseConstructorDefinition(Bool first_pass)
+	UniqueConstructorDeclPtr Parser::ParseConstructorDefinition(MethodParseMode mode, MethodDecl* existing_stub)
 	{
 		SourceLocation const& loc = current_token->GetLocation();
 		std::string_view name = "";
@@ -421,7 +430,7 @@ namespace ola
 		UniqueCompoundStmtPtr constructor_body;
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
-			if (current_token->IsNot(TokenKind::identifier)) 
+			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
 			}
@@ -444,29 +453,27 @@ namespace ola
 				}
 			}
 			function_type.SetType(FuncType::Get(context, VoidType::Get(context), param_types));
-			if (first_pass)
+			if (mode == MethodParseMode::Declarations)
 			{
-				if (Consume(TokenKind::semicolon))
+				if (!Consume(TokenKind::semicolon))
 				{
-					return nullptr;
-				}
-
-				Int32 brace_count = 0;
-				Expect(TokenKind::left_brace); ++brace_count;
-				while (brace_count != 0)
-				{
-					if (Consume(TokenKind::left_brace))
+					Int32 brace_count = 0;
+					Expect(TokenKind::left_brace); ++brace_count;
+					while (brace_count != 0)
 					{
-						++brace_count;
+						if (Consume(TokenKind::left_brace))
+						{
+							++brace_count;
+						}
+						else if (Consume(TokenKind::right_brace))
+						{
+							--brace_count;
+						}
+						else current_token++;
 					}
-					else if (Consume(TokenKind::right_brace)) 
-					{
-						--brace_count;
-					}
-					else current_token++;
 				}
 			}
-			else
+			else 
 			{
 				if (!Consume(TokenKind::semicolon))
 				{
@@ -478,7 +485,18 @@ namespace ola
 				}
 			}
 		}
-		return first_pass ? nullptr : sema->ActOnConstructorDecl(name, loc, function_type, std::move(param_decls), std::move(constructor_body));
+		if (mode == MethodParseMode::Declarations)
+		{
+			return sema->ActOnConstructorDecl(name, loc, function_type, std::move(param_decls), nullptr);
+		}
+		else 
+		{
+			if (existing_stub)
+			{
+				sema->ActOnAttachMethodBody(existing_stub, std::move(param_decls), std::move(constructor_body));
+			}
+			return nullptr;
+		}
 	}
 
 	UniqueParamVarDeclPtr Parser::ParseParamVariableDeclaration()
@@ -812,17 +830,28 @@ namespace ola
 			sema->sema_ctx.current_base_class = base_class;
 			sema->sema_ctx.current_class_name = class_name;
 			{
-				auto ParseClassMembers = [&](Bool first_pass)
+				std::vector<MethodDecl*> body_stubs;
+				Uint64 body_stub_idx = 0;
+				auto ParseClassMembers = [&](MethodParseMode mode)
 					{
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
 							if (current_token->Is(TokenKind::identifier))
 							{
-								UniqueConstructorDeclPtr constructor = ParseConstructorDefinition(first_pass);
-								if (!first_pass)
+								if (mode == MethodParseMode::Declarations)
 								{
-									member_functions.push_back(std::move(constructor));
+									UniqueConstructorDeclPtr stub = ParseConstructorDefinition(MethodParseMode::Declarations);
+									body_stubs.push_back(stub.get());
+									if (stub) 
+									{
+										member_functions.push_back(std::move(stub));
+									}
+								}
+								else
+								{
+									MethodDecl* stub = body_stub_idx < body_stubs.size() ? body_stubs[body_stub_idx++] : nullptr;
+									(void)ParseConstructorDefinition(MethodParseMode::Bodies, stub);
 								}
 								continue;
 							}
@@ -830,20 +859,29 @@ namespace ola
 							Bool is_function_declaration = IsFunctionDeclaration();
 							if (is_function_declaration)
 							{
-								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
-								if (!first_pass)
+								if (mode == MethodParseMode::Declarations)
 								{
-									member_functions.push_back(std::move(member_function));
+									UniqueMethodDeclPtr stub = ParseMethodDefinition(MethodParseMode::Declarations);
+									body_stubs.push_back(stub.get());
+									if (stub) 
+									{
+										member_functions.push_back(std::move(stub));
+									}
+								}
+								else
+								{
+									MethodDecl* stub = body_stub_idx < body_stubs.size() ? body_stubs[body_stub_idx++] : nullptr;
+									(void)ParseMethodDefinition(MethodParseMode::Bodies, stub);
 								}
 							}
 							else
 							{
-								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
-								if (first_pass)
+								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(mode == MethodParseMode::Declarations);
+								if (mode == MethodParseMode::Declarations)
 								{
 									for (auto& var_decl : var_decls)
 									{
-										if (var_decl) 
+										if (var_decl)
 										{
 											member_variables.push_back(std::move(var_decl));
 										}
@@ -855,9 +893,9 @@ namespace ola
 					};
 
 				TokenPtr start_token = current_token;
-				ParseClassMembers(true);
+				ParseClassMembers(MethodParseMode::Declarations);
 				current_token = start_token;
-				ParseClassMembers(false);
+				ParseClassMembers(MethodParseMode::Bodies);
 			}
 			sema->sema_ctx.current_class_name = "";
 			sema->sema_ctx.current_base_class = nullptr;
@@ -968,17 +1006,28 @@ namespace ola
 			sema->sema_ctx.current_func = nullptr;
 
 			{
-				auto ParseClassMembers = [&](Bool first_pass)
+				std::vector<MethodDecl*> body_stubs;
+				Uint64 body_stub_idx = 0;
+				auto ParseClassMembers = [&](MethodParseMode mode)
 					{
 						Expect(TokenKind::left_brace);
 						while (!Consume(TokenKind::right_brace))
 						{
 							if (current_token->Is(TokenKind::identifier))
 							{
-								UniqueConstructorDeclPtr constructor = ParseConstructorDefinition(first_pass);
-								if (!first_pass)
+								if (mode == MethodParseMode::Declarations)
 								{
-									member_functions.push_back(std::move(constructor));
+									UniqueConstructorDeclPtr stub = ParseConstructorDefinition(MethodParseMode::Declarations);
+									body_stubs.push_back(stub.get());
+									if (stub) 
+									{
+										member_functions.push_back(std::move(stub));
+									}
+								}
+								else
+								{
+									MethodDecl* stub = body_stub_idx < body_stubs.size() ? body_stubs[body_stub_idx++] : nullptr;
+									(void)ParseConstructorDefinition(MethodParseMode::Bodies, stub);
 								}
 								continue;
 							}
@@ -986,16 +1035,25 @@ namespace ola
 							Bool is_function_declaration = IsFunctionDeclaration();
 							if (is_function_declaration)
 							{
-								UniqueMethodDeclPtr member_function = ParseMethodDefinition(first_pass);
-								if (!first_pass)
+								if (mode == MethodParseMode::Declarations)
 								{
-									member_functions.push_back(std::move(member_function));
+									UniqueMethodDeclPtr stub = ParseMethodDefinition(MethodParseMode::Declarations);
+									body_stubs.push_back(stub.get());
+									if (stub) 
+									{
+										member_functions.push_back(std::move(stub));
+									}
+								}
+								else
+								{
+									MethodDecl* stub = body_stub_idx < body_stubs.size() ? body_stubs[body_stub_idx++] : nullptr;
+									(void)ParseMethodDefinition(MethodParseMode::Bodies, stub);
 								}
 							}
 							else
 							{
-								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(first_pass);
-								if (first_pass)
+								UniqueFieldDeclPtrList var_decls = ParseFieldDeclaration(mode == MethodParseMode::Declarations);
+								if (mode == MethodParseMode::Declarations)
 								{
 									for (auto& var_decl : var_decls)
 									{
@@ -1011,9 +1069,9 @@ namespace ola
 					};
 
 				TokenPtr start_token = current_token;
-				ParseClassMembers(true);
+				ParseClassMembers(MethodParseMode::Declarations);
 				current_token = start_token;
-				ParseClassMembers(false);
+				ParseClassMembers(MethodParseMode::Bodies);
 			}
 
 			sema->sema_ctx.current_class_name = saved_class_name;

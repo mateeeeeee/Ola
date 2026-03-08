@@ -137,7 +137,8 @@ namespace ola
 
 	UniqueMethodDeclPtr Sema::ActOnMethodDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
 		UniqueParamVarDeclPtrList&& param_decls, UniqueCompoundStmtPtr&& body_stmt,
-		DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs)
+		DeclVisibility visibility, FuncAttributes func_attrs, MethodAttributes method_attrs,
+		Bool pre_registration)
 	{
 		if (name == sema_ctx.current_class_name)
 		{
@@ -218,7 +219,7 @@ namespace ola
 			}
 			sema_ctx.return_stmt_encountered = false;
 		}
-		else if(!member_function_decl->IsPure())
+		else if(!pre_registration && !member_function_decl->IsPure())
 		{
 			diagnostics.Report(loc, non_pure_method_needs_definition);
 			return nullptr;
@@ -260,6 +261,42 @@ namespace ola
 
 		Bool result = sema_ctx.decl_sym_table.Insert_Overload(constructor_decl.get());
 		return constructor_decl;
+	}
+
+	void Sema::ActOnAttachMethodBody(MethodDecl* method, UniqueParamVarDeclPtrList&& new_params, UniqueCompoundStmtPtr&& body_stmt)
+	{
+		method->SetParamDecls(std::move(new_params));
+		if (body_stmt)
+		{
+			if (method->IsPure())
+			{
+				diagnostics.Report(method->GetLocation(), pure_method_cannot_have_body);
+				return;
+			}
+			method->SetBodyStmt(std::move(body_stmt));
+			for (std::string const& goto_label : sema_ctx.gotos)
+			{
+				if (!sema_ctx.labels.contains(goto_label))
+				{
+					diagnostics.Report(method->GetLocation(), undeclared_label, goto_label);
+					sema_ctx.gotos.clear();
+					sema_ctx.labels.clear();
+					return;
+				}
+			}
+			sema_ctx.gotos.clear();
+			sema_ctx.labels.clear();
+			FuncType const* func_type = method->GetFuncType();
+			if (!sema_ctx.return_stmt_encountered && !isa<VoidType>(func_type->GetReturnType()))
+			{
+				diagnostics.Report(method->GetLocation(), no_return_statement_found_in_non_void_function);
+			}
+			sema_ctx.return_stmt_encountered = false;
+		}
+		else if (!method->IsPure() && !method->IsConstructor())
+		{
+			diagnostics.Report(method->GetLocation(), non_pure_method_needs_definition);
+		}
 	}
 
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)

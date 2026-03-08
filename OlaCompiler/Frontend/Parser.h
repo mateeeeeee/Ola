@@ -17,6 +17,8 @@ namespace ola
 	enum class DeclVisibility : Uint8;
 	using ExprParseFn = UniqueExprPtr(Parser::*)();
 
+	enum class MethodParseMode : Bool { Declarations, Bodies };
+
 	class Parser
 	{
 		using TokenPtr = std::vector<Token>::iterator;
@@ -57,8 +59,8 @@ namespace ola
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDeclaration();
 		OLA_NODISCARD UniqueFunctionDeclPtr ParseFunctionDefinition(DeclVisibility visibility);
 		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDeclaration();
-		OLA_NODISCARD UniqueMethodDeclPtr ParseMethodDefinition(Bool first_pass);
-		OLA_NODISCARD UniqueConstructorDeclPtr ParseConstructorDefinition(Bool first_pass);
+		UniqueMethodDeclPtr ParseMethodDefinition(MethodParseMode mode, MethodDecl* existing_stub = nullptr);
+		UniqueConstructorDeclPtr ParseConstructorDefinition(MethodParseMode mode, MethodDecl* existing_stub = nullptr);
 		OLA_NODISCARD UniqueParamVarDeclPtr ParseParamVariableDeclaration();
 		OLA_NODISCARD UniqueVarDeclPtrList ParseVariableDeclaration(DeclVisibility visibility);
 		OLA_NODISCARD UniqueFieldDeclPtrList ParseFieldDeclaration(Bool first_pass);

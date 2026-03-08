@@ -127,6 +127,10 @@ namespace ola
 
 	private:
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, Function* func);
+		void DeclareMethodDeclIR(MethodDecl const& method_decl);
+		void DefineMethodDeclIR(MethodDecl const& method_decl);
+		void DeclareConstructorDeclIR(ConstructorDecl const& ctor_decl);
+		void DefineConstructorDeclIR(ConstructorDecl const& ctor_decl);
 		void ConditionalBranch(Value*, BasicBlock*, BasicBlock*);
 
 		IRType* ConvertToIRType(Type const*);
