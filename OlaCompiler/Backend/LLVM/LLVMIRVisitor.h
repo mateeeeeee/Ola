@@ -44,6 +44,7 @@ namespace ola
 		virtual void Visit(Decl const&, Uint32) override;
 		virtual void Visit(FunctionDecl const&, Uint32) override;
 		virtual void Visit(MethodDecl const&, Uint32) override;
+		virtual void Visit(ConstructorDecl const&, Uint32) override;
 		virtual void Visit(ParamVarDecl const&, Uint32) override;
 		virtual void Visit(FieldDecl const&, Uint32) override;
 		virtual void Visit(VarDecl const&, Uint32) override;
@@ -89,6 +90,7 @@ namespace ola
 		virtual void Visit(MethodCallExpr const&, Uint32) override;
 		virtual void Visit(ThisExpr const&, Uint32) override;
 		virtual void Visit(SuperExpr const&, Uint32) override;
+		virtual void Visit(ConstructorExpr const&, Uint32) override;
 		virtual void Visit(NullLiteral const&, Uint32) override;
 		virtual void Visit(NewExpr const&, Uint32) override;
 		virtual void Visit(DeleteExpr const&, Uint32) override;
@@ -122,6 +124,10 @@ namespace ola
 
 	private:
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
+		void DeclareMethodDeclLLVM(MethodDecl const&);
+		void DefineMethodDeclLLVM(MethodDecl const&);
+		void DeclareConstructorDeclLLVM(ConstructorDecl const&);
+		void DefineConstructorDeclLLVM(ConstructorDecl const&);
 
 		void ConditionalBranch(llvm::Value*, llvm::BasicBlock*, llvm::BasicBlock*);
 		llvm::Type* ConvertToIRType(Type const*);

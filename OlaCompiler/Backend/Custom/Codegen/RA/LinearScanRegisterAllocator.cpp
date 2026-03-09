@@ -212,7 +212,8 @@ namespace ola
 				if (MI.GetOpcode() == InstStore)
 				{
 					MachineOperand& addr_op = MI.GetOperand(0);
-					if (IsSpilledVReg(addr_op))
+					Bool const addr_spilled = IsSpilledVReg(addr_op);
+					if (addr_spilled)
 					{
 						Uint32 vreg_id = addr_op.GetReg().reg;
 						MachineOperand spill_slot = GetSpillSlot(vreg_id, addr_op.GetType());
@@ -231,7 +232,8 @@ namespace ola
 						MachineOperand spill_slot = GetSpillSlot(vreg_id, val_op.GetType());
 
 						Bool is_float = (val_op.GetType() == MachineType::Float64);
-						Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+						Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() :
+							(addr_spilled ? target_reg_info.GetReturnRegister() : target_reg_info.GetGPScratchRegister());
 						MachineInstruction load_inst(InstLoad);
 						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, val_op.GetType()));
 						load_inst.SetOp<1>(spill_slot);
