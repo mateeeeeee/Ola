@@ -336,3 +336,109 @@ TEST(Lexer, IsFunctionAttribute)
 	for (Uint32 i = 0; i < 5; ++i)
 		EXPECT_TRUE(tokens[i].IsFunctionAttribute()) << "token " << i << " should be func attr";
 }
+
+TEST(Lexer, MiscKeywords)
+{
+	auto tokens = LexFiltered("auto import sizeof length foreach");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_auto);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::KW_import);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::KW_sizeof);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::KW_length);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::KW_foreach);
+}
+
+TEST(Lexer, IdentifierWithUnderscore)
+{
+	auto tokens = LexFiltered("_foo bar_baz _");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "_foo");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "bar_baz");
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[2].GetData(), "_");
+}
+
+TEST(Lexer, IdentifierWithDigits)
+{
+	auto tokens = LexFiltered("x1 foo42 a0b1");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "x1");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "foo42");
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[2].GetData(), "a0b1");
+}
+
+TEST(Lexer, AdjacentTokensNoWhitespace)
+{
+	auto tokens = LexFiltered("x+y");
+
+	ASSERT_GE(tokens.size(), 4u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "x");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::plus);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[2].GetData(), "y");
+}
+
+TEST(Lexer, ParenthesizedExpression)
+{
+	auto tokens = LexFiltered("(a+b)*c");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::left_round);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::plus);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::right_round);
+	EXPECT_EQ(tokens[5].GetKind(), TokenKind::star);
+	EXPECT_EQ(tokens[6].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, Ellipsis)
+{
+	auto tokens = LexFiltered("...");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::ellipsis);
+}
+
+TEST(Lexer, MultipleStringLiterals)
+{
+	auto tokens = LexFiltered("\"hello\" \"world\"");
+
+	ASSERT_GE(tokens.size(), 2u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[0].GetData(), "hello");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[1].GetData(), "world");
+}
+
+TEST(Lexer, ConsecutiveOperators)
+{
+	auto tokens = LexFiltered("a&&b||c");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::amp_amp);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::pipe_pipe);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, WhitespaceOnlyInput)
+{
+	auto tokens = LexFiltered("   \t  ");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::eof);
+}
+
+TEST(Lexer, MultiLineSourceLocations)
+{
+	auto tokens = LexFiltered("int\nfloat\nbool");
+
+	EXPECT_EQ(tokens[0].GetLocation().line, 1u);
+	EXPECT_EQ(tokens[1].GetLocation().line, 2u);
+	EXPECT_EQ(tokens[2].GetLocation().line, 3u);
+}

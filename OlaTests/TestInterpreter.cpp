@@ -654,3 +654,365 @@ TEST(Interpreter, Select)
 
 	EXPECT_EQ(RunMain(module), 42);
 }
+
+TEST(Interpreter, FloatAddition)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(1.5 + 2.5) == 4
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* sum = builder.MakeInst<BinaryInst>(Opcode::FAdd, ctx.GetFloat(1.5), ctx.GetFloat(2.5));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), sum);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 4);
+}
+
+TEST(Interpreter, FloatSubtraction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(10.0 - 5.0) == 5
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* diff = builder.MakeInst<BinaryInst>(Opcode::FSub, ctx.GetFloat(10.0), ctx.GetFloat(5.0));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), diff);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 5);
+}
+
+TEST(Interpreter, FloatMultiplication)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(6.0 * 7.0) == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* prod = builder.MakeInst<BinaryInst>(Opcode::FMul, ctx.GetFloat(6.0), ctx.GetFloat(7.0));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), prod);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, FloatDivision)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(84.0 / 2.0) == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* quot = builder.MakeInst<BinaryInst>(Opcode::FDiv, ctx.GetFloat(84.0), ctx.GetFloat(2.0));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), quot);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, FloatNegation)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(-(-42.0)) == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* neg = builder.MakeInst<UnaryInst>(Opcode::FNeg, ctx.GetFloat(-42.0));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), neg);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, FloatToSignedInt)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// F2S(9.7) == 9 (truncates toward zero)
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), ctx.GetFloat(9.7));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 9);
+}
+
+TEST(Interpreter, SignedIntToFloat)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (int)(S2F(42)) == 42  — round-trip through float preserves integer
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* fv = builder.MakeInst<CastInst>(Opcode::S2F, ctx.GetFloatType(), ctx.GetInt64(42));
+	Value* result = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), fv);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, BitwiseNot)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ~0 == -1; -1 + 43 == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* notval = builder.MakeInst<UnaryInst>(Opcode::Not, ctx.GetInt64(0));
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Add, notval, ctx.GetInt64(43));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, ArithmeticShiftRight)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// -16 >> 2 (arithmetic) should be -4; -4 + 46 == 42
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* shifted = builder.MakeInst<BinaryInst>(Opcode::AShr, ctx.GetInt64(-16), ctx.GetInt64(2));
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Add, shifted, ctx.GetInt64(46));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, FloatCompareLess)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (1.0 < 2.0) ? 42 : 0
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry    = builder.AddBlock("entry");
+	BasicBlock* bb_true  = builder.AddBlock("true");
+	BasicBlock* bb_false = builder.AddBlock("false");
+
+	builder.SetCurrentBlock(entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::FCmpOLT, ctx.GetFloat(1.0), ctx.GetFloat(2.0));
+	builder.MakeInst<BranchInst>(cond, bb_true, bb_false);
+
+	builder.SetCurrentBlock(bb_true);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	builder.SetCurrentBlock(bb_false);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, FloatCompareEqual)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (3.14 == 3.14) ? 42 : 0
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry    = builder.AddBlock("entry");
+	BasicBlock* bb_true  = builder.AddBlock("true");
+	BasicBlock* bb_false = builder.AddBlock("false");
+
+	builder.SetCurrentBlock(entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::FCmpOEQ, ctx.GetFloat(3.14), ctx.GetFloat(3.14));
+	builder.MakeInst<BranchInst>(cond, bb_true, bb_false);
+
+	builder.SetCurrentBlock(bb_true);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	builder.SetCurrentBlock(bb_false);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, ChainedFunctionCalls)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// int double_it(int x) { return x + x; }
+	// int main() { return double_it(double_it(10)) + 2; }  // 42
+	std::vector<IRType*> params = { ctx.GetIntegerType(64) };
+	IRFuncType* dbl_ft = ctx.GetFunctionType(ctx.GetIntegerType(64), params);
+	Function* dbl_fn = new Function("double_it", dbl_ft, Linkage::Internal);
+	module.AddGlobal(dbl_fn);
+
+	builder.SetCurrentFunction(dbl_fn);
+	BasicBlock* dbl_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(dbl_entry);
+	Value* sum = builder.MakeInst<BinaryInst>(Opcode::Add, dbl_fn->GetArg(0), dbl_fn->GetArg(0));
+	builder.MakeInst<ReturnInst>(sum);
+
+	IRFuncType* main_ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* main_fn = new Function("main", main_ft, Linkage::External);
+	module.AddGlobal(main_fn);
+
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* main_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(main_entry);
+	std::vector<Value*> args1 = { ctx.GetInt64(10) };
+	Value* first = builder.MakeInst<CallInst>(dbl_fn, std::span<Value*>(args1));
+	std::vector<Value*> args2 = { first };
+	Value* second = builder.MakeInst<CallInst>(dbl_fn, std::span<Value*>(args2));
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Add, second, ctx.GetInt64(2));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, GlobalVariableStoreAndLoad)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// int g = 0; main() { g = 42; return g; }
+	GlobalVariable* gv = new GlobalVariable("g", ctx.GetIntegerType(64), Linkage::Internal, ctx.GetInt64(0));
+	module.AddGlobal(gv);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<StoreInst>(ctx.GetInt64(42), gv);
+	Value* loaded = builder.MakeInst<LoadInst>(gv);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, MultipleAllocas)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// a = 20, b = 22; return a + b
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* pa = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	Value* pb = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(20), pa);
+	builder.MakeInst<StoreInst>(ctx.GetInt64(22), pb);
+	Value* a = builder.MakeInst<LoadInst>(pa);
+	Value* b = builder.MakeInst<LoadInst>(pb);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Add, a, b);
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(RunMain(module), 42);
+}
+
+TEST(Interpreter, UnsignedCompareLessThan)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// (3 ULT 5) ? 42 : 0
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("main", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry    = builder.AddBlock("entry");
+	BasicBlock* bb_true  = builder.AddBlock("true");
+	BasicBlock* bb_false = builder.AddBlock("false");
+
+	builder.SetCurrentBlock(entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpULT, ctx.GetInt64(3), ctx.GetInt64(5));
+	builder.MakeInst<BranchInst>(cond, bb_true, bb_false);
+
+	builder.SetCurrentBlock(bb_true);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	builder.SetCurrentBlock(bb_false);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(RunMain(module), 42);
+}

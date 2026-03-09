@@ -438,3 +438,256 @@ TEST(Sema, UndeclaredClassField_Error)
 		"class Outer { Undeclared inner; };"
 	);
 }
+
+// modifying_rvalue_expr
+TEST(Sema, AssignToLiteral_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { 42 = 1; }");
+}
+
+// pure_must_be_virtual
+TEST(Sema, PureWithoutVirtual_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public void Draw() pure; };"
+	);
+}
+
+// final_must_be_virtual
+TEST(Sema, FinalWithoutVirtual_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public void Draw() final {} };"
+	);
+}
+
+// pure_cannot_be_final
+TEST(Sema, PureAndFinal_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public void Draw() virtual pure final; };"
+	);
+}
+
+// pure_method_cannot_have_body
+TEST(Sema, PureMethodWithBody_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public void Draw() virtual pure {} };"
+	);
+}
+
+TEST(Sema, VirtualPureMethod_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo { public void Draw() virtual pure; };"
+	);
+}
+
+TEST(Sema, VirtualFinalMethod_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Base { public void Draw() virtual {} };"
+		"class Derived : Base { public void Draw() virtual final {} };"
+	);
+}
+
+// variable_type_abstract — cannot instantiate abstract class by value
+TEST(Sema, InstantiateAbstractClass_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Abs { public void Do() virtual pure; };"
+		"void foo() { Abs a; }"
+	);
+}
+
+// base_final_error — inheriting from a final class
+TEST(Sema, InheritFromFinalClass_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"final class Base { public int x; };"
+		"class Derived : Base { public int y; };"
+	);
+}
+
+// cannot_override_final_function
+TEST(Sema, OverrideFinalMethod_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Base { public void Foo() virtual final {} };"
+		"class Derived : Base { public void Foo() virtual {} };"
+	);
+}
+
+// constructor_return_type_error
+TEST(Sema, ConstructorWithReturnType_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public int Foo() {} };"
+	);
+}
+
+// ref_var_needs_init
+TEST(Sema, RefWithoutInit_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { ref int r; }");
+}
+
+// ref_var_rvalue_bind — reference cannot bind to rvalue
+TEST(Sema, RefBindToRvalue_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { ref int r = 42; }");
+}
+
+// global_ref_not_allowed
+TEST(Sema, GlobalRef_Error)
+{
+	EXPECT_SEMA_ERROR("int g = 0; ref int r = g;");
+}
+
+TEST(Sema, RefLocalVariable_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = 5; ref int r = x; }");
+}
+
+// template_arg_count_mismatch
+TEST(Sema, TemplateArgCountMismatch_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Box<T> { public T val; };"
+		"void foo() { Box<int, float> b; }"
+	);
+}
+
+// template_arg_missing
+TEST(Sema, TemplateArgMissing_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Box<T> { public T val; };"
+		"void foo() { Box b; }"
+	);
+}
+
+// non_template_with_args
+TEST(Sema, NonTemplateWithArgs_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public int x; };"
+		"void foo() { Foo<int> f; }"
+	);
+}
+
+TEST(Sema, TemplateInstantiation_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Box<T> { public T val; };"
+		"void foo() { Box<int> b; }"
+	);
+}
+
+// delete_arg_not_pointer
+TEST(Sema, DeleteNonPointer_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = 5; delete x; }");
+}
+
+// null_assigned_to_non_pointer
+TEST(Sema, NullToNonPointer_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = null; }");
+}
+
+TEST(Sema, NullToPointer_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = null; }");
+}
+
+// new_invalid_type — cannot allocate void
+TEST(Sema, NewVoid_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { void* p = new void; }");
+}
+
+// array_subscript_not_integer
+TEST(Sema, ArraySubscriptNotInteger_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int[3] a; int x = a[1.5]; }");
+}
+
+// length_operand_not_array
+TEST(Sema, LengthOnNonArray_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = 5; int n = length(x); }");
+}
+
+TEST(Sema, LengthOnArray_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int[5] a; int n = length(a); }");
+}
+
+// ternary_expr_types_incompatible
+TEST(Sema, TernaryTypeMismatch_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class A { public int x; };"
+		"class B { public int y; };"
+		"void foo() { A a; B b; auto r = true ? a : b; }"
+	);
+}
+
+TEST(Sema, TernarySameTypes_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = true ? 1 : 2; }");
+}
+
+// super_used_in_wrong_context
+TEST(Sema, SuperWithoutBaseClass_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { Foo() { super(); } };"
+	);
+}
+
+// method_cannot_be_nomangle
+TEST(Sema, MethodNomangle_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public nomangle void Bar() {} };"
+	);
+}
+
+// non_pure_method_needs_definition
+TEST(Sema, NonPureMethodNoBody_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public void Bar() virtual; };"
+	);
+}
+
+TEST(Sema, SizeofInt_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = sizeof(int); }");
+}
+
+TEST(Sema, EnumMemberAccess_Ok)
+{
+	EXPECT_SEMA_OK(
+		"enum Color { Red, Green, Blue };"
+		"void foo() { Color c = Red; }"
+	);
+}
+
+TEST(Sema, IntToFloatImplicitCast_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { float f = 42; }");
+}
+
+TEST(Sema, BoolToIntImplicitCast_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = true; }");
+}
+
+TEST(Sema, ConstArrayDecl_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { const int[3] a; }");
+}
