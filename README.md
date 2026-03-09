@@ -27,7 +27,7 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
     - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
-  * std library: `io`, `math`, `assert`, `string`, `file`
+  * std library: `io`, `math`, `assert`, `string`, `file`, `pair`, `optional`, `vector`, `list`, `stack`, `queue`, `map`, `set`
   * LLVM backend
   * Custom backend
     - Custom IR
@@ -109,7 +109,8 @@ public int main()
 The project consists of the following parts:
 1. **Ola Library**:
    - A standard library for the Ola language, implemented in C and built as a static library to be used by the compiler. It includes essential components like:
-     - `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olafile.h`
+     - C headers: `olaio.h`, `olamath.h`, `olaassert.h`, `olastring.h`, `olafile.h`
+     - Ola std imports: `std.io`, `std.math`, `std.assert`, `std.string`, `std.file`, `std.pair`, `std.optional`, `std.vector`, `std.list`, `std.stack`, `std.queue`, `std.map`, `std.set`
    
 2. **Ola Compiler**:
    - The core of the Ola project, implemented as a **static library** (`OlaCompiler`) with the following components:
