@@ -108,7 +108,10 @@ namespace ola
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDefinition(SourceLocation const& loc, UniqueFunctionDeclPtr&& function_decl, UniqueCompoundStmtPtr&& body_stmt)
 	{
-		OLA_ASSERT(body_stmt);
+		if (!function_decl || !body_stmt)
+		{
+			return nullptr;
+		}
 		function_decl->SetBodyStmt(std::move(body_stmt));
 		for (std::string const& goto_label : sema_ctx.gotos)
 		{

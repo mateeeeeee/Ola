@@ -427,6 +427,18 @@ TEST(Parser, InterfaceDeclaration)
 	ASSERT_FALSE(h.HasErrors());
 }
 
+TEST(Parser, InterfaceWithWrongMethodSyntax)
+{
+	// virtual/pure go after params in Ola, not before the return type.
+	// Parser should report an error rather than crash.
+	ParseHelper h(
+		"interface Drawable {"
+		"  public virtual pure void Draw();"
+		"};"
+	);
+	EXPECT_TRUE(h.HasErrors());
+}
+
 TEST(Parser, EnumWithValues)
 {
 	ParseHelper h("enum Dir { North, South = 5, East, West };");
@@ -532,10 +544,19 @@ TEST(Parser, ArrayAccessExpr)
 
 TEST(Parser, MissingClosingBrace)
 {
-	// Note: severely malformed input (e.g. missing closing paren) can crash
-	// the parser because error recovery is limited. Only test cases where the
-	// parser can recover gracefully.
-	ParseHelper h("void foo() { int x = 5; int y = 10;");
+	ParseHelper h("void foo() { int x = 5;");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, MissingClosingParen)
+{
+	ParseHelper h("void foo( {}");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, EmptyEnumBody)
+{
+	ParseHelper h("enum Empty {};");
 	EXPECT_TRUE(h.HasErrors());
 }
 

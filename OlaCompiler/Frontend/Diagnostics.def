@@ -111,4 +111,6 @@ DIAG(ptr_to_ptr_not_allowed, error, "Pointer to pointer is not allowed")
 DIAG(template_arg_count_mismatch, error, "Template '{}' expects {} type argument(s), but {} were provided")
 DIAG(template_arg_missing, error, "Class template '{}' requires template arguments")
 DIAG(non_template_with_args, error, "'{}' is not a class template")
+DIAG(empty_enum_declaration, error, "Enum declaration cannot be empty, at least one enumerator is required")
+DIAG(method_attr_before_return_type, error, "Method attributes (virtual, pure, final, const) must appear after the parameter list, not before the return type")
 #undef DIAG

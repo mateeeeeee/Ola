@@ -625,6 +625,30 @@ TEST(Sema, LengthOnArray_Ok)
 	EXPECT_SEMA_OK("void foo() { int[5] a; int n = length(a); }");
 }
 
+// incompatible_function_attributes — inline + noinline
+TEST(Sema, InlineAndNoinline_Error)
+{
+	EXPECT_SEMA_ERROR("inline noinline void foo() {}");
+}
+
+// function_attribute_repetition
+TEST(Sema, DuplicateFunctionAttribute_Error)
+{
+	EXPECT_SEMA_ERROR("inline inline void foo() {}");
+}
+
+// function_def_cannot_be_extern
+TEST(Sema, ExternWithBody_Error)
+{
+	EXPECT_SEMA_ERROR("extern void foo() {}");
+}
+
+// function_decl_needs_to_be_extern
+TEST(Sema, DeclWithoutExtern_Error)
+{
+	EXPECT_SEMA_ERROR("void foo();");
+}
+
 // ternary_expr_types_incompatible
 TEST(Sema, TernaryTypeMismatch_Error)
 {

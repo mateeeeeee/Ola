@@ -202,6 +202,7 @@ namespace ola
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
+				return nullptr;
 			}
 
 			name = current_token->GetData(); ++current_token;
@@ -210,12 +211,22 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
+				if (current_token->Is(TokenKind::eof) || current_token->Is(TokenKind::left_brace))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				if (!param_types.empty() && !Consume(TokenKind::comma))
 				{
 					Diag(function_params_missing_coma);
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				if (!param_decl)
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -243,6 +254,7 @@ namespace ola
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
+				return nullptr;
 			}
 
 			SourceLocation const& loc = current_token->GetLocation();
@@ -252,17 +264,31 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
+				if (current_token->Is(TokenKind::eof) || current_token->Is(TokenKind::left_brace))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				if (!param_types.empty() && !Consume(TokenKind::comma))
 				{
 					Diag(function_params_missing_coma);
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				if (!param_decl)
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
 			function_type.SetType(FuncType::Get(context, return_type, param_types));
 			func_decl = sema->ActOnFunctionDecl(name, loc, function_type, std::move(param_decls), visibility, attrs);
+			if (!func_decl)
+			{
+				return nullptr;
+			}
 			if (Consume(TokenKind::semicolon))
 			{
 				Diag(function_decl_needs_to_be_extern);
@@ -296,12 +322,18 @@ namespace ola
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(func_attrs);
+			if (current_token->IsOneOf(TokenKind::KW_virtual, TokenKind::KW_pure, TokenKind::KW_final, TokenKind::KW_const))
+			{
+				Diag(method_attr_before_return_type);
+				return nullptr;
+			}
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
+				return nullptr;
 			}
 
 			SourceLocation const& loc = current_token->GetLocation();
@@ -310,12 +342,22 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
+				if (current_token->Is(TokenKind::eof) || current_token->Is(TokenKind::left_brace))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				if (!param_types.empty() && !Consume(TokenKind::comma))
 				{
 					Diag(function_params_missing_coma);
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				if (!param_decl)
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -350,12 +392,18 @@ namespace ola
 		{
 			SYM_TABLE_GUARD(sema->sema_ctx.decl_sym_table);
 			ParseFunctionAttributes(func_attrs);
+			if (current_token->IsOneOf(TokenKind::KW_virtual, TokenKind::KW_pure, TokenKind::KW_final, TokenKind::KW_const))
+			{
+				Diag(method_attr_before_return_type);
+				return nullptr;
+			}
 			QualType return_type{};
 			ParseTypeQualifier(return_type);
 			ParseTypeSpecifier(return_type);
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
+				return nullptr;
 			}
 
 			SourceLocation const& loc = current_token->GetLocation();
@@ -364,12 +412,22 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
+				if (current_token->Is(TokenKind::eof) || current_token->Is(TokenKind::left_brace))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				if (!param_types.empty() && !Consume(TokenKind::comma))
 				{
 					Diag(function_params_missing_coma);
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
+				if (!param_decl)
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				param_types.emplace_back(param_decl->GetType());
 				param_decls.push_back(std::move(param_decl));
 			}
@@ -433,6 +491,7 @@ namespace ola
 			if (current_token->IsNot(TokenKind::identifier))
 			{
 				Diag(expected_identifier);
+				return nullptr;
 			}
 			SourceLocation const& loc = current_token->GetLocation();
 			name = current_token->GetData(); ++current_token;
@@ -440,6 +499,11 @@ namespace ola
 			std::vector<QualType> param_types{};
 			while (!Consume(TokenKind::right_round))
 			{
+				if (current_token->Is(TokenKind::eof) || current_token->Is(TokenKind::left_brace))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				if (!param_types.empty() && !Consume(TokenKind::comma))
 				{
 					Diag(function_params_missing_coma);
@@ -665,6 +729,12 @@ namespace ola
 		Int64 val = 0;
 		while (true)
 		{
+			if (current_token->Is(TokenKind::right_brace) || current_token->Is(TokenKind::eof))
+			{
+				Diag(empty_enum_declaration);
+				Consume(TokenKind::right_brace);
+				break;
+			}
 			std::string enum_value_name;
 			if (current_token->IsNot(TokenKind::identifier))
 			{
@@ -927,7 +997,22 @@ namespace ola
 			Expect(TokenKind::left_brace);
 			while (!Consume(TokenKind::right_brace))
 			{
+				if (current_token->Is(TokenKind::eof))
+				{
+					Diag(unexpected_token);
+					break;
+				}
 				UniqueMethodDeclPtr member_function = ParseMethodDeclaration();
+				if (!member_function)
+				{
+					// Skip tokens until we find ';', '}', or EOF to recover
+					while (!current_token->IsOneOf(TokenKind::semicolon, TokenKind::right_brace, TokenKind::eof))
+					{
+						++current_token;
+					}
+					Consume(TokenKind::semicolon);
+					continue;
+				}
 				member_functions.push_back(std::move(member_function));
 			}
 			Expect(TokenKind::semicolon);
