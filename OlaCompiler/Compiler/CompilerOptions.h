@@ -7,7 +7,7 @@ namespace ola
 	enum CompilerFlags : Uint32
 	{
 		CompilerFlag_None = 0x00,
-		CompilerFlag_NoLLVM = 0x01,
+		CompilerFlag_UseLLVM = 0x01,
 		CompilerFlag_DumpAST = 0x02,
 		CompilerFlag_DumpCFG = 0x04,
 		CompilerFlag_DumpCallGraph = 0x08,

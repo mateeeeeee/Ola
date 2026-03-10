@@ -18,7 +18,7 @@ namespace ola
 			cli_parser.AddArg(false, "--emit-ir");
 			cli_parser.AddArg(false, "--emit-mir");
 			cli_parser.AddArg(false, "--emit-asm");
-			cli_parser.AddArg(false, "--nollvm");
+			cli_parser.AddArg(false, "--llvm");
 			cli_parser.AddArg(false, "--test");
 			cli_parser.AddArg(false, "--timeout");
 			cli_parser.AddArg(false, "-c", "--no-run");
@@ -55,7 +55,7 @@ namespace ola
 			OLA_INFO("      --emit-ir            Emit IR");
 			OLA_INFO("      --emit-mir           Emit Machine IR");
 			OLA_INFO("      --emit-asm           Emit Assembly code");
-			OLA_INFO("      --nollvm            Disable LLVM backend");
+			OLA_INFO("      --llvm               Use LLVM backend (ignored if LLVM is not available)");
 			OLA_INFO("      --test               Enable test mode with predefined test cases");
 			OLA_INFO("      --timeout            Enable timeout detection");
 			OLA_INFO("  -c, --no-run             Compile only, do not run the output");
@@ -103,7 +103,7 @@ namespace ola
 		}
 
 		if (cli_result["--ast"])				compiler_flags |= CompilerFlag_DumpAST;
-		if (cli_result["--nollvm"])				compiler_flags |= CompilerFlag_NoLLVM;
+		if (cli_result["--llvm"])				compiler_flags |= CompilerFlag_UseLLVM;
 		if (cli_result["--cfg"])				compiler_flags |= CompilerFlag_DumpCFG;
 		if (cli_result["--callgraph"])			compiler_flags |= CompilerFlag_DumpCallGraph;
 		if (cli_result["--domtree"])			compiler_flags |= CompilerFlag_DumpDomTree;

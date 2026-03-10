@@ -12,16 +12,16 @@
 // OLA_EXE_PATH is now provided by CMake at configure time via target_compile_definitions
 // This makes the test paths portable across different generators (Unix Makefiles, Xcode, Visual Studio, etc.)
 
-#if !LLVM_BACKEND
+#if LLVM_BACKEND
 
 #ifdef DEBUG
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm --timeout --test __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --nollvm --interpret --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --llvm __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --llvm --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --interpret --timeout --test __VA_ARGS__))
 #else
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm --timeout --test __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --nollvm --interpret --timeout --test __VA_ARGS__))
+#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --llvm __VA_ARGS__))
+#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --llvm --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --interpret --timeout --test __VA_ARGS__))
 #endif
 
 #else

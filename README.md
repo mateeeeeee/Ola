@@ -194,7 +194,7 @@ cmake -B build -DBUILD_PLAYGROUND=OFF     # Disable playground
   * `--emit-mir`: Emit IR file
   * `--emit-asm`: Emit ASM file
   * `--domfrontier`: Print dominance frontiers to standard output
-  * `--nollvm`: Use custom backend instead of LLVM backend
+  * `--llvm`: Use LLVM backend instead of the default custom backend (ignored if LLVM is not available)
   * `--test`: Used for running g-tests
   * `--timeout`: Used for detecting infinite loops during tests
   * `--Od`: No optimizations

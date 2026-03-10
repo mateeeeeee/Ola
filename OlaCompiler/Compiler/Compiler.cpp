@@ -120,7 +120,7 @@ namespace ola
 				std::string compile_cmd = std::format("clang -S {} -o {} -masm=intel", ir_file, assembly_file);
 				ExecuteCommand(compile_cmd.c_str());
 #else
-				OLA_ASSERT_MSG(false, "LLVM backend is disabled. Use --nollvm or generate project with -DENABLE_LLVM=ON assuming you have LLVM 17.0 installed");
+				OLA_ASSERT_MSG(false, "LLVM backend is not available. Build with -DENABLE_LLVM=ON and LLVM 17.0 installed");
 #endif
 			}
 			else
@@ -181,7 +181,7 @@ namespace ola
 		Bool const cfg_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCFG;
 		Bool const callgraph_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpCallGraph;
 		Bool const domtree_dump = compile_request.GetCompilerFlags() & CompilerFlag_DumpDomTree;
-		Bool const no_llvm = compile_request.GetCompilerFlags() & CompilerFlag_NoLLVM;
+		Bool const use_llvm = compile_request.GetCompilerFlags() & CompilerFlag_UseLLVM;
 		Bool const emit_ir = compile_request.GetCompilerFlags() & CompilerFlag_EmitIR;
 		Bool const emit_mir = compile_request.GetCompilerFlags() & CompilerFlag_EmitMIR;
 		Bool const emit_asm = compile_request.GetCompilerFlags() & CompilerFlag_EmitASM;
@@ -280,7 +280,7 @@ namespace ola
 			std::string file_ext = fs::path(source_files[i]).extension().string();
 			std::string source_file = source_files[i]; source_file += ".ola";
 			std::string ir_file;
-			if (no_llvm)
+			if (!use_llvm)
 			{
 				ir_file = file_name + ".oir";
 			}
@@ -295,7 +295,7 @@ namespace ola
 			{
 				.opt_level = opt_level,
 				.target_arch = target_arch,
-				.use_llvm_backend = !no_llvm,
+				.use_llvm_backend = use_llvm,
 				.dump_ast = ast_dump,
 				.dump_cfg = cfg_dump,
 				.dump_callgraph = callgraph_dump,
@@ -340,7 +340,7 @@ namespace ola
 
 		if (cfg_dump || callgraph_dump || domtree_dump)
 		{
-			GenerateGraphVizImages(input_directory, !no_llvm);
+			GenerateGraphVizImages(input_directory, use_llvm);
 		}
 
 		Bool const build_static_lib = compile_request.GetCompilerFlags() & CompilerFlag_StaticLib;
