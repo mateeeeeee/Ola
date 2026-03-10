@@ -442,3 +442,143 @@ TEST(Lexer, MultiLineSourceLocations)
 	EXPECT_EQ(tokens[1].GetLocation().line, 2u);
 	EXPECT_EQ(tokens[2].GetLocation().line, 3u);
 }
+
+TEST(Lexer, NegativeIntLiteral)
+{
+	auto tokens = LexFiltered("-100");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::minus);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::int_number);
+	EXPECT_EQ(tokens[1].GetData(), "100");
+}
+
+TEST(Lexer, ForeachKeyword)
+{
+	auto tokens = LexFiltered("foreach");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_foreach);
+}
+
+TEST(Lexer, MultiCharCompoundAssignShift)
+{
+	auto tokens = LexFiltered("x <<= y >>= z");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::less_less_equal);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::greater_greater_equal);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, ArrowInExpression)
+{
+	auto tokens = LexFiltered("a->b");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::arrow);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, StringLiteralEmpty)
+{
+	auto tokens = LexFiltered("\"\"");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[0].GetData(), "");
+}
+
+TEST(Lexer, IdentifierStartingWithKeywordPrefix)
+{
+	auto tokens = LexFiltered("integer");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "integer");
+}
+
+TEST(Lexer, IdentifierMatchingKeywordSubstring)
+{
+	auto tokens = LexFiltered("forall");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "forall");
+}
+
+TEST(Lexer, SequentialPunctuators)
+{
+	auto tokens = LexFiltered("(){}[];");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::left_round);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::right_round);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::left_brace);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::right_brace);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::left_square);
+	EXPECT_EQ(tokens[5].GetKind(), TokenKind::right_square);
+	EXPECT_EQ(tokens[6].GetKind(), TokenKind::semicolon);
+}
+
+TEST(Lexer, FloatWithLeadingZero)
+{
+	auto tokens = LexFiltered("0.0");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::float_number);
+	EXPECT_EQ(tokens[0].GetData(), "0.0");
+}
+
+TEST(Lexer, TabsAsWhitespace)
+{
+	auto tokens = LexFiltered("int\tx");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_int);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "x");
+}
+
+TEST(Lexer, TernaryOperators)
+{
+	auto tokens = LexFiltered("a ? b : c");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::question);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::colon);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, ComplexExpression)
+{
+	auto tokens = LexFiltered("x = a * (b + c) - d / e;");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::equal);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::star);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::left_round);
+	EXPECT_EQ(tokens[5].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[6].GetKind(), TokenKind::plus);
+	EXPECT_EQ(tokens[7].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[8].GetKind(), TokenKind::right_round);
+	EXPECT_EQ(tokens[9].GetKind(), TokenKind::minus);
+	EXPECT_EQ(tokens[10].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[11].GetKind(), TokenKind::slash);
+	EXPECT_EQ(tokens[12].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[13].GetKind(), TokenKind::semicolon);
+}
+
+TEST(Lexer, MultipleNewlines)
+{
+	auto tokens = LexSource("a\n\n\nb");
+
+	Uint32 newline_count = 0;
+	for (auto const& t : tokens)
+		if (t.GetKind() == TokenKind::newline) ++newline_count;
+	EXPECT_EQ(newline_count, 3u);
+}
+
+TEST(Lexer, ColumnAfterTab)
+{
+	auto tokens = LexFiltered("a b");
+
+	EXPECT_EQ(tokens[0].GetLocation().column, 1u);
+	EXPECT_GT(tokens[1].GetLocation().column, 1u);
+}

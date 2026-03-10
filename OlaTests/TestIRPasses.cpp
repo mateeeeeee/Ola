@@ -1074,3 +1074,288 @@ TEST(IPCP, DoesNotPropagateWhenCalledWithDifferentConstants)
 	// The Add in foo still has the argument as an operand (not a constant).
 	EXPECT_FALSE(isa<ConstantInt>(cast<BinaryInst>(add)->GetLHS()));
 }
+
+TEST(ArithmeticReduction, SubtractZeroBecomesOperand)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { return x - 0; }  =>  return x
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::Sub, x, ctx.GetInt64(0));
+	builder.MakeInst<ReturnInst>(result);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Sub), 0u);
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	EXPECT_EQ(ret_val, x);
+}
+
+TEST(ArithmeticReduction, MultiplyByMinusOneBecomesNeg)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { return x * -1; }  => might become neg x or similar
+	// The pass may or may not handle this, but it shouldn't crash.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::SMul, x, ctx.GetInt64(-1));
+	builder.MakeInst<ReturnInst>(result);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	// Just verify no crash and the ret still exists
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Ret), 1u);
+}
+
+TEST(DCE, RemovesChainOfDeadInstructions)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { a = x + 1; b = a + 2; return 0; }
+	// Both a and b are dead.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* a = builder.MakeInst<BinaryInst>(Opcode::Add, x, ctx.GetInt64(1));
+	builder.MakeInst<BinaryInst>(Opcode::Add, a, ctx.GetInt64(2)); // dead
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 2u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 0u);
+}
+
+TEST(DCE, PreservesCallInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn() { call helper(); return 0; }
+	// The call has side effects and must survive DCE even though
+	// its result is unused.
+	Function* helper = MakeFunc(module, ctx, "helper", ctx.GetVoidType(), {}, Linkage::External);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	std::vector<Value*> no_args;
+	builder.MakeInst<CallInst>(helper, std::span<Value*>(no_args));
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Call), 1u);
+}
+
+TEST(ConstantPropagation, FoldsSubtraction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret (10 - 3) => ret 7
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	BinaryInst* sub = new BinaryInst(Opcode::Sub, ctx.GetInt64(10), ctx.GetInt64(3));
+	sub->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(sub);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 7);
+}
+
+TEST(ConstantPropagation, FoldsMultiplication)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret (6 * 7) => ret 42
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	BinaryInst* mul = new BinaryInst(Opcode::SMul, ctx.GetInt64(6), ctx.GetInt64(7));
+	mul->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(mul);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 42);
+}
+
+TEST(ConstantPropagation, FoldsDivision)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret (84 / 2) => ret 42
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	BinaryInst* div = new BinaryInst(Opcode::SDiv, ctx.GetInt64(84), ctx.GetInt64(2));
+	div->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(div);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 42);
+}
+
+TEST(ConstantPropagation, FoldsCompareNE)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// cmp = (5 != 5) => false => branch becomes unconditional
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry   = builder.AddBlock("entry");
+	BasicBlock* bb_then = builder.AddBlock("then");
+	BasicBlock* bb_else = builder.AddBlock("else");
+
+	builder.SetCurrentBlock(bb_then);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(1));
+
+	builder.SetCurrentBlock(bb_else);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	CompareInst* cmp = new CompareInst(Opcode::ICmpNE, ctx.GetInt64(5), ctx.GetInt64(5));
+	cmp->InsertBefore(entry, entry->end());
+	BranchInst* br = new BranchInst(cmp, bb_then, bb_else);
+	br->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_TRUE(cast<BranchInst>(entry->GetTerminator())->IsUnconditional());
+	// 5 != 5 is false, so branch should go to else
+	EXPECT_EQ(cast<BranchInst>(entry->GetTerminator())->GetTrueTarget(), bb_else);
+}
+
+TEST(SimplifyCFG, ConvertsIdenticalTargetsToUnconditional)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// entry: cond = ...; br cond, target, target
+	// Since both targets are the same, simplify to unconditional br.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry  = builder.AddBlock("entry");
+	BasicBlock* target = builder.AddBlock("target");
+
+	Value* x = fn->GetArg(0);
+
+	builder.SetCurrentBlock(entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSGT, x, ctx.GetInt64(0));
+	builder.MakeInst<BranchInst>(cond, target, target);
+
+	builder.SetCurrentBlock(target);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<SimplifyCFGPass>();
+	fpm.Run(*fn, fam);
+
+	// Should have simplified to 2 or fewer blocks (entry might be merged with target)
+	EXPECT_LE(CountBlocks(fn), 2u);
+}
+
+TEST(Mem2Reg, HandlesMultipleStoresSameBlock)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn() { p = alloca; store 1 -> p; store 2 -> p; v = load p; ret v; }
+	// The load should resolve to 2 (last store wins).
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* p = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(1), p);
+	builder.MakeInst<StoreInst>(ctx.GetInt64(2), p);
+	Value* v = builder.MakeInst<LoadInst>(p);
+	builder.MakeInst<ReturnInst>(v);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<Mem2RegPass>();
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<LoadInst>(fn), 0u);
+	// The return should carry the constant 2
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 2);
+}

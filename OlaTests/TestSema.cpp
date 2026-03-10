@@ -715,3 +715,243 @@ TEST(Sema, ConstArrayDecl_Ok)
 {
 	EXPECT_SEMA_OK("void foo() { const int[3] a; }");
 }
+
+TEST(Sema, ForeachOnArray_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() { int[5] a; foreach (int x : a) {} }"
+	);
+}
+
+TEST(Sema, ForeachOnNonArray_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void foo() { int x = 5; foreach (int y : x) {} }"
+	);
+}
+
+TEST(Sema, ForeachTypeMismatch_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public int x; };"
+		"void bar() { int[5] a; foreach (Foo x : a) {} }"
+	);
+}
+
+TEST(Sema, IncompatibleFunctionArgument_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class A { public int x; };"
+		"void bar(A a) {}"
+		"void foo() { bar(42); }"
+	);
+}
+
+TEST(Sema, FunctionOverloadResolution_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void bar(int x) {}"
+		"void bar(float x) {}"
+		"void foo() { bar(42); bar(3.14); }"
+	);
+}
+
+TEST(Sema, RefAssignThrough_Ok)
+{
+	// r = b assigns the value of b through the reference to a, not rebinding
+	EXPECT_SEMA_OK(
+		"void foo() { int a = 1; int b = 2; ref int r = a; r = b; }"
+	);
+}
+
+TEST(Sema, RefParamMutation_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void inc(ref int x) { x = x + 1; }"
+		"void foo() { int a = 5; inc(a); }"
+	);
+}
+
+TEST(Sema, FloatToIntImplicit_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = 3.14; }");
+}
+
+TEST(Sema, IntToBoolImplicit_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { bool b = 42; }");
+}
+TEST(Sema, VariableShadowingInNestedScope_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  int x = 1;"
+		"  if (x > 0) {"
+		"    int x = 2;"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, VariableUsedAfterScope_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void foo() {"
+		"  if (true) { int x = 1; }"
+		"  int y = x;"
+		"}"
+	);
+}
+
+TEST(Sema, AutoInferInt_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { auto x = 42; }");
+}
+
+TEST(Sema, AutoInferFloat_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { auto x = 3.14; }");
+}
+
+TEST(Sema, AutoInferBool_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { auto x = true; }");
+}
+
+TEST(Sema, NewCtorArgCountMismatch_Error)
+{
+	// Constructor takes (int, int) but called with 3 args via new
+	EXPECT_SEMA_ERROR(
+		"class Foo { Foo(int x, int y) { this.val = x; } public int val; };"
+		"void bar() { Foo* f = new Foo(1, 2, 3); delete f; }"
+	);
+}
+
+TEST(Sema, ClassWithVirtualAndOverride_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Base { public int Get() virtual { return 0; } };"
+		"class Derived : Base { public int Get() virtual { return 1; } };"
+	);
+}
+
+TEST(Sema, AbstractClassPointer_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Abs { public void Do() virtual pure; };"
+		"class Concrete : Abs { public void Do() virtual {} };"
+		"void foo() { Concrete c; }"
+	);
+}
+
+TEST(Sema, BitwiseOrWithFloat_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { float x = 1.5; int y = x | 1; }");
+}
+
+TEST(Sema, BitwiseXorWithFloat_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { float x = 1.5; int y = x ^ 1; }");
+}
+
+TEST(Sema, BitwiseNotOnFloat_Ok)
+{
+	// ~float implicitly casts to int, then applies bitwise not
+	EXPECT_SEMA_OK("void foo() { float x = 1.5; int y = ~x; }");
+}
+
+TEST(Sema, ArrayLargeIndex_Error)
+{
+	// Constant index 100 is clearly outside bounds for size-3 array
+	EXPECT_SEMA_ERROR("void foo() { int[3] a; int x = a[100]; }");
+}
+
+TEST(Sema, EnumMemberUndeclared_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"enum Color { Red, Green, Blue };"
+		"void foo() { Color c = Purple; }"
+	);
+}
+
+TEST(Sema, EnumUsedAsInt_Ok)
+{
+	EXPECT_SEMA_OK(
+		"enum Color { Red, Green, Blue };"
+		"void foo() { int x = Red; }"
+	);
+}
+
+TEST(Sema, ChainedArithmeticOperations_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = 1 + 2 * 3 - 4 / 2; }");
+}
+
+TEST(Sema, NestedFunctionCalls_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int add(int a, int b) { return a + b; }"
+		"int mul(int a, int b) { return a * b; }"
+		"void foo() { int r = add(mul(2, 3), mul(4, 5)); }"
+	);
+}
+
+TEST(Sema, CompoundAssignOnConst_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { const int x = 5; x += 1; }");
+}
+
+TEST(Sema, IncrementConst_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { const int x = 5; x++; }");
+}
+
+TEST(Sema, DeleteNull_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = null; delete p; }");
+}
+
+TEST(Sema, NewArrayType_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = new int(10); }");
+}
+
+TEST(Sema, ExternDeclaration_Ok)
+{
+	EXPECT_SEMA_OK("extern void puts(const char[] s);");
+}
+
+TEST(Sema, FunctionCallOrder_CalleeDeclaredFirst_Ok)
+{
+	// Functions must be declared before being called at global scope
+	EXPECT_SEMA_OK(
+		"void bar() { }"
+		"void foo() { bar(); }"
+	);
+}
+
+TEST(Sema, SwitchOnEnum_Ok)
+{
+	EXPECT_SEMA_OK(
+		"enum Color { Red, Green, Blue };"
+		"void foo(Color c) { switch (c) { case 0: break; case 1: break; default: break; } }"
+	);
+}
+
+TEST(Sema, MultiLevelInheritance_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class A { public int x; };"
+		"class B : A { public int y; };"
+		"class C : B { public int z; };"
+	);
+}
+
+TEST(Sema, VirtualOverrideChain_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class A { public int Do() virtual { return 0; } };"
+		"class B : A { public int Do() virtual { return 1; } };"
+		"class C : B { public int Do() virtual { return 2; } };"
+	);
+}

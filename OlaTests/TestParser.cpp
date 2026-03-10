@@ -573,3 +573,324 @@ TEST(Parser, MultipleVarsInOneDecl)
 	ParseHelper h("int a = 1; int b = 2; int c = 3;");
 	ASSERT_FALSE(h.HasErrors());
 }
+
+TEST(Parser, ForeachLoop)
+{
+	ParseHelper h("void foo() { int[5] a; foreach (int x : a) {} }");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_GE(fn->GetBodyStmt()->GetStmts().size(), 2u);
+}
+
+TEST(Parser, BreakAndContinueInLoop)
+{
+	ParseHelper h("void foo() { for (int i = 0; i < 10; ++i) { if (i == 5) break; continue; } }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, NestedForLoops)
+{
+	ParseHelper h(
+		"void foo() {"
+		"  for (int i = 0; i < 10; ++i) {"
+		"    for (int j = 0; j < 10; ++j) {}"
+		"  }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, PointerDeclaration)
+{
+	ParseHelper h("void foo() { int* p = new int; delete p; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ChainedMemberAccess)
+{
+	ParseHelper h(
+		"class Inner { public int val; };"
+		"class Outer { public Inner inner; };"
+		"void foo() { Outer o; int x = o.inner.val; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, FunctionAttribute_NoMangle)
+{
+	ParseHelper h("nomangle void extern_func() {}");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_TRUE(fn->IsNoMangle());
+}
+
+TEST(Parser, FunctionAttribute_Deprecated)
+{
+	ParseHelper h("deprecated void old_func() {}");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_TRUE(fn->IsDeprecated());
+}
+
+TEST(Parser, FunctionAttribute_NoOpt)
+{
+	ParseHelper h("noopt void debug_func() {}");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_TRUE(fn->IsNoOpt());
+}
+
+TEST(Parser, MultipleReturnPaths)
+{
+	ParseHelper h(
+		"int foo(int x) {"
+		"  if (x > 0) { return 1; }"
+		"  else { return -1; }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, NestedSwitchStatement)
+{
+	ParseHelper h(
+		"void foo(int x, int y) {"
+		"  switch (x) {"
+		"    case 0: switch (y) { case 1: break; default: break; } break;"
+		"    default: break;"
+		"  }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, AutoTypeInference)
+{
+	ParseHelper h("void foo() { auto x = 42; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, AutoTypeWithExpression)
+{
+	ParseHelper h("void foo() { int a = 10; auto b = a + 5; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ClassWithMultipleMethods)
+{
+	ParseHelper h(
+		"class Math {"
+		"  public int Add(int a, int b) { return a + b; }"
+		"  public int Sub(int a, int b) { return a - b; }"
+		"  public int Mul(int a, int b) { return a * b; }"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ClassWithPrivateAndPublic)
+{
+	ParseHelper h(
+		"class Counter {"
+		"  private int count;"
+		"  public int Get() { return this.count; }"
+		"  public void Inc() { this.count = this.count + 1; }"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, InterfaceWithMultipleMethods)
+{
+	ParseHelper h(
+		"interface Shape {"
+		"  public int Area();"
+		"  public int Perimeter();"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, TemplateClassDeclaration)
+{
+	ParseHelper h(
+		"class Box<T> {"
+		"  public T val;"
+		"  public T Get() { return this.val; }"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, TemplateClassInstantiation)
+{
+	ParseHelper h(
+		"class Wrapper<T> { public T val; };"
+		"void foo() { Wrapper<int> w; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, EnumWithManyMembers)
+{
+	ParseHelper h("enum Weekday { Mon, Tue, Wed, Thu, Fri, Sat, Sun };");
+	ASSERT_FALSE(h.HasErrors());
+
+	EnumDecl const* enm = nullptr;
+	for (auto const& d : h.TU().GetDecls())
+		if (auto* e = dyn_cast<EnumDecl>(d.get())) { enm = e; break; }
+	ASSERT_NE(enm, nullptr);
+	EXPECT_EQ(enm->GetName(), "Weekday");
+}
+
+TEST(Parser, SizeofExpression)
+{
+	ParseHelper h("void foo() { int s = sizeof(int); }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, LengthExpression)
+{
+	ParseHelper h("void foo() { int[10] a; int n = length(a); }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, BitwiseExpressions)
+{
+	ParseHelper h("void foo() { int x = 5 & 3; int y = x | 2; int z = y ^ 1; int w = ~z; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ShiftExpressions)
+{
+	ParseHelper h("void foo() { int x = 1 << 3; int y = 16 >> 2; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ComplexExpressionPrecedence)
+{
+	// a + b * c - d / e should parse correctly
+	ParseHelper h("void foo() { int a = 1; int b = 2; int c = 3; int d = 4; int e = 5; int r = a + b * c - d / e; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, LogicalExpressions)
+{
+	ParseHelper h("void foo() { bool a = true; bool b = false; bool c = a && b || !a; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, VirtualMethodDecl)
+{
+	ParseHelper h(
+		"class Shape {"
+		"  public int Area() virtual { return 0; }"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, PureVirtualMethod)
+{
+	ParseHelper h(
+		"class Shape {"
+		"  public int Area() virtual pure;"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, FinalClass)
+{
+	ParseHelper h("class Singleton final { public int val; };");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, NullLiteral)
+{
+	ParseHelper h("void foo() { int* p = null; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ConstGlobalVariable)
+{
+	ParseHelper h("const int MAX = 100;");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, MultiDimensionalArray)
+{
+	ParseHelper h("void foo() { int[3][4] matrix; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, PreIncrementDecrement)
+{
+	ParseHelper h("void foo() { int x = 0; ++x; --x; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, PostIncrementDecrement)
+{
+	ParseHelper h("void foo() { int x = 0; x++; x--; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ConstructorWithMultipleParams)
+{
+	ParseHelper h(
+		"class Rect {"
+		"  Rect(int w, int h) { this.w = w; this.h = h; }"
+		"  public int w;"
+		"  public int h;"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, SuperCall)
+{
+	ParseHelper h(
+		"class Base {"
+		"  Base(int x) { this.x = x; }"
+		"  public int x;"
+		"};"
+		"class Derived : Base {"
+		"  Derived(int x, int y) { super(x); this.y = y; }"
+		"  public int y;"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, MissingReturnType)
+{
+	ParseHelper h("foo() {}");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, MissingFunctionName)
+{
+	ParseHelper h("void () {}");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, UnexpectedTokenInExpression)
+{
+	ParseHelper h("void foo() { int x = ; }");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, DoubleSemicolon)
+{
+	ParseHelper h("void foo() { int x = 5;; }");
+	EXPECT_FALSE(h.HasErrors());
+}
