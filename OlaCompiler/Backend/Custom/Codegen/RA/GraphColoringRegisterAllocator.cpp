@@ -507,6 +507,8 @@ namespace ola
 					}
 				}
 
+			Bool gp_scratch_used = false;
+			Bool fp_scratch_used = false;
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
@@ -551,7 +553,10 @@ namespace ola
 						else
 						{
 							Bool is_float = (MO.GetType() == MachineType::Float64);
-							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
+							Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+							Uint32 scratch = scratch_used ? target_reg_info.GetReturnRegister() : primary_scratch;
+							scratch_used = true;
 
 							MachineInstruction load_inst(InstLoad);
 							load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, MO.GetType()));

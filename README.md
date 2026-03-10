@@ -137,7 +137,7 @@ The project consists of the following parts:
 
 5. **Ola Tests**:
    - A set of tests built with GoogleTest, organized into four targets:
-     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes and Interpreter — no system calls.
+     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes, Machine IR, Register Allocation and Interpreter — no system calls.
      - **OlaTestsE2E**: End-to-end tests using the custom backend. Invokes **OlaDriver** via system calls.
      - **OlaTestsInterpreter**: End-to-end tests using the interpreter backend. Invokes **OlaDriver** via system calls.
      - **OlaTestsLLVM**: End-to-end tests using the LLVM backend. Only built when LLVM is detected. Invokes **OlaDriver** via system calls.

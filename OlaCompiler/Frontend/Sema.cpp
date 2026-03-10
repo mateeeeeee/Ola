@@ -39,11 +39,6 @@ namespace ola
 				diagnostics.Report(loc, missing_type_specifier);
 				return nullptr;
 			}
-			if (isa<ArrayType>(ref_type->GetReferredType()))
-			{
-				diagnostics.Report(loc, arrays_cannot_be_refs);
-				return nullptr;
-			}
 			if (isa<PtrType>(ref_type->GetReferredType()))
 			{
 				diagnostics.Report(loc, pointers_cannot_be_refs);
@@ -1190,12 +1185,17 @@ namespace ola
 
 	UniqueIntLiteralPtr Sema::ActOnLengthOperator(QualType const& type, SourceLocation const& loc)
 	{
-		if (!isa<ArrayType>(type))
+		Type const* unwrapped = type.GetTypePtr();
+		if (RefType const* ref_type = dyn_cast<RefType>(unwrapped))
+		{
+			unwrapped = ref_type->GetReferredType().GetTypePtr();
+		}
+		if (!isa<ArrayType>(unwrapped))
 		{
 			diagnostics.Report(loc, length_operand_not_array);
 			return nullptr;
 		}
-		ArrayType const* array_type = cast<ArrayType>(type);
+		ArrayType const* array_type = cast<ArrayType>(unwrapped);
 		if (array_type->GetArraySize() == 0)
 		{
 			diagnostics.Report(loc, length_operand_incomplete_array);
@@ -1400,7 +1400,12 @@ namespace ola
 
 	UniqueArrayAccessExprPtr Sema::ActOnArrayAccessExpr(SourceLocation const& loc, UniqueExprPtr&& array_expr, UniqueExprPtr&& index_expr)
 	{
-		if (!isa<ArrayType>(array_expr->GetType()) && !isa<PtrType>(array_expr->GetType()))
+		Type const* expr_type = array_expr->GetType().GetTypePtr();
+		if (RefType const* ref_type = dyn_cast<RefType>(expr_type))
+		{
+			expr_type = ref_type->GetReferredType().GetTypePtr();
+		}
+		if (!isa<ArrayType>(expr_type) && !isa<PtrType>(expr_type))
 		{
 			diagnostics.Report(loc, subscripted_value_not_array);
 			return nullptr;
@@ -1412,9 +1417,9 @@ namespace ola
 		}
 
 		QualType element_type;
-		if (isa<ArrayType>(array_expr->GetType()))
+		if (isa<ArrayType>(expr_type))
 		{
-			ArrayType const* array_type = cast<ArrayType>(array_expr->GetType());
+			ArrayType const* array_type = cast<ArrayType>(expr_type);
 			if (index_expr->IsConstexpr())
 			{
 				Int64 bracket_value = index_expr->EvaluateConstexpr();
@@ -1428,7 +1433,7 @@ namespace ola
 		}
 		else
 		{
-			PtrType const* ptr_type = cast<PtrType>(array_expr->GetType());
+			PtrType const* ptr_type = cast<PtrType>(expr_type);
 			element_type = ptr_type->GetPointeeType();
 		}
 
@@ -1849,11 +1854,6 @@ namespace ola
 		Bool is_array = (has_type_specifier && isa<ArrayType>(type)) || (has_init && isa<ArrayType>(init_expr->GetType()));
 		if (is_array)
 		{
-			if (is_ref_type)
-			{
-				diagnostics.Report(loc, arrays_cannot_be_refs);
-				return nullptr;
-			}
 			if (Expr* array_init_expr = init_expr.get())
 			{
 				ArrayType const* init_expr_type = cast<ArrayType>(array_init_expr->GetType());

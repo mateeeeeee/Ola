@@ -6,234 +6,97 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @Factorial__I i64(i64 %n) {
+define internal @SumArray__I5 i64(i64[5] %arr) {
 entry:
-%0 = icmp sle i64 %n, 1
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%1 = sub i64 %n, 1
-%2 = call i64 %1, @Factorial__I
-%3 = smul i64 %n, %2
-br label exit
+%0 = alloca i64[5]
+store i64[5] %arr, ptr %0
+br label for.cond
+for.body:
+%1 = gep ptr %0, 0, %2
+%3 = load i64, ptr %1
+%4 = add i64 %5, %3
+br label for.iter
+for.cond:
+%5 = phi i64 [ 0, entry ], [ %4, for.iter ]
+%2 = phi i64 [ 0, entry ], [ %6, for.iter ]
+%7 = icmp slt i64 %2, 5
+br i8 %7, label for.body, label exit
+for.iter:
+%8 = alloca ptr
+store i64 %2, ptr %8
+%6 = add i64 %2, 1
+br label for.cond
 exit:
-%4 = phi i64 [ %3, if.end ], [ 1, if.then ]
-ret i64 %4
+ret i64 %5
 }
 
 
-define internal @TestFactorial void() {
+define internal @TestArrayPassByValue void() {
 entry:
-%0 = call i64 0, @Factorial__I
-%1 = icmp eq i64 %0, 1
-call i8 %1, @Assert
-%2 = call i64 1, @Factorial__I
-%3 = icmp eq i64 %2, 1
-call i8 %3, @Assert
-%4 = call i64 5, @Factorial__I
-%5 = icmp eq i64 %4, 120
-call i8 %5, @Assert
-%6 = call i64 6, @Factorial__I
-%7 = icmp eq i64 %6, 720
-call i8 %7, @Assert
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 2, ptr %1
+%2 = ptr add ptr %0, 8
+store 4, ptr %2
+%3 = ptr add ptr %0, 16
+store 6, ptr %3
+%4 = ptr add ptr %0, 24
+store 8, ptr %4
+%5 = ptr add ptr %0, 32
+store 10, ptr %5
+%6 = load i64[5], ptr %0
+%7 = call i64[5] %6, @SumArray__I5
+%8 = icmp eq i64 %7, 30
+call i8 %8, @Assert
+%9 = alloca i64[3]
+%10 = ptr add ptr %9, 0
+store 1, ptr %10
+%11 = ptr add ptr %9, 8
+store 2, ptr %11
+%12 = ptr add ptr %9, 16
+store 3, ptr %12
+%13 = load i64[3], ptr %9
+br label entry.inlined
+entry.split:
+%14 = load i64, ptr %10
+%15 = icmp eq i64 %14, 1
+call i8 %15, @Assert
 br label exit
-exit:
-ret 
-}
-
-
-define internal @Fibonacci__I i64(i64 %n) {
-entry:
-%0 = icmp sle i64 %n, 0
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%1 = icmp eq i64 %n, 1
-br i8 %1, label if.then1, label if.end1
-if.then1:
-br label exit
-if.end1:
-%2 = sub i64 %n, 1
-%3 = call i64 %2, @Fibonacci__I
-%4 = sub i64 %n, 2
-%5 = call i64 %4, @Fibonacci__I
-%6 = add i64 %3, %5
-br label exit
-exit:
-%7 = phi i64 [ %6, if.end1 ], [ 1, if.then1 ], [ 0, if.then ]
-ret i64 %7
-}
-
-
-define internal @TestFibonacci void() {
-entry:
-%0 = call i64 0, @Fibonacci__I
-%1 = icmp eq i64 %0, 0
-call i8 %1, @Assert
-%2 = call i64 1, @Fibonacci__I
-%3 = icmp eq i64 %2, 1
-call i8 %3, @Assert
-%4 = call i64 2, @Fibonacci__I
-%5 = icmp eq i64 %4, 1
-call i8 %5, @Assert
-%6 = call i64 7, @Fibonacci__I
-%7 = icmp eq i64 %6, 13
-call i8 %7, @Assert
-%8 = call i64 10, @Fibonacci__I
-%9 = icmp eq i64 %8, 55
-call i8 %9, @Assert
-br label exit
+entry.inlined:
+%16 = alloca i64[3]
+store i64[3] %13, ptr %16
+%17 = ptr add ptr %16, 0
+store 999, ptr %17
+br label entry.split
 exit:
 ret 
 }
 
 
-define internal @SumRange__I i64(i64 %n) {
+define internal @ZeroArray__I5ref void(ptr %arr) {
 entry:
-%0 = icmp sle i64 %n, 0
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%1 = sub i64 %n, 1
-%2 = call i64 %1, @SumRange__I
-%3 = add i64 %n, %2
-br label exit
-exit:
-%4 = phi i64 [ %3, if.end ], [ 0, if.then ]
-ret i64 %4
-}
-
-
-define internal @TestSumRange void() {
-entry:
-%0 = call i64 0, @SumRange__I
-%1 = icmp eq i64 %0, 0
-call i8 %1, @Assert
-%2 = call i64 1, @SumRange__I
-%3 = icmp eq i64 %2, 1
-call i8 %3, @Assert
-%4 = call i64 5, @SumRange__I
-%5 = icmp eq i64 %4, 15
-call i8 %5, @Assert
-%6 = call i64 10, @SumRange__I
-%7 = icmp eq i64 %6, 55
-call i8 %7, @Assert
-br label exit
+br label for.cond
+for.body:
+%0 = gep ptr %arr, 0, %1
+store 0, ptr %0
+br label for.iter
+for.cond:
+%1 = phi i64 [ 0, entry ], [ %2, for.iter ]
+%3 = icmp slt i64 %1, 5
+br i8 %3, label for.body, label exit
+for.iter:
+%4 = alloca ptr
+store i64 %1, ptr %4
+%2 = add i64 %1, 1
+br label for.cond
 exit:
 ret 
 }
 
 
-define internal @Power__I__I i64(i64 %base,i64 %exp) {
+define internal @TestArrayPassByRef void() {
 entry:
-%0 = icmp eq i64 %exp, 0
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%1 = sub i64 %exp, 1
-%2 = call i64 %base, %1, @Power__I__I
-%3 = smul i64 %base, %2
-br label exit
-exit:
-%4 = phi i64 [ %3, if.end ], [ 1, if.then ]
-ret i64 %4
-}
-
-
-define internal @TestPower void() {
-entry:
-%0 = call i64 2, 0, @Power__I__I
-%1 = icmp eq i64 %0, 1
-call i8 %1, @Assert
-%2 = call i64 2, 1, @Power__I__I
-%3 = icmp eq i64 %2, 2
-call i8 %3, @Assert
-%4 = call i64 2, 10, @Power__I__I
-%5 = icmp eq i64 %4, 1024
-call i8 %5, @Assert
-%6 = call i64 3, 4, @Power__I__I
-%7 = icmp eq i64 %6, 81
-call i8 %7, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @GCD__I__I i64(i64 %a,i64 %b) {
-entry:
-br label tailrecurse
-tailrecurse:
-%b.tr = phi i64 [ %b, entry ], [ %0, if.end ]
-%a.tr = phi i64 [ %a, entry ], [ %b.tr, if.end ]
-%1 = icmp eq i64 %b.tr, 0
-br i8 %1, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%0 = srem i64 %a.tr, %b.tr
-br label tailrecurse
-exit:
-ret i64 %a.tr
-}
-
-
-define internal @TestGCD void() {
-entry:
-%0 = call i64 12, 8, @GCD__I__I
-%1 = icmp eq i64 %0, 4
-call i8 %1, @Assert
-%2 = call i64 100, 75, @GCD__I__I
-%3 = icmp eq i64 %2, 25
-call i8 %3, @Assert
-%4 = call i64 17, 13, @GCD__I__I
-%5 = icmp eq i64 %4, 1
-call i8 %5, @Assert
-%6 = call i64 0, 5, @GCD__I__I
-%7 = icmp eq i64 %6, 5
-call i8 %7, @Assert
-br label exit
-exit:
-ret 
-}
-
-
-define internal @IsPalindrome__I10__I__I i8(i64[10] %arr,i64 %left,i64 %right) {
-entry:
-%0 = alloca i64[10]
-store i64[10] %arr, ptr %0
-%1 = icmp sge i64 %left, %right
-br i8 %1, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-%2 = gep ptr %0, 0, %left
-%3 = gep ptr %0, 0, %right
-%4 = load i64, ptr %2
-%5 = load i64, ptr %3
-%6 = icmp ne i64 %4, %5
-br i8 %6, label if.then1, label if.end1
-if.then1:
-br label exit
-if.end1:
-%7 = load i64[10], ptr %0
-%8 = add i64 %left, 1
-%9 = sub i64 %right, 1
-%10 = call i64[10] %7, %8, %9, @IsPalindrome__I10__I__I
-br label exit
-exit:
-%11 = phi i8 [ %10, if.end1 ], [ 0, if.then1 ], [ 1, if.then ]
-ret i8 %11
-}
-
-
-define internal @TestIsPalindrome void() {
-entry:
-%0 = alloca i64[10]
+%0 = alloca i64[5]
 %1 = ptr add ptr %0, 0
 store 1, ptr %1
 %2 = ptr add ptr %0, 8
@@ -241,48 +104,267 @@ store 2, ptr %2
 %3 = ptr add ptr %0, 16
 store 3, ptr %3
 %4 = ptr add ptr %0, 24
-store 2, ptr %4
+store 4, ptr %4
 %5 = ptr add ptr %0, 32
-store 1, ptr %5
-%6 = ptr add ptr %0, 40
-store 0, ptr %6
-%7 = ptr add ptr %0, 48
-store 0, ptr %7
-%8 = ptr add ptr %0, 56
-store 0, ptr %8
-%9 = ptr add ptr %0, 64
-store 0, ptr %9
-%10 = ptr add ptr %0, 72
-store 0, ptr %10
-%11 = load i64[10], ptr %0
-%12 = call i64[10] %11, 0, 4, @IsPalindrome__I10__I__I
-%13 = icmp eq i8 %12, 1
+store 5, ptr %5
+call ptr %0, @ZeroArray__I5ref
+br label for.cond
+for.body:
+%6 = gep ptr %0, 0, %7
+%8 = load i64, ptr %6
+%9 = icmp eq i64 %8, 0
+call i8 %9, @Assert
+br label for.iter
+for.cond:
+%7 = phi i64 [ 0, entry ], [ %10, for.iter ]
+%11 = icmp slt i64 %7, 5
+br i8 %11, label for.body, label exit
+for.iter:
+%12 = alloca ptr
+store i64 %7, ptr %12
+%10 = add i64 %7, 1
+br label for.cond
+exit:
+ret 
+}
+
+
+define internal @ReverseArray__I5ref void(ptr %arr) {
+entry:
+br label while.cond
+while.cond:
+%0 = phi i64 [ 0, entry ], [ %1, while.body ]
+%2 = phi i64 [ 4, entry ], [ %3, while.body ]
+%4 = icmp slt i64 %0, %2
+br i8 %4, label while.body, label exit
+while.body:
+%5 = gep ptr %arr, 0, %0
+%6 = load i64, ptr %5
+%7 = gep ptr %arr, 0, %2
+%8 = load i64, ptr %7
+store i64 %8, ptr %5
+store i64 %6, ptr %7
+%9 = alloca ptr
+store i64 %0, ptr %9
+%1 = add i64 %0, 1
+%10 = alloca ptr
+store i64 %2, ptr %10
+%3 = sub i64 %2, 1
+br label while.cond
+exit:
+ret 
+}
+
+
+define internal @TestArrayReverse void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+call ptr %0, @ReverseArray__I5ref
+%6 = load i64, ptr %1
+%7 = icmp eq i64 %6, 5
+call i8 %7, @Assert
+%8 = load i64, ptr %2
+%9 = icmp eq i64 %8, 4
+call i8 %9, @Assert
+%10 = load i64, ptr %3
+%11 = icmp eq i64 %10, 3
+call i8 %11, @Assert
+%12 = load i64, ptr %4
+%13 = icmp eq i64 %12, 2
 call i8 %13, @Assert
-%14 = alloca i64[10]
-%15 = ptr add ptr %14, 0
-store 1, ptr %15
-%16 = ptr add ptr %14, 8
-store 2, ptr %16
-%17 = ptr add ptr %14, 16
-store 3, ptr %17
-%18 = ptr add ptr %14, 24
-store 4, ptr %18
-%19 = ptr add ptr %14, 32
-store 5, ptr %19
-%20 = ptr add ptr %14, 40
-store 0, ptr %20
-%21 = ptr add ptr %14, 48
-store 0, ptr %21
-%22 = ptr add ptr %14, 56
-store 0, ptr %22
-%23 = ptr add ptr %14, 64
-store 0, ptr %23
-%24 = ptr add ptr %14, 72
-store 0, ptr %24
-%25 = load i64[10], ptr %14
-%26 = call i64[10] %25, 0, 4, @IsPalindrome__I10__I__I
-%27 = icmp eq i8 %26, 0
-call i8 %27, @Assert
+%14 = load i64, ptr %5
+%15 = icmp eq i64 %14, 1
+call i8 %15, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayBubbleSort void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 5, ptr %1
+%2 = ptr add ptr %0, 8
+store 3, ptr %2
+%3 = ptr add ptr %0, 16
+store 1, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 2, ptr %5
+br label for.cond
+for.body:
+%6 = sub i64 4, %7
+br label for.cond1
+for.cond:
+%7 = phi i64 [ 0, entry ], [ %8, for.iter ]
+%9 = icmp slt i64 %7, 5
+br i8 %9, label for.body, label for.end
+for.iter:
+%10 = alloca ptr
+store i64 %7, ptr %10
+%8 = add i64 %7, 1
+br label for.cond
+for.end:
+%11 = load i64, ptr %1
+%12 = icmp eq i64 %11, 1
+call i8 %12, @Assert
+%13 = load i64, ptr %2
+%14 = icmp eq i64 %13, 2
+call i8 %14, @Assert
+%15 = load i64, ptr %3
+%16 = icmp eq i64 %15, 3
+call i8 %16, @Assert
+%17 = load i64, ptr %4
+%18 = icmp eq i64 %17, 4
+call i8 %18, @Assert
+%19 = load i64, ptr %5
+%20 = icmp eq i64 %19, 5
+call i8 %20, @Assert
+br label exit
+for.body1:
+%21 = gep ptr %0, 0, %22
+%23 = add i64 %22, 1
+%24 = gep ptr %0, 0, %23
+%25 = load i64, ptr %21
+%26 = load i64, ptr %24
+%27 = icmp sgt i64 %25, %26
+br i8 %27, label if.then, label edge.0
+edge.0:
+br label for.iter1
+for.cond1:
+%22 = phi i64 [ 0, for.body ], [ %23, for.iter1 ]
+%28 = icmp slt i64 %22, %6
+br i8 %28, label for.body1, label for.iter
+for.iter1:
+%29 = alloca ptr
+store i64 %22, ptr %29
+br label for.cond1
+if.then:
+%30 = load i64, ptr %21
+%31 = load i64, ptr %24
+store i64 %31, ptr %21
+store i64 %30, ptr %24
+br label for.iter1
+exit:
+ret 
+}
+
+
+define internal @TestArrayCountMatches void() {
+entry:
+%0 = alloca i64[8]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 3, ptr %2
+%3 = ptr add ptr %0, 16
+store 5, ptr %3
+%4 = ptr add ptr %0, 24
+store 3, ptr %4
+%5 = ptr add ptr %0, 32
+store 7, ptr %5
+%6 = ptr add ptr %0, 40
+store 3, ptr %6
+%7 = ptr add ptr %0, 48
+store 9, ptr %7
+%8 = ptr add ptr %0, 56
+store 3, ptr %8
+br label for.cond
+for.body:
+%9 = gep ptr %0, 0, %10
+%11 = load i64, ptr %9
+%12 = icmp eq i64 %11, 3
+br i8 %12, label if.then, label edge.0
+edge.0:
+br label if.end
+for.cond:
+%13 = phi i64 [ 0, entry ], [ %14, for.iter ]
+%10 = phi i64 [ 0, entry ], [ %15, for.iter ]
+%16 = icmp slt i64 %10, 8
+br i8 %16, label for.body, label for.end
+for.iter:
+%17 = alloca ptr
+store i64 %10, ptr %17
+%15 = add i64 %10, 1
+br label for.cond
+for.end:
+%18 = icmp eq i64 %13, 4
+call i8 %18, @Assert
+br label exit
+if.then:
+%19 = alloca ptr
+store i64 %13, ptr %19
+%20 = add i64 %13, 1
+br label if.end
+if.end:
+%14 = phi i64 [ %13, edge.0 ], [ %20, if.then ]
+br label for.iter
+exit:
+ret 
+}
+
+
+define internal @TestArrayPrefixSum void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+br label for.cond
+for.body:
+%6 = gep ptr %0, 0, %7
+%8 = sub i64 %7, 1
+%9 = gep ptr %0, 0, %8
+%10 = load i64, ptr %6
+%11 = load i64, ptr %9
+%12 = add i64 %10, %11
+store i64 %12, ptr %6
+br label for.iter
+for.cond:
+%7 = phi i64 [ 1, entry ], [ %13, for.iter ]
+%14 = icmp slt i64 %7, 5
+br i8 %14, label for.body, label for.end
+for.iter:
+%15 = alloca ptr
+store i64 %7, ptr %15
+%13 = add i64 %7, 1
+br label for.cond
+for.end:
+%16 = load i64, ptr %1
+%17 = icmp eq i64 %16, 1
+call i8 %17, @Assert
+%18 = load i64, ptr %2
+%19 = icmp eq i64 %18, 3
+call i8 %19, @Assert
+%20 = load i64, ptr %3
+%21 = icmp eq i64 %20, 6
+call i8 %21, @Assert
+%22 = load i64, ptr %4
+%23 = icmp eq i64 %22, 10
+call i8 %23, @Assert
+%24 = load i64, ptr %5
+%25 = icmp eq i64 %24, 15
+call i8 %25, @Assert
 br label exit
 exit:
 ret 
@@ -291,12 +373,12 @@ ret
 
 define external @main i64() {
 entry:
-call ptr @TestFactorial
-call ptr @TestFibonacci
-call ptr @TestSumRange
-call ptr @TestPower
-call ptr @TestGCD
-call ptr @TestIsPalindrome
+call ptr @TestArrayPassByValue
+call ptr @TestArrayPassByRef
+call ptr @TestArrayReverse
+call ptr @TestArrayBubbleSort
+call ptr @TestArrayCountMatches
+call ptr @TestArrayPrefixSum
 br label exit
 exit:
 ret i64 0

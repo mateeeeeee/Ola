@@ -1536,6 +1536,10 @@ namespace ola
 		else
 		{
 			Type const* array_expr_type = array_expr->GetType();
+			if (RefType const* ref_type = dyn_cast<RefType>(array_expr_type))
+			{
+				array_expr_type = ref_type->GetReferredType().GetTypePtr();
+			}
 			if (isa<PtrType>(array_expr_type))
 			{
 				IRType* ptr_ir_type = ConvertToIRType(array_expr_type);
