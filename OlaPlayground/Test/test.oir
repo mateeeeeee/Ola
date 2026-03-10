@@ -6,28 +6,1161 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
+define internal @GlobalArray1 ptr [1,1,1,]
+
+
+define internal @GlobalArray2 ptr [1,2,3,0,0,]
+
+
+define internal @GlobalArray3 ptr [10,20,30,]
+
+
+define internal @GlobalFloatArray ptr [1.5,2.5,3.5,]
+
+
+define internal @GlobalBoolArray ptr [1,0,1,0,]
+
+
+define internal @TestGlobalArrays void() {
+entry:
+call i8 1, @Assert
+%0 = ptr add ptr @GlobalArray1, 0
+%1 = load i64, ptr %0
+%2 = icmp eq i64 %1, 1
+call i8 %2, @Assert
+%3 = ptr add ptr @GlobalArray1, 8
+%4 = load i64, ptr %3
+%5 = icmp eq i64 %4, 1
+call i8 %5, @Assert
+%6 = ptr add ptr @GlobalArray1, 16
+%7 = load i64, ptr %6
+%8 = icmp eq i64 %7, 1
+call i8 %8, @Assert
+call i8 1, @Assert
+%9 = ptr add ptr @GlobalArray2, 0
+%10 = load i64, ptr %9
+%11 = icmp eq i64 %10, 1
+call i8 %11, @Assert
+%12 = ptr add ptr @GlobalArray2, 8
+%13 = load i64, ptr %12
+%14 = icmp eq i64 %13, 2
+call i8 %14, @Assert
+%15 = ptr add ptr @GlobalArray2, 16
+%16 = load i64, ptr %15
+%17 = icmp eq i64 %16, 3
+call i8 %17, @Assert
+%18 = ptr add ptr @GlobalArray2, 24
+%19 = load i64, ptr %18
+%20 = icmp eq i64 %19, 0
+call i8 %20, @Assert
+%21 = ptr add ptr @GlobalArray2, 32
+%22 = load i64, ptr %21
+%23 = icmp eq i64 %22, 0
+call i8 %23, @Assert
+%24 = ptr add ptr @GlobalArray3, 0
+%25 = load i64, ptr %24
+%26 = icmp eq i64 %25, 10
+call i8 %26, @Assert
+%27 = ptr add ptr @GlobalArray3, 8
+%28 = load i64, ptr %27
+%29 = icmp eq i64 %28, 20
+call i8 %29, @Assert
+%30 = ptr add ptr @GlobalArray3, 16
+%31 = load i64, ptr %30
+%32 = icmp eq i64 %31, 30
+call i8 %32, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestLocalArrays void() {
+entry:
+%0 = alloca i64[10]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+%5 = ptr add ptr %0, 32
+store 0, ptr %5
+%6 = ptr add ptr %0, 40
+store 0, ptr %6
+%7 = ptr add ptr %0, 48
+store 0, ptr %7
+%8 = ptr add ptr %0, 56
+store 0, ptr %8
+%9 = ptr add ptr %0, 64
+store 0, ptr %9
+%10 = ptr add ptr %0, 72
+store 0, ptr %10
+call i8 1, @Assert
+%11 = ptr add ptr %0, 0
+%12 = load i64, ptr %11
+%13 = icmp eq i64 %12, 1
+call i8 %13, @Assert
+%14 = ptr add ptr %0, 8
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 2
+call i8 %16, @Assert
+%17 = ptr add ptr %0, 16
+%18 = load i64, ptr %17
+%19 = icmp eq i64 %18, 0
+call i8 %19, @Assert
+%20 = ptr add ptr %0, 48
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 0
+call i8 %22, @Assert
+%23 = alloca i64[3]
+%24 = ptr add ptr %23, 0
+store -5, ptr %24
+%25 = ptr add ptr %23, 8
+store 0, ptr %25
+%26 = ptr add ptr %23, 16
+store 5, ptr %26
+%27 = ptr add ptr %23, 0
+%28 = load i64, ptr %27
+%29 = icmp eq i64 %28, -5
+call i8 %29, @Assert
+%30 = ptr add ptr %23, 8
+%31 = load i64, ptr %30
+%32 = icmp eq i64 %31, 0
+call i8 %32, @Assert
+%33 = ptr add ptr %23, 16
+%34 = load i64, ptr %33
+%35 = icmp eq i64 %34, 5
+call i8 %35, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestFloatArrays void() {
+entry:
+%0 = ptr add ptr @GlobalFloatArray, 0
+%1 = load f64, ptr %0
+%2 = fcmp ogt f64 %1, 1.4999
+%3 = ptr add ptr @GlobalFloatArray, 0
+%4 = load f64, ptr %3
+%5 = fcmp olt f64 %4, 1.5001
+%6 = and i8 %2, %5
+%7 = icmp ne i8 %6, 0
+call i8 %7, @Assert
+%8 = ptr add ptr @GlobalFloatArray, 8
+%9 = load f64, ptr %8
+%10 = fcmp ogt f64 %9, 2.4999
+%11 = ptr add ptr @GlobalFloatArray, 8
+%12 = load f64, ptr %11
+%13 = fcmp olt f64 %12, 2.5001
+%14 = and i8 %10, %13
+%15 = icmp ne i8 %14, 0
+call i8 %15, @Assert
+%16 = ptr add ptr @GlobalFloatArray, 16
+%17 = load f64, ptr %16
+%18 = fcmp ogt f64 %17, 3.4999
+%19 = ptr add ptr @GlobalFloatArray, 16
+%20 = load f64, ptr %19
+%21 = fcmp olt f64 %20, 3.5001
+%22 = and i8 %18, %21
+%23 = icmp ne i8 %22, 0
+call i8 %23, @Assert
+%24 = alloca f64[4]
+%25 = ptr add ptr %24, 0
+store 0.5, ptr %25
+%26 = ptr add ptr %24, 8
+store 1, ptr %26
+%27 = ptr add ptr %24, 16
+store 1.5, ptr %27
+%28 = ptr add ptr %24, 24
+store 2, ptr %28
+%29 = ptr add ptr %24, 0
+%30 = load f64, ptr %29
+%31 = fcmp ogt f64 %30, 0.4999
+%32 = ptr add ptr %24, 0
+%33 = load f64, ptr %32
+%34 = fcmp olt f64 %33, 0.5001
+%35 = and i8 %31, %34
+%36 = icmp ne i8 %35, 0
+call i8 %36, @Assert
+%37 = ptr add ptr %24, 24
+%38 = load f64, ptr %37
+%39 = fcmp ogt f64 %38, 1.9999
+%40 = ptr add ptr %24, 24
+%41 = load f64, ptr %40
+%42 = fcmp olt f64 %41, 2.0001
+%43 = and i8 %39, %42
+%44 = icmp ne i8 %43, 0
+call i8 %44, @Assert
+%45 = ptr add ptr %24, 0
+%46 = ptr add ptr %24, 8
+%47 = load f64, ptr %45
+%48 = load f64, ptr %46
+%49 = fadd f64 %47, %48
+%50 = ptr add ptr %24, 16
+%51 = load f64, ptr %50
+%52 = fadd f64 %49, %51
+%53 = ptr add ptr %24, 24
+%54 = load f64, ptr %53
+%55 = fadd f64 %52, %54
+%56 = alloca f64
+store f64 %55, ptr %56
+%57 = load f64, ptr %56
+%58 = fcmp ogt f64 %57, 4.9999
+%59 = load f64, ptr %56
+%60 = fcmp olt f64 %59, 5.0001
+%61 = and i8 %58, %60
+%62 = icmp ne i8 %61, 0
+call i8 %62, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestBoolArrays void() {
+entry:
+%0 = ptr add ptr @GlobalBoolArray, 0
+%1 = load i8, ptr %0
+%2 = icmp eq i8 %1, 1
+call i8 %2, @Assert
+%3 = ptr add ptr @GlobalBoolArray, 1
+%4 = load i8, ptr %3
+%5 = icmp eq i8 %4, 0
+call i8 %5, @Assert
+%6 = ptr add ptr @GlobalBoolArray, 2
+%7 = load i8, ptr %6
+%8 = icmp eq i8 %7, 1
+call i8 %8, @Assert
+%9 = ptr add ptr @GlobalBoolArray, 3
+%10 = load i8, ptr %9
+%11 = icmp eq i8 %10, 0
+call i8 %11, @Assert
+%12 = alloca i8[3]
+%13 = ptr add ptr %12, 0
+store 1, ptr %13
+%14 = ptr add ptr %12, 1
+store 1, ptr %14
+%15 = ptr add ptr %12, 2
+store 0, ptr %15
+%16 = ptr add ptr %12, 0
+%17 = load i8, ptr %16
+%18 = icmp eq i8 %17, 1
+call i8 %18, @Assert
+%19 = ptr add ptr %12, 1
+%20 = load i8, ptr %19
+%21 = icmp eq i8 %20, 1
+call i8 %21, @Assert
+%22 = ptr add ptr %12, 2
+%23 = load i8, ptr %22
+%24 = icmp eq i8 %23, 0
+call i8 %24, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayModification void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+%6 = ptr add ptr %0, 0
+store 10, ptr %6
+%7 = ptr add ptr %0, 0
+%8 = load i64, ptr %7
+%9 = icmp eq i64 %8, 10
+call i8 %9, @Assert
+%10 = ptr add ptr %0, 32
+store 50, ptr %10
+%11 = ptr add ptr %0, 32
+%12 = load i64, ptr %11
+%13 = icmp eq i64 %12, 50
+call i8 %13, @Assert
+%14 = ptr add ptr %0, 16
+%15 = ptr add ptr %0, 0
+%16 = ptr add ptr %0, 32
+%17 = load i64, ptr %15
+%18 = load i64, ptr %16
+%19 = add i64 %17, %18
+store i64 %19, ptr %14
+%20 = ptr add ptr %0, 16
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 60
+call i8 %22, @Assert
+%23 = ptr add ptr %0, 8
+%24 = ptr add ptr %0, 8
+%25 = load i64, ptr %24
+%26 = smul i64 %25, 2
+store i64 %26, ptr %23
+%27 = ptr add ptr %0, 8
+%28 = load i64, ptr %27
+%29 = icmp eq i64 %28, 4
+call i8 %29, @Assert
+%30 = ptr add ptr %0, 24
+%31 = load i64, ptr %30
+%32 = alloca ptr
+store i64 %31, ptr %32
+%33 = add i64 %31, 1
+store i64 %33, ptr %30
+%34 = ptr add ptr %0, 24
+%35 = load i64, ptr %34
+%36 = icmp eq i64 %35, 5
+call i8 %36, @Assert
+%37 = ptr add ptr %0, 24
+%38 = load i64, ptr %37
+%39 = add i64 %38, 1
+store i64 %39, ptr %37
+%40 = ptr add ptr %0, 24
+%41 = load i64, ptr %40
+%42 = icmp eq i64 %41, 6
+call i8 %42, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayExpressions void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 10, ptr %1
+%2 = ptr add ptr %0, 8
+store 20, ptr %2
+%3 = ptr add ptr %0, 16
+store 30, ptr %3
+%4 = ptr add ptr %0, 24
+store 40, ptr %4
+%5 = ptr add ptr %0, 32
+store 50, ptr %5
+%6 = ptr add ptr %0, 0
+%7 = ptr add ptr %0, 8
+%8 = load i64, ptr %6
+%9 = load i64, ptr %7
+%10 = add i64 %8, %9
+%11 = ptr add ptr %0, 16
+%12 = load i64, ptr %11
+%13 = add i64 %10, %12
+%14 = ptr add ptr %0, 24
+%15 = load i64, ptr %14
+%16 = add i64 %13, %15
+%17 = ptr add ptr %0, 32
+%18 = load i64, ptr %17
+%19 = add i64 %16, %18
+%20 = alloca i64
+store i64 %19, ptr %20
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 150
+call i8 %22, @Assert
+%23 = ptr add ptr %0, 0
+%24 = ptr add ptr %0, 8
+%25 = load i64, ptr %23
+%26 = load i64, ptr %24
+%27 = smul i64 %25, %26
+%28 = alloca i64
+store i64 %27, ptr %28
+%29 = load i64, ptr %28
+%30 = icmp eq i64 %29, 200
+call i8 %30, @Assert
+%31 = ptr add ptr %0, 32
+%32 = ptr add ptr %0, 0
+%33 = load i64, ptr %31
+%34 = load i64, ptr %32
+%35 = sub i64 %33, %34
+%36 = alloca i64
+store i64 %35, ptr %36
+%37 = load i64, ptr %36
+%38 = icmp eq i64 %37, 40
+call i8 %38, @Assert
+%39 = ptr add ptr %0, 32
+%40 = ptr add ptr %0, 0
+%41 = load i64, ptr %39
+%42 = load i64, ptr %40
+%43 = icmp sgt i64 %41, %42
+%44 = alloca i8
+store i8 %43, ptr %44
+%45 = load i8, ptr %44
+%46 = icmp eq i8 %45, 1
+call i8 %46, @Assert
+%47 = ptr add ptr %0, 0
+%48 = ptr add ptr %0, 8
+%49 = load i64, ptr %47
+%50 = load i64, ptr %48
+%51 = add i64 %49, %50
+%52 = ptr add ptr %0, 16
+%53 = load i64, ptr %52
+%54 = add i64 %51, %53
+%55 = sdiv i64 %54, 3
+%56 = alloca i64
+store i64 %55, ptr %56
+%57 = load i64, ptr %56
+%58 = icmp eq i64 %57, 20
+call i8 %58, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayVariableIndex void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 100, ptr %1
+%2 = ptr add ptr %0, 8
+store 200, ptr %2
+%3 = ptr add ptr %0, 16
+store 300, ptr %3
+%4 = ptr add ptr %0, 24
+store 400, ptr %4
+%5 = ptr add ptr %0, 32
+store 500, ptr %5
+%6 = alloca i64
+store 0, ptr %6
+%7 = load i64, ptr %6
+%8 = gep ptr %0, 0, %7
+%9 = load i64, ptr %8
+%10 = icmp eq i64 %9, 100
+call i8 %10, @Assert
+store 2, ptr %6
+%11 = load i64, ptr %6
+%12 = gep ptr %0, 0, %11
+%13 = load i64, ptr %12
+%14 = icmp eq i64 %13, 300
+call i8 %14, @Assert
+%15 = alloca i64
+store 4, ptr %15
+%16 = load i64, ptr %15
+%17 = gep ptr %0, 0, %16
+%18 = load i64, ptr %17
+%19 = icmp eq i64 %18, 500
+call i8 %19, @Assert
+%20 = alloca i64
+store 1, ptr %20
+%21 = load i64, ptr %20
+%22 = add i64 %21, 1
+%23 = gep ptr %0, 0, %22
+%24 = load i64, ptr %23
+%25 = icmp eq i64 %24, 300
+call i8 %25, @Assert
+%26 = load i64, ptr %15
+%27 = sub i64 %26, 2
+%28 = gep ptr %0, 0, %27
+%29 = load i64, ptr %28
+%30 = icmp eq i64 %29, 300
+call i8 %30, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayInLoops void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+%6 = alloca i64
+store 0, ptr %6
+%7 = alloca i64
+store 0, ptr %7
+br label for.cond
+for.body:
+%8 = load i64, ptr %7
+%9 = gep ptr %0, 0, %8
+%10 = load i64, ptr %6
+%11 = load i64, ptr %9
+%12 = add i64 %10, %11
+store i64 %12, ptr %6
+br label for.iter
+for.cond:
+%13 = load i64, ptr %7
+%14 = icmp slt i64 %13, 5
+br i8 %14, label for.body, label for.end
+for.iter:
+%15 = load i64, ptr %7
+%16 = alloca ptr
+store i64 %15, ptr %16
+%17 = add i64 %15, 1
+store i64 %17, ptr %7
+br label for.cond
+for.end:
+%18 = load i64, ptr %6
+%19 = icmp eq i64 %18, 15
+call i8 %19, @Assert
+%20 = alloca i64
+store 0, ptr %20
+br label for.cond1
+for.body1:
+%21 = load i64, ptr %20
+%22 = gep ptr %0, 0, %21
+%23 = load i64, ptr %20
+%24 = gep ptr %0, 0, %23
+%25 = load i64, ptr %24
+%26 = smul i64 %25, 2
+store i64 %26, ptr %22
+br label for.iter1
+for.cond1:
+%27 = load i64, ptr %20
+%28 = icmp slt i64 %27, 5
+br i8 %28, label for.body1, label for.end1
+for.iter1:
+%29 = load i64, ptr %20
+%30 = alloca ptr
+store i64 %29, ptr %30
+%31 = add i64 %29, 1
+store i64 %31, ptr %20
+br label for.cond1
+for.end1:
+%32 = ptr add ptr %0, 0
+%33 = load i64, ptr %32
+%34 = icmp eq i64 %33, 2
+call i8 %34, @Assert
+%35 = ptr add ptr %0, 8
+%36 = load i64, ptr %35
+%37 = icmp eq i64 %36, 4
+call i8 %37, @Assert
+%38 = ptr add ptr %0, 16
+%39 = load i64, ptr %38
+%40 = icmp eq i64 %39, 6
+call i8 %40, @Assert
+%41 = ptr add ptr %0, 24
+%42 = load i64, ptr %41
+%43 = icmp eq i64 %42, 8
+call i8 %43, @Assert
+%44 = ptr add ptr %0, 32
+%45 = load i64, ptr %44
+%46 = icmp eq i64 %45, 10
+call i8 %46, @Assert
+%47 = ptr add ptr %0, 0
+%48 = alloca i64
+%49 = load i64, ptr %47
+store i64 %49, ptr %48
+%50 = alloca i64
+store 1, ptr %50
+br label for.cond2
+for.body2:
+%51 = load i64, ptr %50
+%52 = gep ptr %0, 0, %51
+%53 = load i64, ptr %52
+%54 = load i64, ptr %48
+%55 = icmp sgt i64 %53, %54
+br i8 %55, label if.then, label if.end
+for.cond2:
+%56 = load i64, ptr %50
+%57 = icmp slt i64 %56, 5
+br i8 %57, label for.body2, label for.end2
+for.iter2:
+%58 = load i64, ptr %50
+%59 = alloca ptr
+store i64 %58, ptr %59
+%60 = add i64 %58, 1
+store i64 %60, ptr %50
+br label for.cond2
+for.end2:
+br label exit
+if.then:
+%61 = load i64, ptr %50
+%62 = gep ptr %0, 0, %61
+%63 = load i64, ptr %62
+store i64 %63, ptr %48
+br label if.end
+if.else:
+br label exit
+if.end:
+br label for.iter2
+exit:
+ret 
+}
+
+
+define internal @TestArrayWhileLoop void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 5, ptr %1
+%2 = ptr add ptr %0, 8
+store 4, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 2, ptr %4
+%5 = ptr add ptr %0, 32
+store 1, ptr %5
+%6 = alloca i64
+store 0, ptr %6
+%7 = alloca i64
+store 0, ptr %7
+br label while.cond
+while.cond:
+%8 = load i64, ptr %6
+%9 = icmp slt i64 %8, 5
+br i8 %9, label while.body, label while.end
+while.body:
+%10 = load i64, ptr %6
+%11 = gep ptr %0, 0, %10
+%12 = load i64, ptr %7
+%13 = load i64, ptr %11
+%14 = add i64 %12, %13
+store i64 %14, ptr %7
+%15 = load i64, ptr %6
+%16 = alloca ptr
+store i64 %15, ptr %16
+%17 = add i64 %15, 1
+store i64 %17, ptr %6
+br label while.cond
+while.end:
+%18 = load i64, ptr %7
+%19 = icmp eq i64 %18, 15
+call i8 %19, @Assert
+store 0, ptr %6
+br label while.cond1
+while.cond1:
+%20 = load i64, ptr %6
+%21 = icmp slt i64 %20, 5
+br i8 %21, label while.body1, label while.end1
+while.body1:
+%22 = load i64, ptr %6
+%23 = gep ptr %0, 0, %22
+%24 = load i64, ptr %23
+%25 = srem i64 %24, 2
+%26 = icmp eq i64 %25, 0
+br i8 %26, label if.then, label if.end
+while.end1:
+%27 = load i64, ptr %6
+%28 = gep ptr %0, 0, %27
+%29 = load i64, ptr %28
+%30 = icmp eq i64 %29, 4
+call i8 %30, @Assert
+br label exit
+if.then:
+br label while.end1
+if.else:
+br label exit
+if.end:
+%31 = load i64, ptr %6
+%32 = alloca ptr
+store i64 %31, ptr %32
+%33 = add i64 %31, 1
+store i64 %33, ptr %6
+br label while.cond1
+break:
+br label if.end
+exit:
+ret 
+}
+
+
+define internal @TestArrayLengthSizeof void() {
+entry:
+%0 = alloca i64[10]
+call i8 1, @Assert
+call i8 1, @Assert
+%1 = alloca f64[5]
+call i8 1, @Assert
+call i8 1, @Assert
+%2 = alloca i8[8]
+call i8 1, @Assert
+call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayNegativeValues void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store -10, ptr %1
+%2 = ptr add ptr %0, 8
+store -5, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+%4 = ptr add ptr %0, 24
+store 5, ptr %4
+%5 = ptr add ptr %0, 32
+store 10, ptr %5
+%6 = ptr add ptr %0, 0
+%7 = load i64, ptr %6
+%8 = icmp eq i64 %7, -10
+call i8 %8, @Assert
+%9 = ptr add ptr %0, 8
+%10 = load i64, ptr %9
+%11 = icmp eq i64 %10, -5
+call i8 %11, @Assert
+%12 = ptr add ptr %0, 16
+%13 = load i64, ptr %12
+%14 = icmp eq i64 %13, 0
+call i8 %14, @Assert
+%15 = ptr add ptr %0, 24
+%16 = load i64, ptr %15
+%17 = icmp eq i64 %16, 5
+call i8 %17, @Assert
+%18 = ptr add ptr %0, 32
+%19 = load i64, ptr %18
+%20 = icmp eq i64 %19, 10
+call i8 %20, @Assert
+%21 = ptr add ptr %0, 0
+%22 = ptr add ptr %0, 8
+%23 = load i64, ptr %21
+%24 = load i64, ptr %22
+%25 = add i64 %23, %24
+%26 = ptr add ptr %0, 16
+%27 = load i64, ptr %26
+%28 = add i64 %25, %27
+%29 = ptr add ptr %0, 24
+%30 = load i64, ptr %29
+%31 = add i64 %28, %30
+%32 = ptr add ptr %0, 32
+%33 = load i64, ptr %32
+%34 = add i64 %31, %33
+%35 = alloca i64
+store i64 %34, ptr %35
+%36 = load i64, ptr %35
+%37 = icmp eq i64 %36, 0
+call i8 %37, @Assert
+%38 = ptr add ptr %0, 0
+%39 = ptr add ptr %0, 32
+%40 = load i64, ptr %39
+%41 = neg i64 %40
+store i64 %41, ptr %38
+%42 = ptr add ptr %0, 0
+%43 = load i64, ptr %42
+%44 = icmp eq i64 %43, -10
+call i8 %44, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestAutoArray void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 10, ptr %1
+%2 = ptr add ptr %0, 8
+store 20, ptr %2
+%3 = ptr add ptr %0, 16
+store 30, ptr %3
+%4 = ptr add ptr %0, 24
+store 40, ptr %4
+%5 = ptr add ptr %0, 32
+store 50, ptr %5
+call i8 1, @Assert
+%6 = ptr add ptr %0, 0
+%7 = load i64, ptr %6
+%8 = icmp eq i64 %7, 10
+call i8 %8, @Assert
+%9 = ptr add ptr %0, 32
+%10 = load i64, ptr %9
+%11 = icmp eq i64 %10, 50
+call i8 %11, @Assert
+%12 = alloca i64
+store 0, ptr %12
+%13 = alloca i64
+store 0, ptr %13
+br label for.cond
+for.body:
+%14 = load i64, ptr %13
+%15 = gep ptr %0, 0, %14
+%16 = load i64, ptr %12
+%17 = load i64, ptr %15
+%18 = add i64 %16, %17
+store i64 %18, ptr %12
+br label for.iter
+for.cond:
+%19 = load i64, ptr %13
+%20 = icmp slt i64 %19, 5
+br i8 %20, label for.body, label for.end
+for.iter:
+%21 = load i64, ptr %13
+%22 = alloca ptr
+store i64 %21, ptr %22
+%23 = add i64 %21, 1
+store i64 %23, ptr %13
+br label for.cond
+for.end:
+%24 = load i64, ptr %12
+%25 = icmp eq i64 %24, 150
+call i8 %25, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayBoundary void() {
+entry:
+%0 = alloca i64[1]
+%1 = ptr add ptr %0, 0
+store 42, ptr %1
+%2 = ptr add ptr %0, 0
+%3 = load i64, ptr %2
+%4 = icmp eq i64 %3, 42
+call i8 %4, @Assert
+call i8 1, @Assert
+%5 = alloca i64[10]
+%6 = ptr add ptr %5, 0
+store 1, ptr %6
+%7 = ptr add ptr %5, 8
+store 2, ptr %7
+%8 = ptr add ptr %5, 16
+store 3, ptr %8
+%9 = ptr add ptr %5, 24
+store 4, ptr %9
+%10 = ptr add ptr %5, 32
+store 5, ptr %10
+%11 = ptr add ptr %5, 40
+store 6, ptr %11
+%12 = ptr add ptr %5, 48
+store 7, ptr %12
+%13 = ptr add ptr %5, 56
+store 8, ptr %13
+%14 = ptr add ptr %5, 64
+store 9, ptr %14
+%15 = ptr add ptr %5, 72
+store 10, ptr %15
+%16 = ptr add ptr %5, 0
+%17 = load i64, ptr %16
+%18 = icmp eq i64 %17, 1
+call i8 %18, @Assert
+%19 = ptr add ptr %5, 72
+%20 = load i64, ptr %19
+%21 = icmp eq i64 %20, 10
+call i8 %21, @Assert
+%22 = alloca i64
+store 0, ptr %22
+%23 = alloca i64
+store 0, ptr %23
+br label for.cond
+for.body:
+%24 = load i64, ptr %23
+%25 = gep ptr %5, 0, %24
+%26 = load i64, ptr %22
+%27 = load i64, ptr %25
+%28 = add i64 %26, %27
+store i64 %28, ptr %22
+br label for.iter
+for.cond:
+%29 = load i64, ptr %23
+%30 = icmp slt i64 %29, 10
+br i8 %30, label for.body, label for.end
+for.iter:
+%31 = load i64, ptr %23
+%32 = alloca ptr
+store i64 %31, ptr %32
+%33 = add i64 %31, 1
+store i64 %33, ptr %23
+br label for.cond
+for.end:
+%34 = load i64, ptr %22
+%35 = icmp eq i64 %34, 55
+call i8 %35, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArraySwap void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 4, ptr %4
+%5 = ptr add ptr %0, 32
+store 5, ptr %5
+%6 = ptr add ptr %0, 0
+%7 = alloca i64
+%8 = load i64, ptr %6
+store i64 %8, ptr %7
+%9 = ptr add ptr %0, 0
+%10 = ptr add ptr %0, 32
+%11 = load i64, ptr %10
+store i64 %11, ptr %9
+%12 = ptr add ptr %0, 32
+%13 = load i64, ptr %7
+store i64 %13, ptr %12
+%14 = ptr add ptr %0, 0
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 5
+call i8 %16, @Assert
+%17 = ptr add ptr %0, 32
+%18 = load i64, ptr %17
+%19 = icmp eq i64 %18, 1
+call i8 %19, @Assert
+%20 = ptr add ptr %0, 8
+%21 = load i64, ptr %20
+%22 = icmp eq i64 %21, 2
+call i8 %22, @Assert
+%23 = ptr add ptr %0, 16
+%24 = load i64, ptr %23
+%25 = icmp eq i64 %24, 3
+call i8 %25, @Assert
+%26 = ptr add ptr %0, 24
+%27 = load i64, ptr %26
+%28 = icmp eq i64 %27, 4
+call i8 %28, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayTernary void() {
+entry:
+%0 = alloca i64[3]
+%1 = ptr add ptr %0, 0
+store 10, ptr %1
+%2 = ptr add ptr %0, 8
+store 20, ptr %2
+%3 = ptr add ptr %0, 16
+store 30, ptr %3
+%4 = ptr add ptr %0, 0
+%5 = ptr add ptr %0, 8
+%6 = load i64, ptr %4
+%7 = load i64, ptr %5
+%8 = icmp sgt i64 %6, %7
+%9 = ptr add ptr %0, 0
+%10 = load i64, ptr %9
+%11 = ptr add ptr %0, 8
+%12 = load i64, ptr %11
+%13 = select i8 %8, i64 %10, i64 %12
+%14 = alloca i64
+store i64 %13, ptr %14
+%15 = load i64, ptr %14
+%16 = icmp eq i64 %15, 20
+call i8 %16, @Assert
+%17 = ptr add ptr %0, 16
+%18 = load i64, ptr %14
+%19 = load i64, ptr %17
+%20 = icmp sgt i64 %18, %19
+%21 = load i64, ptr %14
+%22 = ptr add ptr %0, 16
+%23 = load i64, ptr %22
+%24 = select i8 %20, i64 %21, i64 %23
+store i64 %24, ptr %14
+%25 = load i64, ptr %14
+%26 = icmp eq i64 %25, 30
+call i8 %26, @Assert
+%27 = alloca i64
+store 0, ptr %27
+%28 = load i64, ptr %27
+%29 = gep ptr %0, 0, %28
+%30 = load i64, ptr %29
+%31 = icmp eq i64 %30, 10
+call i8 %31, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayAssignment void() {
+entry:
+%0 = alloca i64[3]
+%1 = ptr add ptr %0, 0
+store 1, ptr %1
+%2 = ptr add ptr %0, 8
+store 2, ptr %2
+%3 = ptr add ptr %0, 16
+store 3, ptr %3
+%4 = alloca i64[3]
+%5 = alloca i64
+store 0, ptr %5
+br label for.cond
+for.body:
+%6 = load i64, ptr %5
+%7 = gep ptr %4, 0, %6
+%8 = load i64, ptr %5
+%9 = gep ptr %0, 0, %8
+%10 = load i64, ptr %9
+store i64 %10, ptr %7
+br label for.iter
+for.cond:
+%11 = load i64, ptr %5
+%12 = icmp slt i64 %11, 3
+br i8 %12, label for.body, label for.end
+for.iter:
+%13 = load i64, ptr %5
+%14 = alloca ptr
+store i64 %13, ptr %14
+%15 = add i64 %13, 1
+store i64 %15, ptr %5
+br label for.cond
+for.end:
+%16 = ptr add ptr %4, 0
+%17 = load i64, ptr %16
+%18 = icmp eq i64 %17, 1
+call i8 %18, @Assert
+%19 = ptr add ptr %4, 8
+%20 = load i64, ptr %19
+%21 = icmp eq i64 %20, 2
+call i8 %21, @Assert
+%22 = ptr add ptr %4, 16
+%23 = load i64, ptr %22
+%24 = icmp eq i64 %23, 3
+call i8 %24, @Assert
+%25 = ptr add ptr %0, 0
+store 100, ptr %25
+%26 = ptr add ptr %0, 0
+%27 = load i64, ptr %26
+%28 = icmp eq i64 %27, 100
+call i8 %28, @Assert
+%29 = ptr add ptr %4, 0
+%30 = load i64, ptr %29
+%31 = icmp eq i64 %30, 1
+call i8 %31, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @TestArrayAccumulation void() {
+entry:
+%0 = alloca i64[5]
+%1 = ptr add ptr %0, 0
+store 0, ptr %1
+%2 = ptr add ptr %0, 8
+store 0, ptr %2
+%3 = ptr add ptr %0, 16
+store 0, ptr %3
+%4 = ptr add ptr %0, 24
+store 0, ptr %4
+%5 = ptr add ptr %0, 32
+store 0, ptr %5
+%6 = alloca i64
+store 0, ptr %6
+br label for.cond
+for.body:
+%7 = load i64, ptr %6
+%8 = srem i64 %7, 5
+%9 = gep ptr %0, 0, %8
+%10 = load i64, ptr %9
+%11 = alloca ptr
+store i64 %10, ptr %11
+%12 = add i64 %10, 1
+store i64 %12, ptr %9
+br label for.iter
+for.cond:
+%13 = load i64, ptr %6
+%14 = icmp slt i64 %13, 100
+br i8 %14, label for.body, label for.end
+for.iter:
+%15 = load i64, ptr %6
+%16 = alloca ptr
+store i64 %15, ptr %16
+%17 = add i64 %15, 1
+store i64 %17, ptr %6
+br label for.cond
+for.end:
+%18 = ptr add ptr %0, 0
+%19 = load i64, ptr %18
+%20 = icmp eq i64 %19, 20
+call i8 %20, @Assert
+%21 = ptr add ptr %0, 8
+%22 = load i64, ptr %21
+%23 = icmp eq i64 %22, 20
+call i8 %23, @Assert
+%24 = ptr add ptr %0, 16
+%25 = load i64, ptr %24
+%26 = icmp eq i64 %25, 20
+call i8 %26, @Assert
+%27 = ptr add ptr %0, 24
+%28 = load i64, ptr %27
+%29 = icmp eq i64 %28, 20
+call i8 %29, @Assert
+%30 = ptr add ptr %0, 32
+%31 = load i64, ptr %30
+%32 = icmp eq i64 %31, 20
+call i8 %32, @Assert
+br label exit
+exit:
+ret 
+}
+
+
 define internal @SumArray__I5 i64(i64[5] %arr) {
 entry:
 %0 = alloca i64[5]
 store i64[5] %arr, ptr %0
+%1 = alloca i64
+%2 = alloca i64
+store 0, ptr %2
+%3 = alloca i64
+store 0, ptr %3
 br label for.cond
 for.body:
-%1 = gep ptr %0, 0, %2
-%3 = load i64, ptr %1
-%4 = add i64 %5, %3
+%4 = load i64, ptr %3
+%5 = gep ptr %0, 0, %4
+%6 = load i64, ptr %2
+%7 = load i64, ptr %5
+%8 = add i64 %6, %7
+store i64 %8, ptr %2
 br label for.iter
 for.cond:
-%5 = phi i64 [ 0, entry ], [ %4, for.iter ]
-%2 = phi i64 [ 0, entry ], [ %6, for.iter ]
-%7 = icmp slt i64 %2, 5
-br i8 %7, label for.body, label exit
+%9 = load i64, ptr %3
+%10 = icmp slt i64 %9, 5
+br i8 %10, label for.body, label for.end
 for.iter:
-%8 = alloca ptr
-store i64 %2, ptr %8
-%6 = add i64 %2, 1
+%11 = load i64, ptr %3
+%12 = alloca ptr
+store i64 %11, ptr %12
+%13 = add i64 %11, 1
+store i64 %13, ptr %3
 br label for.cond
+for.end:
+%14 = load i64, ptr %2
+store i64 %14, ptr %1
+br label exit
+return:
+br label exit
 exit:
-ret i64 %5
+%15 = load i64, ptr %1
+ret i64 %15
+}
+
+
+define internal @ModifyArrayByValue__I3 void(i64[3] %arr) {
+entry:
+%0 = alloca i64[3]
+store i64[3] %arr, ptr %0
+%1 = ptr add ptr %0, 0
+store 999, ptr %1
+br label exit
+exit:
+ret 
 }
 
 
@@ -46,28 +1179,25 @@ store 8, ptr %4
 store 10, ptr %5
 %6 = load i64[5], ptr %0
 %7 = call i64[5] %6, @SumArray__I5
-%8 = icmp eq i64 %7, 30
-call i8 %8, @Assert
-%9 = alloca i64[3]
-%10 = ptr add ptr %9, 0
-store 1, ptr %10
-%11 = ptr add ptr %9, 8
-store 2, ptr %11
-%12 = ptr add ptr %9, 16
-store 3, ptr %12
-%13 = load i64[3], ptr %9
-br label entry.inlined
-entry.split:
-%14 = load i64, ptr %10
-%15 = icmp eq i64 %14, 1
-call i8 %15, @Assert
+%8 = alloca i64
+store i64 %7, ptr %8
+%9 = load i64, ptr %8
+%10 = icmp eq i64 %9, 30
+call i8 %10, @Assert
+%11 = alloca i64[3]
+%12 = ptr add ptr %11, 0
+store 1, ptr %12
+%13 = ptr add ptr %11, 8
+store 2, ptr %13
+%14 = ptr add ptr %11, 16
+store 3, ptr %14
+%15 = load i64[3], ptr %11
+call i64[3] %15, @ModifyArrayByValue__I3
+%16 = ptr add ptr %11, 0
+%17 = load i64, ptr %16
+%18 = icmp eq i64 %17, 1
+call i8 %18, @Assert
 br label exit
-entry.inlined:
-%16 = alloca i64[3]
-store i64[3] %13, ptr %16
-%17 = ptr add ptr %16, 0
-store 999, ptr %17
-br label entry.split
 exit:
 ret 
 }
@@ -75,20 +1205,30 @@ ret
 
 define internal @ZeroArray__I5ref void(ptr %arr) {
 entry:
+%0 = alloca ptr
+store ptr %arr, ptr %0
+%1 = load ptr, ptr %0
+%2 = alloca i64
+store 0, ptr %2
 br label for.cond
 for.body:
-%0 = gep ptr %arr, 0, %1
-store 0, ptr %0
+%3 = load i64, ptr %2
+%4 = gep ptr %1, 0, %3
+store 0, ptr %4
 br label for.iter
 for.cond:
-%1 = phi i64 [ 0, entry ], [ %2, for.iter ]
-%3 = icmp slt i64 %1, 5
-br i8 %3, label for.body, label exit
+%5 = load i64, ptr %2
+%6 = icmp slt i64 %5, 5
+br i8 %6, label for.body, label for.end
 for.iter:
-%4 = alloca ptr
-store i64 %1, ptr %4
-%2 = add i64 %1, 1
+%7 = load i64, ptr %2
+%8 = alloca ptr
+store i64 %7, ptr %8
+%9 = add i64 %7, 1
+store i64 %9, ptr %2
 br label for.cond
+for.end:
+br label exit
 exit:
 ret 
 }
@@ -108,22 +1248,29 @@ store 4, ptr %4
 %5 = ptr add ptr %0, 32
 store 5, ptr %5
 call ptr %0, @ZeroArray__I5ref
+%6 = alloca i64
+store 0, ptr %6
 br label for.cond
 for.body:
-%6 = gep ptr %0, 0, %7
-%8 = load i64, ptr %6
-%9 = icmp eq i64 %8, 0
-call i8 %9, @Assert
+%7 = load i64, ptr %6
+%8 = gep ptr %0, 0, %7
+%9 = load i64, ptr %8
+%10 = icmp eq i64 %9, 0
+call i8 %10, @Assert
 br label for.iter
 for.cond:
-%7 = phi i64 [ 0, entry ], [ %10, for.iter ]
-%11 = icmp slt i64 %7, 5
-br i8 %11, label for.body, label exit
+%11 = load i64, ptr %6
+%12 = icmp slt i64 %11, 5
+br i8 %12, label for.body, label for.end
 for.iter:
-%12 = alloca ptr
-store i64 %7, ptr %12
-%10 = add i64 %7, 1
+%13 = load i64, ptr %6
+%14 = alloca ptr
+store i64 %13, ptr %14
+%15 = add i64 %13, 1
+store i64 %15, ptr %6
 br label for.cond
+for.end:
+br label exit
 exit:
 ret 
 }
@@ -131,26 +1278,48 @@ ret
 
 define internal @ReverseArray__I5ref void(ptr %arr) {
 entry:
+%0 = alloca ptr
+store ptr %arr, ptr %0
+%1 = load ptr, ptr %0
+%2 = alloca i64
+store 0, ptr %2
+%3 = alloca i64
+store 4, ptr %3
 br label while.cond
 while.cond:
-%0 = phi i64 [ 0, entry ], [ %1, while.body ]
-%2 = phi i64 [ 4, entry ], [ %3, while.body ]
-%4 = icmp slt i64 %0, %2
-br i8 %4, label while.body, label exit
+%4 = load i64, ptr %2
+%5 = load i64, ptr %3
+%6 = icmp slt i64 %4, %5
+br i8 %6, label while.body, label while.end
 while.body:
-%5 = gep ptr %arr, 0, %0
-%6 = load i64, ptr %5
-%7 = gep ptr %arr, 0, %2
-%8 = load i64, ptr %7
-store i64 %8, ptr %5
-store i64 %6, ptr %7
-%9 = alloca ptr
-store i64 %0, ptr %9
-%1 = add i64 %0, 1
-%10 = alloca ptr
-store i64 %2, ptr %10
-%3 = sub i64 %2, 1
+%7 = load i64, ptr %2
+%8 = gep ptr %1, 0, %7
+%9 = alloca i64
+%10 = load i64, ptr %8
+store i64 %10, ptr %9
+%11 = load i64, ptr %2
+%12 = gep ptr %1, 0, %11
+%13 = load i64, ptr %3
+%14 = gep ptr %1, 0, %13
+%15 = load i64, ptr %14
+store i64 %15, ptr %12
+%16 = load i64, ptr %3
+%17 = gep ptr %1, 0, %16
+%18 = load i64, ptr %9
+store i64 %18, ptr %17
+%19 = load i64, ptr %2
+%20 = alloca ptr
+store i64 %19, ptr %20
+%21 = add i64 %19, 1
+store i64 %21, ptr %2
+%22 = load i64, ptr %3
+%23 = alloca ptr
+store i64 %22, ptr %23
+%24 = sub i64 %22, 1
+store i64 %24, ptr %3
 br label while.cond
+while.end:
+br label exit
 exit:
 ret 
 }
@@ -170,21 +1339,26 @@ store 4, ptr %4
 %5 = ptr add ptr %0, 32
 store 5, ptr %5
 call ptr %0, @ReverseArray__I5ref
-%6 = load i64, ptr %1
-%7 = icmp eq i64 %6, 5
-call i8 %7, @Assert
-%8 = load i64, ptr %2
-%9 = icmp eq i64 %8, 4
-call i8 %9, @Assert
-%10 = load i64, ptr %3
-%11 = icmp eq i64 %10, 3
+%6 = ptr add ptr %0, 0
+%7 = load i64, ptr %6
+%8 = icmp eq i64 %7, 5
+call i8 %8, @Assert
+%9 = ptr add ptr %0, 8
+%10 = load i64, ptr %9
+%11 = icmp eq i64 %10, 4
 call i8 %11, @Assert
-%12 = load i64, ptr %4
-%13 = icmp eq i64 %12, 2
-call i8 %13, @Assert
-%14 = load i64, ptr %5
-%15 = icmp eq i64 %14, 1
-call i8 %15, @Assert
+%12 = ptr add ptr %0, 16
+%13 = load i64, ptr %12
+%14 = icmp eq i64 %13, 3
+call i8 %14, @Assert
+%15 = ptr add ptr %0, 24
+%16 = load i64, ptr %15
+%17 = icmp eq i64 %16, 2
+call i8 %17, @Assert
+%18 = ptr add ptr %0, 32
+%19 = load i64, ptr %18
+%20 = icmp eq i64 %19, 1
+call i8 %20, @Assert
 br label exit
 exit:
 ret 
@@ -204,59 +1378,93 @@ store 1, ptr %3
 store 4, ptr %4
 %5 = ptr add ptr %0, 32
 store 2, ptr %5
+%6 = alloca i64
+store 0, ptr %6
 br label for.cond
 for.body:
-%6 = sub i64 4, %7
+%7 = alloca i64
+store 0, ptr %7
 br label for.cond1
 for.cond:
-%7 = phi i64 [ 0, entry ], [ %8, for.iter ]
-%9 = icmp slt i64 %7, 5
+%8 = load i64, ptr %6
+%9 = icmp slt i64 %8, 5
 br i8 %9, label for.body, label for.end
 for.iter:
-%10 = alloca ptr
-store i64 %7, ptr %10
-%8 = add i64 %7, 1
+%10 = load i64, ptr %6
+%11 = alloca ptr
+store i64 %10, ptr %11
+%12 = add i64 %10, 1
+store i64 %12, ptr %6
 br label for.cond
 for.end:
-%11 = load i64, ptr %1
-%12 = icmp eq i64 %11, 1
-call i8 %12, @Assert
-%13 = load i64, ptr %2
-%14 = icmp eq i64 %13, 2
-call i8 %14, @Assert
-%15 = load i64, ptr %3
-%16 = icmp eq i64 %15, 3
-call i8 %16, @Assert
-%17 = load i64, ptr %4
-%18 = icmp eq i64 %17, 4
+%13 = ptr add ptr %0, 0
+%14 = load i64, ptr %13
+%15 = icmp eq i64 %14, 1
+call i8 %15, @Assert
+%16 = ptr add ptr %0, 8
+%17 = load i64, ptr %16
+%18 = icmp eq i64 %17, 2
 call i8 %18, @Assert
-%19 = load i64, ptr %5
-%20 = icmp eq i64 %19, 5
-call i8 %20, @Assert
+%19 = ptr add ptr %0, 16
+%20 = load i64, ptr %19
+%21 = icmp eq i64 %20, 3
+call i8 %21, @Assert
+%22 = ptr add ptr %0, 24
+%23 = load i64, ptr %22
+%24 = icmp eq i64 %23, 4
+call i8 %24, @Assert
+%25 = ptr add ptr %0, 32
+%26 = load i64, ptr %25
+%27 = icmp eq i64 %26, 5
+call i8 %27, @Assert
 br label exit
 for.body1:
-%21 = gep ptr %0, 0, %22
-%23 = add i64 %22, 1
-%24 = gep ptr %0, 0, %23
-%25 = load i64, ptr %21
-%26 = load i64, ptr %24
-%27 = icmp sgt i64 %25, %26
-br i8 %27, label if.then, label edge.0
-edge.0:
-br label for.iter1
+%28 = load i64, ptr %7
+%29 = gep ptr %0, 0, %28
+%30 = load i64, ptr %7
+%31 = add i64 %30, 1
+%32 = gep ptr %0, 0, %31
+%33 = load i64, ptr %29
+%34 = load i64, ptr %32
+%35 = icmp sgt i64 %33, %34
+br i8 %35, label if.then, label if.end
 for.cond1:
-%22 = phi i64 [ 0, for.body ], [ %23, for.iter1 ]
-%28 = icmp slt i64 %22, %6
-br i8 %28, label for.body1, label for.iter
+%36 = load i64, ptr %6
+%37 = sub i64 4, %36
+%38 = load i64, ptr %7
+%39 = icmp slt i64 %38, %37
+br i8 %39, label for.body1, label for.end1
 for.iter1:
-%29 = alloca ptr
-store i64 %22, ptr %29
+%40 = load i64, ptr %7
+%41 = alloca ptr
+store i64 %40, ptr %41
+%42 = add i64 %40, 1
+store i64 %42, ptr %7
 br label for.cond1
+for.end1:
+br label for.iter
 if.then:
-%30 = load i64, ptr %21
-%31 = load i64, ptr %24
-store i64 %31, ptr %21
-store i64 %30, ptr %24
+%43 = load i64, ptr %7
+%44 = gep ptr %0, 0, %43
+%45 = alloca i64
+%46 = load i64, ptr %44
+store i64 %46, ptr %45
+%47 = load i64, ptr %7
+%48 = gep ptr %0, 0, %47
+%49 = load i64, ptr %7
+%50 = add i64 %49, 1
+%51 = gep ptr %0, 0, %50
+%52 = load i64, ptr %51
+store i64 %52, ptr %48
+%53 = load i64, ptr %7
+%54 = add i64 %53, 1
+%55 = gep ptr %0, 0, %54
+%56 = load i64, ptr %45
+store i64 %56, ptr %55
+br label if.end
+if.else:
+br label exit
+if.end:
 br label for.iter1
 exit:
 ret 
@@ -282,35 +1490,43 @@ store 3, ptr %6
 store 9, ptr %7
 %8 = ptr add ptr %0, 56
 store 3, ptr %8
+%9 = alloca i64
+store 0, ptr %9
+%10 = alloca i64
+store 0, ptr %10
 br label for.cond
 for.body:
-%9 = gep ptr %0, 0, %10
-%11 = load i64, ptr %9
-%12 = icmp eq i64 %11, 3
-br i8 %12, label if.then, label edge.0
-edge.0:
-br label if.end
+%11 = load i64, ptr %10
+%12 = gep ptr %0, 0, %11
+%13 = load i64, ptr %12
+%14 = icmp eq i64 %13, 3
+br i8 %14, label if.then, label if.end
 for.cond:
-%13 = phi i64 [ 0, entry ], [ %14, for.iter ]
-%10 = phi i64 [ 0, entry ], [ %15, for.iter ]
-%16 = icmp slt i64 %10, 8
+%15 = load i64, ptr %10
+%16 = icmp slt i64 %15, 8
 br i8 %16, label for.body, label for.end
 for.iter:
-%17 = alloca ptr
-store i64 %10, ptr %17
-%15 = add i64 %10, 1
+%17 = load i64, ptr %10
+%18 = alloca ptr
+store i64 %17, ptr %18
+%19 = add i64 %17, 1
+store i64 %19, ptr %10
 br label for.cond
 for.end:
-%18 = icmp eq i64 %13, 4
-call i8 %18, @Assert
+%20 = load i64, ptr %9
+%21 = icmp eq i64 %20, 4
+call i8 %21, @Assert
 br label exit
 if.then:
-%19 = alloca ptr
-store i64 %13, ptr %19
-%20 = add i64 %13, 1
+%22 = load i64, ptr %9
+%23 = alloca ptr
+store i64 %22, ptr %23
+%24 = add i64 %22, 1
+store i64 %24, ptr %9
 br label if.end
+if.else:
+br label exit
 if.end:
-%14 = phi i64 [ %13, edge.0 ], [ %20, if.then ]
 br label for.iter
 exit:
 ret 
@@ -330,41 +1546,54 @@ store 3, ptr %3
 store 4, ptr %4
 %5 = ptr add ptr %0, 32
 store 5, ptr %5
+%6 = alloca i64
+store 1, ptr %6
 br label for.cond
 for.body:
-%6 = gep ptr %0, 0, %7
-%8 = sub i64 %7, 1
-%9 = gep ptr %0, 0, %8
-%10 = load i64, ptr %6
-%11 = load i64, ptr %9
-%12 = add i64 %10, %11
-store i64 %12, ptr %6
+%7 = load i64, ptr %6
+%8 = gep ptr %0, 0, %7
+%9 = load i64, ptr %6
+%10 = gep ptr %0, 0, %9
+%11 = load i64, ptr %6
+%12 = sub i64 %11, 1
+%13 = gep ptr %0, 0, %12
+%14 = load i64, ptr %10
+%15 = load i64, ptr %13
+%16 = add i64 %14, %15
+store i64 %16, ptr %8
 br label for.iter
 for.cond:
-%7 = phi i64 [ 1, entry ], [ %13, for.iter ]
-%14 = icmp slt i64 %7, 5
-br i8 %14, label for.body, label for.end
+%17 = load i64, ptr %6
+%18 = icmp slt i64 %17, 5
+br i8 %18, label for.body, label for.end
 for.iter:
-%15 = alloca ptr
-store i64 %7, ptr %15
-%13 = add i64 %7, 1
+%19 = load i64, ptr %6
+%20 = alloca ptr
+store i64 %19, ptr %20
+%21 = add i64 %19, 1
+store i64 %21, ptr %6
 br label for.cond
 for.end:
-%16 = load i64, ptr %1
-%17 = icmp eq i64 %16, 1
-call i8 %17, @Assert
-%18 = load i64, ptr %2
-%19 = icmp eq i64 %18, 3
-call i8 %19, @Assert
-%20 = load i64, ptr %3
-%21 = icmp eq i64 %20, 6
-call i8 %21, @Assert
-%22 = load i64, ptr %4
-%23 = icmp eq i64 %22, 10
-call i8 %23, @Assert
-%24 = load i64, ptr %5
-%25 = icmp eq i64 %24, 15
-call i8 %25, @Assert
+%22 = ptr add ptr %0, 0
+%23 = load i64, ptr %22
+%24 = icmp eq i64 %23, 1
+call i8 %24, @Assert
+%25 = ptr add ptr %0, 8
+%26 = load i64, ptr %25
+%27 = icmp eq i64 %26, 3
+call i8 %27, @Assert
+%28 = ptr add ptr %0, 16
+%29 = load i64, ptr %28
+%30 = icmp eq i64 %29, 6
+call i8 %30, @Assert
+%31 = ptr add ptr %0, 24
+%32 = load i64, ptr %31
+%33 = icmp eq i64 %32, 10
+call i8 %33, @Assert
+%34 = ptr add ptr %0, 32
+%35 = load i64, ptr %34
+%36 = icmp eq i64 %35, 15
+call i8 %36, @Assert
 br label exit
 exit:
 ret 
@@ -373,14 +1602,36 @@ ret
 
 define external @main i64() {
 entry:
+%0 = alloca i64
+call ptr @TestGlobalArrays
+call ptr @TestLocalArrays
+call ptr @TestFloatArrays
+call ptr @TestBoolArrays
+call ptr @TestArrayModification
+call ptr @TestArrayExpressions
+call ptr @TestArrayVariableIndex
+call ptr @TestArrayInLoops
+call ptr @TestArrayWhileLoop
+call ptr @TestArrayLengthSizeof
+call ptr @TestArrayNegativeValues
+call ptr @TestAutoArray
+call ptr @TestArrayBoundary
+call ptr @TestArraySwap
+call ptr @TestArrayTernary
+call ptr @TestArrayAssignment
+call ptr @TestArrayAccumulation
 call ptr @TestArrayPassByValue
 call ptr @TestArrayPassByRef
 call ptr @TestArrayReverse
 call ptr @TestArrayBubbleSort
 call ptr @TestArrayCountMatches
 call ptr @TestArrayPrefixSum
+store 0, ptr %0
+br label exit
+return:
 br label exit
 exit:
-ret i64 0
+%1 = load i64, ptr %0
+ret i64 %1
 }
 

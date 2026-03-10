@@ -58,10 +58,7 @@ TEST(Interpreter_Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack), 
 TEST(Interpreter_Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
 TEST(Interpreter_Containers, Map)          { EXPECT_EQ(RUN_TEST(-i test_map),           0); }
 
-TEST(Interpreter_Iteration, Foreach) { EXPECT_EQ(RUN_TEST(-i test_foreach), 0); }
-
-TEST(Interpreter_Declarations, Auto) { EXPECT_EQ(RUN_TEST(-i test_auto), 0); }
-
-TEST(Interpreter_Function, Recursion) { EXPECT_EQ(RUN_TEST(-i test_recursion), 0); }
-
-TEST(Interpreter_Misc, Scope) { EXPECT_EQ(RUN_TEST(-i test_scope), 0); }
+TEST(Interpreter_Iteration, Foreach)		{ EXPECT_EQ(RUN_TEST(-i test_foreach), 0); }
+TEST(Interpreter_Declarations, Auto)		{ EXPECT_EQ(RUN_TEST(-i test_auto), 0); }
+TEST(Interpreter_Function, Recursion)		{ EXPECT_EQ(RUN_TEST(-i test_recursion), 0); }
+TEST(Interpreter_Misc, Scope)				{ EXPECT_EQ(RUN_TEST(-i test_scope), 0); }
