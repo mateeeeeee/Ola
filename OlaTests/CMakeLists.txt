@@ -55,6 +55,10 @@ set(OLA_TESTS
 	Tests/test_new.ola
 	Tests/test_vector.ola
 	Tests/test_pair.ola
+	Tests/test_foreach.ola
+	Tests/test_auto.ola
+	Tests/test_recursion.ola
+	Tests/test_scope.ola
 )
 
 add_executable(OlaTests ${SOURCE})

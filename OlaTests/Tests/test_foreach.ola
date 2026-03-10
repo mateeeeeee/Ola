@@ -1,0 +1,85 @@
+import std.assert;
+
+void TestForeachBasicInt()
+{
+    int[5] arr = {10, 20, 30, 40, 50};
+    int sum = 0;
+    foreach (int x : arr)
+    {
+        sum += x;
+    }
+    Assert(sum == 150);
+}
+
+void TestForeachWithBreak()
+{
+    int[5] arr = {1, 2, 3, 4, 5};
+    int sum = 0;
+    foreach (int x : arr)
+    {
+        if (x == 4) break;
+        sum += x;
+    }
+    Assert(sum == 6);
+}
+
+void TestForeachWithContinue()
+{
+    int[5] arr = {1, 2, 3, 4, 5};
+    int sum = 0;
+    foreach (int x : arr)
+    {
+        if (x == 3) continue;
+        sum += x;
+    }
+    Assert(sum == 12);
+}
+
+void TestForeachFloat()
+{
+    float[3] arr = {1.5, 2.5, 3.0};
+    float sum = 0.0;
+    foreach (float x : arr)
+    {
+        sum += x;
+    }
+    Assert(sum == 7.0);
+}
+
+void TestForeachNested()
+{
+    int[3] outer = {1, 2, 3};
+    int[3] inner = {10, 20, 30};
+    int total = 0;
+    foreach (int a : outer)
+    {
+        foreach (int b : inner)
+        {
+            total += a * b;
+        }
+    }
+    // (1+2+3) * (10+20+30) = 6 * 60 = 360
+    Assert(total == 360);
+}
+
+void TestForeachSingleElement()
+{
+    int[1] arr = {42};
+    int val = 0;
+    foreach (int x : arr)
+    {
+        val = x;
+    }
+    Assert(val == 42);
+}
+
+public int main()
+{
+    TestForeachBasicInt();
+    TestForeachWithBreak();
+    TestForeachWithContinue();
+    TestForeachFloat();
+    TestForeachNested();
+    TestForeachSingleElement();
+    return 0;
+}

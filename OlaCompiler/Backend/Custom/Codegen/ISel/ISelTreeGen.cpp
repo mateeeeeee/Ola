@@ -299,7 +299,7 @@ namespace ola
 	void ISelTreeGen::ProcessLoadInst(LoadInst& I)
 	{
 		IRType* load_type = I.GetType();
-		if (load_type->IsStruct())
+		if (load_type->IsAggregate())
 		{
 			auto captured = CaptureEmittedInstructions([&]() { lowering.LowerLoad(&I); });
 			AddAsmNode(std::move(captured));
@@ -328,7 +328,7 @@ namespace ola
 	{
 		IRType* value_type = I.GetValueOp()->GetType();
 
-		if (value_type->IsStruct())
+		if (value_type->IsAggregate())
 		{
 			auto captured = CaptureEmittedInstructions([&]() { lowering.LowerStore(&I); });
 			AddAsmNode(std::move(captured));
@@ -405,7 +405,7 @@ namespace ola
 	{
 		Value* base_value = I.GetBaseOperand();
 		ISelNodePtr base;
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsAggregate())
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
@@ -567,7 +567,7 @@ namespace ola
 		Value* base_value = I.GetBase();
 		ISelNodePtr base;
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsAggregate())
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));

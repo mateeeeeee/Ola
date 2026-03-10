@@ -1,0 +1,64 @@
+import std.assert;
+
+void TestAutoInt()
+{
+    auto x = 42;
+    Assert(x == 42);
+    x = 100;
+    Assert(x == 100);
+}
+
+void TestAutoFloat()
+{
+    auto x = 3.14;
+    Assert(x == 3.14);
+    x = 2.71;
+    Assert(x == 2.71);
+}
+
+void TestAutoBool()
+{
+    auto x = true;
+    Assert(x == true);
+    x = false;
+    Assert(x == false);
+}
+
+void TestAutoWithExpression()
+{
+    int a = 10;
+    int b = 20;
+    auto c = a + b;
+    Assert(c == 30);
+}
+
+void TestAutoFloatExpression()
+{
+    float a = 1.5;
+    float b = 2.5;
+    auto c = a + b;
+    Assert(c == 4.0);
+}
+
+void TestAutoInLoop()
+{
+    int sum = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        auto val = i * 2;
+        sum += val;
+    }
+    // 0+2+4+6+8 = 20
+    Assert(sum == 20);
+}
+
+public int main()
+{
+    TestAutoInt();
+    TestAutoFloat();
+    TestAutoBool();
+    TestAutoWithExpression();
+    TestAutoFloatExpression();
+    TestAutoInLoop();
+    return 0;
+}

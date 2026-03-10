@@ -59,3 +59,11 @@ TEST(Containers, Set)          { EXPECT_EQ(RUN_TEST(-i test_set),           0); 
 TEST(Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack),         0); }
 TEST(Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
 TEST(Containers, Map)          { EXPECT_EQ(RUN_TEST(-i test_map),           0); }
+
+TEST(Iteration, Foreach) { EXPECT_EQ(RUN_TEST(-i test_foreach), 0); }
+
+TEST(Declarations, Auto) { EXPECT_EQ(RUN_TEST(-i test_auto), 0); }
+
+TEST(Function, Recursion) { EXPECT_EQ(RUN_TEST(-i test_recursion), 0); }
+
+TEST(Misc, Scope) { EXPECT_EQ(RUN_TEST(-i test_scope), 0); }

@@ -130,9 +130,17 @@ namespace ola
 
 	Bool TailRecursionEliminationPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
-		if (F.IsDeclaration()) 
+		if (F.IsDeclaration())
 		{
 			return false;
+		}
+
+		for (Uint64 i = 0; i < F.GetArgCount(); ++i)
+		{
+			if (F.GetArgType(i)->IsAggregate()) 
+			{
+				return false;
+			}
 		}
 
 		std::vector<TailCallCandidate> TailCalls;

@@ -40,8 +40,8 @@ namespace ola
 		{
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
-			Bool const is_struct_arg = arg->GetType()->IsStruct();
-			Uint32 opcode = (arg_operand.IsMemoryOperand() && (arg->GetType()->IsPointer() || is_struct_arg)) ? InstLoadGlobalAddress : InstMove;
+			Bool const is_aggregate_arg = arg->GetType()->IsAggregate();
+			Uint32 opcode = (arg_operand.IsMemoryOperand() && (arg->GetType()->IsPointer() || is_aggregate_arg)) ? InstLoadGlobalAddress : InstMove;
 
 			if (arg_operand.GetType() != MachineType::Float64)
 			{

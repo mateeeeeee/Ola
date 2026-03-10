@@ -6,1119 +6,284 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define external @Vector.int.$Vector void(ptr %this) {
+define internal @Factorial__I i64(i64 %n) {
 entry:
-%0 = ptr add ptr %this, 0
-store null, ptr %0
-%1 = ptr add ptr %this, 8
-store 0, ptr %1
-%2 = ptr add ptr %this, 16
-store 0, ptr %2
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.int.$Vector__I void(ptr %this,i64 %cap) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = shl i64 %cap, 3
-%2 = call i64 %1, @__ola_new
-%3 = bitcast ptr %2
-store ptr %3, ptr %0
-%4 = ptr add ptr %this, 8
-store 0, ptr %4
-%5 = ptr add ptr %this, 16
-store i64 %cap, ptr %5
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.int.$Size i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-br label exit
-exit:
-ret i64 %1
-}
-
-
-define external @Vector.int.$Capacity i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 16
-%1 = load i64, ptr %0
-br label exit
-exit:
-ret i64 %1
-}
-
-
-define external @Vector.int.$Empty i8(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-%2 = icmp eq i64 %1, 0
-br label exit
-exit:
-ret i8 %2
-}
-
-
-define external @Vector.int.$Get__I i64(ptr %this,i64 %index) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = gep ptr %1, %index
-%3 = load i64, ptr %2
-br label exit
-exit:
-ret i64 %3
-}
-
-
-define external @Vector.int.$Set__I__I void(ptr %this,i64 %index,i64 %value) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = gep ptr %1, %index
-store i64 %value, ptr %2
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.int.$Front i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = ptr add ptr %1, 0
-%3 = load i64, ptr %2
-br label exit
-exit:
-ret i64 %3
-}
-
-
-define external @Vector.int.$Back i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = ptr add ptr %this, 8
-%2 = load i64, ptr %1
-%3 = sub i64 %2, 1
-%4 = load ptr, ptr %0
-%5 = gep ptr %4, %3
-%6 = load i64, ptr %5
-br label exit
-exit:
-ret i64 %6
-}
-
-
-define external @Vector.int.$PushBack__I void(ptr %this,i64 %value) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = ptr add ptr %this, 16
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp slt i64 %2, %3
-br i8 %4, label if.then, label if.end
+%0 = icmp sle i64 %n, 1
+br i8 %0, label if.then, label if.end
 if.then:
-%5 = ptr add ptr %this, 0
-%6 = load i64, ptr %0
-%7 = load ptr, ptr %5
-%8 = gep ptr %7, %6
-store i64 %value, ptr %8
-%9 = load i64, ptr %0
-%10 = add i64 %9, 1
-store i64 %10, ptr %0
 br label exit
 if.end:
-%11 = load i64, ptr %1
-%12 = icmp sgt i64 %11, 0
-%13 = load i64, ptr %1
-%14 = add i64 %13, %13
-%15 = select i8 %12, i64 %14, 4
-%16 = shl i64 %15, 3
-%17 = call i64 %16, @__ola_new
-%18 = bitcast ptr %17
-%19 = ptr add ptr %this, 0
-br label for.cond
-for.body:
-%20 = gep ptr %18, %21
-%22 = load ptr, ptr %19
-%23 = gep ptr %22, %21
-%24 = load i64, ptr %23
-store i64 %24, ptr %20
-br label for.iter
-for.cond:
-%21 = phi i64 [ 0, if.end ], [ %25, for.iter ]
-%26 = load i64, ptr %0
-%27 = icmp slt i64 %21, %26
-br i8 %27, label for.body, label for.end
-for.iter:
-%25 = add i64 %21, 1
-br label for.cond
-for.end:
-%28 = load i64, ptr %0
-%29 = gep ptr %18, %28
-store i64 %value, ptr %29
-%30 = ptr add ptr %this, 0
-%31 = load ptr, ptr %30
-%32 = icmp ne ptr %31, null
-br i8 %32, label if.then1, label edge.0
-edge.0:
-br label if.end1
+%1 = sub i64 %n, 1
+%2 = call i64 %1, @Factorial__I
+%3 = smul i64 %n, %2
+br label exit
+exit:
+%4 = phi i64 [ %3, if.end ], [ 1, if.then ]
+ret i64 %4
+}
+
+
+define internal @TestFactorial void() {
+entry:
+%0 = call i64 0, @Factorial__I
+%1 = icmp eq i64 %0, 1
+call i8 %1, @Assert
+%2 = call i64 1, @Factorial__I
+%3 = icmp eq i64 %2, 1
+call i8 %3, @Assert
+%4 = call i64 5, @Factorial__I
+%5 = icmp eq i64 %4, 120
+call i8 %5, @Assert
+%6 = call i64 6, @Factorial__I
+%7 = icmp eq i64 %6, 720
+call i8 %7, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @Fibonacci__I i64(i64 %n) {
+entry:
+%0 = icmp sle i64 %n, 0
+br i8 %0, label if.then, label if.end
+if.then:
+br label exit
+if.end:
+%1 = icmp eq i64 %n, 1
+br i8 %1, label if.then1, label if.end1
 if.then1:
-%33 = ptr add ptr %this, 0
-%34 = load ptr, ptr %33
-%35 = bitcast ptr %34
-call ptr %35, @__ola_delete
-br label if.end1
+br label exit
 if.end1:
-%36 = ptr add ptr %this, 0
-store ptr %18, ptr %36
-store i64 %15, ptr %1
-%37 = load i64, ptr %0
-%38 = add i64 %37, 1
-store i64 %38, ptr %0
+%2 = sub i64 %n, 1
+%3 = call i64 %2, @Fibonacci__I
+%4 = sub i64 %n, 2
+%5 = call i64 %4, @Fibonacci__I
+%6 = add i64 %3, %5
+br label exit
+exit:
+%7 = phi i64 [ %6, if.end1 ], [ 1, if.then1 ], [ 0, if.then ]
+ret i64 %7
+}
+
+
+define internal @TestFibonacci void() {
+entry:
+%0 = call i64 0, @Fibonacci__I
+%1 = icmp eq i64 %0, 0
+call i8 %1, @Assert
+%2 = call i64 1, @Fibonacci__I
+%3 = icmp eq i64 %2, 1
+call i8 %3, @Assert
+%4 = call i64 2, @Fibonacci__I
+%5 = icmp eq i64 %4, 1
+call i8 %5, @Assert
+%6 = call i64 7, @Fibonacci__I
+%7 = icmp eq i64 %6, 13
+call i8 %7, @Assert
+%8 = call i64 10, @Fibonacci__I
+%9 = icmp eq i64 %8, 55
+call i8 %9, @Assert
 br label exit
 exit:
 ret 
 }
 
 
-define external @Vector.int.$PopBack void(ptr %this) {
+define internal @SumRange__I i64(i64 %n) {
 entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-%2 = sub i64 %1, 1
-store i64 %2, ptr %0
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.int.$Clear void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-store 0, ptr %0
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.int.$Destroy void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = icmp ne ptr %1, null
-br i8 %2, label if.then, label edge.0
-edge.0:
-br label if.end
+%0 = icmp sle i64 %n, 0
+br i8 %0, label if.then, label if.end
 if.then:
-%3 = load ptr, ptr %0
-%4 = bitcast ptr %3
-call ptr %4, @__ola_delete
-br label if.end
+br label exit
 if.end:
-store null, ptr %0
-%5 = ptr add ptr %this, 8
-store 0, ptr %5
-%6 = ptr add ptr %this, 16
-store 0, ptr %6
+%1 = sub i64 %n, 1
+%2 = call i64 %1, @SumRange__I
+%3 = add i64 %n, %2
+br label exit
+exit:
+%4 = phi i64 [ %3, if.end ], [ 0, if.then ]
+ret i64 %4
+}
+
+
+define internal @TestSumRange void() {
+entry:
+%0 = call i64 0, @SumRange__I
+%1 = icmp eq i64 %0, 0
+call i8 %1, @Assert
+%2 = call i64 1, @SumRange__I
+%3 = icmp eq i64 %2, 1
+call i8 %3, @Assert
+%4 = call i64 5, @SumRange__I
+%5 = icmp eq i64 %4, 15
+call i8 %5, @Assert
+%6 = call i64 10, @SumRange__I
+%7 = icmp eq i64 %6, 55
+call i8 %7, @Assert
 br label exit
 exit:
 ret 
 }
 
 
-declare @__ola_new ptr(i64)
-
-
-declare @__ola_delete void(ptr)
-
-
-define internal @TestEmptyVector void() {
+define internal @Power__I__I i64(i64 %base,i64 %exp) {
 entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split.split:
-%4 = icmp eq i64 %5, 0
-call i8 %4, @Assert
-br label entry.inlined1
-entry.split.split.split:
-%6 = icmp eq i64 %7, 0
-call i8 %6, @Assert
-br label entry.inlined2
-entry.split.split.split.split:
-%8 = icmp eq i8 %9, 1
-call i8 %8, @Assert
-call ptr %0, @Vector.int.$Destroy
+%0 = icmp eq i64 %exp, 0
+br i8 %0, label if.then, label if.end
+if.then:
 br label exit
-entry.inlined2:
-%10 = load i64, ptr %2
-%9 = icmp eq i64 %10, 0
-br label entry.split.split.split.split
-entry.inlined1:
-%7 = load i64, ptr %3
-br label entry.split.split.split
-entry.inlined3:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.inlined3
+if.end:
+%1 = sub i64 %exp, 1
+%2 = call i64 %base, %1, @Power__I__I
+%3 = smul i64 %base, %2
+br label exit
+exit:
+%4 = phi i64 [ %3, if.end ], [ 1, if.then ]
+ret i64 %4
+}
+
+
+define internal @TestPower void() {
+entry:
+%0 = call i64 2, 0, @Power__I__I
+%1 = icmp eq i64 %0, 1
+call i8 %1, @Assert
+%2 = call i64 2, 1, @Power__I__I
+%3 = icmp eq i64 %2, 2
+call i8 %3, @Assert
+%4 = call i64 2, 10, @Power__I__I
+%5 = icmp eq i64 %4, 1024
+call i8 %5, @Assert
+%6 = call i64 3, 4, @Power__I__I
+%7 = icmp eq i64 %6, 81
+call i8 %7, @Assert
+br label exit
 exit:
 ret 
 }
 
 
-define internal @TestPushBackAndGet void() {
+define internal @GCD__I__I i64(i64 %a,i64 %b) {
 entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 10, @Vector.int.$PushBack__I
-call ptr %0, 20, @Vector.int.$PushBack__I
-call ptr %0, 30, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 3
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split:
-%6 = icmp eq i8 %7, 0
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split:
-%8 = icmp eq i64 %9, 10
-call i8 %8, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split:
-%10 = icmp eq i64 %11, 20
-call i8 %10, @Assert
-br label entry.inlined5
-entry.split.split.split.split.split.split:
-%12 = icmp eq i64 %13, 30
-call i8 %12, @Assert
-call ptr %0, @Vector.int.$Destroy
+br label tailrecurse
+tailrecurse:
+%b.tr = phi i64 [ %b, entry ], [ %0, if.end ]
+%a.tr = phi i64 [ %a, entry ], [ %b.tr, if.end ]
+%1 = icmp eq i64 %b.tr, 0
+br i8 %1, label if.then, label if.end
+if.then:
 br label exit
-entry.inlined5:
-%14 = load ptr, ptr %1
-%15 = gep ptr %14, 2
-%13 = load i64, ptr %15
-br label entry.split.split.split.split.split.split
-entry.inlined4:
-%16 = load ptr, ptr %1
-%17 = gep ptr %16, 1
-%11 = load i64, ptr %17
-br label entry.split.split.split.split.split
-entry.inlined3:
-%18 = load ptr, ptr %1
-%19 = gep ptr %18, 0
-%9 = load i64, ptr %19
-br label entry.split.split.split.split
-entry.inlined2:
-%20 = load i64, ptr %2
-%7 = icmp eq i64 %20, 0
-br label entry.split.split.split
-entry.inlined1:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
+if.end:
+%0 = srem i64 %a.tr, %b.tr
+br label tailrecurse
+exit:
+ret i64 %a.tr
+}
+
+
+define internal @TestGCD void() {
+entry:
+%0 = call i64 12, 8, @GCD__I__I
+%1 = icmp eq i64 %0, 4
+call i8 %1, @Assert
+%2 = call i64 100, 75, @GCD__I__I
+%3 = icmp eq i64 %2, 25
+call i8 %3, @Assert
+%4 = call i64 17, 13, @GCD__I__I
+%5 = icmp eq i64 %4, 1
+call i8 %5, @Assert
+%6 = call i64 0, 5, @GCD__I__I
+%7 = icmp eq i64 %6, 5
+call i8 %7, @Assert
+br label exit
 exit:
 ret 
 }
 
 
-define internal @TestGrow void() {
+define internal @IsPalindrome__I10__I__I i8(i64[10] %arr,i64 %left,i64 %right) {
 entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 1, @Vector.int.$PushBack__I
-call ptr %0, 2, @Vector.int.$PushBack__I
-call ptr %0, 3, @Vector.int.$PushBack__I
-call ptr %0, 4, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 4
-call i8 %4, @Assert
-call ptr %0, 5, @Vector.int.$PushBack__I
-br label entry.inlined2
-entry.split.split.split:
-%6 = icmp eq i64 %7, 8
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split:
-%8 = icmp eq i64 %9, 5
-call i8 %8, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split:
-%10 = icmp eq i64 %11, 1
-call i8 %10, @Assert
-br label entry.inlined5
-entry.split.split.split.split.split.split:
-%12 = icmp eq i64 %13, 2
-call i8 %12, @Assert
-br label entry.inlined6
-entry.split.split.split.split.split.split.split:
-%14 = icmp eq i64 %15, 3
-call i8 %14, @Assert
-br label entry.inlined7
-entry.split.split.split.split.split.split.split.split:
-%16 = icmp eq i64 %17, 4
-call i8 %16, @Assert
-br label entry.inlined8
-entry.split.split.split.split.split.split.split.split.split:
-%18 = icmp eq i64 %19, 5
-call i8 %18, @Assert
-call ptr %0, @Vector.int.$Destroy
+%0 = alloca i64[10]
+store i64[10] %arr, ptr %0
+%1 = icmp sge i64 %left, %right
+br i8 %1, label if.then, label if.end
+if.then:
 br label exit
-entry.inlined8:
-%20 = load ptr, ptr %1
-%21 = gep ptr %20, 4
-%19 = load i64, ptr %21
-br label entry.split.split.split.split.split.split.split.split.split
-entry.inlined7:
-%22 = load ptr, ptr %1
-%23 = gep ptr %22, 3
-%17 = load i64, ptr %23
-br label entry.split.split.split.split.split.split.split.split
-entry.inlined6:
-%24 = load ptr, ptr %1
-%25 = gep ptr %24, 2
-%15 = load i64, ptr %25
-br label entry.split.split.split.split.split.split.split
-entry.inlined5:
-%26 = load ptr, ptr %1
-%27 = gep ptr %26, 1
-%13 = load i64, ptr %27
-br label entry.split.split.split.split.split.split
-entry.inlined4:
-%28 = load ptr, ptr %1
-%29 = gep ptr %28, 0
-%11 = load i64, ptr %29
-br label entry.split.split.split.split.split
-entry.inlined3:
-%9 = load i64, ptr %2
-br label entry.split.split.split.split
-entry.inlined2:
-%7 = load i64, ptr %3
-br label entry.split.split.split
-entry.inlined1:
+if.end:
+%2 = gep ptr %0, 0, %left
+%3 = gep ptr %0, 0, %right
+%4 = load i64, ptr %2
 %5 = load i64, ptr %3
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestSetGet void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 0, @Vector.int.$PushBack__I
-call ptr %0, 0, @Vector.int.$PushBack__I
-call ptr %0, 0, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split.split.split.split:
-%4 = icmp eq i64 %5, 100
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split.split.split.split:
-%6 = icmp eq i64 %7, 200
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split.split.split.split:
-%8 = icmp eq i64 %9, 300
-call i8 %8, @Assert
-call ptr %0, @Vector.int.$Destroy
-br label exit
-entry.inlined3:
-%10 = load ptr, ptr %1
-%11 = gep ptr %10, 2
-%9 = load i64, ptr %11
-br label entry.split.split.split.split.split.split.split
-entry.inlined2:
-%12 = load ptr, ptr %1
-%13 = gep ptr %12, 1
-%7 = load i64, ptr %13
-br label entry.split.split.split.split.split.split
-entry.inlined4:
-%14 = load ptr, ptr %1
-%15 = gep ptr %14, 0
-%5 = load i64, ptr %15
-br label entry.split.split.split.split.split
-entry.inlined5:
-%16 = load ptr, ptr %1
-%17 = gep ptr %16, 2
-store 300, ptr %17
-br label entry.inlined4
-entry.inlined6:
-%18 = load ptr, ptr %1
-%19 = gep ptr %18, 1
-store 200, ptr %19
-br label entry.inlined5
-entry.inlined1:
-%20 = load ptr, ptr %1
-%21 = gep ptr %20, 0
-store 100, ptr %21
-br label entry.inlined6
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestFrontBack void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 11, @Vector.int.$PushBack__I
-call ptr %0, 22, @Vector.int.$PushBack__I
-call ptr %0, 33, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 11
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split:
-%6 = icmp eq i64 %7, 33
-call i8 %6, @Assert
-call ptr %0, @Vector.int.$Destroy
-br label exit
-entry.inlined2:
-%8 = load i64, ptr %2
-%9 = sub i64 %8, 1
-%10 = load ptr, ptr %1
-%11 = gep ptr %10, %9
-%7 = load i64, ptr %11
-br label entry.split.split.split
-entry.inlined1:
-%12 = load ptr, ptr %1
-%13 = ptr add ptr %12, 0
-%5 = load i64, ptr %13
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestPopBack void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 1, @Vector.int.$PushBack__I
-call ptr %0, 2, @Vector.int.$PushBack__I
-call ptr %0, 3, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 3
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split.split:
-%6 = icmp eq i64 %7, 2
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split.split:
-%8 = icmp eq i64 %9, 2
-call i8 %8, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split.split.split:
-%10 = icmp eq i64 %11, 1
-call i8 %10, @Assert
-br label entry.inlined5
-entry.split.split.split.split.split.split.split.split:
-%12 = icmp eq i64 %13, 1
-call i8 %12, @Assert
-call ptr %0, @Vector.int.$Destroy
-br label exit
-entry.inlined5:
-%14 = load i64, ptr %2
-%15 = sub i64 %14, 1
-%16 = load ptr, ptr %1
-%17 = gep ptr %16, %15
-%13 = load i64, ptr %17
-br label entry.split.split.split.split.split.split.split.split
-entry.inlined6:
-%11 = load i64, ptr %2
-br label entry.split.split.split.split.split.split.split
-entry.inlined4:
-%18 = load i64, ptr %2
-%19 = sub i64 %18, 1
-store i64 %19, ptr %2
-br label entry.inlined6
-entry.inlined3:
-%20 = load i64, ptr %2
-%21 = sub i64 %20, 1
-%22 = load ptr, ptr %1
-%23 = gep ptr %22, %21
-%9 = load i64, ptr %23
-br label entry.split.split.split.split.split
-entry.inlined7:
-%7 = load i64, ptr %2
-br label entry.split.split.split.split
-entry.inlined2:
-%24 = load i64, ptr %2
-%25 = sub i64 %24, 1
-store i64 %25, ptr %2
-br label entry.inlined7
-entry.inlined1:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestClear void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 1, @Vector.int.$PushBack__I
-call ptr %0, 2, @Vector.int.$PushBack__I
-call ptr %0, 3, @Vector.int.$PushBack__I
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 3
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split.split:
-%6 = icmp eq i64 %7, 0
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split.split:
-%8 = icmp eq i8 %9, 1
-call i8 %8, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split.split:
-%10 = icmp eq i64 %11, 4
-call i8 %10, @Assert
-call ptr %0, @Vector.int.$Destroy
-br label exit
-entry.inlined4:
-%11 = load i64, ptr %3
-br label entry.split.split.split.split.split.split
-entry.inlined3:
-%12 = load i64, ptr %2
-%9 = icmp eq i64 %12, 0
-br label entry.split.split.split.split.split
-entry.inlined5:
-%7 = load i64, ptr %2
-br label entry.split.split.split.split
-entry.inlined2:
-store 0, ptr %2
-br label entry.inlined5
-entry.inlined1:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestDestroy void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 1, @Vector.int.$PushBack__I
-call ptr %0, 2, @Vector.int.$PushBack__I
-call ptr %0, @Vector.int.$Destroy
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 0
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split:
-%6 = icmp eq i64 %7, 0
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split:
-%8 = icmp eq i8 %9, 1
-call i8 %8, @Assert
-br label exit
-entry.inlined3:
-%10 = load i64, ptr %2
-%9 = icmp eq i64 %10, 0
-br label entry.split.split.split.split
-entry.inlined2:
-%7 = load i64, ptr %3
-br label entry.split.split.split
-entry.inlined1:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
-exit:
-ret 
-}
-
-
-define internal @TestPreallocated void() {
-entry:
-%0 = alloca %Vector.int.
-%1 = ptr add ptr %0, 0
-store null, ptr %1
-%2 = ptr add ptr %0, 8
-store 0, ptr %2
-%3 = ptr add ptr %0, 16
-store 0, ptr %3
-call ptr %0, 8, @Vector.int.$Vector__I
-br label entry.inlined
-entry.split:
-%4 = icmp eq i64 %5, 0
-call i8 %4, @Assert
-br label entry.inlined1
-entry.split.split:
-%6 = icmp eq i64 %7, 8
-call i8 %6, @Assert
-br label entry.inlined2
-entry.split.split.split:
-%8 = icmp eq i8 %9, 1
-call i8 %8, @Assert
-call ptr %0, 42, @Vector.int.$PushBack__I
-br label entry.inlined3
-entry.split.split.split.split:
-%10 = icmp eq i64 %11, 1
-call i8 %10, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split:
-%12 = icmp eq i64 %13, 8
-call i8 %12, @Assert
-br label entry.inlined5
-entry.split.split.split.split.split.split:
-%14 = icmp eq i64 %15, 42
-call i8 %14, @Assert
-call ptr %0, @Vector.int.$Destroy
-br label exit
-entry.inlined5:
-%16 = load ptr, ptr %1
-%17 = gep ptr %16, 0
-%15 = load i64, ptr %17
-br label entry.split.split.split.split.split.split
-entry.inlined4:
-%13 = load i64, ptr %3
-br label entry.split.split.split.split.split
-entry.inlined3:
-%11 = load i64, ptr %2
-br label entry.split.split.split.split
-entry.inlined2:
-%18 = load i64, ptr %2
-%9 = icmp eq i64 %18, 0
-br label entry.split.split.split
-entry.inlined1:
-%7 = load i64, ptr %3
-br label entry.split.split
-entry.inlined:
-%5 = load i64, ptr %2
-br label entry.split
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Vector void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-store null, ptr %0
-%1 = ptr add ptr %this, 8
-store 0, ptr %1
-%2 = ptr add ptr %this, 16
-store 0, ptr %2
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Vector__I void(ptr %this,i64 %cap) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = shl i64 %cap, 3
-%2 = call i64 %1, @__ola_new
-%3 = bitcast ptr %2
-store ptr %3, ptr %0
-%4 = ptr add ptr %this, 8
-store 0, ptr %4
-%5 = ptr add ptr %this, 16
-store i64 %cap, ptr %5
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Size i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-br label exit
-exit:
-ret i64 %1
-}
-
-
-define external @Vector.float.$Capacity i64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 16
-%1 = load i64, ptr %0
-br label exit
-exit:
-ret i64 %1
-}
-
-
-define external @Vector.float.$Empty i8(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-%2 = icmp eq i64 %1, 0
-br label exit
-exit:
-ret i8 %2
-}
-
-
-define external @Vector.float.$Get__I f64(ptr %this,i64 %index) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = gep ptr %1, %index
-%3 = load f64, ptr %2
-br label exit
-exit:
-ret f64 %3
-}
-
-
-define external @Vector.float.$Set__I__F void(ptr %this,i64 %index,f64 %value) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = gep ptr %1, %index
-store f64 %value, ptr %2
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Front f64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = ptr add ptr %1, 0
-%3 = load f64, ptr %2
-br label exit
-exit:
-ret f64 %3
-}
-
-
-define external @Vector.float.$Back f64(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = ptr add ptr %this, 8
-%2 = load i64, ptr %1
-%3 = sub i64 %2, 1
-%4 = load ptr, ptr %0
-%5 = gep ptr %4, %3
-%6 = load f64, ptr %5
-br label exit
-exit:
-ret f64 %6
-}
-
-
-define external @Vector.float.$PushBack__F void(ptr %this,f64 %value) {
-entry:
-%0 = ptr add ptr %this, 8
-%1 = ptr add ptr %this, 16
-%2 = load i64, ptr %0
-%3 = load i64, ptr %1
-%4 = icmp slt i64 %2, %3
-br i8 %4, label if.then, label if.end
-if.then:
-%5 = ptr add ptr %this, 0
-%6 = load i64, ptr %0
-%7 = load ptr, ptr %5
-%8 = gep ptr %7, %6
-store f64 %value, ptr %8
-%9 = load i64, ptr %0
-%10 = add i64 %9, 1
-store i64 %10, ptr %0
-br label exit
-if.end:
-%11 = load i64, ptr %1
-%12 = icmp sgt i64 %11, 0
-%13 = load i64, ptr %1
-%14 = add i64 %13, %13
-%15 = select i8 %12, i64 %14, 4
-%16 = shl i64 %15, 3
-%17 = call i64 %16, @__ola_new
-%18 = bitcast ptr %17
-%19 = ptr add ptr %this, 0
-br label for.cond
-for.body:
-%20 = gep ptr %18, %21
-%22 = load ptr, ptr %19
-%23 = gep ptr %22, %21
-%24 = load f64, ptr %23
-store f64 %24, ptr %20
-br label for.iter
-for.cond:
-%21 = phi i64 [ 0, if.end ], [ %25, for.iter ]
-%26 = load i64, ptr %0
-%27 = icmp slt i64 %21, %26
-br i8 %27, label for.body, label for.end
-for.iter:
-%25 = add i64 %21, 1
-br label for.cond
-for.end:
-%28 = load i64, ptr %0
-%29 = gep ptr %18, %28
-store f64 %value, ptr %29
-%30 = ptr add ptr %this, 0
-%31 = load ptr, ptr %30
-%32 = icmp ne ptr %31, null
-br i8 %32, label if.then1, label edge.0
-edge.0:
-br label if.end1
+%6 = icmp ne i64 %4, %5
+br i8 %6, label if.then1, label if.end1
 if.then1:
-%33 = ptr add ptr %this, 0
-%34 = load ptr, ptr %33
-%35 = bitcast ptr %34
-call ptr %35, @__ola_delete
-br label if.end1
+br label exit
 if.end1:
-%36 = ptr add ptr %this, 0
-store ptr %18, ptr %36
-store i64 %15, ptr %1
-%37 = load i64, ptr %0
-%38 = add i64 %37, 1
-store i64 %38, ptr %0
+%7 = load i64[10], ptr %0
+%8 = add i64 %left, 1
+%9 = sub i64 %right, 1
+%10 = call i64[10] %7, %8, %9, @IsPalindrome__I10__I__I
 br label exit
 exit:
-ret 
+%11 = phi i8 [ %10, if.end1 ], [ 0, if.then1 ], [ 1, if.then ]
+ret i8 %11
 }
 
 
-define external @Vector.float.$PopBack void(ptr %this) {
+define internal @TestIsPalindrome void() {
 entry:
-%0 = ptr add ptr %this, 8
-%1 = load i64, ptr %0
-%2 = sub i64 %1, 1
-store i64 %2, ptr %0
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Clear void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 8
-store 0, ptr %0
-br label exit
-exit:
-ret 
-}
-
-
-define external @Vector.float.$Destroy void(ptr %this) {
-entry:
-%0 = ptr add ptr %this, 0
-%1 = load ptr, ptr %0
-%2 = icmp ne ptr %1, null
-br i8 %2, label if.then, label edge.0
-edge.0:
-br label if.end
-if.then:
-%3 = load ptr, ptr %0
-%4 = bitcast ptr %3
-call ptr %4, @__ola_delete
-br label if.end
-if.end:
-store null, ptr %0
-%5 = ptr add ptr %this, 8
-store 0, ptr %5
-%6 = ptr add ptr %this, 16
-store 0, ptr %6
-br label exit
-exit:
-ret 
-}
-
-
-define internal @TestFloatVector void() {
-entry:
-%0 = alloca %Vector.float.
+%0 = alloca i64[10]
 %1 = ptr add ptr %0, 0
-store null, ptr %1
+store 1, ptr %1
 %2 = ptr add ptr %0, 8
-store 0, ptr %2
+store 2, ptr %2
 %3 = ptr add ptr %0, 16
-store 0, ptr %3
-br label entry.inlined
-entry.split:
-call ptr %0, 1.5, @Vector.float.$PushBack__F
-call ptr %0, 2.5, @Vector.float.$PushBack__F
-call ptr %0, 3.5, @Vector.float.$PushBack__F
-br label entry.inlined1
-entry.split.split:
-%4 = icmp eq i64 %5, 3
-call i8 %4, @Assert
-br label entry.inlined2
-entry.split.split.split:
-%6 = fcmp oeq f64 %7, 1.5
-call i8 %6, @Assert
-br label entry.inlined3
-entry.split.split.split.split:
-%8 = fcmp oeq f64 %9, 2.5
-call i8 %8, @Assert
-br label entry.inlined4
-entry.split.split.split.split.split:
-%10 = fcmp oeq f64 %11, 3.5
-call i8 %10, @Assert
-br label entry.inlined5
-entry.split.split.split.split.split.split:
-%12 = fcmp oeq f64 %13, 1.5
-call i8 %12, @Assert
-br label entry.inlined6
-entry.split.split.split.split.split.split.split:
-%14 = fcmp oeq f64 %15, 3.5
-call i8 %14, @Assert
-call ptr %0, @Vector.float.$Destroy
+store 3, ptr %3
+%4 = ptr add ptr %0, 24
+store 2, ptr %4
+%5 = ptr add ptr %0, 32
+store 1, ptr %5
+%6 = ptr add ptr %0, 40
+store 0, ptr %6
+%7 = ptr add ptr %0, 48
+store 0, ptr %7
+%8 = ptr add ptr %0, 56
+store 0, ptr %8
+%9 = ptr add ptr %0, 64
+store 0, ptr %9
+%10 = ptr add ptr %0, 72
+store 0, ptr %10
+%11 = load i64[10], ptr %0
+%12 = call i64[10] %11, 0, 4, @IsPalindrome__I10__I__I
+%13 = icmp eq i8 %12, 1
+call i8 %13, @Assert
+%14 = alloca i64[10]
+%15 = ptr add ptr %14, 0
+store 1, ptr %15
+%16 = ptr add ptr %14, 8
+store 2, ptr %16
+%17 = ptr add ptr %14, 16
+store 3, ptr %17
+%18 = ptr add ptr %14, 24
+store 4, ptr %18
+%19 = ptr add ptr %14, 32
+store 5, ptr %19
+%20 = ptr add ptr %14, 40
+store 0, ptr %20
+%21 = ptr add ptr %14, 48
+store 0, ptr %21
+%22 = ptr add ptr %14, 56
+store 0, ptr %22
+%23 = ptr add ptr %14, 64
+store 0, ptr %23
+%24 = ptr add ptr %14, 72
+store 0, ptr %24
+%25 = load i64[10], ptr %14
+%26 = call i64[10] %25, 0, 4, @IsPalindrome__I10__I__I
+%27 = icmp eq i8 %26, 0
+call i8 %27, @Assert
 br label exit
-entry.inlined6:
-%16 = load i64, ptr %2
-%17 = sub i64 %16, 1
-%18 = load ptr, ptr %1
-%19 = gep ptr %18, %17
-%15 = load f64, ptr %19
-br label entry.split.split.split.split.split.split.split
-entry.inlined5:
-%20 = load ptr, ptr %1
-%21 = ptr add ptr %20, 0
-%13 = load f64, ptr %21
-br label entry.split.split.split.split.split.split
-entry.inlined4:
-%22 = load ptr, ptr %1
-%23 = gep ptr %22, 2
-%11 = load f64, ptr %23
-br label entry.split.split.split.split.split
-entry.inlined3:
-%24 = load ptr, ptr %1
-%25 = gep ptr %24, 1
-%9 = load f64, ptr %25
-br label entry.split.split.split.split
-entry.inlined2:
-%26 = load ptr, ptr %1
-%27 = gep ptr %26, 0
-%7 = load f64, ptr %27
-br label entry.split.split.split
-entry.inlined1:
-%5 = load i64, ptr %2
-br label entry.split.split
-entry.inlined:
-store null, ptr %1
-store 0, ptr %2
-store 0, ptr %3
-br label entry.split
 exit:
 ret 
 }
@@ -1126,16 +291,12 @@ ret
 
 define external @main i64() {
 entry:
-call ptr @TestEmptyVector
-call ptr @TestPushBackAndGet
-call ptr @TestGrow
-call ptr @TestSetGet
-call ptr @TestFrontBack
-call ptr @TestPopBack
-call ptr @TestClear
-call ptr @TestDestroy
-call ptr @TestPreallocated
-call ptr @TestFloatVector
+call ptr @TestFactorial
+call ptr @TestFibonacci
+call ptr @TestSumRange
+call ptr @TestPower
+call ptr @TestGCD
+call ptr @TestIsPalindrome
 br label exit
 exit:
 ret i64 0

@@ -184,16 +184,9 @@ namespace ola
 					if (AllocaInst* AI = dyn_cast<AllocaInst>(&I))
 					{
 						IRType const* type = AI->GetAllocatedType();
-						if (type->IsArray())
+						if (type->IsAggregate())
 						{
-							IRArrayType const* array_type = cast<IRArrayType>(type);
-							MachineOperand const& MO = MF.AllocateLocalStack(array_type->GetSize());
-							machine_ctx.MapOperand(AI, MO);
-						}
-						else if (type->IsStruct())
-						{
-							IRStructType const* struct_type = cast<IRStructType>(type);
-							MachineOperand const& MO = MF.AllocateLocalStack(struct_type->GetSize());
+							MachineOperand const& MO = MF.AllocateLocalStack(type->GetSize());
 							machine_ctx.MapOperand(AI, MO);
 						}
 						else
@@ -204,7 +197,7 @@ namespace ola
 					}
 					else if (LoadInst* LI = dyn_cast<LoadInst>(&I))
 					{
-						if (LI->GetType()->IsStruct())
+						if (LI->GetType()->IsAggregate())
 						{
 							MF.PreAllocateStructLoad(LI, LI->GetType()->GetSize());
 						}
@@ -227,15 +220,14 @@ namespace ola
 			Argument* arg = F->GetArg(arg_idx);
 			IRType* arg_type = F->GetArgType(arg_idx);
 
-			if (arg_type->IsStruct())
+			if (arg_type->IsAggregate())
 			{
-				IRStructType const* struct_type = cast<IRStructType>(arg_type);
-				Uint32 struct_size = struct_type->GetSize();
-				MachineOperand const& local_slot = MF.AllocateLocalStack(struct_size);
+				Uint32 aggregate_size = arg_type->GetSize();
+				MachineOperand const& local_slot = MF.AllocateLocalStack(aggregate_size);
 				MachineOperand ptr_vreg = machine_ctx.VirtualReg(MachineType::Ptr);
 				machine_ctx.MapOperand(arg, local_slot);
 				args.push_back(ptr_vreg);
-				MF.AddStructArg(arg_idx, local_slot, struct_size);
+				MF.AddStructArg(arg_idx, local_slot, aggregate_size);
 			}
 			else
 			{

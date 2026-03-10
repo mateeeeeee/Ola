@@ -1,0 +1,123 @@
+import std.assert;
+
+int globalVar = 100;
+
+void TestGlobalAccess()
+{
+    Assert(globalVar == 100);
+    globalVar = 200;
+    Assert(globalVar == 200);
+    globalVar = 100;
+}
+
+void TestLocalShadowing()
+{
+    int x = 10;
+    Assert(x == 10);
+    if (true)
+    {
+        int x = 20;
+        Assert(x == 20);
+    }
+    Assert(x == 10);
+}
+
+void TestNestedScopes()
+{
+    int x = 1;
+    if (true)
+    {
+        int y = 2;
+        if (true)
+        {
+            int z = 3;
+            Assert(x == 1);
+            Assert(y == 2);
+            Assert(z == 3);
+        }
+        Assert(x == 1);
+        Assert(y == 2);
+    }
+    Assert(x == 1);
+}
+
+void TestForLoopScope()
+{
+    int sum = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        int temp = i * 10;
+        sum += temp;
+    }
+    // 0 + 10 + 20 = 30
+    Assert(sum == 30);
+}
+
+void TestWhileScope()
+{
+    int count = 0;
+    int i = 0;
+    while (i < 5)
+    {
+        int squared = i * i;
+        count += squared;
+        i++;
+    }
+    // 0 + 1 + 4 + 9 + 16 = 30
+    Assert(count == 30);
+}
+
+void TestSwitchScope()
+{
+    int x = 2;
+    int result = 0;
+    switch (x)
+    {
+        case 1:
+            result = 10;
+            break;
+        case 2:
+            result = 20;
+            break;
+        default:
+            result = -1;
+            break;
+    }
+    Assert(result == 20);
+}
+
+void ModifyGlobal()
+{
+    globalVar = 999;
+}
+
+void TestGlobalModifiedByFunction()
+{
+    Assert(globalVar == 100);
+    ModifyGlobal();
+    Assert(globalVar == 999);
+    globalVar = 100;
+}
+
+void TestMultipleLocals()
+{
+    int a = 1;
+    int b = 2;
+    int c = 3;
+    int d = 4;
+    int e = 5;
+    Assert(a + b + c + d + e == 15);
+}
+
+public int main()
+{
+    TestGlobalAccess();
+    TestLocalShadowing();
+    TestNestedScopes();
+    TestForLoopScope();
+    TestWhileScope();
+    TestSwitchScope();
+    TestGlobalModifiedByFunction();
+    TestMultipleLocals();
+    return 0;
+}

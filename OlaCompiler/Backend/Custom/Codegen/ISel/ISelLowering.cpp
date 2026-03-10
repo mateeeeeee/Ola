@@ -185,7 +185,7 @@ namespace ola
 	void ISelLowering::LowerLoad(LoadInst* LI)
 	{
 		IRType* load_type = LI->GetType();
-		if (load_type->IsStruct())
+		if (load_type->IsAggregate())
 		{
 			MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
 			Uint32 struct_size = load_type->GetSize();
@@ -232,7 +232,7 @@ namespace ola
 	void ISelLowering::LowerStore(StoreInst* SI)
 	{
 		IRType* value_type = SI->GetValueOp()->GetType();
-		if (value_type->IsStruct())
+		if (value_type->IsAggregate())
 		{
 			Uint32 struct_size = value_type->GetSize();
 			MachineOperand src_addr = ctx.GetOperand(SI->GetValueOp());
@@ -300,7 +300,7 @@ namespace ola
 		MachineOperand result = ctx.VirtualReg(GEPI->GetType());
 		IRType* current_type = GEPI->GetType();
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsAggregate())
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(result)
@@ -402,7 +402,7 @@ namespace ola
 
 		MachineOperand base_op = ctx.GetOperand(base);
 		MachineOperand base_register = ctx.VirtualReg(PAI->GetType());
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && (AI->GetAllocatedType()->IsArray() || AI->GetAllocatedType()->IsStruct()))
+		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsAggregate())
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(base_register)

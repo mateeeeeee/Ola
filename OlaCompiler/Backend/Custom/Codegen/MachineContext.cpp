@@ -12,9 +12,9 @@ namespace ola
 		{
 			return MachineType::Ptr;
 		}
-		if (type->IsStruct())
+		if (type->IsAggregate())
 		{
-			OLA_ASSERT_MSG(false, "Struct type in GetOperandType - should be passed by ref");
+			OLA_ASSERT_MSG(false, "Aggregate type in GetOperandType - should be passed by ref");
 			return MachineType::Other;
 		}
 		if (type->IsInteger())
