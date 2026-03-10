@@ -421,7 +421,7 @@ void TestArrayReverse()
 	Assert(arr[4] == 1);
 }
 
-void TestArrayBubbleSort()
+noopt void TestArrayBubbleSort()
 {
 	int[5] arr = {5, 3, 1, 4, 2};
 	for (int i = 0; i < 5; i++)
