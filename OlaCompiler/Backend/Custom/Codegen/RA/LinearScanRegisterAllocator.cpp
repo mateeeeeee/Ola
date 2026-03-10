@@ -303,7 +303,9 @@ namespace ola
 						if (inst_info.HasOpFlag(idx, OperandFlagDef))
 						{
 							Bool is_float = (MO.GetType() == MachineType::Float64);
+							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
 							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+							scratch_used = true;
 							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
 
 							auto next_it = std::next(it);
