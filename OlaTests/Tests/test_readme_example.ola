@@ -1,58 +1,130 @@
 import std.assert;
 
-class Pair<A, B>
+enum Weekday { Mon, Tue, Wed, Thu, Fri, Sat, Sun };
+
+bool IsWeekend(Weekday d)
 {
-    Pair(A a, B b)
+    return d == Sat || d == Sun;
+}
+
+interface Printable
+{
+    public int Length() const;
+};
+
+class Animal : Printable
+{
+    Animal(int legs) { this.legs = legs; }
+    public int Length() const virtual { return this.legs; }
+    public int Sound() const virtual { return 0; }
+    private int legs;
+};
+
+class Dog : Animal
+{
+    Dog() { super(4); }
+    public int Sound() const virtual { return 1; }
+};
+
+class Bird : Animal
+{
+    Bird() { super(2); this.can_fly = true; }
+    public int Sound() const virtual { return 2; }
+    public bool CanFly() const { return this.can_fly; }
+    private bool can_fly;
+};
+
+class Cage<T>
+{
+    Cage(T pet) { this.pet = pet; }
+    public T GetPet() const { return this.pet; }
+    private T pet;
+};
+
+int CountLegs(ref Animal a1, ref Animal a2)
+{
+    return a1.Length() + a2.Length();
+}
+
+int SumArray(int[5] arr)
+{
+    int total = 0;
+    foreach (int x : arr)
     {
-        this.first = a;
-        this.second = b;
+        total += x;
     }
-    public A First() const { return this.first; }
-    public B Second() const { return this.second; }
-    private A first;
-    private B second;
-};
+    return total;
+}
 
-class Shape
+int Fibonacci(int n)
 {
-    Shape(int x, int y) { this.x = x; this.y = y; }
-    public int GetX() const { return this.x; }
-    public int GetY() const { return this.y; }
-    public int Area() const virtual { return 0; }
-    private int x;
-    private int y;
-};
-
-class Rectangle : Shape
-{
-    Rectangle(int x, int y, int w, int h)
-    {
-        super(x, y);
-        this.w = w;
-        this.h = h;
-    }
-    public int Area() const virtual { return this.w * this.h; }
-    private int w;
-    private int h;
-};
-
-int AreaAt(ref Pair<int,int> origin, int w, int h)
-{
-    return w * h;
+    if (n <= 1) return n;
+    return Fibonacci(n - 1) + Fibonacci(n - 2);
 }
 
 public int main()
 {
-    Pair<int, float> p(10, 3.14);
+    // enums
+    Weekday today = Fri;
+    Assert(!IsWeekend(today));
+    Assert(IsWeekend(Sat));
 
-    Rectangle r(0, 0, p.First(), 5);
-    ref Shape s = r;
-    int area = s.Area();
+    // inheritance, polymorphism, virtual dispatch
+    Dog dog;
+    Bird bird;
+    Assert(dog.Sound() == 1);
+    Assert(bird.Sound() == 2);
+    Assert(bird.CanFly());
+
+    // ref parameters with polymorphic dispatch
+    int legs = CountLegs(dog, bird);
+    Assert(legs == 6);
+
+    // auto type deduction
+    auto area = 5 * 10;
     Assert(area == 50);
 
-    Pair<int, int> origin(0, 0);
-    int area2 = AreaAt(origin, 3, 4);
-    Assert(area2 == 12);
+    // templates
+    Cage<int> cage(42);
+    Assert(cage.GetPet() == 42);
+
+    // arrays, foreach, for loop
+    int[5] squares;
+    for (int i = 0; i < 5; ++i)
+    {
+        squares[i] = (i + 1) * (i + 1);
+    }
+    Assert(squares[0] == 1);
+    Assert(squares[4] == 25);
+    int sum = SumArray(squares);
+    Assert(sum == 55);
+
+    // pointers and heap allocation
+    Dog* ptr = new Dog;
+    Assert(ptr->Sound() == 1);
+    delete ptr;
+
+    // switch
+    int result = 0;
+    switch (today)
+    {
+        case 0: result = 10; break;
+        case 4: result = 50; break;
+        default: result = -1; break;
+    }
+    Assert(result == 50);
+
+    // ternary
+    int sign = area > 0 ? 1 : -1;
+    Assert(sign == 1);
+
+    // recursion
+    Assert(Fibonacci(10) == 55);
+
+    // alias
+    alias Score = int;
+    Score s = 100;
+    Assert(s == 100);
 
     return 0;
 }

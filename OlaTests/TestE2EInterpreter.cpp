@@ -13,6 +13,7 @@ TEST(Interpreter_Operators, PlusMinus)      { EXPECT_EQ(RUN_TEST(-i test_plusmin
 TEST(Interpreter_Operators, Increment)      { EXPECT_EQ(RUN_TEST(-i test_increment),      0); }
 TEST(Interpreter_Operators, Ternary)        { EXPECT_EQ(RUN_TEST(-i test_ternary),        0); }
 TEST(Interpreter_Operators, Sizeof)         { EXPECT_EQ(RUN_TEST(-i test_sizeof),         0); }
+TEST(Interpreter_Operators, Dereference)    { EXPECT_EQ(RUN_TEST(-i test_dereference),    0); }
 
 TEST(Interpreter_Control, IfElse)  { EXPECT_EQ(RUN_TEST(-i test_ifelse),  0); }
 TEST(Interpreter_Control, Switch)  { EXPECT_EQ(RUN_TEST(-i test_switch),  0); }
@@ -21,6 +22,7 @@ TEST(Interpreter_Control, Goto)    { EXPECT_EQ(RUN_TEST(-i test_goto),    0); }
 TEST(Interpreter_Iteration, For)     { EXPECT_EQ(RUN_TEST(-i test_for),     0); }
 TEST(Interpreter_Iteration, While)   { EXPECT_EQ(RUN_TEST(-i test_while),   0); }
 TEST(Interpreter_Iteration, DoWhile) { EXPECT_EQ(RUN_TEST(-i test_dowhile), 0); }
+TEST(Interpreter_Iteration, Foreach) { EXPECT_EQ(RUN_TEST(-i test_foreach), 0); }
 
 TEST(Interpreter_Declarations, Import) {}
 TEST(Interpreter_Declarations, Alias)  { EXPECT_EQ(RUN_TEST(-i test_alias), 0); }
@@ -30,24 +32,25 @@ TEST(Interpreter_Declarations, Ref)    { EXPECT_EQ(RUN_TEST(-i test_ref),   0); 
 TEST(Interpreter_Declarations, Ptr)    { EXPECT_EQ(RUN_TEST(-i test_ptr),   0); }
 TEST(Interpreter_Declarations, Array)  { EXPECT_EQ(RUN_TEST(-i test_array), 0); }
 TEST(Interpreter_Declarations, Const)  { EXPECT_EQ(RUN_TEST(-i test_const), 0); }
+TEST(Interpreter_Declarations, New)    { EXPECT_EQ(RUN_TEST(-i test_new),   0); }
+TEST(Interpreter_Declarations, Auto)   { EXPECT_EQ(RUN_TEST(-i test_auto),  0); }
 
 TEST(Interpreter_Function, Calls)      { EXPECT_EQ(RUN_TEST(-i test_functioncalls), 0); }
 TEST(Interpreter_Function, Overloading){ EXPECT_EQ(RUN_TEST(-i test_overloading),   0); }
 TEST(Interpreter_Function, Returns)    { EXPECT_EQ(RUN_TEST(-i test_returns),       0); }
+TEST(Interpreter_Function, Recursion)  { EXPECT_EQ(RUN_TEST(-i test_recursion), 	0); }
 
 TEST(Interpreter_Misc, Strings)       { EXPECT_EQ(RUN_TEST(-i test_string),       0); }
 TEST(Interpreter_Misc, ImplicitCasts) { EXPECT_EQ(RUN_TEST(-i test_implicitcasts),0); }
 TEST(Interpreter_Misc, Literals)      { EXPECT_EQ(RUN_TEST(-i test_literals),     0); }
 TEST(Interpreter_Misc, Floats)        { EXPECT_EQ(RUN_TEST(-i test_floats),       0); }
+TEST(Interpreter_Misc, Scope)		  { EXPECT_EQ(RUN_TEST(-i test_scope), 		  0); }
 
 TEST(Interpreter_Classes, Inheritance)  { EXPECT_EQ(RUN_TEST(-i test_inheritance),  0); }
 TEST(Interpreter_Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphism), 0); }
 TEST(Interpreter_Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
 TEST(Interpreter_Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
 TEST(Interpreter_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }
-
-TEST(Interpreter_Operators, Dereference)   { EXPECT_EQ(RUN_TEST(-i test_dereference),   0); }
-TEST(Interpreter_Declarations, New)        { EXPECT_EQ(RUN_TEST(-i test_new),           0); }
 
 TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
 TEST(Interpreter_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }
@@ -58,7 +61,3 @@ TEST(Interpreter_Containers, Stack)        { EXPECT_EQ(RUN_TEST(-i test_stack), 
 TEST(Interpreter_Containers, Queue)        { EXPECT_EQ(RUN_TEST(-i test_queue),         0); }
 TEST(Interpreter_Containers, Map)          { EXPECT_EQ(RUN_TEST(-i test_map),           0); }
 
-TEST(Interpreter_Iteration, Foreach)		{ EXPECT_EQ(RUN_TEST(-i test_foreach), 0); }
-TEST(Interpreter_Declarations, Auto)		{ EXPECT_EQ(RUN_TEST(-i test_auto), 0); }
-TEST(Interpreter_Function, Recursion)		{ EXPECT_EQ(RUN_TEST(-i test_recursion), 0); }
-TEST(Interpreter_Misc, Scope)				{ EXPECT_EQ(RUN_TEST(-i test_scope), 0); }
