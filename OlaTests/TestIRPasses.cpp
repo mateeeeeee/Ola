@@ -1359,3 +1359,459 @@ TEST(Mem2Reg, HandlesMultipleStoresSameBlock)
 	ASSERT_TRUE(isa<ConstantInt>(ret_val));
 	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 2);
 }
+
+TEST(GVN, PreservesNonDominatedExpression)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x, y):
+	//   entry: cond = x > 0; br cond, left, right
+	//   left:  a = x + y; br merge
+	//   right: b = x + y; br merge
+	//   merge: ret 0
+	// left does NOT dominate right, so GVN must keep both adds.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64),
+		{ ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	BasicBlock* left  = builder.AddBlock("left");
+	BasicBlock* right = builder.AddBlock("right");
+	BasicBlock* merge = builder.AddBlock("merge");
+
+	Value* x = fn->GetArg(0);
+	Value* y = fn->GetArg(1);
+
+	builder.SetCurrentBlock(entry);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSGT, x, ctx.GetInt64(0));
+	builder.MakeInst<BranchInst>(cond, left, right);
+
+	BinaryInst* a = new BinaryInst(Opcode::Add, x, y);
+	a->InsertBefore(left, left->end());
+	BranchInst* br_l = new BranchInst(ctx, merge);
+	br_l->InsertBefore(left, left->end());
+
+	BinaryInst* b = new BinaryInst(Opcode::Add, x, y);
+	b->InsertBefore(right, right->end());
+	BranchInst* br_r = new BranchInst(ctx, merge);
+	br_r->InsertBefore(right, right->end());
+
+	builder.SetCurrentBlock(merge);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 2u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<GVNPass>();
+	fpm.Run(*fn, fam);
+
+	// Neither dominates the other, so both adds must survive.
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 2u);
+}
+
+TEST(LICM, DoesNotHoistNonInvariantInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(a):
+	//   preheader: br header
+	//   header:    i = phi [0, preheader] [i_next, latch]; cond = i < 5; br cond, latch, exit
+	//   latch:     x = i * a   <- NOT invariant (i changes each iteration)
+	//              i_next = i + 1; br header
+	//   exit:      ret 0
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64),
+		{ ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+
+	BasicBlock* preheader = builder.AddBlock("preheader");
+	BasicBlock* header    = builder.AddBlock("header");
+	BasicBlock* latch     = builder.AddBlock("latch");
+	BasicBlock* exit_b    = builder.AddBlock("exit");
+
+	Value* a = fn->GetArg(0);
+
+	builder.SetCurrentBlock(preheader);
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	PhiInst* i_phi = new PhiInst(ctx.GetIntegerType(64));
+	header->AddPhiInst(i_phi);
+	builder.SetCurrentBlock(header);
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSLT, i_phi, ctx.GetInt64(5));
+	builder.MakeInst<BranchInst>(cond, latch, exit_b);
+
+	builder.SetCurrentBlock(latch);
+	BinaryInst* dep = new BinaryInst(Opcode::SMul, i_phi, a);
+	dep->InsertBefore(latch, latch->end());
+	Value* i_next = builder.MakeInst<BinaryInst>(Opcode::Add, i_phi, ctx.GetInt64(1));
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	builder.SetCurrentBlock(exit_b);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	i_phi->AddIncoming(ctx.GetInt64(0), preheader);
+	i_phi->AddIncoming(i_next, latch);
+
+	EXPECT_EQ(CountInBlock(latch, Opcode::SMul), 1u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<LICMPass>();
+	fpm.Run(*fn, fam);
+
+	// The multiply depends on the loop counter phi, so it must stay in the latch.
+	EXPECT_EQ(CountInBlock(latch, Opcode::SMul), 1u);
+}
+
+TEST(SROA, LeavesScalarAllocaAlone)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn() { p = alloca i64; store 42 -> p; v = load p; ret v; }
+	// A scalar alloca has nothing to split; SROA must leave it as-is.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* p = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(42), p);
+	Value* v = builder.MakeInst<LoadInst>(p);
+	builder.MakeInst<ReturnInst>(v);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 1u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<SROAPass>();
+	fpm.Run(*fn, fam);
+
+	// Scalar alloca is not split.
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 1u);
+}
+
+TEST(CriticalEdgeSplitting, DoesNotSplitNonCriticalEdge)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// entry -> exit  (unconditional, single successor, single predecessor)
+	// No critical edge; block count must not change.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	BasicBlock* exit_b = builder.AddBlock("exit");
+
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<BranchInst>(ctx, exit_b);
+
+	builder.SetCurrentBlock(exit_b);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(CountBlocks(fn), 2u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<CriticalEdgeSplittingPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountBlocks(fn), 2u);
+}
+
+TEST(ConstantPropagation, FoldsNegation)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret neg(5) => ret -5
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	UnaryInst* neg = new UnaryInst(Opcode::Neg, ctx.GetInt64(5));
+	neg->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(neg);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), -5);
+}
+
+TEST(DCE, RemovesDeadLoad)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn() { p = alloca; store 42 -> p; dead = load p; return 0; }
+	// The load result is never used; DCE should remove it.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* p = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(42), p);
+	builder.MakeInst<LoadInst>(p); // result unused
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(CountByType<LoadInst>(fn), 1u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<LoadInst>(fn), 0u);
+}
+
+TEST(ArithmeticReduction, DivisionByOneBecomesOperand)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { return x / 1; }  =>  return x
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::SDiv, x, ctx.GetInt64(1));
+	builder.MakeInst<ReturnInst>(result);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::SDiv), 0u);
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	EXPECT_EQ(ret_val, x);
+}
+
+TEST(ArithmeticReduction, FloatAddZeroBecomesOperand)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { return x + 0.0; }  =>  return x
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetFloatType(), { ctx.GetFloatType() });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::FAdd, x, ctx.GetZeroFloat());
+	builder.MakeInst<ReturnInst>(result);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::FAdd), 0u);
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	EXPECT_EQ(ret_val, x);
+}
+
+TEST(ArithmeticReduction, FloatMultiplyByOneBecomesOperand)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x) { return x * 1.0; }  =>  return x
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetFloatType(), { ctx.GetFloatType() });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::FMul, x, ctx.GetFloat(1.0));
+	builder.MakeInst<ReturnInst>(result);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::FMul), 0u);
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	EXPECT_EQ(ret_val, x);
+}
+
+TEST(SimplifyCFG, CollapsesChainOfEmptyBlocks)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// entry -> mid1 -> mid2 -> exit
+	// All intermediate blocks are empty pass-throughs.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry  = builder.AddBlock("entry");
+	BasicBlock* mid1   = builder.AddBlock("mid1");
+	BasicBlock* mid2   = builder.AddBlock("mid2");
+	BasicBlock* exit_b = builder.AddBlock("exit");
+
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<BranchInst>(ctx, mid1);
+
+	builder.SetCurrentBlock(mid1);
+	builder.MakeInst<BranchInst>(ctx, mid2);
+
+	builder.SetCurrentBlock(mid2);
+	builder.MakeInst<BranchInst>(ctx, exit_b);
+
+	builder.SetCurrentBlock(exit_b);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(CountBlocks(fn), 4u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<SimplifyCFGPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_LT(CountBlocks(fn), 4u);
+}
+
+TEST(CSE, EliminatesTriplicateExpression)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// fn(x, y) { a = x + y; b = x + y; c = x + y; return c; }
+	// All three are identical; only one should remain after CSE + DCE.
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64),
+		{ ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	Value* x = fn->GetArg(0);
+	Value* y = fn->GetArg(1);
+	BinaryInst* a = new BinaryInst(Opcode::Add, x, y);
+	a->InsertBefore(entry, entry->end());
+	BinaryInst* b = new BinaryInst(Opcode::Add, x, y);
+	b->InsertBefore(entry, entry->end());
+	BinaryInst* c = new BinaryInst(Opcode::Add, x, y);
+	c->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(c);
+	ret->InsertBefore(entry, entry->end());
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 3u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<CSEPass>();
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 1u);
+}
+
+TEST(GlobalDCE, KeepsExternalFunction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// An external function should never be removed by GlobalDCE,
+	// even if never called within the module.
+	Function* ext = MakeFunc(module, ctx, "external_fn", ctx.GetVoidType(), {}, Linkage::External);
+	builder.SetCurrentFunction(ext);
+	BasicBlock* ext_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(ext_entry);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	Function* main_fn = MakeFunc(module, ctx, "main", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* m_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(m_entry);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	EXPECT_EQ(module.Globals().size(), 2u);
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mam.RegisterPass<CallGraphAnalysisPass>(module);
+	mpm.AddPass<GlobalDeadCodeEliminationPass>();
+	mpm.Run(module, mam);
+
+	// External function must survive.
+	EXPECT_EQ(module.Globals().size(), 2u);
+}
+
+TEST(ConstantPropagation, FoldsShiftLeft)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret (1 << 10) => ret 1024
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	BinaryInst* op = new BinaryInst(Opcode::Shl, ctx.GetInt64(1), ctx.GetInt64(10));
+	op->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(op);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 1024);
+}
+
+TEST(ConstantPropagation, FoldsArithmeticShiftRight)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// ret (1024 >> 3) => ret 128
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+
+	BinaryInst* op = new BinaryInst(Opcode::AShr, ctx.GetInt64(1024), ctx.GetInt64(3));
+	op->InsertBefore(entry, entry->end());
+	ReturnInst* ret = new ReturnInst(op);
+	ret->InsertBefore(entry, entry->end());
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	ASSERT_TRUE(isa<ConstantInt>(ret_val));
+	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 128);
+}

@@ -894,3 +894,154 @@ TEST(Parser, DoubleSemicolon)
 	ParseHelper h("void foo() { int x = 5;; }");
 	EXPECT_FALSE(h.HasErrors());
 }
+
+TEST(Parser, DeeplyNestedExpressions)
+{
+	ParseHelper h("void foo() { int x = ((((1 + 2) * 3) - 4) / 5); }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, EmptyForLoop)
+{
+	ParseHelper h("void foo() { int i = 0; for (; i < 10; ++i) {} }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, MultipleClassInheritanceDecls)
+{
+	ParseHelper h(
+		"class A { public int x; };"
+		"class B : A { public int y; };"
+		"class C : B { public int z; };"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, InterfaceImplementation)
+{
+	ParseHelper h(
+		"interface Drawable {"
+		"  public void Draw();"
+		"};"
+		"class Circle : Drawable {"
+		"  public void Draw() virtual {}"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ClassWithPrivateField)
+{
+	ParseHelper h(
+		"class Secret {"
+		"  private int data;"
+		"  public int GetData() { return this.data; }"
+		"  public void SetData(int d) { this.data = d; }"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, FunctionWithManyParams)
+{
+	ParseHelper h("int add5(int a, int b, int c, int d, int e) { return a + b + c + d + e; }");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_EQ(fn->GetParamDecls().size(), 5u);
+}
+
+TEST(Parser, GlobalConstAndVariable)
+{
+	ParseHelper h("const int MAX = 100; int counter = 0;");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, NestedWhileLoops)
+{
+	ParseHelper h(
+		"void foo() {"
+		"  int i = 0;"
+		"  while (i < 10) {"
+		"    int j = 0;"
+		"    while (j < 10) { j = j + 1; }"
+		"    i = i + 1;"
+		"  }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, RefReturnType)
+{
+	ParseHelper h(
+		"class Holder { public int val; };"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ArrayOfFloats)
+{
+	ParseHelper h("void foo() { float[10] arr; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, OperatorPrecedence_ShiftBeforeCompare)
+{
+	// 1 << 2 > 3 should parse as (1 << 2) > 3
+	ParseHelper h("void foo() { bool b = 1 << 2 > 3; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, EnumWithExplicitValues)
+{
+	ParseHelper h("enum Flags { None = 0, Read = 1, Write = 2, Execute = 4 };");
+	ASSERT_FALSE(h.HasErrors());
+
+	EnumDecl const* enm = nullptr;
+	for (auto const& d : h.TU().GetDecls())
+		if (auto* e = dyn_cast<EnumDecl>(d.get())) { enm = e; break; }
+	ASSERT_NE(enm, nullptr);
+	EXPECT_EQ(enm->GetName(), "Flags");
+}
+
+TEST(Parser, FinalMethodDecl)
+{
+	ParseHelper h(
+		"class Base { public int Get() virtual { return 0; } };"
+		"class Derived : Base { public int Get() virtual final { return 1; } };"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, DeprecatedFunction)
+{
+	ParseHelper h("deprecated void oldFunc() {}");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	EXPECT_TRUE(fn->IsDeprecated());
+}
+
+TEST(Parser, ExternFunctionDeclaration)
+{
+	ParseHelper h("extern void puts(const char[] s);");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, FunctionOverloads)
+{
+	ParseHelper h(
+		"int compute(int x) { return x * 2; }"
+		"float compute(float x) { return x * 2.0; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+
+	Int32 fn_count = 0;
+	for (auto const& d : h.TU().GetDecls())
+		if (auto* f = dyn_cast<FunctionDecl>(d.get()))
+			if (f->GetName() == "compute") ++fn_count;
+	EXPECT_EQ(fn_count, 2);
+}

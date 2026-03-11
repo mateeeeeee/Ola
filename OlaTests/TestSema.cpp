@@ -955,3 +955,228 @@ TEST(Sema, VirtualOverrideChain_Ok)
 		"class C : B { public int Do() virtual { return 2; } };"
 	);
 }
+
+TEST(Sema, PointerToPointer_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int** pp = null; }");
+}
+
+TEST(Sema, SinglePointer_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = null; }");
+}
+
+TEST(Sema, CaseOutsideSwitch_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { case 1: int x = 0; }");
+}
+
+TEST(Sema, InheritFromEnum_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"enum Color { Red, Green };"
+		"class Foo : Color { public int x; };"
+	);
+}
+
+TEST(Sema, RefOfPointerParam_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void foo(ref int* p) {}"
+	);
+}
+
+TEST(Sema, NonConstRefFromConstRefParam_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void bar(ref int r) {}"
+		"void foo() { const int x = 5; bar(x); }"
+	);
+}
+
+TEST(Sema, NoMatchingFunction_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { public int x; };"
+		"void bar(Foo f) {}"
+		"void foo() { bar(3.14); }"
+	);
+}
+
+TEST(Sema, MemberAccessOnPrimitive_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = 5; int y = x.val; }");
+}
+
+TEST(Sema, CtorInitOnNonClass_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int x = int(42); }");
+}
+
+TEST(Sema, AliasingVarForbidden_Error)
+{
+	EXPECT_SEMA_ERROR("alias T = auto;");
+}
+
+TEST(Sema, ConstArrayToNonConstArray_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void foo() { const int[3] a; int[3] b = a; }"
+	);
+}
+
+TEST(Sema, MatchingCtorNotFound_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Foo { Foo(int x) { this.val = x; } public int val; };"
+		"void bar() { Foo f = Foo(1.5, 2.5); }"
+	);
+}
+
+TEST(Sema, SuperCallInMethod_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class Base { Base() {} };"
+		"class Derived : Base {"
+		"  public void Foo() { super(); }"
+		"};"
+	);
+}
+
+TEST(Sema, AdditionOnClassInstances_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class A { public int x; };"
+		"void foo() { A a; A b; int r = a + b; }"
+	);
+}
+
+TEST(Sema, AliasUsedInVarDecl_Ok)
+{
+	EXPECT_SEMA_OK(
+		"alias MyInt = int;"
+		"void foo() { MyInt x = 42; }"
+	);
+}
+
+TEST(Sema, WhileLoopWithBreakContinue_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  int i = 0;"
+		"  while (i < 10) {"
+		"    if (i == 5) break;"
+		"    i = i + 1;"
+		"    continue;"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, DoWhileLoop_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  int i = 0;"
+		"  do { i = i + 1; } while (i < 10);"
+		"}"
+	);
+}
+
+TEST(Sema, NestedClassInstantiation_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Inner { public int x; };"
+		"class Outer { public Inner inner; };"
+		"void foo() { Outer o; int v = o.inner.x; }"
+	);
+}
+
+TEST(Sema, FunctionCallWithImplicitCast_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void bar(float x) {}"
+		"void foo() { bar(42); }"
+	);
+}
+
+TEST(Sema, MultipleEnumTypes_Ok)
+{
+	EXPECT_SEMA_OK(
+		"enum Color { Red, Green, Blue };"
+		"enum Direction { North, South, East, West };"
+		"void foo() { Color c = Red; Direction d = North; }"
+	);
+}
+
+TEST(Sema, ClassWithMultipleConstructors_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Vec {"
+		"  Vec(int x) { this.x = x; this.y = 0; }"
+		"  Vec(int x, int y) { this.x = x; this.y = y; }"
+		"  public int x;"
+		"  public int y;"
+		"};"
+	);
+}
+
+TEST(Sema, ForLoopAllParts_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  for (int i = 0; i < 100; i = i + 1) {"
+		"    int temp = i * 2;"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, SwitchWithMultipleCasesAndDefault_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo(int x) {"
+		"  switch (x) {"
+		"    case 0: break;"
+		"    case 1: break;"
+		"    case 2: break;"
+		"    case 3: break;"
+		"    default: break;"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, DeepInheritanceChainPtrAssignment_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class A { public int x; };"
+		"class B : A { public int y; };"
+		"class C : B { public int z; };"
+		"void foo() { C* c = new C; A* a = c; delete c; }"
+	);
+}
+
+TEST(Sema, ConstGlobalWithNegativeLiteral_Ok)
+{
+	EXPECT_SEMA_OK("const int NEG = -42;");
+}
+
+TEST(Sema, RecursiveFunction_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int factorial(int n) {"
+		"  if (n <= 1) return 1;"
+		"  return n * factorial(n - 1);"
+		"}"
+	);
+}
+
+TEST(Sema, MutuallyExclusiveOverloads_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int compute(int x) { return x * 2; }"
+		"float compute(float x) { return x * 2.0; }"
+		"void foo() { int a = compute(3); float b = compute(1.5); }"
+	);
+}

@@ -598,6 +598,7 @@ namespace ola
 		if (sema_ctx.case_callback_stack.empty())
 		{
 			diagnostics.Report(loc, case_stmt_outside_switch);
+			return nullptr;
 		}
 
 		UniqueCaseStmtPtr case_stmt = nullptr;
@@ -1992,6 +1993,11 @@ namespace ola
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
 				if (isa<RefType>(func_param_type) && !arg->IsLValue())
+				{
+					incompatible_arg = true;
+					break;
+				}
+				if (isa<RefType>(func_param_type) && !func_param_type.IsConst() && arg->GetType().IsConst())
 				{
 					incompatible_arg = true;
 					break;

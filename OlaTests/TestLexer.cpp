@@ -582,3 +582,139 @@ TEST(Lexer, ColumnAfterTab)
 	EXPECT_EQ(tokens[0].GetLocation().column, 1u);
 	EXPECT_GT(tokens[1].GetLocation().column, 1u);
 }
+
+TEST(Lexer, StringEscapeNewline)
+{
+	auto tokens = LexFiltered("\"hello\\nworld\"");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+}
+
+TEST(Lexer, StringEscapeTab)
+{
+	auto tokens = LexFiltered("\"col1\\tcol2\"");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+}
+
+TEST(Lexer, StringEscapeBackslash)
+{
+	auto tokens = LexFiltered("\"path\\\\file\"");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+}
+
+TEST(Lexer, CharEscapeNewline)
+{
+	auto tokens = LexFiltered("'\\n'");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::char_literal);
+}
+
+TEST(Lexer, CharEscapeTab)
+{
+	auto tokens = LexFiltered("'\\t'");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::char_literal);
+}
+
+TEST(Lexer, CharEscapeZero)
+{
+	auto tokens = LexFiltered("'\\0'");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::char_literal);
+}
+
+TEST(Lexer, LargeIntegerLiteral)
+{
+	auto tokens = LexFiltered("1000000");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::int_number);
+	EXPECT_EQ(tokens[0].GetData(), "1000000");
+}
+
+TEST(Lexer, FloatWithNoIntegerPart)
+{
+	auto tokens = LexFiltered(".5");
+
+	// Either lexed as float or as dot + int; either way, no crash
+	ASSERT_GE(tokens.size(), 1u);
+}
+
+TEST(Lexer, MultipleSpacesBetweenTokens)
+{
+	auto tokens = LexFiltered("int     x");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_int);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "x");
+}
+
+TEST(Lexer, LongIdentifier)
+{
+	auto tokens = LexFiltered("very_long_variable_name_for_testing_purposes");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "very_long_variable_name_for_testing_purposes");
+}
+
+TEST(Lexer, KeywordThenIdentifier)
+{
+	auto tokens = LexFiltered("int intValue");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_int);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "intValue");
+}
+
+TEST(Lexer, AllBracketTypes)
+{
+	auto tokens = LexFiltered("()[]{}<>");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::left_round);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::right_round);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::left_square);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::right_square);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::left_brace);
+	EXPECT_EQ(tokens[5].GetKind(), TokenKind::right_brace);
+	EXPECT_EQ(tokens[6].GetKind(), TokenKind::less);
+	EXPECT_EQ(tokens[7].GetKind(), TokenKind::greater);
+}
+
+TEST(Lexer, LineCommentAtEndOfFile)
+{
+	auto tokens = LexFiltered("int x // comment at EOF");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::KW_int);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetData(), "x");
+}
+
+TEST(Lexer, ConsecutiveStringLiterals)
+{
+	auto tokens = LexFiltered("\"a\"\"b\"\"c\"");
+
+	ASSERT_GE(tokens.size(), 3u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[0].GetData(), "a");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[1].GetData(), "b");
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::string_literal);
+	EXPECT_EQ(tokens[2].GetData(), "c");
+}
+
+TEST(Lexer, SourceLocationAfterMultipleTokens)
+{
+	// "ab cd ef" - each token is 2 chars with a space separator
+	auto tokens = LexFiltered("ab cd ef");
+
+	EXPECT_EQ(tokens[0].GetLocation().column, 1u);
+	EXPECT_EQ(tokens[1].GetLocation().column, 4u);
+	EXPECT_EQ(tokens[2].GetLocation().column, 7u);
+}

@@ -501,3 +501,160 @@ TEST(IR, FunctionDeclarationVsDefinition)
 
 	EXPECT_FALSE(fn->IsDeclaration());
 }
+
+TEST(IR, SelectInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* cond = builder.MakeInst<CompareInst>(Opcode::ICmpSGT, fn->GetArg(0), ctx.GetInt64(0));
+	Value* sel = builder.MakeInst<SelectInst>(cond, ctx.GetInt64(1), ctx.GetInt64(-1));
+	ASSERT_NE(sel, nullptr);
+	EXPECT_TRUE(isa<SelectInst>(sel));
+}
+
+TEST(IR, PhiInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	BasicBlock* merge = builder.AddBlock("merge");
+
+	PhiInst* phi = new PhiInst(ctx.GetIntegerType(64));
+	merge->AddPhiInst(phi);
+	phi->AddIncoming(ctx.GetInt64(10), entry);
+
+	EXPECT_TRUE(isa<PhiInst>(phi));
+}
+
+TEST(IR, CallInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* callee_ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* callee = new Function("callee", callee_ft, Linkage::External);
+	module.AddGlobal(callee);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("caller", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	std::vector<Value*> args;
+	Value* call = builder.MakeInst<CallInst>(callee, std::span<Value*>(args));
+	ASSERT_NE(call, nullptr);
+	EXPECT_TRUE(isa<CallInst>(call));
+}
+
+TEST(IR, SwitchInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry  = builder.AddBlock("entry");
+	BasicBlock* case0  = builder.AddBlock("case0");
+	BasicBlock* deflt  = builder.AddBlock("default");
+
+	builder.SetCurrentBlock(entry);
+	Value* sw = builder.MakeInst<SwitchInst>(fn->GetArg(0), deflt);
+	cast<SwitchInst>(sw)->AddCase(0, case0);
+
+	EXPECT_TRUE(isa<SwitchInst>(sw));
+}
+
+TEST(IR, FunctionAttributes)
+{
+	IRContext ctx;
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+
+	EXPECT_FALSE(fn->IsForceInline());
+	EXPECT_FALSE(fn->IsNoInline());
+	EXPECT_FALSE(fn->IsNoOptimizations());
+
+	fn->SetForceInline();
+	EXPECT_TRUE(fn->IsForceInline());
+
+	fn->SetNoInline();
+	EXPECT_TRUE(fn->IsNoInline());
+
+	fn->SetNoOptimizations();
+	EXPECT_TRUE(fn->IsNoOptimizations());
+}
+
+TEST(IR, GlobalVariableReadOnly)
+{
+	IRContext ctx;
+	ConstantInt* init = ctx.GetInt64(42);
+	GlobalVariable* gv = new GlobalVariable("ro", ctx.GetIntegerType(64), Linkage::Internal, init);
+
+	EXPECT_FALSE(gv->IsReadOnly());
+	gv->SetReadOnly();
+	EXPECT_TRUE(gv->IsReadOnly());
+	delete gv;
+}
+
+TEST(IR, StructTypeInterning)
+{
+	IRContext ctx;
+	std::vector<IRType*> members = { ctx.GetIntegerType(64) };
+	IRStructType* a = ctx.GetStructType("Foo", members);
+	IRStructType* b = ctx.GetStructType("Foo", members);
+	// Same name should return the same interned type
+	EXPECT_EQ(a, b);
+}
+
+TEST(IR, EmptyStructType)
+{
+	IRContext ctx;
+	std::vector<IRType*> members = {};
+	IRStructType* st = ctx.GetStructType("Empty", members);
+	ASSERT_NE(st, nullptr);
+	EXPECT_EQ(st->GetMemberCount(), 0u);
+}
+
+TEST(IR, UnaryInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* neg = builder.MakeInst<UnaryInst>(Opcode::Neg, fn->GetArg(0));
+	ASSERT_NE(neg, nullptr);
+	EXPECT_TRUE(isa<UnaryInst>(neg));
+}
