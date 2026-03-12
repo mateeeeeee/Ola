@@ -257,7 +257,7 @@ namespace ola
 				current_token->Is(TokenKind::identifier) &&
 				(current_token + 1)->Is(TokenKind::identifier) &&
 				(current_token + 2)->Is(TokenKind::less) &&
-				!sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()))
+				!sema->sema_ctx.tag_sym_table.Lookup(current_token->GetData()))
 			{
 				++current_token; 
 			}
@@ -2021,7 +2021,7 @@ namespace ola
 		QualType type{};
 		std::string_view identifier = current_token->GetData();
 		if ((current_token->IsTypename() && current_token->IsNot(TokenKind::KW_auto)) || 
-			(current_token->Is(TokenKind::identifier) && sema->sema_ctx.tag_sym_table.LookUp(identifier) != nullptr))
+			(current_token->Is(TokenKind::identifier) && sema->sema_ctx.tag_sym_table.Lookup(identifier) != nullptr))
 		{
 			ParseTypeQualifier(type);
 			ParseTypeSpecifier(type);
@@ -2118,7 +2118,7 @@ namespace ola
 
 		if (current_token->Is(TokenKind::less))
 		{
-			std::vector<Decl*>& overloads = sema->sema_ctx.decl_sym_table.LookUp_Overload(name);
+			std::vector<Decl*>& overloads = sema->sema_ctx.decl_sym_table.LookupOverload(name);
 			TemplateFunctionDecl* tmpl = nullptr;
 			for (Decl* d : overloads)
 			{
@@ -2399,7 +2399,7 @@ namespace ola
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetData();
-			if (TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.LookUp(identifier))
+			if (TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.Lookup(identifier))
 			{
 				if (isa<EnumDecl>(tag_decl))
 				{
@@ -2577,7 +2577,7 @@ namespace ola
 		case TokenKind::identifier:
 		{
 			std::string_view identifier = current_token->GetData();
-			TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.LookUp(identifier);
+			TagDecl* tag_decl = sema->sema_ctx.tag_sym_table.Lookup(identifier);
 			if (tag_decl && isa<AliasDecl>(tag_decl))
 			{
 				type = tag_decl->GetType();
@@ -2663,7 +2663,7 @@ namespace ola
 
 	Bool Parser::IsCurrentTokenTypename()
 	{
-		return current_token->IsTypename() || sema->sema_ctx.tag_sym_table.LookUp(current_token->GetData()) != nullptr;
+		return current_token->IsTypename() || sema->sema_ctx.tag_sym_table.Lookup(current_token->GetData()) != nullptr;
 	}
 
 	Bool Parser::Consume(TokenKind k)

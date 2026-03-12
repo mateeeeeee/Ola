@@ -15,7 +15,7 @@ namespace ola
 
 	UniqueParamVarDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
-		if (!name.empty() && sema_ctx.decl_sym_table.LookUpCurrentScope(name))
+		if (!name.empty() && sema_ctx.decl_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -96,7 +96,7 @@ namespace ola
 		function_decl->SetVisibility(visibility);
 		function_decl->SetParamDecls(std::move(param_decls));
 		
-		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
+		Bool result = sema_ctx.decl_sym_table.InsertOverload(function_decl.get());
 		OLA_ASSERT(result);
 		return function_decl;
 	}
@@ -128,7 +128,7 @@ namespace ola
 			diagnostics.Report(loc, no_return_statement_found_in_non_void_function);
 		}
 		sema_ctx.return_stmt_encountered = false;
-		Bool result = sema_ctx.decl_sym_table.Insert_Overload(function_decl.get());
+		Bool result = sema_ctx.decl_sym_table.InsertOverload(function_decl.get());
 		OLA_ASSERT(result);
 		return function_decl;
 	}
@@ -223,7 +223,7 @@ namespace ola
 			return nullptr;
 		}
 
-		Bool result = sema_ctx.decl_sym_table.Insert_Overload(member_function_decl.get());
+		Bool result = sema_ctx.decl_sym_table.InsertOverload(member_function_decl.get());
 		return member_function_decl;
 	}
 
@@ -257,7 +257,7 @@ namespace ola
 			sema_ctx.labels.clear();
 		}
 
-		Bool result = sema_ctx.decl_sym_table.Insert_Overload(constructor_decl.get());
+		Bool result = sema_ctx.decl_sym_table.InsertOverload(constructor_decl.get());
 		return constructor_decl;
 	}
 
@@ -299,7 +299,7 @@ namespace ola
 
 	UniqueEnumDeclPtr Sema::ActOnEnumDecl(std::string_view name, SourceLocation const& loc, UniqueEnumMemberDeclPtrList&& enum_members)
 	{
-		if (!name.empty() && sema_ctx.tag_sym_table.LookUpCurrentScope(name))
+		if (!name.empty() && sema_ctx.tag_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -330,7 +330,7 @@ namespace ola
 			diagnostics.Report(loc, expected_identifier);
 			return nullptr;
 		}
-		if (sema_ctx.decl_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.decl_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -344,7 +344,7 @@ namespace ola
 
 	UniqueAliasDeclPtr Sema::ActOnAliasDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
 	{
-		if (sema_ctx.tag_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.tag_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -364,7 +364,7 @@ namespace ola
 	{
 		if (!base_name.empty())
 		{
-			if (TagDecl* base_tag_decl = sema_ctx.tag_sym_table.LookUpCurrentScope(base_name))
+			if (TagDecl* base_tag_decl = sema_ctx.tag_sym_table.LookupCurrentScope(base_name))
 			{
 				if (ClassDecl* base_class_decl = dyn_cast<ClassDecl>(base_tag_decl))
 				{
@@ -392,7 +392,7 @@ namespace ola
 
 	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, Bool final)
 	{
-		if (sema_ctx.tag_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.tag_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -420,7 +420,7 @@ namespace ola
 		std::vector<std::string>&& type_params, ClassDecl const* base_class, Bool final,
 		Uint64 body_begin, Uint64 body_end)
 	{
-		if (sema_ctx.tag_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.tag_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -439,7 +439,7 @@ namespace ola
 		auto tmpl = MakeUnique<TemplateFunctionDecl>(name, loc, std::move(type_params), body_begin, body_end);
 		tmpl->SetFuncAttributes(attributes);
 		tmpl->SetVisibility(visibility);
-		sema_ctx.decl_sym_table.InsertGlobal_Overload(tmpl.get());
+		sema_ctx.decl_sym_table.InsertGlobalOverload(tmpl.get());
 		return tmpl;
 	}
 
@@ -1023,7 +1023,7 @@ namespace ola
 		else if (isa<IdentifierExpr>(func_expr.get()))
 		{
 			IdentifierExpr const* func_identifier = cast<IdentifierExpr>(func_expr.get());
-			std::vector<Decl*>& found_decls = sema_ctx.decl_sym_table.LookUp_Overload(func_identifier->GetName());
+			std::vector<Decl*>& found_decls = sema_ctx.decl_sym_table.LookupOverload(func_identifier->GetName());
 			std::vector<FunctionDecl const*> candidate_decls{};
 			for (Decl* decl : found_decls)
 			{
@@ -1107,7 +1107,7 @@ namespace ola
 				return nullptr;
 			}
 
-			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(sema_ctx.current_class_name);
+			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookupMemberOverload(sema_ctx.current_class_name);
 			std::vector<ConstructorDecl const*> candidate_decls;
 			for (Decl* decl : decls)
 			{
@@ -1291,7 +1291,7 @@ namespace ola
 	{
 		if (overloaded_symbol)
 		{
-			std::vector<Decl*>& decls = sema_ctx.decl_sym_table.LookUp_Overload(name);
+			std::vector<Decl*>& decls = sema_ctx.decl_sym_table.LookupOverload(name);
 			if (!decls.empty()) return MakeUnique<IdentifierExpr>(name, loc);
 
 			if (ClassDecl const* base_class_decl = sema_ctx.current_base_class)
@@ -1303,7 +1303,7 @@ namespace ola
 				}
 			}
 
-			if (TagDecl* tag_decl = sema_ctx.tag_sym_table.LookUp(name))
+			if (TagDecl* tag_decl = sema_ctx.tag_sym_table.Lookup(name))
 			{
 				if (isa<ClassDecl>(tag_decl))
 				{
@@ -1315,7 +1315,7 @@ namespace ola
 		}
 		else
 		{
-			if (Decl* decl = sema_ctx.decl_sym_table.LookUp(name))
+			if (Decl* decl = sema_ctx.decl_sym_table.Lookup(name))
 			{
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 				if (decl->IsMember())
@@ -1389,7 +1389,7 @@ namespace ola
 			{
 				if (overloaded_symbol)
 				{
-					std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(name);
+					std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookupMemberOverload(name);
 					if (!decls.empty())
 					{
 						return MakeUnique<IdentifierExpr>(name, loc);
@@ -1397,7 +1397,7 @@ namespace ola
 				}
 				else
 				{
-					Decl* decl = sema_ctx.decl_sym_table.LookUpMember(name);
+					Decl* decl = sema_ctx.decl_sym_table.LookupMember(name);
 					return MakeUnique<DeclRefExpr>(decl, loc);
 				}
 			}
@@ -1573,7 +1573,7 @@ namespace ola
 		}
 		else
 		{
-			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookUpMember_Overload(member_identifier->GetName());
+			std::vector<Decl*> decls = sema_ctx.decl_sym_table.LookupMemberOverload(member_identifier->GetName());
 			for (Decl* decl : decls)
 			{
 				if (isa<MethodDecl>(decl))
@@ -1849,7 +1849,7 @@ namespace ola
 		Bool const init_expr_is_decl_ref = has_init && isa<DeclRefExpr>(init_expr.get());
 		Bool const init_expr_const_ref = has_init && isa<RefType>(init_expr->GetType()) && init_expr->GetType().IsConst();
 
-		if (sema_ctx.decl_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.decl_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
@@ -1873,7 +1873,7 @@ namespace ola
 			return nullptr;
 		}
 
-		if (sema_ctx.decl_sym_table.LookUpCurrentScope(name))
+		if (sema_ctx.decl_sym_table.LookupCurrentScope(name))
 		{
 			diagnostics.Report(loc, redefinition_of_identifier, name);
 			return nullptr;
