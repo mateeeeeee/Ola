@@ -40,6 +40,7 @@ TEST(LLVM_Function, Calls)       { EXPECT_EQ(RUN_TEST(-i test_functioncalls), 0)
 TEST(LLVM_Function, Overloading) { EXPECT_EQ(RUN_TEST(-i test_overloading),   0); }
 TEST(LLVM_Function, Returns)     { EXPECT_EQ(RUN_TEST(-i test_returns),       0); }
 TEST(LLVM_Function, Recursion)	 { EXPECT_EQ(RUN_TEST(-i test_recursion), 	  0); }
+TEST(LLVM_Function, Templates)   { EXPECT_EQ(RUN_TEST(-i test_function_templates), 0); }
 
 TEST(LLVM_Misc, Strings)       { EXPECT_EQ(RUN_TEST(-i test_string),        0); }
 TEST(LLVM_Misc, ImplicitCasts) { EXPECT_EQ(RUN_TEST(-i test_implicitcasts), 0); }

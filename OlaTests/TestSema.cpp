@@ -1415,8 +1415,15 @@ TEST(Sema, TemplateFunctionMultipleInstantiations_Ok)
 TEST(Sema, TemplateFunctionCacheDeduplication_Ok)
 {
 	EXPECT_SEMA_OK(
+		"extern void Assert(bool cond);"
 		"T Identity<T>(T x) { return x; }"
-		"void foo() { int a = Identity<int>(1); int b = Identity<int>(2); }"
+		"public int main() {"
+		"  int a = Identity<int>(1);"
+		"  int b = Identity<int>(2);"
+		"  int c = Identity<int>(3);"
+		"  Assert(a + b + c == 6);"
+		"  return 0;"
+		"}"
 	);
 }
 

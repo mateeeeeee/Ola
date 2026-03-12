@@ -39,6 +39,7 @@ TEST(Interpreter_Function, Calls)      { EXPECT_EQ(RUN_TEST(-i test_functioncall
 TEST(Interpreter_Function, Overloading){ EXPECT_EQ(RUN_TEST(-i test_overloading),   0); }
 TEST(Interpreter_Function, Returns)    { EXPECT_EQ(RUN_TEST(-i test_returns),       0); }
 TEST(Interpreter_Function, Recursion)  { EXPECT_EQ(RUN_TEST(-i test_recursion), 	0); }
+TEST(Interpreter_Function, Templates)  { EXPECT_EQ(RUN_TEST(-i test_function_templates), 0); }
 
 TEST(Interpreter_Misc, Strings)       { EXPECT_EQ(RUN_TEST(-i test_string),       0); }
 TEST(Interpreter_Misc, ImplicitCasts) { EXPECT_EQ(RUN_TEST(-i test_implicitcasts),0); }

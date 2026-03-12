@@ -56,7 +56,13 @@ namespace ola
 		std::vector<SymType*>& LookUp_Overload(std::string_view sym_name)
 		{
 			std::string name_key(sym_name);
-			return overload_sym_map[name_key];
+			auto it = overload_sym_map.find(name_key);
+			if (it != overload_sym_map.end()) 
+			{
+				return it->second;
+			}
+			static const std::vector<SymType*> empty_overload_result{};
+			return empty_overload_result;
 		}
 
 	private:
