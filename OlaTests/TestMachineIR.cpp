@@ -367,3 +367,106 @@ TEST(MachineFunction, IsFunction)
 	EXPECT_TRUE(mf.IsFunction());
 	EXPECT_FALSE(mf.IsBlock());
 }
+
+TEST(MachineOperand, NegativeImmediate)
+{
+	MachineOperand op = MachineOperand::Immediate(-100LL, MachineType::Int64);
+	EXPECT_TRUE(op.IsImmediate());
+	EXPECT_EQ(op.GetImmediate(), -100);
+}
+
+TEST(MachineOperand, ZeroImmediate)
+{
+	MachineOperand op = MachineOperand::Immediate(0LL, MachineType::Int64);
+	EXPECT_TRUE(op.IsImmediate());
+	EXPECT_EQ(op.GetImmediate(), 0);
+}
+
+TEST(MachineOperand, ISARegIsNotStackObject)
+{
+	MachineOperand op = MachineOperand::ISAReg(0u, MachineType::Int64);
+	EXPECT_FALSE(op.IsStackObject());
+	EXPECT_FALSE(op.IsImmediate());
+}
+
+TEST(MachineOperand, VirtualRegTypePreserved)
+{
+	MachineOperand op = MachineOperand::VirtualReg(0u, MachineType::Float64);
+	EXPECT_EQ(op.GetType(), MachineType::Float64);
+	EXPECT_TRUE(op.IsReg());
+}
+
+TEST(MachineOperand, StackObjectNotReg)
+{
+	MachineOperand op = MachineOperand::StackObject(-32, MachineType::Int64);
+	EXPECT_FALSE(op.IsReg());
+	EXPECT_FALSE(op.IsImmediate());
+	EXPECT_TRUE(op.IsStackObject());
+}
+
+TEST(MachineOperand, LargeStackOffset)
+{
+	MachineOperand op = MachineOperand::StackObject(-1024, MachineType::Int64);
+	EXPECT_EQ(op.GetStackOffset(), -1024);
+}
+
+TEST(MachineInstruction, MultipleOperandRoundtrip)
+{
+	MachineInstruction inst(InstAdd);
+	MachineOperand dst = MachineOperand::VirtualReg(0u, MachineType::Int64);
+	MachineOperand src1 = MachineOperand::VirtualReg(1u, MachineType::Int64);
+	MachineOperand src2 = MachineOperand::Immediate(42LL, MachineType::Int64);
+	inst.SetOp<0>(dst);
+	inst.SetOp<1>(src1);
+	inst.SetOp<2>(src2);
+	EXPECT_EQ(inst.GetOp<0>(), dst);
+	EXPECT_EQ(inst.GetOp<1>(), src1);
+	EXPECT_EQ(inst.GetOp<2>(), src2);
+}
+
+TEST(MachineInstruction, FlagCombinations)
+{
+	MachineInstruction inst(InstAdd);
+	inst.SetFlag(MachineInstFlag_Dead);
+	EXPECT_TRUE(inst.HasFlag(MachineInstFlag_Dead));
+	EXPECT_TRUE(inst.IsDead());
+}
+
+TEST(MachineBasicBlock, MultipleInstructions)
+{
+	MachineBasicBlock mbb(nullptr, "bb");
+	mbb.Instructions().push_back(MachineInstruction(InstAdd));
+	mbb.Instructions().push_back(MachineInstruction(InstSub));
+	mbb.Instructions().push_back(MachineInstruction(InstRet));
+	EXPECT_EQ(mbb.Instructions().size(), 3u);
+}
+
+TEST(MachineBasicBlock, MultiplePredecessors)
+{
+	MachineBasicBlock merge(nullptr, "merge");
+	MachineBasicBlock left(nullptr, "left");
+	MachineBasicBlock right(nullptr, "right");
+	merge.AddPredecessor(&left);
+	merge.AddPredecessor(&right);
+	EXPECT_EQ(merge.Predecessors().size(), 2u);
+	EXPECT_TRUE(left.Successors().count(&merge));
+	EXPECT_TRUE(right.Successors().count(&merge));
+}
+
+TEST(MachineFunction, LocalStackMultipleTypes)
+{
+	MachineFunction mf("f", false);
+	mf.AllocateLocalStack(MachineType::Int64);  // 8 bytes
+	mf.AllocateLocalStack(MachineType::Int8);    // 1 byte
+	mf.AllocateLocalStack(MachineType::Float64); // 8 bytes
+	EXPECT_EQ(mf.GetLocalStackAllocationSize(), 17);
+}
+
+TEST(MachineFunction, TotalStackIncludesArgumentAndLocal)
+{
+	MachineFunction mf("f", false);
+	mf.AllocateLocalStack(MachineType::Int64);
+	mf.AllocateArgumentStack(32);
+	// Total should include both local (8) and argument (32)
+	EXPECT_EQ(mf.GetStackAllocationSize(), 40);
+}

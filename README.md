@@ -211,11 +211,8 @@ The project consists of the following parts:
 
 5. **Ola Tests**:
    - A set of tests built with GoogleTest, organized into four targets:
-     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes, Machine IR, Register Allocation and Interpreter, no system calls.
-     - **OlaTestsE2E**: End-to-end tests using the custom backend. Invokes **OlaDriver** via system calls.
-     - **OlaTestsInterpreter**: End-to-end tests using the interpreter backend. Invokes **OlaDriver** via system calls.
-     - **OlaTestsLLVM**: End-to-end tests using the LLVM backend. Only built when LLVM is detected. Invokes **OlaDriver** via system calls.
-     - E2E tests rely on the `Assert` function from the `std.assert` import.
+     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes, Machine IR, Register Allocation and Interpreter. ~700 tests, no system calls.
+     - **OlaTestsE2E**, **OlaTestsInterpreter**, **OlaTestsLLVM**: End-to-end tests that invoke **OlaDriver** via system calls, each targeting a different backend (custom, interpreter, and LLVM respectively). All three share the same test suite (~50 tests), differing only in the backend used. **OlaTestsLLVM** is only built when LLVM is detected. E2E tests rely on the `Assert` function from the `std.assert` import.
 
 ## Dependencies
 * [LLVM 17.0](https://github.com/llvm/llvm-project) for LLVM backend (optional)

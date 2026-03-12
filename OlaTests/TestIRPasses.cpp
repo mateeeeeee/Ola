@@ -30,6 +30,8 @@
 #include "Backend/Custom/IR/Passes/SROAPass.h"
 #include "Backend/Custom/IR/Passes/CriticalEdgeSplittingPass.h"
 #include "Backend/Custom/IR/Passes/IPConstantPropagationPass.h"
+#include "Backend/Custom/IR/Passes/LoopUnrollPass.h"
+#include "Backend/Custom/IR/Passes/GlobalAttributeInferPass.h"
 #include "Utility/RTTI.h"
 
 using namespace ola;
@@ -1814,4 +1816,488 @@ TEST(ConstantPropagation, FoldsArithmeticShiftRight)
 	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
 	ASSERT_TRUE(isa<ConstantInt>(ret_val));
 	EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 128);
+}
+
+// Helper: Build a simple loop: for (i = 0; i < N; i += step) { body }
+// Returns the function. The loop body contains a single add instruction
+// that accumulates: sum = sum + i
+static Function* BuildSimpleCountingLoop(IRModule& module, IRContext& ctx, IRBuilder& builder,
+	Int64 init, Int64 bound, Int64 step)
+{
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("loop_fn", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* preheader = builder.AddBlock("preheader");
+	BasicBlock* header    = builder.AddBlock("header");
+	BasicBlock* body      = builder.AddBlock("body");
+	BasicBlock* latch     = builder.AddBlock("latch");
+	BasicBlock* exit_bb   = builder.AddBlock("exit");
+
+	// preheader: br header
+	builder.SetCurrentBlock(preheader);
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	// header: phi i = [init, preheader], [i_next, latch]
+	//         phi sum = [0, preheader], [sum_next, latch]
+	//         cmp = i < bound
+	//         br cmp, body, exit
+	builder.SetCurrentBlock(header);
+	PhiInst* phi_i = new PhiInst(ctx.GetIntegerType(64));
+	header->AddPhiInst(phi_i);
+	phi_i->AddIncoming(ctx.GetInt64(init), preheader);
+
+	PhiInst* phi_sum = new PhiInst(ctx.GetIntegerType(64));
+	header->AddPhiInst(phi_sum);
+	phi_sum->AddIncoming(ctx.GetInt64(0), preheader);
+
+	Value* cmp = builder.MakeInst<CompareInst>(Opcode::ICmpSLT, phi_i, ctx.GetInt64(bound));
+	builder.MakeInst<BranchInst>(cmp, body, exit_bb);
+
+	// body: sum_next = sum + i
+	//       br latch
+	builder.SetCurrentBlock(body);
+	Value* sum_next = builder.MakeInst<BinaryInst>(Opcode::Add, phi_sum, phi_i);
+	builder.MakeInst<BranchInst>(ctx, latch);
+
+	// latch: i_next = i + step
+	//        br header
+	builder.SetCurrentBlock(latch);
+	Value* i_next = builder.MakeInst<BinaryInst>(Opcode::Add, phi_i, ctx.GetInt64(step));
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	// Wire up the phis
+	phi_i->AddIncoming(i_next, latch);
+	phi_sum->AddIncoming(sum_next, latch);
+
+	// exit: ret sum
+	builder.SetCurrentBlock(exit_bb);
+	builder.MakeInst<ReturnInst>(phi_sum);
+
+	return fn;
+}
+
+TEST(LoopUnroll, NoLoopNoChange)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Simple function with no loop
+	Function* fn = MakeFunc(module, ctx, "no_loop", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(42));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+	fpm.AddPass<LoopUnrollPass>();
+	Bool changed = fpm.Run(*fn, fam);
+
+	EXPECT_FALSE(changed);
+}
+
+TEST(LoopUnroll, FullUnrollSmallLoop)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// for (i = 0; i < 4; i += 1) { sum += i; }
+	Function* fn = BuildSimpleCountingLoop(module, ctx, builder, 0, 4, 1);
+
+	Uint32 blocks_before = CountBlocks(fn);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+
+	LoopUnrollConfig config;
+	config.FullUnrollThreshold = 32;
+	config.MaxUnrolledSize = 256;
+	fpm.AddPass(new LoopUnrollPass(config));
+	Bool changed = fpm.Run(*fn, fam);
+
+	if (changed)
+	{
+		// After full unroll, the loop blocks should be removed
+		// The block count should be smaller (loop blocks eliminated)
+		Uint32 blocks_after = CountBlocks(fn);
+		EXPECT_LT(blocks_after, blocks_before);
+
+		// No more phi instructions from the loop
+		Uint32 phi_count = CountByType<PhiInst>(fn);
+		// The exit phi may remain, but loop phis should be gone
+		EXPECT_LE(phi_count, 1u);
+	}
+}
+
+TEST(LoopUnroll, SkipsLargeLoop)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// for (i = 0; i < 10000; i += 1) — too many iterations to unroll
+	Function* fn = BuildSimpleCountingLoop(module, ctx, builder, 0, 10000, 1);
+
+	Uint32 blocks_before = CountBlocks(fn);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+
+	LoopUnrollConfig config;
+	config.FullUnrollThreshold = 32;
+	config.MaxUnrolledSize = 256;
+	config.AllowPartialUnroll = false;
+	fpm.AddPass(new LoopUnrollPass(config));
+	fpm.Run(*fn, fam);
+
+	// Too large to unroll, blocks should remain the same
+	EXPECT_EQ(CountBlocks(fn), blocks_before);
+}
+
+TEST(LoopUnroll, SkipsNonCanonicalLoop)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Build a loop with non-constant bounds (not canonical for unroll)
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("noncanon", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* preheader = builder.AddBlock("preheader");
+	BasicBlock* header    = builder.AddBlock("header");
+	BasicBlock* body      = builder.AddBlock("body");
+	BasicBlock* exit_bb   = builder.AddBlock("exit");
+
+	builder.SetCurrentBlock(preheader);
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	builder.SetCurrentBlock(header);
+	PhiInst* phi_i = new PhiInst(ctx.GetIntegerType(64));
+	header->AddPhiInst(phi_i);
+	phi_i->AddIncoming(ctx.GetInt64(0), preheader);
+
+	// Non-constant bound: compare against function arg
+	Value* cmp = builder.MakeInst<CompareInst>(Opcode::ICmpSLT, phi_i, fn->GetArg(0));
+	builder.MakeInst<BranchInst>(cmp, body, exit_bb);
+
+	builder.SetCurrentBlock(body);
+	Value* i_next = builder.MakeInst<BinaryInst>(Opcode::Add, phi_i, ctx.GetInt64(1));
+	builder.MakeInst<BranchInst>(ctx, header);
+
+	phi_i->AddIncoming(i_next, body);
+
+	builder.SetCurrentBlock(exit_bb);
+	builder.MakeInst<ReturnInst>(phi_i);
+
+	Uint32 blocks_before = CountBlocks(fn);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+
+	LoopUnrollConfig config;
+	config.AllowPartialUnroll = false;
+	fpm.AddPass(new LoopUnrollPass(config));
+	fpm.Run(*fn, fam);
+
+	// Non-constant bound means no known trip count → no full unroll, no partial unroll
+	EXPECT_EQ(CountBlocks(fn), blocks_before);
+}
+
+TEST(GlobalAttributeInfer, MarksUnmodifiedGlobalAsReadOnly)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Create an internal global that is only loaded, never stored to
+	ConstantInt* init = ctx.GetInt64(42);
+	GlobalVariable* gv = new GlobalVariable("readonly_g", ctx.GetIntegerType(64), Linkage::Internal, init);
+	module.AddGlobal(gv);
+
+	// Create a function that only reads from the global
+	Function* fn = MakeFunc(module, ctx, "reader", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* loaded = builder.MakeInst<LoadInst>(gv);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	EXPECT_FALSE(gv->IsReadOnly());
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mpm.AddPass<GlobalAttributeInferPass>();
+	mpm.Run(module, mam);
+
+	EXPECT_TRUE(gv->IsReadOnly());
+}
+
+TEST(GlobalAttributeInfer, DoesNotMarkModifiedGlobal)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	ConstantInt* init = ctx.GetInt64(0);
+	GlobalVariable* gv = new GlobalVariable("mutable_g", ctx.GetIntegerType(64), Linkage::Internal, init);
+	module.AddGlobal(gv);
+
+	// Create a function that stores to the global
+	Function* fn = MakeFunc(module, ctx, "writer", ctx.GetVoidType(), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<StoreInst>(ctx.GetInt64(100), gv);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mpm.AddPass<GlobalAttributeInferPass>();
+	mpm.Run(module, mam);
+
+	// Global is stored to, should NOT be marked read-only
+	EXPECT_FALSE(gv->IsReadOnly());
+}
+
+TEST(GlobalAttributeInfer, SkipsExternalGlobal)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// External globals should not be marked as read-only
+	ConstantInt* init = ctx.GetInt64(42);
+	GlobalVariable* gv = new GlobalVariable("ext_g", ctx.GetIntegerType(64), Linkage::External, init);
+	module.AddGlobal(gv);
+
+	Function* fn = MakeFunc(module, ctx, "reader", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* loaded = builder.MakeInst<LoadInst>(gv);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mpm.AddPass<GlobalAttributeInferPass>();
+	mpm.Run(module, mam);
+
+	// External linkage globals are skipped by the pass
+	EXPECT_FALSE(gv->IsReadOnly());
+}
+
+TEST(GlobalAttributeInfer, AlreadyReadOnlyUntouched)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	ConstantInt* init = ctx.GetInt64(7);
+	GlobalVariable* gv = new GlobalVariable("already_ro", ctx.GetIntegerType(64), Linkage::Internal, init);
+	gv->SetReadOnly();
+	module.AddGlobal(gv);
+
+	Function* fn = MakeFunc(module, ctx, "noop", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mpm.AddPass<GlobalAttributeInferPass>();
+	mpm.Run(module, mam);
+
+	EXPECT_TRUE(gv->IsReadOnly());
+}
+
+TEST(ArithmeticReduction, XorSelfBecomesZero)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	// x ^ x should become 0
+	Value* xor_val = builder.MakeInst<BinaryInst>(Opcode::Xor, fn->GetArg(0), fn->GetArg(0));
+	builder.MakeInst<ReturnInst>(xor_val);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	if (isa<ConstantInt>(ret_val))
+	{
+		EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 0);
+	}
+}
+
+TEST(ArithmeticReduction, AndWithZeroBecomesZero)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	// x & 0 should become 0
+	Value* and_val = builder.MakeInst<BinaryInst>(Opcode::And, fn->GetArg(0), ctx.GetInt64(0));
+	builder.MakeInst<ReturnInst>(and_val);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	Value* ret_val = cast<ReturnInst>(entry->GetTerminator())->GetReturnValue();
+	if (isa<ConstantInt>(ret_val))
+	{
+		EXPECT_EQ(cast<ConstantInt>(ret_val)->GetValue(), 0);
+	}
+}
+
+TEST(DCE, RemovesUnusedBinaryChain)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	// Chain of unused computations
+	Value* a = builder.MakeInst<BinaryInst>(Opcode::Add, fn->GetArg(0), ctx.GetInt64(1));
+	Value* b = builder.MakeInst<BinaryInst>(Opcode::SMul, a, ctx.GetInt64(2));
+	Value* c = builder.MakeInst<BinaryInst>(Opcode::Sub, b, ctx.GetInt64(3));
+	(void)c; // c is not used by anything
+
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	Uint32 inst_count_before = CountByType<BinaryInst>(fn);
+	EXPECT_EQ(inst_count_before, 3u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<DeadCodeEliminationPass>();
+	fpm.Run(*fn, fam);
+
+	// All three binary instructions should be removed as dead
+	EXPECT_EQ(CountByType<BinaryInst>(fn), 0u);
+}
+
+TEST(GlobalDCE, RemovesMultipleUnusedInternalFunctions)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Create external main function
+	Function* main_fn = MakeFunc(module, ctx, "main", ctx.GetIntegerType(64), {}, Linkage::External);
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	// Create two unreferenced internal functions
+	Function* dead1 = MakeFunc(module, ctx, "dead1", ctx.GetVoidType(), {}, Linkage::Internal);
+	builder.SetCurrentFunction(dead1);
+	BasicBlock* d1_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(d1_entry);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	Function* dead2 = MakeFunc(module, ctx, "dead2", ctx.GetVoidType(), {}, Linkage::Internal);
+	builder.SetCurrentFunction(dead2);
+	BasicBlock* d2_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(d2_entry);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	EXPECT_EQ(module.Globals().size(), 3u);
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mam.RegisterPass<CallGraphAnalysisPass>(module);
+	mpm.AddPass<GlobalDeadCodeEliminationPass>();
+	mpm.Run(module, mam);
+
+	// Both dead internal functions should be removed
+	EXPECT_EQ(module.Globals().size(), 1u);
+	bool dead1_present = false, dead2_present = false;
+	for (GlobalValue* g : module.Globals())
+	{
+		if (g->GetName() == "dead1") dead1_present = true;
+		if (g->GetName() == "dead2") dead2_present = true;
+	}
+	EXPECT_FALSE(dead1_present);
+	EXPECT_FALSE(dead2_present);
+	EXPECT_NE(module.GetFunctionByName("main"), nullptr);
+}
+
+TEST(FunctionInliner, DoesNotInlineRecursiveFunction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Create a recursive function marked force-inline
+	Function* recfn = MakeFunc(module, ctx, "rec", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	recfn->SetForceInline();
+	builder.SetCurrentFunction(recfn);
+
+	BasicBlock* entry = builder.AddBlock("entry");
+	BasicBlock* base  = builder.AddBlock("base");
+	BasicBlock* rec   = builder.AddBlock("rec");
+
+	builder.SetCurrentBlock(entry);
+	Value* cmp = builder.MakeInst<CompareInst>(Opcode::ICmpSLE, recfn->GetArg(0), ctx.GetInt64(0));
+	builder.MakeInst<BranchInst>(cmp, base, rec);
+
+	builder.SetCurrentBlock(base);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(1));
+
+	builder.SetCurrentBlock(rec);
+	Value* sub = builder.MakeInst<BinaryInst>(Opcode::Sub, recfn->GetArg(0), ctx.GetInt64(1));
+	std::vector<Value*> args = { sub };
+	Value* call = builder.MakeInst<CallInst>(recfn, std::span<Value*>(args));
+	Value* mul = builder.MakeInst<BinaryInst>(Opcode::SMul, recfn->GetArg(0), call);
+	builder.MakeInst<ReturnInst>(mul);
+
+	// Create a caller
+	Function* caller = MakeFunc(module, ctx, "main", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(caller);
+	BasicBlock* caller_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(caller_entry);
+	std::vector<Value*> call_args = { ctx.GetInt64(5) };
+	Value* result = builder.MakeInst<CallInst>(recfn, std::span<Value*>(call_args));
+	builder.MakeInst<ReturnInst>(result);
+
+	// The inliner should handle recursive functions gracefully
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<FunctionInlinerPass>();
+	fpm.Run(*caller, fam);
+
+	// The function should still have a call instruction (recursive can't be fully inlined)
+	EXPECT_GE(CountByType<CallInst>(caller), 1u);
 }

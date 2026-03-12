@@ -1180,3 +1180,210 @@ TEST(Sema, MutuallyExclusiveOverloads_Ok)
 		"void foo() { int a = compute(3); float b = compute(1.5); }"
 	);
 }
+
+TEST(Sema, DecrementBool_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { bool b = true; b--; }");
+}
+
+TEST(Sema, PreIncrementBool_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { bool b = false; ++b; }");
+}
+
+TEST(Sema, FloatIncrement_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { float f = 1.0; f++; }");
+}
+
+TEST(Sema, ModifyingConstLocal_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"void foo() { const int x = 5; x = 10; }"
+	);
+}
+
+TEST(Sema, CompoundAssignShift_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = 4; x <<= 2; x >>= 1; }");
+}
+
+TEST(Sema, CompoundAssignBitwise_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int x = 0xFF; x &= 0x0F; x |= 0x30; x ^= 0x01; }");
+}
+
+TEST(Sema, NegativeArraySize_Error)
+{
+	EXPECT_SEMA_ERROR("void foo() { int[-1] a; }");
+}
+
+TEST(Sema, ArrayOfBool_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { bool[5] flags; }");
+}
+
+TEST(Sema, ArrayOfFloat_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { float[10] data; }");
+}
+
+TEST(Sema, ConstPointerAssignment_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { int* p = new int; const int* cp = p; delete p; }");
+}
+
+TEST(Sema, CharLiteral_Ok)
+{
+	EXPECT_SEMA_OK("void foo() { char c = 'a'; }");
+}
+
+TEST(Sema, ConstructorCallExpr_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Vec { Vec(int x) { this.x = x; } public int x; };"
+		"void foo() { Vec v = Vec(42); }"
+	);
+}
+
+TEST(Sema, EnumMemberUsedInSwitch_Ok)
+{
+	EXPECT_SEMA_OK(
+		"enum Dir { North, South, East, West };"
+		"void foo(int d) {"
+		"  switch (d) {"
+		"    case 0: break;"
+		"    case 1: break;"
+		"    default: break;"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, NestedForLoop_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  for (int i = 0; i < 10; ++i) {"
+		"    for (int j = 0; j < 10; ++j) {"
+		"      int x = i * j;"
+		"    }"
+		"  }"
+		"}"
+	);
+}
+
+TEST(Sema, DoWhileWithBreak_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  int i = 0;"
+		"  do {"
+		"    if (i == 5) break;"
+		"    i = i + 1;"
+		"  } while (i < 10);"
+		"}"
+	);
+}
+
+TEST(Sema, TemplateMultipleInstantiations_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Holder<T> { public T val; };"
+		"void foo() { Holder<int> hi; Holder<float> hf; }"
+	);
+}
+
+TEST(Sema, AliasOfAlias_Ok)
+{
+	EXPECT_SEMA_OK(
+		"alias MyInt = int;"
+		"alias MyInt2 = MyInt;"
+		"void foo() { MyInt2 x = 42; }"
+	);
+}
+
+TEST(Sema, InterfaceMethodImplementation_Ok)
+{
+	EXPECT_SEMA_OK(
+		"interface Drawable {"
+		"  public void Draw();"
+		"};"
+		"class Circle : Drawable {"
+		"  public void Draw() virtual {}"
+		"};"
+	);
+}
+
+TEST(Sema, ClassFieldDefaultVisibility_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo { int x; };"
+	);
+}
+
+TEST(Sema, RecursiveMutual_Ok)
+{
+	EXPECT_SEMA_OK(
+		"extern int isEven(int n);"
+		"extern int isOdd(int n);"
+	);
+}
+
+TEST(Sema, ReturnClassByValue_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Pt { Pt(int x) { this.x = x; } public int x; };"
+		"Pt make() { return Pt(5); }"
+	);
+}
+
+TEST(Sema, MultipleClassesWithMethods_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class A { public int Get() { return 1; } };"
+		"class B { public int Get() { return 2; } };"
+		"void foo() { A a; B b; int x = a.Get() + b.Get(); }"
+	);
+}
+
+TEST(Sema, SizeofClass_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Foo { public int x; public int y; };"
+		"void foo() { int s = sizeof(Foo); }"
+	);
+}
+
+TEST(Sema, ConstGlobalFloat_Ok)
+{
+	EXPECT_SEMA_OK("const float PI = 3.14;");
+}
+
+TEST(Sema, GotoForward_Ok)
+{
+	EXPECT_SEMA_OK(
+		"void foo() {"
+		"  goto end;"
+		"  int x = 5;"
+		"  end: return;"
+		"}"
+	);
+}
+
+TEST(Sema, AssignClassToSameType_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Pt { public int x; };"
+		"void foo() { Pt a; Pt b; a = b; }"
+	);
+}
+
+TEST(Sema, AssignClassToDifferentType_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class A { public int x; };"
+		"class B { public int y; };"
+		"void foo() { A a; B b; a = b; }"
+	);
+}

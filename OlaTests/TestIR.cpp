@@ -658,3 +658,391 @@ TEST(IR, UnaryInstruction)
 	ASSERT_NE(neg, nullptr);
 	EXPECT_TRUE(isa<UnaryInst>(neg));
 }
+
+TEST(IR, CastInstruction_ZExt)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(8) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* zext = builder.MakeInst<CastInst>(Opcode::ZExt, ctx.GetIntegerType(64), fn->GetArg(0));
+	ASSERT_NE(zext, nullptr);
+	EXPECT_TRUE(isa<CastInst>(zext));
+	auto* ci = cast<CastInst>(zext);
+	EXPECT_EQ(ci->GetDestType(), ctx.GetIntegerType(64));
+	EXPECT_EQ(ci->GetSrcType(), ctx.GetIntegerType(8));
+}
+
+TEST(IR, CastInstruction_F2S)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetFloatType() });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* f2s = builder.MakeInst<CastInst>(Opcode::F2S, ctx.GetIntegerType(64), fn->GetArg(0));
+	ASSERT_NE(f2s, nullptr);
+	auto* ci = cast<CastInst>(f2s);
+	EXPECT_EQ(ci->GetOpcode(), Opcode::F2S);
+}
+
+TEST(IR, CastInstruction_S2F)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetFloatType(), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* s2f = builder.MakeInst<CastInst>(Opcode::S2F, ctx.GetFloatType(), fn->GetArg(0));
+	ASSERT_NE(s2f, nullptr);
+	auto* ci = cast<CastInst>(s2f);
+	EXPECT_EQ(ci->GetOpcode(), Opcode::S2F);
+}
+
+TEST(IR, ReturnInstVoid)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	builder.MakeInst<ReturnInst>(ctx);
+	auto* ret = cast<ReturnInst>(entry->GetTerminator());
+	EXPECT_TRUE(ret->IsVoid());
+	EXPECT_EQ(ret->GetReturnValue(), nullptr);
+}
+
+TEST(IR, ReturnInstWithValue)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(99));
+	auto* ret = cast<ReturnInst>(entry->GetTerminator());
+	EXPECT_FALSE(ret->IsVoid());
+	ASSERT_NE(ret->GetReturnValue(), nullptr);
+}
+
+TEST(IR, BinaryInst_Add)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* add = builder.MakeInst<BinaryInst>(Opcode::Add, fn->GetArg(0), fn->GetArg(1));
+	ASSERT_NE(add, nullptr);
+	EXPECT_TRUE(isa<BinaryInst>(add));
+	auto* bin = cast<BinaryInst>(add);
+	EXPECT_EQ(bin->GetOpcode(), Opcode::Add);
+	EXPECT_EQ(bin->GetLHS(), fn->GetArg(0));
+	EXPECT_EQ(bin->GetRHS(), fn->GetArg(1));
+}
+
+TEST(IR, FloatBinaryInst)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetFloatType(), { ctx.GetFloatType(), ctx.GetFloatType() });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* fadd = builder.MakeInst<BinaryInst>(Opcode::FAdd, fn->GetArg(0), fn->GetArg(1));
+	ASSERT_NE(fadd, nullptr);
+	EXPECT_EQ(cast<Instruction>(fadd)->GetOpcode(), Opcode::FAdd);
+}
+
+TEST(IR, CompareInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* cmp = builder.MakeInst<CompareInst>(Opcode::ICmpEQ, fn->GetArg(0), ctx.GetInt64(0));
+	ASSERT_NE(cmp, nullptr);
+	EXPECT_TRUE(isa<CompareInst>(cmp));
+	auto* ci = cast<CompareInst>(cmp);
+	EXPECT_EQ(ci->GetCompareOp(), CompareOp::ICmpEQ);
+}
+
+TEST(IR, PtrAddInstruction)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* alloca = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	Value* ptr_add = builder.MakeInst<PtrAddInst>(alloca, ctx.GetInt64(8), ctx.GetIntegerType(64));
+	ASSERT_NE(ptr_add, nullptr);
+	EXPECT_TRUE(isa<PtrAddInst>(ptr_add));
+}
+
+TEST(IR, InstructionClone)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* add = builder.MakeInst<BinaryInst>(Opcode::Add, fn->GetArg(0), fn->GetArg(1));
+	auto* addInst = cast<Instruction>(add);
+	Instruction* clone = addInst->Clone();
+	ASSERT_NE(clone, nullptr);
+	EXPECT_EQ(clone->GetOpcode(), Opcode::Add);
+	delete clone;
+}
+
+TEST(IR, OpcodePredicates)
+{
+	EXPECT_TRUE(IsOpcodeTerminator(Opcode::Ret));
+	EXPECT_TRUE(IsOpcodeTerminator(Opcode::Branch));
+	EXPECT_TRUE(IsOpcodeTerminator(Opcode::Switch));
+	EXPECT_FALSE(IsOpcodeTerminator(Opcode::Add));
+
+	EXPECT_TRUE(IsOpcodeMemoryOp(Opcode::Load));
+	EXPECT_TRUE(IsOpcodeMemoryOp(Opcode::Store));
+	EXPECT_FALSE(IsOpcodeMemoryOp(Opcode::Add));
+
+	EXPECT_TRUE(IsOpcodeIntegerOp(Opcode::Add));
+	EXPECT_TRUE(IsOpcodeIntegerOp(Opcode::Sub));
+	EXPECT_TRUE(IsOpcodeIntegerOp(Opcode::Shl));
+	EXPECT_FALSE(IsOpcodeIntegerOp(Opcode::FAdd));
+
+	EXPECT_TRUE(IsOpcodeFloatOp(Opcode::FAdd));
+	EXPECT_TRUE(IsOpcodeFloatOp(Opcode::FMul));
+	EXPECT_FALSE(IsOpcodeFloatOp(Opcode::Add));
+
+	EXPECT_TRUE(IsOpcodeCastOp(Opcode::ZExt));
+	EXPECT_TRUE(IsOpcodeCastOp(Opcode::F2S));
+	EXPECT_TRUE(IsOpcodeCastOp(Opcode::S2F));
+	EXPECT_FALSE(IsOpcodeCastOp(Opcode::Add));
+}
+
+TEST(IR, OpcodeCommutative)
+{
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::Add));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::SMul));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::And));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::Or));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::Xor));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::FAdd));
+	EXPECT_TRUE(IsOpcodeCommutative(Opcode::FMul));
+
+	EXPECT_FALSE(IsOpcodeCommutative(Opcode::Sub));
+	EXPECT_FALSE(IsOpcodeCommutative(Opcode::SDiv));
+	EXPECT_FALSE(IsOpcodeCommutative(Opcode::Shl));
+}
+
+TEST(IR, OpcodeSideEffects)
+{
+	EXPECT_TRUE(HasOpcodeSideEffects(Opcode::Alloca));
+	EXPECT_TRUE(HasOpcodeSideEffects(Opcode::Store));
+	EXPECT_TRUE(HasOpcodeSideEffects(Opcode::Call));
+	EXPECT_FALSE(HasOpcodeSideEffects(Opcode::Add));
+	EXPECT_FALSE(HasOpcodeSideEffects(Opcode::Load));
+}
+
+TEST(IR, ConstantNullPtr)
+{
+	IRContext ctx;
+	IRPtrType* pt = ctx.GetPointerType(ctx.GetIntegerType(64));
+	ConstantNullPtr* np = new ConstantNullPtr(pt);
+	ASSERT_NE(np, nullptr);
+	EXPECT_TRUE(isa<ConstantNullPtr>(np));
+	delete np;
+}
+
+TEST(IR, UndefValue)
+{
+	IRContext ctx;
+	UndefValue* uv = new UndefValue(ctx.GetIntegerType(64));
+	ASSERT_NE(uv, nullptr);
+	EXPECT_TRUE(isa<UndefValue>(uv));
+	delete uv;
+}
+
+TEST(IR, SwitchWithMultipleCases)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry  = builder.AddBlock("entry");
+	BasicBlock* case0  = builder.AddBlock("case0");
+	BasicBlock* case1  = builder.AddBlock("case1");
+	BasicBlock* case2  = builder.AddBlock("case2");
+	BasicBlock* deflt  = builder.AddBlock("default");
+
+	builder.SetCurrentBlock(entry);
+	Value* sw = builder.MakeInst<SwitchInst>(fn->GetArg(0), deflt);
+	auto* swi = cast<SwitchInst>(sw);
+	swi->AddCase(0, case0);
+	swi->AddCase(1, case1);
+	swi->AddCase(42, case2);
+
+	EXPECT_EQ(swi->GetNumCases(), 3u);
+	EXPECT_EQ(swi->GetCaseValue(0), 0);
+	EXPECT_EQ(swi->GetCaseValue(1), 1);
+	EXPECT_EQ(swi->GetCaseValue(2), 42);
+}
+
+TEST(IR, PhiMultipleIncoming)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), {});
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	BasicBlock* left  = builder.AddBlock("left");
+	BasicBlock* right = builder.AddBlock("right");
+	BasicBlock* merge = builder.AddBlock("merge");
+
+	PhiInst* phi = new PhiInst(ctx.GetIntegerType(64));
+	merge->AddPhiInst(phi);
+	phi->AddIncoming(ctx.GetInt64(10), left);
+	phi->AddIncoming(ctx.GetInt64(20), right);
+
+	EXPECT_EQ(phi->GetNumIncomingValues(), 2u);
+	EXPECT_EQ(phi->GetIncomingValue(0), ctx.GetInt64(10));
+	EXPECT_EQ(phi->GetIncomingValue(1), ctx.GetInt64(20));
+	EXPECT_EQ(phi->GetIncomingBlock(0), left);
+	EXPECT_EQ(phi->GetIncomingBlock(1), right);
+	EXPECT_EQ(phi->GetIncomingValueForBlock(left), ctx.GetInt64(10));
+	EXPECT_EQ(phi->GetIncomingValueForBlock(right), ctx.GetInt64(20));
+	EXPECT_EQ(phi->GetIncomingValueForBlock(entry), nullptr);
+}
+
+TEST(IR, FunctionArgTypes)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+
+	std::vector<IRType*> params = { ctx.GetIntegerType(8), ctx.GetFloatType(), ctx.GetIntegerType(64) };
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetVoidType(), params);
+	Function* fn = new Function("multi", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	EXPECT_EQ(fn->GetArgCount(), 3u);
+	EXPECT_EQ(fn->GetArg(0)->GetType(), ctx.GetIntegerType(8));
+	EXPECT_EQ(fn->GetArg(1)->GetType(), ctx.GetFloatType());
+	EXPECT_EQ(fn->GetArg(2)->GetType(), ctx.GetIntegerType(64));
+}
+
+TEST(IR, InstructionIsUsed)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRFuncType* ft = ctx.GetFunctionType(ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	Function* fn = new Function("foo", ft, Linkage::External);
+	module.AddGlobal(fn);
+
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* alloca = builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	// Before storing, alloca has no uses from other instructions
+	builder.MakeInst<StoreInst>(fn->GetArg(0), alloca);
+	// After storing, alloca is used by the store
+	EXPECT_TRUE(cast<Instruction>(alloca)->IsUsed());
+}
+
+TEST(IR, GlobalVariableLinkage)
+{
+	IRContext ctx;
+	ConstantInt* init = ctx.GetInt64(0);
+	GlobalVariable* gv_internal = new GlobalVariable("internal_g", ctx.GetIntegerType(64), Linkage::Internal, init);
+	GlobalVariable* gv_external = new GlobalVariable("external_g", ctx.GetIntegerType(64), Linkage::External, init);
+
+	EXPECT_EQ(gv_internal->GetLinkage(), Linkage::Internal);
+	EXPECT_EQ(gv_external->GetLinkage(), Linkage::External);
+
+	delete gv_internal;
+	delete gv_external;
+}

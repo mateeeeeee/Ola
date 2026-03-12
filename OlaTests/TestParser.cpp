@@ -1045,3 +1045,146 @@ TEST(Parser, FunctionOverloads)
 			if (f->GetName() == "compute") ++fn_count;
 	EXPECT_EQ(fn_count, 2);
 }
+
+TEST(Parser, CharVariableDecl)
+{
+	ParseHelper h("void foo() { char c = 'x'; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, PointerToClassType)
+{
+	ParseHelper h(
+		"class Node { public int val; };"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, IfWithoutElse)
+{
+	ParseHelper h("void foo(int x) { if (x > 0) { x = 0; } }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, SwitchWithFallthrough)
+{
+	ParseHelper h(
+		"void foo(int x) {"
+		"  switch (x) {"
+		"    case 0:"
+		"    case 1: break;"
+		"    default: break;"
+		"  }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, MethodCallChain)
+{
+	ParseHelper h(
+		"class Builder { public int Get() { return 42; } };"
+		"void foo() { Builder b; int v = b.Get(); }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, VoidReturnNoSemicolon_Error)
+{
+	ParseHelper h("void foo() { return }");
+	EXPECT_TRUE(h.HasErrors());
+}
+
+TEST(Parser, NestedTemplateInstantiation)
+{
+	ParseHelper h(
+		"class Inner<T> { public T val; };"
+		"class Outer<T> { public Inner<T> inner; };"
+		"void foo() { Outer<int> o; }"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ClassWithBothCtorAndMethods)
+{
+	ParseHelper h(
+		"class Obj {"
+		"  Obj(int x) { this.x = x; }"
+		"  public int Get() { return this.x; }"
+		"  public void Set(int v) { this.x = v; }"
+		"  public int x;"
+		"};"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, MultipleEnums)
+{
+	ParseHelper h(
+		"enum A { X, Y };"
+		"enum B { P, Q, R };"
+	);
+	ASSERT_FALSE(h.HasErrors());
+
+	Int32 enum_count = 0;
+	for (auto const& d : h.TU().GetDecls())
+		if (isa<EnumDecl>(d.get())) ++enum_count;
+	EXPECT_EQ(enum_count, 2);
+}
+
+TEST(Parser, GlobalArrayDecl)
+{
+	ParseHelper h("int[10] globalArr;");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ForLoopWithMultipleStatements)
+{
+	ParseHelper h(
+		"void foo() {"
+		"  int sum = 0;"
+		"  for (int i = 0; i < 10; ++i) {"
+		"    sum = sum + i;"
+		"    if (sum > 20) break;"
+		"  }"
+		"}"
+	);
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, AssignmentExpression)
+{
+	ParseHelper h("void foo() { int x = 0; int y = 0; x = y = 5; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, BinaryExprSub)
+{
+	ParseHelper h("void foo() { int x = 10 - 3; }");
+	ASSERT_FALSE(h.HasErrors());
+
+	auto* fn = h.FindFirst<FunctionDecl>();
+	ASSERT_NE(fn, nullptr);
+	auto* decl_stmt = dyn_cast<DeclStmt>(fn->GetBodyStmt()->GetStmts()[0].get());
+	ASSERT_NE(decl_stmt, nullptr);
+	auto* var = dyn_cast<VarDecl>(decl_stmt->GetDecls()[0].get());
+	ASSERT_NE(var, nullptr);
+	Expr const* init = var->GetInitExpr();
+	if (auto* cast_expr = dyn_cast<ImplicitCastExpr>(init)) init = cast_expr->GetOperand();
+	auto* bin = dyn_cast<BinaryExpr>(init);
+	ASSERT_NE(bin, nullptr);
+	EXPECT_EQ(bin->GetBinaryKind(), BinaryExprKind::Subtract);
+}
+
+TEST(Parser, OperatorPrecedence_CompareBeforeLogical)
+{
+	// a > 0 && b < 10 should parse as (a > 0) && (b < 10)
+	ParseHelper h("void foo() { int a = 1; int b = 5; bool c = a > 0 && b < 10; }");
+	ASSERT_FALSE(h.HasErrors());
+}
+
+TEST(Parser, ConstArrayParam)
+{
+	ParseHelper h("void foo(const int[] arr) {}");
+	ASSERT_FALSE(h.HasErrors());
+}

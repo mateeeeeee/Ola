@@ -718,3 +718,92 @@ TEST(Lexer, SourceLocationAfterMultipleTokens)
 	EXPECT_EQ(tokens[1].GetLocation().column, 4u);
 	EXPECT_EQ(tokens[2].GetLocation().column, 7u);
 }
+
+TEST(Lexer, HexLiteral)
+{
+	auto tokens = LexFiltered("0xFF 0x0 0x1A2B");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::int_number);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::int_number);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::int_number);
+}
+
+TEST(Lexer, StringEscapeQuote)
+{
+	auto tokens = LexFiltered("\"say\\\"hi\\\"\"");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::string_literal);
+}
+
+TEST(Lexer, CharEscapeBackslash)
+{
+	auto tokens = LexFiltered("'\\\\'");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::char_literal);
+}
+
+TEST(Lexer, MixedOperatorsAndIdentifiers)
+{
+	auto tokens = LexFiltered("a+=b-=c*=d");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::plus_equal);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::minus_equal);
+	EXPECT_EQ(tokens[4].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[5].GetKind(), TokenKind::star_equal);
+	EXPECT_EQ(tokens[6].GetKind(), TokenKind::identifier);
+}
+
+TEST(Lexer, TemplateAngleBrackets)
+{
+	auto tokens = LexFiltered("Box<int>");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "Box");
+	EXPECT_EQ(tokens[1].GetKind(), TokenKind::less);
+	EXPECT_EQ(tokens[2].GetKind(), TokenKind::KW_int);
+	EXPECT_EQ(tokens[3].GetKind(), TokenKind::greater);
+}
+
+TEST(Lexer, FloatLargeValue)
+{
+	auto tokens = LexFiltered("123456.789");
+
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::float_number);
+	EXPECT_EQ(tokens[0].GetData(), "123456.789");
+}
+
+
+TEST(Lexer, CommentOnlyInput)
+{
+	auto tokens = LexFiltered("// this is just a comment");
+
+	ASSERT_GE(tokens.size(), 1u);
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::eof);
+}
+
+TEST(Lexer, EllipsisInContext)
+{
+	auto tokens = LexFiltered("void foo(int a, ...)");
+
+	bool found_ellipsis = false;
+	for (auto const& t : tokens)
+		if (t.GetKind() == TokenKind::ellipsis) { found_ellipsis = true; break; }
+	EXPECT_TRUE(found_ellipsis);
+}
+
+TEST(Lexer, SingleCharTokens)
+{
+	auto tokens = LexFiltered("a");
+	EXPECT_EQ(tokens[0].GetKind(), TokenKind::identifier);
+	EXPECT_EQ(tokens[0].GetData(), "a");
+}
+
+TEST(Lexer, SourceLocationFileName)
+{
+	auto tokens = LexFiltered("int");
+	EXPECT_EQ(tokens[0].GetLocation().filename, "<test>");
+}

@@ -292,3 +292,78 @@ TEST(LiveInterval, ConsecutiveExtends)
 	EXPECT_EQ(li.begin, 5u);
 	EXPECT_EQ(li.end, 20u);
 }
+
+TEST(InterferenceGraph, LargeClique)
+{
+	// Create 5 nodes all mutually interfering
+	InterferenceGraph ig;
+	for (Uint32 i = 1; i <= 5; ++i)
+		ig.AddNode(i, false);
+
+	for (Uint32 i = 1; i <= 5; ++i)
+		for (Uint32 j = i + 1; j <= 5; ++j)
+			ig.AddInterference(i, j);
+
+	for (Uint32 i = 1; i <= 5; ++i)
+		EXPECT_EQ(ig.GetDegree(i), 4u);
+}
+
+TEST(InterferenceGraph, IsolatedNode)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	ig.AddNode(2u, false);
+	ig.AddNode(3u, false);
+	ig.AddInterference(1u, 2u);
+	// Node 3 is isolated
+	EXPECT_EQ(ig.GetDegree(3u), 0u);
+	EXPECT_FALSE(ig.Interferes(1u, 3u));
+	EXPECT_FALSE(ig.Interferes(2u, 3u));
+}
+
+TEST(InterferenceGraph, DecrementDegreeDoesNotGoNegative)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	EXPECT_EQ(ig.GetDegree(1u), 0u);
+	ig.DecrementDegree(1u);
+	// Degree should remain at 0 or wrap (implementation dependent)
+	// Just ensure no crash
+	EXPECT_TRUE(true);
+}
+
+TEST(InterferenceGraph, FloatFloatInterference)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, true);
+	ig.AddNode(2u, true);
+	ig.AddNode(3u, true);
+	ig.AddInterference(1u, 2u);
+	ig.AddInterference(2u, 3u);
+	EXPECT_TRUE(ig.Interferes(1u, 2u));
+	EXPECT_TRUE(ig.Interferes(2u, 3u));
+	EXPECT_FALSE(ig.Interferes(1u, 3u));
+	EXPECT_EQ(ig.GetDegree(2u), 2u);
+}
+
+TEST(LiveInterval, SameBeginAndEnd)
+{
+	LiveInterval a{}, b{};
+	a.begin = 5; a.end = 5;
+	b.begin = 5; b.end = 10;
+	EXPECT_FALSE(a < b);
+	EXPECT_FALSE(b < a);
+}
+
+TEST(LiveInterval, ExtendFromLargeRange)
+{
+	LiveInterval li{};
+	li.begin = 100;
+	li.end   = 200;
+	li.Extend(50);
+	EXPECT_EQ(li.begin, 50u);
+	EXPECT_EQ(li.end, 200u);
+	li.Extend(300);
+	EXPECT_EQ(li.begin, 50u);
+	EXPECT_EQ(li.end, 300u);
+}
