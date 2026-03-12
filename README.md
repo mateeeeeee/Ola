@@ -24,6 +24,7 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
   * enums
   * functions 
     - overloading
+    - templates: `T Foo<T>(T x)`
     - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
