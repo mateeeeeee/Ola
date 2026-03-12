@@ -5,10 +5,14 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
   * classes
 	- constructors
   	- templates: `class Box<T>`
-	- single inheritance: `:`
+	- single inheritance: `class D : B`
 	- polymorphism using vtables: `virtual`, `pure`, `final`
 	- access modifiers: `public`, `private`
 	- `interface`, `this` and `super` keywords
+  * functions 
+    - overloading
+    - templates: `T Foo<T>(T x)`
+    - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * operators:
     - additive: `+`, `-`, `+=`, `-=`, `++`, `--`
     - multiplicative: `*`, `/`, `%`, `*=`, `/=`, `%=`
@@ -22,10 +26,6 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
   * reference type: `ref`
   * automatic type deduction: `auto`
   * enums
-  * functions 
-    - overloading
-    - templates: `T Foo<T>(T x)`
-    - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * arrays
   * misc: `alias`, `sizeof`, `length` operators, strings, floats, implicit casts, scopes, import
   * std library: `io`, `math`, `assert`, `string`, `file`, `pair`, `optional`, `vector`, `list`, `stack`, `queue`, `map`, `set`
