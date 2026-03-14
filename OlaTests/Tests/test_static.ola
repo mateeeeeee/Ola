@@ -1,0 +1,152 @@
+import std.assert;
+
+class Counter
+{
+	private static int count = 0;
+
+	Counter()
+	{
+		count = count + 1;
+	}
+
+	public static int GetCount()
+	{
+		return count;
+	}
+
+	public static void Reset()
+	{
+		count = 0;
+	}
+
+	public int GetValue() const
+	{
+		return count;
+	}
+};
+
+void TestStaticFieldViaMethod()
+{
+	Counter.Reset();
+	Assert(Counter.GetCount() == 0);
+	Counter c1;
+	Assert(Counter.GetCount() == 1);
+	Counter c2;
+	Assert(Counter.GetCount() == 2);
+	Counter.Reset();
+	Assert(Counter.GetCount() == 0);
+}
+
+void TestStaticAccessFromInstanceMethod()
+{
+	Counter.Reset();
+	Counter c1;
+	Counter c2;
+	Assert(c1.GetValue() == 2);
+	Assert(c2.GetValue() == 2);
+}
+
+class MathUtil
+{
+	public static int Square(int x)
+	{
+		return x * x;
+	}
+
+	public static int Add(int a, int b)
+	{
+		return a + b;
+	}
+
+	public static int Max(int a, int b)
+	{
+		if (a > b)
+		{
+			return a;
+		}
+		return b;
+	}
+};
+
+void TestStaticMethodsNoState()
+{
+	Assert(MathUtil.Square(5) == 25);
+	Assert(MathUtil.Square(0) == 0);
+	Assert(MathUtil.Add(3, 4) == 7);
+	Assert(MathUtil.Max(10, 20) == 20);
+	Assert(MathUtil.Max(20, 10) == 20);
+}
+
+class Base
+{
+	public static int base_val = 100;
+	public static int GetBaseVal() { return base_val; }
+};
+
+class Derived : Base
+{
+	Derived() { super(); }
+	public int GetBoth() const
+	{
+		return Base.base_val;
+	}
+};
+
+void TestStaticWithInheritance()
+{
+	Assert(Base.base_val == 100);
+	Assert(Base.GetBaseVal() == 100);
+	Derived d;
+	Assert(d.GetBoth() == 100);
+}
+
+class Visibility
+{
+	private static int secret = 42;
+	public static int GetSecret() { return secret; }
+};
+
+void TestStaticVisibility()
+{
+	Assert(Visibility.GetSecret() == 42);
+}
+
+class StaticInit
+{
+	public static int a = 10;
+	public static int b = 20;
+	public static int GetSum() { return a + b; }
+};
+
+void TestStaticFieldInitializers()
+{
+	Assert(StaticInit.a == 10);
+	Assert(StaticInit.b == 20);
+	Assert(StaticInit.GetSum() == 30);
+	StaticInit.a = 100;
+	Assert(StaticInit.GetSum() == 120);
+}
+
+void TestStaticFieldMutation()
+{
+	Counter.Reset();
+	Assert(Counter.GetCount() == 0);
+	Counter c1;
+	Counter c2;
+	Counter c3;
+	Assert(Counter.GetCount() == 3);
+	Counter.Reset();
+	Assert(Counter.GetCount() == 0);
+}
+
+public int main()
+{
+	TestStaticFieldViaMethod();
+	TestStaticAccessFromInstanceMethod();
+	TestStaticMethodsNoState();
+	TestStaticWithInheritance();
+	TestStaticVisibility();
+	TestStaticFieldInitializers();
+	TestStaticFieldMutation();
+	return 0;
+}

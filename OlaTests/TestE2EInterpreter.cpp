@@ -52,6 +52,7 @@ TEST(Interpreter_Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphis
 TEST(Interpreter_Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
 TEST(Interpreter_Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
 TEST(Interpreter_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }
+TEST(Interpreter_Classes, Static)       { EXPECT_EQ(RUN_TEST(-i test_static),       0); }
 
 TEST(Interpreter_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
 TEST(Interpreter_Containers, Pair)         { EXPECT_EQ(RUN_TEST(-i test_pair),          0); }

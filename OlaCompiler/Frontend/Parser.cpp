@@ -1436,6 +1436,11 @@ namespace ola
 					UniqueAliasDeclPtr alias_decl = ParseAliasDeclaration();
 					stmts.push_back(sema->ActOnDeclStmt(std::move(alias_decl)));
 				}
+				else if (current_token->Is(TokenKind::identifier) && (current_token + 1)->Is(TokenKind::period))
+				{
+					UniqueStmtPtr stmt = ParseExpressionStatement();
+					stmts.push_back(std::move(stmt));
+				}
 				else
 				{
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(DeclVisibility::None);
@@ -1979,6 +1984,10 @@ namespace ola
 			break;
 			case TokenKind::period:
 			{
+				if (!expr)
+				{
+					return nullptr;
+				}
 				++current_token;
 				sema->sema_ctx.current_class_expr_stack.push_back(expr.get());
 				UniqueIdentifierExprPtr member_identifier = ParseMemberIdentifier();

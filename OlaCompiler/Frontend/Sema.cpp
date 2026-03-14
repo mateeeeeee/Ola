@@ -1089,12 +1089,33 @@ namespace ola
 
 			if (isa<MethodDecl>(match_decl))
 			{
+				MethodDecl const* method = cast<MethodDecl>(match_decl);
+				if (method->IsStatic() && !sema_ctx.current_class_name.empty())
+				{
+					UniqueIdentifierExprPtr class_name_expr = MakeUnique<IdentifierExpr>(sema_ctx.current_class_name, loc);
+
+					UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
+					member_expr->SetClassExpr(std::move(class_name_expr));
+					member_expr->SetMemberDecl(method);
+					member_expr->SetType(match_func_type);
+
+					UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, method);
+					method_call_expr->SetType(match_func_type->GetReturnType());
+					method_call_expr->SetArgs(std::move(args));
+					method_call_expr->SetCallee(std::move(member_expr));
+					if (isa<RefType>(method_call_expr->GetType()))
+					{
+						method_call_expr->SetLValue();
+					}
+					return method_call_expr;
+				}
+
 				UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
 				member_expr->SetClassExpr(ActOnThisExpr(loc, true));
-				member_expr->SetMemberDecl(cast<MethodDecl>(match_decl));
+				member_expr->SetMemberDecl(method);
 				member_expr->SetType(match_func_type);
 
-				UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, cast<MethodDecl>(match_decl));
+				UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, method);
 				method_call_expr->SetType(match_func_type->GetReturnType());
 				method_call_expr->SetArgs(std::move(args));
 				method_call_expr->SetCallee(std::move(member_expr));

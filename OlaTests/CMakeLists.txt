@@ -59,6 +59,7 @@ set(OLA_TESTS
 	Tests/test_auto.ola
 	Tests/test_recursion.ola
 	Tests/test_scope.ola
+	Tests/test_static.ola
 )
 
 add_executable(OlaTests ${SOURCE})
