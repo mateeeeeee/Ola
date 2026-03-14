@@ -1,32 +1,318 @@
 
 .const
 
-_INT0:
-.quad 4607632778762754458
+_Base$base_val:
+.quad 100
+.p2align 3
 
 
-_INT1:
-.quad 4612136378390124954
+_Visibility$secret:
+.quad 42
+.p2align 3
 
 
-_INT2:
-.quad 4626322717216342016
+_StaticInit$b:
+.quad 20
+.p2align 3
 
 
-_INT3:
-.quad 4621819117588971520
+.data
+
+_Counter$count:
+.quad 0
+.p2align 3
 
 
-_INT4:
-.quad 4591870180066957722
+_StaticInit$a:
+.quad 10
+.p2align 3
 
 
 .text
 
 .extern _Assert
 .extern _AssertMsg
-_Max__I__I:
+.globl _Counter$GetCount
+_Counter$GetCount:
 label0:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+ldr x27, [x28]
+b label1
+label1:
+mov x0, x27
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+.globl _Counter$Reset
+_Counter$Reset:
+label2:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+mov x27, #0
+str x27, [x28]
+b label3
+label3:
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+.globl _Counter$Counter
+_Counter$Counter:
+label4:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x28, x0
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+ldr x27, [x28]
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+add x26, x27, #1
+str x26, [x28]
+b label5
+label5:
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _Counter$GetValue
+_Counter$GetValue:
+label6:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+ldr x27, [x28]
+b label7
+label7:
+mov x0, x27
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+_TestStaticFieldViaMethod:
+label8:
+sub sp, sp, #64
+stp x29, x30, [sp, #48]
+add x29, sp, #48
+str x24, [x29, #-8]
+str x25, [x29, #-16]
+str x26, [x29, #-24]
+str x27, [x29, #-32]
+str x28, [x29, #-40]
+b label20
+label9:
+cmp x28, #0
+cset w27, eq
+mov w0, w27
+bl _Assert
+b label18
+label10:
+cmp x27, #1
+cset w26, eq
+mov w0, w26
+bl _Assert
+b label16
+label11:
+cmp x26, #2
+cset w25, eq
+mov w0, w25
+bl _Assert
+b label14
+label12:
+cmp x25, #0
+cset w24, eq
+mov w0, w24
+bl _Assert
+b label21
+label13:
+adrp x24, _Counter$count@PAGE
+add x24, x24, _Counter$count@PAGEOFF
+ldr x25, [x24]
+b label12
+label14:
+adrp x24, _Counter$count@PAGE
+add x24, x24, _Counter$count@PAGEOFF
+mov x25, #0
+str x25, [x24]
+b label13
+label15:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+ldr x26, [x25]
+b label11
+label16:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+ldr x26, [x25]
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+add x24, x26, #1
+str x24, [x25]
+b label15
+label17:
+adrp x24, _Counter$count@PAGE
+add x24, x24, _Counter$count@PAGEOFF
+ldr x27, [x24]
+b label10
+label18:
+adrp x24, _Counter$count@PAGE
+add x24, x24, _Counter$count@PAGEOFF
+ldr x27, [x24]
+adrp x24, _Counter$count@PAGE
+add x24, x24, _Counter$count@PAGEOFF
+add x25, x27, #1
+str x25, [x24]
+b label17
+label19:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+ldr x28, [x25]
+b label9
+label20:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+mov x28, #0
+str x28, [x25]
+b label19
+label21:
+ldr x24, [x29, #-8]
+ldr x25, [x29, #-16]
+ldr x26, [x29, #-24]
+ldr x27, [x29, #-32]
+ldr x28, [x29, #-40]
+ldp x29, x30, [sp, #48]
+add sp, sp, #64
+ret
+_TestStaticAccessFromInstanceMethod:
+label22:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+b label29
+label23:
+cmp x28, #2
+cset w27, eq
+mov w0, w27
+bl _Assert
+b label25
+label24:
+cmp x27, #2
+cset w26, eq
+mov w0, w26
+bl _Assert
+b label30
+label25:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x27, [x26]
+b label24
+label26:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x28, [x26]
+b label23
+label27:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x28, [x26]
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+add x27, x28, #1
+str x27, [x26]
+b label26
+label28:
+adrp x27, _Counter$count@PAGE
+add x27, x27, _Counter$count@PAGEOFF
+ldr x26, [x27]
+adrp x27, _Counter$count@PAGE
+add x27, x27, _Counter$count@PAGEOFF
+add x28, x26, #1
+str x28, [x27]
+b label27
+label29:
+adrp x28, _Counter$count@PAGE
+add x28, x28, _Counter$count@PAGEOFF
+mov x27, #0
+str x27, [x28]
+b label28
+label30:
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _MathUtil$Square__I
+_MathUtil$Square__I:
+label31:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+mul x27, x28, x28
+b label32
+label32:
+mov x0, x27
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+.globl _MathUtil$Add__I__I
+_MathUtil$Add__I__I:
+label33:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+mov x28, x0
+mov x27, x1
+add x26, x28, x27
+b label34
+label34:
+mov x0, x26
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _MathUtil$Max__I__I
+_MathUtil$Max__I__I:
+label35:
 sub sp, sp, #48
 stp x29, x30, [sp, #32]
 add x29, sp, #32
@@ -38,15 +324,15 @@ mov x27, x1
 cmp x28, x27
 cset w26, gt
 tst w26, w26
-b.ne label1
-b label2
-label1:
+b.ne label36
+b label37
+label36:
 mov x26, x28
-b label3
-label2:
+b label38
+label37:
 mov x26, x27
-b label3
-label3:
+b label38
+label38:
 mov x0, x26
 ldr x26, [x29, #-8]
 ldr x27, [x29, #-16]
@@ -54,251 +340,373 @@ ldr x28, [x29, #-24]
 ldp x29, x30, [sp, #32]
 add sp, sp, #48
 ret
-_Max__F__F:
-label4:
-sub sp, sp, #48
-stp x29, x30, [sp, #32]
-add x29, sp, #32
+_TestStaticMethodsNoState:
+label39:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
 str x28, [x29, #-8]
-str d28, [x29, #-16]
-str d29, [x29, #-24]
-str d30, [x29, #-32]
-fmov d30, d0
-fmov d29, d1
-fcmp d30, d29
-cset w28, gt
-tst w28, w28
-b.ne label5
-b label6
-label5:
-fmov d28, d30
-b label7
-label6:
-fmov d28, d29
-b label7
-label7:
-fmov d0, d28
+b label40
+label40:
+mov w0, #1
+bl _Assert
+b label41
+label41:
+mov w0, #1
+bl _Assert
+b label42
+label42:
+mov w0, #1
+bl _Assert
+mov x1, #20
+mov x0, #10
+bl _MathUtil$Max__I__I
+mov x28, x0
+cmp x28, #20
+cset w28, eq
+mov w0, w28
+bl _Assert
+mov x1, #10
+mov x0, #20
+bl _MathUtil$Max__I__I
+mov x28, x0
+cmp x28, #20
+cset w28, eq
+mov w0, w28
+bl _Assert
+b label43
+label43:
 ldr x28, [x29, #-8]
-ldr d28, [x29, #-16]
-ldr d29, [x29, #-24]
-ldr d30, [x29, #-32]
-ldp x29, x30, [sp, #32]
-add sp, sp, #48
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
 ret
-_Min__I__I:
-label8:
+.globl _Base$GetBaseVal
+_Base$GetBaseVal:
+label44:
 sub sp, sp, #32
 stp x29, x30, [sp, #16]
 add x29, sp, #16
 str x27, [x29, #-8]
 str x28, [x29, #-16]
-mov x28, x0
-mov x28, x1
-cmp x28, #3
-cset w27, ge
-tst w27, w27
-b.ne label9
-b label10
-label9:
-mov x27, #3
-b label11
-label10:
-mov x27, x28
-b label11
-label11:
+adrp x28, _Base$base_val@PAGE
+add x28, x28, _Base$base_val@PAGEOFF
+ldr x27, [x28]
+b label45
+label45:
 mov x0, x27
 ldr x27, [x29, #-8]
 ldr x28, [x29, #-16]
 ldp x29, x30, [sp, #16]
 add sp, sp, #32
 ret
-_Min__F__F:
-label12:
+.globl _Derived$GetBoth
+_Derived$GetBoth:
+label46:
 sub sp, sp, #32
 stp x29, x30, [sp, #16]
 add x29, sp, #16
-str x28, [x29, #-8]
-str d30, [x29, #-16]
-fmov d30, d0
-fmov d30, d1
-b label13
-label13:
-adrp x28, _INT0@PAGE
-ldr x28, [x28, _INT0@PAGEOFF]
-fmov d0, x28
-ldr x28, [x29, #-8]
-ldr d30, [x29, #-16]
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+mov x28, x0
+adrp x28, _Base$base_val@PAGE
+add x28, x28, _Base$base_val@PAGEOFF
+ldr x27, [x28]
+b label47
+label47:
+mov x0, x27
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
 ldp x29, x30, [sp, #16]
 add sp, sp, #32
 ret
-.globl _main
-_main:
-label14:
-sub sp, sp, #80
-stp x29, x30, [sp, #64]
-add x29, sp, #64
+_TestStaticWithInheritance:
+label48:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+adrp x28, _Base$base_val@PAGE
+add x28, x28, _Base$base_val@PAGEOFF
+ldr x27, [x28]
+cmp x27, #100
+cset w27, eq
+mov w0, w27
+bl _Assert
+b label52
+label49:
+cmp x27, #100
+cset w28, eq
+mov w0, w28
+bl _Assert
+b label51
+label50:
+cmp x28, #100
+cset w26, eq
+mov w0, w26
+bl _Assert
+b label53
+label51:
+adrp x26, _Base$base_val@PAGE
+add x26, x26, _Base$base_val@PAGEOFF
+ldr x28, [x26]
+b label50
+label52:
+adrp x26, _Base$base_val@PAGE
+add x26, x26, _Base$base_val@PAGEOFF
+ldr x27, [x26]
+b label49
+label53:
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _Visibility$GetSecret
+_Visibility$GetSecret:
+label54:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+adrp x28, _Visibility$secret@PAGE
+add x28, x28, _Visibility$secret@PAGEOFF
+ldr x27, [x28]
+b label55
+label55:
+mov x0, x27
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+_TestStaticVisibility:
+label56:
+sub sp, sp, #32
+stp x29, x30, [sp, #16]
+add x29, sp, #16
+str x27, [x29, #-8]
+str x28, [x29, #-16]
+b label58
+label57:
+cmp x28, #42
+cset w27, eq
+mov w0, w27
+bl _Assert
+b label59
+label58:
+adrp x27, _Visibility$secret@PAGE
+add x27, x27, _Visibility$secret@PAGEOFF
+ldr x28, [x27]
+b label57
+label59:
+ldr x27, [x29, #-8]
+ldr x28, [x29, #-16]
+ldp x29, x30, [sp, #16]
+add sp, sp, #32
+ret
+.globl _StaticInit$GetSum
+_StaticInit$GetSum:
+label60:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x26, [x29, #-8]
+str x27, [x29, #-16]
+str x28, [x29, #-24]
+adrp x28, _StaticInit$a@PAGE
+add x28, x28, _StaticInit$a@PAGEOFF
+ldr x27, [x28]
+adrp x28, _StaticInit$b@PAGE
+add x28, x28, _StaticInit$b@PAGEOFF
+ldr x26, [x28]
+add x28, x27, x26
+b label61
+label61:
+mov x0, x28
+ldr x26, [x29, #-8]
+ldr x27, [x29, #-16]
+ldr x28, [x29, #-24]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+_TestStaticFieldInitializers:
+label62:
+sub sp, sp, #64
+stp x29, x30, [sp, #48]
+add x29, sp, #48
 str x24, [x29, #-8]
 str x25, [x29, #-16]
 str x26, [x29, #-24]
 str x27, [x29, #-32]
 str x28, [x29, #-40]
-str d29, [x29, #-48]
-str d30, [x29, #-56]
-b label15
-label15:
-mov w0, #1
-bl _Assert
-b label16
-label16:
-mov w0, #1
-bl _Assert
-b label17
-label17:
-mov w0, #1
-bl _Assert
-b label18
-label18:
-mov w0, #1
-bl _Assert
-b label19
-label19:
-mov w0, #1
-bl _Assert
-b label20
-label20:
-mov w0, #1
-bl _Assert
-mov x1, #7
-mov x0, #3
-bl _Max__I__I
-mov x28, x0
-cmp x28, #7
-cset w28, eq
-mov w0, w28
-bl _Assert
-mov x1, #5
-mov x0, #10
-bl _Max__I__I
-mov x28, x0
-cmp x28, #10
-cset w28, eq
-mov w0, w28
-bl _Assert
-adrp x28, _INT1@PAGE
-ldr x28, [x28, _INT1@PAGEOFF]
-fmov d1, x28
-adrp x28, _INT0@PAGE
-ldr x28, [x28, _INT0@PAGEOFF]
-fmov d0, x28
-bl _Max__F__F
-fmov d30, d0
-adrp x28, _INT1@PAGE
-ldr x28, [x28, _INT1@PAGEOFF]
-fmov d29, x28
-fcmp d30, d29
-cset w28, eq
-mov w0, w28
-bl _Assert
-mov x1, #7
-mov x0, #3
-bl _Min__I__I
-mov x28, x0
-cmp x28, #3
-cset w28, eq
-mov w0, w28
-bl _Assert
-adrp x28, _INT1@PAGE
-ldr x28, [x28, _INT1@PAGEOFF]
-fmov d1, x28
-adrp x28, _INT0@PAGE
-ldr x28, [x28, _INT0@PAGEOFF]
-fmov d0, x28
-bl _Min__F__F
-fmov d29, d0
-adrp x28, _INT0@PAGE
-ldr x28, [x28, _INT0@PAGEOFF]
-fmov d30, x28
-fcmp d29, d30
-cset w28, eq
-mov w0, w28
-bl _Assert
-b label21
-label21:
-mov w0, #1
-bl _Assert
-b label22
-label22:
-mov w0, #1
-bl _Assert
-b label29
-label23:
-cmp w28, #1
+adrp x28, _StaticInit$a@PAGE
+add x28, x28, _StaticInit$a@PAGEOFF
+ldr x27, [x28]
+cmp x27, #10
 cset w27, eq
 mov w0, w27
 bl _Assert
-b label24
-label24:
-mov w0, #1
+adrp x27, _StaticInit$b@PAGE
+add x27, x27, _StaticInit$b@PAGEOFF
+ldr x28, [x27]
+cmp x28, #20
+cset w28, eq
+mov w0, w28
 bl _Assert
-b label25
-label25:
-mov w0, #1
+b label66
+label63:
+cmp x28, #30
+cset w27, eq
+mov w0, w27
 bl _Assert
-b label26
-label26:
-mov w0, #1
+adrp x27, _StaticInit$a@PAGE
+add x27, x27, _StaticInit$a@PAGEOFF
+mov x26, #100
+str x26, [x27]
+b label65
+label64:
+cmp x26, #120
+cset w27, eq
+mov w0, w27
 bl _Assert
-mov x1, #2
-mov x0, #1
-bl _Max__I__I
-mov x27, x0
-mov x1, #4
-mov x0, #3
-bl _Min__I__I
-mov x26, x0
-b label28
-label27:
-cmp x25, #5
-cset w24, eq
-mov w0, w24
-bl _Assert
-adrp x24, _INT2@PAGE
-ldr x24, [x24, _INT2@PAGEOFF]
-fmov d1, x24
-adrp x24, _INT3@PAGE
-ldr x24, [x24, _INT3@PAGEOFF]
-fmov d0, x24
-bl _Max__F__F
-fmov d30, d0
-adrp x24, _INT2@PAGE
-ldr x24, [x24, _INT2@PAGEOFF]
-fmov d29, x24
-fcmp d30, d29
-cset w24, eq
-mov w0, w24
-bl _Assert
-b label30
-label28:
-add x25, x27, x26
-b label27
-label29:
-mov x26, #0
-scvtf d29, x26
-adrp x26, _INT4@PAGE
-ldr x26, [x26, _INT4@PAGEOFF]
-fmov d30, x26
-fcmp d30, d29
-cset w28, gt
-b label23
-label30:
-mov x0, #0
+b label67
+label65:
+adrp x27, _StaticInit$a@PAGE
+add x27, x27, _StaticInit$a@PAGEOFF
+ldr x25, [x27]
+adrp x27, _StaticInit$b@PAGE
+add x27, x27, _StaticInit$b@PAGEOFF
+ldr x24, [x27]
+add x26, x25, x24
+b label64
+label66:
+adrp x24, _StaticInit$a@PAGE
+add x24, x24, _StaticInit$a@PAGEOFF
+ldr x26, [x24]
+adrp x24, _StaticInit$b@PAGE
+add x24, x24, _StaticInit$b@PAGEOFF
+ldr x25, [x24]
+add x28, x26, x25
+b label63
+label67:
 ldr x24, [x29, #-8]
 ldr x25, [x29, #-16]
 ldr x26, [x29, #-24]
 ldr x27, [x29, #-32]
 ldr x28, [x29, #-40]
-ldr d29, [x29, #-48]
-ldr d30, [x29, #-56]
-ldp x29, x30, [sp, #64]
-add sp, sp, #80
+ldp x29, x30, [sp, #48]
+add sp, sp, #64
+ret
+_TestStaticFieldMutation:
+label68:
+sub sp, sp, #48
+stp x29, x30, [sp, #32]
+add x29, sp, #32
+str x25, [x29, #-8]
+str x26, [x29, #-16]
+str x27, [x29, #-24]
+str x28, [x29, #-32]
+b label79
+label69:
+cmp x28, #0
+cset w27, eq
+mov w0, w27
+bl _Assert
+b label77
+label70:
+cmp x27, #3
+cset w26, eq
+mov w0, w26
+bl _Assert
+b label73
+label71:
+cmp x26, #0
+cset w25, eq
+mov w0, w25
+bl _Assert
+b label80
+label72:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+ldr x26, [x25]
+b label71
+label73:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+mov x26, #0
+str x26, [x25]
+b label72
+label74:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x27, [x26]
+b label70
+label75:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x27, [x26]
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+add x25, x27, #1
+str x25, [x26]
+b label74
+label76:
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+ldr x26, [x25]
+adrp x25, _Counter$count@PAGE
+add x25, x25, _Counter$count@PAGEOFF
+add x27, x26, #1
+str x27, [x25]
+b label75
+label77:
+adrp x27, _Counter$count@PAGE
+add x27, x27, _Counter$count@PAGEOFF
+ldr x25, [x27]
+adrp x27, _Counter$count@PAGE
+add x27, x27, _Counter$count@PAGEOFF
+add x26, x25, #1
+str x26, [x27]
+b label76
+label78:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+ldr x28, [x26]
+b label69
+label79:
+adrp x26, _Counter$count@PAGE
+add x26, x26, _Counter$count@PAGEOFF
+mov x28, #0
+str x28, [x26]
+b label78
+label80:
+ldr x25, [x29, #-8]
+ldr x26, [x29, #-16]
+ldr x27, [x29, #-24]
+ldr x28, [x29, #-32]
+ldp x29, x30, [sp, #32]
+add sp, sp, #48
+ret
+.globl _main
+_main:
+label81:
+sub sp, sp, #16
+stp x29, x30, [sp, #0]
+add x29, sp, #0
+bl _TestStaticFieldViaMethod
+bl _TestStaticAccessFromInstanceMethod
+bl _TestStaticMethodsNoState
+bl _TestStaticWithInheritance
+bl _TestStaticVisibility
+bl _TestStaticFieldInitializers
+bl _TestStaticFieldMutation
+b label82
+label82:
+mov x0, #0
+ldp x29, x30, [sp, #0]
+add sp, sp, #16
 ret

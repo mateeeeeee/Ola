@@ -513,30 +513,6 @@ namespace ola
 		{
 			field->Accept(*this);
 		}
-		// Two-pass method processing: declare all first, then define all.
-		// This allows forward references between methods within the same class.
-		for (auto& method : class_decl.GetMethods())
-		{
-			if (isa<ConstructorDecl>(method.get()))
-			{
-				DeclareConstructorDeclLLVM(*cast<ConstructorDecl>(method.get()));
-			}
-			else
-			{
-				DeclareMethodDeclLLVM(*method);
-			}
-		}
-		for (auto& method : class_decl.GetMethods())
-		{
-			if (isa<ConstructorDecl>(method.get()))
-			{
-				DefineConstructorDeclLLVM(*cast<ConstructorDecl>(method.get()));
-			}
-			else
-			{
-				DefineMethodDeclLLVM(*method);
-			}
-		}
 
 		for (auto& static_field : class_decl.GetStaticFields())
 		{
@@ -573,6 +549,32 @@ namespace ola
 			name += static_method->GetMangledName();
 			llvm::Function::Create(llvm_func_type, llvm::Function::ExternalLinkage, name, module);
 		}
+
+		// Two-pass method processing: declare all first, then define all.
+		// This allows forward references between methods within the same class.
+		for (auto& method : class_decl.GetMethods())
+		{
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DeclareConstructorDeclLLVM(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DeclareMethodDeclLLVM(*method);
+			}
+		}
+		for (auto& method : class_decl.GetMethods())
+		{
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DefineConstructorDeclLLVM(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DefineMethodDeclLLVM(*method);
+			}
+		}
+
 		for (auto& static_method : class_decl.GetStaticMethods())
 		{
 			FuncType const* func_type = static_method->GetFuncType();
@@ -2343,6 +2345,30 @@ namespace ola
 		else if (llvm::GetElementPtrInst* GEPI = dyn_cast<llvm::GetElementPtrInst>(value))
 		{
 			load = Load(GEPI->getResultElementType(), GEPI);
+		}
+		else if (llvm::GlobalVariable* GV = dyn_cast<llvm::GlobalVariable>(value))
+		{
+			llvm::Type* vt = GV->getValueType();
+			if (vt->isIntegerTy() || vt->isFloatingPointTy())
+			{
+				Bool ptr_expects_pointer = false;
+				if (llvm::AllocaInst* dest = dyn_cast<llvm::AllocaInst>(ptr))
+				{
+					ptr_expects_pointer = dest->getAllocatedType()->isPointerTy();
+				}
+				if (!ptr_expects_pointer)
+				{
+					load = Load(vt, GV);
+				}
+				else
+				{
+					load = value;
+				}
+			}
+			else
+			{
+				load = value;
+			}
 		}
 		else if (llvm::isa<llvm::ConstantPointerNull>(value) || llvm::isa<llvm::BitCastInst>(value) || llvm::isa<llvm::CallInst>(value))
 		{

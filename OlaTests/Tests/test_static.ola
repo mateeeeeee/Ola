@@ -85,7 +85,6 @@ class Base
 
 class Derived : Base
 {
-	Derived() { super(); }
 	public int GetBoth() const
 	{
 		return Base.base_val;

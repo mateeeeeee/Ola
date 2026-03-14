@@ -679,28 +679,6 @@ namespace ola
 		{
 			field->Accept(*this);
 		}
-		for (auto& method : class_decl.GetMethods())
-		{
-			if (isa<ConstructorDecl>(method.get()))
-			{
-				DeclareConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
-			}
-			else
-			{
-				DeclareMethodDeclIR(*method);
-			}
-		}
-		for (auto& method : class_decl.GetMethods())
-		{
-			if (isa<ConstructorDecl>(method.get()))
-			{
-				DefineConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
-			}
-			else
-			{
-				DefineMethodDeclIR(*method);
-			}
-		}
 
 		for (auto& static_field : class_decl.GetStaticFields())
 		{
@@ -741,6 +719,30 @@ namespace ola
 			Function* ir_function = new Function(name, ir_func_type, Linkage::External);
 			module.AddGlobal(ir_function);
 		}
+
+		for (auto& method : class_decl.GetMethods())
+		{
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DeclareConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DeclareMethodDeclIR(*method);
+			}
+		}
+		for (auto& method : class_decl.GetMethods())
+		{
+			if (isa<ConstructorDecl>(method.get()))
+			{
+				DefineConstructorDeclIR(*cast<ConstructorDecl>(method.get()));
+			}
+			else
+			{
+				DefineMethodDeclIR(*method);
+			}
+		}
+
 		for (auto& static_method : class_decl.GetStaticMethods())
 		{
 			FuncType const* func_type = static_method->GetFuncType();
@@ -2474,6 +2476,22 @@ namespace ola
 		}
 		if (isa<Constant>(value) || isa<CallInst>(value) || isa<CastInst>(value))
 		{
+			if (GlobalVariable* GV = dyn_cast<GlobalVariable>(value))
+			{
+				if (GV->GetValueType()->IsScalar())
+				{
+					Bool ptr_expects_pointer = false;
+					if (AllocaInst* dest = dyn_cast<AllocaInst>(ptr))
+					{
+						ptr_expects_pointer = dest->GetAllocatedType()->IsPointer();
+					}
+					if (!ptr_expects_pointer)
+					{
+						Value* load = Load(GV->GetValueType(), GV);
+						return builder->MakeInst<StoreInst>(load, ptr);
+					}
+				}
+			}
 			return builder->MakeInst<StoreInst>(value, ptr);
 		}
 
