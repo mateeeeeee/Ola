@@ -8,6 +8,7 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
 	- single inheritance: `class D : B`
 	- polymorphism using vtables: `virtual`, `pure`, `final`
 	- access modifiers: `public`, `private`
+	- static fields and methods: `static int count;`, `static int Get()`
 	- `interface`, `this` and `super` keywords
   * functions 
     - overloading
