@@ -101,7 +101,7 @@ namespace ola
 			if (IsFunctionDeclaration())
 			{
 				UniqueFunctionDeclPtr function_decl = ParseFunctionDeclaration();
-				if(function_decl)
+				if (function_decl)
 				{
 					global_decl_list.push_back(std::move(function_decl));
 				}
@@ -166,7 +166,7 @@ namespace ola
 				if (IsFunctionDeclaration())
 				{
 					UniqueDeclPtr function_decl = ParseFunctionDefinition(visibility);
-					if(function_decl)
+					if (function_decl)
 					{
 						global_decl_list.push_back(std::move(function_decl));
 					}
@@ -176,7 +176,7 @@ namespace ola
 					UniqueVarDeclPtrList variable_decls = ParseVariableDeclaration(visibility);
 					for (auto& variable_decl : variable_decls)
 					{
-						if(variable_decl)
+						if (variable_decl)
 						{
 							global_decl_list.push_back(std::move(variable_decl));
 						}
@@ -594,7 +594,7 @@ namespace ola
 				}
 
 				UniqueParamVarDeclPtr param_decl = ParseParamVariableDeclaration();
-				if(param_decl)
+				if (param_decl)
 				{
 					param_types.emplace_back(param_decl->GetType());
 					param_decls.push_back(std::move(param_decl));
@@ -687,7 +687,7 @@ namespace ola
 			if (Consume(TokenKind::equal))
 			{
 				init_expr = (current_token->Is(TokenKind::left_brace)) ? ParseInitializerListExpression() : ParseAssignmentExpression();
-				if(!init_expr)
+				if (!init_expr)
 				{
 					break;
 				}
@@ -755,7 +755,7 @@ namespace ola
 			if (Consume(TokenKind::equal))
 			{
 				init_expr = current_token->Is(TokenKind::left_brace) ? ParseInitializerListExpression() : ParseAssignmentExpression();
-				if(!init_expr)
+				if (!init_expr)
 				{
 					break;
 				}
@@ -2193,7 +2193,11 @@ namespace ola
 			TemplateFunctionDecl* tmpl = nullptr;
 			for (Decl* d : overloads)
 			{
-				if (isa<TemplateFunctionDecl>(d)) { tmpl = cast<TemplateFunctionDecl>(d); break; }
+				if (isa<TemplateFunctionDecl>(d)) 
+				{ 
+					tmpl = cast<TemplateFunctionDecl>(d); 
+					break; 
+				}
 			}
 			if (tmpl)
 			{
@@ -2457,7 +2461,10 @@ namespace ola
 	void Parser::ParseTypeSpecifier(QualType& type, Bool array_size_forbidden, Bool allow_ref)
 	{
 		Bool is_ref = false;
-		if(allow_ref) is_ref = Consume(TokenKind::KW_ref);
+		if (allow_ref)
+		{
+			is_ref = Consume(TokenKind::KW_ref);
+		}
 
 		switch (current_token->GetKind())
 		{
@@ -2788,9 +2795,7 @@ namespace ola
 
 	void Parser::Diag(DiagCode code)
 	{
-		--current_token;
 		diagnostics.Report(current_token->GetLocation(), code);
-		++current_token;
 	}
 	template<typename... Ts>
 	void Parser::Diag(DiagCode code, Ts&&... args)
