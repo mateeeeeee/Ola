@@ -1475,3 +1475,115 @@ TEST(Sema, TemplateFunctionArgCountMismatch_Error)
 		"void foo() { int y = Identity<int, float>(42); }"
 	);
 }
+
+TEST(Sema, StaticField_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C { public static int x = 0; };"
+		"void foo() { int y = C.x; }"
+	);
+}
+
+TEST(Sema, StaticMethod_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C { public static int Get() { return 42; } };"
+		"void foo() { int y = C.Get(); }"
+	);
+}
+
+TEST(Sema, StaticFieldBareNameInsideClass_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  static int x = 0;"
+		"  public static int Get() { return x; }"
+		"};"
+	);
+}
+
+TEST(Sema, StaticMethodBareNameInsideClass_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  public static int Get() { return 42; }"
+		"  public static int Call() { return Get(); }"
+		"};"
+	);
+}
+
+TEST(Sema, StaticFieldFromInstanceMethod_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  static int x = 10;"
+		"  public int Get() const { return x; }"
+		"};"
+	);
+}
+
+TEST(Sema, StaticMethodCannotBeVirtual_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class C {"
+		"  public static int Get() const virtual { return 0; }"
+		"};"
+	);
+}
+
+TEST(Sema, StaticMethodCannotBeConst_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class C {"
+		"  public static int Get() const { return 0; }"
+		"};"
+	);
+}
+
+TEST(Sema, ThisInStaticMethod_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class C {"
+		"  int x;"
+		"  public static int Get() { return this.x; }"
+		"};"
+	);
+}
+
+TEST(Sema, InstanceMemberInStaticMethod_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class C {"
+		"  int x;"
+		"  public static int Get() { return x; }"
+		"};"
+	);
+}
+
+TEST(Sema, PrivateStaticFieldOutside_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"class C { private static int x = 0; };"
+		"void foo() { int y = C.x; }"
+	);
+}
+
+TEST(Sema, StaticOutsideClass_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"static int x = 0;"
+	);
+}
+
+TEST(Sema, StaticFieldNotInStructLayout_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  int a;"
+		"  public static int s = 0;"
+		"  C() { a = 1; }"
+		"  public int GetA() const { return a; }"
+		"};"
+		"void foo() { C c; }"
+	);
+}

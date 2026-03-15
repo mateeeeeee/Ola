@@ -513,6 +513,43 @@ namespace ola
 		{
 			field->Accept(*this);
 		}
+
+		for (auto& static_field : class_decl.GetStaticFields())
+		{
+			QualType const& var_type = static_field->GetType();
+			llvm::Type* llvm_type = ConvertToIRType(var_type);
+			llvm::Constant* constant_init = nullptr;
+
+			if (Expr const* init_expr = static_field->GetInitExpr())
+			{
+				init_expr->Accept(*this);
+				llvm::Value* init_value = value_map[init_expr];
+				constant_init = llvm::dyn_cast<llvm::Constant>(init_value);
+			}
+			if (!constant_init)
+			{
+				constant_init = llvm::Constant::getNullValue(llvm_type);
+			}
+
+			std::string global_name(SanitizeClassName(class_decl.GetName()));
+			global_name += "$";
+			global_name += static_field->GetName();
+			llvm::GlobalVariable* global_var = new llvm::GlobalVariable(
+				module, llvm_type, var_type.IsConst(), llvm::GlobalValue::InternalLinkage,
+				constant_init, global_name.c_str());
+			value_map[static_field.get()] = global_var;
+		}
+
+		for (auto& static_method : class_decl.GetStaticMethods())
+		{
+			FuncType const* func_type = static_method->GetFuncType();
+			llvm::FunctionType* llvm_func_type = llvm::cast<llvm::FunctionType>(ConvertToIRType(func_type));
+			std::string name(SanitizeClassName(class_decl.GetName()));
+			name += "$";
+			name += static_method->GetMangledName();
+			llvm::Function::Create(llvm_func_type, llvm::Function::ExternalLinkage, name, module);
+		}
+
 		// Two-pass method processing: declare all first, then define all.
 		// This allows forward references between methods within the same class.
 		for (auto& method : class_decl.GetMethods())
@@ -535,6 +572,33 @@ namespace ola
 			else
 			{
 				DefineMethodDeclLLVM(*method);
+			}
+		}
+
+		for (auto& static_method : class_decl.GetStaticMethods())
+		{
+			FuncType const* func_type = static_method->GetFuncType();
+			std::string name(SanitizeClassName(class_decl.GetName()));
+			name += "$";
+			name += static_method->GetMangledName();
+			llvm::Function* llvm_function = module.getFunction(name);
+
+			llvm::Argument* param_arg = llvm_function->arg_begin();
+			if (isa<ClassType>(func_type->GetReturnType()))
+			{
+				return_value = &*param_arg;
+				++param_arg;
+			}
+			for (auto& param : static_method->GetParamDecls())
+			{
+				llvm::Value* llvm_param = &*param_arg;
+				llvm_param->setName(param->GetName());
+				value_map[param.get()] = llvm_param;
+				++param_arg;
+			}
+			if (static_method->HasDefinition())
+			{
+				VisitFunctionDeclCommon(*static_method, llvm_function);
 			}
 		}
 
@@ -1412,6 +1476,13 @@ namespace ola
 	{
 		Expr const* class_expr = member_expr.GetClassExpr();
 		Decl const* member_decl = member_expr.GetMemberDecl();
+
+		if (isa<FieldDecl>(member_decl) && cast<FieldDecl>(member_decl)->IsStatic())
+		{
+			value_map[&member_expr] = value_map[member_decl];
+			return;
+		}
+
 		class_expr->Accept(*this);
 		llvm::Value* struct_value = value_map[class_expr];
 		if (isa<FieldDecl>(member_decl))
@@ -1439,6 +1510,47 @@ namespace ola
 		OLA_ASSERT(isa<MethodDecl>(decl));
 		MethodDecl const* method_decl = cast<MethodDecl>(decl);
 		ClassDecl const* class_decl = method_decl->GetParentDecl();
+
+		if (method_decl->IsStatic())
+		{
+			std::string name(SanitizeClassName(class_decl->GetName()));
+			name += "$";
+			name += method_decl->GetMangledName();
+			llvm::Function* called_function = module.getFunction(name);
+			OLA_ASSERT(called_function);
+
+			std::vector<llvm::Value*> args;
+			Uint32 arg_index = 0;
+			Bool return_struct = isa<ClassType>(member_call_expr.GetCalleeType()->GetReturnType());
+			llvm::AllocaInst* return_alloc = nullptr;
+			if (return_struct)
+			{
+				return_alloc = builder.CreateAlloca(called_function->getArg(arg_index)->getType());
+				args.push_back(return_alloc);
+				++arg_index;
+			}
+
+			for (auto const& arg_expr : member_call_expr.GetArgs())
+			{
+				arg_expr->Accept(*this);
+				llvm::Value* arg_value = value_map[arg_expr.get()];
+				OLA_ASSERT(arg_value);
+				llvm::Type* arg_type = called_function->getArg(arg_index)->getType();
+				if (arg_type->isPointerTy() && !isa<PtrType>(arg_expr->GetType()))
+				{
+					args.push_back(arg_value);
+				}
+				else
+				{
+					args.push_back(Load(arg_type, arg_value));
+				}
+				++arg_index;
+			}
+
+			llvm::Value* call_result = builder.CreateCall(called_function, args);
+			value_map[&member_call_expr] = return_alloc ? return_alloc : call_result;
+			return;
+		}
 
 		Expr const* class_expr = member_expr->GetClassExpr();
 		class_expr->Accept(*this);
@@ -2233,6 +2345,30 @@ namespace ola
 		else if (llvm::GetElementPtrInst* GEPI = dyn_cast<llvm::GetElementPtrInst>(value))
 		{
 			load = Load(GEPI->getResultElementType(), GEPI);
+		}
+		else if (llvm::GlobalVariable* GV = dyn_cast<llvm::GlobalVariable>(value))
+		{
+			llvm::Type* vt = GV->getValueType();
+			if (vt->isIntegerTy() || vt->isFloatingPointTy())
+			{
+				Bool ptr_expects_pointer = false;
+				if (llvm::AllocaInst* dest = dyn_cast<llvm::AllocaInst>(ptr))
+				{
+					ptr_expects_pointer = dest->getAllocatedType()->isPointerTy();
+				}
+				if (!ptr_expects_pointer)
+				{
+					load = Load(vt, GV);
+				}
+				else
+				{
+					load = value;
+				}
+			}
+			else
+			{
+				load = value;
+			}
 		}
 		else if (llvm::isa<llvm::ConstantPointerNull>(value) || llvm::isa<llvm::BitCastInst>(value) || llvm::isa<llvm::CallInst>(value))
 		{

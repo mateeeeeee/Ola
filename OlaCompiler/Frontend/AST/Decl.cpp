@@ -65,6 +65,23 @@ namespace ola
 			method->Accept(this_visitor, 0);
 		}
 	}
+	void ClassDecl::SetStaticFields(UniqueFieldDeclPtrList&& _static_fields)
+	{
+		static_fields = std::move(_static_fields);
+		for (auto& field : static_fields)
+		{
+			field->SetParentDecl(this);
+			field->SetStatic(true);
+		}
+	}
+	void ClassDecl::SetStaticMethods(UniqueMethodDeclPtrList&& _static_methods)
+	{
+		static_methods = std::move(_static_methods);
+		for (auto& method : static_methods)
+		{
+			method->SetParentDecl(this);
+		}
+	}
 	std::vector<ConstructorDecl const*> ClassDecl::FindConstructors() const
 	{
 		std::vector<ConstructorDecl const*> found_decls;
@@ -100,6 +117,30 @@ namespace ola
 			}
 		}
 		return base_class ? base_class->FindFieldDecl(name) : nullptr;
+	}
+	FieldDecl* ClassDecl::FindStaticFieldDecl(std::string_view name) const
+	{
+		for (Uint32 i = 0; i < static_fields.size(); ++i)
+		{
+			if (static_fields[i]->GetName().compare(name) == 0)
+			{
+				return static_fields[i].get();
+			}
+		}
+		return base_class ? base_class->FindStaticFieldDecl(name) : nullptr;
+	}
+	std::vector<MethodDecl const*> ClassDecl::FindStaticMethodDecls(std::string_view name) const
+	{
+		std::vector<MethodDecl const*> found_decls;
+		for (Uint32 i = 0; i < static_methods.size(); ++i)
+		{
+			if (static_methods[i]->GetName().compare(name) == 0)
+			{
+				found_decls.push_back(static_methods[i].get());
+			}
+		}
+		if (found_decls.empty()) return base_class ? base_class->FindStaticMethodDecls(name) : std::vector<MethodDecl const*>{};
+		else return found_decls;
 	}
 
 	BuildVTableResult ClassDecl::BuildVTable(MethodDecl const*& error_decl)
@@ -274,6 +315,8 @@ namespace ola
 		visitor.Visit(*this, depth);
 		for (auto const& field : fields) field->Accept(visitor, depth + 1);
 		for (auto const& method : methods) method->Accept(visitor, depth + 1);
+		for (auto const& field : static_fields) field->Accept(visitor, depth + 1);
+		for (auto const& method : static_methods) method->Accept(visitor, depth + 1);
 	}
 	void ConstructorDecl::Accept(ASTVisitor& visitor, Uint32 depth) const
 	{

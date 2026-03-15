@@ -66,9 +66,14 @@ namespace ola
 		return param_decl;
 	}
 
-	UniqueFieldDeclPtr Sema::ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility)
+	UniqueFieldDeclPtr Sema::ActOnFieldDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& init_expr, DeclVisibility visibility, Bool is_static)
 	{
-		return ActOnVariableDeclCommon<FieldDecl>(name, loc, type, std::move(init_expr), visibility);
+		UniqueFieldDeclPtr field_decl = ActOnVariableDeclCommon<FieldDecl>(name, loc, type, std::move(init_expr), visibility);
+		if (field_decl && is_static)
+		{
+			field_decl->SetStatic(true);
+		}
+		return field_decl;
 	}
 
 	UniqueFunctionDeclPtr Sema::ActOnFunctionDecl(std::string_view name, SourceLocation const& loc, QualType const& type,
@@ -162,6 +167,19 @@ namespace ola
 		{
 			diagnostics.Report(loc, method_cannot_be_nomangle);
 			return nullptr;
+		}
+		if (HasAttribute(method_attrs, MethodAttribute_Static))
+		{
+			if (HasAttribute(method_attrs, MethodAttribute_Virtual) || HasAttribute(method_attrs, MethodAttribute_Pure) || HasAttribute(method_attrs, MethodAttribute_Final))
+			{
+				diagnostics.Report(loc, static_method_cannot_be_virtual);
+				return nullptr;
+			}
+			if (HasAttribute(method_attrs, MethodAttribute_Const))
+			{
+				diagnostics.Report(loc, static_method_cannot_be_const);
+				return nullptr;
+			}
 		}
 		if (HasAttribute(method_attrs, MethodAttribute_Final))
 		{
@@ -390,7 +408,10 @@ namespace ola
 		return nullptr;
 	}
 
-	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc, UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions, Bool final)
+	UniqueClassDeclPtr Sema::ActOnClassDecl(std::string_view name, ClassDecl const* base_class, SourceLocation const& loc,
+		UniqueFieldDeclPtrList&& member_variables, UniqueMethodDeclPtrList&& member_functions,
+		UniqueFieldDeclPtrList&& static_fields, UniqueMethodDeclPtrList&& static_methods,
+		Bool final)
 	{
 		if (sema_ctx.tag_sym_table.LookupCurrentScope(name))
 		{
@@ -403,6 +424,8 @@ namespace ola
 		class_decl->SetBaseClass(base_class);
 		class_decl->SetFields(std::move(member_variables));
 		class_decl->SetMethods(std::move(member_functions));
+		class_decl->SetStaticFields(std::move(static_fields));
+		class_decl->SetStaticMethods(std::move(static_methods));
 		class_decl->SetFinal(final);
 
 		MethodDecl const* error_decl = nullptr;
@@ -1066,12 +1089,33 @@ namespace ola
 
 			if (isa<MethodDecl>(match_decl))
 			{
+				MethodDecl const* method = cast<MethodDecl>(match_decl);
+				if (method->IsStatic() && !sema_ctx.current_class_name.empty())
+				{
+					UniqueIdentifierExprPtr class_name_expr = MakeUnique<IdentifierExpr>(sema_ctx.current_class_name, loc);
+
+					UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
+					member_expr->SetClassExpr(std::move(class_name_expr));
+					member_expr->SetMemberDecl(method);
+					member_expr->SetType(match_func_type);
+
+					UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, method);
+					method_call_expr->SetType(match_func_type->GetReturnType());
+					method_call_expr->SetArgs(std::move(args));
+					method_call_expr->SetCallee(std::move(member_expr));
+					if (isa<RefType>(method_call_expr->GetType()))
+					{
+						method_call_expr->SetLValue();
+					}
+					return method_call_expr;
+				}
+
 				UniqueMemberExprPtr member_expr = MakeUnique<MemberExpr>(loc);
 				member_expr->SetClassExpr(ActOnThisExpr(loc, true));
-				member_expr->SetMemberDecl(cast<MethodDecl>(match_decl));
+				member_expr->SetMemberDecl(method);
 				member_expr->SetType(match_func_type);
 
-				UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, cast<MethodDecl>(match_decl));
+				UniqueMethodCallExprPtr method_call_expr = MakeUnique<MethodCallExpr>(loc, method);
 				method_call_expr->SetType(match_func_type->GetReturnType());
 				method_call_expr->SetArgs(std::move(args));
 				method_call_expr->SetCallee(std::move(member_expr));
@@ -1320,6 +1364,15 @@ namespace ola
 				UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(decl, loc);
 				if (decl->IsMember())
 				{
+					if (isa<FieldDecl>(decl) && cast<FieldDecl>(decl)->IsStatic())
+					{
+						return decl_ref;
+					}
+					if (sema_ctx.is_static_method)
+					{
+						diagnostics.Report(loc, instance_member_in_static, name);
+						return nullptr;
+					}
 					return ActOnFieldAccess(loc, ActOnThisExpr(loc, true), std::move(decl_ref));
 				}
 				else
@@ -1329,10 +1382,29 @@ namespace ola
 			}
 			else if (ClassDecl const* base_class_decl = sema_ctx.current_base_class)
 			{
+				if (FieldDecl* static_field = base_class_decl->FindStaticFieldDecl(name))
+				{
+					return MakeUnique<DeclRefExpr>(static_field, loc);
+				}
 				if (Decl* class_member_decl = base_class_decl->FindFieldDecl(name))
 				{
+					if (sema_ctx.is_static_method)
+					{
+						diagnostics.Report(loc, instance_member_in_static, name);
+						return nullptr;
+					}
 					UniqueDeclRefExprPtr decl_ref = MakeUnique<DeclRefExpr>(class_member_decl, loc);
 					return ActOnFieldAccess(loc, ActOnSuperExpr(loc, true), std::move(decl_ref));
+				}
+			}
+
+			if (TagDecl* tag_decl = sema_ctx.tag_sym_table.Lookup(name))
+			{
+				if (isa<ClassDecl>(tag_decl))
+				{
+					UniqueIdentifierExprPtr class_expr = MakeUnique<IdentifierExpr>(name, loc);
+					class_expr->SetType(ClassType::Get(ctx, cast<ClassDecl>(tag_decl)));
+					return class_expr;
 				}
 			}
 		}
@@ -1368,6 +1440,29 @@ namespace ola
 					return nullptr;
 				}
 				ClassDecl const* class_decl = class_type->GetClassDecl();
+
+				Bool is_static_access = isa<IdentifierExpr>(current_class_expr) && !isa<DeclRefExpr>(current_class_expr);
+				if (is_static_access)
+				{
+					if (overloaded_symbol)
+					{
+						std::vector<MethodDecl const*> method_decls = class_decl->FindStaticMethodDecls(name);
+						if (!method_decls.empty())
+						{
+							return MakeUnique<IdentifierExpr>(name, loc);
+						}
+					}
+					else
+					{
+						if (FieldDecl* static_field = class_decl->FindStaticFieldDecl(name))
+						{
+							return MakeUnique<DeclRefExpr>(static_field, loc);
+						}
+					}
+					diagnostics.Report(loc, invalid_member_access);
+					return nullptr;
+				}
+
 				if (overloaded_symbol)
 				{
 					std::vector<MethodDecl const*> method_decls = class_decl->FindMethodDecls(name);
@@ -1566,8 +1661,15 @@ namespace ola
 		}
 		OLA_ASSERT(class_decl || isa<ThisExpr>(class_expr.get()));
 
+		Bool is_static_access = isa<IdentifierExpr>(class_expr.get()) && !isa<DeclRefExpr>(class_expr.get())
+			&& !isoneof<ThisExpr, SuperExpr>(class_expr.get());
+
 		std::vector<MethodDecl const*> candidate_decls;
-		if (class_decl)
+		if (is_static_access && class_decl)
+		{
+			candidate_decls = class_decl->FindStaticMethodDecls(member_identifier->GetName());
+		}
+		else if (class_decl)
 		{
 			candidate_decls = class_decl->FindMethodDecls(member_identifier->GetName());
 		}
@@ -1641,6 +1743,11 @@ namespace ola
 
 	UniqueThisExprPtr Sema::ActOnThisExpr(SourceLocation const& loc, Bool implicit)
 	{
+		if (sema_ctx.is_static_method)
+		{
+			diagnostics.Report(loc, this_in_static_method);
+			return nullptr;
+		}
 		UniqueThisExprPtr this_expr = MakeUnique<ThisExpr>(loc);
 		this_expr->SetImplicit(implicit);
 		QualType this_type(ClassType::Get(ctx, nullptr), sema_ctx.is_method_const ? Qualifier_Const : Qualifier_None);
@@ -1650,6 +1757,11 @@ namespace ola
 
 	UniqueSuperExprPtr Sema::ActOnSuperExpr(SourceLocation const& loc, Bool implicit)
 	{
+		if (sema_ctx.is_static_method)
+		{
+			diagnostics.Report(loc, super_in_static_method);
+			return nullptr;
+		}
 		if (!sema_ctx.current_base_class)
 		{
 			diagnostics.Report(loc, super_used_in_wrong_context);

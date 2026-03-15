@@ -45,6 +45,7 @@ namespace ola
 		Bool IsFloat() const { return kind == IRTypeKind::Float; }
 		Bool IsArray() const { return kind == IRTypeKind::Array; }
 		Bool IsAggregate() const { return IsStruct() || IsArray(); }
+		Bool IsScalar() const { return IsInteger() || IsFloat(); }
 		Bool IsFunction() const { return kind == IRTypeKind::Function; }
 		Bool IsLabel() const { return kind == IRTypeKind::Label; }
 

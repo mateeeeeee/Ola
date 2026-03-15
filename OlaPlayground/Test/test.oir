@@ -6,7 +6,153 @@ declare @Assert void(i8)
 declare @AssertMsg void(i8,ptr)
 
 
-define internal @Max__I__I i64(i64 %a,i64 %b) {
+define internal @Counter$count ptr 0
+
+
+define external @Counter$GetCount i64() {
+entry:
+%0 = load i64, ptr @Counter$count
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define external @Counter$Reset void() {
+entry:
+store 0, ptr @Counter$count
+br label exit
+exit:
+ret 
+}
+
+
+define external @Counter$Counter void(ptr %this) {
+entry:
+%0 = load i64, ptr @Counter$count
+%1 = add i64 %0, 1
+store i64 %1, ptr @Counter$count
+br label exit
+exit:
+ret 
+}
+
+
+define external @Counter$GetValue i64(ptr %this) {
+entry:
+%0 = load i64, ptr @Counter$count
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define internal @TestStaticFieldViaMethod void() {
+entry:
+br label entry.inlined
+entry.split.split:
+%0 = icmp eq i64 %1, 0
+call i8 %0, @Assert
+br label entry.inlined1
+entry.split.split.split.split:
+%2 = icmp eq i64 %3, 1
+call i8 %2, @Assert
+br label entry.inlined2
+entry.split.split.split.split.split.split:
+%4 = icmp eq i64 %5, 2
+call i8 %4, @Assert
+br label entry.inlined3
+entry.split.split.split.split.split.split.split.split:
+%6 = icmp eq i64 %7, 0
+call i8 %6, @Assert
+br label exit
+entry.inlined4:
+%7 = load i64, ptr @Counter$count
+br label entry.split.split.split.split.split.split.split.split
+entry.inlined3:
+store 0, ptr @Counter$count
+br label entry.inlined4
+entry.inlined5:
+%5 = load i64, ptr @Counter$count
+br label entry.split.split.split.split.split.split
+entry.inlined2:
+%8 = load i64, ptr @Counter$count
+%9 = add i64 %8, 1
+store i64 %9, ptr @Counter$count
+br label entry.inlined5
+entry.inlined6:
+%3 = load i64, ptr @Counter$count
+br label entry.split.split.split.split
+entry.inlined1:
+%10 = load i64, ptr @Counter$count
+%11 = add i64 %10, 1
+store i64 %11, ptr @Counter$count
+br label entry.inlined6
+entry.inlined7:
+%1 = load i64, ptr @Counter$count
+br label entry.split.split
+entry.inlined:
+store 0, ptr @Counter$count
+br label entry.inlined7
+exit:
+ret 
+}
+
+
+define internal @TestStaticAccessFromInstanceMethod void() {
+entry:
+br label entry.inlined
+entry.split.split.split.split:
+%0 = icmp eq i64 %1, 2
+call i8 %0, @Assert
+br label entry.inlined1
+entry.split.split.split.split.split:
+%2 = icmp eq i64 %3, 2
+call i8 %2, @Assert
+br label exit
+entry.inlined1:
+%3 = load i64, ptr @Counter$count
+br label entry.split.split.split.split.split
+entry.inlined2:
+%1 = load i64, ptr @Counter$count
+br label entry.split.split.split.split
+entry.inlined3:
+%4 = load i64, ptr @Counter$count
+%5 = add i64 %4, 1
+store i64 %5, ptr @Counter$count
+br label entry.inlined2
+entry.inlined4:
+%6 = load i64, ptr @Counter$count
+%7 = add i64 %6, 1
+store i64 %7, ptr @Counter$count
+br label entry.inlined3
+entry.inlined:
+store 0, ptr @Counter$count
+br label entry.inlined4
+exit:
+ret 
+}
+
+
+define external @MathUtil$Square__I i64(i64 %x) {
+entry:
+%0 = smul i64 %x, %x
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define external @MathUtil$Add__I__I i64(i64 %a,i64 %b) {
+entry:
+%0 = add i64 %a, %b
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define external @MathUtil$Max__I__I i64(i64 %a,i64 %b) {
 entry:
 %0 = icmp sgt i64 %a, %b
 br i8 %0, label if.then, label if.end
@@ -20,43 +166,7 @@ ret i64 %1
 }
 
 
-define internal @Max__F__F f64(f64 %a,f64 %b) {
-entry:
-%0 = fcmp ogt f64 %a, %b
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-br label exit
-exit:
-%1 = phi f64 [ %b, if.end ], [ %a, if.then ]
-ret f64 %1
-}
-
-
-define internal @Min__I__I i64(i64 %a,i64 %b) {
-entry:
-%0 = icmp slt i64 3, %b
-br i8 %0, label if.then, label if.end
-if.then:
-br label exit
-if.end:
-br label exit
-exit:
-%1 = phi i64 [ %b, if.end ], [ 3, if.then ]
-ret i64 %1
-}
-
-
-define internal @Min__F__F f64(f64 %a,f64 %b) {
-entry:
-br label exit
-exit:
-ret f64 1.1
-}
-
-
-define external @main i64() {
+define internal @TestStaticMethodsNoState void() {
 entry:
 br label entry.split
 entry.split:
@@ -67,66 +177,201 @@ call i8 1, @Assert
 br label entry.split.split.split
 entry.split.split.split:
 call i8 1, @Assert
-br label entry.split.split.split.split
-entry.split.split.split.split:
-call i8 1, @Assert
-br label entry.split.split.split.split.split
-entry.split.split.split.split.split:
-call i8 1, @Assert
-br label entry.split.split.split.split.split.split
-entry.split.split.split.split.split.split:
-call i8 1, @Assert
-%0 = call i64 3, 7, @Max__I__I
-%1 = icmp eq i64 %0, 7
+%0 = call i64 10, 20, @MathUtil$Max__I__I
+%1 = icmp eq i64 %0, 20
 call i8 %1, @Assert
-%2 = call i64 10, 5, @Max__I__I
-%3 = icmp eq i64 %2, 10
+%2 = call i64 20, 10, @MathUtil$Max__I__I
+%3 = icmp eq i64 %2, 20
 call i8 %3, @Assert
-%4 = call f64 1.1, 2.2, @Max__F__F
-%5 = fcmp oeq f64 %4, 2.2
-call i8 %5, @Assert
-%6 = call i64 3, 7, @Min__I__I
-%7 = icmp eq i64 %6, 3
-call i8 %7, @Assert
-%8 = call f64 1.1, 2.2, @Min__F__F
-%9 = fcmp oeq f64 %8, 1.1
-call i8 %9, @Assert
-br label entry.split.split.split.split.split.split.split
-entry.split.split.split.split.split.split.split:
-call i8 1, @Assert
-br label entry.split.split.split.split.split.split.split.split
-entry.split.split.split.split.split.split.split.split:
-call i8 1, @Assert
+br label exit
+exit:
+ret 
+}
+
+
+define internal @Base$base_val ptr 100
+
+
+define external @Base$GetBaseVal i64() {
+entry:
+%0 = load i64, ptr @Base$base_val
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define external @Derived$GetBoth i64(ptr %this) {
+entry:
+%0 = load i64, ptr @Base$base_val
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define internal @TestStaticWithInheritance void() {
+entry:
+%0 = load i64, ptr @Base$base_val
+%1 = icmp eq i64 %0, 100
+call i8 %1, @Assert
 br label entry.inlined
-entry.split.split.split.split.split.split.split.split.split:
-%10 = icmp eq i8 %11, 1
-call i8 %10, @Assert
-br label entry.split.split.split.split.split.split.split.split.split.split
-entry.split.split.split.split.split.split.split.split.split.split:
-call i8 1, @Assert
-br label entry.split.split.split.split.split.split.split.split.split.split.split
-entry.split.split.split.split.split.split.split.split.split.split.split:
-call i8 1, @Assert
-br label entry.split.split.split.split.split.split.split.split.split.split.split.split.split.split
-entry.split.split.split.split.split.split.split.split.split.split.split.split.split.split:
-call i8 1, @Assert
-%12 = call i64 1, 2, @Max__I__I
-%13 = call i64 3, 4, @Min__I__I
+entry.split:
+%2 = icmp eq i64 %3, 100
+call i8 %2, @Assert
 br label entry.inlined1
-entry.split.split.split.split.split.split.split.split.split.split.split.split.split.split.split:
-%14 = icmp eq i64 %15, 5
-call i8 %14, @Assert
-%16 = call f64 10, 20, @Max__F__F
-%17 = fcmp oeq f64 %16, 20
-call i8 %17, @Assert
+entry.split.split:
+%4 = icmp eq i64 %5, 100
+call i8 %4, @Assert
 br label exit
 entry.inlined1:
-%15 = add i64 %12, %13
-br label entry.split.split.split.split.split.split.split.split.split.split.split.split.split.split.split
+%5 = load i64, ptr @Base$base_val
+br label entry.split.split
 entry.inlined:
-%18 = s2f i64 0
-%11 = fcmp ogt f64 0.1, %18
-br label entry.split.split.split.split.split.split.split.split.split
+%3 = load i64, ptr @Base$base_val
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @Visibility$secret ptr 42
+
+
+define external @Visibility$GetSecret i64() {
+entry:
+%0 = load i64, ptr @Visibility$secret
+br label exit
+exit:
+ret i64 %0
+}
+
+
+define internal @TestStaticVisibility void() {
+entry:
+br label entry.inlined
+entry.split:
+%0 = icmp eq i64 %1, 42
+call i8 %0, @Assert
+br label exit
+entry.inlined:
+%1 = load i64, ptr @Visibility$secret
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @StaticInit$a ptr 10
+
+
+define internal @StaticInit$b ptr 20
+
+
+define external @StaticInit$GetSum i64() {
+entry:
+%0 = load i64, ptr @StaticInit$a
+%1 = load i64, ptr @StaticInit$b
+%2 = add i64 %0, %1
+br label exit
+exit:
+ret i64 %2
+}
+
+
+define internal @TestStaticFieldInitializers void() {
+entry:
+%0 = load i64, ptr @StaticInit$a
+%1 = icmp eq i64 %0, 10
+call i8 %1, @Assert
+%2 = load i64, ptr @StaticInit$b
+%3 = icmp eq i64 %2, 20
+call i8 %3, @Assert
+br label entry.inlined
+entry.split:
+%4 = icmp eq i64 %5, 30
+call i8 %4, @Assert
+store 100, ptr @StaticInit$a
+br label entry.inlined1
+entry.split.split:
+%6 = icmp eq i64 %7, 120
+call i8 %6, @Assert
+br label exit
+entry.inlined1:
+%8 = load i64, ptr @StaticInit$a
+%9 = load i64, ptr @StaticInit$b
+%7 = add i64 %8, %9
+br label entry.split.split
+entry.inlined:
+%10 = load i64, ptr @StaticInit$a
+%11 = load i64, ptr @StaticInit$b
+%5 = add i64 %10, %11
+br label entry.split
+exit:
+ret 
+}
+
+
+define internal @TestStaticFieldMutation void() {
+entry:
+br label entry.inlined
+entry.split.split:
+%0 = icmp eq i64 %1, 0
+call i8 %0, @Assert
+br label entry.inlined1
+entry.split.split.split.split.split.split:
+%2 = icmp eq i64 %3, 3
+call i8 %2, @Assert
+br label entry.inlined2
+entry.split.split.split.split.split.split.split.split:
+%4 = icmp eq i64 %5, 0
+call i8 %4, @Assert
+br label exit
+entry.inlined3:
+%5 = load i64, ptr @Counter$count
+br label entry.split.split.split.split.split.split.split.split
+entry.inlined2:
+store 0, ptr @Counter$count
+br label entry.inlined3
+entry.inlined4:
+%3 = load i64, ptr @Counter$count
+br label entry.split.split.split.split.split.split
+entry.inlined5:
+%6 = load i64, ptr @Counter$count
+%7 = add i64 %6, 1
+store i64 %7, ptr @Counter$count
+br label entry.inlined4
+entry.inlined6:
+%8 = load i64, ptr @Counter$count
+%9 = add i64 %8, 1
+store i64 %9, ptr @Counter$count
+br label entry.inlined5
+entry.inlined1:
+%10 = load i64, ptr @Counter$count
+%11 = add i64 %10, 1
+store i64 %11, ptr @Counter$count
+br label entry.inlined6
+entry.inlined7:
+%1 = load i64, ptr @Counter$count
+br label entry.split.split
+entry.inlined:
+store 0, ptr @Counter$count
+br label entry.inlined7
+exit:
+ret 
+}
+
+
+define external @main i64() {
+entry:
+call ptr @TestStaticFieldViaMethod
+call ptr @TestStaticAccessFromInstanceMethod
+call ptr @TestStaticMethodsNoState
+call ptr @TestStaticWithInheritance
+call ptr @TestStaticVisibility
+call ptr @TestStaticFieldInitializers
+call ptr @TestStaticFieldMutation
+br label exit
 exit:
 ret i64 0
 }
