@@ -72,8 +72,10 @@ class Animal : Printable
 
 class Dog : Animal
 {
-    Dog() { super(4); }
+    Dog() { super(4); count = count + 1; }
     public int Sound() const virtual { return 1; }
+    public static int GetCount() { return count; }
+    private static int count = 0;
 };
 
 class Bird : Animal
@@ -144,13 +146,10 @@ public int main()
     {
         squares[i] = (i + 1) * (i + 1);
     }
+    Assert(squares[0] == 1);
+    Assert(squares[4] == 25);
     int sum = SumArray(squares);
-    Assert(sum == 55); // 1 + 4 + 9 + 16 + 25
-
-    // pointers and heap allocation
-    Dog* ptr = new Dog;
-    Assert(ptr->Sound() == 1);
-    delete ptr;
+    Assert(sum == 55);
 
     // switch
     int result = 0;
@@ -173,6 +172,16 @@ public int main()
     alias Score = int;
     Score s = 100;
     Assert(s == 100);
+
+    // pointers and heap allocation
+    Dog* ptr = new Dog;
+    Assert(ptr->Sound() == 1);
+    delete ptr;
+    
+    // static fields and methods
+    Dog d1;
+    Dog d2;
+    Assert(Dog.GetCount() == 3);
 
     return 0;
 }
