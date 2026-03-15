@@ -53,6 +53,7 @@ TEST(LLVM_Classes, Polymorphism) { EXPECT_EQ(RUN_TEST(-i test_polymorphism), 0);
 TEST(LLVM_Classes, Constructors) { EXPECT_EQ(RUN_TEST(-i test_constructors), 0); }
 TEST(LLVM_Classes, Templates)    { EXPECT_EQ(RUN_TEST(-i test_templates),    0); }
 TEST(LLVM_Classes, ReadmeExample){ EXPECT_EQ(RUN_TEST(-i test_readme_example), 0); }
+TEST(LLVM_Classes, Static)		 { EXPECT_EQ(RUN_TEST(-i test_static), 0); }
 
 
 TEST(LLVM_Containers, Vector)       { EXPECT_EQ(RUN_TEST(-i test_vector),        0); }
