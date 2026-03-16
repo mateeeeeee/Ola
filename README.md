@@ -10,8 +10,9 @@ Optimizing C-like compiler with both LLVM backend and fully custom backend targe
 	- access modifiers: `public`, `private`
 	- static fields and methods: `static int count;`, `static int Get()`
 	- `interface`, `this` and `super` keywords
-  * functions 
+  * functions
     - overloading
+    - default parameter values: `int foo(int a, int b = 10)`
     - templates: `T Foo<T>(T x)`
     - attributes: `inline`, `noinline`, `nomangle` (equivalent to C++'s `extern "C"`), `noopt`, `deprecated`
   * operators:
