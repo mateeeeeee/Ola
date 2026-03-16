@@ -657,11 +657,16 @@ namespace ola
 		std::string_view name = "";
 		if (current_token->Is(TokenKind::identifier))
 		{
-			name = current_token->GetData(); 
+			name = current_token->GetData();
 			++current_token;
 		}
 
-		return sema->ActOnParamVariableDecl(name, loc, variable_type);
+		UniqueExprPtr default_expr = nullptr;
+		if (Consume(TokenKind::equal))
+		{
+			default_expr = ParseAssignmentExpression();
+		}
+		return sema->ActOnParamVariableDecl(name, loc, variable_type, std::move(default_expr));
 	}
 
 	UniqueVarDeclPtrList Parser::ParseVariableDeclaration(DeclVisibility visibility)

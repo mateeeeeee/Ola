@@ -13,7 +13,7 @@ namespace ola
 		return ActOnVariableDeclCommon<VarDecl>(name, loc, type, std::move(init_expr), visibility);
 	}
 
-	UniqueParamVarDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type)
+	UniqueParamVarDeclPtr Sema::ActOnParamVariableDecl(std::string_view name, SourceLocation const& loc, QualType const& type, UniqueExprPtr&& default_expr)
 	{
 		if (!name.empty() && sema_ctx.decl_sym_table.LookupCurrentScope(name))
 		{
@@ -59,6 +59,26 @@ namespace ola
 		param_decl->SetGlobal(false);
 		param_decl->SetVisibility(DeclVisibility::None);
 		param_decl->SetType(type);
+
+		if (default_expr)
+		{
+			if (!default_expr->IsConstexpr())
+			{
+				diagnostics.Report(loc, default_param_not_constexpr);
+				return nullptr;
+			}
+			if (!type->IsAssignableFrom(default_expr->GetType()))
+			{
+				diagnostics.Report(loc, incompatible_initializer);
+				return nullptr;
+			}
+			if (type.GetTypePtr() != default_expr->GetType().GetTypePtr())
+			{
+				default_expr = ActOnImplicitCastExpr(loc, type, std::move(default_expr));
+			}
+			param_decl->SetInitExpr(std::move(default_expr));
+		}
+
 		if (!name.empty())
 		{
 			sema_ctx.decl_sym_table.Insert(param_decl.get());
@@ -100,6 +120,7 @@ namespace ola
 		function_decl->SetType(type);
 		function_decl->SetVisibility(visibility);
 		function_decl->SetParamDecls(std::move(param_decls));
+		ValidateDefaultParams(function_decl->GetParamDecls(), loc);
 		
 		Bool result = sema_ctx.decl_sym_table.InsertOverload(function_decl.get());
 		OLA_ASSERT(result);
@@ -214,6 +235,7 @@ namespace ola
 		member_function_decl->SetFuncAttributes(func_attrs);
 		member_function_decl->SetMethodAttributes(method_attrs);
 		member_function_decl->SetParamDecls(std::move(param_decls));
+		ValidateDefaultParams(member_function_decl->GetParamDecls(), loc);
 		if (body_stmt)
 		{
 			member_function_decl->SetBodyStmt(std::move(body_stmt));
@@ -260,6 +282,7 @@ namespace ola
 		constructor_decl->SetType(type);
 		constructor_decl->SetVisibility(DeclVisibility::Public);
 		constructor_decl->SetParamDecls(std::move(param_decls));
+		ValidateDefaultParams(constructor_decl->GetParamDecls(), loc);
 		if (body_stmt)
 		{
 			constructor_decl->SetBodyStmt(std::move(body_stmt));
@@ -1018,11 +1041,21 @@ namespace ola
 			FuncType const* match_func_type = match_decl->GetFuncType();
 
 			std::span<QualType const> param_types = match_func_type->GetParams();
-			if (args.size() != param_types.size())
+			Uint64 default_count = 0;
+			for (auto const& p : match_decl->GetParamDecls())
+			{
+				if (p->GetInitExpr()) 
+				{
+					++default_count;
+				}
+			}
+			Uint64 required_count = param_types.size() - default_count;
+			if (args.size() > param_types.size() || args.size() < required_count)
 			{
 				diagnostics.Report(loc, matching_function_not_found);
 				return nullptr;
 			}
+			FillDefaultArgs(match_decl, args, loc);
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
@@ -1071,6 +1104,7 @@ namespace ola
 			FunctionDecl const* match_decl = match_decls[0];
 			FuncType const* match_func_type = match_decl->GetFuncType();
 
+			FillDefaultArgs(match_decl, args, loc);
 			std::span<QualType const> param_types = match_func_type->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
@@ -1180,6 +1214,7 @@ namespace ola
 				diagnostics.Report(loc, calling_deprecated_function, match_decl->GetName());
 			}
 
+			FillDefaultArgs(match_decl, args, loc);
 			std::span<QualType const> param_types = match_func_type->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
@@ -1240,6 +1275,7 @@ namespace ola
 				diagnostics.Report(loc, calling_deprecated_function, match_decl->GetName());
 			}
 
+			FillDefaultArgs(match_decl, args, loc);
 			std::span<QualType const> param_types = match_func_type->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
@@ -1704,6 +1740,7 @@ namespace ola
 			return nullptr;
 		}
 
+		FillDefaultArgs(match_decl, args, loc);
 		std::span<QualType const> param_types = match_decl_type->GetParams();
 		for (Uint64 i = 0; i < param_types.size(); ++i)
 		{
@@ -1796,6 +1833,7 @@ namespace ola
 		}
 
 		ConstructorDecl const* match_ctor = match_ctors[0];
+		FillDefaultArgs(match_ctor, args, loc);
 		std::span<QualType const> param_types = match_ctor->GetFuncType()->GetParams();
 		for (Uint64 i = 0; i < param_types.size(); ++i)
 		{
@@ -1861,6 +1899,7 @@ namespace ola
 				return nullptr;
 			}
 			matched_ctor = match_ctors[0];
+			FillDefaultArgs(matched_ctor, ctor_args, loc);
 			std::span<QualType const> param_types = matched_ctor->GetFuncType()->GetParams();
 			for (Uint64 i = 0; i < param_types.size(); ++i)
 			{
@@ -2143,13 +2182,21 @@ namespace ola
 		{
 			FuncType const* func_type = decl->GetFuncType();
 			std::span<QualType const> param_types = func_type->GetParams();
-			if (args.size() != param_types.size())
+
+			Uint64 default_count = 0;
+			for (auto const& p : decl->GetParamDecls())
+			{
+				if (p->GetInitExpr()) ++default_count;
+			}
+			Uint64 required_count = param_types.size() - default_count;
+
+			if (args.size() > param_types.size() || args.size() < required_count)
 			{
 				continue;
 			}
 
 			Bool incompatible_arg = false;
-			for (Uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < args.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -2175,7 +2222,7 @@ namespace ola
 			}
 
 			Uint32 current_conversions_needed = 0;
-			for (Uint64 i = 0; i < param_types.size(); ++i)
+			for (Uint64 i = 0; i < args.size(); ++i)
 			{
 				UniqueExprPtr& arg = args[i];
 				QualType const& func_param_type = param_types[i];
@@ -2184,6 +2231,9 @@ namespace ola
 					++current_conversions_needed;
 				}
 			}
+			//penalize defaulted args slightly since we want to prefer exact matches
+			current_conversions_needed += static_cast<Uint32>(param_types.size() - args.size());
+
 			if (match_conversions_needed == current_conversions_needed)
 			{
 				match_decls.push_back(decl);
@@ -2196,6 +2246,95 @@ namespace ola
 			}
 		}
 		return match_decls;
+	}
+
+	void Sema::ValidateDefaultParams(UniqueParamVarDeclPtrList const& param_decls, SourceLocation const& loc)
+	{
+		Bool seen_default = false;
+		for (auto const& param : param_decls)
+		{
+			if (param->GetInitExpr())
+			{
+				seen_default = true;
+			}
+			else if (seen_default)
+			{
+				diagnostics.Report(loc, default_param_not_trailing);
+				return;
+			}
+		}
+	}
+
+	UniqueExprPtr Sema::CloneConstExpr(Expr const* expr)
+	{
+		if (!expr) 
+		{
+			return nullptr;
+		}
+
+		SourceLocation const& loc = expr->GetLocation();
+		if (isa<ImplicitCastExpr>(expr))
+		{
+			ImplicitCastExpr const* cast_expr = cast<ImplicitCastExpr>(expr);
+			UniqueExprPtr cloned_operand = CloneConstExpr(cast_expr->GetOperand());
+			if (!cloned_operand) 
+			{
+				return nullptr;
+			}
+			UniqueImplicitCastExprPtr clone = MakeUnique<ImplicitCastExpr>(loc, cast_expr->GetType());
+			clone->SetOperand(std::move(cloned_operand));
+			return clone;
+		}
+		if (isa<IntLiteral>(expr))
+		{
+			UniqueIntLiteralPtr clone = MakeUnique<IntLiteral>(cast<IntLiteral>(expr)->GetValue(), loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		if (isa<FloatLiteral>(expr))
+		{
+			UniqueFloatLiteralPtr clone = MakeUnique<FloatLiteral>(cast<FloatLiteral>(expr)->GetValue(), loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		if (isa<BoolLiteral>(expr))
+		{
+			UniqueBoolLiteralPtr clone = MakeUnique<BoolLiteral>(cast<BoolLiteral>(expr)->GetValue(), loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		if (isa<CharLiteral>(expr))
+		{
+			UniqueCharLiteralPtr clone = MakeUnique<CharLiteral>(cast<CharLiteral>(expr)->GetChar(), loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		if (isa<StringLiteral>(expr))
+		{
+			UniqueStringLiteralPtr clone = MakeUnique<StringLiteral>(cast<StringLiteral>(expr)->GetString(), loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		if (isa<NullLiteral>(expr))
+		{
+			UniqueNullLiteralPtr clone = MakeUnique<NullLiteral>(loc);
+			clone->SetType(expr->GetType());
+			return clone;
+		}
+		OLA_ASSERT_MSG(false, "CloneConstExpr: unsupported expression kind");
+		return nullptr;
+	}
+
+	void Sema::FillDefaultArgs(FunctionDecl const* decl, UniqueExprPtrList& args, SourceLocation const& loc)
+	{
+		UniqueParamVarDeclPtrList const& params = decl->GetParamDecls();
+		for (Uint64 i = args.size(); i < params.size(); ++i)
+		{
+			Expr const* default_expr = params[i]->GetInitExpr();
+			OLA_ASSERT(default_expr);
+			UniqueExprPtr cloned = CloneConstExpr(default_expr);
+			args.push_back(std::move(cloned));
+		}
 	}
 }
 
