@@ -1660,3 +1660,78 @@ TEST(Sema, DefaultParamNotConstexpr_Error)
 		"int foo(int a, int b = g()) { return a + b; }"
 	);
 }
+
+TEST(Sema, DefaultParamCallTooManyArgs_Error)
+{
+	EXPECT_SEMA_ERROR(
+		"int foo(int a, int b = 10) { return a + b; }"
+		"void bar() { foo(1, 2, 3); }"
+	);
+}
+
+TEST(Sema, DefaultParamFloat_Ok)
+{
+	EXPECT_SEMA_OK(
+		"float foo(float a, float b = 1.5) { return a + b; }"
+		"void bar() { foo(2.5); }"
+	);
+}
+
+TEST(Sema, DefaultParamBool_Ok)
+{
+	EXPECT_SEMA_OK(
+		"bool foo(bool a, bool b = true) { if(a && b) return true; return false; }"
+		"void bar() { foo(true); }"
+	);
+}
+
+TEST(Sema, DefaultParamChar_Ok)
+{
+	EXPECT_SEMA_OK(
+		"char foo(char c = 'x') { return c; }"
+		"void bar() { foo(); }"
+	);
+}
+
+TEST(Sema, DefaultParamImplicitCast_Ok)
+{
+	EXPECT_SEMA_OK(
+		"float foo(float a, float b = 0) { return a + b; }"
+		"void bar() { foo(1.5); }"
+	);
+}
+
+TEST(Sema, DefaultParamOverloadDisambiguate_Ok)
+{
+	EXPECT_SEMA_OK(
+		"int foo(int a) { return a; }"
+		"int foo(int a, int b) { return a + b; }"
+		"void bar() { foo(1); foo(1, 2); }"
+	);
+}
+
+TEST(Sema, DefaultParamConstructorMultiple_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class Vec {"
+		"  Vec(int x = 0, int y = 0) { this.x = x; this.y = y; }"
+		"  public int x; public int y;"
+		"};"
+		"void foo() { Vec v1; Vec v2(5); Vec v3(5, 10); }"
+	);
+}
+
+TEST(Sema, DefaultParamNotTrailingMultiple_Error)
+{
+	EXPECT_SEMA_ERROR("int foo(int a = 1, int b, int c = 3) { return a + b + c; }");
+}
+
+TEST(Sema, DefaultParamMethodCallWithDefaults_Ok)
+{
+	EXPECT_SEMA_OK(
+		"class C {"
+		"  public int Sum(int a, int b = 0, int c = 0) { return a + b + c; }"
+		"};"
+		"void foo() { C c; c.Sum(1); c.Sum(1, 2); c.Sum(1, 2, 3); }"
+	);
+}
