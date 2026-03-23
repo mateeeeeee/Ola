@@ -18,6 +18,8 @@ set(SOURCE_INTERPRETER
   TestE2EInterpreter.cpp
 )
 
+option(OLA_VERIFY_IR "Run IR verifier in E2E tests" OFF)
+
 set(OLA_TESTS
 	Tests/test_additive.ola
 	Tests/test_alias.ola
@@ -126,11 +128,15 @@ target_compile_definitions(OlaTests PRIVATE
 target_compile_definitions(OlaTestsE2E PRIVATE
     OLA_EXE_PATH="${OLA_EXE_PATH}"
     OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+    OLA_LLVM_BACKEND=0
+    $<$<BOOL:${OLA_VERIFY_IR}>:OLA_VERIFY_IR=1>
 )
 
 target_compile_definitions(OlaTestsInterpreter PRIVATE
     OLA_EXE_PATH="${OLA_EXE_PATH}"
     OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+    OLA_LLVM_BACKEND=0
+    $<$<BOOL:${OLA_VERIFY_IR}>:OLA_VERIFY_IR=1>
 )
 
 if(LLVM_FOUND)
@@ -151,5 +157,7 @@ if(LLVM_FOUND)
     target_compile_definitions(OlaTestsLLVM PRIVATE
         OLA_EXE_PATH="${OLA_EXE_PATH}"
         OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+        OLA_LLVM_BACKEND=1
+        $<$<BOOL:${OLA_VERIFY_IR}>:OLA_VERIFY_IR=1>
     )
 endif()

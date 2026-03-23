@@ -10,7 +10,19 @@
 #endif
 
 // OLA_EXE_PATH is now provided by CMake at configure time via target_compile_definitions
-#define OLA_VERIFY_IR 0
+// OLA_LLVM_BACKEND and OLA_VERIFY_IR can be set via CMake options or defined before including this header
+
+#ifdef DEBUG
+	#define OLA_OPT_FLAG --O0
+#else
+	#define OLA_OPT_FLAG --O3
+#endif
+
+#if OLA_LLVM_BACKEND
+	#define OLA_BACKEND_FLAG --llvm
+#else
+	#define OLA_BACKEND_FLAG
+#endif
 
 #if OLA_VERIFY_IR
 	#define OLA_VERIFY_FLAG --verify-ir
@@ -18,31 +30,9 @@
 	#define OLA_VERIFY_FLAG
 #endif
 
-#if LLVM_BACKEND
-
-#ifdef DEBUG
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --llvm OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --llvm --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --interpret --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#else
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --llvm OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --llvm --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --interpret --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#endif
-
-#else
-
-#ifdef DEBUG
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O0 --interpret --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#else
-#define OLA(...)					std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#define OLA_TEST_INTERPRET(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH --O3 --interpret --timeout --test OLA_VERIFY_FLAG __VA_ARGS__))
-#endif
-
-#endif
+#define OLA(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_BACKEND_FLAG OLA_VERIFY_FLAG __VA_ARGS__))
+#define OLA_TEST(...)			std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_BACKEND_FLAG OLA_VERIFY_FLAG --timeout --test __VA_ARGS__))
+#define OLA_TEST_INTERPRET(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_VERIFY_FLAG --interpret --timeout --test __VA_ARGS__))
 
 #if defined(OLA_PLATFORM_WINDOWS)
 	#if DEBUG
