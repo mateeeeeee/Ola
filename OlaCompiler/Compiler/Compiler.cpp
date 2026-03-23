@@ -18,6 +18,7 @@
 #include "Backend/Custom/Codegen/Targets/X86/SysV/SysV_X86Target.h"
 #include "Backend/Custom/Codegen/Targets/ARM/ARMTarget.h"
 #include "Backend/Custom/Interpreter/IRInterpreter.h"
+#include "Backend/Custom/IR/IRVerifier.h"
 #include "Utility/DebugVisitor.h"
 #include "Utility/Command.h"
 #include "autogen/OlaConfig.h"
@@ -59,6 +60,7 @@ namespace ola
 			Bool dump_domtree;
 			Bool print_domfrontier;
 			Bool isel_legacy;
+			Bool verify_ir;
 		};
 
 		void CompileTranslationUnit(FrontendContext& context,
@@ -129,6 +131,19 @@ namespace ola
 				ir_gen_ctx.Generate(ast);
 				IRModule& ir_module = ir_gen_ctx.GetModule();
 
+				if (opts.verify_ir)
+				{
+					IRVerifier verifier;
+					if (!verifier.Verify(ir_module))
+					{
+						for (auto const& err : verifier.GetErrors())
+						{
+							OLA_ERROR("IR verify (pre-opt): {}", err.message);
+						}
+						return;
+					}
+				}
+
 				IRPassManager ir_pass_manager(ir_module);
 				IRPassOptions pass_opts
 				{
@@ -137,6 +152,19 @@ namespace ola
 					.domfrontier_print = opts.print_domfrontier
 				};
 				ir_pass_manager.Run(opts.opt_level, pass_opts);
+
+				if (opts.verify_ir)
+				{
+					IRVerifier verifier;
+					if (!verifier.Verify(ir_module))
+					{
+						for (auto const& err : verifier.GetErrors())
+						{
+							OLA_ERROR("IR verify (post-opt): {}", err.message);
+						}
+						return;
+					}
+				}
 
 				ir_module.Print(ir_file);
 
@@ -190,6 +218,7 @@ namespace ola
 		Bool const no_run = compile_request.GetCompilerFlags() & CompilerFlag_NoRun;
 		Bool const isel_legacy = compile_request.GetCompilerFlags() & CompilerFlag_ISelLegacy;
 		Bool const interpret = compile_request.GetCompilerFlags() & CompilerFlag_Interpret;
+		Bool const verify_ir = compile_request.GetCompilerFlags() & CompilerFlag_VerifyIR;
 		OptimizationLevel opt_level = compile_request.GetOptimizationLevel();
 
 		fs::path cur_path = fs::current_path();
@@ -229,6 +258,20 @@ namespace ola
 				ir_gen_ctx.Generate(ast);
 				IRModule& ir_module = ir_gen_ctx.GetModule();
 
+				if (verify_ir)
+				{
+					IRVerifier verifier;
+					if (!verifier.Verify(ir_module))
+					{
+						for (auto const& err : verifier.GetErrors())
+						{
+							OLA_ERROR("IR verify (pre-opt): {}", err.message);
+						}
+						fs::current_path(cur_path);
+						return -1;
+					}
+				}
+
 				IRPassManager ir_pass_manager(ir_module);
 				IRPassOptions pass_opts
 				{
@@ -237,6 +280,20 @@ namespace ola
 					.domfrontier_print = print_domfrontier
 				};
 				ir_pass_manager.Run(opt_level, pass_opts);
+
+				if (verify_ir)
+				{
+					IRVerifier verifier;
+					if (!verifier.Verify(ir_module))
+					{
+						for (auto const& err : verifier.GetErrors())
+						{
+							OLA_ERROR("IR verify (post-opt): {}", err.message);
+						}
+						fs::current_path(cur_path);
+						return -1;
+					}
+				}
 
 				if (emit_ir)
 				{
@@ -302,6 +359,7 @@ namespace ola
 				.dump_domtree = domtree_dump,
 				.print_domfrontier = print_domfrontier,
 				.isel_legacy = isel_legacy,
+				.verify_ir = verify_ir,
 			};
 			CompileTranslationUnit(context, source_file, ir_file, mir_file, assembly_file, tu_comp_opts);
 

@@ -194,6 +194,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/TailRecursionEliminationPass.cpp
   Backend/Custom/IR/CallGraph.h
   Backend/Custom/IR/CallGraph.cpp
+  Backend/Custom/IR/IRVerifier.h
+  Backend/Custom/IR/IRVerifier.cpp
   Backend/Custom/Codegen/MachineOperand.h
   Backend/Custom/Codegen/MachineOperand.cpp
   Backend/Custom/Codegen/MachineInstruction.h

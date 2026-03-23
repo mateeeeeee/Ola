@@ -126,6 +126,15 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Debug)"
         },
+        {
+            "name": "Tests: IR Verifier",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTests",
+            "args": ["--gtest_filter=IRVerifier.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
         // ----------------------------------------------------------------
         // OlaTestsE2E — custom backend E2E tests
         // ----------------------------------------------------------------

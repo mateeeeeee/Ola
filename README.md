@@ -223,7 +223,7 @@ The project consists of the following parts:
 
 5. **Ola Tests**:
    - A set of tests built with GoogleTest, organized into four targets:
-     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes, Machine IR, Register Allocation and Interpreter. ~700 tests, no system calls.
+     - **OlaTests**: Unit tests for the Lexer, Parser, Sema, IR, IR Passes, IR Verifier, Machine IR, Register Allocation and Interpreter. ~700 tests, no system calls.
      - **OlaTestsE2E**, **OlaTestsInterpreter**, **OlaTestsLLVM**: End-to-end tests that invoke **OlaDriver** via system calls, each targeting a different backend (custom, interpreter, and LLVM respectively). All three share the same test suite (~50 tests), differing only in the backend used. **OlaTestsLLVM** is only built when LLVM is detected. E2E tests rely on the `Assert` function from the `std.assert` import.
 
 ## Dependencies
@@ -280,6 +280,7 @@ cmake -B build -DBUILD_PLAYGROUND=OFF     # Disable playground
   * `--llvm`: Use LLVM backend instead of the default custom backend (ignored if LLVM is not available)
   * `--test`: Used for running g-tests
   * `--timeout`: Used for detecting infinite loops during tests
+  * `--verify-ir`: Run IR verifier after generation and after optimization passes
   * `--Od`: No optimizations
   * `--O0`: Same as `--Od`
   * `--O1`: Optimize

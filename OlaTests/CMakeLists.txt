@@ -5,6 +5,7 @@ set(SOURCE
   TestIR.cpp
   TestInterpreter.cpp
   TestIRPasses.cpp
+  TestIRVerifier.cpp
   TestMachineIR.cpp
   TestRegisterAlloc.cpp
 )
