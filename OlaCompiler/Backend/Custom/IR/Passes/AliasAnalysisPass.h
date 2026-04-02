@@ -17,12 +17,15 @@ namespace ola
 	};
 
 	inline constexpr Int64 UNKNOWN_MEMORY_OFFSET = INT64_MIN;
-	
+	inline constexpr Uint64 UNKNOWN_MEMORY_SIZE = UINT64_MAX;
+
 	struct MemoryLocation
 	{
 		Value* Ptr = nullptr;
-		Int64 Offset = UNKNOWN_MEMORY_OFFSET; 
+		Int64 Offset = UNKNOWN_MEMORY_OFFSET;
+		Uint64 Size = UNKNOWN_MEMORY_SIZE;
 		Bool HasKnownOffset() const { return Offset != UNKNOWN_MEMORY_OFFSET; }
+		Bool HasKnownSize() const { return Size != UNKNOWN_MEMORY_SIZE; }
 	};
 
 	class AliasAnalysis
@@ -51,6 +54,7 @@ namespace ola
 	private:
 		static Value* GetUnderlyingObject(Value* V);
 		static Bool IsIdentifiedObject(Value* V);
+		static Bool IsIdentifiedFunctionLocal(Value* V);
 		AliasResult AliasFromUnderlyingObjects(Value* O1, Value* O2) const;
 	};
 

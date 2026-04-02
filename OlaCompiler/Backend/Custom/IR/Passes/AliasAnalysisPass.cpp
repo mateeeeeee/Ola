@@ -1,6 +1,7 @@
 #include "AliasAnalysisPass.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Backend/Custom/IR/Constant.h"
 #include "Backend/Custom/IR/IRType.h"
 
 namespace ola
@@ -37,9 +38,22 @@ namespace ola
 			}
 			else if (GetElementPtrInst* GEP = dyn_cast<GetElementPtrInst>(Ptr))
 			{
-				// for GEP, we'd need to compute the offset from indices
-				// for now, treat as unknown offset but continue to base
-				Loc.Offset = UNKNOWN_MEMORY_OFFSET;
+				if (Loc.HasKnownOffset() && GEP->GetNumIndices() == 1)
+				{
+					if (ConstantInt* CI = dyn_cast<ConstantInt>(GEP->GetIndex(0)))
+					{
+						IRType* ElemType = GEP->GetSourceElementType();
+						Loc.Offset += CI->GetValue() * ElemType->GetSize();
+					}
+					else
+					{
+						Loc.Offset = UNKNOWN_MEMORY_OFFSET;
+					}
+				}
+				else
+				{
+					Loc.Offset = UNKNOWN_MEMORY_OFFSET;
+				}
 				Ptr = GEP->GetBaseOperand();
 				Loc.Ptr = Ptr;
 			}
@@ -89,17 +103,34 @@ namespace ola
 
 	Bool AliasAnalysis::IsIdentifiedObject(Value* V)
 	{
-		/*An "identified" object is one with a distinct identity that cannot alias with other identified objects:
-			- AllocaInst: local stack allocations
-			- GlobalVariable: global variables */
 		return isa<AllocaInst>(V) || isa<GlobalVariable>(V);
+	}
+
+	Bool AliasAnalysis::IsIdentifiedFunctionLocal(Value* V)
+	{
+		return isa<AllocaInst>(V);
 	}
 
 	AliasResult AliasAnalysis::AliasFromUnderlyingObjects(Value* O1, Value* O2) const
 	{
 		if (O1 == O2)
 		{
-			return AliasResult::MayAlias;  // Could be MustAlias if offsets match
+			return AliasResult::MayAlias;
+		}
+
+		Bool Null1 = isa<ConstantNullPtr>(O1);
+		Bool Null2 = isa<ConstantNullPtr>(O2);
+		if (Null1 && Null2)
+		{
+			return AliasResult::MustAlias;
+		}
+		if (Null1 || Null2)
+		{
+			Value* Other = Null1 ? O2 : O1;
+			if (IsIdentifiedObject(Other) || isa<Argument>(Other))
+			{
+				return AliasResult::NoAlias;
+			}
 		}
 
 		if (IsIdentifiedObject(O1) && IsIdentifiedObject(O2))
@@ -107,20 +138,15 @@ namespace ola
 			return AliasResult::NoAlias;
 		}
 
-		if (AllocaInst* AI1 = dyn_cast<AllocaInst>(O1))
+		if (IsIdentifiedFunctionLocal(O1) && isa<Argument>(O2))
 		{
-			if (isa<GlobalVariable>(O2))
-			{
-				return AliasResult::NoAlias;
-			}
+			return AliasResult::NoAlias;
 		}
-		if (AllocaInst* AI2 = dyn_cast<AllocaInst>(O2))
+		if (IsIdentifiedFunctionLocal(O2) && isa<Argument>(O1))
 		{
-			if (isa<GlobalVariable>(O1))
-			{
-				return AliasResult::NoAlias;
-			}
+			return AliasResult::NoAlias;
 		}
+
 		return AliasResult::MayAlias;
 	}
 
