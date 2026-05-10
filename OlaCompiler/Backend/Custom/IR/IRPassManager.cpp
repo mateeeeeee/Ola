@@ -25,6 +25,7 @@
 #include "Passes/SROAPass.h"
 #include "Passes/AliasAnalysisPass.h"
 #include "Passes/TailRecursionEliminationPass.h"
+#include "Passes/HeapToStackPromotionPass.h"
 
 namespace ola
 {
@@ -72,6 +73,7 @@ namespace ola
 	{
 		FunctionPassManager FPM;
 		FPM.AddPass(CreateFunctionInlinerPass());
+		FPM.AddPass(CreateHeapToStackPromotionPass());
 		FPM.AddPass(CreateSROAPass());
 		FPM.AddPass(CreateMem2RegPass());
 		FPM.AddPass(CreateDCEPass());

@@ -34,7 +34,7 @@ Optimizing compiler for a statically-typed C-like language, featuring both an LL
   * LLVM backend
   * Custom backend
     - Custom IR
-    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, CP and IPCP, LICM, Loop Unroll, DCE, Global DCE, SROA, Devirtualization, Tail Recursion Elimination
+    	- Optimization passes: Function Inlining, Simplify CFG, Mem2Reg, CSE, GVN, Arithmetic Reduction, CP and IPCP, LICM, Loop Unroll, DCE, Global DCE, SROA, Devirtualization, Tail Recursion Elimination, Heap-to-Stack Promotion
       - Analysis passes: CFG, Loop, Alias, Dominator Tree, Dominator Frontier, Call Graph
     - Custom MIR
 	  - Instruction Selection: Tree pattern matching ISel (with legacy fallback)

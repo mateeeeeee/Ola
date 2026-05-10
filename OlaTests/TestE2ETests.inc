@@ -30,6 +30,7 @@ OLA_E2E_TEST(Declarations, Array,  test_array)
 OLA_E2E_TEST(Declarations, Const,  test_const)
 OLA_E2E_TEST(Declarations, Auto,   test_auto)
 OLA_E2E_TEST(Declarations, New,    test_new)
+OLA_E2E_TEST(Declarations, Heap2Stack, test_heap2stack)
 
 OLA_E2E_TEST(Function, Calls,         test_functioncalls)
 OLA_E2E_TEST(Function, Overloading,   test_overloading)

@@ -248,8 +248,37 @@ namespace ola
 
 	void ISelTreeGen::ProcessCompareInst(CompareInst& I)
 	{
-		ISelNodePtr left = CreateNodeForValue(I.GetLHS());
-		ISelNodePtr right = CreateNodeForValue(I.GetRHS());
+		ISelNodePtr left;
+		if (dyn_cast<AllocaInst>(I.GetLHS()))
+		{
+			MachineOperand base_op = ctx.GetOperand(I.GetLHS());
+			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+			MachineInstruction load_addr(InstLoadGlobalAddress);
+			load_addr.SetOp<0>(reg->GetRegister());
+			load_addr.SetOp<1>(base_op);
+			pending_leaf_instructions.push_back(load_addr);
+			left = std::move(reg);
+		}
+		else
+		{
+			left = CreateNodeForValue(I.GetLHS());
+		}
+
+		ISelNodePtr right;
+		if (dyn_cast<AllocaInst>(I.GetRHS()))
+		{
+			MachineOperand base_op = ctx.GetOperand(I.GetRHS());
+			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
+			MachineInstruction load_addr(InstLoadGlobalAddress);
+			load_addr.SetOp<0>(reg->GetRegister());
+			load_addr.SetOp<1>(base_op);
+			pending_leaf_instructions.push_back(load_addr);
+			right = std::move(reg);
+		}
+		else
+		{
+			right = CreateNodeForValue(I.GetRHS());
+		}
 
 		std::vector<ISelNode*> leaves = { left.get(), right.get() };
 
@@ -405,7 +434,7 @@ namespace ola
 	{
 		Value* base_value = I.GetBaseOperand();
 		ISelNodePtr base;
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsAggregate())
+		if (dyn_cast<AllocaInst>(base_value))
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));
@@ -567,7 +596,7 @@ namespace ola
 		Value* base_value = I.GetBase();
 		ISelNodePtr base;
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base_value); AI && AI->GetAllocatedType()->IsAggregate())
+		if (dyn_cast<AllocaInst>(base_value))
 		{
 			MachineOperand base_op = ctx.GetOperand(base_value);
 			auto reg = std::make_unique<ISelRegisterNode>(ctx.VirtualReg(MachineType::Ptr));

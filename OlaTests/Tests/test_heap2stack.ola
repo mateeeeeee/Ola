@@ -1,0 +1,109 @@
+import std.assert;
+
+class Point
+{
+	Point(int _x, int _y)
+	{
+		this.x = _x;
+		this.y = _y;
+	}
+
+	public int Sum() const
+	{
+		return x + y;
+	}
+
+	public int x;
+	public int y;
+};
+
+void TestLocalNonEscaping()
+{
+	Point* p = new Point(3, 7);
+	int result = p->Sum();
+	Assert(result == 10);
+	delete p;
+}
+
+void TestFieldAccess()
+{
+	Point* p = new Point(10, 20);
+	int x = p->x;
+	int y = p->y;
+	Assert(x == 10);
+	Assert(y == 20);
+	delete p;
+}
+
+void TestMultipleLocal()
+{
+	Point* a = new Point(1, 2);
+	Point* b = new Point(3, 4);
+	int sum = a->Sum() + b->Sum();
+	Assert(sum == 10);
+	delete a;
+	delete b;
+}
+
+class Container
+{
+	Container(int v) { this.value = v; }
+	public int Get() const { return value; }
+	public int value;
+};
+
+int ExtractValue(Container* c)
+{
+	return c->Get();
+}
+
+void TestPassedToCallee()
+{
+	Container* c = new Container(42);
+	int v = ExtractValue(c);
+	Assert(v == 42);
+	delete c;
+}
+
+Container* MakeContainer(int v)
+{
+	Container* c = new Container(v);
+	return c;
+}
+
+void TestReturnedPointer()
+{
+	Container* c = MakeContainer(99);
+	Assert(c->Get() == 99);
+	delete c;
+}
+
+void TestNewInLoop()
+{
+	int total = 0;
+	for (int i = 0; i < 5; ++i)
+	{
+		Point* p = new Point(i, i);
+		total = total + p->Sum();
+		delete p;
+	}
+	Assert(total == 20);
+}
+
+void TestNewWithoutDelete()
+{
+	Point* p = new Point(5, 5);
+	Assert(p->Sum() == 10);
+}
+
+public int main()
+{
+	TestLocalNonEscaping();
+	TestFieldAccess();
+	TestMultipleLocal();
+	TestPassedToCallee();
+	TestReturnedPointer();
+	TestNewInLoop();
+	TestNewWithoutDelete();
+	return 0;
+}

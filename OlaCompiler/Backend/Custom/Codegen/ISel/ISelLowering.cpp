@@ -131,11 +131,36 @@ namespace ola
 
 	void ISelLowering::LowerCompare(CompareInst* CI)
 	{
+		MachineOperand lhs_op;
+		if (dyn_cast<AllocaInst>(CI->GetLHS()))
+		{
+			lhs_op = ctx.VirtualReg(MachineType::Ptr);
+			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+				.SetOp<0>(lhs_op)
+				.SetOp<1>(ctx.GetOperand(CI->GetLHS())));
+		}
+		else
+		{
+			lhs_op = ctx.GetOperand(CI->GetLHS());
+		}
+
+		MachineOperand rhs_op;
+		if (dyn_cast<AllocaInst>(CI->GetRHS()))
+		{
+			rhs_op = ctx.VirtualReg(MachineType::Ptr);
+			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
+				.SetOp<0>(rhs_op)
+				.SetOp<1>(ctx.GetOperand(CI->GetRHS())));
+		}
+		else
+		{
+			rhs_op = ctx.GetOperand(CI->GetRHS());
+		}
+
 		MachineOperand ret = ctx.VirtualReg(CI->GetType());
 		MachineInstruction MI(GetMachineOpcode(CI->GetOpcode()));
-
-		MI.SetOp<0>(ret).SetOp<1>(ctx.GetOperand(CI->GetLHS()))
-			.SetOp<2>(ctx.GetOperand(CI->GetRHS()))
+		MI.SetOp<0>(ret).SetOp<1>(lhs_op)
+			.SetOp<2>(rhs_op)
 			.SetOp<3>(MachineOperand::Immediate((Uint32)CI->GetCompareOp(), MachineType::Other));
 		ctx.EmitInst(MI);
 
@@ -300,7 +325,7 @@ namespace ola
 		MachineOperand result = ctx.VirtualReg(GEPI->GetType());
 		IRType* current_type = GEPI->GetType();
 
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsAggregate())
+		if (dyn_cast<AllocaInst>(base))
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(result)
@@ -402,7 +427,7 @@ namespace ola
 
 		MachineOperand base_op = ctx.GetOperand(base);
 		MachineOperand base_register = ctx.VirtualReg(PAI->GetType());
-		if (AllocaInst* AI = dyn_cast<AllocaInst>(base); AI && AI->GetAllocatedType()->IsAggregate())
+		if (dyn_cast<AllocaInst>(base))
 		{
 			ctx.EmitInst(MachineInstruction(InstLoadGlobalAddress)
 				.SetOp<0>(base_register)

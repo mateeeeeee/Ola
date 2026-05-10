@@ -32,6 +32,7 @@
 #include "Backend/Custom/IR/Passes/IPConstantPropagationPass.h"
 #include "Backend/Custom/IR/Passes/LoopUnrollPass.h"
 #include "Backend/Custom/IR/Passes/GlobalAttributeInferPass.h"
+#include "Backend/Custom/IR/Passes/HeapToStackPromotionPass.h"
 #include "Utility/RTTI.h"
 
 using namespace ola;
@@ -2300,4 +2301,361 @@ TEST(FunctionInliner, DoesNotInlineRecursiveFunction)
 
 	// The function should still have a call instruction (recursive can't be fully inlined)
 	EXPECT_GE(CountByType<CallInst>(caller), 1u);
+}
+
+static Value* EmitHeapAlloc(IRBuilder& builder, IRContext& ctx, IRModule& module, IRStructType* st)
+{
+	IRPtrType* ptr_void = ctx.GetPointerType(ctx.GetVoidType());
+	IRFuncType* alloc_ft = ctx.GetFunctionType(ptr_void, { ctx.GetIntegerType(64) });
+	Function* alloc_fn = module.GetFunctionByName("__ola_new");
+	if (!alloc_fn)
+	{
+		alloc_fn = new Function("__ola_new", alloc_ft, Linkage::External);
+		module.AddGlobal(alloc_fn);
+	}
+	std::vector<Value*> args = { ctx.GetInt64((Int64)st->GetSize()) };
+	return builder.MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(args));
+}
+
+static Value* EmitHeapFree(IRBuilder& builder, IRContext& ctx, IRModule& module, Value* ptr)
+{
+	IRPtrType* ptr_void = ctx.GetPointerType(ctx.GetVoidType());
+	IRFuncType* free_ft = ctx.GetFunctionType(ctx.GetVoidType(), { ptr_void });
+	Function* free_fn = module.GetFunctionByName("__ola_delete");
+	if (!free_fn)
+	{
+		free_fn = new Function("__ola_delete", free_ft, Linkage::External);
+		module.AddGlobal(free_fn);
+	}
+	Value* void_ptr = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_void, ptr);
+	std::vector<Value*> args = { void_ptr };
+	return builder.MakeInst<CallInst>(static_cast<Value*>(free_fn), std::span<Value*>(args));
+}
+
+TEST(HeapToStack, PromotesNonEscapingAllocation)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Point", { ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	Value* field = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(42), field);
+	Value* loaded = builder.MakeInst<LoadInst>(field);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	EXPECT_EQ(CountByType<CallInst>(fn), 2u);
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 1u);
+
+	Uint32 call_count = 0;
+	for (auto const& bb : *fn)
+		for (auto const& inst : bb)
+			if (CallInst const* ci = dyn_cast<CallInst>(&inst))
+			{
+				Function* callee = ci->GetCalleeAsFunction();
+				if (callee && (callee->GetName() == "__ola_new" || callee->GetName() == "__ola_delete"))
+					++call_count;
+			}
+	EXPECT_EQ(call_count, 0u);
+}
+
+TEST(HeapToStack, DoesNotPromoteEscapingPointer_Return)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("S", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ptr_st, {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	builder.MakeInst<ReturnInst>(typed);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
+	EXPECT_EQ(CountByType<CallInst>(fn), 1u);
+}
+
+TEST(HeapToStack, DoesNotPromoteEscapingPointer_CallArg)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("T", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* ext_fn = MakeFunc(module, ctx, "external_use", ctx.GetVoidType(), { ptr_st }, Linkage::External);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	std::vector<Value*> call_args = { typed };
+	builder.MakeInst<CallInst>(ext_fn, std::span<Value*>(call_args));
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
+}
+
+TEST(HeapToStack, PromotesSingleFieldStruct)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Wrapper", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	Value* field = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(99), field);
+	Value* loaded = builder.MakeInst<LoadInst>(field);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 1u);
+	Uint32 heap_calls = 0;
+	for (auto const& bb : *fn)
+		for (auto const& inst : bb)
+			if (CallInst const* ci = dyn_cast<CallInst>(&inst))
+			{
+				Function* callee = ci->GetCalleeAsFunction();
+				if (callee && (callee->GetName() == "__ola_new" || callee->GetName() == "__ola_delete"))
+					++heap_calls;
+			}
+	EXPECT_EQ(heap_calls, 0u);
+}
+
+TEST(HeapToStack, PromotesWithPtrAddAccess)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Pair", { ctx.GetIntegerType(64), ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	Value* f0 = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	Value* f1 = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(8), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(10), f0);
+	builder.MakeInst<StoreInst>(ctx.GetInt64(20), f1);
+	Value* v0 = builder.MakeInst<LoadInst>(f0);
+	Value* v1 = builder.MakeInst<LoadInst>(f1);
+	Value* sum = builder.MakeInst<BinaryInst>(Opcode::Add, v0, v1);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(sum);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 1u);
+}
+
+TEST(HeapToStack, PromotesMultipleIndependentAllocations)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Node", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* raw1 = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed1 = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw1);
+	Value* raw2 = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed2 = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw2);
+
+	Value* f1 = builder.MakeInst<PtrAddInst>(typed1, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(10), f1);
+	Value* f2 = builder.MakeInst<PtrAddInst>(typed2, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(20), f2);
+
+	Value* v1 = builder.MakeInst<LoadInst>(f1);
+	Value* v2 = builder.MakeInst<LoadInst>(f2);
+	Value* sum = builder.MakeInst<BinaryInst>(Opcode::Add, v1, v2);
+
+	EmitHeapFree(builder, ctx, module, typed1);
+	EmitHeapFree(builder, ctx, module, typed2);
+	builder.MakeInst<ReturnInst>(sum);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 2u);
+}
+
+TEST(HeapToStack, PromotesWithPointerStoredToLocal)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Item", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* local_ptr = builder.MakeInst<AllocaInst>(ptr_st);
+	Value* raw = EmitHeapAlloc(builder, ctx, module, st);
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	builder.MakeInst<StoreInst>(typed, local_ptr);
+	Value* reloaded = builder.MakeInst<LoadInst>(local_ptr);
+	Value* field = builder.MakeInst<PtrAddInst>(reloaded, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(77), field);
+	Value* loaded = builder.MakeInst<LoadInst>(field);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(loaded);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_GE(CountByType<AllocaInst>(fn), 2u);
+}
+
+TEST(HeapToStack, DoesNotPromoteOversizedAllocation)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("Small", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	IRPtrType* ptr_void = ctx.GetPointerType(ctx.GetVoidType());
+	IRFuncType* alloc_ft = ctx.GetFunctionType(ptr_void, { ctx.GetIntegerType(64) });
+	Function* alloc_fn = module.GetFunctionByName("__ola_new");
+	if (!alloc_fn)
+	{
+		alloc_fn = new Function("__ola_new", alloc_ft, Linkage::External);
+		module.AddGlobal(alloc_fn);
+	}
+	std::vector<Value*> args = { ctx.GetInt64(64) };
+	Value* raw = builder.MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(args));
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	Value* field = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(1), field);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
+}
+
+TEST(HeapToStack, DoesNotPromoteVariableSize)
+{
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRStructType* st = ctx.GetStructType("V", { ctx.GetIntegerType(64) });
+	IRPtrType* ptr_st = ctx.GetPointerType(st);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	IRPtrType* ptr_void = ctx.GetPointerType(ctx.GetVoidType());
+	IRFuncType* alloc_ft = ctx.GetFunctionType(ptr_void, { ctx.GetIntegerType(64) });
+	Function* alloc_fn = module.GetFunctionByName("__ola_new");
+	if (!alloc_fn)
+	{
+		alloc_fn = new Function("__ola_new", alloc_ft, Linkage::External);
+		module.AddGlobal(alloc_fn);
+	}
+	Value* dyn_size = builder.MakeInst<BinaryInst>(Opcode::SMul, fn->GetArg(0), ctx.GetInt64(8));
+	std::vector<Value*> args = { dyn_size };
+	Value* raw = builder.MakeInst<CallInst>(static_cast<Value*>(alloc_fn), std::span<Value*>(args));
+	Value* typed = builder.MakeInst<CastInst>(Opcode::Bitcast, ptr_st, raw);
+	Value* field = builder.MakeInst<PtrAddInst>(typed, ctx.GetInt64(0), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(1), field);
+	EmitHeapFree(builder, ctx, module, typed);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<HeapToStackPromotionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByType<AllocaInst>(fn), 0u);
 }

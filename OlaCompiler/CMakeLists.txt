@@ -192,6 +192,8 @@ set(BACKEND_FILES
   Backend/Custom/IR/Passes/AliasAnalysisPass.cpp
   Backend/Custom/IR/Passes/TailRecursionEliminationPass.h
   Backend/Custom/IR/Passes/TailRecursionEliminationPass.cpp
+  Backend/Custom/IR/Passes/HeapToStackPromotionPass.h
+  Backend/Custom/IR/Passes/HeapToStackPromotionPass.cpp
   Backend/Custom/IR/CallGraph.h
   Backend/Custom/IR/CallGraph.cpp
   Backend/Custom/IR/IRVerifier.h
