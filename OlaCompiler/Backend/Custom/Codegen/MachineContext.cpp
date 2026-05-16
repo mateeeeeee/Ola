@@ -82,6 +82,10 @@ namespace ola
 		case Opcode::ICmpSGT:
 		case Opcode::ICmpSLE:
 		case Opcode::ICmpSLT:
+		case Opcode::ICmpUGE:
+		case Opcode::ICmpUGT:
+		case Opcode::ICmpULE:
+		case Opcode::ICmpULT:
 			return InstICmp;
 		case Opcode::FCmpOEQ:
 		case Opcode::FCmpONE:

@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "ISelLowering.h"
 #include "Backend/Custom/IR/IRType.h"
 #include "Backend/Custom/IR/Instruction.h"
@@ -54,6 +55,10 @@ namespace ola
 		case Opcode::ICmpSGT:
 		case Opcode::ICmpSLE:
 		case Opcode::ICmpSLT:
+		case Opcode::ICmpUGE:
+		case Opcode::ICmpUGT:
+		case Opcode::ICmpULE:
+		case Opcode::ICmpULT:
 		case Opcode::FCmpOEQ:
 		case Opcode::FCmpONE:
 		case Opcode::FCmpOGE:
@@ -117,6 +122,7 @@ namespace ola
 		}
 		default:
 			OLA_ASSERT_MSG(false, "Not implemented yet");
+			std::abort();
 		}
 	}
 
@@ -458,33 +464,44 @@ namespace ola
 
 	void ISelLowering::LowerSwitch(SwitchInst* SI)
 	{
-		if (!SI || SI->GetNumCases() == 0) return;
+		if (!SI)
+		{
+			 return;
+		}
+		
 		BasicBlock* src_block = SI->GetBasicBlock();
 		Value* cond_value = SI->GetCondition();
 		MachineOperand cond_op = ctx.GetOperand(cond_value);
+
+		if (cond_op.IsImmediate())
+		{
+			Int64 imm = cond_op.GetImmediate();
+			for (auto& case_pair : SI->Cases())
+			{
+				if (imm == case_pair.GetCaseValue())
+				{
+					EmitJump(InstJump, case_pair.GetCaseBlock(), src_block);
+					return;
+				}
+			}
+			if (BasicBlock* default_block = SI->GetDefaultCase())
+			{
+				EmitJump(InstJump, default_block, src_block);
+			}
+			return;
+		}
 
 		for (auto& case_pair : SI->Cases())
 		{
 			Int64 case_value = case_pair.GetCaseValue();
 			BasicBlock* case_block = case_pair.GetCaseBlock();
 
-			if (!cond_op.IsImmediate())
-			{
-				MachineInstruction testMI(InstICmp);
-				testMI.SetOp<0>(cond_op);
-				testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineType::Int64));
-				ctx.EmitInst(testMI);
+			MachineInstruction testMI(InstICmp);
+			testMI.SetOp<0>(cond_op);
+			testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineType::Int64));
+			ctx.EmitInst(testMI);
 
-				EmitJump(InstJE, case_block, src_block);
-			}
-			else
-			{
-				Int64 imm = cond_op.GetImmediate();
-				if (imm == case_value)
-				{
-					EmitJump(InstJump, case_block, src_block);
-				}
-			}
+			EmitJump(InstJE, case_block, src_block);
 		}
 		if (BasicBlock* default_block = SI->GetDefaultCase())
 		{

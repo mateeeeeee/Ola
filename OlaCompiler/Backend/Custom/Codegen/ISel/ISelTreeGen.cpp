@@ -24,29 +24,12 @@ namespace ola
 	{
 		forest = ISelForest();
 		value_map.Clear();
-		use_count.Clear();
 
-		CountUses(BB);
 		for (Instruction& I : BB)
 		{
 			ProcessInstruction(I);
 		}
 		return std::move(forest);
-	}
-
-	void ISelTreeGen::CountUses(BasicBlock& BB)
-	{
-		for (Instruction& I : BB)
-		{
-			for (Uint32 i = 0; i < I.GetNumOperands(); ++i)
-			{
-				Value* operand = I.GetOperand(i);
-				if (auto* node = value_map.GetNode(operand))
-				{
-					use_count.IncrementUse(node);
-				}
-			}
-		}
 	}
 
 	MachineType ISelTreeGen::GetMachineTypeForValue(Value* V) const
@@ -301,11 +284,7 @@ namespace ola
 	{
 		if (I.GetOpcode() == Opcode::Bitcast && I.GetSrcType()->IsPointer() && I.GetDestType()->IsPointer())
 		{
-			ISelNodePtr src = CreateNodeForValue(I.GetSrc());
-			if (auto* reg = dyn_cast<ISelRegisterNode>(src.get()))
-			{
-				ctx.MapOperand(&I, reg->GetRegister());
-			}
+			ctx.MapOperand(&I, ctx.GetOperand(I.GetSrc()));
 			return;
 		}
 
@@ -391,7 +370,6 @@ namespace ola
 
 	void ISelTreeGen::ProcessSwitchInst(SwitchInst& I)
 	{
-		if (I.GetNumCases() == 0) return;
 		auto captured = CaptureEmittedInstructions([&]() { lowering.LowerSwitch(&I); });
 		AddAsmNode(std::move(captured));
 	}

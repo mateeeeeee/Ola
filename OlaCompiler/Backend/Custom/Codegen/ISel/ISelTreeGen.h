@@ -32,14 +32,12 @@ namespace ola
 
 		ISelForest GenerateTrees(BasicBlock& BB);
 		ISelValueMap const& GetValueMap() const { return value_map; }
-		ISelUseCount const& GetUseCount() const { return use_count; }
 
 	private:
 		MachineContext& ctx;
 		ISelLowering& lowering;
 		ISelForest forest;
 		ISelValueMap value_map;
-		ISelUseCount use_count;
 		std::vector<MachineInstruction> pending_leaf_instructions;
 
 	private:
@@ -65,7 +63,6 @@ namespace ola
 
 		void AddTree(ISelNodePtr tree, std::vector<ISelNode*> const& leaves, Bool has_memory);
 		void AddAsmNode(std::vector<MachineInstruction> instructions);
-		void CountUses(BasicBlock& BB);
 		MachineType GetMachineTypeForValue(Value* V) const;
 
 		template<typename Func>

@@ -61,14 +61,6 @@ namespace ola
 
 	void IRVerifier::VerifyTerminator(Function const& function, BasicBlock const& block)
 	{
-		Instruction const* term = block.GetTerminator();
-		if (!term)
-		{
-			Error(std::format("function '{}': block {} has no terminator",
-				function.GetName(), block.GetIndex()));
-			return;
-		}
-
 		Bool found_terminator_before_end = false;
 		for (auto it = block.begin(); it != block.end(); ++it)
 		{
@@ -83,6 +75,14 @@ namespace ola
 		if (found_terminator_before_end)
 		{
 			Error(std::format("function '{}': block {} has instructions after terminator",
+				function.GetName(), block.GetIndex()));
+			return;
+		}
+
+		Instruction const* term = block.GetTerminator();
+		if (!term)
+		{
+			Error(std::format("function '{}': block {} has no terminator",
 				function.GetName(), block.GetIndex()));
 		}
 	}
@@ -184,6 +184,11 @@ namespace ola
 	void IRVerifier::VerifyCall(Instruction const& inst)
 	{
 		CallInst const& call = *cast<CallInst>(&inst);
+		if (call.GetNumOperands() == 0)
+		{
+			Error("call: missing callee operand");
+			return;
+		}
 		Value* callee = call.GetCallee();
 		if (!callee)
 		{

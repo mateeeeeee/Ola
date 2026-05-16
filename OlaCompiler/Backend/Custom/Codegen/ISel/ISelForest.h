@@ -95,32 +95,4 @@ namespace ola
 	private:
 		std::unordered_map<Value*, ISelNode*> value_to_node;
 	};
-
-	class ISelUseCount
-	{
-	public:
-		void IncrementUse(ISelNode* node)
-		{
-			use_counts[node]++;
-		}
-
-		Uint32 GetUseCount(ISelNode* node) const
-		{
-			auto it = use_counts.find(node);
-			return it != use_counts.end() ? it->second : 0;
-		}
-
-		Bool HasSingleUse(ISelNode* node) const
-		{
-			return GetUseCount(node) == 1;
-		}
-
-		void Clear()
-		{
-			use_counts.clear();
-		}
-
-	private:
-		std::unordered_map<ISelNode*, Uint32> use_counts;
-	};
 }

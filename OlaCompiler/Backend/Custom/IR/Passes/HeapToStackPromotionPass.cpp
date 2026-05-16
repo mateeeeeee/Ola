@@ -79,6 +79,10 @@ namespace ola
 					}
 				}
 
+				if (!call->HasOneUse())
+				{
+					continue;
+				}
 				for (Use* U : call->Users())
 				{
 					if (CastInst* cast_inst = dyn_cast<CastInst>(U->GetUser()))
@@ -195,8 +199,28 @@ namespace ola
 						continue;
 					}
 					Value* store_addr = store->GetAddressOp();
-					if (isa<AllocaInst>(store_addr))
+					if (AllocaInst* alloca_dst = dyn_cast<AllocaInst>(store_addr))
 					{
+						Bool alloca_address_escapes = false;
+						for (Use* AU : alloca_dst->Users())
+						{
+							Instruction* alloca_user = AU->GetUser();
+							if (isa<LoadInst>(alloca_user))
+							{
+								continue;
+							}
+							if (StoreInst* alloca_store = dyn_cast<StoreInst>(alloca_user);
+								alloca_store && alloca_store->GetAddressOp() == alloca_dst)
+							{
+								continue;
+							}
+							alloca_address_escapes = true;
+							break;
+						}
+						if (alloca_address_escapes)
+						{
+							return true;
+						}
 						continue;
 					}
 					if (dyn_cast<GetElementPtrInst>(store_addr))
@@ -311,7 +335,7 @@ namespace ola
 				to_remove.push_back(call);
 				if (Instruction* v_inst = dyn_cast<Instruction>(v))
 				{
-					if (isa<CastInst>(v_inst))
+					if (isa<CastInst>(v_inst) && v_inst->HasOneUse())
 					{
 						to_remove.push_back(v_inst);
 					}
