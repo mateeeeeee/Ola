@@ -343,7 +343,7 @@ namespace ola
 	class GotoStmt final : public Stmt
 	{
 	public:
-		explicit GotoStmt(std::string_view label) : Stmt(StmtKind::Label), label_name(label) {}
+		explicit GotoStmt(std::string_view label) : Stmt(StmtKind::Goto), label_name(label) {}
 		std::string_view GetLabelName() const { return label_name; }
 
 		virtual void Accept(ASTVisitor&, Uint32) const override;

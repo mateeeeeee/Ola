@@ -34,8 +34,11 @@ namespace ola
 
 	static void CFGAnalysis(MachineFunction& MF)
 	{
-		for (auto& block : MF.Blocks())
+		auto& blocks = MF.Blocks();
+		for (auto block_iter = blocks.begin(); block_iter != blocks.end(); ++block_iter)
 		{
+			auto& block = *block_iter;
+			Bool terminates = false;
 			for (auto& MI : block->Instructions())
 			{
 				Uint32 opcode = MI.GetOpcode();
@@ -46,6 +49,19 @@ namespace ola
 					OLA_ASSERT(MO.GetRelocable()->IsBlock());
 					MachineBasicBlock* target = static_cast<MachineBasicBlock*>(MO.GetRelocable());
 					block->AddSuccessor(target);
+					if (opcode == InstJump) terminates = true;
+				}
+				else if (opcode == InstRet)
+				{
+					terminates = true;
+				}
+			}
+			if (!terminates)
+			{
+				auto next_iter = std::next(block_iter);
+				if (next_iter != blocks.end())
+				{
+					block->AddSuccessor(next_iter->get());
 				}
 			}
 		}

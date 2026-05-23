@@ -93,7 +93,7 @@ namespace ola
 				}
 				else if (Sub_(Any_(V), Exact_(V))(ctx))
 				{
-					ReplaceInstruction(I, I.GetContext().GetInt64(0));
+					ReplaceInstruction(I, I.GetContext().GetInt(I.GetType(), 0));
 				}
 				else if (FSub_(Any_(V), Exact_(V))(ctx))
 				{
@@ -101,7 +101,7 @@ namespace ola
 				}
 				else if (Mul_(Any_(V), CInt_(0))(ctx))
 				{
-					ReplaceInstruction(I, I.GetContext().GetInt64(0));
+					ReplaceInstruction(I, I.GetContext().GetInt(I.GetType(), 0));
 				}
 				else if (FMul_(Any_(V), CFloat_(0.0))(ctx))
 				{
@@ -133,17 +133,17 @@ namespace ola
 				}
 				else if (SDiv_(Any_(V), Exact_(V))(ctx))
 				{
-					ReplaceInstruction(I, I.GetContext().GetInt64(1));
+					ReplaceInstruction(I, I.GetContext().GetInt(I.GetType(), 1));
 				}
 				else if (FDiv_(Any_(V), Exact_(V))(ctx))
 				{
-					ReplaceInstruction(I, I.GetContext().GetFloat(0));
+					ReplaceInstruction(I, I.GetContext().GetFloat(1.0));
 				}
 				else if (SDiv_(Any_(V), CInt_(1))(ctx))
 				{
 					ReplaceInstruction(I, V);
 				}
-				else if (FDiv_(Any_(V), CFloat_(0.0))(ctx))
+				else if (FDiv_(Any_(V), CFloat_(1.0))(ctx))
 				{
 					ReplaceInstruction(I, V);
 				}

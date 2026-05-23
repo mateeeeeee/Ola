@@ -41,17 +41,21 @@ namespace ola
 	Bool SimplifyCFGPass::MergeBlocks(Function& F)
 	{
 		Bool Changed = false;
-		for (auto& BB : F) 
+		BasicBlock* entry = &F.GetEntryBlock();
+		for (auto& BB : F)
 		{
+			if (&BB == entry) continue;
+			if (!BB.IsUsed()) continue;
 			if (BB.Instructions().Size() == 1)
 			{
 				Instruction* I = BB.GetTerminator();
 				if (BranchInst* BI = dyn_cast<BranchInst>(I); BI && BI->IsUnconditional() && BI->GetTrueTarget())
 				{
 					BasicBlock* Succ = BI->GetTrueTarget();
-					if (!Succ->HasPhiInsts())
+					if (Succ != &BB && !Succ->HasPhiInsts())
 					{
 						BB.ReplaceAllUsesWith(Succ);
+						Changed = true;
 					}
 				}
 			}

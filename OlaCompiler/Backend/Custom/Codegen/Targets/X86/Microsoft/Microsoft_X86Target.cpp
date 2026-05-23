@@ -40,7 +40,8 @@ namespace ola
 			gp_regs.reserve(X86_GPREnd - X86_GPRBegin + 1);
 			for (Uint32 r = X86_GPRBegin; r < X86_GPREnd; ++r)
 			{
-				gp_regs.push_back(r); //skip rbp, rsp
+				if (r == X86_RSP || r == X86_RBP) continue;
+				gp_regs.push_back(r);
 			}
 
 			fp_regs.reserve(X86_FPREnd - X86_FPRBegin + 1);

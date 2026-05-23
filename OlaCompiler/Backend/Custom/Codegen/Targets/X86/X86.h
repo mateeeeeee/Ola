@@ -19,11 +19,11 @@ namespace ola
 
 	inline constexpr Bool X86_IsGPRReg(Uint32 r)
 	{
-		return r >= X86_GPRBegin && r <= X86_GPREnd;
+		return r >= X86_GPRBegin && r < X86_GPREnd;
 	}
 	inline constexpr Bool X86_IsFPRReg(Uint32 r)
 	{
-		return r >= X86_FPRBegin && r <= X86_FPREnd;
+		return r >= X86_FPRBegin && r < X86_FPREnd;
 	}
 
 	// Caller-saved and callee-saved register classification is ABI-specific.
