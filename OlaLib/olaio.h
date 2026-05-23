@@ -45,8 +45,10 @@ extern "C"
 	}
 	void ReadString(char* str, int64_t str_size)
 	{
-		unsigned int buf_size = (unsigned int)str_size;
-		scanf("%s", str);
+		if (str == NULL || str_size <= 0) return;
+		char fmt[32];
+		snprintf(fmt, sizeof(fmt), "%%%" PRId64 "s", str_size - 1);
+		scanf(fmt, str);
 	}
 }
 #pragma warning( pop )

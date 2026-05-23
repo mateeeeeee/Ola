@@ -5,6 +5,9 @@
 #include "DominanceFrontierAnalysisPass.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Backend/Custom/IR/IRContext.h"
+#include "Backend/Custom/IR/Constant.h"
+#include "Backend/Custom/IR/IRType.h"
 
 namespace ola
 {
@@ -171,11 +174,13 @@ namespace ola
 						if (AllocaInst* AI = dyn_cast<AllocaInst>(LI->GetAddressOp()); AI && AllocasSet.contains(AI))
 						{
 							Value* CurrentValue = ValueStacks[AI].top();
-							if (CurrentValue)
+							if (!CurrentValue)
 							{
-								LI->ReplaceAllUsesWith(CurrentValue);
-								InstructionRemoveQueue.push_back(LI);
+								// Load reaches without a dominating store, alloca is read uninitialized, replace with undef
+								CurrentValue = LI->GetType()->GetContext().GetUndefValue(LI->GetType());
 							}
+							LI->ReplaceAllUsesWith(CurrentValue);
+							InstructionRemoveQueue.push_back(LI);
 						}
 					}
 					else if (StoreInst* SI = dyn_cast<StoreInst>(&I))

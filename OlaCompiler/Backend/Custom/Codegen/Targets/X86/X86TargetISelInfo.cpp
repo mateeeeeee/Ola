@@ -262,6 +262,10 @@ namespace ola
 						case CompareOp::ICmpSGE: return CompareOp::ICmpSLT;
 						case CompareOp::ICmpSLT: return CompareOp::ICmpSGE;
 						case CompareOp::ICmpSLE: return CompareOp::ICmpSGT;
+						case CompareOp::ICmpUGT: return CompareOp::ICmpULE;
+						case CompareOp::ICmpUGE: return CompareOp::ICmpULT;
+						case CompareOp::ICmpULT: return CompareOp::ICmpUGE;
+						case CompareOp::ICmpULE: return CompareOp::ICmpUGT;
 						}
 						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 						return CompareOp::ICmpEQ;
@@ -295,6 +299,10 @@ namespace ola
 						case CompareOp::ICmpSGE: return X86_InstSetGE;
 						case CompareOp::ICmpSLT: return X86_InstSetLT;
 						case CompareOp::ICmpSLE: return X86_InstSetLE;
+						case CompareOp::ICmpUGT: return X86_InstSetA;
+						case CompareOp::ICmpUGE: return X86_InstSetAE;
+						case CompareOp::ICmpULT: return X86_InstSetB;
+						case CompareOp::ICmpULE: return X86_InstSetBE;
 						}
 						OLA_ASSERT_MSG(false, "opcode has to be compare instruction!");
 						return InstUnknown;

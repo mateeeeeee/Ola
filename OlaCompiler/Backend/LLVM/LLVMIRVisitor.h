@@ -122,6 +122,8 @@ namespace ola
 		llvm::IntegerType* bool_type	= nullptr;
 		llvm::IntegerType* char_type	= nullptr;
 
+		std::unordered_map<ClassDecl const*, llvm::StructType*> struct_type_map;
+
 	private:
 		void VisitFunctionDeclCommon(FunctionDecl const& decl, llvm::Function* func);
 		void DeclareMethodDeclLLVM(MethodDecl const&);

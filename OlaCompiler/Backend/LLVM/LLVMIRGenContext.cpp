@@ -7,7 +7,8 @@
 namespace ola
 {
 
-	LLVMIRGenContext::LLVMIRGenContext(std::string_view file_name) : context(), module(file_name.data(), context)
+	LLVMIRGenContext::LLVMIRGenContext(std::string_view file_name)
+		: context(), module(llvm::StringRef(file_name.data(), file_name.size()), context)
 	{
 		llvm::InitializeAllTargets();
 		llvm::InitializeAllTargetMCs();

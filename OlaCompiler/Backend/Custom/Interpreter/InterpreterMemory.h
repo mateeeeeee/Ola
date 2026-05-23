@@ -57,6 +57,10 @@ namespace ola
 		std::unordered_map<GlobalVariable*, Uint8*> global_addresses;
 		std::unordered_map<std::string_view, Uint8*> string_pool;
 
+		// Free-list for HeapAlloc/HeapFree, keyed by block size.
+		// Block layout: [Uint64 size][user payload]; HeapAlloc returns the payload pointer.
+		std::unordered_multimap<Uint32, Uint8*> free_blocks;
+
 	private:
 		Uint8* AlignPointer(Uint8* ptr, Uint32 alignment);
 	};

@@ -1279,7 +1279,7 @@ namespace ola
 			}
 			else if (IsFloat(cast_operand_type))
 			{
-				value_map[&cast_expr] = builder.CreateFPToUI(cast_operand, bool_type);
+				value_map[&cast_expr] = builder.CreateFCmpONE(cast_operand, llvm::ConstantFP::get(cast_operand->getType(), 0.0));
 			}
 			else if (IsRef(cast_operand_type))
 			{
@@ -2221,9 +2221,6 @@ namespace ola
 
 	llvm::Type* LLVMIRVisitor::ConvertClassDecl(ClassDecl const* class_decl)
 	{
-		using LLVMStructTypeMap = std::unordered_map<ClassDecl const*, llvm::StructType*>;
-		static LLVMStructTypeMap struct_type_map;
-
 		if (struct_type_map.contains(class_decl))
 		{
 			return struct_type_map[class_decl];

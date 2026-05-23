@@ -491,6 +491,16 @@ namespace ola
 			return;
 		}
 
+		if (!cond_op.IsReg())
+		{
+			MachineOperand reg = ctx.VirtualReg(cond_op.GetType());
+			ctx.EmitInst(MachineInstruction(InstMove)
+				.SetOp<0>(reg)
+				.SetOp<1>(cond_op));
+			cond_op = reg;
+		}
+
+		MachineType const cond_type = cond_op.GetType();
 		for (auto& case_pair : SI->Cases())
 		{
 			Int64 case_value = case_pair.GetCaseValue();
@@ -498,7 +508,7 @@ namespace ola
 
 			MachineInstruction testMI(InstICmp);
 			testMI.SetOp<0>(cond_op);
-			testMI.SetOp<1>(MachineOperand::Immediate(case_value, MachineType::Int64));
+			testMI.SetOp<1>(MachineOperand::Immediate(case_value, cond_type));
 			ctx.EmitInst(testMI);
 
 			EmitJump(InstJE, case_block, src_block);

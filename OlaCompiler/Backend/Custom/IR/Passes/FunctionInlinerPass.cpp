@@ -138,6 +138,12 @@ namespace ola
 
 		Builder.SetCurrentBlock(CallBlock);
 		Builder.MakeInst<BranchInst>(Ctx, BBMap[&Callee->GetEntryBlock()]);
+
+		//Collect (return value, predecessor block) pairs from each return site so we can
+		//replace CI's uses with a phi over them, doing CI->ReplaceAllUsesWith inside the
+		//loop overwrites earlier replacements, only the last return's value would survive
+		std::vector<std::pair<Value*, BasicBlock*>> ReturnedValues;
+		Bool const HasReturnValue = !CI->GetType()->IsVoid();
 		for (BasicBlock& BB : *Callee)
 		{
 			if (ReturnInst* RI = dyn_cast<ReturnInst>(BB.GetTerminator()))
@@ -146,14 +152,31 @@ namespace ola
 				Builder.SetCurrentBlock(InlinedBB);
 				if (InlinedBB->GetTerminator() && InlinedBB->GetTerminator()->GetOpcode() == Opcode::Ret) InlinedBB->GetTerminator()->EraseFromParent();
 
-				if (!RI->IsVoid())
+				if (HasReturnValue && !RI->IsVoid())
 				{
 					Value* RetVal = RI->GetReturnValue();
 					Value* MappedRetVal = ValueMap[RetVal];
-					if (MappedRetVal) CI->ReplaceAllUsesWith(MappedRetVal);
-					else CI->ReplaceAllUsesWith(RetVal);
+					ReturnedValues.emplace_back(MappedRetVal ? MappedRetVal : RetVal, InlinedBB);
 				}
 				Builder.MakeInst<BranchInst>(Ctx, CallBlockRemainder);
+			}
+		}
+
+		if (HasReturnValue)
+		{
+			if (ReturnedValues.size() == 1)
+			{
+				CI->ReplaceAllUsesWith(ReturnedValues.front().first);
+			}
+			else if (ReturnedValues.size() > 1)
+			{
+				PhiInst* Phi = new PhiInst(CI->GetType());
+				CallBlockRemainder->AddPhiInst(Phi);
+				for (auto const& [val, pred] : ReturnedValues)
+				{
+					Phi->AddIncoming(val, pred);
+				}
+				CI->ReplaceAllUsesWith(Phi);
 			}
 		}
 		CI->EraseFromParent();

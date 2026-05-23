@@ -1,4 +1,5 @@
 #include <unordered_set>
+#include <limits>
 #include "ConstantPropagationPass.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRBuilder.h"
@@ -20,14 +21,28 @@ namespace ola
 			ConstantInt* CI2 = dyn_cast<ConstantInt>(RHS);
 			if (CI1 && CI2)
 			{
+				Uint32 bit_width = LHS->GetType()->IsInteger() ? LHS->GetType()->GetSize() * 8 : 64;
 				switch (BI->GetOpcode())
 				{
 				case Opcode::Add:  return ctx.GetInt(LHS->GetType(), CI1->GetValue() + CI2->GetValue());
 				case Opcode::Sub:  return ctx.GetInt(LHS->GetType(), CI1->GetValue() - CI2->GetValue());
 				case Opcode::SMul: return ctx.GetInt(LHS->GetType(), CI1->GetValue() * CI2->GetValue());
-				case Opcode::SDiv: return ctx.GetInt(LHS->GetType(), CI1->GetValue() / CI2->GetValue());
-				case Opcode::Shl:  return ctx.GetInt(LHS->GetType(), CI1->GetValue() << CI2->GetValue());
-				case Opcode::AShr: return ctx.GetInt(LHS->GetType(), CI1->GetValue() >> CI2->GetValue());
+				case Opcode::SDiv:
+					if (CI2->GetValue() == 0) return nullptr;
+					if (CI2->GetValue() == -1 && CI1->GetValue() == std::numeric_limits<Int64>::min()) return nullptr;
+					return ctx.GetInt(LHS->GetType(), CI1->GetValue() / CI2->GetValue());
+				case Opcode::Shl:
+				{
+					Int64 shift = CI2->GetValue();
+					if (shift < 0 || static_cast<Uint32>(shift) >= bit_width) return nullptr;
+					return ctx.GetInt(LHS->GetType(), static_cast<Int64>(static_cast<Uint64>(CI1->GetValue()) << shift));
+				}
+				case Opcode::AShr:
+				{
+					Int64 shift = CI2->GetValue();
+					if (shift < 0 || static_cast<Uint32>(shift) >= bit_width) return nullptr;
+					return ctx.GetInt(LHS->GetType(), CI1->GetValue() >> shift);
+				}
 				}
 			}
 
@@ -61,7 +76,7 @@ namespace ola
 			ConstantFloat* CF = dyn_cast<ConstantFloat>(UI->GetOperand());
 			if (CF && UI->GetOpcode() == Opcode::Neg)
 			{
-				ctx.GetFloat(-CF->GetValue());
+				return ctx.GetFloat(-CF->GetValue());
 			}
 			return nullptr;
 		}

@@ -143,17 +143,30 @@ namespace ola
 
 	Uint8* InterpreterMemory::HeapAlloc(Uint32 size)
 	{
+		if (auto it = free_blocks.find(size); it != free_blocks.end())
+		{
+			Uint8* payload = it->second;
+			free_blocks.erase(it);
+			std::memset(payload, 0, size);
+			return payload;
+		}
+
 		heap_ptr = AlignPointer(heap_ptr, 8);
-		Uint8* result = heap_ptr;
+		Uint8* header = heap_ptr;
+		heap_ptr += sizeof(Uint64);
+		Uint8* payload = heap_ptr;
 		heap_ptr += size;
 		OLA_ASSERT_MSG(heap_ptr < heap_base + heap.size(), "Heap overflow!");
-		std::memset(result, 0, size);
-		return result;
+		*reinterpret_cast<Uint64*>(header) = static_cast<Uint64>(size);
+		std::memset(payload, 0, size);
+		return payload;
 	}
 
 	void InterpreterMemory::HeapFree(Uint8* ptr)
 	{
-		(void)ptr;
+		if (ptr == nullptr) return;
+		Uint64 size = *reinterpret_cast<Uint64*>(ptr - sizeof(Uint64));
+		free_blocks.emplace(static_cast<Uint32>(size), ptr);
 	}
 
 	Bool InterpreterMemory::IsValidStackAddress(Uint8* addr) const

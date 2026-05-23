@@ -232,6 +232,7 @@ namespace ola
 		{
 			std::vector<std::string> const& source_files = compile_request.GetSourceFiles();
 			FrontendContext context{};
+			Int last_exit_code = 0;
 
 			for (Uint64 i = 0; i < source_files.size(); ++i)
 			{
@@ -304,12 +305,10 @@ namespace ola
 				IRInterpreter interpreter(ir_module);
 				Int exit_code = interpreter.Execute();
 				OLA_INFO("Program exited with code: {}", exit_code);
-
-				fs::current_path(cur_path);
-				return exit_code;
+				last_exit_code = exit_code;
 			}
 			fs::current_path(cur_path);
-			return 0;
+			return last_exit_code;
 		}
 
 		std::vector<std::string> const& source_files = compile_request.GetSourceFiles();

@@ -7,6 +7,14 @@
 #pragma warning( push )
 #pragma warning( disable : 6031 )
 
+#if defined(_WIN32)
+#  define OLA_FSEEK64(fp, off, whence) _fseeki64((fp), (off), (whence))
+#  define OLA_FTELL64(fp)              _ftelli64(fp)
+#else
+#  define OLA_FSEEK64(fp, off, whence) fseeko((fp), (off_t)(off), (whence))
+#  define OLA_FTELL64(fp)              (int64_t)ftello(fp)
+#endif
+
 extern "C"
 {
 	typedef FILE* FileHandle;
@@ -111,13 +119,13 @@ extern "C"
 	int64_t FileTell(FileHandle file)
 	{
 		if (file == NULL) return -1;
-		return (int64_t)ftell(file);
+		return OLA_FTELL64(file);
 	}
 
 	bool FileSeek(FileHandle file, int64_t offset, int64_t origin)
 	{
 		if (file == NULL) return false;
-		return fseek(file, (long)offset, (int)origin) == 0;
+		return OLA_FSEEK64(file, offset, (int)origin) == 0;
 	}
 
 	void FileRewind(FileHandle file)
@@ -180,8 +188,8 @@ extern "C"
 		FILE* file = fopen(filename, "rb");
 		if (file == NULL) return -1;
 
-		fseek(file, 0, SEEK_END);
-		int64_t size = (int64_t)ftell(file);
+		OLA_FSEEK64(file, 0, SEEK_END);
+		int64_t size = OLA_FTELL64(file);
 		fclose(file);
 
 		return size;

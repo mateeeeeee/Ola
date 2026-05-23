@@ -85,7 +85,10 @@ namespace ola
 				{
 					output_file = input_files[0];
 				}
-				input_directory = OLA_TESTS_PATH"Tests";
+				if (input_directory.empty())
+				{
+					input_directory = OLA_TESTS_PATH"Tests";
+				}
 			}
 			else
 			{

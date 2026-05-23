@@ -362,11 +362,12 @@ namespace ola
 
 	void CopyCoalescer::FreezeMoves(Uint32 vreg)
 	{
+		Uint32 const vreg_alias = GetAlias(vreg);
 		for (MoveInfo* move : NodeMoves(vreg))
 		{
-			Uint32 x = move->dst_vreg;
-			Uint32 y = move->src_vreg;
-			Uint32 v = (GetAlias(y) == GetAlias(vreg)) ? GetAlias(x) : GetAlias(y);
+			Uint32 x = GetAlias(move->dst_vreg);
+			Uint32 y = GetAlias(move->src_vreg);
+			Uint32 v = (y == vreg_alias) ? x : y;
 
 			auto it = std::find(active_moves.begin(), active_moves.end(), move);
 			if (it != active_moves.end())

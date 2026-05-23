@@ -83,6 +83,22 @@ namespace ola
 			return false;
 		}
 
+		//Refuse to hoist instructions that may fault 
+		//Hoisting them out of the loop would speculate the fault onto a path 
+		//the original loop may never have executed (e.g. divide-by-zero on a guarded branch).
+		if (BinaryInst* BI = dyn_cast<BinaryInst>(I))
+		{
+			Opcode op = BI->GetOpcode();
+			if (op == Opcode::SDiv || op == Opcode::SRem)
+			{
+				ConstantInt* RhsConst = dyn_cast<ConstantInt>(BI->GetRHS());
+				if (!RhsConst || RhsConst->GetValue() == 0)
+				{
+					return false;
+				}
+			}
+		}
+
 		for (Value* Op : I->Operands())
 		{
 			if (isa<Constant>(Op))

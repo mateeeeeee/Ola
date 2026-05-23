@@ -554,6 +554,11 @@ namespace ola
 				if (L->Contains(IncomingBB))
 				{
 					ExitPhi->SetIncomingBlock(i, Preheader);
+					Value* IncomingVal = ExitPhi->GetIncomingValue(i);
+					if (auto It = CurrentValueMap.find(IncomingVal); It != CurrentValueMap.end())
+					{
+						ExitPhi->SetIncomingValue(i, It->second);
+					}
 				}
 			}
 		}
@@ -566,14 +571,14 @@ namespace ola
 
 		for (BasicBlock* BB : BlocksToRemove)
 		{
-			for (auto It = BB->begin(); It != BB->end(); )
+			while (!BB->Instructions().Empty())
 			{
-				Instruction& I = *It;
-				++It;
-				if (!I.IsUsed())
+				Instruction& I = BB->Instructions().Back();
+				if (I.IsUsed())
 				{
-					I.EraseFromParent();
+					I.ReplaceAllUsesWith(Ctx.GetUndefValue(I.GetType()));
 				}
+				I.EraseFromParent();
 			}
 		}
 

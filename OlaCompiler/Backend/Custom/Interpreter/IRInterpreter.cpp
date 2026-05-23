@@ -306,18 +306,29 @@ namespace ola
 		case Opcode::And:  return InterpreterValue::MakeInt(lhs.AsInt() & rhs.AsInt());
 		case Opcode::Or:   return InterpreterValue::MakeInt(lhs.AsInt() | rhs.AsInt());
 		case Opcode::Xor:  return InterpreterValue::MakeInt(lhs.AsInt() ^ rhs.AsInt());
-		case Opcode::Shl:  return InterpreterValue::MakeInt(lhs.AsInt() << rhs.AsInt());
-		case Opcode::LShr: return InterpreterValue::MakeInt(static_cast<Int64>(static_cast<Uint64>(lhs.AsInt()) >> rhs.AsInt()));
-		case Opcode::AShr: return InterpreterValue::MakeInt(lhs.AsInt() >> rhs.AsInt());
+		case Opcode::Shl:
+		{
+			Uint64 const shift = static_cast<Uint64>(rhs.AsInt()) & 63u;
+			return InterpreterValue::MakeInt(static_cast<Int64>(static_cast<Uint64>(lhs.AsInt()) << shift));
+		}
+		case Opcode::LShr:
+		{
+			Uint64 const shift = static_cast<Uint64>(rhs.AsInt()) & 63u;
+			return InterpreterValue::MakeInt(static_cast<Int64>(static_cast<Uint64>(lhs.AsInt()) >> shift));
+		}
+		case Opcode::AShr:
+		{
+			Uint64 const shift = static_cast<Uint64>(rhs.AsInt()) & 63u;
+			return InterpreterValue::MakeInt(lhs.AsInt() >> shift);
+		}
 
 		case Opcode::FAdd: return InterpreterValue::MakeFloat(lhs.AsFloat() + rhs.AsFloat());
 		case Opcode::FSub: return InterpreterValue::MakeFloat(lhs.AsFloat() - rhs.AsFloat());
 		case Opcode::FMul: return InterpreterValue::MakeFloat(lhs.AsFloat() * rhs.AsFloat());
 		case Opcode::FDiv: return InterpreterValue::MakeFloat(lhs.AsFloat() / rhs.AsFloat());
 		case Opcode::FFma:
-		{
-			return InterpreterValue::MakeFloat(lhs.AsFloat() * rhs.AsFloat());
-		}
+			OLA_ASSERT_MSG(false, "FFma is a ternary op (a*b + c) but BinaryInst only carries two operands");
+			return InterpreterValue::MakeVoid();
 		default:
 			OLA_ASSERT_MSG(false, "Unknown binary opcode");
 		}
