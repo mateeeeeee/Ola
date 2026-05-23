@@ -22,5 +22,17 @@ namespace ola
 		instruction_flag |= inst_flag;
 	}
 
+	void InstInfo::AddImplicitUse(Uint32 reg)
+	{
+		OLA_ASSERT(num_implicit_uses < MAX_IMPLICITS);
+		implicit_uses[num_implicit_uses++] = reg;
+	}
+
+	void InstInfo::AddImplicitDef(Uint32 reg)
+	{
+		OLA_ASSERT(num_implicit_defs < MAX_IMPLICITS);
+		implicit_defs[num_implicit_defs++] = reg;
+	}
+
 }
 

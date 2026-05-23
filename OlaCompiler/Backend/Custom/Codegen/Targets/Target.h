@@ -49,6 +49,7 @@ namespace ola
 	class InstInfo
 	{
 		static constexpr Uint32 MAX_OPERANDS = 7;
+		static constexpr Uint32 MAX_IMPLICITS = 4;
 	public:
 		InstInfo() = default;
 
@@ -63,16 +64,27 @@ namespace ola
 		}
 		Uint32 GetOperandCount() const { return operand_count; }
 
+		Uint32 GetImplicitUseCount() const { return num_implicit_uses; }
+		Uint32 GetImplicitUse(Uint32 idx) const { OLA_ASSERT(idx < num_implicit_uses); return implicit_uses[idx]; }
+		Uint32 GetImplicitDefCount() const { return num_implicit_defs; }
+		Uint32 GetImplicitDef(Uint32 idx) const { OLA_ASSERT(idx < num_implicit_defs); return implicit_defs[idx]; }
+
 		void SetOperandCount(Uint32 _operand_count)
 		{
 			operand_count = _operand_count;
 		}
 		void SetOpFlag(Uint32 idx, OperandFlag flag);
 		void SetInstFlag(InstFlag inst_flag);
+		void AddImplicitUse(Uint32 reg);
+		void AddImplicitDef(Uint32 reg);
 	private:
 		Uint32 operand_count = 0;
 		OperandFlag operand_flags[MAX_OPERANDS] = {};
 		InstFlag instruction_flag = InstFlagNone;
+		Uint32 implicit_uses[MAX_IMPLICITS] = {};
+		Uint32 num_implicit_uses = 0;
+		Uint32 implicit_defs[MAX_IMPLICITS] = {};
+		Uint32 num_implicit_defs = 0;
 	};
 
 	class TargetInstInfo

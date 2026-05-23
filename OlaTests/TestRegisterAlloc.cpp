@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
 #include "Backend/Custom/Codegen/RA/InterferenceGraph.h"
 #include "Backend/Custom/Codegen/RA/LivenessAnalysis.h"
+#include "Backend/Custom/Codegen/Targets/Target.h"
+#include "Backend/Custom/Codegen/Targets/X86/X86.h"
+#include "Backend/Custom/Codegen/Targets/X86/X86TargetInstInfo.h"
+#include "Backend/Custom/Codegen/MachineInstruction.h"
+#include "Backend/Custom/Codegen/MachineOperand.h"
 
 using namespace ola;
 
@@ -366,4 +371,243 @@ TEST(LiveInterval, ExtendFromLargeRange)
 	li.Extend(300);
 	EXPECT_EQ(li.begin, 50u);
 	EXPECT_EQ(li.end, 300u);
+}
+
+TEST(InstInfo, DefaultHasNoImplicitOperands)
+{
+	InstInfo info{};
+	EXPECT_EQ(info.GetImplicitUseCount(), 0u);
+	EXPECT_EQ(info.GetImplicitDefCount(), 0u);
+}
+
+TEST(InstInfo, AddImplicitUseRecorded)
+{
+	InstInfo info{};
+	info.AddImplicitUse(X86_RAX);
+	info.AddImplicitUse(X86_RDX);
+	ASSERT_EQ(info.GetImplicitUseCount(), 2u);
+	EXPECT_EQ(info.GetImplicitUse(0), static_cast<Uint32>(X86_RAX));
+	EXPECT_EQ(info.GetImplicitUse(1), static_cast<Uint32>(X86_RDX));
+}
+
+TEST(InstInfo, AddImplicitDefRecorded)
+{
+	InstInfo info{};
+	info.AddImplicitDef(X86_RCX);
+	ASSERT_EQ(info.GetImplicitDefCount(), 1u);
+	EXPECT_EQ(info.GetImplicitDef(0), static_cast<Uint32>(X86_RCX));
+}
+
+TEST(InstInfo, ImplicitUsesAndDefsAreSeparate)
+{
+	InstInfo info{};
+	info.AddImplicitUse(X86_RAX);
+	info.AddImplicitDef(X86_RDX);
+	EXPECT_EQ(info.GetImplicitUseCount(), 1u);
+	EXPECT_EQ(info.GetImplicitDefCount(), 1u);
+	EXPECT_EQ(info.GetImplicitUse(0), static_cast<Uint32>(X86_RAX));
+	EXPECT_EQ(info.GetImplicitDef(0), static_cast<Uint32>(X86_RDX));
+}
+
+TEST(X86TargetInstInfo, IDivDeclaresImplicitRaxRdx)
+{
+	// idiv: implicit use+def of RAX (quotient) and RDX (remainder).
+	// Without these implicits, vregs live across SDiv could be wrongly assigned RAX/RDX.
+	X86TargetInstInfo target_inst_info;
+	InstInfo info = target_inst_info.GetInstInfo(InstSDiv);
+
+	std::unordered_set<Uint32> implicit_uses;
+	for (Uint32 i = 0; i < info.GetImplicitUseCount(); ++i) implicit_uses.insert(info.GetImplicitUse(i));
+	std::unordered_set<Uint32> implicit_defs;
+	for (Uint32 i = 0; i < info.GetImplicitDefCount(); ++i) implicit_defs.insert(info.GetImplicitDef(i));
+
+	EXPECT_TRUE(implicit_uses.contains(X86_RAX));
+	EXPECT_TRUE(implicit_uses.contains(X86_RDX));
+	EXPECT_TRUE(implicit_defs.contains(X86_RAX));
+	EXPECT_TRUE(implicit_defs.contains(X86_RDX));
+}
+
+TEST(X86TargetInstInfo, SRemDeclaresImplicitRaxRdx)
+{
+	X86TargetInstInfo target_inst_info;
+	InstInfo info = target_inst_info.GetInstInfo(InstSRem);
+
+	std::unordered_set<Uint32> implicit_uses;
+	for (Uint32 i = 0; i < info.GetImplicitUseCount(); ++i) implicit_uses.insert(info.GetImplicitUse(i));
+	std::unordered_set<Uint32> implicit_defs;
+	for (Uint32 i = 0; i < info.GetImplicitDefCount(); ++i) implicit_defs.insert(info.GetImplicitDef(i));
+
+	EXPECT_TRUE(implicit_uses.contains(X86_RAX));
+	EXPECT_TRUE(implicit_uses.contains(X86_RDX));
+	EXPECT_TRUE(implicit_defs.contains(X86_RAX));
+	EXPECT_TRUE(implicit_defs.contains(X86_RDX));
+}
+
+TEST(X86TargetInstInfo, CqoUsesRaxDefsRdx)
+{
+	// cqo (sign-extend rax into rdx:rax) uses RAX and defs RDX.
+	X86TargetInstInfo target_inst_info;
+	InstInfo info = target_inst_info.GetInstInfo(X86_InstCqo);
+
+	ASSERT_EQ(info.GetImplicitUseCount(), 1u);
+	ASSERT_EQ(info.GetImplicitDefCount(), 1u);
+	EXPECT_EQ(info.GetImplicitUse(0), static_cast<Uint32>(X86_RAX));
+	EXPECT_EQ(info.GetImplicitDef(0), static_cast<Uint32>(X86_RDX));
+}
+
+TEST(X86TargetInstInfo, CallIsFlagged)
+{
+	X86TargetInstInfo target_inst_info;
+	InstInfo info = target_inst_info.GetInstInfo(InstCall);
+	EXPECT_TRUE(info.HasInstFlag(InstFlagCall));
+}
+
+TEST(IGNode, ForbiddenColorsStartsEmpty)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	IGNode* node = ig.GetNode(1u);
+	ASSERT_NE(node, nullptr);
+	EXPECT_TRUE(node->forbidden_colors.empty());
+}
+
+TEST(IGNode, ForbiddenColorsAreRecorded)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	IGNode* node = ig.GetNode(1u);
+	node->forbidden_colors.insert(X86_RAX);
+	node->forbidden_colors.insert(X86_RDX);
+	EXPECT_EQ(node->forbidden_colors.size(), 2u);
+	EXPECT_TRUE(node->forbidden_colors.contains(X86_RAX));
+	EXPECT_TRUE(node->forbidden_colors.contains(X86_RDX));
+}
+
+TEST(IGNode, ForbiddenColorsClearOnGraphClear)
+{
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	ig.GetNode(1u)->forbidden_colors.insert(X86_RAX);
+	ig.Clear();
+	EXPECT_FALSE(ig.HasNode(1u));
+}
+
+TEST(RegClassification, X86PhysRegsAreISARegs)
+{
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_RAX)));
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_RDX)));
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_RCX)));
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_R15)));
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_XMM0)));
+	EXPECT_TRUE(IsISAReg(static_cast<Uint32>(X86_XMM15)));
+}
+
+TEST(RegClassification, X86PhysRegsAreNotVirtual)
+{
+	EXPECT_FALSE(IsVirtualReg(static_cast<Uint32>(X86_RAX)));
+	EXPECT_FALSE(IsVirtualReg(static_cast<Uint32>(X86_R15)));
+}
+
+TEST(RegClassification, VirtualRegOperandsClassifyCorrectly)
+{
+	MachineOperand vreg = MachineOperand::VirtualReg(0, MachineType::Int64);
+	EXPECT_TRUE(vreg.IsReg());
+	EXPECT_TRUE(IsVirtualReg(vreg.GetReg().reg));
+	EXPECT_FALSE(IsISAReg(vreg.GetReg().reg));
+}
+
+TEST(RegClassification, ISARegOperandsClassifyCorrectly)
+{
+	MachineOperand rax = MachineOperand::ISAReg(X86_RAX, MachineType::Int64);
+	EXPECT_TRUE(rax.IsReg());
+	EXPECT_TRUE(IsISAReg(rax.GetReg().reg));
+	EXPECT_FALSE(IsVirtualReg(rax.GetReg().reg));
+}
+
+TEST(RegClassification, X86GPRRangeExcludesSentinel)
+{
+	// X86_GPREnd is a sentinel and must not be classified as a GPR.
+	EXPECT_FALSE(X86_IsGPRReg(X86_GPREnd));
+	EXPECT_FALSE(X86_IsFPRReg(X86_FPREnd));
+	EXPECT_TRUE(X86_IsGPRReg(X86_R15));
+	EXPECT_TRUE(X86_IsFPRReg(X86_XMM15));
+}
+
+TEST(InterferenceGraph_Stress, LargeChainAllPairs)
+{
+	InterferenceGraph ig;
+	constexpr Uint32 N = 50;
+	for (Uint32 i = 0; i < N; ++i) ig.AddNode(i, false);
+	for (Uint32 i = 0; i + 1 < N; ++i) ig.AddInterference(i, i + 1);
+
+	EXPECT_EQ(ig.GetDegree(0), 1u);
+	EXPECT_EQ(ig.GetDegree(N - 1), 1u);
+	for (Uint32 i = 1; i + 1 < N; ++i)
+	{
+		EXPECT_EQ(ig.GetDegree(i), 2u) << "node " << i;
+	}
+}
+
+TEST(InterferenceGraph_Stress, FullClique100)
+{
+	// 100-node clique. Every node has degree 99.
+	InterferenceGraph ig;
+	constexpr Uint32 N = 100;
+	for (Uint32 i = 0; i < N; ++i) ig.AddNode(i, false);
+	for (Uint32 i = 0; i < N; ++i)
+		for (Uint32 j = i + 1; j < N; ++j)
+			ig.AddInterference(i, j);
+
+	for (Uint32 i = 0; i < N; ++i)
+	{
+		EXPECT_EQ(ig.GetDegree(i), N - 1) << "node " << i;
+	}
+}
+
+TEST(InterferenceGraph_Stress, MixedClassesNoCrossClassEdges)
+{
+	InterferenceGraph ig;
+	constexpr Uint32 N_INT = 50;
+	constexpr Uint32 N_FP  = 50;
+	for (Uint32 i = 0; i < N_INT; ++i) ig.AddNode(i, false);
+	for (Uint32 i = 0; i < N_FP;  ++i) ig.AddNode(N_INT + i, true);
+
+	for (Uint32 i = 0; i < N_INT + N_FP; ++i)
+		for (Uint32 j = i + 1; j < N_INT + N_FP; ++j)
+			ig.AddInterference(i, j);
+
+	for (Uint32 i = 0; i < N_INT; ++i)
+	{
+		EXPECT_EQ(ig.GetDegree(i), N_INT - 1) << "int node " << i;
+	}
+	for (Uint32 i = 0; i < N_FP; ++i)
+	{
+		EXPECT_EQ(ig.GetDegree(N_INT + i), N_FP - 1) << "float node " << N_INT + i;
+	}
+}
+
+TEST(InterferenceGraph_Stress, RepeatedAddInterferenceIdempotent)
+{
+	// AddInterference called many times on the same pair must not inflate degree.
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	ig.AddNode(2u, false);
+	for (int i = 0; i < 10000; ++i) ig.AddInterference(1u, 2u);
+	EXPECT_EQ(ig.GetDegree(1u), 1u);
+	EXPECT_EQ(ig.GetDegree(2u), 1u);
+}
+
+TEST(InterferenceGraph_Stress, ForbiddenColorsAccumulate)
+{
+	// A vreg can have many forbidden colors (e.g. live across many calls,
+	// each contributing the full caller-saved set).
+	InterferenceGraph ig;
+	ig.AddNode(1u, false);
+	IGNode* node = ig.GetNode(1u);
+
+	for (Uint32 r = X86_GPRBegin; r < X86_GPREnd; ++r)
+	{
+		node->forbidden_colors.insert(r);
+	}
+	EXPECT_EQ(node->forbidden_colors.size(), X86_GPREnd - X86_GPRBegin);
 }

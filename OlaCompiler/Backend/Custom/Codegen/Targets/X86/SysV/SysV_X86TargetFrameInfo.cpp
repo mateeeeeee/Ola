@@ -31,9 +31,8 @@ namespace ola
 	
 	void SysV_X86TargetFrameInfo::EmitCall(CallInst* CI, MachineContext& ctx) const
 	{
-		Function* callee = CI->GetCalleeAsFunction();
-		OLA_ASSERT(callee);
-		MachineGlobal const* global = ctx.GetGlobal(callee);
+		Bool const is_indirect = CI->IsIndirect();
+		MachineGlobal const* global = is_indirect ? nullptr : ctx.GetGlobal(CI->GetCalleeAsFunction());
 
 		MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
 		for (Int32 idx = CI->ArgSize() - 1; idx >= 0; --idx)
@@ -48,9 +47,9 @@ namespace ola
 				// SysV X86 ABI: Integer arguments go in RDI, RSI, RDX, RCX, R8, R9 (6 registers)
 				if (idx >= 6)
 				{
-					Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8;
+					Int32 offset = (MF->GetMaxCallArgCount() - idx) * 8;
 					MachineInstruction copy_arg_to_stack(opcode);
-					copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+					copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 					ctx.EmitInst(copy_arg_to_stack);
 				}
 				else
@@ -66,9 +65,9 @@ namespace ola
 				// SysV X86 ABI: Float arguments go in XMM0-XMM7 (8 registers)
 				if (idx >= 8)
 				{
-					Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8;
+					Int32 offset = (MF->GetMaxCallArgCount() - idx) * 8;
 					MachineInstruction copy_arg_to_stack(opcode);
-					copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+					copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				 ctx.EmitInst(copy_arg_to_stack);
 				}
 				else
@@ -82,7 +81,18 @@ namespace ola
 		}
 
 		MachineInstruction call_inst(InstCall);
-		call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
+		if (is_indirect)
+		{
+			Value* callee_ptr = CI->GetCallee();
+			MachineOperand callee_operand = ctx.GetOperand(callee_ptr);
+			MachineOperand rax = MachineOperand::ISAReg(X86_RAX, MachineType::Int64);
+			ctx.EmitInst(MachineInstruction(InstMove).SetOp<0>(rax).SetOp<1>(callee_operand));
+			call_inst.SetOp<0>(rax);
+		}
+		else
+		{
+			call_inst.SetOp<0>(MachineOperand::Relocable(global->GetRelocable()));
+		}
 		ctx.EmitInst(call_inst);
 		IRType const* return_type = CI->GetType();
 		if (return_type->IsVoid())
@@ -118,7 +128,11 @@ namespace ola
 		MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, Int64);
 		MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, Int64);
 
-		if (MF.GetStackAllocationSize() > 0)
+		// Always emit a frame when there are calls or local stack. Stack size
+		// may grow further during register allocation (spills) — the actual
+		// `sub rsp, N` immediate is patched in EmitProloguePostRA.
+		Bool const needs_frame = MF.HasCallInstructions() || MF.GetLocalStackAllocationSize() > 0;
+		if (needs_frame)
 		{
 			MachineInstruction push_rbp(InstPush);
 			push_rbp.SetOp<0>(rbp);
@@ -129,8 +143,9 @@ namespace ola
 			ctx.EmitInst(set_rbp);
 
 			MachineInstruction allocate_stack(InstSub);
-			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize(), Int64));
+			allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(0, Int64));
 			ctx.EmitInst(allocate_stack);
+			MF.SetHasFrame(true);
 		}
 
 		Uint32 arg_idx = 0;
@@ -196,95 +211,142 @@ namespace ola
 	{
 		auto const& gp_regs = ctx.GetUsedRegistersInfo()->gp_used_registers;
 		auto const& fp_regs = ctx.GetUsedRegistersInfo()->fp_used_registers;
-		Uint32 const stack_adjustment = (gp_regs.size() + fp_regs.size()) * 8;
+		Uint32 const spill_size = (gp_regs.size() + fp_regs.size()) * 8;
+		Uint32 const stack_size = MF.GetStackAllocationSize();
+		Uint32 const total = stack_size + spill_size;
 
-		std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
-		std::list<MachineInstruction>::iterator insert_point = insert_list.begin();
-		//try to find stack allocation
-		insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
-			{
-				if (MI.GetOpcode() == InstSub && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == X86_RSP) return true;
-				return false;
-			});
-		if (insert_point != insert_list.end())
-		{
-			MachineInstruction& MI = *insert_point;
-			OLA_ASSERT(MI.GetOp<1>().IsImmediate());
-			Int64 stack_alloc = MI.GetOp<1>().GetImmediate();
-			MI.SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
-			++insert_point;
-		}
-		else
-		{
-			OLA_ASSERT(MF.GetStackAllocationSize() == 0);
-			Uint32 new_stack_allocation = MF.GetStackAllocationSize() + stack_adjustment;
-			if (new_stack_allocation > 0)
-			{
-				MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, MachineType::Int64);
-				MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, MachineType::Int64);
+		// Keep RSP 16-byte aligned. After `push rbp`, RSP is 16-byte aligned;
+		// we then `sub rsp, N` where N is a multiple of 16.
+		Uint32 const aligned = OLA_ALIGN_UP(total, 16);
+		Uint32 const padding = aligned - total;
 
+		Bool const needs_frame = (stack_size > 0) || (spill_size > 0);
+		MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, MachineType::Int64);
+		MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, MachineType::Int64);
+
+		auto& insts = ctx.GetCurrentBasicBlock()->Instructions();
+		auto insert_it = insts.begin();
+		auto sub_it = insts.end();
+		if (needs_frame)
+		{
+			if (!MF.HasFrame())
+			{
+				// Prologue didn't emit a frame (no calls + no local stack at
+				// prologue-emit time), but RA introduced spills. Emit one now.
 				MachineInstruction push_rbp(InstPush);
 				push_rbp.SetOp<0>(rbp);
-				insert_point = ctx.EmitInst(insert_list.begin(), push_rbp); ++insert_point;
+				insert_it = ctx.EmitInst(insert_it, push_rbp); ++insert_it;
 
 				MachineInstruction set_rbp(InstMove);
 				set_rbp.SetOp<0>(rbp).SetOp<1>(rsp);
-				insert_point = ctx.EmitInst(insert_point, set_rbp); ++insert_point;
+				insert_it = ctx.EmitInst(insert_it, set_rbp); ++insert_it;
 
-				MachineInstruction allocate_stack(InstSub);
-				allocate_stack.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(MF.GetStackAllocationSize() + stack_adjustment, MachineType::Int64));
-				insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
+				MachineInstruction sub_rsp_inst(InstSub);
+				sub_rsp_inst.SetOp<0>(rsp).SetOp<1>(MachineOperand::Immediate(aligned, MachineType::Int64));
+				insert_it = ctx.EmitInst(insert_it, sub_rsp_inst); ++insert_it;
+
+				sub_it = std::prev(insert_it);
+				MF.SetHasFrame(true);
+			}
+			else
+			{
+				sub_it = std::find_if(insts.begin(), insts.end(),
+					[](MachineInstruction& mi)
+					{
+						return mi.GetOpcode() == InstSub &&
+							mi.GetOp<0>().IsReg() && mi.GetOp<0>().GetReg().reg == X86_RSP;
+					});
 			}
 		}
-		if (stack_adjustment == 0) return;
-
-		TargetInstInfo const& target_inst_info = ctx.GetModule().GetTarget().GetInstInfo();
-		for (auto const& MBB : MF.Blocks())
+		else
 		{
-			for (auto& MI : MBB->Instructions())
-			{
-				InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
-				for (Uint32 i = 0; i < inst_info.GetOperandCount(); ++i)
+			sub_it = std::find_if(insts.begin(), insts.end(),
+				[](MachineInstruction& mi)
 				{
-					MachineOperand& MO = MI.GetOperand(i);
-					if (MO.IsStackObject())
+					return mi.GetOpcode() == InstSub &&
+						mi.GetOp<0>().IsReg() && mi.GetOp<0>().GetReg().reg == X86_RSP;
+				});
+		}
+
+		if (sub_it != insts.end())
+		{
+			sub_it->SetOp<1>(MachineOperand::Immediate(aligned, MachineType::Int64));
+		}
+
+		// Adjust negative stack-object offsets to account for the callee-saved
+		// register save area (placed below RBP first) and any alignment padding.
+		// Outgoing-call argument slots additionally need the post-RA local-stack
+		// size folded in — they were emitted with offset = -(MaxCall-idx)*8 in
+		// EmitCall, before RA could grow the local stack with spills.
+		Int32 const local_stack = MF.GetLocalStackAllocationSize();
+		Int32 const arg_shift = -static_cast<Int32>(spill_size + padding) - local_stack;
+		Int32 const local_shift = -static_cast<Int32>(spill_size + padding);
+		TargetInstInfo const& target_inst_info = ctx.GetModule().GetTarget().GetInstInfo();
+		if (spill_size > 0 || padding > 0 || local_stack > 0)
+		{
+			for (auto const& MBB : MF.Blocks())
+			{
+				for (auto& MI : MBB->Instructions())
+				{
+					InstInfo const& inst_info = target_inst_info.GetInstInfo(MI);
+					for (Uint32 i = 0; i < inst_info.GetOperandCount(); ++i)
 					{
+						MachineOperand& MO = MI.GetOperand(i);
+						if (!MO.IsStackObject()) continue;
 						Int32 operand_offset = MO.GetStackOffset();
-						if (operand_offset < 0)
+						if (MO.IsArgSlot())
 						{
-							MI.SetOperand(i, MachineOperand::StackObject(operand_offset - stack_adjustment, MO.GetType()));
+							MI.SetOperand(i, MachineOperand::StackObject(operand_offset + arg_shift, MO.GetType()));
+						}
+						else if (operand_offset < 0 && (spill_size > 0 || padding > 0))
+						{
+							MI.SetOperand(i, MachineOperand::StackObject(operand_offset + local_shift, MO.GetType()));
 						}
 					}
 				}
 			}
 		}
 
-		Uint32 stack_offset = 0;
-		for (Uint32 gp_reg : gp_regs)
+		if (spill_size == 0)
 		{
-			stack_offset += 8;
-			MachineInstruction MI(InstMove);
-			MI.SetOp<0>(MachineOperand::StackObject(-stack_offset, MachineType::Int64));
-			MI.SetOp<1>(MachineOperand::ISAReg(gp_reg, MachineType::Int64));
-			ctx.EmitInst(insert_point, MI);
-			MF.AddCalleeSavedArg(gp_reg, stack_offset, MachineType::Int64);
+			return;
 		}
-		for (Uint32 fp_reg : fp_regs)
-		{
-			stack_offset += 8;
-			MachineInstruction MI(InstMove);
-			MI.SetOp<0>(MachineOperand::StackObject(-stack_offset, MachineType::Float64));
-			MI.SetOp<1>(MachineOperand::ISAReg(fp_reg, MachineType::Float64));
-			ctx.EmitInst(insert_point, MI);
-			MF.AddCalleeSavedArg(fp_reg, stack_offset, MachineType::Float64);
-		}
-		OLA_ASSERT(stack_offset == stack_adjustment);
 
+		if (sub_it != insts.end())
+		{
+			insert_it = std::next(sub_it);
+		}
+		else
+		{
+			insert_it = insts.begin();
+		}
+
+		Int32 save_offset = 8;
+		for (Uint32 reg : gp_regs)
+		{
+			MachineInstruction save(InstMove);
+			save.SetOp<0>(MachineOperand::StackObject(-save_offset, MachineType::Int64));
+			save.SetOp<1>(MachineOperand::ISAReg(reg, MachineType::Int64));
+			insert_it = ctx.EmitInst(insert_it, save);
+			++insert_it;
+			MF.AddCalleeSavedArg(reg, save_offset, MachineType::Int64);
+			save_offset += 8;
+		}
+		for (Uint32 reg : fp_regs)
+		{
+			MachineInstruction save(InstMove);
+			save.SetOp<0>(MachineOperand::StackObject(-save_offset, MachineType::Float64));
+			save.SetOp<1>(MachineOperand::ISAReg(reg, MachineType::Float64));
+			insert_it = ctx.EmitInst(insert_it, save);
+			++insert_it;
+			MF.AddCalleeSavedArg(reg, save_offset, MachineType::Float64);
+			save_offset += 8;
+		}
 	}
 
 	void SysV_X86TargetFrameInfo::EmitEpilogue(MachineFunction& MF, MachineContext& ctx) const
 	{
-		if (MF.GetStackAllocationSize() > 0)
+		if (MF.HasFrame())
 		{
 			MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, MachineType::Int64);
 			MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, MachineType::Int64);
@@ -302,42 +364,53 @@ namespace ola
 
 	void SysV_X86TargetFrameInfo::EmitEpiloguePostRA(MachineFunction& MF, MachineContext& ctx) const
 	{
-		if (!MF.GetCalleeSavedArgs().empty())
-		{
-			std::list<MachineInstruction>& insert_list = ctx.GetCurrentBasicBlock()->Instructions();
-			std::list<MachineInstruction>::iterator insert_point = insert_list.end();
-			insert_point = std::find_if(insert_list.begin(), insert_list.end(), [](MachineInstruction& MI)
-				{
-					if (MI.GetOpcode() == InstMove && MI.GetOp<0>().IsReg() && MI.GetOp<0>().GetReg().reg == X86_RSP
-						&& MI.GetOp<1>().IsReg() && MI.GetOp<1>().GetReg().reg == X86_RBP)
-					{
-						return true;
-					}
-					return false;
-				});
-			Bool missing_epilogue = (insert_point == insert_list.end());
-			if(missing_epilogue) --insert_point;
+		auto& insts = ctx.GetCurrentBasicBlock()->Instructions();
 
+		if (!MF.HasFrame()) return;
+
+		auto mov_it = std::find_if(insts.begin(), insts.end(),
+			[](MachineInstruction& mi)
+			{
+				return mi.GetOpcode() == InstMove &&
+					mi.GetOp<0>().IsReg() && mi.GetOp<0>().GetReg().reg == X86_RSP &&
+					mi.GetOp<1>().IsReg() && mi.GetOp<1>().GetReg().reg == X86_RBP;
+			});
+
+		if (mov_it == insts.end())
+		{
+			// Prologue created the frame post-RA, so no epilogue marker exists yet.
+			MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, MachineType::Int64);
+			MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, MachineType::Int64);
+
+			auto ret_it = std::find_if(insts.begin(), insts.end(),
+				[](MachineInstruction& mi)
+				{
+					return mi.GetOpcode() == InstRet;
+				});
+
+			if (ret_it != insts.end())
+			{
+				MachineInstruction reset_stack(InstMove);
+				reset_stack.SetOp<0>(rsp).SetOp<1>(rbp);
+				auto mov_insert_it = ctx.EmitInst(ret_it, reset_stack);
+
+				MachineInstruction pop_rbp(InstPop);
+				pop_rbp.SetOp<0>(rbp);
+				ctx.EmitInst(std::next(mov_insert_it), pop_rbp);
+				mov_it = mov_insert_it;
+			}
+		}
+
+		if (!MF.GetCalleeSavedArgs().empty() && mov_it != insts.end())
+		{
+			auto insert_it = mov_it;
 			for (auto const& [reg, offset, type] : MF.GetCalleeSavedArgs())
 			{
-				MachineInstruction MI(InstMove);
-				MI.SetOp<0>(MachineOperand::ISAReg(reg, type));
-				MI.SetOp<1>(MachineOperand::StackObject(-offset, type));
-				insert_point = ctx.EmitInst(insert_point, MI);
-				++insert_point;
-			}
-			if (missing_epilogue)
-			{
-				MachineOperand rbp = MachineOperand::ISAReg(X86_RBP, MachineType::Int64);
-				MachineOperand rsp = MachineOperand::ISAReg(X86_RSP, MachineType::Int64);
-
-				MachineInstruction set_rbp(InstMove);
-				set_rbp.SetOp<0>(rsp).SetOp<1>(rbp);
-				insert_point = ctx.EmitInst(insert_point, set_rbp); ++insert_point;
-
-				MachineInstruction allocate_stack(InstPop);
-				allocate_stack.SetOp<0>(rbp);
-				insert_point = ctx.EmitInst(insert_point, allocate_stack); ++insert_point;
+				MachineInstruction restore(InstMove);
+				restore.SetOp<0>(MachineOperand::ISAReg(reg, type));
+				restore.SetOp<1>(MachineOperand::StackObject(-offset, type));
+				insert_it = ctx.EmitInst(insert_it, restore);
+				++insert_it;
 			}
 		}
 	}

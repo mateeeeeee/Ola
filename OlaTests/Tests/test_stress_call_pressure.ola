@@ -1,0 +1,87 @@
+import std.assert;
+
+// Many vregs live across many calls. With caller-saved registers in the
+// allocator's color pool, vregs assigned to caller-saved that span a call
+// would be clobbered without the new physreg-aware liveness (calls implicitly
+// def all caller-saved registers).
+
+public int Identity(int x) { return x; }
+public int AddOne(int x)   { return x + 1; }
+public int DoubleIt(int x) { return x + x; }
+public int NegateIt(int x) { return 0 - x; }
+public int Square(int x)   { return x * x; }
+
+public int CallPressure(int seed)
+{
+    // 12 named values, all used after several intervening calls.
+    int v1  = Identity(seed + 1);
+    int v2  = Identity(seed + 2);
+    int v3  = Identity(seed + 3);
+    int v4  = Identity(seed + 4);
+    int v5  = AddOne(seed + 5);
+    int v6  = AddOne(seed + 6);
+    int v7  = AddOne(seed + 7);
+    int v8  = DoubleIt(seed + 8);
+    int v9  = DoubleIt(seed + 9);
+    int v10 = NegateIt(seed + 10);
+    int v11 = NegateIt(seed + 11);
+    int v12 = Square(seed + 1);
+
+    // Each of the calls below clobbers all caller-saved registers; v1..v12
+    // must all survive across ALL of them.
+    int u1 = AddOne(v1);
+    int u2 = AddOne(v2);
+    int u3 = AddOne(v3);
+    int u4 = AddOne(v4);
+    int u5 = DoubleIt(v5);
+    int u6 = DoubleIt(v6);
+    int u7 = DoubleIt(v7);
+    int u8 = NegateIt(v8);
+    int u9 = NegateIt(v9);
+    int u10 = Identity(v10);
+    int u11 = Identity(v11);
+    int u12 = Identity(v12);
+
+    // Every original v* AND every u* must hold the right value here.
+    return v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12
+         + u1 + u2 + u3 + u4 + u5 + u6 + u7 + u8 + u9 + u10 + u11 + u12;
+}
+
+public int RecursiveCallPressure(int n, int acc1, int acc2, int acc3, int acc4)
+{
+    if (n <= 0) return acc1 + acc2 + acc3 + acc4;
+    int next1 = acc1 + n;
+    int next2 = acc2 + (n * 2);
+    int next3 = acc3 + (n * 3);
+    int next4 = acc4 + (n * 5);
+    return RecursiveCallPressure(n - 1, next1, next2, next3, next4);
+}
+
+public int main()
+{
+    int r1 = CallPressure(10);
+    // v1..v4: 11, 12, 13, 14            sum_v_low = 50
+    // v5..v7 = 16, 17, 18                sum_v_mid = 51
+    // v8, v9 = 36, 38                    sum_v_dbl = 74
+    // v10, v11 = -20, -21                sum_v_neg = -41
+    // v12 = 121
+    // sum_v = 50 + 51 + 74 - 41 + 121 = 255
+    // u1..u4 = v1+1..v4+1 = 12,13,14,15  sum_u_low = 54
+    // u5..u7 = v5*2..v7*2 = 32,34,36     sum_u_mid = 102
+    // u8, u9 = -36, -38                  sum_u_dn  = -74
+    // u10..u12 = v10..v12 = -20,-21,121  sum_u_id  = 80
+    // sum_u = 54 + 102 - 74 + 80 = 162
+    // total = 255 + 162 = 417
+    Assert(r1 == 417);
+
+    int r2 = RecursiveCallPressure(10, 0, 0, 0, 0);
+    // sum_n_1_to_10 = 55
+    // acc1 = 55
+    // acc2 = 2*55 = 110
+    // acc3 = 3*55 = 165
+    // acc4 = 5*55 = 275
+    // total = 605
+    Assert(r2 == 605);
+
+    return 0;
+}

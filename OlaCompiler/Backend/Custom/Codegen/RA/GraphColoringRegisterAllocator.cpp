@@ -33,14 +33,24 @@ namespace ola
 	{
 		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
 
-		// Only use callee-saved registers to avoid issues with vregs live across calls
-		// (caller-saved registers are clobbered by function calls)
-		std::vector<Uint32> gp_colors = target_reg_info.GetGPCalleeSavedRegisters();
-#if defined(OLA_PLATFORM_WINDOWS)
-		std::vector<Uint32> fp_colors = target_reg_info.GetFPCalleeSavedRegisters();
-#else
-		std::vector<Uint32> fp_colors = target_reg_info.GetFPRegisters();
-#endif
+		//Allocator pool covers all user-allocatable GPRs (callee-saved + caller-saved)
+		//Liveness now tracks physreg uses/defs, so vregs live across calls or across
+		//idiv/cqo etc. get those caller-saved physregs added to forbidden_colors and
+		//won't be assigned to them
+		std::vector<Uint32> gp_colors;
+		{
+			auto callee = target_reg_info.GetGPCalleeSavedRegisters();
+			auto caller = target_reg_info.GetGPCallerSavedRegisters();
+			gp_colors.insert(gp_colors.end(), callee.begin(), callee.end());
+			gp_colors.insert(gp_colors.end(), caller.begin(), caller.end());
+		}
+		std::vector<Uint32> fp_colors;
+		{
+			auto callee = target_reg_info.GetFPCalleeSavedRegisters();
+			auto caller = target_reg_info.GetFPCallerSavedRegisters();
+			fp_colors.insert(fp_colors.end(), callee.begin(), callee.end());
+			fp_colors.insert(fp_colors.end(), caller.begin(), caller.end());
+		}
 
 		K_gp = static_cast<Uint32>(gp_colors.size());
 		K_fp = static_cast<Uint32>(fp_colors.size());
@@ -118,16 +128,21 @@ namespace ola
 
 
 	// Build(liveness)
-	//     for each live interval i do
+	//     for each vreg live interval i do
 	//         add node for vreg[i] to IG
 	//     for each pair (i, j) of live intervals do
 	//         if same register class and intervals overlap then
-	//             add interference edge (i, j)
+	//             vreg vs vreg: add interference edge
+	//             vreg vs physreg: add physreg to vreg's forbidden_colors
+	//             physreg vs physreg: ignore (they're never assigned by us)
 	void GraphColoringRegisterAllocator::Build(MachineFunction& MF, LivenessAnalysisResult& liveness, InterferenceGraph& IG)
 	{
 		for (LiveInterval& LI : liveness.live_intervals)
 		{
-			IG.AddNode(LI.vreg, LI.is_float);
+			if (IsVirtualReg(LI.vreg))
+			{
+				IG.AddNode(LI.vreg, LI.is_float);
+			}
 		}
 
 		for (Uint64 i = 0; i < liveness.live_intervals.size(); ++i)
@@ -142,9 +157,26 @@ namespace ola
 				}
 
 				Bool overlap = !(LI_i.end <= LI_j.begin || LI_j.end <= LI_i.begin);
-				if (overlap)
+				if (!overlap) 
+				{
+					continue;
+				}
+
+				Bool i_phys = IsISAReg(LI_i.vreg);
+				Bool j_phys = IsISAReg(LI_j.vreg);
+				if (i_phys && j_phys) continue;
+				if (!i_phys && !j_phys)
 				{
 					IG.AddInterference(LI_i.vreg, LI_j.vreg);
+				}
+				else
+				{
+					Uint32 vreg = i_phys ? LI_j.vreg : LI_i.vreg;
+					Uint32 phys = i_phys ? LI_i.vreg : LI_j.vreg;
+					if (IGNode* node = IG.GetNode(vreg))
+					{
+						node->forbidden_colors.insert(phys);
+					}
 				}
 			}
 		}
@@ -361,11 +393,16 @@ namespace ola
 			for (auto it = available.rbegin(); it != available.rend(); ++it)
 			{
 				Uint32 color = *it;
-				if (!used_colors.contains(color))
+				if (used_colors.contains(color)) 
 				{
-					assigned = color;
-					break;
+					continue;
 				}
+				if (node->forbidden_colors.contains(color)) 
+				{
+					continue;
+				}
+				assigned = color;
+				break;
 			}
 
 			if (assigned == INVALID_REG)
@@ -507,8 +544,21 @@ namespace ola
 					}
 				}
 
-			Bool gp_scratch_used = false;
-			Bool fp_scratch_used = false;
+				struct OperandRewrite
+				{
+					Uint32 idx;
+					Uint32 vreg_id;
+					MachineType type;
+					Bool is_use;
+					Bool is_def;
+					Bool is_colored;
+					Uint32 color;
+					Bool is_float;
+					Uint32 assigned_scratch = INVALID_REG;
+				};
+				std::vector<OperandRewrite> rewrites;
+				rewrites.reserve(inst_info.GetOperandCount());
+
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
@@ -519,54 +569,75 @@ namespace ola
 
 					Uint32 vreg_id = ResolveAlias(MO.GetReg().reg);
 					IGNode* node = IG.GetNode(vreg_id);
+					OperandRewrite r{};
+					r.idx = idx;
+					r.vreg_id = vreg_id;
+					r.type = MO.GetType();
+					r.is_use = inst_info.HasOpFlag(idx, OperandFlagUse);
+					r.is_def = inst_info.HasOpFlag(idx, OperandFlagDef);
+					r.is_colored = (node && node->color != INVALID_REG);
+					r.color = r.is_colored ? node->color : INVALID_REG;
+					r.is_float = node ? node->is_float : (MO.GetType() == MachineType::Float64);
+					rewrites.push_back(r);
+				}
 
-					if (node && node->color != INVALID_REG)
+				Bool gp_scratch_used = false;
+				Bool fp_scratch_used = false;
+
+				//Pass 1: rewrite colored vregs and emit USE-side spill loads
+				//Process USEs before DEFs so the two USE scratches are distinct
+				//(primary + return-reg fallback). DEFs (Pass 2) can safely
+				//reuse primary scratch because the instruction's reads happen
+				//before its writes
+				for (auto& r : rewrites)
+				{
+					if (r.is_colored)
 					{
-						MI.SetOperand(idx, MachineOperand::ISAReg(node->color, MO.GetType()));
-						if (!target_reg_info.IsCallerSaved(node->color))
+						MI.SetOperand(r.idx, MachineOperand::ISAReg(r.color, r.type));
+						if (!target_reg_info.IsCallerSaved(r.color))
 						{
-							if (node->is_float)
-							{
-								used_registers_info.fp_used_registers.insert(node->color);
-							}
-							else
-							{
-								used_registers_info.gp_used_registers.insert(node->color);
-							}
+							if (r.is_float)	used_registers_info.fp_used_registers.insert(r.color);
+							else			used_registers_info.gp_used_registers.insert(r.color);
 						}
 					}
-					else
+					else if (r.is_use)
 					{
-						MachineOperand spill_slot = GetSpillSlot(vreg_id, MO.GetType());
-						if (inst_info.HasOpFlag(idx, OperandFlagDef))
-						{
-							Bool is_float = (MO.GetType() == MachineType::Float64);
-							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
-							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
-							scratch_used = true;
-							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
+						MachineOperand spill_slot = GetSpillSlot(r.vreg_id, r.type);
+						Bool is_float = r.type == MachineType::Float64;
+						Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
+						Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+						Uint32 scratch = scratch_used ? target_reg_info.GetReturnRegister() : primary_scratch;
+						scratch_used = true;
+						r.assigned_scratch = scratch;
 
-							auto next_it = std::next(it);
-							MachineInstruction store_inst(InstStore);
-							store_inst.SetOp<0>(spill_slot);
-							store_inst.SetOp<1>(MachineOperand::ISAReg(scratch, MO.GetType()));
-							instructions.insert(next_it, store_inst);
-						}
-						else
-						{
-							Bool is_float = (MO.GetType() == MachineType::Float64);
-							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
-							Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
-							Uint32 scratch = scratch_used ? target_reg_info.GetReturnRegister() : primary_scratch;
-							scratch_used = true;
-
-							MachineInstruction load_inst(InstLoad);
-							load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, MO.GetType()));
-							load_inst.SetOp<1>(spill_slot);
-							instructions.insert(it, load_inst);
-							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
-						}
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, r.type));
+						load_inst.SetOp<1>(spill_slot);
+						instructions.insert(it, load_inst);
+						MI.SetOperand(r.idx, MachineOperand::ISAReg(scratch, r.type));
 					}
+				}
+
+				//Pass 2: emit DEF-side spill stores 
+				//For USE+DEF operands the store reuses the same scratch 
+				//already loaded in Pass 1, for DEF-only operands the store 
+				//uses primary scratch
+				for (auto const& r : rewrites)
+				{
+					if (r.is_colored) continue;
+					if (!r.is_def) continue;
+
+					MachineOperand spill_slot = GetSpillSlot(r.vreg_id, r.type);
+					Bool is_float = r.type == MachineType::Float64;
+					Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+					Uint32 scratch = (r.assigned_scratch != INVALID_REG) ? r.assigned_scratch : primary_scratch;
+					MI.SetOperand(r.idx, MachineOperand::ISAReg(scratch, r.type));
+
+					auto next_it = std::next(it);
+					MachineInstruction store_inst(InstStore);
+					store_inst.SetOp<0>(spill_slot);
+					store_inst.SetOp<1>(MachineOperand::ISAReg(scratch, r.type));
+					instructions.insert(next_it, store_inst);
 				}
 
 				++it;

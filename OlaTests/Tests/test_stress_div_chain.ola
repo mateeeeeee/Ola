@@ -1,0 +1,88 @@
+import std.assert;
+
+// Heavy chain of signed divisions and modulos.
+// On x86 these all flow through idiv / cqo, which use RAX and RDX implicitly.
+// Each subsequent expression keeps prior intermediates live across more idivs,
+// so a vreg wrongly assigned to RAX or RDX would be silently clobbered.
+// `public` prevents IPCP from folding the function body to a constant.
+
+public int DivChain(int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    int q1 = a / b;
+    int q2 = c / d;
+    int q3 = e / f;
+    int q4 = g / h;
+
+    int r1 = a % b;
+    int r2 = c % d;
+    int r3 = e % f;
+    int r4 = g % h;
+
+    // Cross-products: every quotient must survive across the next divisions
+    int x1 = (q1 + q2) / (r1 + 1);
+    int x2 = (q3 + q4) / (r2 + 1);
+    int x3 = (x1 + x2) / (r3 + 1);
+    int x4 = (q1 + q3) % (r4 + 1);
+
+    int y1 = (a + b) / (c + d);
+    int y2 = (e + f) / (g + h);
+    int y3 = (a + e) % (c + g);
+    int y4 = (b + f) % (d + h);
+
+    return q1 + q2 + q3 + q4 + r1 + r2 + r3 + r4
+         + x1 + x2 + x3 + x4
+         + y1 + y2 + y3 + y4;
+}
+
+public int RecursiveGCD(int a, int b)
+{
+    if (b == 0) return a;
+    int rem = a % b;
+    return RecursiveGCD(b, rem);
+}
+
+public int ModularSum(int n)
+{
+    int total = 0;
+    int i = 1;
+    while (i <= n)
+    {
+        int a = i * 7;
+        int b = i * 13;
+        int c = i * 19;
+        int q = a / 3;
+        int r = b % 5;
+        int s = c / 11;
+        int t = (a + b) % (c + 1);
+        total = total + q + r + s + t;
+        i = i + 1;
+    }
+    return total;
+}
+
+public int main()
+{
+    int r1 = DivChain(100, 7, 50, 3, 200, 11, 99, 13);
+    // Computed by hand:
+    // q1=14 q2=16 q3=18 q4=7   sum=55
+    // r1=2  r2=2  r3=2  r4=8   sum=14
+    // x1=(14+16)/(2+1)=10
+    // x2=(18+7)/(2+1)=8
+    // x3=(10+8)/(2+1)=6
+    // x4=(14+18)%(8+1)=32%9=5
+    // y1=(100+7)/(50+3)=107/53=2
+    // y2=(200+11)/(99+13)=211/112=1
+    // y3=(100+200)%(50+99)=300%149=2
+    // y4=(7+11)%(3+13)=18%16=2
+    // total = 55+14+10+8+6+5+2+1+2+2 = 105
+    Assert(r1 == 105);
+
+    Assert(RecursiveGCD(48, 18) == 6);
+    Assert(RecursiveGCD(100, 75) == 25);
+    Assert(RecursiveGCD(1071, 462) == 21);
+
+    int s = ModularSum(10);
+    Assert(s > 0);
+
+    return 0;
+}

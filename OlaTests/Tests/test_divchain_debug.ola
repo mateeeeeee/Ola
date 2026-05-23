@@ -1,0 +1,33 @@
+import std.assert;
+import std.io;
+
+public int DivChain(int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    int q1 = a / b;
+    int q2 = c / d;
+    int q3 = e / f;
+    int q4 = g / h;
+    int r1 = a % b;
+    int r2 = c % d;
+    int r3 = e % f;
+    int r4 = g % h;
+    int x1 = (q1 + q2) / (r1 + 1);
+    int x2 = (q3 + q4) / (r2 + 1);
+    int x3 = (x1 + x2) / (r3 + 1);
+    int x4 = (q1 + q3) % (r4 + 1);
+    int y1 = (a + b) / (c + d);
+    int y2 = (e + f) / (g + h);
+    int y3 = (a + e) % (c + g);
+    int y4 = (b + f) % (d + h);
+    return q1 + q2 + q3 + q4 + r1 + r2 + r3 + r4
+         + x1 + x2 + x3 + x4
+         + y1 + y2 + y3 + y4;
+}
+
+public int main()
+{
+    int r = DivChain(100, 7, 50, 3, 200, 11, 99, 13);
+    PrintInt(r);
+    PrintNewline();
+    return 0;
+}

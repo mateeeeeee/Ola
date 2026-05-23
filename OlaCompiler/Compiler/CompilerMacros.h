@@ -33,6 +33,7 @@
 #define OLA(...)				std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_BACKEND_FLAG OLA_VERIFY_FLAG __VA_ARGS__))
 #define OLA_TEST(...)			std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_BACKEND_FLAG OLA_VERIFY_FLAG --timeout --test __VA_ARGS__))
 #define OLA_TEST_INTERPRET(...)	std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_VERIFY_FLAG --interpret --timeout --test __VA_ARGS__))
+#define OLA_TEST_X86(...)		std::system(OLA_STRINGIFY(OLA_EXE_PATH OLA_OPT_FLAG OLA_BACKEND_FLAG OLA_VERIFY_FLAG --target x64 --timeout --test __VA_ARGS__))
 
 #if defined(OLA_PLATFORM_WINDOWS)
 	#if DEBUG

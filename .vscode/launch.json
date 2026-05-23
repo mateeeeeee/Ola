@@ -1,9 +1,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        // ----------------------------------------------------------------
-        // Compiler driver
-        // ----------------------------------------------------------------
         {
             "name": "Debug Ola Compiler",
             "type": "lldb",
@@ -40,11 +37,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Release)"
         },
-        // ----------------------------------------------------------------
-        // OlaTests — unit tests
-        //   Lexer, Parser, Sema, IR, IR Passes,
-        //   Machine IR, Register Allocation
-        // ----------------------------------------------------------------
         {
             "name": "Tests: Unit (Debug)",
             "type": "lldb",
@@ -135,9 +127,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Debug)"
         },
-        // ----------------------------------------------------------------
-        // OlaTestsE2E — custom backend E2E tests
-        // ----------------------------------------------------------------
         {
             "name": "Tests: E2E (Debug)",
             "type": "lldb",
@@ -156,9 +145,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Release)"
         },
-        // ----------------------------------------------------------------
-        // OlaTestsInterpreter — interpreter E2E tests
-        // ----------------------------------------------------------------
         {
             "name": "Tests: E2E Interpreter (Debug)",
             "type": "lldb",
@@ -177,9 +163,33 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Release)"
         },
-        // ----------------------------------------------------------------
-        // OlaTestsLLVM — LLVM backend E2E tests
-        // ----------------------------------------------------------------
+        {
+            "name": "Tests: E2E X86 (Debug)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTestsE2EX86",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
+        {
+            "name": "Tests: E2E X86 (Release)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/bin/OlaTestsE2EX86",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Release)"
+        },
+        {
+            "name": "Tests: E2E X86 RegAlloc only",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/debug/bin/OlaTestsE2EX86",
+            "args": ["--gtest_filter=X86_RegAlloc.*"],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Ola (Debug)"
+        },
         {
             "name": "Tests: E2E LLVM (Debug)",
             "type": "lldb",
@@ -198,9 +208,6 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build Ola (Release)"
         },
-        // ----------------------------------------------------------------
-        // Playground
-        // ----------------------------------------------------------------
         {
             "name": "Debug OlaPlayground",
             "type": "lldb",

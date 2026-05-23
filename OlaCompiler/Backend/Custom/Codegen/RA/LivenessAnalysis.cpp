@@ -15,6 +15,16 @@ namespace ola
 		return static_cast<Uint32>(operand.GetReg().reg);
 	}
 
+	static inline Bool IsTrackableRegOperand(MachineOperand const& MO)
+	{
+		if (!MO.IsReg()) 
+		{
+			return false;
+		}
+		Uint32 r = MO.GetReg().reg;
+		return IsVirtualReg(r) || IsISAReg(r);
+	}
+
 	static void AssignInstNum(MachineFunction& MF, std::unordered_map<MachineInstruction*, Uint64>& inst_number_map,
 							  std::unordered_map<MachineBasicBlock*, Uint64>& block_start_map,
 							  std::unordered_map<MachineBasicBlock*, Uint64>& block_end_map)
@@ -75,7 +85,9 @@ namespace ola
 		std::unordered_set<Uint32> live_out; // Registers live at block exit
 	};
 
-	static void ComputeLocalDefUse(MachineBasicBlock* MBB, BlockLivenessInfo& info, TargetInstInfo const& target_inst_info)
+	static void ComputeLocalDefUse(MachineBasicBlock* MBB, BlockLivenessInfo& info,
+								   TargetInstInfo const& target_inst_info,
+								   TargetRegisterInfo const& target_reg_info)
 	{
 		for (MachineInstruction& MI : MBB->Instructions())
 		{
@@ -83,33 +95,60 @@ namespace ola
 			for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 			{
 				MachineOperand& MO = MI.GetOperand(idx);
-				if (!IsOperandVReg(MO))
+				if (!IsTrackableRegOperand(MO)) 
+				{
+					continue;
+				}
+				if (!inst_info.HasOpFlag(idx, OperandFlagUse)) 
 				{
 					continue;
 				}
 
 				Uint32 reg_id = GetRegAsUint(MO);
-				if (inst_info.HasOpFlag(idx, OperandFlagUse))
+				if (!info.def.contains(reg_id))
 				{
-					if (!info.def.contains(reg_id))
-					{
-						info.use.insert(reg_id);
-					}
+					info.use.insert(reg_id);
+				}
+			}
+			for (Uint32 idx = 0; idx < inst_info.GetImplicitUseCount(); ++idx)
+			{
+				Uint32 reg_id = inst_info.GetImplicitUse(idx);
+				if (!info.def.contains(reg_id))
+				{
+					info.use.insert(reg_id);
 				}
 			}
 
 			for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 			{
 				MachineOperand& MO = MI.GetOperand(idx);
-				if (!IsOperandVReg(MO))
+				if (!IsTrackableRegOperand(MO)) 
+				{
+					continue;
+				}
+				if (!inst_info.HasOpFlag(idx, OperandFlagDef)) 
 				{
 					continue;
 				}
 
 				Uint32 reg_id = GetRegAsUint(MO);
-				if (inst_info.HasOpFlag(idx, OperandFlagDef))
+				info.def.insert(reg_id);
+			}
+			for (Uint32 idx = 0; idx < inst_info.GetImplicitDefCount(); ++idx)
+			{
+				info.def.insert(inst_info.GetImplicitDef(idx));
+			}
+
+			//Calls clobber all caller-saved regs
+			if (inst_info.HasInstFlag(InstFlagCall))
+			{
+				for (Uint32 reg : target_reg_info.GetGPCallerSavedRegisters())
 				{
-					info.def.insert(reg_id);
+					info.def.insert(reg);
+				}
+				for (Uint32 reg : target_reg_info.GetFPCallerSavedRegisters())
+				{
+					info.def.insert(reg);
 				}
 			}
 		}
@@ -157,6 +196,7 @@ namespace ola
 	{
 		LivenessAnalysisResult result{};
 		TargetInstInfo const& target_inst_info = M.GetTarget().GetInstInfo();
+		TargetRegisterInfo const& target_reg_info = M.GetTarget().GetRegisterInfo();
 		CFGAnalysis(MF);
 
 		std::unordered_map<MachineBasicBlock*, Uint64> block_start_map;
@@ -166,13 +206,38 @@ namespace ola
 		std::unordered_map<MachineBasicBlock*, BlockLivenessInfo> block_info;
 		for (auto& MBB : MF.Blocks())
 		{
-			ComputeLocalDefUse(MBB.get(), block_info[MBB.get()], target_inst_info);
+			ComputeLocalDefUse(MBB.get(), block_info[MBB.get()], target_inst_info, target_reg_info);
 		}
 
 		while (ComputeLiveInOut(block_info)) {}
-		
+
 		std::unordered_map<Uint32, LiveInterval> live_interval_map;
 		std::unordered_map<Uint32, Bool> reg_is_float;
+
+		auto RecordReg = [&](Uint32 reg_id, Bool is_float, Uint64 idx)
+		{
+			reg_is_float[reg_id] = is_float;
+			auto it = live_interval_map.find(reg_id);
+			if (it == live_interval_map.end())
+			{
+				live_interval_map[reg_id].begin = idx;
+				live_interval_map[reg_id].end = idx + 1;
+			}
+			else
+			{
+				it->second.Extend(idx);
+			}
+		};
+
+		auto IsFloatPhysReg = [&](Uint32 reg) -> Bool
+		{
+			for (Uint32 fp : target_reg_info.GetFPRegisters())
+			{
+				if (fp == reg) return true;
+			}
+			return false;
+		};
+
 		for (auto& MBB : MF.Blocks())
 		{
 			BlockLivenessInfo& info = block_info[MBB.get()];
@@ -180,31 +245,15 @@ namespace ola
 			Uint64 block_end = block_end_map[MBB.get()];
 			for (Uint32 reg : info.live_in)
 			{
-				if (!live_interval_map.contains(reg))
-				{
-					live_interval_map[reg].begin = block_start;
-					live_interval_map[reg].end = block_start + 1;
-				}
-				else
-				{
-					live_interval_map[reg].Extend(block_start);
-				}
+				Bool is_float = IsISAReg(reg) ? IsFloatPhysReg(reg) : (reg_is_float.contains(reg) ? reg_is_float[reg] : false);
+				RecordReg(reg, is_float, block_start);
 			}
-
 			for (Uint32 reg : info.live_out)
 			{
-				if (!live_interval_map.contains(reg))
-				{
-					live_interval_map[reg].begin = block_end;
-					live_interval_map[reg].end = block_end + 1;
-				}
-				else
-				{
-					live_interval_map[reg].Extend(block_end);
-				}
+				Bool is_float = IsISAReg(reg) ? IsFloatPhysReg(reg) : (reg_is_float.contains(reg) ? reg_is_float[reg] : false);
+				RecordReg(reg, is_float, block_end);
 			}
 
-			std::unordered_set<Uint32> currently_live = info.live_in;
 			for (MachineInstruction& MI : MBB->Instructions())
 			{
 				Uint64 inst_idx = result.instruction_numbering_map[&MI];
@@ -213,51 +262,50 @@ namespace ola
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO))
+					if (!IsTrackableRegOperand(MO))
+					{
+						 continue;
+					}
+					if (!inst_info.HasOpFlag(idx, OperandFlagUse)) 
 					{
 						continue;
 					}
 
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float = MO.GetType() == MachineType::Float64;
-					reg_is_float[reg_id] = is_float;
-
-					if (inst_info.HasOpFlag(idx, OperandFlagUse))
-					{
-						if (live_interval_map.contains(reg_id))
-						{
-							live_interval_map[reg_id].Extend(inst_idx);
-						}
-						else
-						{
-							live_interval_map[reg_id].begin = inst_idx;
-							live_interval_map[reg_id].end = inst_idx + 1;
-						}
-					}
+					RecordReg(reg_id, is_float, inst_idx);
+				}
+				for (Uint32 idx = 0; idx < inst_info.GetImplicitUseCount(); ++idx)
+				{
+					Uint32 reg_id = inst_info.GetImplicitUse(idx);
+					RecordReg(reg_id, IsFloatPhysReg(reg_id), inst_idx);
 				}
 
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
-					if (!IsOperandVReg(MO))
-					{
-						continue;
-					}
+					if (!IsTrackableRegOperand(MO)) continue;
+					if (!inst_info.HasOpFlag(idx, OperandFlagDef)) continue;
 
 					Uint32 reg_id = GetRegAsUint(MO);
 					Bool is_float = MO.GetType() == MachineType::Float64;
-					reg_is_float[reg_id] = is_float;
-					if (inst_info.HasOpFlag(idx, OperandFlagDef))
+					RecordReg(reg_id, is_float, inst_idx);
+				}
+				for (Uint32 idx = 0; idx < inst_info.GetImplicitDefCount(); ++idx)
+				{
+					Uint32 reg_id = inst_info.GetImplicitDef(idx);
+					RecordReg(reg_id, IsFloatPhysReg(reg_id), inst_idx);
+				}
+
+				if (inst_info.HasInstFlag(InstFlagCall))
+				{
+					for (Uint32 reg : target_reg_info.GetGPCallerSavedRegisters())
 					{
-						if (!live_interval_map.contains(reg_id))
-						{
-							live_interval_map[reg_id].begin = inst_idx;
-							live_interval_map[reg_id].end = inst_idx + 1;
-						}
-						else
-						{
-							live_interval_map[reg_id].Extend(inst_idx);
-						}
+						RecordReg(reg, false, inst_idx);
+					}
+					for (Uint32 reg : target_reg_info.GetFPCallerSavedRegisters())
+					{
+						RecordReg(reg, true, inst_idx);
 					}
 				}
 			}

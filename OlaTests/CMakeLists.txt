@@ -64,11 +64,25 @@ set(OLA_TESTS
 	Tests/test_scope.ola
 	Tests/test_static.ola
 	Tests/test_default_params.ola
+	Tests/test_stress_div_chain.ola
+	Tests/test_stress_shifts.ola
+	Tests/test_stress_call_pressure.ola
+	Tests/test_stress_reg_pressure.ola
+	Tests/test_stress_combined.ola
 )
 
 add_executable(OlaTests ${SOURCE})
 add_executable(OlaTestsE2E ${SOURCE_E2E})
 add_executable(OlaTestsInterpreter ${SOURCE_INTERPRETER})
+
+# X86 cross-target E2E tests. Only meaningful on macOS (where the default
+# target is ARM, so X86 codegen is otherwise never exercised end-to-end on
+# Apple Silicon). Requires Rosetta 2.
+if(APPLE)
+    add_executable(OlaTestsE2EX86 TestE2EX86.cpp)
+    target_link_libraries(OlaTestsE2EX86 PRIVATE gtest_main OlaCompiler)
+    target_include_directories(OlaTestsE2EX86 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 
 source_group(" " FILES ${SOURCE})
 source_group("Tests" FILES ${OLA_TESTS})
@@ -111,6 +125,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
         "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
     )
+    if(APPLE)
+        target_compile_options(OlaTestsE2EX86 PRIVATE
+            "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Types.h"
+            "SHELL:-include ${CMAKE_SOURCE_DIR}/OlaCompiler/Core/Defines.h"
+        )
+    endif()
 endif()
 
 # Configure the path to Ola executable for tests
@@ -138,6 +158,15 @@ target_compile_definitions(OlaTestsInterpreter PRIVATE
     OLA_LLVM_BACKEND=0
     $<$<BOOL:${OLA_VERIFY_IR}>:OLA_VERIFY_IR=1>
 )
+
+if(APPLE)
+    target_compile_definitions(OlaTestsE2EX86 PRIVATE
+        OLA_EXE_PATH="${OLA_EXE_PATH}"
+        OLA_TESTS_PATH="${CMAKE_SOURCE_DIR}/OlaTests/"
+        OLA_LLVM_BACKEND=0
+        $<$<BOOL:${OLA_VERIFY_IR}>:OLA_VERIFY_IR=1>
+    )
+endif()
 
 if(LLVM_FOUND)
     add_executable(OlaTestsLLVM TestE2ELLVM.cpp)

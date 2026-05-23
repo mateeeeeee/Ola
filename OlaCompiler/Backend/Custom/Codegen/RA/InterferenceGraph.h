@@ -17,6 +17,7 @@ namespace ola
 		Float64 spill_cost;
 		Uint32 degree;
 		std::unordered_set<Uint32> neighbors;
+		std::unordered_set<Uint32> forbidden_colors;
 
 		IGNode() : vreg(0), color(INVALID_REG), is_float(false), spilled(false), on_stack(false), spill_cost(0.0), degree(0) {}
 		explicit IGNode(Uint32 vreg, Bool is_float)

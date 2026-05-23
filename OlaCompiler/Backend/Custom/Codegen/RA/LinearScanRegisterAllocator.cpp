@@ -39,6 +39,13 @@ namespace ola
 		frame_register = target_reg_info.GetFramePointerRegister();
 		for (LiveInterval& LI : live_intervals)
 		{
+			//Skip physreg intervals; the callee-saved-only pool means vregs already
+			//can't be assigned caller-saved regs that physreg intervals reserve
+			if (IsISAReg(LI.vreg)) 
+			{
+				continue;
+			}
+
 			ExpireOldIntervals(LI);
 			if ((LI.is_float && fp_regs.empty()) || (!LI.is_float && gp_regs.empty()))
 			{
@@ -281,8 +288,20 @@ namespace ola
 					}
 				}
 
-				Bool gp_scratch_used = false;
-				Bool fp_scratch_used = false;
+				//(see GraphColoring allocator for the rationale).
+				struct OperandRewrite
+				{
+					Uint32 idx;
+					Uint32 vreg_id;
+					MachineType type;
+					Bool is_use;
+					Bool is_def;
+					Bool is_assigned;
+					Uint32 reg;
+					Uint32 assigned_scratch = INVALID_REG;
+				};
+				std::vector<OperandRewrite> rewrites;
+				rewrites.reserve(inst_info.GetOperandCount());
 				for (Uint32 idx = 0; idx < inst_info.GetOperandCount(); ++idx)
 				{
 					MachineOperand& MO = MI.GetOperand(idx);
@@ -292,43 +311,62 @@ namespace ola
 					}
 
 					Uint32 vreg_id = MO.GetReg().reg;
-					if (vreg2reg_map.contains(vreg_id))
-					{
-						Uint32 reg_id = vreg2reg_map[vreg_id];
-						MI.SetOperand(idx, MachineOperand::ISAReg(reg_id, MO.GetType()));
-					}
-					else
-					{
-						MachineOperand spill_slot = GetSpillSlot(vreg_id, MO.GetType());
-						if (inst_info.HasOpFlag(idx, OperandFlagDef))
-						{
-							Bool is_float = (MO.GetType() == MachineType::Float64);
-							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
-							Uint32 scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
-							scratch_used = true;
-							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
+					OperandRewrite r{};
+					r.idx = idx;
+					r.vreg_id = vreg_id;
+					r.type = MO.GetType();
+					r.is_use = inst_info.HasOpFlag(idx, OperandFlagUse);
+					r.is_def = inst_info.HasOpFlag(idx, OperandFlagDef);
+					r.is_assigned = vreg2reg_map.contains(vreg_id);
+					r.reg = r.is_assigned ? vreg2reg_map[vreg_id] : INVALID_REG;
+					rewrites.push_back(r);
+				}
 
-							auto next_it = std::next(it);
-							MachineInstruction store_inst(InstStore);
-							store_inst.SetOp<0>(spill_slot);
-							store_inst.SetOp<1>(MachineOperand::ISAReg(scratch, MO.GetType()));
-							instructions.insert(next_it, store_inst);
-						}
-						else
-						{
-							Bool is_float = (MO.GetType() == MachineType::Float64);
-							Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
-							Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
-							Uint32 scratch = scratch_used ? target_reg_info.GetReturnRegister() : primary_scratch;
-							scratch_used = true;
+				Bool gp_scratch_used = false;
+				Bool fp_scratch_used = false;
 
-							MachineInstruction load_inst(InstLoad);
-							load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, MO.GetType()));
-							load_inst.SetOp<1>(spill_slot);
-							instructions.insert(it, load_inst);
-							MI.SetOperand(idx, MachineOperand::ISAReg(scratch, MO.GetType()));
-						}
+				//Pass 1: rewrite assigned vregs and emit USE-side spill loads
+				for (auto& r : rewrites)
+				{
+					if (r.is_assigned)
+					{
+						MI.SetOperand(r.idx, MachineOperand::ISAReg(r.reg, r.type));
 					}
+					else if (r.is_use)
+					{
+						MachineOperand spill_slot = GetSpillSlot(r.vreg_id, r.type);
+						Bool is_float = r.type == MachineType::Float64;
+						Bool& scratch_used = is_float ? fp_scratch_used : gp_scratch_used;
+						Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+						Uint32 scratch = scratch_used ? target_reg_info.GetReturnRegister() : primary_scratch;
+						scratch_used = true;
+						r.assigned_scratch = scratch;
+
+						MachineInstruction load_inst(InstLoad);
+						load_inst.SetOp<0>(MachineOperand::ISAReg(scratch, r.type));
+						load_inst.SetOp<1>(spill_slot);
+						instructions.insert(it, load_inst);
+						MI.SetOperand(r.idx, MachineOperand::ISAReg(scratch, r.type));
+					}
+				}
+
+				//Pass 2: emit DEF-side spill stores
+				for (auto const& r : rewrites)
+				{
+					if (r.is_assigned) continue;
+					if (!r.is_def) continue;
+
+					MachineOperand spill_slot = GetSpillSlot(r.vreg_id, r.type);
+					Bool is_float = r.type == MachineType::Float64;
+					Uint32 primary_scratch = is_float ? target_reg_info.GetFPScratchRegister() : target_reg_info.GetGPScratchRegister();
+					Uint32 scratch = (r.assigned_scratch != INVALID_REG) ? r.assigned_scratch : primary_scratch;
+					MI.SetOperand(r.idx, MachineOperand::ISAReg(scratch, r.type));
+
+					auto next_it = std::next(it);
+					MachineInstruction store_inst(InstStore);
+					store_inst.SetOp<0>(spill_slot);
+					store_inst.SetOp<1>(MachineOperand::ISAReg(scratch, r.type));
+					instructions.insert(next_it, store_inst);
 				}
 			}
 		}

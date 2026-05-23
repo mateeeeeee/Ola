@@ -70,14 +70,19 @@ namespace ola
 	struct MachineStackObject
 	{
 		Int32 offset;
+		//Outgoing call argument slot, encoded with offset = -(MaxCallArgCount - idx) * 8,
+		//rewritten to its final RBP-relative offset in EmitProloguePostRA once the post-RA
+		//local-stack size is known. Distinct from a regular StackObject so the rewrite can
+		//pick a different shift amount without confusing it with a local/spill slot.
+		Bool is_arg_slot = false;
 
 		Bool operator==(MachineStackObject const& rhs) const
 		{
-			return offset == rhs.offset;
+			return offset == rhs.offset && is_arg_slot == rhs.is_arg_slot;
 		}
 		Bool operator!=(MachineStackObject const& rhs) const
 		{
-			return offset != rhs.offset;
+			return !(*this == rhs);
 		}
 	};
 
@@ -121,6 +126,10 @@ namespace ola
 		Int32 GetStackOffset() const
 		{
 			return std::get<MachineStackObject>(storage).offset;
+		}
+		Bool IsArgSlot() const
+		{
+			return IsStackObject() && std::get<MachineStackObject>(storage).is_arg_slot;
 		}
 
 		Bool IsImmediate() const { return std::holds_alternative<Int64>(storage); }
@@ -178,9 +187,13 @@ namespace ola
 		{
 			return MachineOperand(MachineRegister{ reg + VIRTUAL_REG_BEGIN }, type);
 		}
-		static MachineOperand StackObject(Int32 offset, MachineType type) 
+		static MachineOperand StackObject(Int32 offset, MachineType type)
 		{
-			return MachineOperand(MachineStackObject{ offset }, type);
+			return MachineOperand(MachineStackObject{ offset, false }, type);
+		}
+		static MachineOperand ArgSlot(Int32 offset, MachineType type)
+		{
+			return MachineOperand(MachineStackObject{ offset, true }, type);
 		}
 		static MachineOperand InvalidReg() 
 		{

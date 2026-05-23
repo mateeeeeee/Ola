@@ -42,7 +42,7 @@ Optimizing compiler for a statically-typed C-like language, featuring both an LL
       - Register Allocation: linear scan, graph coloring with optional copy coalescing
     - x86-64 code generation
       - Microsoft ABI
-      - SysV ABI (wip)
+      - SysV ABI
     - ARM64 code generation
     - Class support
     - Interpreter

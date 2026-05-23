@@ -48,9 +48,9 @@ namespace ola
 			Uint32 opcode = (arg_operand.IsMemoryOperand() && (arg->GetType()->IsPointer() || is_aggregate_arg)) ? InstLoadGlobalAddress : InstMove;
 			if (idx >= 4)
 			{
-				Int32 offset = MF->GetLocalStackAllocationSize() + (MF->GetMaxCallArgCount() - idx) * 8;
+				Int32 offset = (MF->GetMaxCallArgCount() - idx) * 8;
 				MachineInstruction copy_arg_to_stack(opcode);
-				copy_arg_to_stack.SetOp<0>(MachineOperand::StackObject(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+				copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
 				ctx.EmitInst(copy_arg_to_stack);
 			}
 			else
@@ -249,9 +249,15 @@ namespace ola
 			sub_it->SetOp<1>(MachineOperand::Immediate(aligned, MachineType::Int64));
 		}
 
-		// Adjust stack object offsets to account for callee-saved registers and padding
+		// Adjust stack object offsets to account for callee-saved registers and padding.
+		// Outgoing-call argument slots additionally need the post-RA local-stack size
+		// folded in — they were emitted with offset = -(MaxCall-idx)*8 in EmitCall,
+		// before RA could grow the local stack with spills.
+		Int32 const local_stack = MF.GetLocalStackAllocationSize();
+		Int32 const arg_shift = -static_cast<Int32>(spill_size + padding) - local_stack;
+		Int32 const local_shift = -static_cast<Int32>(spill_size + padding);
 		TargetInstInfo const& target_inst_info = ctx.GetModule().GetTarget().GetInstInfo();
-		if (spill_size > 0 || padding > 0)
+		if (spill_size > 0 || padding > 0 || local_stack > 0)
 		{
 			for (auto& MBB : MF.Blocks())
 			{
@@ -261,13 +267,15 @@ namespace ola
 					for (Uint32 i = 0; i < instruction_info.GetOperandCount(); ++i)
 					{
 						MachineOperand& MO = MI.GetOperand(i);
-						if (MO.IsStackObject())
+						if (!MO.IsStackObject()) continue;
+						Int32 offset = MO.GetStackOffset();
+						if (MO.IsArgSlot())
 						{
-							Int32 offset = MO.GetStackOffset();
-							if (offset < 0)
-							{
-								MO = MachineOperand::StackObject(offset - spill_size - padding, MO.GetType());
-							}
+							MO = MachineOperand::StackObject(offset + arg_shift, MO.GetType());
+						}
+						else if (offset < 0 && (spill_size > 0 || padding > 0))
+						{
+							MO = MachineOperand::StackObject(offset + local_shift, MO.GetType());
 						}
 					}
 				}

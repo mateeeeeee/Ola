@@ -1,0 +1,102 @@
+import std.assert;
+
+// Many simultaneous live values to push the allocator past the GP register
+// count and force spills. Verifies the spilling path still computes correctly.
+// Includes division and call ops so spilled values must be reloaded into
+// non-clobbered registers across idiv / call sites.
+
+public int HighPressure(int a, int b, int c, int d,
+                        int e, int f, int g, int h,
+                        int i, int j, int k, int l)
+{
+    // 12 inputs + many derived values, all kept live until the final sum.
+    int x1 = a + b;
+    int x2 = c + d;
+    int x3 = e + f;
+    int x4 = g + h;
+    int x5 = i + j;
+    int x6 = k + l;
+
+    int y1 = a * b;
+    int y2 = c * d;
+    int y3 = e * f;
+    int y4 = g * h;
+
+    int z1 = a / (b + 1);
+    int z2 = c / (d + 1);
+    int z3 = e / (f + 1);
+    int z4 = g / (h + 1);
+
+    int w1 = a % (b + 1);
+    int w2 = c % (d + 1);
+    int w3 = e % (f + 1);
+    int w4 = g % (h + 1);
+
+    // Every variable above must still be holding its value here:
+    int s1 = x1 + x2 + x3 + x4 + x5 + x6;
+    int s2 = y1 + y2 + y3 + y4;
+    int s3 = z1 + z2 + z3 + z4;
+    int s4 = w1 + w2 + w3 + w4;
+
+    return s1 + s2 + s3 + s4;
+}
+
+public int Helper(int a, int b) { return a * 2 + b; }
+
+public int CrossClassPressure(int n)
+{
+    // Mix integer and float computations interleaved so both register classes
+    // are under pressure simultaneously.
+    int    i1 = n + 1;
+    float  f1 = 1.5;
+    int    i2 = n + 2;
+    float  f2 = 2.5;
+    int    i3 = n + 3;
+    float  f3 = 3.5;
+    int    i4 = n + 4;
+    float  f4 = 4.5;
+    int    i5 = n + 5;
+    float  f5 = 5.5;
+    int    i6 = n + 6;
+    float  f6 = 6.5;
+    int    i7 = n + 7;
+    float  f7 = 7.5;
+
+    // Force integer ops that interact with idiv / shifts:
+    int i_sum = i1 + i2 + i3 + i4 + i5 + i6 + i7;
+    int i_mul = i1 * i2 + i3 * i4 + i5 * i6;
+    int i_div = i7 / (i1 + 1) + i6 / (i2 + 1);
+    int i_mod = i7 % (i1 + 1) + i6 % (i2 + 1);
+
+    // Float ops in parallel:
+    float f_sum = f1 + f2 + f3 + f4 + f5 + f6 + f7;
+    float f_mul = f1 * f2 + f3 * f4 + f5 * f6;
+    float f_div = f7 / f1 + f6 / f2;
+
+    int f_int = f_sum + f_mul + f_div;
+    int extra = Helper(i_sum, i_mul);
+    return i_sum + i_mul + i_div + i_mod + f_int + extra;
+}
+
+public int main()
+{
+    int r1 = HighPressure(10, 3, 20, 7, 30, 11, 40, 13, 50, 17, 60, 19);
+    // x1=13 x2=27 x3=41 x4=53 x5=67 x6=79 -> s1=280
+    // y1=30 y2=140 y3=330 y4=520 -> s2=1020
+    // z1=10/4=2  z2=20/8=2   z3=30/12=2  z4=40/14=2  -> s3=8
+    // w1=10%4=2  w2=20%8=4   w3=30%12=6  w4=40%14=12 -> s4=24
+    // total = 280 + 1020 + 8 + 24 = 1332
+    Assert(r1 == 1332);
+
+    int r2 = CrossClassPressure(0);
+    // Just ensure consistent output across calls (RA shouldn't make this
+    // non-deterministic).
+    int r3 = CrossClassPressure(0);
+    Assert(r2 == r3);
+
+    int r4 = CrossClassPressure(5);
+    int r5 = CrossClassPressure(5);
+    Assert(r4 == r5);
+
+    return 0;
+}

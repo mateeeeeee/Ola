@@ -391,7 +391,11 @@ namespace ola
 								else if constexpr (std::is_same_v<T, Uint32>)			EmitReadOnly(".long {}", arg);
 								else if constexpr (std::is_same_v<T, Uint64>)			EmitReadOnly(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)		EmitReadOnly(".string \"{}\"", arg);
+#if defined(OLA_PLATFORM_MACOS)
+								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitReadOnly(".quad _{}", arg.name);
+#else
 								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitReadOnly(".quad {}", arg.name);
+#endif
 							}, element);
 					}
 					EmitReadOnly("\n");
@@ -409,7 +413,11 @@ namespace ola
 								else if constexpr (std::is_same_v<T, Uint32>)			EmitData(".long {}", arg);
 								else if constexpr (std::is_same_v<T, Uint64>)			EmitData(".quad {}", arg);
 								else if constexpr (std::is_same_v<T, std::string>)		EmitData(".string \"{}\"", arg);
+#if defined(OLA_PLATFORM_MACOS)
+								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitData(".quad _{}", arg.name);
+#else
 								else if constexpr (std::is_same_v<T, MachineSymbolRef>)	EmitData(".quad {}", arg.name);
+#endif
 							}, element);
 					}
 					EmitData("\n");

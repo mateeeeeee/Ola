@@ -60,3 +60,10 @@ OLA_E2E_TEST(Containers, Set,      test_set)
 OLA_E2E_TEST(Containers, Stack,    test_stack)
 OLA_E2E_TEST(Containers, Queue,    test_queue)
 OLA_E2E_TEST(Containers, Map,      test_map)
+
+// Register-allocation stress tests
+OLA_E2E_TEST(RegAlloc, DivChain,      test_stress_div_chain)
+OLA_E2E_TEST(RegAlloc, Shifts,        test_stress_shifts)
+OLA_E2E_TEST(RegAlloc, CallPressure,  test_stress_call_pressure)
+OLA_E2E_TEST(RegAlloc, RegPressure,   test_stress_reg_pressure)
+OLA_E2E_TEST(RegAlloc, Combined,      test_stress_combined)

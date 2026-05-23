@@ -11,11 +11,20 @@ namespace ola
 		switch (opcode)
 		{
 		case InstPush:
+		{
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+		}
+		break;
 		case InstSDiv:
 		case InstSRem:
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagUse);
+			inst_info.AddImplicitUse(X86_RAX);
+			inst_info.AddImplicitUse(X86_RDX);
+			inst_info.AddImplicitDef(X86_RAX);
+			inst_info.AddImplicitDef(X86_RDX);
 		}
 		break;
 		case InstPop:
@@ -27,8 +36,6 @@ namespace ola
 		case InstMove:
 		case InstLoad:
 		case InstLoadGlobalAddress:
-		case InstCMoveEQ:
-		case InstCMoveNE:
 		case InstZExt:
 		case InstF2S:
 		case InstS2F:
@@ -36,6 +43,15 @@ namespace ola
 		case X86_InstMoveFP:
 		{
 			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+			inst_info.SetOpFlag(1, OperandFlagUse);
+		}
+		break;
+		case InstCMoveEQ:
+		case InstCMoveNE:
+		{
+			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagUse);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
@@ -56,6 +72,12 @@ namespace ola
 			inst_info.SetOpFlag(0, OperandFlagNone);
 		}
 		break;
+		case InstCall:
+		{
+			inst_info.SetOperandCount(0);
+			inst_info.SetInstFlag(InstFlagCall);
+		}
+		break;
 		case InstAdd:
 		case InstSub:
 		case InstShl:
@@ -71,7 +93,12 @@ namespace ola
 		case InstFDiv:
 		case X86_InstXorFP:
 		{
+			//X86 two-operand form: dst = dst <op> src
+			//idx 0 is BOTH read and written; spill code must load dst's
+			//prior value before the instruction (handled because OperandFlagUse
+			//is set), and store the new value after (OperandFlagDef)
 			inst_info.SetOperandCount(2);
+			inst_info.SetOpFlag(0, OperandFlagUse);
 			inst_info.SetOpFlag(0, OperandFlagDef);
 			inst_info.SetOpFlag(1, OperandFlagUse);
 		}
@@ -88,6 +115,13 @@ namespace ola
 		case InstNeg:
 		case InstNot:
 		case InstFNeg:
+		{
+			//X86 single-operand form: dst = <op>(dst). idx 0 is read-modify-write
+			inst_info.SetOperandCount(1);
+			inst_info.SetOpFlag(0, OperandFlagUse);
+			inst_info.SetOpFlag(0, OperandFlagDef);
+		}
+		break;
 		case X86_InstSetE:
 		case X86_InstSetNE:
 		case X86_InstSetGT:
@@ -106,6 +140,8 @@ namespace ola
 		case X86_InstCqo:
 		{
 			inst_info.SetOperandCount(0);
+			inst_info.AddImplicitUse(X86_RAX);
+			inst_info.AddImplicitDef(X86_RDX);
 		}
 		break;
 		case X86_InstLea:

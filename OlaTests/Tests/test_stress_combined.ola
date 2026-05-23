@@ -1,0 +1,80 @@
+import std.assert;
+
+// Combined stress: division chains inside loops, with calls inside the loop
+// body, and many live values across iterations. This is the worst case for
+// the register allocator: vregs must survive idiv (RAX/RDX clobber), shifts
+// (RCX clobber), and calls (all caller-saved clobbered) — all in a tight loop.
+
+public int Mix(int a, int b)
+{
+    return (a * 3 + b) | 1;
+}
+
+public int CombinedStress(int n)
+{
+    int sum = 0;
+    int prod = 1;
+    int xorv = 0;
+    int counter = 0;
+    int i = 1;
+
+    while (i <= n)
+    {
+        // idiv chain inside the loop: each idiv clobbers RAX/RDX,
+        // but `sum`, `prod`, `xorv`, `counter`, `i` must all survive.
+        int q = (i * 7) / (i + 1);
+        int r = (i * 13) % (i + 2);
+
+        // Variable shifts: each clobbers RCX
+        int shift_amount = i & 3;
+        int s1 = q << shift_amount;
+        int s2 = r >> shift_amount;
+
+        // Function call clobbering caller-saved
+        int m = Mix(s1, s2);
+
+        // Update accumulators (must survive everything)
+        sum     = sum + q + r;
+        prod    = (prod * 3 + m) | 1;
+        xorv    = xorv ^ s1 ^ s2;
+        counter = counter + 1;
+
+        i = i + 1;
+    }
+
+    return sum + prod + xorv + counter;
+}
+
+public int RecursiveDivShift(int n, int seed)
+{
+    if (n <= 0) return seed;
+    int q = seed / 3;
+    int r = seed % 7;
+    int s = seed << (n & 3);
+    int recursed = RecursiveDivShift(n - 1, q + r);
+    // After the recursive call, s, q, r, seed must all still be live.
+    return recursed + s + q + r + seed;
+}
+
+public int main()
+{
+    int r1 = CombinedStress(8);
+    int r2 = CombinedStress(8);
+    Assert(r1 == r2);          // determinism
+
+    int r3 = CombinedStress(20);
+    int r4 = CombinedStress(20);
+    Assert(r3 == r4);
+
+    Assert(r3 != r1);          // larger n must produce different (likely larger) sum
+
+    int rec1 = RecursiveDivShift(5, 100);
+    int rec2 = RecursiveDivShift(5, 100);
+    Assert(rec1 == rec2);
+
+    int rec3 = RecursiveDivShift(10, 300);
+    int rec4 = RecursiveDivShift(10, 300);
+    Assert(rec3 == rec4);
+
+    return 0;
+}
