@@ -1529,6 +1529,11 @@ namespace ola
 				else
 				{
 					Decl* decl = sema_ctx.decl_sym_table.LookupMember(name);
+					if (!decl)
+					{
+						diagnostics.Report(loc, invalid_member_access);
+						return nullptr;
+					}
 					return MakeUnique<DeclRefExpr>(decl, loc);
 				}
 			}
@@ -1562,14 +1567,16 @@ namespace ola
 	UniqueInitializerListExprPtr Sema::ActOnInitializerListExpr(SourceLocation const& loc, UniqueExprPtrList&& expr_list)
 	{
 		QualType expr_type{};
-		expr_type = expr_list.front()->GetType();
-
-		for (auto const& expr : expr_list)
+		if (!expr_list.empty())
 		{
-			if (expr->GetType().GetTypePtr() != expr_type.GetTypePtr())
+			expr_type = expr_list.front()->GetType();
+			for (auto const& expr : expr_list)
 			{
-				diagnostics.Report(loc, init_list_element_expressions_type_mismatch);
-				return nullptr;
+				if (expr->GetType().GetTypePtr() != expr_type.GetTypePtr())
+				{
+					diagnostics.Report(loc, init_list_element_expressions_type_mismatch);
+					return nullptr;
+				}
 			}
 		}
 		QualType base_type(expr_type);

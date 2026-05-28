@@ -36,6 +36,13 @@ namespace ola
 #else
 		fp_regs = target_reg_info.GetFPRegisters();
 #endif
+		//Spill code emitted during finalization clobbers the scratch registers; if a
+		//vreg were colored to one it would be silently corrupted. Drop them from the
+		//allocatable pool.
+		Uint32 const gp_scratch = target_reg_info.GetGPScratchRegister();
+		Uint32 const fp_scratch = target_reg_info.GetFPScratchRegister();
+		gp_regs.erase(std::remove(gp_regs.begin(), gp_regs.end(), gp_scratch), gp_regs.end());
+		fp_regs.erase(std::remove(fp_regs.begin(), fp_regs.end(), fp_scratch), fp_regs.end());
 		frame_register = target_reg_info.GetFramePointerRegister();
 		for (LiveInterval& LI : live_intervals)
 		{

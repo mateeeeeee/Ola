@@ -37,19 +37,47 @@ namespace ola
 		//Liveness now tracks physreg uses/defs, so vregs live across calls or across
 		//idiv/cqo etc. get those caller-saved physregs added to forbidden_colors and
 		//won't be assigned to them
+		//Scratch registers are excluded from the pool because spill code emitted during
+		//Finalize clobbers them; a vreg assigned to scratch would be silently corrupted
+		Uint32 const gp_scratch = target_reg_info.GetGPScratchRegister();
+		Uint32 const fp_scratch = target_reg_info.GetFPScratchRegister();
 		std::vector<Uint32> gp_colors;
 		{
 			auto callee = target_reg_info.GetGPCalleeSavedRegisters();
 			auto caller = target_reg_info.GetGPCallerSavedRegisters();
-			gp_colors.insert(gp_colors.end(), callee.begin(), callee.end());
-			gp_colors.insert(gp_colors.end(), caller.begin(), caller.end());
+			for (Uint32 reg : callee) 
+			{
+				if (reg != gp_scratch) 
+				{
+					gp_colors.push_back(reg);
+				}
+			}
+			for (Uint32 reg : caller) 
+			{
+				if (reg != gp_scratch) 
+				{
+					gp_colors.push_back(reg);
+				}
+			}
 		}
 		std::vector<Uint32> fp_colors;
 		{
 			auto callee = target_reg_info.GetFPCalleeSavedRegisters();
 			auto caller = target_reg_info.GetFPCallerSavedRegisters();
-			fp_colors.insert(fp_colors.end(), callee.begin(), callee.end());
-			fp_colors.insert(fp_colors.end(), caller.begin(), caller.end());
+			for (Uint32 reg : callee) 
+			{
+				if (reg != fp_scratch) 
+				{
+					fp_colors.push_back(reg);
+				}
+			}
+			for (Uint32 reg : caller) 
+			{
+				if (reg != fp_scratch) 
+				{
+					fp_colors.push_back(reg);
+				}
+			}
 		}
 
 		K_gp = static_cast<Uint32>(gp_colors.size());
