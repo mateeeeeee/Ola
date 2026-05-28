@@ -70,12 +70,20 @@ namespace ola
 		{
 			inst_info.SetOperandCount(1);
 			inst_info.SetOpFlag(0, OperandFlagNone);
+			inst_info.SetInstFlag(InstFlagTerminator);
+			inst_info.SetInstFlag(InstFlagBranch);
 		}
 		break;
 		case InstCall:
 		{
 			inst_info.SetOperandCount(0);
 			inst_info.SetInstFlag(InstFlagCall);
+		}
+		break;
+		case InstRet:
+		{
+			inst_info.SetOperandCount(0);
+			inst_info.SetInstFlag(InstFlagTerminator);
 		}
 		break;
 		case InstAdd:

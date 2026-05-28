@@ -24,8 +24,12 @@ namespace ola
 		virtual void Visit(ThisExpr const& this_expr, Uint32) override
 		{
 			ThisExpr& mut_this_expr = const_cast<ThisExpr&>(this_expr);
-			if (this_expr.GetType().IsConst()) this_type.AddConst();
-			mut_this_expr.SetType(this_type);
+			QualType patched_type = this_type;
+			if (this_expr.GetType().IsConst()) 
+			{
+				patched_type.AddConst();
+			}
+			mut_this_expr.SetType(patched_type);
 		}
 
 	private:

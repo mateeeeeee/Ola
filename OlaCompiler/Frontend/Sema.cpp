@@ -667,7 +667,7 @@ namespace ola
 		{
 			if (!case_expr->IsConstexpr())
 			{
-				diagnostics.Report(case_value_not_constexpr);
+				diagnostics.Report(loc, case_value_not_constexpr);
 			}
 			case_stmt = MakeUnique<CaseStmt>(case_expr->EvaluateConstexpr());
 		}

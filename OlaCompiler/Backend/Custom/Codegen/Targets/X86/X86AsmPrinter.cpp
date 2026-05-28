@@ -102,14 +102,6 @@ namespace ola
 		{
 			return X86_GetRegisterString(MO.GetReg().reg, MachineType::Ptr);
 		}
-		else if (MO.IsStackObject())
-		{
-			// For stack objects in LEA, we need to reference them as rbp-relative
-			// But LEA expects register operands. This shouldn't happen in well-formed LEA.
-			// If it does, we need to emit the rbp + offset calculation
-			Int32 stack_offset = MO.GetStackOffset();
-			return X86_GetRegisterString(X86_RBP, MachineType::Ptr);
-		}
 		OLA_ASSERT_MSG(false, "LEA operand should be a register");
 		return "";
 	}

@@ -18,7 +18,9 @@ namespace ola
 
 	SourceBuffer::SourceBuffer(Char const* buffer_start, Uint64 buffer_size, std::string_view refname)
 		: data_buffer(buffer_start, buffer_size), ref_name(refname)
-	{}
+	{
+		data_buffer.push_back('\0');
+	}
 
 	void SourceBuffer::Prepend(Char const* str)
 	{

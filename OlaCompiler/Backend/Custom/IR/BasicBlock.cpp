@@ -48,7 +48,7 @@ namespace ola
 	void BasicBlock::RemoveSuccessor(BasicBlock* succ)
 	{
 		OLA_ASSERT(current_cfg);
-		return current_cfg->RemovePredecessor(this, succ);
+		return current_cfg->RemoveSuccessor(this, succ);
 	}
 
 	std::unordered_set<BasicBlock*> const& BasicBlock::GetPredecessors() const

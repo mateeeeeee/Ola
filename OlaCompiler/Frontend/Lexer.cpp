@@ -205,16 +205,22 @@ namespace ola
 
 	Bool Lexer::LexChar(Token& t)
 	{
-		FillToken(t, TokenKind::char_literal, [](Char c) -> Bool { return c != '\''; });
-		++cur_ptr;
+		FillToken(t, TokenKind::char_literal, [](Char c) -> Bool { return c != '\'' && c != '\0'; });
+		if (*cur_ptr == '\'') 
+		{
+			++cur_ptr;
+		}
 		UpdatePointersAndLocation();
 		return true;
 	}
 
 	Bool Lexer::LexString(Token& t)
 	{
-		FillToken(t, TokenKind::string_literal, [](Char c) -> Bool { return c != '"'; });
-		++cur_ptr;
+		FillToken(t, TokenKind::string_literal, [](Char c) -> Bool { return c != '"' && c != '\0'; });
+		if (*cur_ptr == '"') 
+		{
+			++cur_ptr;
+		}
 		UpdatePointersAndLocation();
 		return true;
 	}

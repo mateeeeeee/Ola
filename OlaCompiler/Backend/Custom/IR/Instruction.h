@@ -742,8 +742,12 @@ namespace ola
 
 		OLA_NODISCARD Instruction* Clone() const
 		{
-			OLA_TODO();
-			return nullptr; 
+			SwitchInst* NewSwitch = new SwitchInst(GetCondition(), GetDefaultCase());
+			for (SwitchCase const& C : case_values)
+			{
+				NewSwitch->AddCase(C.GetCaseValue(), C.GetCaseBlock());
+			}
+			return NewSwitch;
 		}
 		static Bool ClassOf(Instruction const* I)
 		{
