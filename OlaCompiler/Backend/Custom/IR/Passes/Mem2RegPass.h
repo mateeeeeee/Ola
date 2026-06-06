@@ -23,6 +23,7 @@ namespace ola
 
 	private:
 		DominanceFrontier const* DF = nullptr;
+		DominatorTree const* DT = nullptr;
 
 	private:
 		std::vector<AllocaInst*> FindPromotableAllocaInstructions(Function& F);

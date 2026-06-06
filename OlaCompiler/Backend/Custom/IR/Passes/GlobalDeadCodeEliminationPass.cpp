@@ -5,6 +5,7 @@
 #include "Backend/Custom/IR/CallGraph.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRModule.h"
+#include "Backend/Custom/IR/Constant.h"
 
 namespace ola
 {
@@ -12,7 +13,35 @@ namespace ola
 	{
 		CallGraph& CG = const_cast<CallGraph&>(MAM.GetResult<CallGraphAnalysisPass>(M));
 		std::unordered_set<GlobalValue const*> UsedGlobals;
-		std::function<void(Function const*)> MarkFunctionAsUsed = [&](Function const* F)
+
+		std::function<void(Function const*)> MarkFunctionAsUsed;
+		std::function<void(Value const*)> MarkValueAsUsed;
+		MarkValueAsUsed = [&](Value const* V)
+		{
+			if (!V) return;
+			if (Function const* F = dyn_cast<Function>(V))
+			{
+				MarkFunctionAsUsed(F);
+				return;
+			}
+			if (GlobalVariable const* GV = dyn_cast<GlobalVariable>(V))
+			{
+				if (UsedGlobals.insert(GV).second)
+				{
+					MarkValueAsUsed(GV->GetInitValue());
+				}
+				return;
+			}
+			if (ConstantAggregate const* CA = dyn_cast<ConstantAggregate>(V))
+			{
+				for (Constant const* C : CA->Values())
+				{
+					MarkValueAsUsed(C);
+				}
+			}
+		};
+
+		MarkFunctionAsUsed = [&](Function const* F)
 		{
 			if (!F || !UsedGlobals.insert(F).second)
 			{
@@ -39,10 +68,7 @@ namespace ola
 					{
 						for (auto const& Op : I.Operands())
 						{
-							if (GlobalVariable const* GV = dyn_cast<GlobalVariable>(Op.GetValue()))
-							{
-								UsedGlobals.insert(GV);
-							}
+							MarkValueAsUsed(Op.GetValue());
 						}
 					}
 				}
@@ -54,6 +80,10 @@ namespace ola
 			if (Function* F = dyn_cast<Function>(G); F && F->GetLinkage() != Linkage::Internal)
 			{
 				MarkFunctionAsUsed(F);
+			}
+			else if (GlobalVariable* GV = dyn_cast<GlobalVariable>(G); GV && GV->GetLinkage() != Linkage::Internal)
+			{
+				MarkValueAsUsed(GV);
 			}
 		}
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include "Backend/Custom/Codegen/Targets/AsmPrinter.h"
 
 namespace ola
@@ -18,6 +19,12 @@ namespace ola
 	public:
 		ARMAsmPrinter(std::ostream& os) : AsmPrinter(os) {}
 		virtual void PrintModule(MachineModule const& M) override;
+
+	private:
+		std::unordered_map<Int64, std::string> fp_constant_pool;
+		std::unordered_map<Int64, std::string> int_constant_pool;
+		Uint32 fp_entry_index = 0;
+		Uint32 int_entry_index = 0;
 
 	private:
 		virtual std::string GetSectionLabel(SectionId section) const override

@@ -269,6 +269,55 @@ TEST(ConstantPropagation, FoldsConditionalBranchToUnconditional)
 	EXPECT_EQ(cast<BranchInst>(entry->GetTerminator())->GetTrueTarget(), bb_then);
 }
 
+TEST(ConstantPropagation, RemovesPhiEntryFromDroppedSuccessor)
+{
+	// When folding `br cond, then, else` into `br then` because cond is true,
+	// `else` loses `entry` as a predecessor. Any PHI in `else` must drop the
+	// `entry` incoming entry — leaving it would reference a now-impossible
+	// control-flow edge.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry   = builder.AddBlock("entry");
+	BasicBlock* other   = builder.AddBlock("other");
+	BasicBlock* bb_then = builder.AddBlock("then");
+	BasicBlock* bb_else = builder.AddBlock("else");
+
+	// other → else (separate predecessor, so `else` survives the fold)
+	builder.SetCurrentBlock(other);
+	builder.MakeInst<BranchInst>(ctx, bb_else);
+
+	// else has a phi { entry → 1, other → 2 }
+	builder.SetCurrentBlock(bb_else);
+	PhiInst* phi = new PhiInst(ctx.GetIntegerType(64));
+	bb_else->AddPhiInst(phi);
+	phi->AddIncoming(ctx.GetInt64(1), entry);
+	phi->AddIncoming(ctx.GetInt64(2), other);
+	builder.MakeInst<ReturnInst>(phi);
+
+	builder.SetCurrentBlock(bb_then);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	// entry: cond = (10 > 5); br cond then else  →  br then
+	CompareInst* cmp = new CompareInst(Opcode::ICmpSGT, ctx.GetInt64(10), ctx.GetInt64(5));
+	cmp->InsertBefore(entry, entry->end());
+	BranchInst* br = new BranchInst(cmp, bb_then, bb_else);
+	br->InsertBefore(entry, entry->end());
+
+	ASSERT_EQ(phi->GetNumIncomingValues(), 2u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ConstantPropagationPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(phi->GetNumIncomingValues(), 1u);
+	EXPECT_EQ(phi->GetIncomingBlock(0), other);
+}
+
 TEST(ArithmeticReduction, MultiplyByZeroBecomesZero)
 {
 	IRContext ctx;
@@ -379,6 +428,35 @@ TEST(ArithmeticReduction, MultiplyByPowerOfTwoBecomesShift)
 
 	EXPECT_EQ(CountByOpcode(fn, Opcode::SMul), 0u);
 	EXPECT_EQ(CountByOpcode(fn, Opcode::Shl), 1u);
+}
+
+TEST(ArithmeticReduction, SDivByPowerOfTwoNotRewrittenToAShr)
+{
+	// SDiv(V, 2^k) is NOT equivalent to AShr(V, k) for negative V
+	// (truncation toward zero vs floor). The pass must not perform this
+	// rewrite without a sign-bias correction, which it doesn't have.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = MakeFunc(module, ctx, "f", ctx.GetIntegerType(64), { ctx.GetIntegerType(64) });
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+
+	Value* x = fn->GetArg(0);
+	Value* result = builder.MakeInst<BinaryInst>(Opcode::SDiv, x, ctx.GetInt64(8));
+	builder.MakeInst<ReturnInst>(result);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::SDiv), 1u);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<ArithmeticReductionPass>();
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountByOpcode(fn, Opcode::SDiv), 1u);
+	EXPECT_EQ(CountByOpcode(fn, Opcode::AShr), 0u);
 }
 
 TEST(SimplifyCFG, MergesEmptyPassthroughBlock)
@@ -656,6 +734,50 @@ TEST(GlobalDCE, KeepsReferencedInternalFunction)
 	EXPECT_NE(module.GetFunctionByName("helper"), nullptr);
 }
 
+TEST(GlobalDCE, KeepsFunctionReferencedFromVTable)
+{
+	// An internal function whose only reference is via a function-pointer
+	// stored in a vtable (an internal global initializer) must survive
+	// GlobalDCE — the vtable is reachable from external code, and an
+	// indirect call could land on this function.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// Internal function that's never directly called.
+	Function* slot0 = MakeFunc(module, ctx, "slot0", ctx.GetVoidType(), {}, Linkage::Internal);
+	builder.SetCurrentFunction(slot0);
+	BasicBlock* s_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(s_entry);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	// External vtable: array[1] of function pointer, initialized with &slot0.
+	IRType* fn_ptr_ty = ctx.GetPointerType(slot0->GetType());
+	IRArrayType* arr_ty = ctx.GetArrayType(fn_ptr_ty, 1);
+	std::vector<Constant*> entries = { slot0 };
+	ConstantArray* vtable_init = new ConstantArray(arr_ty, std::span<Constant*>(entries));
+	GlobalVariable* vtable = new GlobalVariable("vtable", arr_ty, Linkage::External, vtable_init);
+	module.AddGlobal(vtable);
+
+	// External main does nothing referencing slot0 directly.
+	Function* main_fn = MakeFunc(module, ctx, "main", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* m_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(m_entry);
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mam.RegisterPass<CallGraphAnalysisPass>(module);
+	mpm.AddPass<GlobalDeadCodeEliminationPass>();
+	mpm.Run(module, mam);
+
+	bool slot0_present = false;
+	for (GlobalValue* g : module.Globals())
+		if (g->GetName() == "slot0") slot0_present = true;
+	EXPECT_TRUE(slot0_present);
+}
+
 TEST(CSE, EliminatesDuplicateExpressionInBlock)
 {
 	IRContext ctx;
@@ -764,6 +886,58 @@ TEST(GVN, EliminatesRedundantExpressionAcrossBlocks)
 	fpm.Run(*fn, fam);
 
 	EXPECT_EQ(CountByOpcode(fn, Opcode::Add), 1u);
+}
+
+TEST(FunctionInliner, HoistsCalleeAllocaIntoCallerEntry)
+{
+	// When inlining a callee that contains an alloca, the alloca must be
+	// placed in the caller's entry block. Otherwise, if the call site is in
+	// a loop, the inlined alloca would become a per-iteration dynamic
+	// allocation.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// int helper() [force_inline] { int x; return 0; }
+	Function* helper = MakeFunc(module, ctx, "helper", ctx.GetIntegerType(64), {}, Linkage::Internal);
+	helper->SetForceInline();
+	builder.SetCurrentFunction(helper);
+	BasicBlock* helper_entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(helper_entry);
+	builder.MakeInst<AllocaInst>(ctx.GetIntegerType(64));
+	builder.MakeInst<ReturnInst>(ctx.GetInt64(0));
+
+	// int main() {
+	//   entry: br loop
+	//   loop:  call helper(); br loop
+	// }
+	Function* main_fn = MakeFunc(module, ctx, "main", ctx.GetIntegerType(64), {});
+	builder.SetCurrentFunction(main_fn);
+	BasicBlock* main_entry = builder.AddBlock("entry");
+	BasicBlock* main_loop = builder.AddBlock("loop");
+	builder.SetCurrentBlock(main_entry);
+	builder.MakeInst<BranchInst>(ctx, main_loop);
+	builder.SetCurrentBlock(main_loop);
+	std::vector<Value*> no_args;
+	builder.MakeInst<CallInst>(helper, std::span<Value*>(no_args));
+	builder.MakeInst<BranchInst>(ctx, main_loop);
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	fpm.AddPass<FunctionInlinerPass>();
+	fpm.Run(*main_fn, fam);
+
+	EXPECT_EQ(CountByOpcode(main_fn, Opcode::Call), 0u);
+
+	// Exactly one alloca anywhere in main, and it lives in the entry block.
+	EXPECT_EQ(CountByType<AllocaInst>(main_fn), 1u);
+	BasicBlock& entry = main_fn->GetEntryBlock();
+	Uint32 entry_allocas = 0;
+	for (Instruction& I : entry)
+	{
+		if (isa<AllocaInst>(&I)) ++entry_allocas;
+	}
+	EXPECT_EQ(entry_allocas, 1u);
 }
 
 TEST(FunctionInliner, InlinesFunctionMarkedForceInline)
@@ -1962,6 +2136,65 @@ TEST(LoopUnroll, SkipsLargeLoop)
 	EXPECT_EQ(CountBlocks(fn), blocks_before);
 }
 
+TEST(LoopUnroll, PartialUnrollSkipsNonDivisibleTripCount)
+{
+	// Partial unroll is unsound when TripCount % Factor != 0 because the body
+	// is cloned Factor times per macro-iteration but the exit check still runs
+	// once per macro-iteration. Verify the pass leaves such loops untouched.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	// trip count = 7, factor = 4 → 7 % 4 != 0, must be skipped
+	Function* fn = BuildSimpleCountingLoop(module, ctx, builder, 0, 7, 1);
+
+	Uint32 blocks_before = CountBlocks(fn);
+	Uint32 insts_before = fn->GetInstructionCount();
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+
+	LoopUnrollConfig config;
+	// Disable full unroll so the only path that could fire is partial.
+	config.FullUnrollThreshold = 0;
+	config.AllowPartialUnroll = true;
+	config.UnrollFactor = 4;
+	config.MaxUnrolledSize = 256;
+	fpm.AddPass(new LoopUnrollPass(config));
+	fpm.Run(*fn, fam);
+
+	EXPECT_EQ(CountBlocks(fn), blocks_before);
+	EXPECT_EQ(fn->GetInstructionCount(), insts_before);
+}
+
+TEST(LoopUnroll, PartialUnrollAcceptsDivisibleTripCount)
+{
+	// trip count = 8, factor = 4 → 8 % 4 == 0, partial unroll runs and
+	// duplicates body instructions inside the latch.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	Function* fn = BuildSimpleCountingLoop(module, ctx, builder, 0, 8, 1);
+
+	Uint32 insts_before = fn->GetInstructionCount();
+
+	FunctionPassManager fpm;
+	FunctionAnalysisManager fam;
+	RegisterAllAnalysisPasses(fam, *fn);
+
+	LoopUnrollConfig config;
+	config.FullUnrollThreshold = 0;
+	config.AllowPartialUnroll = true;
+	config.UnrollFactor = 4;
+	config.MaxUnrolledSize = 256;
+	fpm.AddPass(new LoopUnrollPass(config));
+	fpm.Run(*fn, fam);
+
+	EXPECT_GT(fn->GetInstructionCount(), insts_before);
+}
+
 TEST(LoopUnroll, SkipsNonCanonicalLoop)
 {
 	IRContext ctx;
@@ -2042,6 +2275,35 @@ TEST(GlobalAttributeInfer, MarksUnmodifiedGlobalAsReadOnly)
 	mpm.Run(module, mam);
 
 	EXPECT_TRUE(gv->IsReadOnly());
+}
+
+TEST(GlobalAttributeInfer, DoesNotMarkGlobalStoredViaPtrAdd)
+{
+	// Storing via a PtrAdd whose base is a global must NOT mark that global
+	// as read-only. The pass must trace pointer-arithmetic back to the
+	// underlying global.
+	IRContext ctx;
+	IRModule module(ctx, "test");
+	IRBuilder builder(ctx);
+
+	IRArrayType* arr_ty = ctx.GetArrayType(ctx.GetIntegerType(64), 4);
+	GlobalVariable* gv = new GlobalVariable("arr_g", arr_ty, Linkage::Internal, nullptr);
+	module.AddGlobal(gv);
+
+	Function* fn = MakeFunc(module, ctx, "writer", ctx.GetVoidType(), {});
+	builder.SetCurrentFunction(fn);
+	BasicBlock* entry = builder.AddBlock("entry");
+	builder.SetCurrentBlock(entry);
+	Value* elem_addr = builder.MakeInst<PtrAddInst>(gv, ctx.GetInt64(8), ctx.GetIntegerType(64));
+	builder.MakeInst<StoreInst>(ctx.GetInt64(100), elem_addr);
+	builder.MakeInst<ReturnInst>(ctx);
+
+	IRModulePassManager mpm;
+	IRModuleAnalysisManager mam;
+	mpm.AddPass<GlobalAttributeInferPass>();
+	mpm.Run(module, mam);
+
+	EXPECT_FALSE(gv->IsReadOnly());
 }
 
 TEST(GlobalAttributeInfer, DoesNotMarkModifiedGlobal)

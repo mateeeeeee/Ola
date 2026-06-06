@@ -75,6 +75,7 @@ namespace ola
 		}
 
 		std::unordered_map<BasicBlock*, BasicBlock*> BBMap;
+		BasicBlock* CallerEntry = &Caller->GetEntryBlock();
 		for (BasicBlock& BB : *Callee)
 		{
 			std::string name(BB.GetName());
@@ -86,7 +87,18 @@ namespace ola
 			{
 				if (!isa<ReturnInst>(&I))
 				{
-					Instruction* NewInst = Builder.CloneInst(&I);
+					Instruction* NewInst = nullptr;
+					if (isa<AllocaInst>(&I))
+					{
+						NewInst = I.Clone();
+						OLA_ASSERT(NewInst);
+						Instruction* InsertBefore = &*CallerEntry->Instructions().begin();
+						NewInst->InsertBefore(CallerEntry, InsertBefore);
+					}
+					else
+					{
+						NewInst = Builder.CloneInst(&I);
+					}
 					ValueMap[&I] = NewInst;
 				}
 			}

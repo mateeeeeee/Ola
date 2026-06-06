@@ -35,48 +35,59 @@ namespace ola
 		MachineGlobal const* global = is_indirect ? nullptr : ctx.GetGlobal(CI->GetCalleeAsFunction());
 
 		MachineFunction* MF = ctx.GetCurrentBasicBlock()->GetFunction();
-		for (Int32 idx = CI->ArgSize() - 1; idx >= 0; --idx)
+
+		Uint32 const arg_count = CI->ArgSize();
+		std::vector<Int32> arg_int_pos(arg_count, -1);
+		std::vector<Int32> arg_float_pos(arg_count, -1);
+		std::vector<Int32> arg_stack_pos(arg_count, -1);
+		Uint32 stack_arg_count = 0;
+		{
+			Uint32 int_pos = 0;
+			Uint32 float_pos = 0;
+			for (Uint32 i = 0; i < arg_count; ++i)
+			{
+				Value const* arg = CI->GetArgOp(i);
+				MachineOperand arg_operand = ctx.GetOperand(arg);
+				if (arg_operand.GetType() == MachineType::Float64)
+				{
+					if (float_pos < 8) arg_float_pos[i] = static_cast<Int32>(float_pos++);
+					else arg_stack_pos[i] = static_cast<Int32>(stack_arg_count++);
+				}
+				else
+				{
+					if (int_pos < 6) arg_int_pos[i] = static_cast<Int32>(int_pos++);
+					else arg_stack_pos[i] = static_cast<Int32>(stack_arg_count++);
+				}
+			}
+		}
+
+		for (Int32 idx = static_cast<Int32>(arg_count) - 1; idx >= 0; --idx)
 		{
 			Value const* arg = CI->GetArgOp(idx);
 			MachineOperand arg_operand = ctx.GetOperand(arg);
 			Bool const is_aggregate_arg = arg->GetType()->IsAggregate();
 			Uint32 opcode = (arg_operand.IsMemoryOperand() && (arg->GetType()->IsPointer() || is_aggregate_arg)) ? InstLoadGlobalAddress : InstMove;
 
-			if (arg_operand.GetType() != MachineType::Float64)
+			if (arg_stack_pos[idx] >= 0)
 			{
-				// SysV X86 ABI: Integer arguments go in RDI, RSI, RDX, RCX, R8, R9 (6 registers)
-				if (idx >= 6)
-				{
-					Int32 offset = (MF->GetMaxCallArgCount() - idx) * 8;
-					MachineInstruction copy_arg_to_stack(opcode);
-					copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
-					ctx.EmitInst(copy_arg_to_stack);
-				}
-				else
-				{
-					static constexpr X86Register arg_regs[] = { X86_RDI, X86_RSI, X86_RDX, X86_RCX, X86_R8, X86_R9 };
-					MachineInstruction mov(opcode);
-					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], arg_operand.GetType())).SetOp<1>(arg_operand);
-					ctx.EmitInst(mov);
-				}
+				Int32 offset = (static_cast<Int32>(stack_arg_count) - arg_stack_pos[idx]) * 8;
+				MachineInstruction copy_arg_to_stack(opcode);
+				copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
+				ctx.EmitInst(copy_arg_to_stack);
+			}
+			else if (arg_operand.GetType() != MachineType::Float64)
+			{
+				static constexpr X86Register arg_regs[] = { X86_RDI, X86_RSI, X86_RDX, X86_RCX, X86_R8, X86_R9 };
+				MachineInstruction mov(opcode);
+				mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[arg_int_pos[idx]], arg_operand.GetType())).SetOp<1>(arg_operand);
+				ctx.EmitInst(mov);
 			}
 			else
 			{
-				// SysV X86 ABI: Float arguments go in XMM0-XMM7 (8 registers)
-				if (idx >= 8)
-				{
-					Int32 offset = (MF->GetMaxCallArgCount() - idx) * 8;
-					MachineInstruction copy_arg_to_stack(opcode);
-					copy_arg_to_stack.SetOp<0>(MachineOperand::ArgSlot(-offset, arg_operand.GetType())).SetOp<1>(arg_operand);
-				 ctx.EmitInst(copy_arg_to_stack);
-				}
-				else
-				{
-					static constexpr X86Register arg_regs[] = { X86_XMM0, X86_XMM1, X86_XMM2, X86_XMM3, X86_XMM4, X86_XMM5, X86_XMM6, X86_XMM7 };
-					MachineInstruction mov(opcode);
-					mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[idx], MachineType::Float64)).SetOp<1>(arg_operand);
-					ctx.EmitInst(mov);
-				}
+				static constexpr X86Register arg_regs[] = { X86_XMM0, X86_XMM1, X86_XMM2, X86_XMM3, X86_XMM4, X86_XMM5, X86_XMM6, X86_XMM7 };
+				MachineInstruction mov(opcode);
+				mov.SetOp<0>(MachineOperand::ISAReg(arg_regs[arg_float_pos[idx]], MachineType::Float64)).SetOp<1>(arg_operand);
+				ctx.EmitInst(mov);
 			}
 		}
 
@@ -148,49 +159,49 @@ namespace ola
 			MF.SetHasFrame(true);
 		}
 
-		Uint32 arg_idx = 0;
+		Uint32 int_pos = 0;
+		Uint32 float_pos = 0;
+		Uint32 stack_pos = 0;
 		for (MachineOperand const& arg : MF.Args())
 		{
 			if (arg.GetType() != Float64)
 			{
-				// SysV X86 ABI: First 6 integer arguments in RDI, RSI, RDX, RCX, R8, R9
-				if (arg_idx < 6)
+				if (int_pos < 6)
 				{
 					static constexpr X86Register arg_regs[] = { X86_RDI, X86_RSI, X86_RDX, X86_RCX, X86_R8, X86_R9 };
 					MachineInstruction copy_arg_to_reg(InstMove);
-					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[int_pos], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
+					++int_pos;
 				}
 				else
 				{
-					// Arguments 7+ are on the stack
-					// Stack layout: [return addr (8)] + [old RBP (8)] = 16 bytes base
 					MachineInstruction copy_arg_to_reg(InstMove);
-					Int32 offset = 16 + (arg_idx - 6) * 8;
+					Int32 offset = 16 + stack_pos * 8;
 					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
+					++stack_pos;
 				}
 			}
 			else
 			{
-				// SysV X86 ABI: First 8 float arguments in XMM0-XMM7
-				if (arg_idx < 8)
+				if (float_pos < 8)
 				{
 					static constexpr X86Register arg_regs[] = { X86_XMM0, X86_XMM1, X86_XMM2, X86_XMM3, X86_XMM4, X86_XMM5, X86_XMM6, X86_XMM7 };
 					MachineInstruction copy_arg_to_reg(InstMove);
-					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[arg_idx], arg.GetType())).SetOp<0>(arg);
+					copy_arg_to_reg.SetOp<1>(MachineOperand::ISAReg(arg_regs[float_pos], arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
+					++float_pos;
 				}
 				else
 				{
-					// Arguments 9+ are on the stack
 					MachineInstruction copy_arg_to_reg(InstMove);
-					Int32 offset = 16 + (arg_idx - 8) * 8;
+					Int32 offset = 16 + stack_pos * 8;
 					copy_arg_to_reg.SetOp<1>(MachineOperand::StackObject(offset, arg.GetType())).SetOp<0>(arg);
 					ctx.EmitInst(copy_arg_to_reg);
+					++stack_pos;
 				}
 			}
-			++arg_idx;
 		}
 
 		for (auto const& struct_arg : MF.GetStructArgs())

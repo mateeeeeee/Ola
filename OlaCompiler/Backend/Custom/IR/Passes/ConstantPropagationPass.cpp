@@ -202,10 +202,27 @@ namespace ola
 					if (BranchInst* BI2 = TryConstantFold_BranchInst(BI))
 					{
 						OLA_ASSERT(BI2->IsUnconditional());
+						BasicBlock* Surviving = BI2->GetTrueTarget();
+						BasicBlock* Dropped = (BI->GetTrueTarget() == Surviving) ? BI->GetFalseTarget() : BI->GetTrueTarget();
+						BasicBlock* From = BI->GetBasicBlock();
 						BI->SetCondition(nullptr);
-						BI->SetTrueTarget(BI2->GetTrueTarget());
+						BI->SetTrueTarget(Surviving);
 						BI->SetFalseTarget(nullptr);
 						OLA_ASSERT(BI->IsUnconditional());
+
+						if (Dropped && Dropped != Surviving)
+						{
+							for (PhiInst* Phi : Dropped->PhiInsts())
+							{
+								Int Idx = Phi->GetBasicBlockIndex(From);
+								if (Idx >= 0)
+								{
+									Phi->RemoveIncomingValue(static_cast<Uint32>(Idx));
+								}
+							}
+						}
+
+						delete BI2;
 					}
 				}
 			}

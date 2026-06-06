@@ -51,6 +51,34 @@ int AddBooleans(bool a, bool b, bool c, bool d)
     return a + b + c + d;  // Implicit conversion (true = 1, false = 0)
 }
 
+// Mixed int/float signatures stress the SysV register-class assignment:
+// SysV uses separate counters for integer (RDI..R9) and float (XMM0..XMM7)
+// registers. A buggy single-counter implementation would mis-assign args
+// when the order interleaves classes.
+float MixedIntFloat6(int a, float b, int c, float d, int e, float f)
+{
+    float ints = a + c + e;
+    return ints + b + d + f;
+}
+
+float MixedFloatThenInts(float a, int b, int c, int d, int e, int f, int g)
+{
+    float ints = b + c + d + e + f + g;
+    return a + ints;
+}
+
+float MixedManyInts(int a, int b, int c, int d, int e, int f, float g, float h)
+{
+    float ints = a + b + c + d + e + f;
+    return ints + g + h;
+}
+
+void TestMixedIntFloatCalls()
+{
+    Assert(MixedIntFloat6(1, 2.0, 3, 4.0, 5, 6.0) == 21.0);
+    Assert(MixedFloatThenInts(1.0, 2, 3, 4, 5, 6, 7) == 28.0);
+    Assert(MixedManyInts(1, 2, 3, 4, 5, 6, 7.0, 8.0) == 36.0);
+}
 
 void TestIntCalls()
 {
@@ -78,6 +106,7 @@ public int main()
 {
     TestIntCalls();
     TestFloatCalls();
+    TestMixedIntFloatCalls();
     TestBoolCalls();
     return 0;
 }

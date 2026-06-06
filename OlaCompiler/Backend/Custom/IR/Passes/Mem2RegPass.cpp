@@ -3,24 +3,27 @@
 #include "Mem2RegPass.h"
 #include "CFGAnalysisPass.h"
 #include "DominanceFrontierAnalysisPass.h"
+#include "DominatorTreeAnalysisPass.h"
 #include "Backend/Custom/IR/Instruction.h"
 #include "Backend/Custom/IR/GlobalValue.h"
 #include "Backend/Custom/IR/IRContext.h"
 #include "Backend/Custom/IR/Constant.h"
 #include "Backend/Custom/IR/IRType.h"
+#include "Backend/Custom/IR/DominatorTree.h"
 
 namespace ola
 {
 	Bool Mem2RegPass::RunOn(Function& F, FunctionAnalysisManager& FAM)
 	{
 		std::vector<AllocaInst*> Allocas = FindPromotableAllocaInstructions(F);
-		if (Allocas.empty()) 
+		if (Allocas.empty())
 		{
-			return false; 
+			return false;
 		}
 
 		CFG const& cfg = FAM.GetResult<CFGAnalysisPass>(F);
 		DF = &FAM.GetResult<DominanceFrontierAnalysisPass>(F);
+		DT = &FAM.GetResult<DominatorTreeAnalysisPass>(F);
 
 		InsertPhiFunctions(Allocas, cfg);
 		RenameVariables(Allocas, cfg);
@@ -148,9 +151,9 @@ namespace ola
 			ValueStacks[AI].push(nullptr);
 		}
 		std::unordered_set<AllocaInst*> AllocasSet(Allocas.begin(), Allocas.end());
-		std::unordered_set<BasicBlock*> Visited;
-		std::function<void(BasicBlock*)> RenameBlock = [&](BasicBlock* BB)
+		std::function<void(DominatorTreeNode const*)> RenameNode = [&](DominatorTreeNode const* Node)
 			{
+				BasicBlock* BB = Node->GetBasicBlock();
 				std::unordered_map<AllocaInst*, size_t> StackSizes;
 				for (auto& [AI, Stack] : ValueStacks)
 				{
@@ -176,7 +179,6 @@ namespace ola
 							Value* CurrentValue = ValueStacks[AI].top();
 							if (!CurrentValue)
 							{
-								// Load reaches without a dominating store, alloca is read uninitialized, replace with undef
 								CurrentValue = LI->GetType()->GetContext().GetUndefValue(LI->GetType());
 							}
 							LI->ReplaceAllUsesWith(CurrentValue);
@@ -213,12 +215,9 @@ namespace ola
 					}
 				}
 
-				for (BasicBlock* Successor : cfg.GetSuccessors(BB))
+				for (DominatorTreeNode const* Child : *Node)
 				{
-					if (Visited.insert(Successor).second)
-					{
-						RenameBlock(Successor);
-					}
+					RenameNode(Child);
 				}
 
 				for (auto& [AI, Stack] : ValueStacks)
@@ -230,7 +229,10 @@ namespace ola
 				}
 			};
 
-		RenameBlock(cfg.GetEntryBlock());
+		if (DominatorTreeNode const* Root = DT->GetRoot())
+		{
+			RenameNode(Root);
+		}
 	}
 }
 

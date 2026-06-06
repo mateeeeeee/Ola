@@ -3,6 +3,7 @@
 #include "GlobalAttributeInferPass.h"
 #include "Backend/Custom/IR/IRModule.h"
 #include "Backend/Custom/IR/GlobalValue.h"
+#include "Backend/Custom/IR/Instruction.h"
 
 namespace ola
 {
@@ -38,7 +39,43 @@ namespace ola
 					}
 				}
 
-				// Pass 1: Find direct stores to globals
+				//Pass 1: propagate which GV each pointer instruction ultimately
+				//points into, by walking PtrAdd/GEP chains rooted at a global
+				Bool propagated = true;
+				while (propagated)
+				{
+					propagated = false;
+					for (BasicBlock& BB : *F)
+					{
+						for (Instruction& I : BB)
+						{
+							Value* Base = nullptr;
+							if (PtrAddInst* PA = dyn_cast<PtrAddInst>(&I))
+							{
+								Base = PA->GetBase();
+							}
+							else if (GetElementPtrInst* GEP = dyn_cast<GetElementPtrInst>(&I))
+							{
+								Base = GEP->GetBaseOperand();
+							}
+							if (!Base) 
+							{
+								continue;
+							}
+							if (AddressHolder.contains(&I)) 
+							{
+								continue;
+							}
+							if (auto it = AddressHolder.find(Base); it != AddressHolder.end())
+							{
+								AddressHolder[&I] = it->second;
+								propagated = true;
+							}
+						}
+					}
+				}
+
+				//Pass 2: any store whose address aliases a GV writes to that GV
 				for (BasicBlock& BB : *F)
 				{
 					for (Instruction const& I : BB)
@@ -46,8 +83,9 @@ namespace ola
 						if (StoreInst const* SI = dyn_cast<StoreInst>(&I))
 						{
 							Value* AddressOp = SI->GetAddressOp();
-							if (GlobalVariable* GV = dyn_cast<GlobalVariable>(AddressOp))
+							if (auto it = AddressHolder.find(AddressOp); it != AddressHolder.end())
 							{
+								GlobalVariable* GV = it->second;
 								Worklist.remove_if([&](GlobalVariable* GV2) { return GV2 == GV; });
 							}
 						}
@@ -108,7 +146,7 @@ namespace ola
 		{
 			// Skip vtables, they contain function pointers that require runtime
 			// relocation on macOS ARM64, so they cannot be in read-only sections
-			if (GV->GetName().starts_with(VTABLE_PREFIX)) 
+			if (GV->GetName().starts_with(VTABLE_PREFIX))
 			{
 				continue;
 			}

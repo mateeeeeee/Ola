@@ -430,11 +430,9 @@ namespace ola
 
 	std::string X86AsmPrinter::GetFPConstantPoolEntry(Int64 value)
 	{
-		static std::unordered_map<Int64, std::string> fp_constant_pool;
 		if (!fp_constant_pool.contains(value))
 		{
-			static Uint32 entry_index = 0;
-			fp_constant_pool[value] = "_FP" + std::to_string(entry_index++);
+			fp_constant_pool[value] = "_FP" + std::to_string(fp_entry_index++);
 			EmitReadOnly("{}:", fp_constant_pool[value]);
 			EmitReadOnly(".quad {}", value);
 			EmitReadOnly("\n");
@@ -444,11 +442,9 @@ namespace ola
 
 	std::string X86AsmPrinter::GetIntConstantPoolEntry(Int64 value)
 	{
-		static std::unordered_map<Int64, std::string> int_constant_pool;
 		if (!int_constant_pool.contains(value))
 		{
-			static Uint32 entry_index = 0;
-			int_constant_pool[value] = "_INT" + std::to_string(entry_index++);
+			int_constant_pool[value] = "_INT" + std::to_string(int_entry_index++);
 			EmitReadOnly("{}:", int_constant_pool[value]);
 			EmitReadOnly(".quad {}", value);
 			EmitReadOnly("\n");

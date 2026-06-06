@@ -2805,6 +2805,6 @@ namespace ola
 	template<typename... Ts>
 	void Parser::Diag(DiagCode code, Ts&&... args)
 	{
-		diagnostics.Report(code, current_token->GetLocation(), std::forward<Ts>(args)...);
+		diagnostics.Report(current_token->GetLocation(), code, std::forward<Ts>(args)...);
 	}
 }

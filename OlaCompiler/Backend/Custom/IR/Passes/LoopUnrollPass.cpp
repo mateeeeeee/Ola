@@ -58,6 +58,9 @@ namespace ola
 				}
 			}
 			else if (Config.AllowPartialUnroll &&
+					 Analysis.HasKnownTripCount &&
+					 Config.UnrollFactor > 1 &&
+					 (Analysis.TripCount % (Int64)Config.UnrollFactor) == 0 &&
 					 LoopSize * Config.UnrollFactor <= Config.MaxUnrolledSize)
 			{
 				if (PartialUnroll(L, Analysis, Config.UnrollFactor, F))

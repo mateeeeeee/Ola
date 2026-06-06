@@ -155,14 +155,6 @@ namespace ola
 						ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::Shl, V, I.GetContext().GetInt64(shift)));
 					}
 				}
-				else if (SDiv_(Any_(V), Int_(i))(ctx))
-				{
-					if (IsPowerOfTwo(i))
-					{
-						Int64 const shift = FindPowerOfTwo(i);
-						ReplaceInstruction(I, builder.MakeInst<BinaryInst>(Opcode::AShr, V, I.GetContext().GetInt64(shift)));
-					}
-				}
 			}
 		}
 		for (Instruction* I : instructions_to_remove)
